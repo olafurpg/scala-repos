@@ -93,8 +93,12 @@ trait SegmentFormatSpec
     "roundtrip trivial boolean segments" in surviveRoundTrip(
         BooleanSegment(1234L, CPath("a.b.c"), EmptyBitSet, EmptyBitSet, 0))
     "roundtrip trivial array segments" in {
-      surviveRoundTrip(ArraySegment(
-              1234L, CPath("a.b.c"), CLong, EmptyBitSet, new Array[Long](0)))
+      surviveRoundTrip(
+          ArraySegment(1234L,
+                       CPath("a.b.c"),
+                       CLong,
+                       EmptyBitSet,
+                       new Array[Long](0)))
       surviveRoundTrip(
           ArraySegment(1234L,
                        CPath("a.b.c"),
@@ -142,8 +146,11 @@ trait SegmentFormatSpec
       surviveRoundTrip(segment)
     }
     "roundtrip undefined array segment" in {
-      val segment = ArraySegment(
-          1234L, CPath("a.b.c"), CDouble, EmptyBitSet, new Array[Double](100))
+      val segment = ArraySegment(1234L,
+                                 CPath("a.b.c"),
+                                 CDouble,
+                                 EmptyBitSet,
+                                 new Array[Double](100))
       surviveRoundTrip(segment)
     }
     "roundtrip arbitrary small segments" in {

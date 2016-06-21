@@ -11,8 +11,8 @@ import org.jetbrains.plugins.scala.lang.completion.handlers.ScalaInsertHandler
   * @author Alefas
   * @since 31.03.12
   */
-class ScalaChainLookupElement(
-    val prefix: ScalaLookupItem, val element: ScalaLookupItem)
+class ScalaChainLookupElement(val prefix: ScalaLookupItem,
+                              val element: ScalaLookupItem)
     extends LookupElementDecorator[ScalaLookupItem](element) {
   override def getAllLookupStrings: util.Set[String] = {
     val strings: util.Set[String] = getDelegate.getAllLookupStrings
@@ -47,7 +47,7 @@ class ScalaChainLookupElement(
     val caretModel = editor.getCaretModel
     val offsetForPrefix =
       caretModel.getOffset + (if (element.someSmartCompletion) 5 else 0) -
-      element.getLookupString.length - 1
+        element.getLookupString.length - 1
     element.handleInsert(context)
     val document = context.getDocument
     val status = ScalaInsertHandler.getItemParametersAndAccessorStatus(prefix)

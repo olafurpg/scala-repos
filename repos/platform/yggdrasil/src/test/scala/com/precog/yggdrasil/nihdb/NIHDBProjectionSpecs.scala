@@ -91,8 +91,8 @@ class NIHDBProjectionSpecs
   assert(baseDir.isDirectory && baseDir.canWrite)
 
   trait TempContext {
-    val workDir = new File(
-        baseDir, "nihdbspec%03d".format(dirSeq.getAndIncrement))
+    val workDir =
+      new File(baseDir, "nihdbspec%03d".format(dirSeq.getAndIncrement))
 
     if (!workDir.mkdirs) {
       throw new Exception("Failed to create work directory! " + workDir)
@@ -166,9 +166,9 @@ class NIHDBProjectionSpecs
           nihdb.insert((0L to 2L).toSeq.map { i =>
             NIHDB.Batch(i, Seq(JNum(i)))
           }) >> // Ensure we handle skips/overlap properly. First tests a complete skip, second tests partial
-          nihdb.insert((0L to 2L).toSeq.map { i =>
-            NIHDB.Batch(i, Seq(JNum(i)))
-          }) >> nihdb.insert((0L to 4L).toSeq.map { i =>
+            nihdb.insert((0L to 2L).toSeq.map { i =>
+              NIHDB.Batch(i, Seq(JNum(i)))
+            }) >> nihdb.insert((0L to 4L).toSeq.map { i =>
             NIHDB.Batch(i, Seq(JNum(i)))
           })
 

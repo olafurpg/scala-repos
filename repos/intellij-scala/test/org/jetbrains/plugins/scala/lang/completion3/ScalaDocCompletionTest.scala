@@ -26,8 +26,9 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
     checkResultByText(resultText)
   }
 
-  protected def genericCompletionComprasion(
-      initialText: String, finalText: String, preferedLookupString: String) {
+  protected def genericCompletionComprasion(initialText: String,
+                                            finalText: String,
+                                            preferedLookupString: String) {
     genericCompletionComparison(
         initialText,
         finalText,

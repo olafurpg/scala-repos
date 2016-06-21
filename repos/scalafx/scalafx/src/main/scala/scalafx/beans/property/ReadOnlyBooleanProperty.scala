@@ -45,8 +45,7 @@ class ReadOnlyBooleanProperty(
     with SFXDelegate[jfxbp.ReadOnlyBooleanProperty] {
 
   def this(bean: Object, name: String, value: Boolean) =
-    this(
-        new jfxbp.ReadOnlyBooleanPropertyBase() {
+    this(new jfxbp.ReadOnlyBooleanPropertyBase() {
       def getBean = bean
       def getName = name
       def get = value

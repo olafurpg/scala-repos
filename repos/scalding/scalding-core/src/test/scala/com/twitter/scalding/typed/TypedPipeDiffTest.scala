@@ -32,8 +32,8 @@ class TypedPipeDiffTest extends FunSuite {
 
   val left = List("hi", "hi", "bye", "foo", "bar")
   val right = List("hi", "bye", "foo", "baz")
-  val expectedSortedDiff = List(
-      ("bar", (1, 0)), ("baz", (0, 1)), ("hi", (2, 1))).sorted
+  val expectedSortedDiff =
+    List(("bar", (1, 0)), ("baz", (0, 1)), ("hi", (2, 1))).sorted
 
   val leftArr = List(Array[Byte](3, 3, 5, 3, 2),
                      Array[Byte](2, 2, 2),
@@ -155,8 +155,8 @@ object TypedPipeDiffLaws {
       checkDiff(left, right, diff)
   }
 
-  def diffArrayLaw[T](
-      implicit arb: Arbitrary[List[Array[T]]], ct: ClassTag[T]): Prop =
+  def diffArrayLaw[T](implicit arb: Arbitrary[List[Array[T]]],
+                      ct: ClassTag[T]): Prop =
     Prop.forAll { (left: List[Array[T]], right: List[Array[T]]) =>
       val diff = TypedPipe
         .from(left)

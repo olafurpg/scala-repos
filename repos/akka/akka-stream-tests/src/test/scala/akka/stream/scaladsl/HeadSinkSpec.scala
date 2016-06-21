@@ -15,8 +15,8 @@ import akka.testkit.AkkaSpec
 
 class HeadSinkSpec extends AkkaSpec with ScriptedTest {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 

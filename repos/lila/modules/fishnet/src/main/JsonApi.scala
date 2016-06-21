@@ -79,8 +79,10 @@ object JsonApi {
     val npsCeil = 10 * 1000 * 1000
   }
 
-  case class Game(
-      game_id: String, position: FEN, variant: Variant, moves: String)
+  case class Game(game_id: String,
+                  position: FEN,
+                  variant: Variant,
+                  moves: String)
 
   def fromGame(g: W.Game) =
     Game(game_id = g.id,
@@ -131,14 +133,14 @@ object JsonApi {
     implicit val WorkWrites = OWrites[Work] { work =>
       Json.obj(
           "work" ->
-          (work match {
-                case a: Analysis =>
-                  Json.obj("type" -> "analysis", "id" -> work.id)
-                case m: Move =>
-                  Json.obj("type" -> "move",
-                           "id" -> work.id,
-                           "level" -> m.level)
-              })
+            (work match {
+                  case a: Analysis =>
+                    Json.obj("type" -> "analysis", "id" -> work.id)
+                  case m: Move =>
+                    Json.obj("type" -> "move",
+                             "id" -> work.id,
+                             "level" -> m.level)
+                })
       ) ++ Json.toJson(work.game).as[JsObject]
     }
   }

@@ -67,8 +67,8 @@ trait PredicateHelper {
   }
 
   // Substitute any known alias from a map.
-  protected def replaceAlias(
-      condition: Expression, aliases: AttributeMap[Expression]): Expression = {
+  protected def replaceAlias(condition: Expression,
+                             aliases: AttributeMap[Expression]): Expression = {
     condition.transform {
       case a: Attribute => aliases.getOrElse(a, a)
     }
@@ -228,8 +228,9 @@ case class InSet(child: Expression, hset: Set[Any])
         setName,
         hsetTerm,
         s"$hsetTerm = (($InSetName)references[${ctx.references.size - 1}]).getHSet();")
-    ctx.addMutableState(
-        "boolean", hasNullTerm, s"$hasNullTerm = $hsetTerm.contains(null);")
+    ctx.addMutableState("boolean",
+                        hasNullTerm,
+                        s"$hasNullTerm = $hsetTerm.contains(null);")
     s"""
       ${childGen.code}
       boolean ${ev.isNull} = ${childGen.isNull};
@@ -363,10 +364,8 @@ abstract class BinaryComparison extends BinaryOperator with Predicate {
       // faster version
       defineCodeGen(ctx, ev, (c1, c2) => s"$c1 $symbol $c2")
     } else {
-      defineCodeGen(ctx,
-                    ev,
-                    (c1,
-                     c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
+      defineCodeGen(ctx, ev, (c1, c2) =>
+            s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
     }
   }
 }
@@ -395,16 +394,16 @@ case class EqualTo(left: Expression, right: Expression)
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any = {
     if (left.dataType == FloatType) {
-      Utils.nanSafeCompareFloats(
-          input1.asInstanceOf[Float], input2.asInstanceOf[Float]) == 0
+      Utils.nanSafeCompareFloats(input1.asInstanceOf[Float],
+                                 input2.asInstanceOf[Float]) == 0
     } else if (left.dataType == DoubleType) {
-      Utils.nanSafeCompareDoubles(
-          input1.asInstanceOf[Double], input2.asInstanceOf[Double]) == 0
+      Utils.nanSafeCompareDoubles(input1.asInstanceOf[Double],
+                                  input2.asInstanceOf[Double]) == 0
     } else if (left.dataType != BinaryType) {
       input1 == input2
     } else {
-      java.util.Arrays.equals(
-          input1.asInstanceOf[Array[Byte]], input2.asInstanceOf[Array[Byte]])
+      java.util.Arrays.equals(input1.asInstanceOf[Array[Byte]],
+                              input2.asInstanceOf[Array[Byte]])
     }
   }
 
@@ -431,16 +430,16 @@ case class EqualNullSafe(left: Expression, right: Expression)
       false
     } else {
       if (left.dataType == FloatType) {
-        Utils.nanSafeCompareFloats(
-            input1.asInstanceOf[Float], input2.asInstanceOf[Float]) == 0
+        Utils.nanSafeCompareFloats(input1.asInstanceOf[Float],
+                                   input2.asInstanceOf[Float]) == 0
       } else if (left.dataType == DoubleType) {
-        Utils.nanSafeCompareDoubles(
-            input1.asInstanceOf[Double], input2.asInstanceOf[Double]) == 0
+        Utils.nanSafeCompareDoubles(input1.asInstanceOf[Double],
+                                    input2.asInstanceOf[Double]) == 0
       } else if (left.dataType != BinaryType) {
         input1 == input2
       } else {
-        java.util.Arrays.equals(
-            input1.asInstanceOf[Array[Byte]], input2.asInstanceOf[Array[Byte]])
+        java.util.Arrays.equals(input1.asInstanceOf[Array[Byte]],
+                                input2.asInstanceOf[Array[Byte]])
       }
     }
   }

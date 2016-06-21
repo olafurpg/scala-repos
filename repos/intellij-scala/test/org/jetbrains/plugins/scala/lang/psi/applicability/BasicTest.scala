@@ -95,7 +95,8 @@ class BasicTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "(B, A)") {
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
-          Expression("A"), Type("B")) :: Nil =>
+          Expression("A"),
+          Type("B")) :: Nil =>
     }
   }
 }

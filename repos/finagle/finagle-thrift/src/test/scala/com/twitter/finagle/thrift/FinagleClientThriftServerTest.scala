@@ -22,9 +22,8 @@ class FinagleClientThriftServerTest extends FunSuite {
     def shutdown(): Unit
   }
 
-  def makeServer(
-      transportFactory: TTransportFactory, somewayPromise: Promise[Unit])(
-      f: (Int, Int) => Int) = {
+  def makeServer(transportFactory: TTransportFactory,
+                 somewayPromise: Promise[Unit])(f: (Int, Int) => Int) = {
     val processor = new B.Iface {
       def multiply(a: Int, b: Int): Int = f(a, b)
       def add(a: Int, b: Int): Int = { throw new AnException }
@@ -209,6 +208,7 @@ class FinagleClientThriftServerTest extends FunSuite {
        ThriftClientFramedCodec(),
        "framed transport")
 
-  doit(
-      new TTransportFactory, ThriftClientBufferedCodec(), "buffered transport")
+  doit(new TTransportFactory,
+       ThriftClientBufferedCodec(),
+       "buffered transport")
 }

@@ -51,10 +51,10 @@ trait CometState[
   def render: NodeSeq
 }
 
-trait CometStateWithUpdate[UpdateType,
-                           DeltaType <: DeltaTrait,
-                           MyType <: CometStateWithUpdate[
-                               UpdateType, DeltaType, MyType]]
+trait CometStateWithUpdate[
+    UpdateType,
+    DeltaType <: DeltaTrait,
+    MyType <: CometStateWithUpdate[UpdateType, DeltaType, MyType]]
     extends CometState[DeltaType, MyType] { self: MyType =>
   def process(in: UpdateType): MyType
 }
@@ -125,8 +125,8 @@ object AddAListener {
   * @see CometListener
   * @see ListenerManager
   */
-case class AddAListener(
-    who: SimpleActor[Any], shouldUpdate: PartialFunction[Any, Boolean])
+case class AddAListener(who: SimpleActor[Any],
+                        shouldUpdate: PartialFunction[Any, Boolean])
 
 /**
   * This is a message class for use with ListenerManager and CometListener
@@ -771,13 +771,12 @@ trait BaseCometActor
     * Calculate fixedRender and capture the postpage javascript
     */
   protected def calcFixedRender: Box[NodeSeq] =
-    fixedRender.map(
-        ns =>
+    fixedRender.map(ns =>
           theSession.postPageJavaScript() match {
         case Nil => ns
         case xs => {
-            ns ++ Script(xs)
-          }
+          ns ++ Script(xs)
+        }
     })
 
   /**
@@ -841,109 +840,109 @@ trait BaseCometActor
 
   private lazy val _mediumPriority: PartialFunction[Any, Unit] = {
     case l @ Unlisten(seq) => {
-        _lastListenerTime = millis
-        askingWho match {
-          case Full(who) => forwardMessageTo(l, who) // forward l
-          case _ => listeners = listeners.filter(_._1 != seq)
-        }
-        listenerTransition()
+      _lastListenerTime = millis
+      askingWho match {
+        case Full(who) => forwardMessageTo(l, who) // forward l
+        case _ => listeners = listeners.filter(_._1 != seq)
       }
+      listenerTransition()
+    }
 
     case l @ Listen(when, seqId, toDo) => {
-        _lastListenerTime = millis
-        askingWho match {
-          case Full(who) => forwardMessageTo(l, who) // who forward l
-          case _ =>
-            if (when < lastRenderTime && !partialUpdateStream_?) {
-              toDo(
-                  AnswerRender(
-                      new XmlOrJsCmd(
-                          spanId, lastRendering, buildSpan _, notices.toList),
-                      whosAsking openOr this,
-                      lastRenderTime,
-                      wasLastFullRender))
-              clearNotices
-            } else {
-              _lastRenderTime = when
-              deltas.filter(_.when > when) match {
-                case Nil => listeners = (seqId, toDo) :: listeners
+      _lastListenerTime = millis
+      askingWho match {
+        case Full(who) => forwardMessageTo(l, who) // who forward l
+        case _ =>
+          if (when < lastRenderTime && !partialUpdateStream_?) {
+            toDo(
+                AnswerRender(new XmlOrJsCmd(spanId,
+                                            lastRendering,
+                                            buildSpan _,
+                                            notices.toList),
+                             whosAsking openOr this,
+                             lastRenderTime,
+                             wasLastFullRender))
+            clearNotices
+          } else {
+            _lastRenderTime = when
+            deltas.filter(_.when > when) match {
+              case Nil => listeners = (seqId, toDo) :: listeners
 
-                case all @ (hd :: xs) => {
-                    toDo(
-                        AnswerRender(
-                            new XmlOrJsCmd(
-                                spanId,
-                                Empty,
-                                Empty,
-                                Full(all.reverse.foldLeft(Noop)(_ & _.js)),
-                                Empty,
-                                buildSpan,
-                                false,
-                                notices.toList),
-                            whosAsking openOr this,
-                            hd.when,
-                            false))
-                    clearNotices
-                  }
+              case all @ (hd :: xs) => {
+                toDo(
+                    AnswerRender(
+                        new XmlOrJsCmd(
+                            spanId,
+                            Empty,
+                            Empty,
+                            Full(all.reverse.foldLeft(Noop)(_ & _.js)),
+                            Empty,
+                            buildSpan,
+                            false,
+                            notices.toList),
+                        whosAsking openOr this,
+                        hd.when,
+                        false))
+                clearNotices
               }
-              deltas = _deltaPruner(this, deltas)
             }
-        }
-        listenerTransition()
+            deltas = _deltaPruner(this, deltas)
+          }
       }
+      listenerTransition()
+    }
 
     case PerformSetupComet2(initialReq) => {
-        localSetup()
-        captureInitialReq(initialReq)
-        performReRender(true)
-      }
+      localSetup()
+      captureInitialReq(initialReq)
+      performReRender(true)
+    }
 
     /**
       * Update the defaultHtml... sent in dev mode
       */
     case UpdateDefaultHtml(html) => {
-        val redo = html != _defaultHtml
+      val redo = html != _defaultHtml
 
-        _defaultHtml = html
+      _defaultHtml = html
 
-        if (redo) {
-          performReRender(false)
-        }
+      if (redo) {
+        performReRender(false)
       }
+    }
 
     case AskRender =>
       askingWho match {
         case Full(who) =>
           forwardMessageTo(AskRender, who) //  forward AskRender
         case _ => {
-            val out =
-              if (receivedDelta || alwaysReRenderOnPageLoad) {
-                try {
-                  Full(performReRender(false))
-                } catch {
-                  case e if exceptionHandler.isDefinedAt(e) => {
-                      exceptionHandler(e)
-                      Empty
-                    }
-                  case e: Exception => {
-                      reportError("Failed performReRender", e)
-                      Empty
-                    }
-                }
-              } else {
+          val out = if (receivedDelta || alwaysReRenderOnPageLoad) {
+            try {
+              Full(performReRender(false))
+            } catch {
+              case e if exceptionHandler.isDefinedAt(e) => {
+                exceptionHandler(e)
                 Empty
               }
-
-            reply(
-                AnswerRender(new XmlOrJsCmd(spanId,
-                                            out.openOr(lastRendering),
-                                            buildSpan _,
-                                            notices.toList),
-                             whosAsking openOr this,
-                             lastRenderTime,
-                             true))
-            clearNotices
+              case e: Exception => {
+                reportError("Failed performReRender", e)
+                Empty
+              }
+            }
+          } else {
+            Empty
           }
+
+          reply(
+              AnswerRender(new XmlOrJsCmd(spanId,
+                                          out.openOr(lastRendering),
+                                          buildSpan _,
+                                          notices.toList),
+                           whosAsking openOr this,
+                           lastRenderTime,
+                           true))
+          clearNotices
+        }
       }
 
     case ActionMessageSet(msgs, req) =>
@@ -962,13 +961,13 @@ trait BaseCometActor
       }
 
     case AskQuestion(what, who, otherlisteners) => {
-        this.spanId = who.uniqueId
-        this.listeners = otherlisteners ::: this.listeners
-        startQuestion(what)
-        whosAsking = Full(who)
-        this.reRender(true)
-        listenerTransition()
-      }
+      this.spanId = who.uniqueId
+      this.listeners = otherlisteners ::: this.listeners
+      startQuestion(what)
+      whosAsking = Full(who)
+      this.reRender(true)
+      listenerTransition()
+    }
 
     case AnswerQuestion(what, otherListeners) =>
       askingWho.foreach { ah =>
@@ -990,7 +989,7 @@ trait BaseCometActor
     case ShutdownIfPastLifespan =>
       for {
         ls <- lifespan if listeners.isEmpty &&
-        (lastListenerTime + ls.millis + 1000l) < millis
+          (lastListenerTime + ls.millis + 1000l) < millis
       } {
         this ! ShutDown
       }
@@ -1016,32 +1015,32 @@ trait BaseCometActor
       _localShutdown()
 
     case PartialUpdateMsg(cmdF) => {
-        val cmd: JsCmd = cmdF.apply
-        val time = Helpers.nextNum
-        val delta = JsDelta(time, cmd)
-        receivedDelta = true
-        theSession.updateFunctionMap(S.functionMap, uniqueId, time)
-        S.clearFunctionMap
-        deltas = _deltaPruner(this, (delta :: deltas))
-        if (!listeners.isEmpty) {
-          val postPage = theSession.postPageJavaScript()
-          val rendered = AnswerRender(new XmlOrJsCmd(spanId,
-                                                     Empty,
-                                                     Empty,
-                                                     Full(cmd & postPage),
-                                                     Empty,
-                                                     buildSpan,
-                                                     false,
-                                                     notices.toList),
-                                      whosAsking openOr this,
-                                      time,
-                                      false)
-          clearNotices
-          listeners.foreach(_._2(rendered))
-          listeners = Nil
-          listenerTransition()
-        }
+      val cmd: JsCmd = cmdF.apply
+      val time = Helpers.nextNum
+      val delta = JsDelta(time, cmd)
+      receivedDelta = true
+      theSession.updateFunctionMap(S.functionMap, uniqueId, time)
+      S.clearFunctionMap
+      deltas = _deltaPruner(this, (delta :: deltas))
+      if (!listeners.isEmpty) {
+        val postPage = theSession.postPageJavaScript()
+        val rendered = AnswerRender(new XmlOrJsCmd(spanId,
+                                                   Empty,
+                                                   Empty,
+                                                   Full(cmd & postPage),
+                                                   Empty,
+                                                   buildSpan,
+                                                   false,
+                                                   notices.toList),
+                                    whosAsking openOr this,
+                                    time,
+                                    false)
+        clearNotices
+        listeners.foreach(_._2(rendered))
+        listeners = Nil
+        listenerTransition()
       }
+    }
   }
 
   /**
@@ -1248,8 +1247,12 @@ trait BaseCometActor
     * take over the screen real estate until the question is answered.
     */
   protected def ask(who: LiftCometActor, what: Any)(answerWith: Any => Unit) {
-    who.callInitCometActor(CometCreationInfo(
-            who.uniqueId, name, defaultHtml, attributes, theSession))
+    who.callInitCometActor(
+        CometCreationInfo(who.uniqueId,
+                          name,
+                          defaultHtml,
+                          attributes,
+                          theSession))
     theSession.addCometActor(who)
 
     who ! PerformSetupComet2(Empty)
@@ -1272,12 +1275,11 @@ trait BaseCometActor
     * rendering.
     */
   protected implicit def nsToNsFuncToRenderOut(f: NodeSeq => NodeSeq) = {
-    val additionalJs =
-      if (autoIncludeJsonCode) {
-        Full(jsonToIncludeInCode)
-      } else {
-        Empty
-      }
+    val additionalJs = if (autoIncludeJsonCode) {
+      Full(jsonToIncludeInCode)
+    } else {
+      Empty
+    }
 
     new RenderOut((Box !! defaultHtml).map(f),
                   internalFixedRender,
@@ -1294,24 +1296,25 @@ trait BaseCometActor
     * is helpful if you return a NodeSeq from your render method.
     */
   protected implicit def arrayToRenderOut(in: Seq[Node]): RenderOut = {
-    val additionalJs =
-      if (autoIncludeJsonCode) {
-        Full(jsonToIncludeInCode)
-      } else {
-        Empty
-      }
+    val additionalJs = if (autoIncludeJsonCode) {
+      Full(jsonToIncludeInCode)
+    } else {
+      Empty
+    }
 
-    new RenderOut(
-        Full(in: NodeSeq), internalFixedRender, additionalJs, Empty, false)
+    new RenderOut(Full(in: NodeSeq),
+                  internalFixedRender,
+                  additionalJs,
+                  Empty,
+                  false)
   }
 
   protected implicit def jsToXmlOrJsCmd(in: JsCmd): RenderOut = {
-    val additionalJs =
-      if (autoIncludeJsonCode) {
-        Full(in & jsonToIncludeInCode)
-      } else {
-        Full(in)
-      }
+    val additionalJs = if (autoIncludeJsonCode) {
+      Full(in & jsonToIncludeInCode)
+    } else {
+      Full(in)
+    }
 
     new RenderOut(Empty, internalFixedRender, additionalJs, Empty, false)
   }
@@ -1469,15 +1472,15 @@ private[http] class XmlOrJsCmd(
         case (Full(xml), _, false) =>
           LiftRules.jsArtifacts.setHtml(id, Helpers.stripHead(xml))
         case (Full(xml), Full(js), true) =>
-          LiftRules.jsArtifacts.setHtml(
-              id + "_outer",
-              (spanFunc(Helpers.stripHead(xml)) ++ fixedXhtml.openOr(
-                      Text("")))) & JsCmds.JsTry(js, false)
+          LiftRules.jsArtifacts
+            .setHtml(id + "_outer",
+                     (spanFunc(Helpers.stripHead(xml)) ++ fixedXhtml.openOr(
+                             Text("")))) & JsCmds.JsTry(js, false)
         case (Full(xml), _, true) =>
-          LiftRules.jsArtifacts.setHtml(
-              id + "_outer",
-              (spanFunc(Helpers.stripHead(xml)) ++ fixedXhtml.openOr(
-                      Text(""))))
+          LiftRules.jsArtifacts
+            .setHtml(id + "_outer",
+                     (spanFunc(Helpers.stripHead(xml)) ++ fixedXhtml.openOr(
+                             Text(""))))
         case (_, Full(js), _) => js
         case _ => JsCmds.Noop
       }
@@ -1486,14 +1489,14 @@ private[http] class XmlOrJsCmd(
         (commands, catchHandler) =>
           JsCmds.Run(
               "try{" + commands.toJsCmd + "}catch(e){" + catchHandler.toJsCmd +
-              "}"
+                "}"
           )
       }
 
     var ret: JsCmd =
       JsCmds.JsTry(JsCmds.Run("destroy_" + id + "();"), false) & fullUpdateJs & JsCmds
         .JsTry(JsCmds.Run("destroy_" + id + " = function() {" +
-                   (destroy.openOr(JsCmds.Noop).toJsCmd) + "};"),
+                     (destroy.openOr(JsCmds.Noop).toJsCmd) + "};"),
                false)
 
     S.appendNotices(notices)
@@ -1506,8 +1509,8 @@ private[http] class XmlOrJsCmd(
 
   def outSpan: NodeSeq =
     Script(Run("var destroy_" + id + " = function() {" +
-            (destroy.openOr(JsCmds.Noop).toJsCmd) + "}")) ++ fixedXhtml.openOr(
-        Text(""))
+              (destroy.openOr(JsCmds.Noop).toJsCmd) + "}")) ++ fixedXhtml
+      .openOr(Text(""))
 }
 
 /**
@@ -1519,8 +1522,10 @@ case class PartialUpdateMsg(cmd: () => JsCmd) extends CometMessage
 
 case object AskRender extends CometMessage
 
-case class AnswerRender(
-    response: XmlOrJsCmd, who: LiftCometActor, when: Long, displayAll: Boolean)
+case class AnswerRender(response: XmlOrJsCmd,
+                        who: LiftCometActor,
+                        when: Long,
+                        displayAll: Boolean)
     extends CometMessage
 
 case class PerformSetupComet2(initialReq: Box[Req]) extends CometMessage
@@ -1532,12 +1537,13 @@ case class AskQuestion(what: Any,
                        listeners: List[(ListenerId, AnswerRender => Unit)])
     extends CometMessage
 
-case class AnswerQuestion(
-    what: Any, listeners: List[(ListenerId, AnswerRender => Unit)])
+case class AnswerQuestion(what: Any,
+                          listeners: List[(ListenerId, AnswerRender => Unit)])
     extends CometMessage
 
-case class Listen(
-    when: Long, uniqueId: ListenerId, action: AnswerRender => Unit)
+case class Listen(when: Long,
+                  uniqueId: ListenerId,
+                  action: AnswerRender => Unit)
     extends CometMessage
 
 case class Unlisten(uniqueId: ListenerId) extends CometMessage

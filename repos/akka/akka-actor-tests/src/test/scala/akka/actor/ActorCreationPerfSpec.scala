@@ -50,8 +50,8 @@ object ActorCreationPerfSpec {
         sender() ! Created
       case WaitForChildren ⇒
         context.children.foreach(_ ! IsAlive)
-        context.become(
-            waiting(context.children.size, sender()), discardOld = false)
+        context
+          .become(waiting(context.children.size, sender()), discardOld = false)
     }
 
     def waiting(number: Int, replyTo: ActorRef): Receive = {
@@ -80,8 +80,8 @@ object ActorCreationPerfSpec {
         sender() ! Created
       case WaitForChildren ⇒
         context.children.foreach(_ ! IsAlive)
-        context.become(
-            waiting(context.children.size, sender()), discardOld = false)
+        context
+          .become(waiting(context.children.size, sender()), discardOld = false)
     }
 
     def waiting(number: Int, replyTo: ActorRef): Receive = {
@@ -210,8 +210,9 @@ class ActorCreationPerfSpec
         val heapUsed = timedWithKnownOps(
             TotalTimeKey / s"creating-$nrOfActors-actors" / name,
             ops = nrOfActors) {
-          runWithoutCounter(
-              s"${scenarioName}_driver_outside_$i", nrOfActors, propsCreator)
+          runWithoutCounter(s"${scenarioName}_driver_outside_$i",
+                            nrOfActors,
+                            propsCreator)
         }
 
         avgMem.add(heapUsed.used / nrOfActors) // average actor size, over nrOfRepeats

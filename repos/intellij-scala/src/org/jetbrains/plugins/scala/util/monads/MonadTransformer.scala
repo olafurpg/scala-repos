@@ -21,8 +21,8 @@ trait MonadTransformer { self: PsiElement =>
     }
   }
 
-  class SemiMonadLike[+T](opt: Option[T], default: ScType)(
-      implicit msg: String) {
+  class SemiMonadLike[+T](opt: Option[T],
+                          default: ScType)(implicit msg: String) {
     def flatMap(f: T => TypeResult[ScType]): TypeResult[ScType] = opt match {
       case Some(elem) => f(elem)
       case None => Success(default, None)
@@ -44,14 +44,14 @@ trait MonadTransformer { self: PsiElement =>
     * @return A function, taking a mapping from the Seq[T] to the result and returning the result
     * @see ScTupleTypeElementImpl for example
     */
-  def collectFailures[T](
-      seq: Seq[TypeResult[T]], default: T): (Seq[T] => T) => Success[T] =
+  def collectFailures[T](seq: Seq[TypeResult[T]],
+                         default: T): (Seq[T] => T) => Success[T] =
     (succ: (Seq[T]) => T) => {
       val defaults = seq.map {
         case Success(t, _) => t
         case Failure(_, _) => default
       }
-      (for (f @ Failure(_, _) <- seq) yield
-        f).foldLeft(Success(succ(defaults), Some(self)))(_.apply(_))
+      (for (f @ Failure(_, _) <- seq)
+        yield f).foldLeft(Success(succ(defaults), Some(self)))(_.apply(_))
     }
 }

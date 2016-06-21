@@ -108,8 +108,9 @@ object BinaryMerge extends Merge {
     }
   }*/
 
-  private class ArrayBinaryMerge[@specialized T](
-      a: Array[T], b: Array[T])(implicit o: Order[T], c: ClassTag[T])
+  private class ArrayBinaryMerge[@specialized T](a: Array[T], b: Array[T])(
+      implicit o: Order[T],
+      c: ClassTag[T])
       extends BinaryMerge {
 
     def compare(ai: Int, bi: Int): Int = o.compare(a(ai), b(bi))

@@ -58,8 +58,8 @@ private[concurrent] trait Promise[T]
 
 /* Precondition: `executor` is prepared, i.e., `executor` has been returned from invocation of `prepare` on some other `ExecutionContext`.
  */
-private final class CallbackRunnable[T](
-    val executor: ExecutionContext, val onComplete: Try[T] => Any)
+private final class CallbackRunnable[T](val executor: ExecutionContext,
+                                        val onComplete: Try[T] => Any)
     extends Runnable
     with OnCompleteRunnable {
   // must be filled in before running it
@@ -400,8 +400,8 @@ private[concurrent] object Promise {
 
       override def tryComplete(value: Try[T]): Boolean = false
 
-      override def onComplete[U](func: Try[T] => U)(
-          implicit executor: ExecutionContext): Unit =
+      override def onComplete[U](
+          func: Try[T] => U)(implicit executor: ExecutionContext): Unit =
         (new CallbackRunnable(executor.prepare(), func))
           .executeWithValue(result)
 

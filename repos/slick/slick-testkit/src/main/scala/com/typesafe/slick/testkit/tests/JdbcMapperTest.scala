@@ -22,9 +22,9 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
       def baseProjection = first ~ last
       def forUpdate =
         baseProjection.shaped <>
-        ({ case (f, l) => User(None, f, l) }, { u: User =>
-          Some((u.first, u.last))
-        })
+          ({ case (f, l) => User(None, f, l) }, { u: User =>
+            Some((u.first, u.last))
+          })
       def asFoo =
         forUpdate <> ((u: User) => Foo(u), (f: Foo[User]) => Some(f.value))
     }
@@ -54,8 +54,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
           .result
           .map(_ shouldBe 1),
         updateQ.update(User(None, "Marge", "Simpson")),
-        Query(users.filter(_.id === 1).exists).result.head
-          .map(_ shouldBe true),
+        Query(users.filter(_.id === 1).exists).result.head.map(_ shouldBe true),
         users
           .filter(_.id between (1, 2))
           .to[Set]
@@ -166,7 +165,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
             id,
             (p1i1, p1i2, p1i3, p1i4, p1i5, p1i6).mapTo[Part],
             (p2i1, p2i2, p2i3, p2i4, p2i5, p2i6) <>
-            (Part.tupled, Part.unapply _),
+              (Part.tupled, Part.unapply _),
             (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6).mapTo[Part],
             (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6).mapTo[Part]
         ).mapTo[Whole]
@@ -179,18 +178,18 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
             (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6),
             (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6)
         ).shaped <>
-        ({
-          case (id, p1, p2, p3, p4) =>
-            // We could do this without .shaped but then we'd have to write a type annotation for the parameters
-            Whole(id,
-                  Part.tupled.apply(p1),
-                  Part.tupled.apply(p2),
-                  Part.tupled.apply(p3),
-                  Part.tupled.apply(p4))
-        }, { w: Whole =>
-          def f(p: Part) = Part.unapply(p).get
-          Some((w.id, f(w.p1), f(w.p2), f(w.p3), f(w.p4)))
-        })
+          ({
+            case (id, p1, p2, p3, p4) =>
+              // We could do this without .shaped but then we'd have to write a type annotation for the parameters
+              Whole(id,
+                    Part.tupled.apply(p1),
+                    Part.tupled.apply(p2),
+                    Part.tupled.apply(p3),
+                    Part.tupled.apply(p4))
+          }, { w: Whole =>
+            def f(p: Part) = Part.unapply(p).get
+            Some((w.id, f(w.p1), f(w.p2), f(w.p3), f(w.p4)))
+          })
       // HList-based wide case class mapping
       def m3 =
         (id :: p1i1 :: p1i2 :: p1i3 :: p1i4 :: p1i5 :: p1i6 :: p2i1 :: p2i2 :: p2i3 :: p2i4 :: p2i5 :: p2i6 :: p3i1 :: p3i2 :: p3i3 :: p3i4 :: p3i5 :: p3i6 :: p4i1 :: p4i2 :: p4i3 :: p4i4 :: p4i5 :: p4i6 :: HNil)

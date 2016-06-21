@@ -36,8 +36,8 @@ abstract class AutoImportTestBase
     val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(FileUtil
+          .loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     val offset = fileText.indexOf(refMarker)
     fileText = fileText.replace(refMarker, "")
 
@@ -47,7 +47,8 @@ abstract class AutoImportTestBase
         offset != -1,
         "Not specified ref marker in test case. Use /*ref*/ in scala file for this.")
     val ref: ScReferenceElement = PsiTreeUtil.getParentOfType(
-        scalaFile.findElementAt(offset), classOf[ScReferenceElement])
+        scalaFile.findElementAt(offset),
+        classOf[ScReferenceElement])
     assert(ref != null, "Not specified reference at marker.")
 
     ref.resolve() match {
@@ -79,15 +80,14 @@ abstract class AutoImportTestBase
           UsefulTestCase.doPostponedFormatting(getProjectAdapter)
         }
       }, getProjectAdapter, "Test")
-      res =
-        scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
+      res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
       assert(refPointer.getElement.resolve != null,
              "reference is unresolved after import action")
     } catch {
       case e: Exception =>
         println(e)
-        assert(
-            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+        assert(assertion = false,
+               message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

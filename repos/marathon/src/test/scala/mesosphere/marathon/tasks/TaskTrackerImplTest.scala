@@ -44,7 +44,10 @@ class TaskTrackerImplTest
   before {
     state = spy(new InMemoryStore)
     val taskTrackerModule = MarathonTestHelper.createTaskTrackerModule(
-        AlwaysElectedLeadershipModule(shutdownHooks), state, config, metrics)
+        AlwaysElectedLeadershipModule(shutdownHooks),
+        state,
+        config,
+        metrics)
     taskTracker = taskTrackerModule.taskTracker
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskUpdater = taskTrackerModule.taskUpdater
@@ -523,7 +526,7 @@ class TaskTrackerImplTest
   def containsTask(tasks: Iterable[Task], task: Task) =
     tasks.exists(t =>
           t.taskId == task.taskId && t.agentInfo.host == task.agentInfo.host &&
-          t.launched.map(_.networking) == task.launched.map(_.networking))
+            t.launched.map(_.networking) == task.launched.map(_.networking))
   def shouldContainTask(tasks: Iterable[Task], task: Task) =
     assert(containsTask(tasks, task), s"Should contain ${task.taskId}")
   def shouldNotContainTask(tasks: Iterable[Task], task: Task) =

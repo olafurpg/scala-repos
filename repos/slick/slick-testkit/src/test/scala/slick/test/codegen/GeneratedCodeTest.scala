@@ -43,7 +43,7 @@ object GeneratedCodeTest {
                        trgColumns)
           assertTrue("FKs should be from 'a' to 'b'",
                      tableName(aFk.sourceTable) == A.baseTableRow.tableName &&
-                     tableName(aFk.targetTable) == B.baseTableRow.tableName)
+                       tableName(aFk.targetTable) == B.baseTableRow.tableName)
 
           assertEquals("# of FKs of 'c' should be 1",
                        1,
@@ -64,7 +64,7 @@ object GeneratedCodeTest {
                        cTrgColumns)
           assertTrue("FKs should be from 'c' to 'd'",
                      tableName(cFk.sourceTable) == C.baseTableRow.tableName &&
-                     tableName(cFk.targetTable) == D.baseTableRow.tableName)
+                       tableName(cFk.targetTable) == D.baseTableRow.tableName)
 
           assertEquals("# of unique indices of 'c' should be 0",
                        0,
@@ -111,8 +111,12 @@ object GeneratedCodeTest {
     val Db1 = new Db1
     import Db1._
     import profile.api._
-    val s = Supplier(
-        49, "Superior Coffee", "1 Party Place", "Mendocino", "CA", "95460")
+    val s = Supplier(49,
+                     "Superior Coffee",
+                     "1 Party Place",
+                     "Mendocino",
+                     "CA",
+                     "95460")
     DBIO.seq(
         schema.create,
         Suppliers.length.result.map(assertEquals(0, _)),
@@ -124,8 +128,12 @@ object GeneratedCodeTest {
   def testCG3 = {
     import CG3._
     import profile.api._
-    val s = Supplier(
-        49, "Superior Coffee", "1 Party Place", "Mendocino", "CA", "95460")
+    val s = Supplier(49,
+                     "Superior Coffee",
+                     "1 Party Place",
+                     "Mendocino",
+                     "CA",
+                     "95460")
     DBIO.seq(
         schema.create,
         Suppliers += s,

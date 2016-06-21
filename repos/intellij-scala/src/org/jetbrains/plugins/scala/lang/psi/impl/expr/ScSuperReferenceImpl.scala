@@ -154,15 +154,15 @@ class ScSuperReferenceImpl(node: ASTNode)
         def getVariants: Array[Object] = superTypes match {
           case None => Array[Object]()
           case Some(supers) => {
-              val buff = new ArrayBuffer[Object]
-              supers.foreach { t =>
-                ScType.extractClass(t) match {
-                  case Some(c) => buff += c
-                  case None =>
-                }
+            val buff = new ArrayBuffer[Object]
+            supers.foreach { t =>
+              ScType.extractClass(t) match {
+                case Some(c) => buff += c
+                case None =>
               }
-              buff.toArray
             }
+            buff.toArray
+          }
         }
       }
   }
@@ -170,15 +170,15 @@ class ScSuperReferenceImpl(node: ASTNode)
   def findSuper(id: PsiElement): Option[ScType] = superTypes match {
     case None => None
     case Some(types) => {
-        val name = id.getText
-        for (t <- types) {
-          ScType.extractClass(t) match {
-            case Some(c) if name == c.name => return Some(t)
-            case _ =>
-          }
+      val name = id.getText
+      for (t <- types) {
+        ScType.extractClass(t) match {
+          case Some(c) if name == c.name => return Some(t)
+          case _ =>
         }
-        None
       }
+      None
+    }
   }
 
   private def superTypes: Option[Seq[ScType]] = reference match {
@@ -191,11 +191,11 @@ class ScSuperReferenceImpl(node: ASTNode)
         case _ => None
       }
     case None => {
-        PsiTreeUtil.getContextOfType(this, false, classOf[ScExtendsBlock]) match {
-          case null => None
-          case eb: ScExtendsBlock => Some(eb.superTypes)
-        }
+      PsiTreeUtil.getContextOfType(this, false, classOf[ScExtendsBlock]) match {
+        case null => None
+        case eb: ScExtendsBlock => Some(eb.superTypes)
       }
+    }
   }
 
   protected override def innerType(ctx: TypingContext) =

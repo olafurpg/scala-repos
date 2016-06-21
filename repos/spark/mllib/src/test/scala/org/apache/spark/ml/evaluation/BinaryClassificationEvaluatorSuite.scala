@@ -74,7 +74,7 @@ class BinaryClassificationEvaluatorSuite
     }
     assert(
         thrown.getMessage.replace("\n", "") contains "Column rawPrediction must be of type " +
-        "equal to one of the following types: [DoubleType, ")
+          "equal to one of the following types: [DoubleType, ")
     assert(
         thrown.getMessage.replace("\n", "") contains "but was actually of type StringType.")
   }

@@ -62,8 +62,11 @@ object GenerateUnsafeProjection
       if ($input instanceof UnsafeRow) {
         ${writeUnsafeData(ctx, s"((UnsafeRow) $input)", bufferHolder)}
       } else {
-        ${writeExpressionsToBuffer(
-        ctx, input, fieldEvals, fieldTypes, bufferHolder)}
+        ${writeExpressionsToBuffer(ctx,
+                                   input,
+                                   fieldEvals,
+                                   fieldTypes,
+                                   bufferHolder)}
       }
     """
   }
@@ -81,21 +84,20 @@ object GenerateUnsafeProjection
         rowWriter,
         s"this.$rowWriter = new $rowWriterClass($bufferHolder, ${inputs.length});")
 
-    val resetWriter =
-      if (isTopLevel) {
-        // For top level row writer, it always writes to the beginning of the global buffer holder,
-        // which means its fixed-size region always in the same position, so we don't need to call
-        // `reset` to set up its fixed-size region every time.
-        if (inputs.map(_.isNull).forall(_ == "false")) {
-          // If all fields are not nullable, which means the null bits never changes, then we don't
-          // need to clear it out every time.
-          ""
-        } else {
-          s"$rowWriter.zeroOutNullBytes();"
-        }
+    val resetWriter = if (isTopLevel) {
+      // For top level row writer, it always writes to the beginning of the global buffer holder,
+      // which means its fixed-size region always in the same position, so we don't need to call
+      // `reset` to set up its fixed-size region every time.
+      if (inputs.map(_.isNull).forall(_ == "false")) {
+        // If all fields are not nullable, which means the null bits never changes, then we don't
+        // need to clear it out every time.
+        ""
       } else {
-        s"$rowWriter.reset();"
+        s"$rowWriter.zeroOutNullBytes();"
       }
+    } else {
+      s"$rowWriter.reset();"
+    }
 
     val writeFields = inputs.zip(inputTypes).zipWithIndex.map {
       case ((input, dataType), index) =>
@@ -118,8 +120,10 @@ object GenerateUnsafeProjection
               // Remember the current cursor so that we can calculate how many bytes are
               // written later.
               final int $tmpCursor = $bufferHolder.cursor;
-              ${writeStructToBuffer(
-                ctx, input.value, t.map(_.dataType), bufferHolder)}
+              ${writeStructToBuffer(ctx,
+                                    input.value,
+                                    t.map(_.dataType),
+                                    bufferHolder)}
               $rowWriter.setOffsetAndSize($index, $tmpCursor, $bufferHolder.cursor - $tmpCursor);
             """
 
@@ -285,8 +289,9 @@ object GenerateUnsafeProjection
     * If the input is already in unsafe format, we don't need to go through all elements/fields,
     * we can directly write it.
     */
-  private def writeUnsafeData(
-      ctx: CodegenContext, input: String, bufferHolder: String) = {
+  private def writeUnsafeData(ctx: CodegenContext,
+                              input: String,
+                              bufferHolder: String) = {
     val sizeInBytes = ctx.freshName("sizeInBytes")
     s"""
       final int $sizeInBytes = $input.getSizeInBytes();
@@ -321,24 +326,26 @@ object GenerateUnsafeProjection
         holder,
         s"this.$holder = new $holderClass($result, ${numVarLenFields * 32});")
 
-    val resetBufferHolder =
-      if (numVarLenFields == 0) {
-        ""
-      } else {
-        s"$holder.reset();"
-      }
-    val updateRowSize =
-      if (numVarLenFields == 0) {
-        ""
-      } else {
-        s"$result.setTotalSize($holder.totalSize());"
-      }
+    val resetBufferHolder = if (numVarLenFields == 0) {
+      ""
+    } else {
+      s"$holder.reset();"
+    }
+    val updateRowSize = if (numVarLenFields == 0) {
+      ""
+    } else {
+      s"$result.setTotalSize($holder.totalSize());"
+    }
 
     // Evaluate all the subexpression.
     val evalSubexpr = ctx.subexprFunctions.mkString("\n")
 
-    val writeExpressions = writeExpressionsToBuffer(
-        ctx, ctx.INPUT_ROW, exprEvals, exprTypes, holder, isTopLevel = true)
+    val writeExpressions = writeExpressionsToBuffer(ctx,
+                                                    ctx.INPUT_ROW,
+                                                    exprEvals,
+                                                    exprTypes,
+                                                    holder,
+                                                    isTopLevel = true)
 
     val code = s"""
         $resetBufferHolder
@@ -352,8 +359,8 @@ object GenerateUnsafeProjection
   protected def canonicalize(in: Seq[Expression]): Seq[Expression] =
     in.map(ExpressionCanonicalizer.execute)
 
-  protected def bind(
-      in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
+  protected def bind(in: Seq[Expression],
+                     inputSchema: Seq[Attribute]): Seq[Expression] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
   def generate(expressions: Seq[Expression],

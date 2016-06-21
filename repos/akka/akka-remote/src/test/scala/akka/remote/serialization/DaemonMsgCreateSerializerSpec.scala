@@ -102,8 +102,8 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
             .asInstanceOf[DaemonMsgCreate])
     }
 
-    def assertDaemonMsgCreate(
-        expected: DaemonMsgCreate, got: DaemonMsgCreate): Unit = {
+    def assertDaemonMsgCreate(expected: DaemonMsgCreate,
+                              got: DaemonMsgCreate): Unit = {
       // can't compare props.creator when function
       got.props.clazz should ===(expected.props.clazz)
       got.props.args.length should ===(expected.props.args.length)

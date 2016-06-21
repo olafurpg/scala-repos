@@ -433,8 +433,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
          false,
          false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          name, value, wrap, domain, path, maxAge, secure, httpOnly)
+      val ahcCookie: AHCCookie = new AHCCookie(name,
+                                               value,
+                                               wrap,
+                                               domain,
+                                               path,
+                                               maxAge,
+                                               secure,
+                                               httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -462,8 +468,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
          false,
          false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          name, value, wrap, domain, path, maxAge, secure, httpOnly)
+      val ahcCookie: AHCCookie = new AHCCookie(name,
+                                               value,
+                                               wrap,
+                                               domain,
+                                               path,
+                                               maxAge,
+                                               secure,
+                                               httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -482,8 +494,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     "return -1 values of expires and maxAge as None" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          "someName", "value", true, "domain", "path", -1L, false, false)
+      val ahcCookie: AHCCookie = new AHCCookie("someName",
+                                               "value",
+                                               true,
+                                               "domain",
+                                               "path",
+                                               -1L,
+                                               false,
+                                               false)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -537,8 +555,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
   "withRequestFilter" should {
 
-    class CallbackRequestFilter(
-        callList: scala.collection.mutable.Buffer[Int], value: Int)
+    class CallbackRequestFilter(callList: scala.collection.mutable.Buffer[Int],
+                                value: Int)
         extends WSRequestFilter {
       override def apply(executor: WSRequestExecutor): WSRequestExecutor = {
         callList.append(value)

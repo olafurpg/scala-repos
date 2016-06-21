@@ -58,15 +58,15 @@ private[round] final class Finisher(messenger: Messenger,
         .pair(g.whitePlayer.userId, g.blackPlayer.userId)
         .flatMap {
           case (whiteO, blackO) => {
-              val finish = FinishGame(g, whiteO, blackO)
-              updateCountAndPerfs(finish) inject {
-                message foreach { messenger.system(g, _) }
-                GameRepo game g.id foreach { newGame =>
-                  bus.publish(finish.copy(game = newGame | g), 'finishGame)
-                }
-                prog.events
+            val finish = FinishGame(g, whiteO, blackO)
+            updateCountAndPerfs(finish) inject {
+              message foreach { messenger.system(g, _) }
+              GameRepo game g.id foreach { newGame =>
+                bus.publish(finish.copy(game = newGame | g), 'finishGame)
               }
+              prog.events
             }
+          }
         }
     }
   }
@@ -93,7 +93,7 @@ private[round] final class Finisher(messenger: Messenger,
                                                               white,
                                                               black)
       } zip (finish.white ?? incNbGames(finish.game)) zip
-      (finish.black ?? incNbGames(finish.game)) void
+        (finish.black ?? incNbGames(finish.game)) void
     }
 
   private def incNbGames(game: Game)(user: User): Funit = game.finished ?? {

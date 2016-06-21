@@ -78,8 +78,8 @@ private[saddle] object JoinHelper {
       i += 1
     }
 
-    JoinResult(
-        applyUnsorter(lUnsorter, lLabels), applyUnsorter(rUnsorter, rLabels))
+    JoinResult(applyUnsorter(lUnsorter, lLabels),
+               applyUnsorter(rUnsorter, rLabels))
   }
 
   // Calculates mapping of factor label to count seen in labels array
@@ -99,8 +99,9 @@ private[saddle] object JoinHelper {
 
   // Calculate permutation from sorted(labels) -> labels, so we can recover an array of factor labels
   // in the originally provided order.
-  private def unsorter(
-      labels: Array[Int], counts: Array[Int], numFactors: Int): Array[Int] = {
+  private def unsorter(labels: Array[Int],
+                       counts: Array[Int],
+                       numFactors: Int): Array[Int] = {
     val n = labels.length
 
     // calculate running sum of label counts
@@ -127,8 +128,8 @@ private[saddle] object JoinHelper {
     permuter
   }
 
-  private def applyUnsorter(
-      unsorter: Array[Int], labels: Array[Int]): Array[Int] = {
+  private def applyUnsorter(unsorter: Array[Int],
+                            labels: Array[Int]): Array[Int] = {
     if (unsorter.length > 0) array.take(unsorter, labels, -1)
     else {
       val ll = labels.length

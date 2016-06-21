@@ -138,8 +138,8 @@ object EitherOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: TermName, inputStreamB: TermName) =
+      override def compareBinary(inputStreamA: TermName,
+                                 inputStreamB: TermName) =
         genBinaryCompare(inputStreamA, inputStreamB)
       override def hash(element: TermName): ctx.Tree = genHashFn(element)
       override def put(inputStream: TermName, element: TermName) =

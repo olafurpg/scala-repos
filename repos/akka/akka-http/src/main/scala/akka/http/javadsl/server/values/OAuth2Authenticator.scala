@@ -62,7 +62,7 @@ abstract class OAuth2Authenticator[T](val realm: String)
   /**
     * INTERNAL API
     */
-  protected[http] final def createRoute(
-      first: Route, others: Array[Route]): Route =
+  protected[http] final def createRoute(first: Route,
+                                        others: Array[Route]): Route =
     RouteStructure.OAuth2Authentication(this)(first, others.toList)
 }

@@ -134,8 +134,8 @@ object Cache {
     * @return result as Option[T]
     */
   @deprecated("Inject CacheApi into your component", "2.5.0")
-  def getAs[T](key: String)(
-      implicit app: Application, ct: ClassTag[T]): Option[T] = {
+  def getAs[T](key: String)(implicit app: Application,
+                            ct: ClassTag[T]): Option[T] = {
     cacheApi.get[T](key)
   }
 
@@ -154,7 +154,9 @@ trait EhCacheComponents {
   def applicationLifecycle: ApplicationLifecycle
 
   lazy val ehCacheManager: CacheManager = new CacheManagerProvider(
-      environment, configuration, applicationLifecycle).get
+      environment,
+      configuration,
+      applicationLifecycle).get
 
   /**
     * Use this to create with the given name.
@@ -213,8 +215,9 @@ class EhCacheModule extends Module {
 }
 
 @Singleton
-class CacheManagerProvider @Inject()(
-    env: Environment, config: Configuration, lifecycle: ApplicationLifecycle)
+class CacheManagerProvider @Inject()(env: Environment,
+                                     config: Configuration,
+                                     lifecycle: ApplicationLifecycle)
     extends Provider[CacheManager] {
   lazy val get: CacheManager = {
     val resourceName = config.underlying.getString("play.cache.configResource")

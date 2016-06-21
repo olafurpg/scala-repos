@@ -21,8 +21,9 @@ import io.prediction.data.storage.StorageClientConfig
 import scalikejdbc._
 
 /** JDBC implementations of [[EvaluationInstances]] */
-class JDBCEvaluationInstances(
-    client: String, config: StorageClientConfig, prefix: String)
+class JDBCEvaluationInstances(client: String,
+                              config: StorageClientConfig,
+                              prefix: String)
     extends EvaluationInstances
     with Logging {
 

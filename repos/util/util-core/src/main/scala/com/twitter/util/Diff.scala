@@ -102,9 +102,9 @@ object Diffable {
         val SeqDiff(_, insert) = diff(left, right.take(left.length))
         SeqDiff(right.length,
                 insert ++
-                ((left.length until right.length) map { i =>
-                      (i -> right(i))
-                    }))
+                  ((left.length until right.length) map { i =>
+                        (i -> right(i))
+                      }))
       } else if (left.length > right.length) {
         diff(left.take(right.length), right)
       } else {

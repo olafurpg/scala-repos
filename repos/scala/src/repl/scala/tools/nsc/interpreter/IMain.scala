@@ -78,10 +78,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   private[nsc] var printResults = true // whether to print result lines
   private[nsc] var totalSilence = false // whether to print anything
   private var _initializeComplete = false // compiler is initialized
-  private var _isInitialized: Future[Boolean] =
-    null // set up initialization future
-  private var bindExceptions =
-    true // whether to bind the lastException variable
+  private var _isInitialized: Future[Boolean] = null // set up initialization future
+  private var bindExceptions = true // whether to bind the lastException variable
   private var _executionWrapper = "" // code to be wrapped around all lines
   var partialInput: String = "" // code accumulated in multi-line REPL input
 
@@ -92,13 +90,10 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     *  use a lazy val to ensure that any attempt to use the compiler object waits
     *  on the future.
     */
-  private var _classLoader: util.AbstractFileClassLoader =
-    null // active classloader
-  private val _compiler: ReplGlobal =
-    newCompiler(settings, reporter) // our private compiler
+  private var _classLoader: util.AbstractFileClassLoader = null // active classloader
+  private val _compiler: ReplGlobal = newCompiler(settings, reporter) // our private compiler
 
-  private var _runtimeClassLoader: URLClassLoader =
-    null // wrapper exposing addURL
+  private var _runtimeClassLoader: URLClassLoader = null // wrapper exposing addURL
 
   def compilerClasspath: Seq[java.net.URL] =
     (if (isInitializeComplete) global.classPath.asURLs
@@ -244,8 +239,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   lazy val isettings = new ISettings(this)
 
   /** Instantiate a compiler.  Overridable. */
-  protected def newCompiler(
-      settings: Settings, reporter: reporters.Reporter): ReplGlobal = {
+  protected def newCompiler(settings: Settings,
+                            reporter: reporters.Reporter): ReplGlobal = {
     settings.outputDirs setSingleOutput replOutput.dir
     settings.exposeEmptyPackage.value = true
     new Global(settings, reporter) with ReplGlobal {
@@ -470,8 +465,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   /** Build a request from the user. `trees` is `line` after being parsed.
     */
-  private[interpreter] def buildRequest(
-      line: String, trees: List[Tree]): Request = {
+  private[interpreter] def buildRequest(line: String,
+                                        trees: List[Tree]): Request = {
     executingRequest = new Request(line, trees)
     executingRequest
   }
@@ -490,7 +485,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   }
 
   private[interpreter] def requestFromLine(
-      line: String, synthetic: Boolean): Either[IR.Result, Request] = {
+      line: String,
+      synthetic: Boolean): Either[IR.Result, Request] = {
     val content = line
 
     val trees: List[global.Tree] = parse(content) match {
@@ -500,18 +496,18 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     }
     repltrace(
         trees map
-        (t => {
-              // [Eugene to Paul] previously it just said `t map ...`
-              // because there was an implicit conversion from Tree to a list of Trees
-              // however Martin and I have removed the conversion
-              // (it was conflicting with the new reflection API),
-              // so I had to rewrite this a bit
-              val subs = t collect { case sub => sub }
-              subs map
-              (t0 =>
-                    "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                  "\n") mkString ""
-            }) mkString "\n"
+          (t => {
+                // [Eugene to Paul] previously it just said `t map ...`
+                // because there was an implicit conversion from Tree to a list of Trees
+                // however Martin and I have removed the conversion
+                // (it was conflicting with the new reflection API),
+                // so I had to rewrite this a bit
+                val subs = t collect { case sub => sub }
+                subs map
+                (t0 =>
+                      "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                      "\n") mkString ""
+              }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -540,7 +536,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
              repldbg("[raw] " + raw1 + "   <--->   " + raw2)
 
              val adjustment = (raw1.reverse takeWhile
-                 (ch => (ch != ';') && (ch != '\n'))).size
+                   (ch => (ch != ';') && (ch != '\n'))).size
              val lastpos = lastpos0 - adjustment
 
              // the source code split at the laboriously determined position.
@@ -594,8 +590,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       case Right(req) => new WrappedRequest(req).loadAndRunReq
     }
 
-  private def compile(
-      line: String, synthetic: Boolean): Either[IR.Result, Request] = {
+  private def compile(line: String,
+                      synthetic: Boolean): Either[IR.Result, Request] = {
     if (global == null) Left(IR.Error)
     else
       requestFromLine(line, synthetic) match {
@@ -619,21 +615,21 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       case Left(result) =>
         result match {
           case IR.Incomplete => {
-              code = cat + "\n"
-              new CompiledScript {
-                def eval(context: ScriptContext): Object = null
-                def getEngine: ScriptEngine = IMain.this
-              }
+            code = cat + "\n"
+            new CompiledScript {
+              def eval(context: ScriptContext): Object = null
+              def getEngine: ScriptEngine = IMain.this
             }
+          }
           case _ => {
-              code = ""
-              throw new ScriptException("compile-time error")
-            }
+            code = ""
+            throw new ScriptException("compile-time error")
+          }
         }
       case Right(req) => {
-          code = ""
-          new WrappedRequest(req)
-        }
+        code = ""
+        new WrappedRequest(req)
+      }
     }
   }
 
@@ -715,8 +711,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
         IR.Error
 
       case Right(_) =>
-        val line = "%sval %s = %s.value".format(
-            modifiers map (_ + " ") mkString, name, bindRep.evalPath)
+        val line = "%sval %s = %s.value"
+          .format(modifiers map (_ + " ") mkString, name, bindRep.evalPath)
         repldbg("Interpreting: " + line)
         interpret(line)
     }
@@ -793,7 +789,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
       withLastExceptionLock[String]({
         directBind[Throwable]("lastException", unwrapped)(
-            StdReplTags.tagOfThrowable, classTag[Throwable])
+            StdReplTags.tagOfThrowable,
+            classTag[Throwable])
         stackTrace
       }, stackTrace)
     }
@@ -827,7 +824,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
     private def evalError(path: String, ex: Throwable) =
       throw new EvalException(
-          "Failed to load '" + path + "': " + ex.getMessage, ex)
+          "Failed to load '" + path + "': " + ex.getMessage,
+          ex)
 
     private def load(path: String): Class[_] = {
       try Class.forName(path, true, classLoader) catch {
@@ -873,7 +871,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
               rest filter {
                 case (pos0, msg0) =>
                   (msg != msg0) ||
-                  (pos.lineContent.trim != pos0.lineContent.trim) || {
+                    (pos.lineContent.trim != pos0.lineContent.trim) || {
                     // same messages and same line content after whitespace removal
                     // but we want to let through multiple warnings on the same line
                     // from the same run.  The untrimmed line will be the same since
@@ -892,7 +890,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
         case Array(method) => method
         case xs =>
           sys.error("Internal error: eval object " + evalClass + ", " +
-              xs.mkString("\n", "\n", ""))
+                xs.mkString("\n", "\n", ""))
       }
     private def compileAndSaveRun(label: String, code: String) = {
       showCodeIfDebugging(code)
@@ -911,7 +909,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     def imports = importedSymbols
     def value =
       Some(handlers.last) filter (h => h.definesValue) map
-      (h => definedSymbols(h.definesTerm.get)) getOrElse NoSymbol
+        (h => definedSymbols(h.definesTerm.get)) getOrElse NoSymbol
     val lineRep = new ReadEvalPrint()
 
     private var _originalLine: String = null
@@ -942,13 +940,14 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     /** Code to import bound names from previous lines - accessPath is code to
       * append to objectName to access anything bound by request.
       */
-    lazy val ComputedImports(
-    headerPreamble, importsPreamble, importsTrailer, accessPath) =
-      exitingTyper(
-          importsCode(referencedNames.toSet,
-                      ObjectSourceCode,
-                      definesClass,
-                      generousImports))
+    lazy val ComputedImports(headerPreamble,
+                             importsPreamble,
+                             importsTrailer,
+                             accessPath) = exitingTyper(
+        importsCode(referencedNames.toSet,
+                    ObjectSourceCode,
+                    definesClass,
+                    generousImports))
 
     /** the line of code to compute */
     def toCompute = line
@@ -1139,8 +1138,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def compile(script: String): CompiledScript =
     eval(
         "new javax.script.CompiledScript { def eval(context: javax.script.ScriptContext): Object = { " +
-        script +
-        " }.asInstanceOf[Object]; def getEngine: javax.script.ScriptEngine = engine }")
+          script +
+          " }.asInstanceOf[Object]; def getEngine: javax.script.ScriptEngine = engine }")
       .asInstanceOf[CompiledScript]
 
   @throws[ScriptException]
@@ -1300,12 +1299,12 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def definedTypes = onlyTypes(allDefinedNames)
   def definedSymbolList =
     prevRequestList flatMap (_.defines) filterNot
-    (s => isInternalTermName(s.name))
+      (s => isInternalTermName(s.name))
 
   // Terms with user-given names (i.e. not res0 and not synthetic)
   def namedDefinedTerms =
     definedTerms filterNot
-    (x => isUserVarName("" + x) || directlyBoundNames(x))
+      (x => isUserVarName("" + x) || directlyBoundNames(x))
 
   private var _replScope: Scope = _
   private def resetReplScope() {

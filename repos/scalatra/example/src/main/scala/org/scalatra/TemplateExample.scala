@@ -6,13 +6,14 @@ import scala.xml.{Node, Text}
 
 object Template {
 
-  def page(title: String,
-           content: Seq[Node],
-           url: String => String = identity _,
-           head: Seq[Node] = Nil,
-           scripts: Seq[String] = Seq.empty,
-           defaultScripts: Seq[String] = Seq(
-               "/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) = {
+  def page(
+      title: String,
+      content: Seq[Node],
+      url: String => String = identity _,
+      head: Seq[Node] = Nil,
+      scripts: Seq[String] = Seq.empty,
+      defaultScripts: Seq[String] =
+        Seq("/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) = {
     <html lang="en">
       <head>
         <title>{ title }</title>
@@ -132,13 +133,13 @@ class TemplateExample
   post("/login") {
     (params("first"), params("last")) match {
       case (first: String, last: String) => {
-          session("first") = first
-          session("last") = last
-          displayPage(
-              "Scalatra: Session Example",
-              <pre>You have just logged in as: { first + " " + last }</pre>
+        session("first") = first
+        session("last") = last
+        displayPage(
+            "Scalatra: Session Example",
+            <pre>You have just logged in as: { first + " " + last }</pre>
           <pre>Route: /login</pre>)
-        }
+      }
     }
   }
 

@@ -112,9 +112,9 @@ object AsyncMeter {
   * }
   * }}}
   */
-class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
-                                     burstDuration: Duration,
-                                     maxWaiters: Int)(implicit timer: Timer) {
+class AsyncMeter private[concurrent] (private[concurrent] val burstSize: Int,
+                                      burstDuration: Duration,
+                                      maxWaiters: Int)(implicit timer: Timer) {
 
   require(burstSize > 0,
           s"burst size of $burstSize, which is <= 0 doesn't make sense")
@@ -224,8 +224,7 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
   // we refresh the bucket with as many tokens as we have accrued since we last
   // refreshed.
   private[this] def refreshTokens(): Unit =
-    bucket.put(
-        synchronized {
+    bucket.put(synchronized {
       val newTokens = period.numPeriods(elapsed())
       elapsed = Stopwatch.start()
       val num = newTokens + remainder

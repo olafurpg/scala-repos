@@ -119,8 +119,8 @@ private[memory] trait MemoryManagerSuite
   /**
     * Assert that [[MemoryStore.evictBlocksToFreeSpace]] is called with the given parameters.
     */
-  protected def assertEvictBlocksToFreeSpaceCalled(
-      ms: MemoryStore, numBytes: Long): Unit = {
+  protected def assertEvictBlocksToFreeSpaceCalled(ms: MemoryStore,
+                                                   numBytes: Long): Unit = {
     assert(evictBlocksToFreeSpaceCalled.get() === numBytes,
            s"expected evictBlocksToFreeSpace() to be called with $numBytes")
     evictBlocksToFreeSpaceCalled.set(DEFAULT_EVICT_BLOCKS_TO_FREE_SPACE_CALLED)
@@ -140,9 +140,9 @@ private[memory] trait MemoryManagerSuite
   /**
     * Create a MemoryManager with the specified execution memory limits and no storage memory.
     */
-  protected def createMemoryManager(maxOnHeapExecutionMemory: Long,
-                                    maxOffHeapExecutionMemory: Long =
-                                      0L): MemoryManager
+  protected def createMemoryManager(
+      maxOnHeapExecutionMemory: Long,
+      maxOffHeapExecutionMemory: Long = 0L): MemoryManager
 
   // -- Tests of sharing of execution memory between tasks ----------------------------------------
   // Prior to Spark 1.6, these tests were part of ShuffleMemoryManagerSuite.
@@ -153,30 +153,30 @@ private[memory] trait MemoryManagerSuite
     val manager = createMemoryManager(1000L)
     val taskMemoryManager = new TaskMemoryManager(manager, 0)
 
-    assert(taskMemoryManager.acquireExecutionMemory(
-            100L, MemoryMode.ON_HEAP, null) === 100L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            400L, MemoryMode.ON_HEAP, null) === 400L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            400L, MemoryMode.ON_HEAP, null) === 400L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            200L, MemoryMode.ON_HEAP, null) === 100L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            100L, MemoryMode.ON_HEAP, null) === 0L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            100L, MemoryMode.ON_HEAP, null) === 0L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(100L, MemoryMode.ON_HEAP, null) === 100L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(400L, MemoryMode.ON_HEAP, null) === 400L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(400L, MemoryMode.ON_HEAP, null) === 400L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(200L, MemoryMode.ON_HEAP, null) === 100L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(100L, MemoryMode.ON_HEAP, null) === 0L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(100L, MemoryMode.ON_HEAP, null) === 0L)
 
     taskMemoryManager.releaseExecutionMemory(500L, MemoryMode.ON_HEAP, null)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            300L, MemoryMode.ON_HEAP, null) === 300L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            300L, MemoryMode.ON_HEAP, null) === 200L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(300L, MemoryMode.ON_HEAP, null) === 300L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(300L, MemoryMode.ON_HEAP, null) === 200L)
 
     taskMemoryManager.cleanUpAllAllocatedMemory()
-    assert(taskMemoryManager.acquireExecutionMemory(
-            1000L, MemoryMode.ON_HEAP, null) === 1000L)
-    assert(taskMemoryManager.acquireExecutionMemory(
-            100L, MemoryMode.ON_HEAP, null) === 0L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(1000L, MemoryMode.ON_HEAP, null) === 1000L)
+    assert(taskMemoryManager
+          .acquireExecutionMemory(100L, MemoryMode.ON_HEAP, null) === 0L)
   }
 
   test("two tasks requesting full on-heap execution memory") {
@@ -316,8 +316,8 @@ private[memory] trait MemoryManagerSuite
   }
 
   test("off-heap execution allocations cannot exceed limit") {
-    val memoryManager = createMemoryManager(
-        maxOnHeapExecutionMemory = 0L, maxOffHeapExecutionMemory = 1000L)
+    val memoryManager = createMemoryManager(maxOnHeapExecutionMemory = 0L,
+                                            maxOffHeapExecutionMemory = 1000L)
 
     val tMemManager = new TaskMemoryManager(memoryManager, 1)
     val result1 = Future {

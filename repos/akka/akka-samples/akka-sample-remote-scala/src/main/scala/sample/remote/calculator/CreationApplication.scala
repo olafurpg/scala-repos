@@ -19,8 +19,8 @@ object CreationApplication {
   }
 
   def startRemoteCreationSystem(): Unit = {
-    val system = ActorSystem(
-        "CreationSystem", ConfigFactory.load("remotecreation"))
+    val system =
+      ActorSystem("CreationSystem", ConfigFactory.load("remotecreation"))
     val actor = system.actorOf(Props[CreationActor], name = "creationActor")
 
     println("Started CreationSystem")

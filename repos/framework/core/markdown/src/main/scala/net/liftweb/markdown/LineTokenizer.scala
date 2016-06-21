@@ -245,7 +245,7 @@ class LineTokenizer() extends Parsers {
       case n: NoSuccess =>
         throw new IllegalStateException(
             "Inner line Tokenizing failed. This is a bug. Message was: " +
-            n.msg)
+              n.msg)
     }
 
   /** Tokenizes a whole Markdown document.

@@ -161,6 +161,6 @@ private[spark] object BinomialBounds {
     math.min(1,
              math.max(minSamplingRate,
                       fraction + gamma +
-                      math.sqrt(gamma * gamma + 2 * gamma * fraction)))
+                        math.sqrt(gamma * gamma + 2 * gamma * fraction)))
   }
 }

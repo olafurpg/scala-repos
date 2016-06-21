@@ -31,7 +31,8 @@ trait ScTypeAlias
   override def getIcon(flags: Int): Icon = Icons.TYPE_ALIAS
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean) = m match {
+      m: ScMember,
+      isStrict: Boolean) = m match {
     case t: ScTypeAlias => t.name == name
     case _ => false
   }
@@ -45,7 +46,7 @@ trait ScTypeAlias
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
-    hasAnnotation("java.lang.Deprecated") != None
+      hasAnnotation("java.lang.Deprecated") != None
 
   def getTypeToken: PsiElement = findFirstChildByType(ScalaTokenTypes.kTYPE)
 

@@ -75,8 +75,9 @@ object Opt {
       returning(name)(_ => addHelp(() => helpFormatStr.format(opt, descr)))
   }
 
-  class Instance(
-      val programInfo: Info, val parsed: CommandLine, val name: String)
+  class Instance(val programInfo: Info,
+                 val parsed: CommandLine,
+                 val name: String)
       extends Implicit
       with Error {
     def --? = parsed isSet opt

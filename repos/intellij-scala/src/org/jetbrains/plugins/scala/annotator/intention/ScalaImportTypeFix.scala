@@ -46,8 +46,8 @@ import scala.collection.mutable.ArrayBuffer
   * User: Alexander Podkhalyuzin
   * Date: 15.07.2009
   */
-class ScalaImportTypeFix(
-    private var classes: Array[TypeToImport], ref: ScReferenceElement)
+class ScalaImportTypeFix(private var classes: Array[TypeToImport],
+                         ref: ScReferenceElement)
     extends {
   val project = ref.getProject
 } with HintAction {
@@ -61,8 +61,7 @@ class ScalaImportTypeFix(
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     CommandProcessor
       .getInstance()
-      .runUndoTransparentAction(
-          new Runnable {
+      .runUndoTransparentAction(new Runnable {
         def run() {
           if (!ref.isValid) return
           classes = ScalaImportTypeFix.getTypesToImport(ref, project)
@@ -155,8 +154,9 @@ class ScalaImportTypeFix(
 
   def startInWriteAction(): Boolean = true
 
-  class ScalaAddImportAction(
-      editor: Editor, classes: Array[TypeToImport], ref: ScReferenceElement)
+  class ScalaAddImportAction(editor: Editor,
+                             classes: Array[TypeToImport],
+                             ref: ScReferenceElement)
       extends QuestionAction {
     def addImportOrReference(clazz: TypeToImport) {
       ApplicationManager.getApplication.invokeLater(new Runnable() {
@@ -172,8 +172,8 @@ class ScalaImportTypeFix(
               if (!ref.isInstanceOf[ScDocResolvableCodeReference])
                 ref.bindToElement(clazz.element)
               else
-                ref.replace(ScalaPsiElementFactory.createDocLinkValue(
-                        clazz.qualifiedName, ref.getManager))
+                ref.replace(ScalaPsiElementFactory
+                      .createDocLinkValue(clazz.qualifiedName, ref.getManager))
             }
           }, clazz.getProject, "Add import action")
         }
@@ -211,8 +211,8 @@ class ScalaImportTypeFix(
           val toExclude: java.util.List[String] =
             AddImportAction.getAllExcludableStrings(qname)
           new BaseListPopupStep[String](null, toExclude) {
-            override def onChosen(
-                selectedValue: String, finalChoice: Boolean): PopupStep[_] = {
+            override def onChosen(selectedValue: String,
+                                  finalChoice: Boolean): PopupStep[_] = {
               if (finalChoice) {
                 AddImportAction.excludeFromImport(project, selectedValue)
               }
@@ -354,8 +354,8 @@ object ScalaImportTypeFix {
     }
   }
 
-  def getTypesToImport(
-      ref: ScReferenceElement, myProject: Project): Array[TypeToImport] = {
+  def getTypesToImport(ref: ScReferenceElement,
+                       myProject: Project): Array[TypeToImport] = {
     if (!ref.isValid) return Array.empty
     if (ref.isInstanceOf[ScTypeProjection]) return Array.empty
     val kinds = ref.getKinds(incomplete = false)
@@ -426,7 +426,7 @@ object ScalaImportTypeFix {
       buffer.filter {
         case ClassTypeToImport(clazz) =>
           clazz.isInstanceOf[ScObject] &&
-          clazz.asInstanceOf[ScObject].functionsByName("apply").nonEmpty
+            clazz.asInstanceOf[ScObject].functionsByName("apply").nonEmpty
         case _ => false
       }.sortBy(_.qualifiedName).toArray
     } else buffer.sortBy(_.qualifiedName).toArray

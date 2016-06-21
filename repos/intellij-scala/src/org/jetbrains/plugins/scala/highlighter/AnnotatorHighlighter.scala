@@ -31,8 +31,8 @@ import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
   * Date: 17.07.2008
   */
 object AnnotatorHighlighter {
-  private val JAVA_COLLECTIONS_BASES = List(
-      "java.util.Map", "java.util.Collection")
+  private val JAVA_COLLECTIONS_BASES =
+    List("java.util.Map", "java.util.Collection")
   private val SCALA_FACTORY_METHODS_NAMES = Set("make", "apply")
   private val SCALA_COLLECTION_MUTABLE_BASE =
     "_root_.scala.collection.mutable."
@@ -65,12 +65,13 @@ object AnnotatorHighlighter {
     }
   }
 
-  def highlightReferenceElement(
-      refElement: ScReferenceElement, holder: AnnotationHolder) {
+  def highlightReferenceElement(refElement: ScReferenceElement,
+                                holder: AnnotationHolder) {
 
     def annotateCollectionByType(resolvedType: ScType) {
       if (ScalaNamesUtil.isOperatorName(resolvedType.presentableText.substring(
-                  0, resolvedType.presentableText.prefixLength(_ != '.'))))
+                  0,
+                  resolvedType.presentableText.prefixLength(_ != '.'))))
         return
 
       val scalaProjectSettings: ScalaProjectSettings =
@@ -92,15 +93,16 @@ object AnnotatorHighlighter {
         qn.exists(textName => {
           val cachedClass = ScalaPsiManager
             .instance(refElement.getProject)
-            .getCachedClass(
-                textName, refElement.getResolveScope, ClassCategory.TYPE)
+            .getCachedClass(textName,
+                            refElement.getResolveScope,
+                            ClassCategory.TYPE)
           if (cachedClass == null) false
           else tp.conforms(ScType.designator(cachedClass))
         })
       }
 
-      def simpleAnnotate(
-          annotationText: String, annotationAttributes: TextAttributesKey) {
+      def simpleAnnotate(annotationText: String,
+                         annotationAttributes: TextAttributesKey) {
         if (SCALA_FACTORY_METHODS_NAMES.contains(refElement.nameId.getText)) {
           return
         }
@@ -130,8 +132,7 @@ object AnnotatorHighlighter {
           .getType(TypingContext.empty)
           .foreach {
             case f @ ScFunctionType(returnType, params) =>
-              Option(returnType).foreach(
-                  a =>
+              Option(returnType).foreach(a =>
                     if (a.canonicalText.startsWith(
                             SCALA_COLLECTION_MUTABLE_BASE)) {
                   simpleAnnotate(
@@ -155,11 +156,13 @@ object AnnotatorHighlighter {
     def isHighlightableScalaTestKeyword(fun: ScMember): Boolean = {
       fun.getContainingClass != null &&
       ScalaTestHighlighterUtil.isHighlightableScalaTestKeyword(
-          fun.getContainingClass.getQualifiedName, fun match {
-        case p: ScPatternDefinition =>
-          p.bindings.headOption.map(_.getName).orNull
-        case _ => fun.getName
-      }, fun.getProject)
+          fun.getContainingClass.getQualifiedName,
+          fun match {
+            case p: ScPatternDefinition =>
+              p.bindings.headOption.map(_.getName).orNull
+            case _ => fun.getName
+          },
+          fun.getProject)
     }
 
     val c = ScalaPsiUtil.getParentOfType(refElement, classOf[ScConstructor])
@@ -200,7 +203,7 @@ object AnnotatorHighlighter {
         annotation.setTextAttributes(DefaultHighlighter.TRAIT)
       case x: PsiClass
           if x.getModifierList != null &&
-          x.getModifierList.hasModifierProperty("abstract") =>
+            x.getModifierList.hasModifierProperty("abstract") =>
         annotation.setTextAttributes(DefaultHighlighter.ABSTRACT_CLASS)
       case _: PsiClass
           if refElement.isInstanceOf[ScStableCodeReferenceElement] =>
@@ -395,8 +398,8 @@ object AnnotatorHighlighter {
     }
   }
 
-  private def visitAnnotation(
-      annotation: ScAnnotation, holder: AnnotationHolder): Unit = {
+  private def visitAnnotation(annotation: ScAnnotation,
+                              holder: AnnotationHolder): Unit = {
     val annotation1 =
       holder.createInfoAnnotation(annotation.getFirstChild, null)
     annotation1.setTextAttributes(DefaultHighlighter.ANNOTATION)
@@ -405,8 +408,8 @@ object AnnotatorHighlighter {
     annotation2.setTextAttributes(DefaultHighlighter.ANNOTATION)
   }
 
-  private def visitTypeAlias(
-      typeAlias: ScTypeAlias, holder: AnnotationHolder): Unit = {
+  private def visitTypeAlias(typeAlias: ScTypeAlias,
+                             holder: AnnotationHolder): Unit = {
     val annotation = holder.createInfoAnnotation(typeAlias.nameId, null)
     annotation.setTextAttributes(DefaultHighlighter.TYPE_ALIAS)
   }
@@ -421,8 +424,8 @@ object AnnotatorHighlighter {
     }
   }
 
-  private def visitParameter(
-      param: ScParameter, holder: AnnotationHolder): Unit = {
+  private def visitParameter(param: ScParameter,
+                             holder: AnnotationHolder): Unit = {
     val annotation = holder.createInfoAnnotation(param.nameId, null)
     val attributesKey =
       if (param.isAnonymousParameter) DefaultHighlighter.ANONYMOUS_PARAMETER
@@ -439,21 +442,21 @@ object AnnotatorHighlighter {
     }
   }
 
-  private def visitCaseClause(
-      clause: ScCaseClause, holder: AnnotationHolder): Unit = {
+  private def visitCaseClause(clause: ScCaseClause,
+                              holder: AnnotationHolder): Unit = {
     clause.pattern match {
       case Some(x) => visitPattern(x, holder, DefaultHighlighter.PATTERN)
       case None =>
     }
   }
 
-  private def visitGenerator(
-      generator: ScGenerator, holder: AnnotationHolder): Unit = {
+  private def visitGenerator(generator: ScGenerator,
+                             holder: AnnotationHolder): Unit = {
     visitPattern(generator.pattern, holder, DefaultHighlighter.GENERATOR)
   }
 
-  private def visitEnumerator(
-      enumerator: ScEnumerator, holder: AnnotationHolder): Unit = {
+  private def visitEnumerator(enumerator: ScEnumerator,
+                              holder: AnnotationHolder): Unit = {
     visitPattern(enumerator.pattern, holder, DefaultHighlighter.GENERATOR)
   }
 

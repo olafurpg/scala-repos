@@ -53,8 +53,8 @@ object ScalaEvaluatorBuilder extends EvaluatorBuilder {
     }
 
     def buildCompilingEvaluator: ScalaCompilingEvaluator = {
-      val compilingEvaluator = new ScalaCompilingEvaluator(
-          position.getElementAt, scalaFragment)
+      val compilingEvaluator =
+        new ScalaCompilingEvaluator(position.getElementAt, scalaFragment)
       cache
         .add(position, scalaFragment, compilingEvaluator)
         .asInstanceOf[ScalaCompilingEvaluator]
@@ -74,7 +74,8 @@ private[evaluation] class NeedCompilationException(message: String)
     extends EvaluateException(message)
 
 private[evaluation] class ScalaEvaluatorBuilder(
-    val codeFragment: ScalaCodeFragment, val position: SourcePosition)
+    val codeFragment: ScalaCodeFragment,
+    val position: SourcePosition)
     extends ScalaEvaluatorBuilderUtil
     with SyntheticVariablesHelper {
 

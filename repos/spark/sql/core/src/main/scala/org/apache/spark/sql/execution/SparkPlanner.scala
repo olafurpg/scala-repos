@@ -32,7 +32,7 @@ class SparkPlanner(val sparkContext: SparkContext,
 
   def strategies: Seq[Strategy] =
     experimentalMethods.extraStrategies ++
-    (FileSourceStrategy :: DataSourceStrategy :: DDLStrategy :: SpecialLimits :: Aggregation :: LeftSemiJoin :: EquiJoinSelection :: InMemoryScans :: BasicOperators :: BroadcastNestedLoop :: CartesianProduct :: DefaultJoin :: Nil)
+      (FileSourceStrategy :: DataSourceStrategy :: DDLStrategy :: SpecialLimits :: Aggregation :: LeftSemiJoin :: EquiJoinSelection :: InMemoryScans :: BasicOperators :: BroadcastNestedLoop :: CartesianProduct :: DefaultJoin :: Nil)
 
   /**
     * Used to build table scan operators where complex projection and filtering are done using
@@ -73,8 +73,8 @@ class SparkPlanner(val sparkContext: SparkContext,
       filterCondition.map(Filter(_, scan)).getOrElse(scan)
     } else {
       val scan = scanBuilder((projectSet ++ filterSet).toSeq)
-      Project(
-          projectList, filterCondition.map(Filter(_, scan)).getOrElse(scan))
+      Project(projectList,
+              filterCondition.map(Filter(_, scan)).getOrElse(scan))
     }
   }
 }

@@ -27,8 +27,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val itemStringIntMap = BiMap.stringInt(data.ratings.map(_.item))
     val mllibRatings = data.ratings.map(r =>
           // MLlibRating requires integer index for user and item
-          MLlibRating(
-              userStringIntMap(r.user), itemStringIntMap(r.item), r.rating))
+          MLlibRating(userStringIntMap(r.user),
+                      itemStringIntMap(r.item),
+                      r.rating))
     val m = ALS.train(mllibRatings, ap.rank, ap.numIterations, ap.lambda)
     new ALSModel(rank = m.rank,
                  userFeatures = m.userFeatures,

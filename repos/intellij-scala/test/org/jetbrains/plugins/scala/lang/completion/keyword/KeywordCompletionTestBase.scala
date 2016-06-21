@@ -30,8 +30,8 @@ abstract class KeywordCompletionTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil
+          .loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(caretMarker)
@@ -40,7 +40,8 @@ abstract class KeywordCompletionTestBase
         "Not specified end marker in test case. Use /*caret*/ in scala file for this.")
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
     val editor = fileEditorManager.openTextEditor(
-        new OpenFileDescriptor(getProjectAdapter, file, offset), false)
+        new OpenFileDescriptor(getProjectAdapter, file, offset),
+        false)
     val myType = CompletionType.BASIC
     new CodeCompletionHandlerBase(myType, false, false, true)
       .invokeCompletion(getProjectAdapter, editor)

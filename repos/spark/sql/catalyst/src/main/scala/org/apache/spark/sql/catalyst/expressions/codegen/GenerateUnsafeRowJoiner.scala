@@ -70,29 +70,28 @@ object GenerateUnsafeRowJoiner
     // --------------------- copy bitset from row 1 and row 2 --------------------------- //
     val copyBitset = Seq
       .tabulate(outputBitsetWords) { i =>
-        val bits =
-          if (bitset1Remainder > 0) {
-            if (i < bitset1Words - 1) {
-              s"$getLong(obj1, offset1 + ${i * 8})"
-            } else if (i == bitset1Words - 1) {
-              // combine last work of bitset1 and first word of bitset2
-              s"$getLong(obj1, offset1 + ${i * 8}) | ($getLong(obj2, offset2) << $bitset1Remainder)"
-            } else if (i - bitset1Words < bitset2Words - 1) {
-              // combine next two words of bitset2
-              s"($getLong(obj2, offset2 + ${(i - bitset1Words) * 8}) >>> (64 - $bitset1Remainder))" +
-              s" | ($getLong(obj2, offset2 + ${(i - bitset1Words + 1) * 8}) << $bitset1Remainder)"
-            } else {
-              // last word of bitset2
-              s"$getLong(obj2, offset2 + ${(i - bitset1Words) * 8}) >>> (64 - $bitset1Remainder)"
-            }
+        val bits = if (bitset1Remainder > 0) {
+          if (i < bitset1Words - 1) {
+            s"$getLong(obj1, offset1 + ${i * 8})"
+          } else if (i == bitset1Words - 1) {
+            // combine last work of bitset1 and first word of bitset2
+            s"$getLong(obj1, offset1 + ${i * 8}) | ($getLong(obj2, offset2) << $bitset1Remainder)"
+          } else if (i - bitset1Words < bitset2Words - 1) {
+            // combine next two words of bitset2
+            s"($getLong(obj2, offset2 + ${(i - bitset1Words) * 8}) >>> (64 - $bitset1Remainder))" +
+            s" | ($getLong(obj2, offset2 + ${(i - bitset1Words + 1) * 8}) << $bitset1Remainder)"
           } else {
-            // they are aligned by word
-            if (i < bitset1Words) {
-              s"$getLong(obj1, offset1 + ${i * 8})"
-            } else {
-              s"$getLong(obj2, offset2 + ${(i - bitset1Words) * 8})"
-            }
+            // last word of bitset2
+            s"$getLong(obj2, offset2 + ${(i - bitset1Words) * 8}) >>> (64 - $bitset1Remainder)"
           }
+        } else {
+          // they are aligned by word
+          if (i < bitset1Words) {
+            s"$getLong(obj1, offset1 + ${i * 8})"
+          } else {
+            s"$getLong(obj2, offset2 + ${(i - bitset1Words) * 8})"
+          }
+        }
         s"$putLong(buf, ${offset + i * 8}, $bits);"
       }
       .mkString("\n")
@@ -150,12 +149,11 @@ object GenerateUnsafeRowJoiner
           // Number of bytes to increase for the offset. Note that since in UnsafeRow we store the
           // offset in the upper 32 bit of the words, we can just shift the offset to the left by
           // 32 and increment that amount in place.
-          val shift =
-            if (i < schema1.size) {
-              s"${(outputBitsetWords - bitset1Words + schema2.size) * 8}L"
-            } else {
-              s"(${(outputBitsetWords - bitset2Words + schema1.size) * 8}L + numBytesVariableRow1)"
-            }
+          val shift = if (i < schema1.size) {
+            s"${(outputBitsetWords - bitset1Words + schema2.size) * 8}L"
+          } else {
+            s"(${(outputBitsetWords - bitset2Words + schema1.size) * 8}L + numBytesVariableRow1)"
+          }
           val cursor = offset + outputBitsetWords * 8 + i * 8
           s"""
            |$putLong(buf, $cursor, $getLong(buf, $cursor) + ($shift << 32));
@@ -172,13 +170,13 @@ object GenerateUnsafeRowJoiner
        |class SpecificUnsafeRowJoiner extends ${classOf[UnsafeRowJoiner].getName} {
        |  private byte[] buf = new byte[64];
        |  private UnsafeRow out = new UnsafeRow(${schema1.size +
-                  schema2.size});
+                    schema2.size});
        |
        |  public UnsafeRow join(UnsafeRow row1, UnsafeRow row2) {
        |    // row1: ${schema1.size} fields, $bitset1Words words in bitset
        |    // row2: ${schema2.size}, $bitset2Words words in bitset
        |    // output: ${schema1.size +
-                  schema2.size} fields, $outputBitsetWords words in bitset
+                    schema2.size} fields, $outputBitsetWords words in bitset
        |    final int sizeInBytes = row1.getSizeInBytes() + row2.getSizeInBytes() - $sizeReduction;
        |    if (sizeInBytes > buf.length) {
        |      buf = new byte[sizeInBytes];

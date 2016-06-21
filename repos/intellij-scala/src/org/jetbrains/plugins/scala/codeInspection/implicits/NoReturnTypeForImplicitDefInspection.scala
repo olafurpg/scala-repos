@@ -21,13 +21,13 @@ class NoReturnTypeForImplicitDefInspection
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case fun: ScFunctionDefinition
         if fun.hasModifierProperty("implicit") && fun.parameters.size == 1 &&
-        !fun.paramClauses.clauses.exists(_.isImplicit) &&
-        fun.returnTypeElement.isEmpty =>
+          !fun.paramClauses.clauses.exists(_.isImplicit) &&
+          fun.returnTypeElement.isEmpty =>
       val descr = description
       val range = new TextRange(
           0,
           fun.parameterList.getTextRange.getEndOffset -
-          fun.getModifierList.getTextRange.getStartOffset)
+            fun.getModifierList.getTextRange.getStartOffset)
       holder.registerProblem(fun, range, descr, new AddReturnTypeQuickFix(fun))
   }
 }

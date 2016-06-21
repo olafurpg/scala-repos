@@ -18,8 +18,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScFunctionDeclarationImpl private (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
+class ScFunctionDeclarationImpl private (stub: StubElement[ScFunction],
+                                         nodeType: IElementType,
+                                         node: ASTNode)
     extends ScFunctionImpl(stub, nodeType, node)
     with ScFunctionDeclaration {
   override def accept(visitor: PsiElementVisitor) {

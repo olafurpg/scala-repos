@@ -92,8 +92,10 @@ private[recommendation] trait ALSParams
     * Default: 10
     * @group param
     */
-  val rank = new IntParam(
-      this, "rank", "rank of the factorization", ParamValidators.gtEq(1))
+  val rank = new IntParam(this,
+                          "rank",
+                          "rank of the factorization",
+                          ParamValidators.gtEq(1))
 
   /** @group getParam */
   def getRank: Int = $(rank)
@@ -103,8 +105,10 @@ private[recommendation] trait ALSParams
     * Default: 10
     * @group param
     */
-  val numUserBlocks = new IntParam(
-      this, "numUserBlocks", "number of user blocks", ParamValidators.gtEq(1))
+  val numUserBlocks = new IntParam(this,
+                                   "numUserBlocks",
+                                   "number of user blocks",
+                                   ParamValidators.gtEq(1))
 
   /** @group getParam */
   def getNumUserBlocks: Int = $(numUserBlocks)
@@ -114,8 +118,10 @@ private[recommendation] trait ALSParams
     * Default: 10
     * @group param
     */
-  val numItemBlocks = new IntParam(
-      this, "numItemBlocks", "number of item blocks", ParamValidators.gtEq(1))
+  val numItemBlocks = new IntParam(this,
+                                   "numItemBlocks",
+                                   "number of item blocks",
+                                   ParamValidators.gtEq(1))
 
   /** @group getParam */
   def getNumItemBlocks: Int = $(numItemBlocks)
@@ -125,8 +131,9 @@ private[recommendation] trait ALSParams
     * Default: false
     * @group param
     */
-  val implicitPrefs = new BooleanParam(
-      this, "implicitPrefs", "whether to use implicit preference")
+  val implicitPrefs = new BooleanParam(this,
+                                       "implicitPrefs",
+                                       "whether to use implicit preference")
 
   /** @group getParam */
   def getImplicitPrefs: Boolean = $(implicitPrefs)
@@ -136,8 +143,10 @@ private[recommendation] trait ALSParams
     * Default: 1.0
     * @group param
     */
-  val alpha = new DoubleParam(
-      this, "alpha", "alpha for implicit preference", ParamValidators.gtEq(0))
+  val alpha = new DoubleParam(this,
+                              "alpha",
+                              "alpha for implicit preference",
+                              ParamValidators.gtEq(0))
 
   /** @group getParam */
   def getAlpha: Double = $(alpha)
@@ -203,10 +212,10 @@ private[recommendation] trait ALSParams
   */
 @Experimental
 @Since("1.3.0")
-class ALSModel private[ml](@Since("1.4.0") override val uid: String,
-                           @Since("1.4.0") val rank: Int,
-                           @transient val userFactors: DataFrame,
-                           @transient val itemFactors: DataFrame)
+class ALSModel private[ml] (@Since("1.4.0") override val uid: String,
+                            @Since("1.4.0") val rank: Int,
+                            @transient val userFactors: DataFrame,
+                            @transient val itemFactors: DataFrame)
     extends Model[ALSModel]
     with ALSModelParams
     with MLWritable {
@@ -468,8 +477,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Rating class for better code readability.
     */
   @DeveloperApi
-  case class Rating[@specialized(Int, Long) ID](
-      user: ID, item: ID, rating: Float)
+  case class Rating[@specialized(Int, Long) ID](user: ID,
+                                                item: ID,
+                                                rating: Float)
 
   @Since("1.6.0")
   override def load(path: String): ALS = super.load(path)
@@ -661,8 +671,11 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     val solver = if (nonnegative) new NNLSSolver else new CholeskySolver
     val blockRatings = partitionRatings(ratings, userPart, itemPart).persist(
         intermediateRDDStorageLevel)
-    val (userInBlocks, userOutBlocks) = makeBlocks(
-        "user", blockRatings, userPart, itemPart, intermediateRDDStorageLevel)
+    val (userInBlocks, userOutBlocks) = makeBlocks("user",
+                                                   blockRatings,
+                                                   userPart,
+                                                   itemPart,
+                                                   intermediateRDDStorageLevel)
     // materialize blockRatings and user blocks
     userOutBlocks.count()
     val swappedBlockRatings = blockRatings.map {
@@ -684,7 +697,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     var previousCheckpointFile: Option[String] = None
     val shouldCheckpoint: Int => Boolean = (iter) =>
       sc.checkpointDir.isDefined && checkpointInterval != -1 &&
-      (iter % checkpointInterval == 0)
+        (iter % checkpointInterval == 0)
     val deletePreviousCheckpointFile: () => Unit = () =>
       previousCheckpointFile.foreach { file =>
         try {
@@ -873,8 +886,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * A rating block that contains src IDs, dst IDs, and ratings, stored in primitive arrays.
     */
   private[recommendation] case class RatingBlock[
-      @specialized(Int, Long) ID: ClassTag](
-      srcIds: Array[ID], dstIds: Array[ID], ratings: Array[Float]) {
+      @specialized(Int, Long) ID: ClassTag](srcIds: Array[ID],
+                                            dstIds: Array[ID],
+                                            ratings: Array[Float]) {
 
     /** Size of the block. */
     def size: Int = srcIds.length
@@ -1007,7 +1021,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       var j = 0
       while (j < sz) {
         this.dstEncodedIndices +=
-          encoder.encode(dstBlockId, dstLocalIndices(j))
+        encoder.encode(dstBlockId, dstLocalIndices(j))
         j += 1
       }
       this
@@ -1015,8 +1029,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
 
     /** Builds a [[UncompressedInBlock]]. */
     def build(): UncompressedInBlock[ID] = {
-      new UncompressedInBlock(
-          srcIds.result(), dstEncodedIndices.result(), ratings.result())
+      new UncompressedInBlock(srcIds.result(),
+                              dstEncodedIndices.result(),
+                              ratings.result())
     }
   }
 
@@ -1024,10 +1039,10 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * A block of (srcId, dstEncodedIndex, rating) tuples stored in primitive arrays.
     */
   private[recommendation] class UncompressedInBlock[
-      @specialized(Int, Long) ID: ClassTag](val srcIds: Array[ID],
-                                            val dstEncodedIndices: Array[Int],
-                                            val ratings: Array[Float])(
-      implicit ord: Ordering[ID]) {
+      @specialized(Int, Long) ID: ClassTag](
+      val srcIds: Array[ID],
+      val dstEncodedIndices: Array[Int],
+      val ratings: Array[Float])(implicit ord: Ordering[ID]) {
 
     /** Size the of block. */
     def length: Int = srcIds.length
@@ -1129,20 +1144,22 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       }
     }
 
-    override def getKey(
-        data: UncompressedInBlock[ID], pos: Int): KeyWrapper[ID] = {
+    override def getKey(data: UncompressedInBlock[ID],
+                        pos: Int): KeyWrapper[ID] = {
       getKey(data, pos, null)
     }
 
-    private def swapElements[@specialized(Int, Float) T](
-        data: Array[T], pos0: Int, pos1: Int): Unit = {
+    private def swapElements[@specialized(Int, Float) T](data: Array[T],
+                                                         pos0: Int,
+                                                         pos1: Int): Unit = {
       val tmp = data(pos0)
       data(pos0) = data(pos1)
       data(pos1) = tmp
     }
 
-    override def swap(
-        data: UncompressedInBlock[ID], pos0: Int, pos1: Int): Unit = {
+    override def swap(data: UncompressedInBlock[ID],
+                      pos0: Int,
+                      pos1: Int): Unit = {
       swapElements(data.srcIds, pos0, pos1)
       swapElements(data.dstEncodedIndices, pos0, pos1)
       swapElements(data.ratings, pos0, pos1)
@@ -1154,8 +1171,11 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
                            dstPos: Int,
                            length: Int): Unit = {
       System.arraycopy(src.srcIds, srcPos, dst.srcIds, dstPos, length)
-      System.arraycopy(
-          src.dstEncodedIndices, srcPos, dst.dstEncodedIndices, dstPos, length)
+      System.arraycopy(src.dstEncodedIndices,
+                       srcPos,
+                       dst.dstEncodedIndices,
+                       dstPos,
+                       length)
       System.arraycopy(src.ratings, srcPos, dst.ratings, dstPos, length)
     }
 
@@ -1214,7 +1234,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
           i += 1
         }
         logDebug("Converting to local indices took " +
-            (System.nanoTime() - start) / 1e9 + " seconds.")
+              (System.nanoTime() - start) / 1e9 + " seconds.")
         val dstLocalIndices = dstIds.map(dstIdToLocalIndex.apply)
         (srcBlockId, (dstBlockId, srcIds, dstLocalIndices, ratings))
     }.groupByKey(new ALSPartitioner(srcPart.numPartitions))
@@ -1295,8 +1315,8 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     val merged =
       srcOut.groupByKey(new ALSPartitioner(dstInBlocks.partitions.length))
     dstInBlocks.join(merged).mapValues {
-      case (
-          InBlock(dstIds, srcPtrs, srcEncodedIndices, ratings), srcFactors) =>
+      case (InBlock(dstIds, srcPtrs, srcEncodedIndices, ratings),
+            srcFactors) =>
         val sortedSrcFactors = new Array[FactorBlock](numSrcBlocks)
         srcFactors.foreach {
           case (srcBlockId, factors) =>
@@ -1346,13 +1366,13 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Computes the Gramian matrix of user or item factors, which is only used in implicit preference.
     * Caching of the input factors is handled in [[ALS#train]].
     */
-  private def computeYtY(
-      factorBlocks: RDD[(Int, FactorBlock)], rank: Int): NormalEquation = {
+  private def computeYtY(factorBlocks: RDD[(Int, FactorBlock)],
+                         rank: Int): NormalEquation = {
     factorBlocks.values
       .aggregate(new NormalEquation(rank))(seqOp = (ne, factors) => {
-      factors.foreach(ne.add(_, 0.0))
-      ne
-    }, combOp = (ne1, ne2) => ne1.merge(ne2))
+        factors.foreach(ne.add(_, 0.0))
+        ne
+      }, combOp = (ne1, ne2) => ne1.merge(ne2))
   }
 
   /**

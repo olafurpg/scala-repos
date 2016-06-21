@@ -65,7 +65,7 @@ case class Time(private val millis: Long) {
   def floor(that: Duration, zeroTime: Time): Time = {
     val t = that.milliseconds
     new Time(((this.millis - zeroTime.milliseconds) / t) * t +
-        zeroTime.milliseconds)
+          zeroTime.milliseconds)
   }
 
   def isMultipleOf(that: Duration): Boolean =

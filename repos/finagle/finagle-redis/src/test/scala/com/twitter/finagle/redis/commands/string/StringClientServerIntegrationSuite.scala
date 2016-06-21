@@ -196,8 +196,10 @@ final class StringClientServerIntegrationSuite
                     foo,
                     StringToChannelBuffer("noexists"),
                     StringToChannelBuffer("stuff"))))
-      val expects = List(
-          "thang", "bar", BytesToString(RedisCodec.NIL_VALUE_BA.array), "bleh")
+      val expects = List("thang",
+                         "bar",
+                         BytesToString(RedisCodec.NIL_VALUE_BA.array),
+                         "bleh")
       assertMBulkReply(req, expects)
     }
   }

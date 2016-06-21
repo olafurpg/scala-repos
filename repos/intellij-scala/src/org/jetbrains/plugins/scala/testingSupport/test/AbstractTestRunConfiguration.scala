@@ -54,7 +54,9 @@ abstract class AbstractTestRunConfiguration(
       new mutable.HashMap[String, String](),
     private var addIntegrationTestsClasspath: Boolean = false)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory)
+        name,
+        new RunConfigurationModule(project),
+        configurationFactory)
     with ScalaTestingConfiguration {
 
   val SCALA_HOME = "-Dscala.home="
@@ -324,8 +326,8 @@ abstract class AbstractTestRunConfiguration(
         val clazz = getClazz(getTestClassPath, withDependencies = false)
         if (clazz == null || isInvalidSuite(clazz)) {
           throw new RuntimeConfigurationException(
-              "No Suite Class is found for Class %s in module %s".format(
-                  getTestClassPath, getModule.getName))
+              "No Suite Class is found for Class %s in module %s"
+                .format(getTestClassPath, getModule.getName))
         }
         if (!ScalaPsiUtil.cachedDeepIsInheritor(clazz, suiteClass)) {
           throw new RuntimeConfigurationException(
@@ -347,16 +349,16 @@ abstract class AbstractTestRunConfiguration(
         ExecutionBundle.message("run.configuration.configuration.tab.title"),
         new AbstractTestRunConfigurationEditor(project, this))
     JavaRunConfigurationExtensionManager.getInstance.appendEditors(this, group)
-    group.addEditor(
-        ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel)
+    group.addEditor(ExecutionBundle.message("logs.tab.title"),
+                    new LogConfigurationPanel)
     group
   }
 
   protected[test] def isInvalidSuite(clazz: PsiClass): Boolean =
     AbstractTestRunConfiguration.isInvalidSuite(clazz)
 
-  override def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+  override def getState(executor: Executor,
+                        env: ExecutionEnvironment): RunProfileState = {
     def classNotFoundError() {
       throw new ExecutionException("Test class not found.")
     }
@@ -427,8 +429,8 @@ abstract class AbstractTestRunConfiguration(
 
         //expand environment variables in vmParams
         for (entry <- params.getEnv.entrySet) {
-          vmParams = StringUtil.replace(
-              vmParams, "$" + entry.getKey + "$", entry.getValue, false)
+          vmParams = StringUtil
+            .replace(vmParams, "$" + entry.getKey + "$", entry.getValue, false)
         }
 
         params.getVMParametersList.addParametersString(vmParams)
@@ -453,8 +455,9 @@ abstract class AbstractTestRunConfiguration(
                  if jdk == null) {
               jdk = JavaParameters.getModuleJdk(module)
             }
-            params.configureByProject(
-                project, JavaParameters.JDK_AND_CLASSES_AND_TESTS, jdk)
+            params.configureByProject(project,
+                                      JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+                                      jdk)
           case _ =>
             params.configureByModule(module,
                                      JavaParameters.JDK_AND_CLASSES_AND_TESTS,
@@ -553,10 +556,10 @@ abstract class AbstractTestRunConfiguration(
           params.getProgramParametersList.addParametersString(getTestArgs)
         }
 
-        for (ext <- Extensions.getExtensions(
-                       RunConfigurationExtension.EP_NAME)) {
-          ext.updateJavaParameters(
-              currentConfiguration, params, getRunnerSettings)
+        for (ext <- Extensions.getExtensions(RunConfigurationExtension.EP_NAME)) {
+          ext.updateJavaParameters(currentConfiguration,
+                                   params,
+                                   getRunnerSettings)
         }
 
         params
@@ -570,10 +573,13 @@ abstract class AbstractTestRunConfiguration(
         if (getConfiguration == null) setConfiguration(currentConfiguration)
         val config = getConfiguration
         JavaRunConfigurationExtensionManager.getInstance
-          .attachExtensionsToProcess(
-            currentConfiguration, processHandler, runnerSettings)
+          .attachExtensionsToProcess(currentConfiguration,
+                                     processHandler,
+                                     runnerSettings)
         val consoleProperties = new SMTRunnerConsoleProperties(
-            currentConfiguration, "Scala", executor) with PropertiesExtension {
+            currentConfiguration,
+            "Scala",
+            executor) with PropertiesExtension {
           override def getTestLocator = new ScalaTestLocationProvider
           def getRunConfigurationBase: RunConfigurationBase = config
         }
@@ -581,8 +587,8 @@ abstract class AbstractTestRunConfiguration(
         consoleProperties.setIdBasedTestTree(true)
 
         // console view
-        val consoleView = SMTestRunnerConnectionUtil.createAndAttachConsole(
-            "Scala", processHandler, consoleProperties)
+        val consoleView = SMTestRunnerConnectionUtil
+          .createAndAttachConsole("Scala", processHandler, consoleProperties)
 
         val res = new DefaultExecutionResult(
             consoleView,
@@ -611,8 +617,8 @@ abstract class AbstractTestRunConfiguration(
 
   override def writeExternal(element: Element) {
     super.writeExternal(element)
-    JavaRunConfigurationExtensionManager.getInstance.writeExternal(
-        this, element)
+    JavaRunConfigurationExtensionManager.getInstance
+      .writeExternal(this, element)
     writeModule(element)
     JDOMExternalizer.write(element, "path", getTestClassPath)
     JDOMExternalizer.write(element, "package", getTestPackagePath)
@@ -625,8 +631,8 @@ abstract class AbstractTestRunConfiguration(
                            "testKind",
                            if (testKind != null) testKind.toString
                            else TestKind.CLASS.toString)
-    JDOMExternalizer.write(
-        element, "showProgressMessages", showProgressMessages.toString)
+    JDOMExternalizer
+      .write(element, "showProgressMessages", showProgressMessages.toString)
     JDOMExternalizer.writeMap(element, envs, "envs", "envVar")
     PathMacroManager.getInstance(getProject).collapsePathsRecursively(element)
   }
@@ -634,8 +640,8 @@ abstract class AbstractTestRunConfiguration(
   override def readExternal(element: Element) {
     PathMacroManager.getInstance(getProject).expandPaths(element)
     super.readExternal(element)
-    JavaRunConfigurationExtensionManager.getInstance.readExternal(
-        this, element)
+    JavaRunConfigurationExtensionManager.getInstance
+      .readExternal(this, element)
     readModule(element)
     testClassPath = JDOMExternalizer.readString(element, "path")
     testPackagePath = JDOMExternalizer.readString(element, "package")

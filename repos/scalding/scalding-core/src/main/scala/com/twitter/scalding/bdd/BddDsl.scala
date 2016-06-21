@@ -23,8 +23,8 @@ trait BddDsl extends FieldConversions with PipeOperationsConversions {
       jobTest.source(source, data)
   }
 
-  class SimpleTypeTestSourceWithoutSchema[T](val data: Iterable[T])(
-      implicit setter: TupleSetter[T])
+  class SimpleTypeTestSourceWithoutSchema[T](
+      val data: Iterable[T])(implicit setter: TupleSetter[T])
       extends TestSourceWithoutSchema {
     def addSourceToJob(jobTest: JobTest, source: Source): JobTest =
       jobTest.source[T](source, data)(setter)
@@ -62,8 +62,9 @@ trait BddDsl extends FieldConversions with PipeOperationsConversions {
       TestCaseWhen(List(source, other), op)
   }
 
-  case class TestCaseGiven3(
-      source: TestSource, other: TestSource, third: TestSource) {
+  case class TestCaseGiven3(source: TestSource,
+                            other: TestSource,
+                            third: TestSource) {
     def And(next: TestSource) =
       TestCaseGivenList(List(source, other, third, next))
 

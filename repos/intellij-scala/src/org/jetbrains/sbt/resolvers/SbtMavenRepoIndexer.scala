@@ -35,10 +35,11 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
 
   private val indexerEngine = new DefaultIndexerEngine
   private val queryCreator = new DefaultQueryCreator
-  private val indexer = new DefaultIndexer(
-      new DefaultSearchEngine, indexerEngine, queryCreator)
+  private val indexer =
+    new DefaultIndexer(new DefaultSearchEngine, indexerEngine, queryCreator)
   private val updater = new DefaultIndexUpdater(
-      new DefaultIncrementalHandler, java.util.Collections.emptyList())
+      new DefaultIncrementalHandler,
+      java.util.Collections.emptyList())
   private val httpWagon = container.lookup(classOf[Wagon], "http")
 
   private val indexers = Seq(
@@ -135,8 +136,9 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
   private def updateRemote(progressIndicator: Option[ProgressIndicator]) {
     val transferListener = new AbstractTransferListener {
       var downloadedBytes = 0
-      override def transferProgress(
-          evt: TransferEvent, bytes: Array[Byte], length: Int) =
+      override def transferProgress(evt: TransferEvent,
+                                    bytes: Array[Byte],
+                                    length: Int) =
         progressIndicator foreach { indicator =>
           downloadedBytes += length
           val done =

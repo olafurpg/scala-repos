@@ -41,7 +41,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
+        activeLookup.find(le => le.getLookupString == "BLLLL").get,
+        '\t')
     checkResultByText(resultText)
   }
 
@@ -269,8 +270,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(
-          activeLookup.find(_.getLookupString == "XXXX").get, '\t')
+      completeLookupItem(activeLookup.find(_.getLookupString == "XXXX").get,
+                         '\t')
       checkResultByText(resultText)
     }
   }
@@ -308,8 +309,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(
-          activeLookup.find(_.getLookupString == "XXXX").get, '\t')
+      completeLookupItem(activeLookup.find(_.getLookupString == "XXXX").get,
+                         '\t')
       checkResultByText(resultText)
     }
   }

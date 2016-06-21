@@ -24,8 +24,8 @@ class NameInterpreterTest extends FunSuite with BeforeAndAfter {
 
   test("NameInterpreter uses it when interpreter is set") {
     NameInterpreter.global = new NameInterpreter {
-      override def bind(
-          dtab: Dtab, path: Path): Activity[NameTree[Name.Bound]] =
+      override def bind(dtab: Dtab,
+                        path: Path): Activity[NameTree[Name.Bound]] =
         Activity.value(NameTree.Leaf(Name.empty))
     }
 

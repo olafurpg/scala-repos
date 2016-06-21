@@ -61,13 +61,13 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
 
   @Test
   def testResetToEarliestWhenOffsetTooHigh() =
-    assertEquals(
-        NumMessages, resetAndConsume(NumMessages, "smallest", LargeOffset))
+    assertEquals(NumMessages,
+                 resetAndConsume(NumMessages, "smallest", LargeOffset))
 
   @Test
   def testResetToEarliestWhenOffsetTooLow() =
-    assertEquals(
-        NumMessages, resetAndConsume(NumMessages, "smallest", SmallOffset))
+    assertEquals(NumMessages,
+                 resetAndConsume(NumMessages, "smallest", SmallOffset))
 
   @Test
   def testResetToLatestWhenOffsetTooHigh() =
@@ -88,8 +88,9 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
         TestUtils.getBrokerListStrFromServers(servers),
         keyEncoder = classOf[StringEncoder].getName)
 
-    for (i <- 0 until numMessages) producer.send(
-        new KeyedMessage[String, Array[Byte]](topic, topic, "test".getBytes))
+    for (i <- 0 until numMessages)
+      producer.send(
+          new KeyedMessage[String, Array[Byte]](topic, topic, "test".getBytes))
 
     // update offset in zookeeper for consumer to jump "forward" in time
     val dirs = new ZKGroupTopicDirs(group, topic)
@@ -100,8 +101,9 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
     consumerProps.put("fetch.wait.max.ms", "0")
     val consumerConfig = new ConsumerConfig(consumerProps)
 
-    TestUtils.updateConsumerOffset(
-        consumerConfig, dirs.consumerOffsetDir + "/" + "0", offset)
+    TestUtils.updateConsumerOffset(consumerConfig,
+                                   dirs.consumerOffsetDir + "/" + "0",
+                                   offset)
     info("Updated consumer offset to " + offset)
 
     val consumerConnector: ConsumerConnector = Consumer.create(consumerConfig)

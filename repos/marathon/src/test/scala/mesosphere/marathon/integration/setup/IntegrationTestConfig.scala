@@ -71,12 +71,14 @@ object IntegrationTestConfig {
     * @return the detected location of the native mesos library.
     */
   private[this] def defaultMesosLibConfig: String = {
-    val javaLibraryPath = sys.props.getOrElse(
-        "java.library.path", "/usr/local/lib:/usr/lib:/usr/lib64")
+    val javaLibraryPath = sys.props
+      .getOrElse("java.library.path", "/usr/local/lib:/usr/lib:/usr/lib64")
     val mesos_dir = sys.env.get("MESOS_DIR").map(_ + "/lib").toStream
     val dirs =
       javaLibraryPath.split(':').toStream #::: Stream(
-          "/usr/local/lib", "/usr/lib", "/usr/lib64") #::: mesos_dir
+          "/usr/local/lib",
+          "/usr/lib",
+          "/usr/lib64") #::: mesos_dir
     val libCandidates = dirs.flatMap { (libDir: String) =>
       Stream(
           new File(libDir, "libmesos.dylib"),
@@ -109,12 +111,12 @@ object IntegrationTestConfig {
     val zkHost = string("zkHost", unusedForExternalSetup("localhost"))
     val zkPort = int("zkPort", 2183 + (math.random * 100).toInt)
     val master = string("master", unusedForExternalSetup("127.0.0.1:5050"))
-    val mesosLib = string(
-        "mesosLib", unusedForExternalSetup(defaultMesosLibConfig))
+    val mesosLib =
+      string("mesosLib", unusedForExternalSetup(defaultMesosLibConfig))
     val httpPort = int("httpPort", 11211 + (math.random * 100).toInt)
     val marathonHost = string("marathonHost", "localhost")
-    val marathonBasePort = int(
-        "marathonPort", 8080 + (math.random * 100).toInt)
+    val marathonBasePort =
+      int("marathonPort", 8080 + (math.random * 100).toInt)
     val clusterSize = int("clusterSize", 3)
     val marathonPorts = 0.to(clusterSize - 1).map(_ + marathonBasePort)
     val marathonGroup = PathId(

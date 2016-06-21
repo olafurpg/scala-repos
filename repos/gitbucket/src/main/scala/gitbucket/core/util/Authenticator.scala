@@ -114,8 +114,7 @@ trait CollaboratorsAuthenticator {
             case Some(x) if (x.isAdmin) => action(repository)
             case Some(x) if (paths(0) == x.userName) => action(repository)
             case Some(x)
-                if (getCollaborators(paths(0), paths(1)).contains(
-                    x.userName)) =>
+                if (getCollaborators(paths(0), paths(1)).contains(x.userName)) =>
               action(repository)
             case _ => Unauthorized()
           }
@@ -179,8 +178,7 @@ trait ReadableUsersAuthenticator {
               action(repository)
             case Some(x) if (paths(0) == x.userName) => action(repository)
             case Some(x)
-                if (getCollaborators(paths(0), paths(1)).contains(
-                    x.userName)) =>
+                if (getCollaborators(paths(0), paths(1)).contains(x.userName)) =>
               action(repository)
             case _ => Unauthorized()
           }

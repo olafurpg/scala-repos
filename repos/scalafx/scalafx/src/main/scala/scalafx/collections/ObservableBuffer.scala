@@ -541,7 +541,7 @@ class ObservableBuffer[T](
     } else {
       throw new IllegalStateException(
           "Type of this Observable List does not implement " +
-          "java.util.Comparable. Please use a Comparator function.")
+            "java.util.Comparable. Please use a Comparator function.")
     }
   }
 

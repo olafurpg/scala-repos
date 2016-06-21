@@ -178,7 +178,7 @@ class DefaultClientTest
       }
 
       assert(statsReceiver.stats(Seq(name, "request_latency_ms")) ==
-          (Seq(dur, dur) map (_.inMillis)))
+            (Seq(dur, dur) map (_.inMillis)))
     }
   }
 
@@ -196,13 +196,14 @@ class DefaultClientTest
     new DefaultClientHelper {
       @volatile var closed = false
 
-      val dest = Name.Bound.singleton(
-          Var.async(Addr.Bound(Seq.empty[Address]: _*)) { _ =>
-        Closable.make { _ =>
-          closed = true
-          Future.Done
-        }
-      })
+      val dest =
+        Name.Bound.singleton(Var.async(Addr.Bound(Seq.empty[Address]: _*)) {
+          _ =>
+            Closable.make { _ =>
+              closed = true
+              Future.Done
+            }
+        })
       val svc = client.newService(dest, "test")
       assert(!closed, "client closed too early")
       val f = svc.close()
@@ -262,8 +263,8 @@ class DefaultClientTest
           failureAccrual = { factory: ServiceFactory[Int, Int] =>
             FailureAccrualFactory.wrapper(
                 statsReceiver,
-                FailureAccrualPolicy.consecutiveFailures(
-                    6, Backoff.const(3.seconds)),
+                FailureAccrualPolicy
+                  .consecutiveFailures(6, Backoff.const(3.seconds)),
                 name,
                 DefaultLogger,
                 failing,

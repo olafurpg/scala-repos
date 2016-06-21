@@ -68,9 +68,8 @@ class TopologyTests extends WordSpec {
     * Perform a single run of TestGraphs.singleStepJob using the
     * supplied list of integers and the testFn defined above.
     */
-  def funcToPlan(
-      mkJob: (Producer[Storm, Int],
-              Storm#Store[Int, Int]) => TailProducer[Storm, Any])
+  def funcToPlan(mkJob: (Producer[Storm, Int],
+                         Storm#Store[Int, Int]) => TailProducer[Storm, Any])
     : StormTopology = {
     val original = sample[List[Int]]
 

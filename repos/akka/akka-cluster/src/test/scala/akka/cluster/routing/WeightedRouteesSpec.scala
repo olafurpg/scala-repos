@@ -12,7 +12,8 @@ import akka.routing.ActorRefRoutee
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class WeightedRouteesSpec
-    extends AkkaSpec(ConfigFactory.parseString("""
+    extends AkkaSpec(ConfigFactory.parseString(
+            """
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port = 0
       """)) {

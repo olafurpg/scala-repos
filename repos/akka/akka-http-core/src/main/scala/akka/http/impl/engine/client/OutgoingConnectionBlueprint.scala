@@ -76,8 +76,10 @@ private[http] object OutgoingConnectionBlueprint {
       val requestRendering: Flow[RequestRenderingContext,
                                  ByteString,
                                  NotUsed] = {
-        val requestRendererFactory = new HttpRequestRendererFactory(
-            userAgentHeader, requestHeaderSizeHint, log)
+        val requestRendererFactory =
+          new HttpRequestRendererFactory(userAgentHeader,
+                                         requestHeaderSizeHint,
+                                         log)
         Flow[RequestRenderingContext]
           .flatMapConcat(requestRendererFactory.renderToSource)
           .named("renderer")
@@ -93,15 +95,16 @@ private[http] object OutgoingConnectionBlueprint {
       val responseParsingMerge = b.add {
         // the initial header parser we initially use for every connection,
         // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
-        val rootParser = new HttpResponseParser(
-            parserSettings, HttpHeaderParser(parserSettings) {
-          info ⇒
-            if (parserSettings.illegalHeaderWarnings)
-              logParsingError(
-                  info withSummaryPrepended "Illegal response header",
-                  log,
-                  parserSettings.errorLoggingVerbosity)
-        })
+        val rootParser =
+          new HttpResponseParser(parserSettings,
+                                 HttpHeaderParser(parserSettings) {
+                                   info ⇒
+                                     if (parserSettings.illegalHeaderWarnings)
+                                       logParsingError(
+                                           info withSummaryPrepended "Illegal response header",
+                                           log,
+                                           parserSettings.errorLoggingVerbosity)
+                                 })
         new ResponseParsingMerge(rootParser)
       }
 
@@ -116,8 +119,9 @@ private[http] object OutgoingConnectionBlueprint {
       }.named("errorLogger"))
       val wrapTls = b.add(Flow[ByteString].map(SendBytes))
 
-      val collectSessionBytes =
-        b.add(Flow[SslTlsInbound].collect { case s: SessionBytes ⇒ s })
+      val collectSessionBytes = b.add(Flow[SslTlsInbound].collect {
+        case s: SessionBytes ⇒ s
+      })
 
       renderingContextCreation.out ~> bypassFanout.in
       bypassFanout.out(0) ~> terminationMerge.in0
@@ -203,8 +207,11 @@ private[http] object OutgoingConnectionBlueprint {
         }
 
         def onPush(): Unit = grab(in) match {
-          case ResponseStart(
-              statusCode, protocol, headers, entityCreator, closeRequested) ⇒
+          case ResponseStart(statusCode,
+                             protocol,
+                             headers,
+                             entityCreator,
+                             closeRequested) ⇒
             val entity =
               createEntity(entityCreator) withSizeLimit parserSettings.maxContentLength
             push(out, HttpResponse(statusCode, headers, entity, protocol))
@@ -370,9 +377,9 @@ private[http] object OutgoingConnectionBlueprint {
         }
 
         @tailrec
-        def drainParser(current: ResponseOutput,
-                        b: ListBuffer[ResponseOutput] =
-                          ListBuffer.empty): Unit = {
+        def drainParser(
+            current: ResponseOutput,
+            b: ListBuffer[ResponseOutput] = ListBuffer.empty): Unit = {
           def e(output: List[ResponseOutput], andThen: () ⇒ Unit): Unit =
             if (output.nonEmpty) emit(out, output, andThen)
             else andThen()

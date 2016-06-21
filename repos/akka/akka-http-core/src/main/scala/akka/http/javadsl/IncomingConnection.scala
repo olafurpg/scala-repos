@@ -18,7 +18,7 @@ import scala.compat.java8.FutureConverters._
 /**
   * Represents one accepted incoming HTTP connection.
   */
-class IncomingConnection private[http](
+class IncomingConnection private[http] (
     delegate: akka.http.scaladsl.Http.IncomingConnection) {
 
   /**

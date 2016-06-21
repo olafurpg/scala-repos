@@ -50,20 +50,20 @@ object Test {
         "%s == %s")
 
     val startsWithInputs: Inputs
-    lazy val startsWith = Method(
-        _ startsWith _, startsWithInputs, "%s startsWith %s")
+    lazy val startsWith =
+      Method(_ startsWith _, startsWithInputs, "%s startsWith %s")
 
     val endsWithInputs: Inputs
     lazy val endsWith = Method(_ endsWith _, endsWithInputs, "%s endsWith %s")
 
     val indexOfSliceInputs: Inputs
     private def subseqTest(s1: Seq[T], s2: Seq[T]) = (s1 indexOfSlice s2) != -1
-    lazy val indexOfSlice = Method(
-        subseqTest _, indexOfSliceInputs, "(%s indexOfSlice %s) != -1")
+    lazy val indexOfSlice =
+      Method(subseqTest _, indexOfSliceInputs, "(%s indexOfSlice %s) != -1")
 
     val sameElementsInputs: Inputs
-    lazy val sameElements = Method(
-        _ sameElements _, sameElementsInputs, "%s sameElements %s")
+    lazy val sameElements =
+      Method(_ sameElements _, sameElementsInputs, "%s sameElements %s")
 
     def methodList =
       List(eqeq, startsWith, endsWith, indexOfSlice, sameElements)
@@ -124,11 +124,11 @@ object Test {
       val scrut = s1f(seq)
 
       for (Method(f, (trueList, falseList), descr) <- methodList) {
-        for (s <- trueList; rhs = s2f(s)) assertOne(
-            scrut, rhs, f(scrut, rhs), descr)
+        for (s <- trueList; rhs = s2f(s))
+          assertOne(scrut, rhs, f(scrut, rhs), descr)
 
-        for (s <- falseList; rhs = s2f(s)) assertOne(
-            scrut, rhs, !f(scrut, rhs), "!(" + descr + ")")
+        for (s <- falseList; rhs = s2f(s))
+          assertOne(scrut, rhs, !f(scrut, rhs), "!(" + descr + ")")
       }
     }
   }

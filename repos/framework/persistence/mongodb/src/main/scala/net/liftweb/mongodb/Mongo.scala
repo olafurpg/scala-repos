@@ -117,7 +117,7 @@ object MongoDB {
       case _ =>
         throw new MongoException(
             "Mongo not found: " + collectionName + ". ConnectionIdentifier: " +
-            name.toString)
+              name.toString)
     }
 
     f(coll)
@@ -133,8 +133,8 @@ object MongoDB {
         case _ =>
           throw new MongoException(
               "Mongo not found: " + collectionName +
-              ". ConnectionIdentifier: " +
-              DefaultConnectionIdentifier.toString)
+                ". ConnectionIdentifier: " +
+                DefaultConnectionIdentifier.toString)
       }
 
     f(coll)
@@ -147,7 +147,8 @@ object MongoDB {
     * See: http://docs.mongodb.org/ecosystem/drivers/java-concurrency/
     */
   @deprecated(
-      "No longer needed. See mongo-java-drivers's JavaDocs for details", "3.0")
+      "No longer needed. See mongo-java-drivers's JavaDocs for details",
+      "3.0")
   def useSession[T](name: ConnectionIdentifier)(f: (DB) => T): T = {
 
     val db = getDb(name) match {
@@ -169,7 +170,8 @@ object MongoDB {
     * Same as above except uses DefaultConnectionIdentifier
     */
   @deprecated(
-      "No longer needed. See mongo-java-drivers's JavaDocs for details", "3.0")
+      "No longer needed. See mongo-java-drivers's JavaDocs for details",
+      "3.0")
   def useSession[T](f: (DB) => T): T = {
 
     val db = getDb(DefaultConnectionIdentifier) match {

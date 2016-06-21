@@ -28,7 +28,7 @@ object RequestEntityAcceptance {
   * @param isIdempotent true if requests can be safely (& automatically) repeated
   * @param requestEntityAcceptance Expected if meaning of request entities is properly defined
   */
-final case class HttpMethod private[http](
+final case class HttpMethod private[http] (
     override val value: String,
     isSafe: Boolean,
     isIdempotent: Boolean,

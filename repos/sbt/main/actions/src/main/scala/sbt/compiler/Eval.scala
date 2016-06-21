@@ -174,8 +174,9 @@ final class Eval(optionsNoncp: Seq[String],
       override def units = (unit :: Nil).iterator
     }
     def unlinkAll(): Unit =
-      for ((sym, _) <- run.symSource) if (ev.unlink) unlink(sym)
-      else toUnlinkLater ::= sym
+      for ((sym, _) <- run.symSource)
+        if (ev.unlink) unlink(sym)
+        else toUnlinkLater ::= sym
 
     val (extra, loader) = backing match {
       case Some(back) if classExists(back, moduleName) =>
@@ -246,8 +247,8 @@ final class Eval(optionsNoncp: Seq[String],
       getValue[Any](moduleName, new AbstractFileClassLoader(dir, parent))
   def loadPlain(dir: File, moduleName: String): ClassLoader => Any =
     parent =>
-      getValue[Any](
-          moduleName, new URLClassLoader(Array(dir.toURI.toURL), parent))
+      getValue[Any](moduleName,
+                    new URLClassLoader(Array(dir.toURI.toURL), parent))
 
   //wrap tree in object objectName { def WrapValName = <tree> }
   def augment(parser: global.syntaxAnalyzer.UnitParser,
@@ -277,8 +278,9 @@ final class Eval(optionsNoncp: Seq[String],
     )
 
     def moduleBody =
-      Template(
-          List(gen.scalaAnyRefConstr), emptyValDef, emptyInit :: definitions)
+      Template(List(gen.scalaAnyRefConstr),
+               emptyValDef,
+               emptyInit :: definitions)
     def moduleDef = ModuleDef(NoMods, newTermName(objectName), moduleBody)
     parser.makePackaging(0, emptyPkg, (imports :+ moduleDef).toList)
   }
@@ -305,7 +307,7 @@ final class Eval(optionsNoncp: Seq[String],
     override def traverse(tree: Tree): Unit = tree match {
       case ValDef(_, n, actualTpe, _)
           if isTopLevelModule(tree.symbol.owner) &&
-          isAcceptableType(actualTpe.tpe) =>
+            isAcceptableType(actualTpe.tpe) =>
         vals ::= nme.localToGetter(n).encoded
       case _ => super.traverse(tree)
     }
@@ -323,14 +325,14 @@ final class Eval(optionsNoncp: Seq[String],
   private[this] def classExists(dir: File, name: String) =
     (new File(dir, name + ".class")).exists
   // TODO: use the code from Analyzer
-  private[this] def getGeneratedFiles(
-      backing: Option[File], moduleName: String): Seq[File] =
+  private[this] def getGeneratedFiles(backing: Option[File],
+                                      moduleName: String): Seq[File] =
     backing match {
       case None => Nil
       case Some(dir) => dir listFiles moduleFileFilter(moduleName)
     }
-  private[this] def getClassFiles(
-      backing: Option[File], moduleName: String): Seq[File] =
+  private[this] def getClassFiles(backing: Option[File],
+                                  moduleName: String): Seq[File] =
     backing match {
       case None => Nil
       case Some(dir) => dir listFiles moduleClassFilter(moduleName)
@@ -471,8 +473,9 @@ final class Eval(optionsNoncp: Seq[String],
   private[this] def checkError(label: String) =
     if (reporter.hasErrors) throw new EvalException(label)
 
-  private[this] final class EvalSourceFile(
-      name: String, startLine: Int, contents: String)
+  private[this] final class EvalSourceFile(name: String,
+                                           startLine: Int,
+                                           contents: String)
       extends BatchSourceFile(name, contents) {
     override def lineToOffset(line: Int): Int =
       super.lineToOffset((line - startLine) max 0)
@@ -484,8 +487,8 @@ final class Eval(optionsNoncp: Seq[String],
     * Constructs a CompilationUnit for each definition, which can be used to independently parse the definition into a Tree.
     * Additionally, a CompilationUnit for the combined definitions is constructed for use by combined compilation after parsing.
     */
-  private[this] def mkDefsUnit(
-      srcName: String, definitions: Seq[(String, scala.Range)])
+  private[this] def mkDefsUnit(srcName: String,
+                               definitions: Seq[(String, scala.Range)])
     : (CompilationUnit, Seq[CompilationUnit]) = {
     def fragmentUnit(content: String, lineMap: Array[Int]) =
       new CompilationUnit(fragmentSourceFile(srcName, content, lineMap))
@@ -509,8 +512,9 @@ final class Eval(optionsNoncp: Seq[String],
     * Source file that can map the offset in the file to and from line numbers that may discontinuous.
     * The values in `lineMap` must be ordered, but need not be consecutive.
     */
-  private[this] def fragmentSourceFile(
-      srcName: String, content: String, lineMap: Array[Int]) =
+  private[this] def fragmentSourceFile(srcName: String,
+                                       content: String,
+                                       lineMap: Array[Int]) =
     new BatchSourceFile(srcName, content) {
       override def lineToOffset(line: Int): Int =
         super.lineToOffset(lineMap.indexWhere(_ == line) max 0)

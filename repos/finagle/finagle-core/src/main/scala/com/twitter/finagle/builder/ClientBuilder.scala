@@ -29,8 +29,11 @@ import scala.annotation.{implicitNotFound, varargs}
   * Factory for [[com.twitter.finagle.builder.ClientBuilder]] instances
   */
 object ClientBuilder {
-  type Complete[Req, Rep] = ClientBuilder[
-      Req, Rep, ClientConfig.Yes, ClientConfig.Yes, ClientConfig.Yes]
+  type Complete[Req, Rep] = ClientBuilder[Req,
+                                          Rep,
+                                          ClientConfig.Yes,
+                                          ClientConfig.Yes,
+                                          ClientConfig.Yes]
   type NoCluster[Req, Rep] =
     ClientBuilder[Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]
   type NoCodec =
@@ -92,8 +95,7 @@ object ClientConfig {
   private case class NilClient[Req, Rep](
       stack: Stack[ServiceFactory[Req, Rep]] = StackClient.newStack[Req, Rep],
       params: Stack.Params = DefaultParams
-  )
-      extends StackBasedClient[Req, Rep] {
+  ) extends StackBasedClient[Req, Rep] {
 
     def withParams(ps: Stack.Params) = copy(params = ps)
     def transformed(t: Stack.Transformer) = copy(stack = t(stack))
@@ -145,13 +147,13 @@ object ClientConfig {
   // historical defaults for ClientBuilder
   private[builder] val DefaultParams =
     Stack.Params.empty + param.Stats(NullStatsReceiver) +
-    param.Label(DefaultName) + DefaultPool.Param(low = 1,
-                                                 high = Int.MaxValue,
-                                                 bufferSize = 0,
-                                                 idleTime = 5.seconds,
-                                                 maxWaiters = Int.MaxValue) +
-    param.Tracer(NullTracer) + param.Monitor(NullMonitor) +
-    param.Reporter(NullReporterFactory) + Daemonize(false)
+      param.Label(DefaultName) + DefaultPool.Param(low = 1,
+                                                   high = Int.MaxValue,
+                                                   bufferSize = 0,
+                                                   idleTime = 5.seconds,
+                                                   maxWaiters = Int.MaxValue) +
+      param.Tracer(NullTracer) + param.Monitor(NullMonitor) +
+      param.Reporter(NullReporterFactory) + Daemonize(false)
 }
 
 @implicitNotFound(
@@ -161,8 +163,9 @@ private[builder] trait ClientConfigEvidence[
 
 private[builder] object ClientConfigEvidence {
   implicit object FullyConfigured
-      extends ClientConfigEvidence[
-          ClientConfig.Yes, ClientConfig.Yes, ClientConfig.Yes]
+      extends ClientConfigEvidence[ClientConfig.Yes,
+                                   ClientConfig.Yes,
+                                   ClientConfig.Yes]
 }
 
 /**
@@ -260,7 +263,7 @@ private[builder] final class ClientConfig[
   * @see The [[http://twitter.github.io/finagle/guide/Configuration.html user guide]]
   *      for information on the preferred `with`-style APIs insead.
   */
-class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] private[finagle](
+class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] private[finagle] (
     client: StackBasedClient[Req, Rep]
 ) {
   import ClientConfig._
@@ -277,16 +280,23 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
 
   override def toString() = "ClientBuilder(%s)".format(params)
 
-  private def copy[
-      Req1, Rep1, HasCluster1, HasCodec1, HasHostConnectionLimit1](
+  private def copy[Req1,
+                   Rep1,
+                   HasCluster1,
+                   HasCodec1,
+                   HasHostConnectionLimit1](
       client: StackBasedClient[Req1, Rep1]
-  )
-    : ClientBuilder[
-        Req1, Rep1, HasCluster1, HasCodec1, HasHostConnectionLimit1] =
+  ): ClientBuilder[Req1,
+                   Rep1,
+                   HasCluster1,
+                   HasCodec1,
+                   HasHostConnectionLimit1] =
     new ClientBuilder(client)
 
-  private def configured[
-      P: Stack.Param, HasCluster1, HasCodec1, HasHostConnectionLimit1](
+  private def configured[P: Stack.Param,
+                         HasCluster1,
+                         HasCodec1,
+                         HasHostConnectionLimit1](
       param: P
   ): ClientBuilder[Req, Rep, HasCluster1, HasCodec1, HasHostConnectionLimit1] =
     copy(client.configured(param))
@@ -710,8 +720,8 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     * @see [[retryPolicy]] for per-request rules on which failures are
     * eligible for retries.
     */
-  def retryBudget(
-      budget: RetryBudget, backoffSchedule: Stream[Duration]): This =
+  def retryBudget(budget: RetryBudget,
+                  backoffSchedule: Stream[Duration]): This =
     configured(Retries.Budget(budget, backoffSchedule))
 
   /**
@@ -740,8 +750,7 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     * provided against the given hostname.
     */
   def tls(hostname: String): This = {
-    configured(
-        (Transport.TLSClientEngine(Some({
+    configured((Transport.TLSClientEngine(Some({
       case inet: InetSocketAddress => Ssl.client(hostname, inet.getPort)
       case _ => Ssl.client()
     })))).configured(Transporter.TLSHostname(Some(hostname)))
@@ -753,8 +762,7 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     * No SSL Hostname Validation is performed
     */
   def tls(sslContext: SSLContext): This =
-    configured(
-        (Transport.TLSClientEngine(Some({
+    configured((Transport.TLSClientEngine(Some({
       case inet: InetSocketAddress =>
         Ssl.client(sslContext, inet.getHostName, inet.getPort)
       case _ => Ssl.client(sslContext)
@@ -766,11 +774,11 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     * SSL Hostname Validation is performed, on the passed in hostname
     */
   def tls(sslContext: SSLContext, hostname: Option[String]): This =
-    configured(
-        (Transport.TLSClientEngine(Some({
+    configured((Transport.TLSClientEngine(Some({
       case inet: InetSocketAddress =>
-        Ssl.client(
-            sslContext, hostname.getOrElse(inet.getHostName), inet.getPort)
+        Ssl.client(sslContext,
+                   hostname.getOrElse(inet.getHostName),
+                   inet.getPort)
       case _ => Ssl.client(sslContext)
     })))).configured(Transporter.TLSHostname(hostname))
 
@@ -778,8 +786,7 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     * Do not perform TLS validation. Probably dangerous.
     */
   def tlsWithoutValidation(): This =
-    configured(
-        Transport.TLSClientEngine(Some({
+    configured(Transport.TLSClientEngine(Some({
       case inet: InetSocketAddress =>
         Ssl.clientWithoutCertificateValidation(inet.getHostName, inet.getPort)
       case _ => Ssl.clientWithoutCertificateValidation()
@@ -810,8 +817,8 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     configured(
         params[Transporter.HttpProxy].copy(credentials = Some(credentials)))
 
-  @deprecated(
-      "Use socksProxy(socksProxy: Option[SocketAddress])", "2014-12-02")
+  @deprecated("Use socksProxy(socksProxy: Option[SocketAddress])",
+              "2014-12-02")
   def socksProxy(socksProxy: SocketAddress): This =
     configured(params[Transporter.SocksProxy].copy(sa = Some(socksProxy)))
 
@@ -904,7 +911,7 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
 
   @deprecated(
       "No longer experimental: Use failFast()." +
-      "The new default value is true, so replace .expFailFast(true) with nothing at all",
+        "The new default value is true, so replace .expFailFast(true) with nothing at all",
       "5.3.10")
   def expFailFast(enabled: Boolean): This =
     failFast(enabled)
@@ -962,7 +969,9 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     */
   def buildFactory()(
       implicit THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ClientConfigEvidence[
-          HasCluster, HasCodec, HasHostConnectionLimit]
+          HasCluster,
+          HasCodec,
+          HasHostConnectionLimit]
   ): ServiceFactory[Req, Rep] = {
     val Label(label) = params[Label]
     val DestName(dest) = params[DestName]
@@ -973,15 +982,19 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
   def buildFactory(
       THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
   ): ServiceFactory[Req, Rep] =
-    buildFactory()(new ClientConfigEvidence[
-            HasCluster, HasCodec, HasHostConnectionLimit] {})
+    buildFactory()(
+        new ClientConfigEvidence[HasCluster,
+                                 HasCodec,
+                                 HasHostConnectionLimit] {})
 
   /**
     * Construct a Service.
     */
   def build()(
       implicit THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ClientConfigEvidence[
-          HasCluster, HasCodec, HasHostConnectionLimit]
+          HasCluster,
+          HasCodec,
+          HasHostConnectionLimit]
   ): Service[Req, Rep] = {
     val Label(label) = params[Label]
     val DestName(dest) = params[DestName]
@@ -992,8 +1005,10 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
   def build(
       THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
   ): Service[Req, Rep] =
-    build()(new ClientConfigEvidence[
-            HasCluster, HasCodec, HasHostConnectionLimit] {})
+    build()(
+        new ClientConfigEvidence[HasCluster,
+                                 HasCodec,
+                                 HasHostConnectionLimit] {})
 
   private[this] def validated = {
     if (!params.contains[DestName])
@@ -1023,8 +1038,7 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
   */
 private case class ClientBuilderClient[Req, Rep](
     client: StackClient[Req, Rep]
-)
-    extends StackClient[Req, Rep] {
+) extends StackClient[Req, Rep] {
 
   def params = client.params
   def withParams(ps: Stack.Params) = copy(client.withParams(ps))
@@ -1044,8 +1058,9 @@ private object ClientBuilderClient {
   import com.twitter.finagle.param._
 
   private class StatsFilterModule[Req, Rep]
-      extends Stack.Module2[
-          Stats, ExceptionStatsHandler, ServiceFactory[Req, Rep]] {
+      extends Stack.Module2[Stats,
+                            ExceptionStatsHandler,
+                            ServiceFactory[Req, Rep]] {
     override val role = new Stack.Role("ClientBuilder StatsFilter")
     override val description =
       "Record request stats scoped to 'tries', measured after any retries have occurred"
@@ -1182,8 +1197,7 @@ private case class CodecClient[Req, Rep](
     codecFactory: CodecFactory[Req, Rep]#Client,
     stack: Stack[ServiceFactory[Req, Rep]] = StackClient.newStack[Req, Rep],
     params: Stack.Params = ClientConfig.DefaultParams
-)
-    extends StackClient[Req, Rep] {
+) extends StackClient[Req, Rep] {
   import com.twitter.finagle.param._
 
   def withParams(ps: Stack.Params) = copy(params = ps)
@@ -1230,8 +1244,7 @@ private case class CodecClient[Req, Rep](
     case class Client(
         stack: Stack[ServiceFactory[Req, Rep]] = clientStack,
         params: Stack.Params = params
-    )
-        extends StdStackClient[Req, Rep, Client] {
+    ) extends StdStackClient[Req, Rep, Client] {
       protected def copy1(stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
                           params: Stack.Params = this.params): Client =
         copy(stack, params)

@@ -22,17 +22,16 @@ import sbt.util.Logger
 object RawCompileLike {
   type Gen = (Seq[File], Seq[File], File, Seq[String], Int, Logger) => Unit
 
-  private def optionFiles(
-      options: Seq[String], fileInputOpts: Seq[String]): List[File] = {
+  private def optionFiles(options: Seq[String],
+                          fileInputOpts: Seq[String]): List[File] = {
     @annotation.tailrec
     def loop(opt: List[String], result: List[File]): List[File] = {
       opt.dropWhile(!fileInputOpts.contains(_)) match {
-        case List(_, fileOpt, tail @ _ *) =>
-          {
-            val file = new File(fileOpt)
-            if (file.isFile) loop(tail.toList, file :: result)
-            else loop(tail.toList, result)
-          }
+        case List(_, fileOpt, tail @ _ *) => {
+          val file = new File(fileOpt)
+          if (file.isFile) loop(tail.toList, file :: result)
+          else loop(tail.toList, result)
+        }
         case Nil | List(_) => result
       }
     }
@@ -73,7 +72,7 @@ object RawCompileLike {
         log.info("No sources available, skipping " + description + "...")
       else {
         log.info(description.capitalize + " to " +
-            outputDirectory.absolutePath + "...")
+              outputDirectory.absolutePath + "...")
         IO.delete(outputDirectory)
         IO.createDirectory(outputDirectory)
         doCompile(sources, classpath, outputDirectory, options, maxErrors, log)

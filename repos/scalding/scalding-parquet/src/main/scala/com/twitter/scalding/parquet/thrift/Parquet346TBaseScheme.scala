@@ -43,7 +43,8 @@ class Parquet346TBaseScheme[T <: TBase[_, _]](
 
     // Use the fixed record converter instead of the one set in super
     ThriftReadSupport.setRecordConverterClass(
-        jobConf, classOf[Parquet346TBaseRecordConverter[_]])
+        jobConf,
+        classOf[Parquet346TBaseRecordConverter[_]])
   }
 }
 
@@ -71,10 +72,12 @@ class Parquet346TBaseRecordConverter[T <: TBase[_, _]](
             } catch {
               case e: InstantiationException =>
                 throw new ParquetDecodingException(
-                    "Could not instantiate Thrift " + thriftClass, e)
+                    "Could not instantiate Thrift " + thriftClass,
+                    e)
               case e: IllegalAccessException =>
                 throw new ParquetDecodingException(
-                    "Thrift class or constructor not public " + thriftClass, e)
+                    "Thrift class or constructor not public " + thriftClass,
+                    e)
             }
           }
         },

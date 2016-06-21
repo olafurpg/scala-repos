@@ -13,8 +13,8 @@ import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
   * User: Alexander Podkhalyuzin
   * Date: 08.11.11
   */
-class ScalaArrayAccessEvaluator(
-    arrayReferenceEvaluator: Evaluator, indexEvaluator: Evaluator)
+class ScalaArrayAccessEvaluator(arrayReferenceEvaluator: Evaluator,
+                                indexEvaluator: Evaluator)
     extends Evaluator {
   def evaluate(context: EvaluationContextImpl): AnyRef = {
     myEvaluatedIndex = 0
@@ -61,8 +61,9 @@ class ScalaArrayAccessEvaluator(
           }
         }
         def getInspectItem(project: Project): NodeDescriptorImpl = {
-          new ArrayElementDescriptorImpl(
-              project, myEvaluatedArrayReference, myEvaluatedIndex)
+          new ArrayElementDescriptorImpl(project,
+                                         myEvaluatedArrayReference,
+                                         myEvaluatedIndex)
         }
       }
     }

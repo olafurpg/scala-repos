@@ -180,8 +180,8 @@ class AppDefinitionValidatorTest
 
   test("only container") {
     val f = new Fixture
-    val app = AppDefinition(
-        id = PathId("/test"), container = Some(f.validDockerContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
@@ -439,8 +439,8 @@ class AppDefinitionValidatorTest
       PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)
     val zero = UpgradeStrategy(0, 0)
 
-    def residentApp(
-        id: String, volumes: Seq[PersistentVolume]): AppDefinition = {
+    def residentApp(id: String,
+                    volumes: Seq[PersistentVolume]): AppDefinition = {
       AppDefinition(
           id = PathId(id),
           cmd = Some("test"),

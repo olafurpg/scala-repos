@@ -122,7 +122,7 @@ final class Solver(n: Int) {
     printBoard(last)
   }
 
-/*
+  /*
    def printPieces() = 
       for (i <- Iterator.range(0,Board.pieces)) pieces(i).print 
  */
@@ -156,19 +156,21 @@ final class Board {
   def asString() =
     new String(
         cells map
-        (c =>
-              if (c.piece == null) '-'.toByte
-              else (c.piece.number + 48).toByte))
+          (c =>
+                if (c.piece == null) '-'.toByte
+                else (c.piece.number + 48).toByte))
 
   def firstEmptyCellIndex() = cells.findIndexOf(c => c.isEmpty)
 
   private val cache: Array[Array[Array[Array[Array[BoardCell]]]]] =
-    for (i <- Array.range(0, Board.pieces)) yield
-      for (j <- Array.range(0, Piece.orientations)) yield
-        for (k <- Array.range(0, Piece.size)) // piece cell index
-        yield
-          for (m <- Array.range(0, Board.size)) // board cell index
-          yield (null: BoardCell)
+    for (i <- Array.range(0, Board.pieces))
+      yield
+        for (j <- Array.range(0, Piece.orientations))
+          yield
+            for (k <- Array.range(0, Piece.size)) // piece cell index
+              yield
+                for (m <- Array.range(0, Board.size)) // board cell index
+                  yield (null: BoardCell)
 
   def add(pieceIndex: Int, boardIndex: Int, p: Piece): Boolean = {
     var a = cache(p.number)(p.orientation)(pieceIndex)(boardIndex)
@@ -259,7 +261,7 @@ final class Board {
     }
     a
   }
-/*
+  /*
 // Printing all the board cells and their neighbours
 // helps check that they are connected properly
 
@@ -304,8 +306,8 @@ final class Piece(_number: Int) {
 
   def cells = cache(orientation)
 
-  private val cache = for (i <- Array.range(0, Piece.orientations)) yield
-    pieceOrientation(i)
+  private val cache = for (i <- Array.range(0, Piece.orientations))
+    yield pieceOrientation(i)
 
   var orientation = 0
 
@@ -459,7 +461,7 @@ final class Piece(_number: Int) {
     a(3).next(Cell.SE) = a(4)
   }
 
-/*
+  /*
    def print() = {
       Console.println("Piece # " + number)
       Console.println("cell\tNW NE W  E  SW SE")

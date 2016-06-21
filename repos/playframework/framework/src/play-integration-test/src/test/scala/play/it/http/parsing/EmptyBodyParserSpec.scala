@@ -13,9 +13,9 @@ object EmptyBodyParserSpec extends PlaySpecification {
 
   "The empty body parser" should {
 
-    def parse(
-        bytes: ByteString, contentType: Option[String], encoding: String)(
-        implicit mat: Materializer) = {
+    def parse(bytes: ByteString,
+              contentType: Option[String],
+              encoding: String)(implicit mat: Materializer) = {
       await(
           BodyParsers.parse
             .empty(FakeRequest().withHeaders(

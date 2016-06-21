@@ -44,8 +44,10 @@ private[clustering] trait LDAParams
     * @group param
     */
   @Since("1.6.0")
-  final val k = new IntParam(
-      this, "k", "number of topics (clusters) to infer", ParamValidators.gt(1))
+  final val k = new IntParam(this,
+                             "k",
+                             "number of topics (clusters) to infer",
+                             ParamValidators.gt(1))
 
   /** @group getParam */
   @Since("1.6.0")
@@ -81,7 +83,7 @@ private[clustering] trait LDAParams
       this,
       "docConcentration",
       "Concentration parameter (commonly named \"alpha\") for the prior placed on documents'" +
-      " distributions over topics (\"theta\").",
+        " distributions over topics (\"theta\").",
       (alpha: Array[Double]) => alpha.forall(_ >= 0.0))
 
   /** @group getParam */
@@ -125,7 +127,7 @@ private[clustering] trait LDAParams
       this,
       "topicConcentration",
       "Concentration parameter (commonly named \"beta\" or \"eta\") for the prior placed on topic'" +
-      " distributions over terms.",
+        " distributions over terms.",
       ParamValidators.gtEq(0))
 
   /** @group getParam */
@@ -168,8 +170,8 @@ private[clustering] trait LDAParams
       this,
       "optimizer",
       "Optimizer or inference" +
-      " algorithm used to estimate the LDA model.  Supported: " +
-      supportedOptimizers.mkString(", "),
+        " algorithm used to estimate the LDA model.  Supported: " +
+        supportedOptimizers.mkString(", "),
       (o: String) =>
         ParamValidators.inArray(supportedOptimizers).apply(o.toLowerCase))
 
@@ -191,8 +193,8 @@ private[clustering] trait LDAParams
       this,
       "topicDistribution",
       "Output column" +
-      " with estimates of the topic mixture distribution for each document (often called \"theta\"" +
-      " in the literature).  Returns a vector of zeros for an empty document.")
+        " with estimates of the topic mixture distribution for each document (often called \"theta\"" +
+        " in the literature).  Returns a vector of zeros for an empty document.")
 
   setDefault(topicDistributionCol -> "topicDistribution")
 
@@ -212,7 +214,7 @@ private[clustering] trait LDAParams
       this,
       "learningOffset",
       "A (positive) learning" +
-      " parameter that downweights early iterations. Larger values make early iterations count less.",
+        " parameter that downweights early iterations. Larger values make early iterations count less.",
       ParamValidators.gt(0))
 
   /** @group expertGetParam */
@@ -231,8 +233,8 @@ private[clustering] trait LDAParams
       this,
       "learningDecay",
       "Learning rate, set as an" +
-      " exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic" +
-      " convergence.",
+        " exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic" +
+        " convergence.",
       ParamValidators.gt(0))
 
   /** @group expertGetParam */
@@ -258,9 +260,9 @@ private[clustering] trait LDAParams
       this,
       "subsamplingRate",
       "Fraction of the corpus" +
-      " to be sampled and used in each iteration of mini-batch gradient descent, in range (0, 1].",
-      ParamValidators.inRange(
-          0.0, 1.0, lowerInclusive = false, upperInclusive = true))
+        " to be sampled and used in each iteration of mini-batch gradient descent, in range (0, 1].",
+      ParamValidators
+        .inRange(0.0, 1.0, lowerInclusive = false, upperInclusive = true))
 
   /** @group getParam */
   @Since("1.6.0")
@@ -278,7 +280,7 @@ private[clustering] trait LDAParams
       this,
       "optimizeDocConcentration",
       "Indicates whether the docConcentration (Dirichlet parameter for document-topic" +
-      " distribution) will be optimized during training.")
+        " distribution) will be optimized during training.")
 
   /** @group expertGetParam */
   @Since("1.6.0")
@@ -295,20 +297,20 @@ private[clustering] trait LDAParams
         require(
             getDocConcentration.length == getK,
             s"LDA docConcentration was of length" +
-            s" ${getDocConcentration.length}, but k = $getK.  docConcentration must be an array of" +
-            s" length either 1 (scalar) or k (num topics).")
+              s" ${getDocConcentration.length}, but k = $getK.  docConcentration must be an array of" +
+              s" length either 1 (scalar) or k (num topics).")
       }
       getOptimizer match {
         case "online" =>
           require(
               getDocConcentration.forall(_ >= 0),
               "For Online LDA optimizer, docConcentration values must be >= 0.  Found values: " +
-              getDocConcentration.mkString(","))
+                getDocConcentration.mkString(","))
         case "em" =>
           require(
               getDocConcentration.forall(_ >= 0),
               "For EM optimizer, docConcentration values must be >= 1.  Found values: " +
-              getDocConcentration.mkString(","))
+                getDocConcentration.mkString(","))
       }
     }
     if (isSet(topicConcentration)) {
@@ -316,11 +318,11 @@ private[clustering] trait LDAParams
         case "online" =>
           require(getTopicConcentration >= 0,
                   s"For Online LDA optimizer, topicConcentration" +
-                  s" must be >= 0.  Found value: $getTopicConcentration")
+                    s" must be >= 0.  Found value: $getTopicConcentration")
         case "em" =>
           require(getTopicConcentration >= 0,
                   s"For EM optimizer, topicConcentration" +
-                  s" must be >= 1.  Found value: $getTopicConcentration")
+                    s" must be >= 1.  Found value: $getTopicConcentration")
       }
     }
     SchemaUtils.checkColumnType(schema, $(featuresCol), new VectorUDT)
@@ -349,7 +351,7 @@ private[clustering] trait LDAParams
   */
 @Since("1.6.0")
 @Experimental
-sealed abstract class LDAModel private[ml](
+sealed abstract class LDAModel private[ml] (
     @Since("1.6.0") override val uid: String,
     @Since("1.6.0") val vocabSize: Int,
     @Since("1.6.0") @transient protected val sqlContext: SQLContext)
@@ -402,7 +404,7 @@ sealed abstract class LDAModel private[ml](
     } else {
       logWarning(
           "LDAModel.transform was called without any output columns. Set an output column" +
-          " such as topicDistributionCol to produce results.")
+            " such as topicDistributionCol to produce results.")
       dataset
     }
   }
@@ -506,7 +508,7 @@ sealed abstract class LDAModel private[ml](
   */
 @Since("1.6.0")
 @Experimental
-class LocalLDAModel private[ml](
+class LocalLDAModel private[ml] (
     uid: String,
     vocabSize: Int,
     @Since("1.6.0") override protected val oldLocalModel: OldLocalLDAModel,
@@ -577,10 +579,12 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
       val docConcentration = data.getAs[Vector](2)
       val topicConcentration = data.getAs[Double](3)
       val gammaShape = data.getAs[Double](4)
-      val oldModel = new OldLocalLDAModel(
-          topicsMatrix, docConcentration, topicConcentration, gammaShape)
-      val model = new LocalLDAModel(
-          metadata.uid, vocabSize, oldModel, sqlContext)
+      val oldModel = new OldLocalLDAModel(topicsMatrix,
+                                          docConcentration,
+                                          topicConcentration,
+                                          gammaShape)
+      val model =
+        new LocalLDAModel(metadata.uid, vocabSize, oldModel, sqlContext)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }
@@ -607,7 +611,7 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
   */
 @Since("1.6.0")
 @Experimental
-class DistributedLDAModel private[ml](
+class DistributedLDAModel private[ml] (
     uid: String,
     vocabSize: Int,
     private val oldDistributedModel: OldDistributedLDAModel,
@@ -636,8 +640,11 @@ class DistributedLDAModel private[ml](
 
   @Since("1.6.0")
   override def copy(extra: ParamMap): DistributedLDAModel = {
-    val copied = new DistributedLDAModel(
-        uid, vocabSize, oldDistributedModel, sqlContext, oldLocalModelOption)
+    val copied = new DistributedLDAModel(uid,
+                                         vocabSize,
+                                         oldDistributedModel,
+                                         sqlContext,
+                                         oldLocalModelOption)
     copyValues(copied, extra).setParent(parent)
     copied
   }
@@ -696,8 +703,11 @@ object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val modelPath = new Path(path, "oldModel").toString
       val oldModel = OldDistributedLDAModel.load(sc, modelPath)
-      val model = new DistributedLDAModel(
-          metadata.uid, oldModel.vocabSize, oldModel, sqlContext, None)
+      val model = new DistributedLDAModel(metadata.uid,
+                                          oldModel.vocabSize,
+                                          oldModel,
+                                          sqlContext,
+                                          None)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }
@@ -857,8 +867,8 @@ class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
 private[clustering] object LDA extends DefaultParamsReadable[LDA] {
 
   /** Get dataset for spark.mllib LDA */
-  def getOldDataset(
-      dataset: DataFrame, featuresCol: String): RDD[(Long, Vector)] = {
+  def getOldDataset(dataset: DataFrame,
+                    featuresCol: String): RDD[(Long, Vector)] = {
     dataset
       .withColumn("docId", monotonicallyIncreasingId())
       .select("docId", featuresCol)

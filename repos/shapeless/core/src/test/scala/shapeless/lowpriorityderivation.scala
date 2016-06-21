@@ -262,16 +262,16 @@ object LowPriorityDerivationTests {
         }
     }
 
-    implicit def mkTC[T](
-        implicit ev: LowPriority, cached: Strict[MkTC[T]]): TC[T] =
+    implicit def mkTC[T](implicit ev: LowPriority,
+                         cached: Strict[MkTC[T]]): TC[T] =
       cached.value.tc
   }
 
   object SimpleTCDeriver extends SimpleDeriver[TC] {
     def instance[T](msg0: Int => String) = TC.instance(msg0)
 
-    implicit def mkTC[T](
-        implicit ev: LowPriority, cached: Strict[MkTC[T]]): TC[T] =
+    implicit def mkTC[T](implicit ev: LowPriority,
+                         cached: Strict[MkTC[T]]): TC[T] =
       cached.value.tc
   }
 

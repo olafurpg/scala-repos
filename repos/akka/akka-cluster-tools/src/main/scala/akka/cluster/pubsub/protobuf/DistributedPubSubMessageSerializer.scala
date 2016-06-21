@@ -192,8 +192,9 @@ private[akka] class DistributedPubSubMessageSerializer(
     sendFromProto(dm.Send.parseFrom(bytes))
 
   private def sendFromProto(send: dm.Send): Send =
-    Send(
-        send.getPath, payloadFromProto(send.getPayload), send.getLocalAffinity)
+    Send(send.getPath,
+         payloadFromProto(send.getPayload),
+         send.getLocalAffinity)
 
   private def sendToAllToProto(sendToAll: SendToAll): dm.SendToAll = {
     dm.SendToAll

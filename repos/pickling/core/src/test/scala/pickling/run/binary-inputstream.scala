@@ -37,8 +37,8 @@ class BinaryInputStreamReaderTest extends FunSuite {
 
   // Byte, Short, Char, Int, Long, Float, Double
 
-  def testPerson[T, U <: Person[T]: FastTypeTag](obj: U)(
-      implicit p: Pickler[U], u: Unpickler[U]): Unit = {
+  def testPerson[T, U <: Person[T]: FastTypeTag](
+      obj: U)(implicit p: Pickler[U], u: Unpickler[U]): Unit = {
     val pickle = obj.pickle
     val streamPickle = BinaryPickle(new ByteArrayInputStream(pickle.value))
     val readObj = streamPickle.unpickle[U]

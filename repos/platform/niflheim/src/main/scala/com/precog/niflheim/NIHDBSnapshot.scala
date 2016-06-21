@@ -71,8 +71,8 @@ trait NIHDBSnapshot {
   def getBlock(id0: Option[Long], cols: Option[Set[CPath]]): Option[Block] =
     findReader(id0).map(_.snapshot(cols))
 
-  def getBlockAfter(
-      id0: Option[Long], cols: Option[Set[ColumnRef]]): Option[Block] =
+  def getBlockAfter(id0: Option[Long],
+                    cols: Option[Set[ColumnRef]]): Option[Block] =
     findReaderAfter(id0).map { reader =>
       val snapshot = reader.snapshotRef(cols)
       if (logger.isTraceEnabled) {

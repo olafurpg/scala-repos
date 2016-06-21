@@ -7,15 +7,15 @@ object Identifiers {
 
   val Operator = P(
       !Keywords ~
-      (!("/*" | "//") ~ (CharsWhile(x => isOpChar(x) && x != '/') | "/"))
-        .rep(1)
+        (!("/*" | "//") ~ (CharsWhile(x => isOpChar(x) && x != '/') | "/"))
+          .rep(1)
   )
 
   val VarId = VarId0(true)
 
   def VarId0(dollar: Boolean) = P(!Keywords ~ Lower ~ IdRest(dollar))
   val PlainId = P(!Keywords ~ Upper ~ IdRest(true) | VarId | Operator ~
-      (!OpChar | &("/*" | "//")))
+        (!OpChar | &("/*" | "//")))
   val PlainIdNoDollar = P(
       !Keywords ~ Upper ~ IdRest(false) | VarId0(false) | Operator)
   val BacktickId = P("`" ~ CharsWhile(_ != '`') ~ "`")
@@ -28,7 +28,7 @@ object Identifiers {
             c => NonLetterDigitId.contains(c) || c.isLetter || c.isDigit
         ))
     P(IdUnderscoreChunk.rep ~
-        (CharsWhile(_ == '_') ~ CharsWhile(isOpChar, min = 0)).?)
+          (CharsWhile(_ == '_') ~ CharsWhile(isOpChar, min = 0)).?)
   }
 
   val alphaKeywords = Seq(

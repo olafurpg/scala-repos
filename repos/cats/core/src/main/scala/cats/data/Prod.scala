@@ -31,8 +31,8 @@ private[data] sealed abstract class ProdInstances extends ProdInstances0 {
       def G: Alternative[G] = GG
     }
 
-  implicit def prodEq[F[_], G[_], A](
-      implicit FF: Eq[F[A]], GG: Eq[G[A]]): Eq[Prod[F, G, A]] =
+  implicit def prodEq[F[_], G[_], A](implicit FF: Eq[F[A]],
+                                     GG: Eq[G[A]]): Eq[Prod[F, G, A]] =
     new Eq[Prod[F, G, A]] {
       def eqv(x: Prod[F, G, A], y: Prod[F, G, A]): Boolean =
         FF.eqv(x.first, y.first) && GG.eqv(x.second, y.second)
@@ -71,7 +71,8 @@ private[data] sealed abstract class ProdInstances2 extends ProdInstances3 {
 
 private[data] sealed abstract class ProdInstances3 extends ProdInstances4 {
   implicit def prodApply[F[_], G[_]](
-      implicit FF: Apply[F], GG: Apply[G]): Apply[Lambda[X => Prod[F, G, X]]] =
+      implicit FF: Apply[F],
+      GG: Apply[G]): Apply[Lambda[X => Prod[F, G, X]]] =
     new ProdApply[F, G] {
       def F: Apply[F] = FF
       def G: Apply[G] = GG

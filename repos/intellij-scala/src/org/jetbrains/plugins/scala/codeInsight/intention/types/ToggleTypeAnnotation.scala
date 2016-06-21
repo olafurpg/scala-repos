@@ -33,8 +33,8 @@ class ToggleTypeAnnotation extends PsiElementBaseIntentionAction {
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    ToggleTypeAnnotation.complete(
-        new AddOrRemoveStrategy(Option(editor)), element)
+    ToggleTypeAnnotation
+      .complete(new AddOrRemoveStrategy(Option(editor)), element)
   }
 }
 
@@ -105,8 +105,7 @@ object ToggleTypeAnnotation {
       }
     }
 
-    for (pattern <- element.parentsInFile.findByType(
-                       classOf[ScBindingPattern])) {
+    for (pattern <- element.parentsInFile.findByType(classOf[ScBindingPattern])) {
       pattern match {
         case p: ScTypedPattern if p.typePattern.isDefined =>
           strategy.removeFromPattern(p)

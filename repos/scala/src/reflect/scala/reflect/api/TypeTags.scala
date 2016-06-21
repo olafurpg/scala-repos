@@ -194,8 +194,8 @@ trait TypeTags { self: Universe =>
 
     override def equals(x: Any) =
       x.isInstanceOf[WeakTypeTag[_]] &&
-      this.mirror == x.asInstanceOf[WeakTypeTag[_]].mirror &&
-      this.tpe == x.asInstanceOf[WeakTypeTag[_]].tpe
+        this.mirror == x.asInstanceOf[WeakTypeTag[_]].mirror &&
+        this.tpe == x.asInstanceOf[WeakTypeTag[_]].tpe
 
     override def hashCode = mirror.hashCode * 31 + tpe.hashCode
 
@@ -266,8 +266,8 @@ trait TypeTags { self: Universe =>
 
     override def equals(x: Any) =
       x.isInstanceOf[TypeTag[_]] &&
-      this.mirror == x.asInstanceOf[TypeTag[_]].mirror &&
-      this.tpe == x.asInstanceOf[TypeTag[_]].tpe
+        this.mirror == x.asInstanceOf[TypeTag[_]].mirror &&
+        this.tpe == x.asInstanceOf[TypeTag[_]].tpe
 
     override def hashCode = mirror.hashCode * 31 + tpe.hashCode
 
@@ -344,8 +344,8 @@ trait TypeTags { self: Universe =>
   }
 
   /* @group TypeTags */
-  private class PredefTypeTag[T](
-      _tpe: Type, copyIn: Universe => Universe#TypeTag[T])
+  private class PredefTypeTag[T](_tpe: Type,
+                                 copyIn: Universe => Universe#TypeTag[T])
       extends TypeTagImpl[T](rootMirror, new api.PredefTypeCreator(copyIn)) {
     override lazy val tpe: Type = _tpe
     @throws(classOf[ObjectStreamException])
@@ -388,8 +388,8 @@ trait TypeTags { self: Universe =>
 // This class should be final, but we can't do that in Scala 2.11.x without breaking
 // binary incompatibility.
 @SerialVersionUID(1L)
-private[scala] class SerializedTypeTag(
-    var tpec: TypeCreator, var concrete: Boolean)
+private[scala] class SerializedTypeTag(var tpec: TypeCreator,
+                                       var concrete: Boolean)
     extends Serializable {
   import scala.reflect.runtime.universe.{TypeTag, WeakTypeTag, runtimeMirror}
   @throws(classOf[ObjectStreamException])

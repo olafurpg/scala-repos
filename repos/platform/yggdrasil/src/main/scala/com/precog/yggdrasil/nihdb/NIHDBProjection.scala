@@ -31,8 +31,9 @@ import com.weiglewilczek.slf4s.Logging
 
 import scalaz.{NonEmptyList => NEL, Monad, StreamT}
 
-final class NIHDBProjection(
-    snapshot: NIHDBSnapshot, val authorities: Authorities, projectionId: Int)
+final class NIHDBProjection(snapshot: NIHDBSnapshot,
+                            val authorities: Authorities,
+                            projectionId: Int)
     extends ProjectionLike[Future, Slice]
     with Logging {
   type Key = Long
@@ -42,8 +43,8 @@ final class NIHDBProjection(
   val length = readers.map(_.length.toLong).sum
 
   override def toString =
-    "NIHDBProjection(id = %d, len = %d, authorities = %s)".format(
-        projectionId, length, authorities)
+    "NIHDBProjection(id = %d, len = %d, authorities = %s)"
+      .format(projectionId, length, authorities)
 
   def structure(implicit M: Monad[Future]) =
     M.point(readers.flatMap(_.structure)(collection.breakOut): Set[ColumnRef])
@@ -74,8 +75,8 @@ final class NIHDBProjection(
     }
   }
 
-  private def getSnapshotBlock(
-      id: Option[Long], columns: Option[Set[CPath]]): Option[Block] = {
+  private def getSnapshotBlock(id: Option[Long],
+                               columns: Option[Set[CPath]]): Option[Block] = {
     try {
       // We're limiting ourselves to 2 billion blocks total here
       val index = id.map(_.toInt).getOrElse(0)

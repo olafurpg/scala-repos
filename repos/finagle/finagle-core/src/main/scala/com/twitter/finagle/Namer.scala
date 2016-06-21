@@ -71,8 +71,7 @@ object Namer {
 
     private[this] object InetPath {
       def unapply(path: Path): Option[(Address, Path)] = path match {
-        case Path
-              .Utf8("$", "inet", host, IntegerString(port), residual @ _ *) =>
+        case Path.Utf8("$", "inet", host, IntegerString(port), residual @ _ *) =>
           Some(
               (Address(new InetSocketAddress(host, port)),
                Path.Utf8(residual: _*)))

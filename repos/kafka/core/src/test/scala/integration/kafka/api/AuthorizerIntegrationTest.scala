@@ -61,11 +61,13 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
   val TopicReadAcl = Map(
       topicResource -> Set(
           new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Read)))
-  val TopicWriteAcl = Map(
-      topicResource -> Set(
+  val TopicWriteAcl = Map(topicResource -> Set(
           new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Write)))
-  val TopicDescribeAcl = Map(topicResource -> Set(new Acl(
-              KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)))
+  val TopicDescribeAcl = Map(
+      topicResource -> Set(new Acl(KafkaPrincipal.ANONYMOUS,
+                                   Allow,
+                                   Acl.WildCardHost,
+                                   Describe)))
 
   val consumers = Buffer[KafkaConsumer[Array[Byte], Array[Byte]]]()
   val producers = Buffer[KafkaProducer[Array[Byte], Array[Byte]]]()
@@ -106,46 +108,46 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
 
   val RequestKeyToErrorCode = Map[Short, (Nothing) => Short](
       ApiKeys.METADATA.id ->
-      ((resp: requests.MetadataResponse) =>
-            resp
-              .errors()
-              .asScala
-              .find(_._1 == topic)
-              .getOrElse(("test", Errors.NONE))
-              ._2
-              .code()),
+        ((resp: requests.MetadataResponse) =>
+              resp
+                .errors()
+                .asScala
+                .find(_._1 == topic)
+                .getOrElse(("test", Errors.NONE))
+                ._2
+                .code()),
       ApiKeys.PRODUCE.id ->
-      ((resp: requests.ProduceResponse) =>
-            resp.responses().asScala.find(_._1 == tp).get._2.errorCode),
+        ((resp: requests.ProduceResponse) =>
+              resp.responses().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.FETCH.id ->
-      ((resp: requests.FetchResponse) =>
-            resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
+        ((resp: requests.FetchResponse) =>
+              resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.LIST_OFFSETS.id ->
-      ((resp: requests.ListOffsetResponse) =>
-            resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
+        ((resp: requests.ListOffsetResponse) =>
+              resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.OFFSET_COMMIT.id ->
-      ((resp: requests.OffsetCommitResponse) =>
-            resp.responseData().asScala.find(_._1 == tp).get._2),
+        ((resp: requests.OffsetCommitResponse) =>
+              resp.responseData().asScala.find(_._1 == tp).get._2),
       ApiKeys.OFFSET_FETCH.id ->
-      ((resp: requests.OffsetFetchResponse) =>
-            resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
+        ((resp: requests.OffsetFetchResponse) =>
+              resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.GROUP_COORDINATOR.id ->
-      ((resp: requests.GroupCoordinatorResponse) => resp.errorCode()),
+        ((resp: requests.GroupCoordinatorResponse) => resp.errorCode()),
       ApiKeys.UPDATE_METADATA_KEY.id ->
-      ((resp: requests.UpdateMetadataResponse) => resp.errorCode()),
+        ((resp: requests.UpdateMetadataResponse) => resp.errorCode()),
       ApiKeys.JOIN_GROUP.id -> ((resp: JoinGroupResponse) => resp.errorCode()),
       ApiKeys.SYNC_GROUP.id -> ((resp: SyncGroupResponse) => resp.errorCode()),
       ApiKeys.HEARTBEAT.id -> ((resp: HeartbeatResponse) => resp.errorCode()),
       ApiKeys.LEAVE_GROUP.id ->
-      ((resp: LeaveGroupResponse) => resp.errorCode()),
+        ((resp: LeaveGroupResponse) => resp.errorCode()),
       ApiKeys.LEADER_AND_ISR.id ->
-      ((resp: requests.LeaderAndIsrResponse) =>
-            resp.responses().asScala.find(_._1 == tp).get._2),
+        ((resp: requests.LeaderAndIsrResponse) =>
+              resp.responses().asScala.find(_._1 == tp).get._2),
       ApiKeys.STOP_REPLICA.id ->
-      ((resp: requests.StopReplicaResponse) =>
-            resp.responses().asScala.find(_._1 == tp).get._2),
+        ((resp: requests.StopReplicaResponse) =>
+              resp.responses().asScala.find(_._1 == tp).get._2),
       ApiKeys.CONTROLLED_SHUTDOWN_KEY.id ->
-      ((resp: requests.ControlledShutdownResponse) => resp.errorCode())
+        ((resp: requests.ControlledShutdownResponse) => resp.errorCode())
   )
 
   val RequestKeysToAcls = Map[Short, Map[Resource, Set[Acl]]](
@@ -183,12 +185,15 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
                                  ClusterAction)),
                      Resource.ClusterResource)
 
-    for (i <- 0 until producerCount) producers += TestUtils.createNewProducer(
-        TestUtils.getBrokerListStrFromServers(servers), acks = 1)
-    for (i <- 0 until consumerCount) consumers += TestUtils.createNewConsumer(
-        TestUtils.getBrokerListStrFromServers(servers),
-        groupId = group,
-        securityProtocol = SecurityProtocol.PLAINTEXT)
+    for (i <- 0 until producerCount)
+      producers += TestUtils.createNewProducer(
+          TestUtils.getBrokerListStrFromServers(servers),
+          acks = 1)
+    for (i <- 0 until consumerCount)
+      consumers += TestUtils.createNewConsumer(
+          TestUtils.getBrokerListStrFromServers(servers),
+          groupId = group,
+          securityProtocol = SecurityProtocol.PLAINTEXT)
 
     // create the consumer offset topic
     TestUtils.createTopic(zkUtils,
@@ -253,20 +258,23 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
         new requests.UpdateMetadataRequest.Broker(
             brokerId,
             Map(SecurityProtocol.PLAINTEXT -> new requests.UpdateMetadataRequest.EndPoint(
-                    "localhost", 0)).asJava,
+                    "localhost",
+                    0)).asJava,
             null)).asJava
-    new requests.UpdateMetadataRequest(
-        brokerId, Int.MaxValue, partitionState, brokers)
+    new requests.UpdateMetadataRequest(brokerId,
+                                       Int.MaxValue,
+                                       partitionState,
+                                       brokers)
   }
 
   private def createJoinGroupRequest = {
-    new JoinGroupRequest(
-        group,
-        30000,
-        "",
-        "consumer",
-        List(new JoinGroupRequest.ProtocolMetadata(
-                "consumer-range", ByteBuffer.wrap("test".getBytes()))).asJava)
+    new JoinGroupRequest(group,
+                         30000,
+                         "",
+                         "consumer",
+                         List(new JoinGroupRequest.ProtocolMetadata(
+                                 "consumer-range",
+                                 ByteBuffer.wrap("test".getBytes()))).asJava)
   }
 
   private def createSyncGroupRequest = {
@@ -280,7 +288,8 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
         "",
         1000,
         Map(tp -> new requests.OffsetCommitRequest.PartitionData(
-                0, "metadata")).asJava)
+                0,
+                "metadata")).asJava)
   }
 
   private def createHeartbeatRequest = {
@@ -307,8 +316,10 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
   }
 
   private def createStopReplicaRequest = {
-    new requests.StopReplicaRequest(
-        brokerId, Int.MaxValue, true, Set(tp).asJava)
+    new requests.StopReplicaRequest(brokerId,
+                                    Int.MaxValue,
+                                    true,
+                                    Set(tp).asJava)
   }
 
   private def createControlledShutdownRequest = {
@@ -340,12 +351,18 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
     for ((key, request) <- requestKeyToRequest) {
       removeAllAcls
       val resources = RequestKeysToAcls(key).map(_._1.resourceType).toSet
-      sendRequestAndVerifyResponseErrorCode(
-          socket, key, request, resources, isAuthorized = false)
-      for ((resource, acls) <- RequestKeysToAcls(key)) addAndVerifyAcls(
-          acls, resource)
-      sendRequestAndVerifyResponseErrorCode(
-          socket, key, request, resources, isAuthorized = true)
+      sendRequestAndVerifyResponseErrorCode(socket,
+                                            key,
+                                            request,
+                                            resources,
+                                            isAuthorized = false)
+      for ((resource, acls) <- RequestKeysToAcls(key))
+        addAndVerifyAcls(acls, resource)
+      sendRequestAndVerifyResponseErrorCode(socket,
+                                            key,
+                                            request,
+                                            resources,
+                                            isAuthorized = true)
     }
   }
 
@@ -362,10 +379,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
 
   @Test
   def testProduceWithTopicDescribe() {
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)),
-        topicResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Describe)),
+                     topicResource)
     try {
       sendRecords(numRecords, tp)
       fail("sendRecords should have thrown")
@@ -412,10 +431,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
         assertEquals(Collections.singleton(newTopic), e.unauthorizedTopics())
     }
 
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Create)),
-        Resource.ClusterResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Create)),
+                     Resource.ClusterResource)
     sendRecords(numRecords, topicPartition)
   }
 
@@ -479,10 +500,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
     sendRecords(1, tp)
     removeAllAcls()
 
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)),
-        topicResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Describe)),
+                     topicResource)
     addAndVerifyAcls(
         Set(new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Read)),
         groupResource)
@@ -547,8 +570,8 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
         Set(new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Read)),
         newTopicResource)
     addAndVerifyAcls(GroupReadAcl(groupResource), groupResource)
-    addAndVerifyAcls(
-        ClusterAcl(Resource.ClusterResource), Resource.ClusterResource)
+    addAndVerifyAcls(ClusterAcl(Resource.ClusterResource),
+                     Resource.ClusterResource)
     try {
       this.consumers(0).assign(List(topicPartition).asJava)
       consumeRecords(this.consumers(0))
@@ -561,10 +584,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
     addAndVerifyAcls(
         Set(new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Write)),
         newTopicResource)
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Create)),
-        Resource.ClusterResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Create)),
+                     Resource.ClusterResource)
 
     sendRecords(numRecords, topicPartition)
     consumeRecords(this.consumers(0), topic = newTopic, part = 0)
@@ -599,10 +624,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
     addAndVerifyAcls(
         Set(new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Read)),
         groupResource)
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)),
-        topicResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Describe)),
+                     topicResource)
     this.consumers.head.commitSync(Map(tp -> new OffsetAndMetadata(5)).asJava)
   }
 
@@ -654,10 +681,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
     addAndVerifyAcls(
         Set(new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Read)),
         groupResource)
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)),
-        topicResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Describe)),
+                     topicResource)
     this.consumers.head.assign(List(tp).asJava)
     this.consumers.head.position(tp)
   }
@@ -684,18 +713,21 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
 
   @Test
   def testListOfsetsWithTopicDescribe() {
-    addAndVerifyAcls(
-        Set(new Acl(
-                KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)),
-        topicResource)
+    addAndVerifyAcls(Set(
+                         new Acl(KafkaPrincipal.ANONYMOUS,
+                                 Allow,
+                                 Acl.WildCardHost,
+                                 Describe)),
+                     topicResource)
     this.consumers.head.partitionsFor(topic);
   }
 
   def removeAllAcls() = {
     servers.head.apis.authorizer.get.getAcls().keys.foreach { resource =>
       servers.head.apis.authorizer.get.removeAcls(resource)
-      TestUtils.waitAndVerifyAcls(
-          Set.empty[Acl], servers.head.apis.authorizer.get, resource)
+      TestUtils.waitAndVerifyAcls(Set.empty[Acl],
+                                  servers.head.apis.authorizer.get,
+                                  resource)
     }
   }
 
@@ -796,7 +828,7 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
       if (iters > maxIters)
         throw new IllegalStateException(
             "Failed to consume the expected records after " + iters +
-            " iterations.")
+              " iterations.")
       iters += 1
     }
     for (i <- 0 until numRecords) {

@@ -12,8 +12,8 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class StopOnFirstMatchingOfferMatcher(chained: OfferMatcher*)
     extends OfferMatcher {
-  override def matchOffer(
-      deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+  override def matchOffer(deadline: Timestamp,
+                          offer: Offer): Future[MatchedTaskOps] = {
     chained.foldLeft(Future.successful(
             MatchedTaskOps.noMatch(offer.getId, resendThisOffer = false))) {
       case (matchedFuture, nextMatcher) =>

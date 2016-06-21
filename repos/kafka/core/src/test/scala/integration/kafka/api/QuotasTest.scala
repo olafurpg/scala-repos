@@ -46,10 +46,10 @@ class QuotasTest extends KafkaServerTestHarness {
   val overridingProps = new Properties()
 
   // Low enough quota that a producer sending a small payload in a tight loop should get throttled
-  overridingProps.put(
-      KafkaConfig.ProducerQuotaBytesPerSecondDefaultProp, "8000")
-  overridingProps.put(
-      KafkaConfig.ConsumerQuotaBytesPerSecondDefaultProp, "2500")
+  overridingProps
+    .put(KafkaConfig.ProducerQuotaBytesPerSecondDefaultProp, "8000")
+  overridingProps
+    .put(KafkaConfig.ConsumerQuotaBytesPerSecondDefaultProp, "2500")
 
   override def generateConfigs() = {
     FixedPortTestUtils
@@ -73,8 +73,8 @@ class QuotasTest extends KafkaServerTestHarness {
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     producerProps.put(ProducerConfig.ACKS_CONFIG, "0")
-    producerProps.put(
-        ProducerConfig.BUFFER_MEMORY_CONFIG, producerBufferSize.toString)
+    producerProps
+      .put(ProducerConfig.BUFFER_MEMORY_CONFIG, producerBufferSize.toString)
     producerProps.put(ProducerConfig.CLIENT_ID_CONFIG, producerId1)
     producerProps.put(
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
@@ -88,8 +88,8 @@ class QuotasTest extends KafkaServerTestHarness {
     producers += new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
 
     val numPartitions = 1
-    val leaders = TestUtils.createTopic(
-        zkUtils, topic1, numPartitions, numServers, servers)
+    val leaders = TestUtils
+      .createTopic(zkUtils, topic1, numPartitions, numServers, servers)
     leaderNode =
       if (leaders(0).get == servers.head.config.brokerId)
         servers.head
@@ -104,10 +104,10 @@ class QuotasTest extends KafkaServerTestHarness {
     // Create consumers
     val consumerProps = new Properties
     consumerProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "QuotasTest")
-    consumerProps.setProperty(
-        ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 4096.toString)
-    consumerProps.setProperty(
-        ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+    consumerProps.setProperty(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG,
+                              4096.toString)
+    consumerProps
+      .setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
     consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     consumerProps.put(
         ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
@@ -119,13 +119,19 @@ class QuotasTest extends KafkaServerTestHarness {
     consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, consumerId1)
     consumers += new KafkaConsumer(consumerProps)
     // Create replica consumers with the same clientId as the high level consumer. These requests should never be throttled
-    replicaConsumers += new SimpleConsumer(
-        "localhost", leaderNode.boundPort(), 1000000, 64 * 1024, consumerId1)
+    replicaConsumers += new SimpleConsumer("localhost",
+                                           leaderNode.boundPort(),
+                                           1000000,
+                                           64 * 1024,
+                                           consumerId1)
 
     consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, consumerId2)
     consumers += new KafkaConsumer(consumerProps)
-    replicaConsumers += new SimpleConsumer(
-        "localhost", leaderNode.boundPort(), 1000000, 64 * 1024, consumerId2)
+    replicaConsumers += new SimpleConsumer("localhost",
+                                           leaderNode.boundPort(),
+                                           1000000,
+                                           64 * 1024,
+                                           consumerId2)
   }
 
   @After
@@ -237,8 +243,10 @@ class QuotasTest extends KafkaServerTestHarness {
     for (i <- 0 to count) {
       val payload = i.toString.getBytes
       numBytesProduced += payload.length
-      p.send(new ProducerRecord[Array[Byte], Array[Byte]](
-                  topic1, null, null, payload),
+      p.send(new ProducerRecord[Array[Byte], Array[Byte]](topic1,
+                                                           null,
+                                                           null,
+                                                           payload),
               new ErrorLoggingCallback(topic1, null, null, true))
         .get()
       Thread.sleep(1)
@@ -246,8 +254,8 @@ class QuotasTest extends KafkaServerTestHarness {
     numBytesProduced
   }
 
-  def consume(
-      consumer: KafkaConsumer[Array[Byte], Array[Byte]], numRecords: Int) {
+  def consume(consumer: KafkaConsumer[Array[Byte], Array[Byte]],
+              numRecords: Int) {
     consumer.subscribe(List(topic1))
     var numConsumed = 0
     while (numConsumed < numRecords) {

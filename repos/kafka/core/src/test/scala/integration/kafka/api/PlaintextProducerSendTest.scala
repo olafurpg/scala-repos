@@ -51,8 +51,9 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
       brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-    return new KafkaProducer[Array[Byte], Array[Byte]](
-        producerProps, new ByteArraySerializer, new ByteArraySerializer)
+    return new KafkaProducer[Array[Byte], Array[Byte]](producerProps,
+                                                       new ByteArraySerializer,
+                                                       new ByteArraySerializer)
   }
 
   @Test
@@ -61,7 +62,10 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
     try {
       val producer = createProducerWithWrongSerializer(brokerList)
       val record5 = new ProducerRecord[Array[Byte], Array[Byte]](
-          topic, new Integer(0), "key".getBytes, "value".getBytes)
+          topic,
+          new Integer(0),
+          "key".getBytes,
+          "value".getBytes)
       producer.send(record5)
       fail("Should have gotten a SerializationException")
     } catch {

@@ -26,6 +26,6 @@ trait ScPatternArgumentList extends ScArguments {
       child = child.getPrevSibling
     }
     return child != null &&
-    child.getNode.getElementType == ScalaTokenTypes.tCOMMA
+      child.getNode.getElementType == ScalaTokenTypes.tCOMMA
   }
 }

@@ -128,8 +128,10 @@ class KillOverdueTasksActorTest
         stagedAt = now - 10.seconds
     )
 
-    val runningTask = MarathonTestHelper.runningTaskProto(
-        "running", stagedAt = now - 5.seconds, startedAt = now - 2.seconds)
+    val runningTask =
+      MarathonTestHelper.runningTaskProto("running",
+                                          stagedAt = now - 5.seconds,
+                                          startedAt = now - 2.seconds)
 
     Given("Several somehow overdue tasks plus some not overdue tasks")
     val appId = PathId("/ignored")

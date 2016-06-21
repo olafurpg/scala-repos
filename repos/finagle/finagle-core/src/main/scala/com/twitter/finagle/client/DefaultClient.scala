@@ -81,8 +81,7 @@ case class DefaultClient[Req, Rep](
     loadBalancer: LoadBalancerFactory = DefaultBalancerFactory,
     newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] =
       TraceInitializerFilter.clientModule[Req, Rep]
-)
-    extends Client[Req, Rep] { outer =>
+) extends Client[Req, Rep] { outer =>
 
   private[this] def transform(stack: Stack[ServiceFactory[Req, Rep]]) = {
     val failureAccrualTransform: Transformer[Req, Rep] = failureAccrual match {
@@ -112,12 +111,12 @@ case class DefaultClient[Req, Rep](
 
   private[this] val params =
     Stack.Params.empty + param.Label(name) + param.Timer(timer) +
-    param.Monitor(monitor) + param.Stats(statsReceiver) +
-    param.Tracer(tracer) + param.Reporter(reporter) +
-    LoadBalancerFactory.HostStats(hostStatsReceiver) +
-    LoadBalancerFactory.Param(loadBalancer) + TimeoutFactory.Param(
+      param.Monitor(monitor) + param.Stats(statsReceiver) +
+      param.Tracer(tracer) + param.Reporter(reporter) +
+      LoadBalancerFactory.HostStats(hostStatsReceiver) +
+      LoadBalancerFactory.Param(loadBalancer) + TimeoutFactory.Param(
         serviceTimeout) + TimeoutFilter.Param(requestTimeout) +
-    ExpiringService.Param(maxIdletime, maxLifetime)
+      ExpiringService.Param(maxIdletime, maxLifetime)
 
   private[this] case class Client(
       stack: Stack[ServiceFactory[Req, Rep]] = clientStack,
@@ -138,8 +137,9 @@ case class DefaultClient[Req, Rep](
     protected def newDispatcher(transport: Transport[In, Out]) = throw unimpl
 
     override protected val endpointer: Stackable[ServiceFactory[Req, Rep]] =
-      new Stack.Module2[
-          Transporter.EndpointAddr, param.Stats, ServiceFactory[Req, Rep]] {
+      new Stack.Module2[Transporter.EndpointAddr,
+                        param.Stats,
+                        ServiceFactory[Req, Rep]] {
         val role = com.twitter.finagle.stack.Endpoint
         val description = "Send requests over the wire"
         def make(_addr: Transporter.EndpointAddr,

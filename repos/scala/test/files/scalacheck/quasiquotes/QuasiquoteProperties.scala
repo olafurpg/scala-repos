@@ -55,13 +55,13 @@ trait Helpers {
   implicit class TestSimilarListTree(lst: List[Tree]) {
     def ≈(other: List[Tree]) =
       (lst.length == other.length) &&
-      lst.zip(other).forall { case (t1, t2) => t1 ≈ t2 }
+        lst.zip(other).forall { case (t1, t2) => t1 ≈ t2 }
   }
 
   implicit class TestSimilarListListTree(lst: List[List[Tree]]) {
     def ≈(other: List[List[Tree]]) =
       (lst.length == other.length) &&
-      lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
+        lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
   }
 
   implicit class TestSimilarName(name: Name) {
@@ -71,8 +71,8 @@ trait Helpers {
   implicit class TestSimilarMods(mods: Modifiers) {
     def ≈(other: Modifiers) =
       (mods.flags == other.flags) &&
-      (mods.privateWithin ≈ other.privateWithin) &&
-      (mods.annotations ≈ other.annotations)
+        (mods.privateWithin ≈ other.privateWithin) &&
+        (mods.annotations ≈ other.annotations)
   }
 
   def assertThrows[T <: AnyRef](f: => Any)(

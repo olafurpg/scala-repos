@@ -20,8 +20,8 @@ import scala.collection.JavaConverters._
   * Note: This creates its *own* local cache directory for cache metadata. using its name.
   *
   */
-class MavenRemoteRepositoryResolver(
-    val repo: MavenRepository, settings: IvySettings)
+class MavenRemoteRepositoryResolver(val repo: MavenRepository,
+                                    settings: IvySettings)
     extends MavenRepositoryResolver(settings)
     with CustomRemoteMavenResolver {
   setName(repo.name)
@@ -37,7 +37,9 @@ class MavenRemoteRepositoryResolver(
     MavenRepositorySystemFactory.newSessionImpl(system, localRepo)
   private val aetherRepository = {
     new org.eclipse.aether.repository.RemoteRepository.Builder(
-        repo.name, SbtRepositoryLayout.LAYOUT_NAME, repo.root).build()
+        repo.name,
+        SbtRepositoryLayout.LAYOUT_NAME,
+        repo.root).build()
   }
   // TODO - Check if isUseCacheOnly is used correctly.
   private def isUseCacheOnly: Boolean =

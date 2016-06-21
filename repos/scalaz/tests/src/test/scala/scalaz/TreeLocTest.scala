@@ -17,7 +17,7 @@ object TreeLocTest extends SpecLite {
         streamEqual[Tree[A]].contramap((_: Stream[Tree[A]]).take(1000))
       def equal(a1: Tree[A], a2: Tree[A]) =
         Equal[A].equal(a1.rootLabel, a2.rootLabel) &&
-        streamEqualApprox.equal(a1.subForest, a2.subForest)
+          streamEqualApprox.equal(a1.subForest, a2.subForest)
     }
 
     // TODO checkAll("TreeLoc", applicative.laws[TreeLoc])

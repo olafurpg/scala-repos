@@ -117,8 +117,8 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
 
   private def testCreation(path: String) {
     val zk = zkUtils.zkConnection.getZookeeper
-    val zwe = new ZKCheckedEphemeral(
-        path, "", zk, JaasUtils.isZkSecurityEnabled())
+    val zwe =
+      new ZKCheckedEphemeral(path, "", zk, JaasUtils.isZkSecurityEnabled())
     var created = false
     var counter = 10
 
@@ -146,10 +146,12 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
 
     //Creates a second session
     val (_, zkConnection2) = ZkUtils.createZkClientAndConnection(
-        zkConnect, zkSessionTimeoutMs, zkConnectionTimeout)
+        zkConnect,
+        zkSessionTimeoutMs,
+        zkConnectionTimeout)
     val zk2 = zkConnection2.getZookeeper
-    var zwe = new ZKCheckedEphemeral(
-        path, "", zk2, JaasUtils.isZkSecurityEnabled())
+    var zwe =
+      new ZKCheckedEphemeral(path, "", zk2, JaasUtils.isZkSecurityEnabled())
 
     // Creates znode for path in the first session
     zk1.create(path, Array[Byte](), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL)
@@ -176,8 +178,8 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
     // Creates znode for path in the first session
     zk.create(path, Array[Byte](), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL)
 
-    var zwe = new ZKCheckedEphemeral(
-        path, "", zk, JaasUtils.isZkSecurityEnabled())
+    var zwe =
+      new ZKCheckedEphemeral(path, "", zk, JaasUtils.isZkSecurityEnabled())
     //Bootstraps the ZKWatchedEphemeral object
     var gotException = false;
     try {

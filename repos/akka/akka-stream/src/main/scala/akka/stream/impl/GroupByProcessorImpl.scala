@@ -93,8 +93,8 @@ private[akka] class GroupByProcessorImpl(settings: ActorMaterializerSettings,
       }
     }
 
-  def dispatchToSubstream(
-      elem: Any, substream: SubstreamOutput): TransferPhase = {
+  def dispatchToSubstream(elem: Any,
+                          substream: SubstreamOutput): TransferPhase = {
     pendingSubstreamOutput = substream
     TransferPhase(substream.NeedsDemand) { () ⇒
       substream.enqueueOutputElement(elem)

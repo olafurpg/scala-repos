@@ -22,8 +22,9 @@ trait WebCommands {
     * Call handleWebCommand on the handlers.
     * @return the result from the first Some-returning handler
     */
-  def handleWebCommand(
-      request: RequestHeader, buildLink: BuildLink, path: File): Option[Result]
+  def handleWebCommand(request: RequestHeader,
+                       buildLink: BuildLink,
+                       path: File): Option[Result]
 }
 
 /**

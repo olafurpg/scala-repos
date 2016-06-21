@@ -386,8 +386,8 @@ sealed abstract class ZipperInstances {
     override def traverseImpl[G[_]: Applicative, A, B](za: Zipper[A])(
         f: A => G[B]): G[Zipper[B]] =
       za traverse f
-    override def foldRight[A, B](fa: Zipper[A], z: => B)(
-        f: (A, => B) => B): B =
+    override def foldRight[A, B](fa: Zipper[A],
+                                 z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
@@ -404,8 +404,8 @@ sealed abstract class ZipperInstances {
       fa.lefts.forall(f) && f(fa.focus) && fa.rights.forall(f)
     override def any[A](fa: Zipper[A])(f: A => Boolean) =
       fa.lefts.exists(f) || f(fa.focus) || fa.rights.exists(f)
-    override def foldMap1[A, B](fa: Zipper[A])(
-        f: A => B)(implicit F: Semigroup[B]) =
+    override def foldMap1[A, B](
+        fa: Zipper[A])(f: A => B)(implicit F: Semigroup[B]) =
       fa.rights.foldLeft(
           Foldable[Stream].foldMapRight1Opt(fa.lefts)(f)((a, b) =>
                 F.append(b, f(a))) match {
@@ -413,8 +413,8 @@ sealed abstract class ZipperInstances {
             case None => f(fa.focus)
           }
       )((b, a) => F.append(b, f(a)))
-    override def foldMapRight1[A, B](fa: Zipper[A])(
-        z: A => B)(f: (A, => B) => B) =
+    override def foldMapRight1[A, B](
+        fa: Zipper[A])(z: A => B)(f: (A, => B) => B) =
       Foldable[Stream].foldLeft(
           fa.lefts,
           Foldable[Stream].foldMapRight1Opt(fa.rights)(z)(f) match {
@@ -468,8 +468,8 @@ sealed abstract class ZipperInstances {
       import std.stream.streamEqual
       def equal(a1: Zipper[A], a2: Zipper[A]) =
         streamEqual[A].equal(a1.lefts, a2.lefts) &&
-        Equal[A].equal(a1.focus, a2.focus) &&
-        streamEqual[A].equal(a1.rights, a2.rights)
+          Equal[A].equal(a1.focus, a2.focus) &&
+          streamEqual[A].equal(a1.rights, a2.rights)
     }
 
   implicit def zipperShow[A: Show]: Show[Zipper[A]] = new Show[Zipper[A]] {

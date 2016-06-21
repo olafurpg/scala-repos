@@ -147,8 +147,10 @@ trait EventService
                                                ingestMaxFields,
                                                ingestTmpDir,
                                                AccessMode.Create)
-    val archiveHandler = new ArchiveServiceHandler[ByteChunk](
-        apiKeyFinder, eventStore, Clock.System, deleteTimeout)
+    val archiveHandler = new ArchiveServiceHandler[ByteChunk](apiKeyFinder,
+                                                              eventStore,
+                                                              Clock.System,
+                                                              deleteTimeout)
     val createHandler = new FileStoreHandler(serviceLocation,
                                              permissionsFinder,
                                              jobManager,

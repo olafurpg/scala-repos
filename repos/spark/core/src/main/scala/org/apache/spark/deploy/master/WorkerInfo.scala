@@ -34,10 +34,8 @@ private[spark] class WorkerInfo(val id: String,
   Utils.checkHost(host, "Expected hostname")
   assert(port > 0)
 
-  @transient var executors: mutable.HashMap[String, ExecutorDesc] =
-    _ // executorId => info
-  @transient var drivers: mutable.HashMap[String, DriverInfo] =
-    _ // driverId => info
+  @transient var executors: mutable.HashMap[String, ExecutorDesc] = _ // executorId => info
+  @transient var drivers: mutable.HashMap[String, DriverInfo] = _ // driverId => info
   @transient var state: WorkerState.Value = _
   @transient var coresUsed: Int = _
   @transient var memoryUsed: Int = _

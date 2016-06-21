@@ -206,8 +206,10 @@ class DistributedSuite
     val blockManager = SparkEnv.get.blockManager
     val blockTransfer = SparkEnv.get.blockTransferService
     blockManager.master.getLocations(blockId).foreach { cmId =>
-      val bytes = blockTransfer.fetchBlockSync(
-          cmId.host, cmId.port, cmId.executorId, blockId.toString)
+      val bytes = blockTransfer.fetchBlockSync(cmId.host,
+                                               cmId.port,
+                                               cmId.executorId,
+                                               blockId.toString)
       val deserialized = blockManager
         .dataDeserialize(blockId, bytes.nioByteBuffer())
         .asInstanceOf[Iterator[Int]]
@@ -255,8 +257,11 @@ class DistributedSuite
   }
 
   test("passing environment variables to cluster") {
-    sc = new SparkContext(
-        clusterUrl, "test", null, Nil, Map("TEST_VAR" -> "TEST_VALUE"))
+    sc = new SparkContext(clusterUrl,
+                          "test",
+                          null,
+                          Nil,
+                          Map("TEST_VAR" -> "TEST_VALUE"))
     val values =
       sc.parallelize(1 to 2, 2).map(x => System.getenv("TEST_VAR")).collect()
     assert(values.toSeq === Seq("TEST_VALUE", "TEST_VALUE"))

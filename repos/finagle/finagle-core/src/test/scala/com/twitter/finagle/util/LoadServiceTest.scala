@@ -234,6 +234,6 @@ class MetaInfCodedClassloader(parent: ClassLoader)
 class FooAnnouncer extends Announcer {
   override val scheme: String = "foo"
 
-  override def announce(
-      addr: InetSocketAddress, name: String): Future[Announcement] = null
+  override def announce(addr: InetSocketAddress,
+                        name: String): Future[Announcement] = null
 }

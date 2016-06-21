@@ -39,22 +39,25 @@ object TestRelations {
       AttributeReference("h", DecimalType(10, 2))())
 
   val nestedRelation = LocalRelation(
+      AttributeReference("top",
+                         StructType(
+                             StructField("duplicateField",
+                                         StringType) :: StructField(
+                                 "duplicateField",
+                                 StringType) :: StructField(
+                                 "differentCase",
+                                 StringType) :: StructField("differentcase",
+                                                            StringType) :: Nil
+                         ))())
+
+  val nestedRelation2 = LocalRelation(
       AttributeReference(
           "top",
           StructType(
-              StructField("duplicateField", StringType) :: StructField(
-                  "duplicateField", StringType) :: StructField(
-                  "differentCase", StringType) :: StructField(
-                  "differentcase", StringType) :: Nil
+              StructField("aField", StringType) :: StructField(
+                  "bField",
+                  StringType) :: StructField("cField", StringType) :: Nil
           ))())
-
-  val nestedRelation2 = LocalRelation(
-      AttributeReference("top",
-                         StructType(
-                             StructField("aField", StringType) :: StructField(
-                                 "bField", StringType) :: StructField(
-                                 "cField", StringType) :: Nil
-                         ))())
 
   val listRelation = LocalRelation(
       AttributeReference("list", ArrayType(IntegerType))())

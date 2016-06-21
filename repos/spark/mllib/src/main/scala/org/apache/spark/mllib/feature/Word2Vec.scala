@@ -187,7 +187,7 @@ class Word2Vec extends Serializable with Logging {
     require(
         vocabSize > 0,
         "The vocabulary size should be > 0. You may need to check " +
-        "the setting of minCount, which could be large enough to remove all your words in sentences.")
+          "the setting of minCount, which could be large enough to remove all your words in sentences.")
 
     var a = 0
     while (a < vocabSize) {
@@ -322,9 +322,9 @@ class Word2Vec extends Serializable with Logging {
     if (vocabSize.toLong * vectorSize >= Int.MaxValue) {
       throw new RuntimeException(
           "Please increase minCount or decrease vectorSize in Word2Vec" +
-          " to avoid an OOM. You are highly recommended to make your vocabSize*vectorSize, " +
-          "which is " + vocabSize + "*" + vectorSize +
-          " for now, less than `Int.MaxValue`.")
+            " to avoid an OOM. You are highly recommended to make your vocabSize*vectorSize, " +
+            "which is " + vocabSize + "*" + vectorSize +
+            " for now, less than `Int.MaxValue`.")
     }
 
     val syn0Global = Array.fill[Float](vocabSize * vectorSize)(
@@ -351,8 +351,8 @@ class Word2Vec extends Serializable with Logging {
                   // TODO: discount by iteration?
                   alpha =
                     learningRate *
-                    (1 - numPartitions * wordCount.toDouble /
-                        (trainWordsCount + 1))
+                      (1 - numPartitions * wordCount.toDouble /
+                            (trainWordsCount + 1))
                   if (alpha < learningRate * 0.0001)
                     alpha = learningRate * 0.0001
                   logInfo("wordCount = " + wordCount + ", alpha = " + alpha)
@@ -381,10 +381,10 @@ class Word2Vec extends Serializable with Logging {
                             blas.sdot(vectorSize, syn0, l1, 1, syn1, l2, 1)
                           if (f > -MAX_EXP && f < MAX_EXP) {
                             val ind = ((f + MAX_EXP) *
-                                (EXP_TABLE_SIZE / MAX_EXP / 2.0)).toInt
+                                  (EXP_TABLE_SIZE / MAX_EXP / 2.0)).toInt
                             f = expTable.value(ind)
                             val g = ((1 - bcVocab.value(word).code(d) -
-                                    f) * alpha).toFloat
+                                      f) * alpha).toFloat
                             blas.saxpy(vectorSize, g, syn1, l2, 1, neu1e, 0, 1)
                             blas.saxpy(vectorSize, g, syn0, l1, 1, syn1, l2, 1)
                             syn1Modify(inner) += 1
@@ -435,8 +435,8 @@ class Word2Vec extends Serializable with Logging {
       while (i < synAgg.length) {
         val index = synAgg(i)._1
         if (index < vocabSize) {
-          Array.copy(
-              synAgg(i)._2, 0, syn0Global, index * vectorSize, vectorSize)
+          Array
+            .copy(synAgg(i)._2, 0, syn0Global, index * vectorSize, vectorSize)
         } else {
           Array.copy(synAgg(i)._2,
                      0,
@@ -475,7 +475,7 @@ class Word2Vec extends Serializable with Logging {
   *                    (i * vectorSize, i * vectorSize + vectorSize)
   */
 @Since("1.1.0")
-class Word2VecModel private[spark](
+class Word2VecModel private[spark] (
     private[spark] val wordIndex: Map[String, Int],
     private[spark] val wordVectors: Array[Float])
     extends Serializable
@@ -626,8 +626,8 @@ object Word2VecModel extends Loader[Word2VecModel] {
     val wordVectors = new Array[Float](vectorSize * numWords)
     var i = 0
     while (i < numWords) {
-      Array.copy(
-          model(wordList(i)), 0, wordVectors, i * vectorSize, vectorSize)
+      Array
+        .copy(model(wordList(i)), 0, wordVectors, i * vectorSize, vectorSize)
       i += 1
     }
     wordVectors
@@ -666,7 +666,7 @@ object Word2VecModel extends Loader[Word2VecModel] {
       val metadata = compact(
           render(
               ("class" -> classNameV1_0) ~ ("version" -> formatVersionV1_0) ~
-              ("vectorSize" -> vectorSize) ~ ("numWords" -> numWords)))
+                ("vectorSize" -> vectorSize) ~ ("numWords" -> numWords)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -703,7 +703,7 @@ object Word2VecModel extends Loader[Word2VecModel] {
         require(
             expectedVectorSize == vectorSize,
             s"Word2VecModel requires each word to be mapped to a vector of size " +
-            s"$expectedVectorSize, got vector of size $vectorSize")
+              s"$expectedVectorSize, got vector of size $vectorSize")
         require(
             expectedNumWords == numWords,
             s"Word2VecModel requires $expectedNumWords words, but got $numWords")
@@ -711,8 +711,8 @@ object Word2VecModel extends Loader[Word2VecModel] {
       case _ =>
         throw new Exception(
             s"Word2VecModel.load did not recognize model with (className, format version):" +
-            s"($loadedClassName, $loadedVersion).  Supported:\n" +
-            s"  ($classNameV1_0, 1.0)")
+              s"($loadedClassName, $loadedVersion).  Supported:\n" +
+              s"  ($classNameV1_0, 1.0)")
     }
   }
 }

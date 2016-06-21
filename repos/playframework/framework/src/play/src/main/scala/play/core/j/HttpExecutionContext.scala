@@ -79,8 +79,9 @@ class HttpExecutionContext(contextClassLoader: ClassLoader,
     if (delegatePrepared eq delegate) {
       this
     } else {
-      new HttpExecutionContext(
-          contextClassLoader, httpContext, delegatePrepared)
+      new HttpExecutionContext(contextClassLoader,
+                               httpContext,
+                               delegatePrepared)
     }
   }
 }

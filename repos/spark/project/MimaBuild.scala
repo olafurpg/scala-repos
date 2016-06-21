@@ -69,19 +69,17 @@ object MimaBuild {
     val memberExcludeFilePath = file(
         base.getAbsolutePath + "/.generated-mima-member-excludes")
 
-    val ignoredClasses: Seq[String] =
-      if (!classExcludeFilePath.exists()) {
-        Seq()
-      } else {
-        IO.read(classExcludeFilePath).split("\n")
-      }
+    val ignoredClasses: Seq[String] = if (!classExcludeFilePath.exists()) {
+      Seq()
+    } else {
+      IO.read(classExcludeFilePath).split("\n")
+    }
 
-    val ignoredMembers: Seq[String] =
-      if (!memberExcludeFilePath.exists()) {
-        Seq()
-      } else {
-        IO.read(memberExcludeFilePath).split("\n")
-      }
+    val ignoredMembers: Seq[String] = if (!memberExcludeFilePath.exists()) {
+      Seq()
+    } else {
+      IO.read(memberExcludeFilePath).split("\n")
+    }
 
     defaultExcludes ++ ignoredClasses.flatMap(excludeClass) ++ ignoredMembers
       .flatMap(excludeMember) ++ MimaExcludes.excludes(currentSparkVersion)

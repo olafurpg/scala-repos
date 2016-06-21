@@ -111,8 +111,10 @@ object softmax extends UFunc {
           }
         }
 
-        override def visitArray(
-            arr: Array[Float], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(arr: Array[Float],
+                                offset: Int,
+                                length: Int,
+                                stride: Int): Unit = {
           var i = 0
           var off = offset
           var cur = 0.0f

@@ -11,21 +11,21 @@ import lila.db.Implicits._
 import lila.hub.FutureSequencer
 import lila.hub.{actorApi => hubApi}
 
-final class FishnetApi(hub: lila.hub.Env,
-                       repo: FishnetRepo,
-                       moveDb: MoveDB,
-                       analysisColl: Coll,
-                       sequencer: FutureSequencer,
-                       monitor: Monitor,
-                       saveAnalysis: lila.analyse.Analysis => Funit,
-                       offlineMode: Boolean)(
-    implicit system: akka.actor.ActorSystem) {
+final class FishnetApi(
+    hub: lila.hub.Env,
+    repo: FishnetRepo,
+    moveDb: MoveDB,
+    analysisColl: Coll,
+    sequencer: FutureSequencer,
+    monitor: Monitor,
+    saveAnalysis: lila.analyse.Analysis => Funit,
+    offlineMode: Boolean)(implicit system: akka.actor.ActorSystem) {
 
   import FishnetApi._
   import BSONHandlers._
 
-  def authenticateClient(
-      req: JsonApi.Request, ip: Client.IpAddress): Fu[Try[Client]] = {
+  def authenticateClient(req: JsonApi.Request,
+                         ip: Client.IpAddress): Fu[Try[Client]] = {
     if (offlineMode) repo.getOfflineClient map some
     else repo.getEnabledClient(req.fishnet.apikey)
   } map {
@@ -84,8 +84,9 @@ final class FishnetApi(hub: lila.hub.Env,
         }
     }.map { _ map JsonApi.fromWork }
 
-  def postMove(
-      workId: Work.Id, client: Client, data: JsonApi.Request.PostMove): Funit =
+  def postMove(workId: Work.Id,
+               client: Client,
+               data: JsonApi.Request.PostMove): Funit =
     fuccess {
       moveDb.get(workId).filter(_ isAcquiredBy client) match {
         case None => monitor.notFound(Client.Skill.Move, client)
@@ -95,7 +96,8 @@ final class FishnetApi(hub: lila.hub.Env,
               moveDb delete work
               monitor.move(work, client)
               hub.actor.roundMap ! hubApi.map.Tell(
-                  work.game.id, hubApi.round.FishnetPlay(uci, work.currentFen))
+                  work.game.id,
+                  hubApi.round.FishnetPlay(uci, work.currentFen))
             case _ =>
               moveDb updateOrGiveUp work.invalid
               monitor.failure(work, client)
@@ -158,8 +160,8 @@ final class FishnetApi(hub: lila.hub.Env,
           ).some)
       .map(0 !=)
 
-  private[fishnet] def createClient(
-      userId: Client.UserId, skill: String): Fu[Client] =
+  private[fishnet] def createClient(userId: Client.UserId,
+                                    skill: String): Fu[Client] =
     Client.Skill.byKey(skill).fold(fufail[Client](s"Invalid skill $skill")) {
       sk =>
         val client = Client(_id = Client.makeKey,

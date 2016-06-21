@@ -101,8 +101,9 @@ object RequestBuilder {
   /**
     * Provides a typesafe `build` with content for Java.
     */
-  def safeBuild(
-      builder: Complete, method: Method, content: Option[Buf]): Request =
+  def safeBuild(builder: Complete,
+                method: Method,
+                content: Option[Buf]): Request =
     builder.build(method, content)(RequestEvidence.FullyConfigured)
 
   /**
@@ -157,7 +158,7 @@ private[http] final case class RequestConfig[HasUrl, HasForm](
     proxied: Boolean = false
 )
 
-class RequestBuilder[HasUrl, HasForm] private[http](
+class RequestBuilder[HasUrl, HasForm] private[http] (
     config: RequestConfig[HasUrl, HasForm]
 ) {
   import RequestConfig._
@@ -309,7 +310,8 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def build(method: Method, content: Option[Buf])(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.RequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = {
     content match {
       case Some(content) => withContent(method, content)
@@ -322,7 +324,8 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def buildGet()(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.RequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = withoutContent(Method.Get)
 
   /**
@@ -330,7 +333,8 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def buildHead()(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.RequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = withoutContent(Method.Head)
 
   /**
@@ -338,7 +342,8 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def buildDelete()(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.RequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = withoutContent(Method.Delete)
 
   /**
@@ -346,7 +351,8 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def buildPost(content: Buf)(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.RequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = withContent(Method.Post, content)
 
   /**
@@ -354,7 +360,8 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def buildPut(content: Buf)(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.RequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = withContent(Method.Put, content)
 
   /**
@@ -362,21 +369,24 @@ class RequestBuilder[HasUrl, HasForm] private[http](
     */
   def buildFormPost(multipart: Boolean = false)(
       implicit HTTP_REQUEST_BUILDER_IS_NOT_FULLY_SPECIFIED: RequestBuilder.PostRequestEvidence[
-          HasUrl, HasForm]
+          HasUrl,
+          HasForm]
   ): Request = {
     val dataFactory = new DefaultHttpDataFactory(false) // we don't use disk
     val req = withoutContent(Method.Post)
-    val encoder = new HttpPostRequestEncoder(
-        dataFactory, req.httpRequest, multipart)
+    val encoder =
+      new HttpPostRequestEncoder(dataFactory, req.httpRequest, multipart)
 
     config.formElements.foreach {
       case FileElement(name, content, contentType, filename) =>
-        HttpPostRequestEncoderEx.addBodyFileUpload(
-            encoder, dataFactory, req.httpRequest)(name,
-                                                   filename.getOrElse(""),
-                                                   BufChannelBuffer(content),
-                                                   contentType.getOrElse(null),
-                                                   false)
+        HttpPostRequestEncoderEx.addBodyFileUpload(encoder,
+                                                   dataFactory,
+                                                   req.httpRequest)(
+            name,
+            filename.getOrElse(""),
+            BufChannelBuffer(content),
+            contentType.getOrElse(null),
+            false)
 
       case SimpleElement(name, value) =>
         encoder.addBodyAttribute(name, value)
@@ -471,22 +481,20 @@ private object HttpPostRequestEncoderEx {
     require(filename != null)
     require(content != null)
 
-    val scontentType =
-      if (contentType == null) {
-        if (isText) {
-          HttpPostBodyUtil.DEFAULT_TEXT_CONTENT_TYPE
-        } else {
-          HttpPostBodyUtil.DEFAULT_BINARY_CONTENT_TYPE
-        }
+    val scontentType = if (contentType == null) {
+      if (isText) {
+        HttpPostBodyUtil.DEFAULT_TEXT_CONTENT_TYPE
       } else {
-        contentType
+        HttpPostBodyUtil.DEFAULT_BINARY_CONTENT_TYPE
       }
-    val contentTransferEncoding =
-      if (!isText) {
-        HttpPostBodyUtil.TransferEncodingMechanism.BINARY
-      } else {
-        HttpPostBodyUtil.TransferEncodingMechanism.BIT7
-      }
+    } else {
+      contentType
+    }
+    val contentTransferEncoding = if (!isText) {
+      HttpPostBodyUtil.TransferEncodingMechanism.BINARY
+    } else {
+      HttpPostBodyUtil.TransferEncodingMechanism.BIT7
+    }
 
     val fileUpload = factory.createFileUpload(request,
                                               name,

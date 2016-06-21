@@ -31,8 +31,7 @@ class StreamBuffersRateSpec extends AkkaSpec {
     val section = Flow[Int]
       .map(_ * 2)
       .withAttributes(Attributes.inputBuffer(initial = 1, max = 1))
-    val flow =
-      section.via(Flow[Int].map(_ / 2)) // the buffer size of this map is the default
+    val flow = section.via(Flow[Int].map(_ / 2)) // the buffer size of this map is the default
     //#section-buffer
   }
 
@@ -41,8 +40,7 @@ class StreamBuffersRateSpec extends AkkaSpec {
     import scala.concurrent.duration._
     case class Tick()
 
-    RunnableGraph.fromGraph(
-        GraphDSL.create() { implicit b =>
+    RunnableGraph.fromGraph(GraphDSL.create() { implicit b =>
       import GraphDSL.Implicits._
 
       val zipper = b.add(ZipWith[Tick, Int, Int]((tick, count) => count))

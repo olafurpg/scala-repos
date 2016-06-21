@@ -409,7 +409,9 @@ object SnippetSpec extends Specification with XmlMatchers {
       S.initIfUninitted(new LiftSession("", "", Empty)) {
         S.withAttrs(new UnprefixedAttribute("a", "a", Null)) {
           S.withAttrs(new UnprefixedAttribute(
-                  "b", "b", new UnprefixedAttribute("c", "c", Null))) {
+                  "b",
+                  "b",
+                  new UnprefixedAttribute("c", "c", Null))) {
             S.withAttrs(new UnprefixedAttribute("d", "d", Null)) {
               S.attr("a") must_== Full("a")
               S.attr("b") must_== Full("b")
@@ -438,7 +440,9 @@ object SnippetSpec extends Specification with XmlMatchers {
       S.initIfUninitted(new LiftSession("", "", Empty)) {
         S.withAttrs(new UnprefixedAttribute("a", "a", Null)) {
           S.withAttrs(new UnprefixedAttribute(
-                  "b", "b", new UnprefixedAttribute("c", "c", Null))) {
+                  "b",
+                  "b",
+                  new UnprefixedAttribute("c", "c", Null))) {
             S.withAttrs(new UnprefixedAttribute("d", "d", Null)) {
               S.currentAttr("a") must_== Empty
               S.currentAttr("b") must_== Empty

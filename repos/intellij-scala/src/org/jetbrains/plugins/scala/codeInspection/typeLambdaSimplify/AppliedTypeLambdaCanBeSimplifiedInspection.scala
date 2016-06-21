@@ -41,13 +41,13 @@ class AppliedTypeLambdaCanBeSimplifiedInspection extends LocalInspectionTool {
   override def getDisplayName: String =
     InspectionBundle.message("applied.type.lambda.can.be.simplified")
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     if (!holder.getFile.isInstanceOf[ScalaFile])
       return new PsiElementVisitor {}
 
-    def addInfo(
-        paramType: ScParameterizedTypeElement, replacementText: => String) = {
+    def addInfo(paramType: ScParameterizedTypeElement,
+                replacementText: => String) = {
       val fixes = Array[LocalQuickFix](
           new SimplifyAppliedTypeLambdaQuickFix(paramType, replacementText))
       val problem = holder.getManager.createProblemDescriptor(
@@ -130,15 +130,15 @@ class AppliedTypeLambdaCanBeSimplifiedInspection extends LocalInspectionTool {
   }
 }
 
-class SimplifyAppliedTypeLambdaQuickFix(
-    paramType: ScParameterizedTypeElement, replacement: => String)
-    extends AbstractFixOnPsiElement(
-        InspectionBundle.message("simplify.type"), paramType) {
+class SimplifyAppliedTypeLambdaQuickFix(paramType: ScParameterizedTypeElement,
+                                        replacement: => String)
+    extends AbstractFixOnPsiElement(InspectionBundle.message("simplify.type"),
+                                    paramType) {
 
   def doApplyFix(project: Project): Unit = {
     val pType = getElement
     val parent = pType.getContext
-    pType.replace(ScalaPsiElementFactory.createTypeElementFromText(
-            replacement, pType.getManager))
+    pType.replace(ScalaPsiElementFactory
+          .createTypeElementFromText(replacement, pType.getManager))
   }
 }

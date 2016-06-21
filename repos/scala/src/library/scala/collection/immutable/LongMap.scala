@@ -78,8 +78,10 @@ object LongMap {
         this.asInstanceOf[LongMap.Tip[S]]
       else LongMap.Tip(key, s)
   }
-  private[immutable] case class Bin[+T](
-      prefix: Long, mask: Long, left: LongMap[T], right: LongMap[T])
+  private[immutable] case class Bin[+T](prefix: Long,
+                                        mask: Long,
+                                        left: LongMap[T],
+                                        right: LongMap[T])
       extends LongMap[T] {
     def bin[S](left: LongMap[S], right: LongMap[S]): LongMap[S] = {
       if ((this.left eq left) && (this.right eq right))
@@ -120,14 +122,14 @@ private[immutable] abstract class LongMapIterator[V, T](it: LongMap[V])
   final def next: T =
     pop() match {
       case LongMap.Bin(_, _, t @ LongMap.Tip(_, _), right) => {
-          push(right)
-          valueOf(t)
-        }
+        push(right)
+        valueOf(t)
+      }
       case LongMap.Bin(_, _, left, right) => {
-          push(right)
-          push(left)
-          next
-        }
+        push(right)
+        push(left)
+        next
+      }
       case t @ LongMap.Tip(_, _) => valueOf(t)
       // This should never happen. We don't allow LongMap.Nil in subtrees of the LongMap
       // and don't return an LongMapIterator for LongMap.Nil.
@@ -193,8 +195,8 @@ sealed abstract class LongMap[+T]
     */
   override final def foreach[U](f: ((Long, T)) => U): Unit = this match {
     case LongMap.Bin(_, _, left, right) => {
-        left.foreach(f); right.foreach(f)
-      }
+      left.foreach(f); right.foreach(f)
+    }
     case LongMap.Tip(key, value) => f((key, value))
     case LongMap.Nil =>
   }
@@ -212,8 +214,8 @@ sealed abstract class LongMap[+T]
     */
   final def foreachKey(f: Long => Unit): Unit = this match {
     case LongMap.Bin(_, _, left, right) => {
-        left.foreachKey(f); right.foreachKey(f)
-      }
+      left.foreachKey(f); right.foreachKey(f)
+    }
     case LongMap.Tip(key, _) => f(key)
     case LongMap.Nil =>
   }
@@ -231,8 +233,8 @@ sealed abstract class LongMap[+T]
     */
   final def foreachValue(f: T => Unit): Unit = this match {
     case LongMap.Bin(_, _, left, right) => {
-        left.foreachValue(f); right.foreachValue(f)
-      }
+      left.foreachValue(f); right.foreachValue(f)
+    }
     case LongMap.Tip(_, value) => f(value)
     case LongMap.Nil =>
   }
@@ -243,10 +245,10 @@ sealed abstract class LongMap[+T]
 
   override def filter(f: ((Long, T)) => Boolean): LongMap[T] = this match {
     case LongMap.Bin(prefix, mask, left, right) => {
-        val (newleft, newright) = (left.filter(f), right.filter(f))
-        if ((left eq newleft) && (right eq newright)) this
-        else bin(prefix, mask, newleft, newright)
-      }
+      val (newleft, newright) = (left.filter(f), right.filter(f))
+      if ((left eq newleft) && (right eq newright)) this
+      else bin(prefix, mask, newleft, newright)
+    }
     case LongMap.Tip(key, value) =>
       if (f((key, value))) this
       else LongMap.Nil
@@ -358,12 +360,12 @@ sealed abstract class LongMap[+T]
     */
   def modifyOrRemove[S](f: (Long, T) => Option[S]): LongMap[S] = this match {
     case LongMap.Bin(prefix, mask, left, right) => {
-        val newleft = left.modifyOrRemove(f)
-        val newright = right.modifyOrRemove(f)
-        if ((left eq newleft) && (right eq newright))
-          this.asInstanceOf[LongMap[S]]
-        else bin(prefix, mask, newleft, newright)
-      }
+      val newleft = left.modifyOrRemove(f)
+      val newright = right.modifyOrRemove(f)
+      if ((left eq newleft) && (right eq newright))
+        this.asInstanceOf[LongMap[S]]
+      else bin(prefix, mask, newleft, newright)
+    }
     case LongMap.Tip(key, value) =>
       f(key, value) match {
         case None => LongMap.Nil
@@ -386,8 +388,8 @@ sealed abstract class LongMap[+T]
     */
   def unionWith[S >: T](that: LongMap[S], f: (Long, S, S) => S): LongMap[S] =
     (this, that) match {
-      case (
-          LongMap.Bin(p1, m1, l1, r1), that @ (LongMap.Bin(p2, m2, l2, r2))) =>
+      case (LongMap.Bin(p1, m1, l1, r1),
+            that @ (LongMap.Bin(p2, m2, l2, r2))) =>
         if (shorter(m1, m2)) {
           if (!hasMatch(p2, p1, m1))
             join[S](p1, this, p2, that) // TODO: remove [S] when SI-5548 is fixed
@@ -423,8 +425,8 @@ sealed abstract class LongMap[+T]
     * @param f       The combining function.
     * @return        Intersection of `this` and `that`, with values for identical keys produced by function `f`.
     */
-  def intersectionWith[S, R](
-      that: LongMap[S], f: (Long, T, S) => R): LongMap[R] =
+  def intersectionWith[S, R](that: LongMap[S],
+                             f: (Long, T, S) => R): LongMap[R] =
     (this, that) match {
       case (LongMap.Bin(p1, m1, l1, r1), that @ LongMap.Bin(p2, m2, l2, r2)) =>
         if (shorter(m1, m2)) {

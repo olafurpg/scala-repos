@@ -31,7 +31,8 @@ import scala.collection.mutable.ArrayBuffer
   */
 object ScalaStubsUtil {
   def getClassInheritors(
-      clazz: PsiClass, scope: GlobalSearchScope): Seq[ScTemplateDefinition] = {
+      clazz: PsiClass,
+      scope: GlobalSearchScope): Seq[ScTemplateDefinition] = {
     val name: String = clazz.name
     if (name == null) return Seq.empty
     val inheritors = new ArrayBuffer[ScTemplateDefinition]
@@ -48,9 +49,9 @@ object ScalaStubsUtil {
       if (stub != null) {
         if (stub.getParentStub.getStubType
               .isInstanceOf[ScTemplateDefinitionElementType[
-                    _ <: ScTemplateDefinition]]) {
+                      _ <: ScTemplateDefinition]]) {
           inheritors +=
-            stub.getParentStub.getPsi.asInstanceOf[ScTemplateDefinition]
+          stub.getParentStub.getPsi.asInstanceOf[ScTemplateDefinition]
         }
       } else {
         extendsBlock.getParent match {
@@ -63,7 +64,8 @@ object ScalaStubsUtil {
   }
 
   def getSelfTypeInheritors(
-      clazz: PsiClass, scope: GlobalSearchScope): Seq[ScTemplateDefinition] = {
+      clazz: PsiClass,
+      scope: GlobalSearchScope): Seq[ScTemplateDefinition] = {
     val name: String = clazz.name
     if (name == null) return Seq.empty
     val inheritors = new ArrayBuffer[ScTemplateDefinition]
@@ -88,7 +90,8 @@ object ScalaStubsUtil {
                         c.components.exists(checkTp)
                       case _ =>
                         ScType.extractClass(
-                            tp, Some(inheritedClazz.getProject)) match {
+                            tp,
+                            Some(inheritedClazz.getProject)) match {
                           case Some(otherClazz) =>
                             if (otherClazz == inheritedClazz) return true
                           case _ =>
@@ -98,7 +101,8 @@ object ScalaStubsUtil {
                   }
                   if (checkTp(tp)) {
                     val clazz = PsiTreeUtil.getContextOfType(
-                        selfTypeElement, classOf[ScTemplateDefinition])
+                        selfTypeElement,
+                        classOf[ScTemplateDefinition])
                     if (clazz != null) inheritors += clazz
                   }
                 case _ =>
@@ -120,16 +124,16 @@ object ScalaStubsUtil {
     inheritors.toSeq
   }
 
-  def serializeFileStubElement(
-      stub: ScFileStub, dataStream: StubOutputStream) {
+  def serializeFileStubElement(stub: ScFileStub,
+                               dataStream: StubOutputStream) {
     dataStream.writeBoolean(stub.isScript)
     dataStream.writeBoolean(stub.isCompiled)
     dataStream.writeName(stub.packageName)
     dataStream.writeName(stub.getFileName)
   }
 
-  def deserializeFileStubElement(
-      dataStream: StubInputStream, parentStub: Object) = {
+  def deserializeFileStubElement(dataStream: StubInputStream,
+                                 parentStub: Object) = {
     val script = dataStream.readBoolean
     val compiled = dataStream.readBoolean
     val packName = dataStream.readName

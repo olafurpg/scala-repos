@@ -51,9 +51,9 @@ object HttpExample {
     def receive = {
       case msg: CamelMessage =>
         sender() !
-        (msg.mapBody { body: Array[Byte] =>
-              new String(body).replaceAll("Akka ", "AKKA ")
-            })
+          (msg.mapBody { body: Array[Byte] =>
+                new String(body).replaceAll("Akka ", "AKKA ")
+              })
       case msg: Failure => sender() ! msg
     }
   }

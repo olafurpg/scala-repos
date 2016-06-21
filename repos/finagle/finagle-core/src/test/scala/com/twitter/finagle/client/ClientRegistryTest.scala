@@ -25,7 +25,8 @@ class crtnamer extends Namer {
   def enum(prefix: Path): Activity[Dtab] = Activity.pending
 
   def lookup(path: Path): Activity[NameTree[Name]] = {
-    Activity(Var.value(Activity.Ok(NameTree.Leaf(Name.Bound(va, new Object())))))
+    Activity(
+        Var.value(Activity.Ok(NameTree.Leaf(Name.Bound(va, new Object())))))
   }
 }
 
@@ -49,8 +50,7 @@ class ClientRegistryTest
     ClientRegistry.clear()
   }
 
-  test("ClientRegistry.expAllRegisteredClientsResolved zero clients")(
-      new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved zero clients")(new Ctx {
     val allResolved0 = ClientRegistry.expAllRegisteredClientsResolved()
     assert(allResolved0.poll == Some(Return(Set())))
   })
@@ -170,8 +170,7 @@ class ClientRegistryTest
 
     val factory = ServiceFactory.const(mockSvc)
 
-    val stack = new StackBuilder(
-        Stack.Leaf(new Stack.Head {
+    val stack = new StackBuilder(Stack.Leaf(new Stack.Head {
       def role: Stack.Role = headRole
       def description: String = "the head!!"
       def parameters: Seq[Stack.Param[_]] = Seq(TestParam2.param)
@@ -195,7 +194,7 @@ class ClientRegistryTest
     val stk = newStack()
     val params =
       Stack.Params.empty + param1 + param.Label("foo") +
-      param.ProtocolLibrary("fancy")
+        param.ProtocolLibrary("fancy")
     val simple = new SimpleRegistry()
     GlobalRegistry.withRegistry(simple) {
       val factory =

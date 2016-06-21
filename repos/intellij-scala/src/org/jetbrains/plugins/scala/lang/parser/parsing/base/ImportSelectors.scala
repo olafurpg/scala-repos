@@ -42,39 +42,39 @@ object ImportSelectors extends ParserNode {
           builder.advanceLexer() //Ate _
           builder.getTokenType match {
             case ScalaTokenTypes.tRBRACE => {
-                builder.advanceLexer() //Ate }
-                builder.restoreNewlinesState
-                importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
-                return true
-              }
+              builder.advanceLexer() //Ate }
+              builder.restoreNewlinesState
+              importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
+              return true
+            }
             case _ => {
-                ParserUtils.parseLoopUntilRBrace(builder, () => {}) //we need to find closing brace, otherwise we can miss important things
-                builder.restoreNewlinesState
-                importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
-                return true
-              }
+              ParserUtils.parseLoopUntilRBrace(builder, () => {}) //we need to find closing brace, otherwise we can miss important things
+              builder.restoreNewlinesState
+              importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
+              return true
+            }
           }
         case ScalaTokenTypes.tIDENTIFIER =>
           ImportSelector parse builder
           builder.getTokenType match {
             case ScalaTokenTypes.tCOMMA => {
-                builder.advanceLexer() //Ate ,
-              }
+              builder.advanceLexer() //Ate ,
+            }
             case ScalaTokenTypes.tRBRACE => {
-                builder.advanceLexer() //Ate}
-                builder.restoreNewlinesState
-                importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
-                return true
-              }
+              builder.advanceLexer() //Ate}
+              builder.restoreNewlinesState
+              importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
+              return true
+            }
             case null => {
-                builder.restoreNewlinesState
-                importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
-                return true
-              }
+              builder.restoreNewlinesState
+              importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
+              return true
+            }
             case _ => {
-                builder error ErrMsg("rbrace.expected")
-                builder.advanceLexer()
-              }
+              builder error ErrMsg("rbrace.expected")
+              builder.advanceLexer()
+            }
           }
         case null =>
           builder.restoreNewlinesState

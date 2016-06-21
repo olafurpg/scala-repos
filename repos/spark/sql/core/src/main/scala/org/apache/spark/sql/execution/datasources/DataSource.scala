@@ -110,12 +110,12 @@ case class DataSource(sqlContext: SQLContext,
                   provider == "com.databricks.spark.avro") {
                 throw new ClassNotFoundException(
                     s"Failed to find data source: $provider. Please use Spark package " +
-                    "http://spark-packages.org/package/databricks/spark-avro",
+                      "http://spark-packages.org/package/databricks/spark-avro",
                     error)
               } else {
                 throw new ClassNotFoundException(
                     s"Failed to find data source: $provider. Please find packages at " +
-                    "http://spark-packages.org",
+                      "http://spark-packages.org",
                     error)
               }
             }
@@ -127,8 +127,8 @@ case class DataSource(sqlContext: SQLContext,
         // There are multiple registered aliases for the input
         sys.error(
             s"Multiple sources found for $provider " +
-            s"(${sources.map(_.getClass.getName).mkString(", ")}), " +
-            "please specify the fully qualified class name.")
+              s"(${sources.map(_.getClass.getName).mkString(", ")}), " +
+              "please specify the fully qualified class name.")
     }
   }
 
@@ -156,8 +156,8 @@ case class DataSource(sqlContext: SQLContext,
           SparkHadoopUtil.get.globPathIfNecessary(qualified)
         }.toArray
 
-        val fileCatalog: FileCatalog = new HDFSFileCatalog(
-            sqlContext, options, globbedPaths, None)
+        val fileCatalog: FileCatalog =
+          new HDFSFileCatalog(sqlContext, options, globbedPaths, None)
         val dataSchema = userSpecifiedSchema.orElse {
           format.inferSchema(sqlContext,
                              caseInsensitiveOptions,
@@ -233,8 +233,7 @@ case class DataSource(sqlContext: SQLContext,
         // If they gave a schema, then we try and figure out the types of the partition columns
         // from that schema.
         val partitionSchema = userSpecifiedSchema.map { schema =>
-          StructType(
-              partitionColumns.map { c =>
+          StructType(partitionColumns.map { c =>
             // TODO: Case sensitivity.
             schema
               .find(_.name.toLowerCase() == c.toLowerCase())
@@ -243,8 +242,10 @@ case class DataSource(sqlContext: SQLContext,
           })
         }
 
-        val fileCatalog: FileCatalog = new HDFSFileCatalog(
-            sqlContext, options, globbedPaths, partitionSchema)
+        val fileCatalog: FileCatalog = new HDFSFileCatalog(sqlContext,
+                                                           options,
+                                                           globbedPaths,
+                                                           partitionSchema)
         val dataSchema = userSpecifiedSchema.orElse {
           format.inferSchema(sqlContext,
                              caseInsensitiveOptions,
@@ -252,7 +253,7 @@ case class DataSource(sqlContext: SQLContext,
         }.getOrElse {
           throw new AnalysisException(
               s"Unable to infer schema for $format at ${allPaths.take(2).mkString(",")}. " +
-              "It must be specified manually")
+                "It must be specified manually")
         }
 
         HadoopFsRelation(
@@ -291,8 +292,7 @@ case class DataSource(sqlContext: SQLContext,
         //  3. It's OK that the output path doesn't exist yet;
         val caseInsensitiveOptions = new CaseInsensitiveMap(options)
         val outputPath = {
-          val path = new Path(
-              caseInsensitiveOptions.getOrElse("path", {
+          val path = new Path(caseInsensitiveOptions.getOrElse("path", {
             throw new IllegalArgumentException("'path' is not specified")
           }))
           val fs =
@@ -301,15 +301,15 @@ case class DataSource(sqlContext: SQLContext,
         }
 
         val caseSensitive = sqlContext.conf.caseSensitiveAnalysis
-        PartitioningUtils.validatePartitionColumnDataTypes(
-            data.schema, partitionColumns, caseSensitive)
+        PartitioningUtils.validatePartitionColumnDataTypes(data.schema,
+                                                           partitionColumns,
+                                                           caseSensitive)
 
-        val equality =
-          if (sqlContext.conf.caseSensitiveAnalysis) {
-            org.apache.spark.sql.catalyst.analysis.caseSensitiveResolution
-          } else {
-            org.apache.spark.sql.catalyst.analysis.caseInsensitiveResolution
-          }
+        val equality = if (sqlContext.conf.caseSensitiveAnalysis) {
+          org.apache.spark.sql.catalyst.analysis.caseSensitiveResolution
+        } else {
+          org.apache.spark.sql.catalyst.analysis.caseInsensitiveResolution
+        }
 
         val dataSchema = StructType(data.schema.filterNot(f =>
                   partitionColumns.exists(equality(_, f.name))))
@@ -337,7 +337,7 @@ case class DataSource(sqlContext: SQLContext,
                   .toSet) {
               throw new AnalysisException(
                   s"Requested partitioning does not equal existing partitioning: " +
-                  s"$ex != ${partitionColumns.toSet}.")
+                    s"$ex != ${partitionColumns.toSet}.")
             }
           }
         }

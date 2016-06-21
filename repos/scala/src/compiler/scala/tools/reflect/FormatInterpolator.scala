@@ -101,7 +101,7 @@ abstract class FormatInterpolator {
               case '\r' => "\\r"
               case '\"' =>
                 "${'\"'}" /* avoid lint warn */ +
-                " or a triple-quoted literal \"\"\"with embedded \" or \\u0022\"\"\"" // $" in future
+                  " or a triple-quoted literal \"\"\"with embedded \" or \\u0022\"\"\"" // $" in future
               case '\'' => "'"
               case '\\' => """\\"""
               case x => "\\u%04x" format x
@@ -125,8 +125,8 @@ abstract class FormatInterpolator {
               c.error(errPoint, msg("unsupported"))
               s0
             } else {
-              currentRun.reporting.deprecationWarning(
-                  errPoint, msg("deprecated"))
+              currentRun.reporting
+                .deprecationWarning(errPoint, msg("deprecated"))
               try StringContext.treatEscapes(s0) catch escapeHatch
             }
           }
@@ -294,8 +294,8 @@ abstract class FormatInterpolator {
     }
     def goodIndex = {
       if (index.nonEmpty && hasFlag('<'))
-        c.warning(
-            groupPos(Index), "Argument index ignored if '<' flag is present")
+        c.warning(groupPos(Index),
+                  "Argument index ignored if '<' flag is present")
       val okRange = index map (i => i > 0 && i <= argc) getOrElse true
       okRange || hasFlag('<') || falsely {
         errorAt(Index, "Argument index out of range")
@@ -309,7 +309,7 @@ abstract class FormatInterpolator {
       */
     def pickAcceptable(arg: Tree, variants: Type*): Option[Type] =
       variants find (arg.tpe <:< _) orElse
-      (variants find (c.inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
+        (variants find (c.inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
           variants(0))
   }
   object Conversion {
@@ -367,7 +367,7 @@ abstract class FormatInterpolator {
     override def verify = op match {
       case "%" =>
         super.verify && noPrecision && truly(width foreach
-            (_ => c.warning(groupPos(Width), "width ignored on literal")))
+              (_ => c.warning(groupPos(Width), "width ignored on literal")))
       case "n" => noFlags && noWidth && noPrecision
     }
     override protected val okFlags = "-"
@@ -406,8 +406,12 @@ abstract class FormatInterpolator {
       }
       if (bad_+) None
       else
-        pickAcceptable(
-            arg, IntTpe, LongTpe, ByteTpe, ShortTpe, tagOfBigInt.tpe)
+        pickAcceptable(arg,
+                       IntTpe,
+                       LongTpe,
+                       ByteTpe,
+                       ShortTpe,
+                       tagOfBigInt.tpe)
     }
   }
   class FloatingPointXn(val m: Match, val pos: Position, val argc: Int)
@@ -433,12 +437,13 @@ abstract class FormatInterpolator {
             errorAt(CC, "Date/time conversion must have two characters")
           })
     def goodCC = ("HIklMSLNpzZsQBbhAaCYyjmdeRTrDFc" contains cc) || falsely {
-      errorAtOffset(
-          CC, 1, s"'$cc' doesn't seem to be a date or time conversion")
+      errorAtOffset(CC,
+                    1,
+                    s"'$cc' doesn't seem to be a date or time conversion")
     }
     override def verify =
       super.verify && hasCC && goodCC && noPrecision &&
-      only_-("date/time conversions")
+        only_-("date/time conversions")
     def accepts(arg: Tree) =
       pickAcceptable(arg, LongTpe, tagOfCalendar.tpe, tagOfDate.tpe)
   }

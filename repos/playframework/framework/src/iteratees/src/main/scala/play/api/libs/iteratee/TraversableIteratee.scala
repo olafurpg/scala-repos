@@ -67,8 +67,8 @@ object Traversable {
     }
   }
 
-  def take[M](count: Int)(
-      implicit p: M => scala.collection.TraversableLike[_, M])
+  def take[M](
+      count: Int)(implicit p: M => scala.collection.TraversableLike[_, M])
     : Enumeratee[M, M] = new Enumeratee[M, M] {
 
     def applyOn[A](it: Iteratee[M, A]): Iteratee[M, Iteratee[M, A]] = {
@@ -122,8 +122,9 @@ object Traversable {
       case in @ Input.El(e) =>
         Iteratee.flatten(Future(e.span(p))(pec).map {
           case (prefix, suffix) if suffix.isEmpty =>
-            new CheckDone[M, M] { def continue[A](k: K[M, A]) = Cont(step(k)) } &> k(
-                Input.El(prefix))
+            new CheckDone[M, M] {
+              def continue[A](k: K[M, A]) = Cont(step(k))
+            } &> k(Input.El(prefix))
           case (prefix, suffix) =>
             Done(if (prefix.isEmpty) Cont(k) else k(Input.El(prefix)),
                  Input.El(suffix.drop(1)))
@@ -139,8 +140,8 @@ object Traversable {
     def continue[A](k: K[M, A]) = Cont(step(k))
   }
 
-  def drop[M](count: Int)(
-      implicit p: M => scala.collection.TraversableLike[_, M])
+  def drop[M](
+      count: Int)(implicit p: M => scala.collection.TraversableLike[_, M])
     : Enumeratee[M, M] = new Enumeratee[M, M] {
 
     def applyOn[A](inner: Iteratee[M, A]): Iteratee[M, Iteratee[M, A]] = {

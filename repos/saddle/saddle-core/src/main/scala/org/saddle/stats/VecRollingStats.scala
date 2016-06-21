@@ -135,7 +135,8 @@ class RollingMean[@spec(Int, Long, Double) A: ST: Vec2Stats: NUM]
 }
 
 class RollingMedian[@spec(Int, Long, Double) A: ST: Vec2Stats: NUM](
-    winSz: Int, origv: Vec[A]) {
+    winSz: Int,
+    origv: Vec[A]) {
   val sa = implicitly[ST[A]]
 
   val len = origv.length

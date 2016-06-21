@@ -62,11 +62,11 @@ class H5StoreSpec extends Specification {
     } match {
       case Left(exception) => Skipped("Could not import HDF5")
       case Right(result) => {
-          test in {
-            logic
-            H5Store.openResourceCount must_== 0 // check for any resource leaks
-          }
+        test in {
+          logic
+          H5Store.openResourceCount must_== 0 // check for any resource leaks
         }
+      }
     }
   }
 
@@ -151,7 +151,7 @@ class H5StoreSpec extends Specification {
 
       // try slicing
       H5Store.readSeriesSlice[DateTime, Double](fid, "s1", d2, d3, true) must_==
-        s1.sliceBy(d2, d3)
+      s1.sliceBy(d2, d3)
 
       H5Store.closeFile(fid)
 
@@ -252,9 +252,15 @@ class H5StoreSpec extends Specification {
       H5Store.readFrame[Int, Int, Any](tmp, "df6") must_== df6
 
       // try slicing
-      H5Store.readFrameSlice[DateTime, Int, Double](
-          fid, "df1", d2, d3, 2, 3, true, true) must_==
-        df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
+      H5Store.readFrameSlice[DateTime, Int, Double](fid,
+                                                    "df1",
+                                                    d2,
+                                                    d3,
+                                                    2,
+                                                    3,
+                                                    true,
+                                                    true) must_==
+      df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
 
       H5Store.closeFile(fid)
 
@@ -411,39 +417,44 @@ class H5StoreSpec extends Specification {
 
       // simultaneous writes
 
-      val taskListW = for (i <- 1 to 100) yield
-        new Callable[Unit] {
-          def call() {
-            H5Store.writeFrame(tmp, "f%s".format(i), df1)
-            H5Store.writeFrame(tmp, "f%s".format(100 + i), df2)
+      val taskListW = for (i <- 1 to 100)
+        yield
+          new Callable[Unit] {
+            def call() {
+              H5Store.writeFrame(tmp, "f%s".format(i), df1)
+              H5Store.writeFrame(tmp, "f%s".format(100 + i), df2)
+            }
           }
-        }
 
       pool.invokeAll(taskListW)
 
       // simultaneous reads
 
-      val taskListR = for (i <- 1 to 100) yield
-        new Callable[Unit] {
-          def call() {
-            H5Store.readFrame[DateTime, Int, Double](
-                tmp, "f%s".format(100 + i)) must_== df2
-            H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+      val taskListR = for (i <- 1 to 100)
+        yield
+          new Callable[Unit] {
+            def call() {
+              H5Store.readFrame[DateTime, Int, Double](
+                  tmp,
+                  "f%s".format(100 + i)) must_== df2
+              H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+            }
           }
-        }
 
       pool.invokeAll(taskListR.toSeq)
 
       // interleaved reads & writes
 
-      val taskListRW = for (i <- 1 to 100) yield
-        new Callable[Unit] {
-          def call() {
-            if (i % 2 == 0) H5Store.writeFrame(tmp, "f%s".format(100 + i), df1)
-            else
-              H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+      val taskListRW = for (i <- 1 to 100)
+        yield
+          new Callable[Unit] {
+            def call() {
+              if (i % 2 == 0)
+                H5Store.writeFrame(tmp, "f%s".format(100 + i), df1)
+              else
+                H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+            }
           }
-        }
 
       pool.invokeAll(taskListRW.toSeq)
 

@@ -29,9 +29,9 @@ object ScatterGatherFirstCompletedSpec {
         case Stop(Some(_id)) if (_id == id) ⇒ context.stop(self)
         case _id: Int if (_id == id) ⇒
         case x ⇒ {
-            Thread sleep 100 * id
-            sender() ! id
-          }
+          Thread sleep 100 * id
+          sender() ! id
+        }
       }
 
       override def postStop = {
@@ -53,8 +53,7 @@ class ScatterGatherFirstCompletedSpec
       val doneLatch = new TestLatch(2)
 
       val counter1 = new AtomicInteger
-      val actor1 = system.actorOf(
-          Props(new Actor {
+      val actor1 = system.actorOf(Props(new Actor {
         def receive = {
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter1.addAndGet(msg)
@@ -62,8 +61,7 @@ class ScatterGatherFirstCompletedSpec
       }))
 
       val counter2 = new AtomicInteger
-      val actor2 = system.actorOf(
-          Props(new Actor {
+      val actor2 = system.actorOf(Props(new Actor {
         def receive = {
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter2.addAndGet(msg)
@@ -101,7 +99,8 @@ class ScatterGatherFirstCompletedSpec
     "without routees should reply immediately" in {
       val probe = TestProbe()
       val router = system.actorOf(ScatterGatherFirstCompletedPool(
-              nrOfInstances = 0, within = 5.seconds).props(Props.empty))
+              nrOfInstances = 0,
+              within = 5.seconds).props(Props.empty))
       router.tell("hello", probe.ref)
       probe.expectMsgType[Status.Failure](2.seconds).cause.getClass should be(
           classOf[TimeoutException])

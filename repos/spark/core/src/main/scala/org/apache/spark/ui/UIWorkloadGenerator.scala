@@ -41,7 +41,7 @@ private[spark] object UIWorkloadGenerator {
       // scalastyle:off println
       println(
           "Usage: ./bin/spark-class org.apache.spark.ui.UIWorkloadGenerator " +
-          "[master] [FIFO|FAIR] [#job set (4 jobs per set)]")
+            "[master] [FIFO|FAIR] [#job set (4 jobs per set)]")
       // scalastyle:on println
       System.exit(1)
     }

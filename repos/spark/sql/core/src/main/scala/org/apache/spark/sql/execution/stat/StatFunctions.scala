@@ -67,11 +67,12 @@ private[sql] object StatFunctions extends Logging {
       require(
           field.dataType.isInstanceOf[NumericType],
           s"Quantile calculation for column $colName with data type ${field.dataType}" +
-          " is not supported.")
+            " is not supported.")
       Column(Cast(Column(colName).expr, DoubleType))
     }
-    val emptySummaries = Array.fill(cols.size)(new QuantileSummaries(
-            QuantileSummaries.defaultCompressThreshold, relativeError))
+    val emptySummaries = Array.fill(cols.size)(
+        new QuantileSummaries(QuantileSummaries.defaultCompressThreshold,
+                              relativeError))
 
     // Note that it works more or less by accident as `rdd.aggregate` is not a pure function:
     // this function returns the same array as given in the input (because `aggregate` reuses
@@ -194,8 +195,10 @@ private[sql] object StatFunctions extends Logging {
         newSamples.append(sampled(sampleIdx))
         sampleIdx += 1
       }
-      new QuantileSummaries(
-          compressThreshold, relativeError, newSamples, currentCount)
+      new QuantileSummaries(compressThreshold,
+                            relativeError,
+                            newSamples,
+                            currentCount)
     }
 
     /**
@@ -213,13 +216,18 @@ private[sql] object StatFunctions extends Logging {
       val compressed = compressImmut(inserted.sampled,
                                      mergeThreshold =
                                        2 * relativeError * inserted.count)
-      new QuantileSummaries(
-          compressThreshold, relativeError, compressed, inserted.count)
+      new QuantileSummaries(compressThreshold,
+                            relativeError,
+                            compressed,
+                            inserted.count)
     }
 
     private def shallowCopy: QuantileSummaries = {
-      new QuantileSummaries(
-          compressThreshold, relativeError, sampled, count, headSampled)
+      new QuantileSummaries(compressThreshold,
+                            relativeError,
+                            sampled,
+                            count,
+                            headSampled)
     }
 
     /**
@@ -243,8 +251,8 @@ private[sql] object StatFunctions extends Logging {
         // TODO: could replace full sort by ordered merge, the two lists are known to be sorted
         // already.
         val res = (sampled ++ other.sampled).sortBy(_.value)
-        val comp = compressImmut(
-            res, mergeThreshold = 2 * relativeError * count)
+        val comp =
+          compressImmut(res, mergeThreshold = 2 * relativeError * count)
         new QuantileSummaries(other.compressThreshold,
                               other.relativeError,
                               comp,
@@ -355,8 +363,8 @@ private[sql] object StatFunctions extends Logging {
   }
 
   /** Calculate the Pearson Correlation Coefficient for the given columns */
-  private[sql] def pearsonCorrelation(
-      df: DataFrame, cols: Seq[String]): Double = {
+  private[sql] def pearsonCorrelation(df: DataFrame,
+                                      cols: Seq[String]): Double = {
     val counts = collectStatisticalData(df, cols, "correlation")
     counts.Ck / math.sqrt(counts.MkX * counts.MkY)
   }
@@ -366,10 +374,8 @@ private[sql] object StatFunctions extends Logging {
     var xAvg = 0.0 // the mean of all examples seen so far in col1
     var yAvg = 0.0 // the mean of all examples seen so far in col2
     var Ck = 0.0 // the co-moment after k examples
-    var MkX =
-      0.0 // sum of squares of differences from the (current) mean for col1
-    var MkY =
-      0.0 // sum of squares of differences from the (current) mean for col2
+    var MkX = 0.0 // sum of squares of differences from the (current) mean for col1
+    var MkY = 0.0 // sum of squares of differences from the (current) mean for col2
     var count = 0L // count of observed examples
     // add an example to the calculation
     def add(x: Double, y: Double): this.type = {
@@ -409,14 +415,14 @@ private[sql] object StatFunctions extends Logging {
       functionName: String): CovarianceCounter = {
     require(cols.length == 2,
             s"Currently $functionName calculation is supported " +
-            "between two columns.")
+              "between two columns.")
     cols.map(name => (name, df.schema.fields.find(_.name == name))).foreach {
       case (name, data) =>
         require(data.nonEmpty, s"Couldn't find column with name $name")
         require(
             data.get.dataType.isInstanceOf[NumericType],
             s"Currently $functionName calculation " +
-            s"for columns with dataType ${data.get.dataType} not supported.")
+              s"for columns with dataType ${data.get.dataType} not supported.")
     }
     val columns = cols.map(n => Column(Cast(Column(n).expr, DoubleType)))
     df.select(columns: _*)
@@ -441,14 +447,15 @@ private[sql] object StatFunctions extends Logging {
   }
 
   /** Generate a table of frequencies for the elements of two columns. */
-  private[sql] def crossTabulate(
-      df: DataFrame, col1: String, col2: String): DataFrame = {
+  private[sql] def crossTabulate(df: DataFrame,
+                                 col1: String,
+                                 col2: String): DataFrame = {
     val tableName = s"${col1}_$col2"
     val counts = df.groupBy(col1, col2).agg(count("*")).take(1e6.toInt)
     if (counts.length == 1e6.toInt) {
       logWarning(
           "The maximum limit of 1e6 pairs have been collected, which may not be all of " +
-          "the pairs. Please try reducing the amount of distinct items in your columns.")
+            "the pairs. Please try reducing the amount of distinct items in your columns.")
     }
     def cleanElement(element: Any): String = {
       if (element == null) "null" else element.toString
@@ -459,7 +466,7 @@ private[sql] object StatFunctions extends Logging {
     val columnSize = distinctCol2.size
     require(columnSize < 1e4,
             s"The number of distinct values for $col2, can't " +
-            s"exceed 1e4. Currently $columnSize")
+              s"exceed 1e4. Currently $columnSize")
     val table = counts
       .groupBy(_.get(0))
       .map {

@@ -79,14 +79,17 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
             }
         }
 
-        override lazy val httpErrorHandler = new DefaultHttpErrorHandler(
-            environment, configuration, sourceMapper, Some(router)) {
+        override lazy val httpErrorHandler =
+          new DefaultHttpErrorHandler(environment,
+                                      configuration,
+                                      sourceMapper,
+                                      Some(router)) {
 
-          override protected def onNotFound(request: RequestHeader,
-                                            message: String) = {
-            Future.successful(Results.NotFound("Nothing was found!"))
+            override protected def onNotFound(request: RequestHeader,
+                                              message: String) = {
+              Future.successful(Results.NotFound("Nothing was found!"))
+            }
           }
-        }
       }
       val server = components.server
       //#components

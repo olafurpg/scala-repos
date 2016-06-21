@@ -280,8 +280,8 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     * @param rule the function use to transform this nodes children
     */
   def transformUp(rule: PartialFunction[BaseType, BaseType]): BaseType = {
-    val afterRuleOnChildren = transformChildren(
-        rule, (t, r) => t.transformUp(r))
+    val afterRuleOnChildren =
+      transformChildren(rule, (t, r) => t.transformUp(r))
     if (this fastEquals afterRuleOnChildren) {
       CurrentOrigin.withOrigin(origin) {
         rule.applyOrElse(this, identity[BaseType])
@@ -538,17 +538,19 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     builder.append("\n")
 
     if (innerChildren.nonEmpty) {
-      innerChildren.init.foreach(_.generateTreeString(
-              depth + 2, lastChildren :+ false :+ false, builder))
-      innerChildren.last.generateTreeString(
-          depth + 2, lastChildren :+ false :+ true, builder)
+      innerChildren.init.foreach(
+          _.generateTreeString(depth + 2,
+                               lastChildren :+ false :+ false,
+                               builder))
+      innerChildren.last
+        .generateTreeString(depth + 2, lastChildren :+ false :+ true, builder)
     }
 
     if (treeChildren.nonEmpty) {
       treeChildren.init.foreach(
           _.generateTreeString(depth + 1, lastChildren :+ false, builder))
-      treeChildren.last.generateTreeString(
-          depth + 1, lastChildren :+ true, builder)
+      treeChildren.last
+        .generateTreeString(depth + 1, lastChildren :+ true, builder)
     }
 
     builder
@@ -579,7 +581,7 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     def collectJsonValue(tn: BaseType): Unit = {
       val jsonFields =
         ("class" -> JString(tn.getClass.getName)) ::
-        ("num-children" -> JInt(tn.children.length)) :: tn.jsonFields
+          ("num-children" -> JInt(tn.children.length)) :: tn.jsonFields
       jsonValues += JObject(jsonFields)
       tn.children.foreach(collectJsonValue)
     }
@@ -593,7 +595,7 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     val fieldValues = productIterator.toSeq ++ otherCopyArgs
     assert(fieldNames.length == fieldValues.length,
            s"${getClass.getSimpleName} fields: " + fieldNames.mkString(", ") +
-           s", values: " + fieldValues.map(_.toString).mkString(", "))
+             s", values: " + fieldValues.map(_.toString).mkString(", "))
 
     fieldNames
       .zip(fieldValues)
@@ -630,8 +632,8 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     case m: Metadata => m.jsonValue
     case s: StorageLevel =>
       ("useDisk" -> s.useDisk) ~ ("useMemory" -> s.useMemory) ~
-      ("useOffHeap" -> s.useOffHeap) ~ ("deserialized" -> s.deserialized) ~
-      ("replication" -> s.replication)
+        ("useOffHeap" -> s.useOffHeap) ~ ("deserialized" -> s.deserialized) ~
+        ("replication" -> s.replication)
     case n: TreeNode[_] => n.jsonValue
     case o: Option[_] => o.map(parseToJson)
     case t: Seq[_] => JArray(t.map(parseToJson).toList)
@@ -664,15 +666,15 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
 }
 
 object TreeNode {
-  def fromJSON[BaseType <: TreeNode[BaseType]](
-      json: String, sc: SparkContext): BaseType = {
+  def fromJSON[BaseType <: TreeNode[BaseType]](json: String,
+                                               sc: SparkContext): BaseType = {
     val jsonAST = parse(json)
     assert(jsonAST.isInstanceOf[JArray])
     reconstruct(jsonAST.asInstanceOf[JArray], sc).asInstanceOf[BaseType]
   }
 
-  private def reconstruct(
-      treeNodeJson: JArray, sc: SparkContext): TreeNode[_] = {
+  private def reconstruct(treeNodeJson: JArray,
+                          sc: SparkContext): TreeNode[_] = {
     assert(treeNodeJson.arr.forall(_.isInstanceOf[JObject]))
     val jsonNodes = Stack(treeNodeJson.arr.map(_.asInstanceOf[JObject]): _*)
 
@@ -767,8 +769,11 @@ object TreeNode {
         val JBool(useOffHeap) = value \ "useOffHeap"
         val JBool(deserialized) = value \ "deserialized"
         val JInt(replication) = value \ "replication"
-        StorageLevel(
-            useDisk, useMemory, useOffHeap, deserialized, replication.toInt)
+        StorageLevel(useDisk,
+                     useMemory,
+                     useOffHeap,
+                     deserialized,
+                     replication.toInt)
       case t if t <:< localTypeOf[TreeNode[_]] =>
         value match {
           case JInt(i) => children(i.toInt)

@@ -19,8 +19,9 @@ abstract class AnnotatorTestBase[T <: ScalaPsiElement](
   final val Suffix = " }"
 
   protected def messages(@Language(
-          value = "Scala", prefix = Prefix, suffix = Suffix) code: String)
-    : List[Message] = {
+          value = "Scala",
+          prefix = Prefix,
+          suffix = Suffix) code: String): List[Message] = {
     val s: String = Prefix + code + Suffix
     val mock = new AnnotatorHolderMock
     val file: ScalaFile = s.parse

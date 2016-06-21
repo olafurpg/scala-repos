@@ -98,7 +98,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     swapped(k)
 
   def append[AA >: A, BB >: B](that: => (AA \&/ BB))(
-      implicit SA: Semigroup[AA], SB: Semigroup[BB]): (AA \&/ BB) =
+      implicit SA: Semigroup[AA],
+      SB: Semigroup[BB]): (AA \&/ BB) =
     (this, that) match {
       case (This(a1), This(a2)) => This(SA.append(a1, a2))
       case (This(a1), Both(a2, b)) => Both(SA.append(a1, a2), b)
@@ -150,8 +151,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def foreach(g: B => Unit): Unit =
     bimap(_ => (), g)
 
-  def flatMap[AA >: A, D](g: B => (AA \&/ D))(
-      implicit M: Semigroup[AA]): (AA \&/ D) =
+  def flatMap[AA >: A, D](
+      g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
     this match {
       case a @ This(_) =>
         a
@@ -221,8 +222,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
         M.append(x(a), b)
     }
 
-  def ===[AA >: A, BB >: B](
-      x: AA \&/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
+  def ===[AA >: A, BB >: B](x: AA \&/ BB)(implicit EA: Equal[AA],
+                                          EB: Equal[BB]): Boolean =
     this match {
       case This(a) =>
         x match {
@@ -374,17 +375,17 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
         implicit F: Monoid[M]) =
       fa.bifoldMap(f)(g)
 
-    override def bifoldRight[A, B, C](fa: A \&/ B, z: => C)(f: (A, => C) => C)(
-        g: (B, => C) => C) =
+    override def bifoldRight[A, B, C](fa: A \&/ B, z: => C)(
+        f: (A, => C) => C)(g: (B, => C) => C) =
       fa.bifoldRight(z)(f)(g)
 
-    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: A \&/ B)(
-        f: A => G[C], g: B => G[D]) =
+    def bitraverseImpl[G[_]: Applicative, A, B, C, D](
+        fab: A \&/ B)(f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }
 
-  implicit final def TheseOrder[A, B](
-      implicit A: Order[A], B: Order[B]): Order[A \&/ B] =
+  implicit final def TheseOrder[A, B](implicit A: Order[A],
+                                      B: Order[B]): Order[A \&/ B] =
     new Order[A \&/ B] {
       override def equal(x: A \&/ B, y: A \&/ B) =
         x === y
@@ -437,15 +438,15 @@ sealed abstract class TheseInstances1 {
         \&/.That(f(fa))
     }
 
-  implicit def TheseEqual[A, B](
-      implicit EA: Equal[A], EB: Equal[B]): Equal[A \&/ B] =
+  implicit def TheseEqual[A, B](implicit EA: Equal[A],
+                                EB: Equal[B]): Equal[A \&/ B] =
     Equal.equal(_ === _)
 
-  implicit def TheseSemigroup[A, B](
-      implicit SA: Semigroup[A], SB: Semigroup[B]): Semigroup[A \&/ B] =
+  implicit def TheseSemigroup[A, B](implicit SA: Semigroup[A],
+                                    SB: Semigroup[B]): Semigroup[A \&/ B] =
     Semigroup.instance(_.append(_))
 
-  implicit def TheseShow[A, B](
-      implicit SA: Show[A], SB: Show[B]): Show[A \&/ B] =
+  implicit def TheseShow[A, B](implicit SA: Show[A],
+                               SB: Show[B]): Show[A \&/ B] =
     Show.show(_.show)
 }

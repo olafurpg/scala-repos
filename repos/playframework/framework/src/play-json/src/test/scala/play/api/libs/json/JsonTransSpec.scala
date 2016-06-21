@@ -23,11 +23,11 @@ object JsonTransSpec extends Specification {
             "field31" -> "beta",
             "field32" -> 345
         ),
-        "field4" -> Json.arr("alpha",
-                             2,
-                             true,
-                             Json.obj("field41" -> "toto",
-                                      "field42" -> "tata"))
+        "field4" -> Json.arr(
+            "alpha",
+            2,
+            true,
+            Json.obj("field41" -> "toto", "field42" -> "tata"))
     )
 
     "pick a value at a path" in {
@@ -177,8 +177,8 @@ object JsonTransSpec extends Specification {
 
     "deepMerge when reducing JsObjects" in {
       val json = Json.obj("somekey1" -> 11, "somekey2" -> 22)
-      val jsonTransform =
-        ((__ \ "key1" \ "sk1").json.copyFrom((__ \ "somekey1").json.pick) and
+      val jsonTransform = ((__ \ "key1" \ "sk1").json
+            .copyFrom((__ \ "somekey1").json.pick) and
             (__ \ "key1" \ "sk2").json.copyFrom((__ \ "somekey2").json.pick)).reduce
 
       json.validate(jsonTransform).get must beEqualTo(
@@ -195,7 +195,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-          ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
+        ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
       }
 
       "when the reader is the wrong type" in {
@@ -206,7 +206,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-          ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
+        ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
       }
     }
   }

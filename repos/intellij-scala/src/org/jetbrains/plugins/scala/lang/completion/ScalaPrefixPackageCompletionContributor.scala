@@ -79,7 +79,9 @@ object ScalaPrefixPackageCompletionContributor {
       if (pckg == null) return
 
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          pckg.name, position.getContext, position) match {
+          pckg.name,
+          position.getContext,
+          position) match {
         case ResolvesTo(pack: PsiPackage)
             if pack.getQualifiedName == pckg.getQualifiedName =>
           return
@@ -88,7 +90,9 @@ object ScalaPrefixPackageCompletionContributor {
 
       val resolveResult = new ScalaResolveResult(pckg, prefixCompletion = true)
       val lookupElems = LookupElementManager.getLookupElement(
-          resolveResult, isInImport = false, shouldImport = true)
+          resolveResult,
+          isInImport = false,
+          shouldImport = true)
       lookupElems.foreach { le =>
         le.elementToImport = pckg
       }

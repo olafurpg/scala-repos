@@ -85,7 +85,7 @@ object DistributedCacheFile {
             symlinkNameFor(sourceUri))
 }
 
-final case class UncachedFile private[scalding](source: Either[String, URI]) {
+final case class UncachedFile private[scalding] (source: Either[String, URI]) {
 
   import DistributedCacheFile._
 
@@ -137,13 +137,13 @@ sealed abstract class CachedFile {
   def file: File
 }
 
-final case class LocallyCachedFile private[scalding](sourcePath: String)
+final case class LocallyCachedFile private[scalding] (sourcePath: String)
     extends CachedFile {
   def path = file.getCanonicalPath
   def file = new File(sourcePath).getCanonicalFile
 }
 
-final case class HadoopCachedFile private[scalding](sourceUri: URI)
+final case class HadoopCachedFile private[scalding] (sourceUri: URI)
     extends CachedFile {
 
   import DistributedCacheFile._

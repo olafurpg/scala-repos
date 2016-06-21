@@ -73,8 +73,7 @@ object SimpleParamsExample {
     paramMap.put(lr.regParam -> 0.1, lr.thresholds -> Array(0.45, 0.55)) // Specify multiple Params.
 
     // One can also combine ParamMaps.
-    val paramMap2 =
-      ParamMap(lr.probabilityCol -> "myProbability") // Change output column name
+    val paramMap2 = ParamMap(lr.probabilityCol -> "myProbability") // Change output column name
     val paramMapCombined = paramMap ++ paramMap2
 
     // Now learn a new model using the paramMapCombined parameters.

@@ -160,7 +160,8 @@ object PlayRun {
                                 reloader: BuildLink,
                                 ws: Option[WatchState] = None): Unit = {
     val ContinuousState = AttributeKey[WatchState](
-        "watch state", "Internal: tracks state for continuous execution.")
+        "watch state",
+        "Internal: tracks state for continuous execution.")
     def isEOF(c: Int): Boolean = c == 4
 
     @tailrec def shouldTerminate: Boolean =
@@ -171,8 +172,10 @@ object PlayRun {
       ws.getOrElse(state get ContinuousState getOrElse WatchState.empty)
 
     val (triggered, newWatchState, newState) = try {
-      val (triggered, newWatchState) = SourceModificationWatch.watch(
-          sourcesFinder, watched.pollInterval, watchState)(shouldTerminate)
+      val (triggered, newWatchState) =
+        SourceModificationWatch.watch(sourcesFinder,
+                                      watched.pollInterval,
+                                      watchState)(shouldTerminate)
       (triggered, newWatchState, state)
     } catch {
       case e: Exception =>
@@ -257,8 +260,7 @@ object PlayRun {
 
     val filter = Set("--no-exit-sbt")
     val filtered = args.filterNot(filter)
-    val devSettings =
-      Seq.empty[(String, String)] // there are no dev settings in a prod website
+    val devSettings = Seq.empty[(String, String)] // there are no dev settings in a prod website
 
     // Parse HTTP port argument
     val (properties, httpPort, httpsPort, httpAddress) = Reloader.filterArgs(
@@ -313,7 +315,8 @@ object PlayRun {
           }
         }.start()
 
-        println(Colors.green("""|
+        println(Colors.green(
+                """|
             |(Starting server. Type Ctrl+D to exit logs, the server will remain in background)
             | """.stripMargin))
 

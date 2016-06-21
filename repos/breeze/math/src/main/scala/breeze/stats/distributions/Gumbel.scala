@@ -8,8 +8,8 @@ import breeze.numerics.{exp, log}
   *
   * @author dlwh
   **/
-case class Gumbel(location: Double, scale: Double)(
-    implicit rand: RandBasis = Rand)
+case class Gumbel(location: Double,
+                  scale: Double)(implicit rand: RandBasis = Rand)
     extends ContinuousDistr[Double]
     with Moments[Double, Double]
     with HasCdf {

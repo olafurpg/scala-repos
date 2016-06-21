@@ -46,7 +46,8 @@ object RegisterEngine extends Logging {
 
     info(s"Registering engine ${engineManifest.id} ${engineManifest.version}")
     engineManifests.update(
-        engineManifest.copy(files = engineFiles.map(_.toURI.toString)), true)
+        engineManifest.copy(files = engineFiles.map(_.toURI.toString)),
+        true)
   }
 
   def unregisterEngine(jsonManifest: File): Unit = {
@@ -75,7 +76,7 @@ object RegisterEngine extends Logging {
       info(s"Unregistered engine ${em.id} ${em.version}")
     } getOrElse {
       error(s"${fileEngineManifest.id} ${fileEngineManifest.version} is not " +
-          "registered.")
+            "registered.")
     }
   }
 }

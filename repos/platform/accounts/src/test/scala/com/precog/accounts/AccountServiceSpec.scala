@@ -111,8 +111,8 @@ trait TestAccountService
 
   val clock = Clock.System
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      0, Duration(1, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(0, Duration(1, "second"))
 
   val shortFutureTimeouts = FutureTimeouts(5, Duration(50, "millis"))
 
@@ -164,8 +164,10 @@ class AccountServiceSpec extends TestAccountService with Tags {
   def deleteAccount(accountId: String, user: String, pass: String) =
     accounts.header(auth(user, pass)).delete(accountId)
 
-  def changePassword(
-      accountId: String, user: String, oldPass: String, newPass: String) = {
+  def changePassword(accountId: String,
+                     user: String,
+                     oldPass: String,
+                     newPass: String) = {
     val request: JValue = JObject(JField("password", JString(newPass)) :: Nil)
     accounts.header(auth(user, oldPass)).put(accountId + "/password")(request)
   }
@@ -175,8 +177,9 @@ class AccountServiceSpec extends TestAccountService with Tags {
     accounts.post(accountId + "/password/reset")(request)
   }
 
-  def resetPassword(
-      accountId: AccountId, tokenId: ResetTokenId, newPass: String) = {
+  def resetPassword(accountId: AccountId,
+                    tokenId: ResetTokenId,
+                    newPass: String) = {
     val request: JValue = JObject(JField("password", JString(newPass)) :: Nil)
     accounts.post(accountId + "/password/reset/" + tokenId)(request)
   }
@@ -189,8 +192,10 @@ class AccountServiceSpec extends TestAccountService with Tags {
   def getAccountPlan(accountId: String, user: String, pass: String) =
     accounts.header(auth(user, pass)).get(accountId + "/plan")
 
-  def putAccountPlan(
-      accountId: String, user: String, pass: String, planType: String) = {
+  def putAccountPlan(accountId: String,
+                     user: String,
+                     pass: String,
+                     planType: String) = {
     val request: JValue = JObject(JField("type", JString(planType)) :: Nil)
     accounts.header(auth(user, pass)).put(accountId + "/plan")(request)
   }

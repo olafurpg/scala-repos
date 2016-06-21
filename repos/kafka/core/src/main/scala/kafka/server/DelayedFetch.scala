@@ -26,12 +26,12 @@ import org.apache.kafka.common.errors.{NotLeaderForPartitionException, UnknownTo
 
 import scala.collection._
 
-case class FetchPartitionStatus(
-    startOffsetMetadata: LogOffsetMetadata, fetchInfo: PartitionFetchInfo) {
+case class FetchPartitionStatus(startOffsetMetadata: LogOffsetMetadata,
+                                fetchInfo: PartitionFetchInfo) {
 
   override def toString =
     "[startOffsetMetadata: " + startOffsetMetadata + ", " + "fetchInfo: " +
-    fetchInfo + "]"
+      fetchInfo + "]"
 }
 
 /**
@@ -46,7 +46,7 @@ case class FetchMetadata(
 
   override def toString =
     "[minBytes: " + fetchMinBytes + ", " + "onlyLeader:" + fetchOnlyLeader +
-    ", "
+      ", "
   "onlyCommitted: " + fetchOnlyCommitted + ", "
   "partitionStatus: " + fetchPartitionStatus + "]"
 }
@@ -58,8 +58,8 @@ case class FetchMetadata(
 class DelayedFetch(delayMs: Long,
                    fetchMetadata: FetchMetadata,
                    replicaManager: ReplicaManager,
-                   responseCallback: Map[
-                       TopicAndPartition, FetchResponsePartitionData] => Unit)
+                   responseCallback: Map[TopicAndPartition,
+                                         FetchResponsePartitionData] => Unit)
     extends DelayedOperation(delayMs) {
 
   /**
@@ -80,7 +80,8 @@ class DelayedFetch(delayMs: Long,
         try {
           if (fetchOffset != LogOffsetMetadata.UnknownOffsetMetadata) {
             val replica = replicaManager.getLeaderReplicaIfLocal(
-                topicAndPartition.topic, topicAndPartition.partition)
+                topicAndPartition.topic,
+                topicAndPartition.partition)
             val endOffset =
               if (fetchMetadata.fetchOnlyCommitted) replica.highWatermark
               else replica.logEndOffset
@@ -105,15 +106,15 @@ class DelayedFetch(delayMs: Long,
               } else if (fetchOffset.messageOffset < endOffset.messageOffset) {
                 // we need take the partition fetch size as upper bound when accumulating the bytes
                 accumulatedSize +=
-                  math.min(endOffset.positionDiff(fetchOffset),
-                           fetchStatus.fetchInfo.fetchSize)
+                math.min(endOffset.positionDiff(fetchOffset),
+                         fetchStatus.fetchInfo.fetchSize)
               }
             }
           }
         } catch {
           case utpe: UnknownTopicOrPartitionException => // Case B
-            debug("Broker no longer know of %s, satisfy %s immediately".format(
-                    topicAndPartition, fetchMetadata))
+            debug("Broker no longer know of %s, satisfy %s immediately"
+                  .format(topicAndPartition, fetchMetadata))
             return forceComplete()
           case nle: NotLeaderForPartitionException => // Case A
             debug(
@@ -145,8 +146,9 @@ class DelayedFetch(delayMs: Long,
               status.fetchInfo))
 
     val fetchPartitionData = logReadResults.mapValues(result =>
-          FetchResponsePartitionData(
-              result.errorCode, result.hw, result.info.messageSet))
+          FetchResponsePartitionData(result.errorCode,
+                                     result.hw,
+                                     result.info.messageSet))
 
     responseCallback(fetchPartitionData)
   }

@@ -67,8 +67,8 @@ object BoxesRunTime {
   }
 
   @inline
-  private def equalsNumChar(
-      xn: java.lang.Number, yc: java.lang.Character): Boolean = {
+  private def equalsNumChar(xn: java.lang.Number,
+                            yc: java.lang.Character): Boolean = {
     (xn: Any) match {
       case xn: Double => xn == yc.charValue()
       case xn: Long => xn == yc.charValue()

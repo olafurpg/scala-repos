@@ -42,10 +42,11 @@ class SslConnectHandlerTest extends FunSuite with MockitoSugar {
     var shutdownCount = 0
     def onShutdown() = shutdownCount += 1
 
-    val listenerHandler = new SslListenerConnectionHandler(
-        sslHandler, onShutdown)
-    val event = new UpstreamChannelStateEvent(
-        channel, ChannelState.CONNECTED, remoteAddress)
+    val listenerHandler =
+      new SslListenerConnectionHandler(sslHandler, onShutdown)
+    val event = new UpstreamChannelStateEvent(channel,
+                                              ChannelState.CONNECTED,
+                                              remoteAddress)
 
     listenerHandler.handleUpstream(ctx, event)
   }
@@ -77,7 +78,10 @@ class SslConnectHandlerTest extends FunSuite with MockitoSugar {
 
     val connectFuture = Channels.future(channel, true)
     val connectRequested = new DownstreamChannelStateEvent(
-        channel, connectFuture, ChannelState.CONNECTED, remoteAddress)
+        channel,
+        connectFuture,
+        ChannelState.CONNECTED,
+        remoteAddress)
 
     val ch = new SslConnectHandler(sslHandler, verifier)
     ch.handleDownstream(ctx, connectRequested)
@@ -124,8 +128,9 @@ class SslConnectHandlerTest extends FunSuite with MockitoSugar {
   class helper2 extends SslConnectHandlerHelper {
     verify(sslHandler, times(0)).handshake()
     ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(
-                          channel, ChannelState.CONNECTED, remoteAddress))
+                      new UpstreamChannelStateEvent(channel,
+                                                    ChannelState.CONNECTED,
+                                                    remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
   }

@@ -41,8 +41,8 @@ object ToHeadUsages extends Specification {
     }
   }
 
-  private val host_ = System.getProperty(
-      "net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
+  private val host_ = System
+    .getProperty("net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
   private val port_ = System
     .getProperty("net.liftweb.webapptest.toheadusages.port", "8282")
     .toInt
@@ -69,7 +69,7 @@ object ToHeadUsages extends Specification {
           "/htmlFragmentWithHead",
           html =>
             html.getElementsByXPath("/html/body/script[@id='fromFrag']").size must
-            (be_==(0) when jetty.running)
+              (be_==(0) when jetty.running)
       )
     }
 

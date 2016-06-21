@@ -171,7 +171,8 @@ trait LowPriorityDefaultReads {
     * Generic deserializer for collections types.
     */
   implicit def traversableReads[F[_], A](
-      implicit bf: generic.CanBuildFrom[F[_], A, F[A]], ra: Reads[A]) =
+      implicit bf: generic.CanBuildFrom[F[_], A, F[A]],
+      ra: Reads[A]) =
     new Reads[F[A]] {
       def reads(json: JsValue) = json match {
         case JsArray(ts) =>
@@ -326,9 +327,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `java.text.SimpleDateFormat`.
     * @param corrector a simple string transformation function that can be used to transform input String before parsing. Useful when standards are not exactly respected and require a few tweaks
     */
-  def dateReads(pattern: String,
-                corrector: String => String =
-                  identity): Reads[java.util.Date] =
+  def dateReads(
+      pattern: String,
+      corrector: String => String = identity): Reads[java.util.Date] =
     new Reads[java.util.Date] {
 
       def reads(json: JsValue): JsResult[java.util.Date] = json match {
@@ -338,16 +339,17 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.date.isoformat", pattern))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.date.isoformat",
+                                          pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
       }
     }
 
-  private def parseJDate(
-      pattern: String, input: String): Option[java.util.Date] = {
+  private def parseJDate(pattern: String,
+                         input: String): Option[java.util.Date] = {
     // REMEMBER THAT SIMPLEDATEFORMAT IS NOT THREADSAFE
     val df = new java.text.SimpleDateFormat(pattern)
     df.setLenient(false)
@@ -480,8 +482,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
     *   DateTimeFormatter.ISO_DATE_TIME, _.drop(1))
     * }}}
     */
-  def localDateTimeReads[T](
-      parsing: T, corrector: String => String = identity)(
+  def localDateTimeReads[T](parsing: T,
+                            corrector: String => String = identity)(
       implicit p: T => TemporalParser[LocalDateTime]): Reads[LocalDateTime] =
     new Reads[LocalDateTime] {
       def reads(json: JsValue): JsResult[LocalDateTime] = json match {
@@ -491,8 +493,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.date.isoformat", parsing))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.date.isoformat",
+                                          parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -530,8 +533,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
     *   DateTimeFormatter.ISO_OFFSET_DATE_TIME, _.drop(1))
     * }}}
     */
-  def offsetDateTimeReads[T](
-      parsing: T, corrector: String => String = identity)(
+  def offsetDateTimeReads[T](parsing: T,
+                             corrector: String => String = identity)(
       implicit p: T => TemporalParser[OffsetDateTime]): Reads[OffsetDateTime] =
     new Reads[OffsetDateTime] {
       def reads(json: JsValue): JsResult[OffsetDateTime] = json match {
@@ -540,8 +543,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.date.isoformat", parsing))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.date.isoformat",
+                                          parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -572,8 +576,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
     *   DateTimeFormatter.ISO_DATE_TIME, _.drop(1))
     * }}}
     */
-  def zonedDateTimeReads[T](
-      parsing: T, corrector: String => String = identity)(
+  def zonedDateTimeReads[T](parsing: T,
+                            corrector: String => String = identity)(
       implicit p: T => TemporalParser[ZonedDateTime]): Reads[ZonedDateTime] =
     new Reads[ZonedDateTime] {
       def reads(json: JsValue): JsResult[ZonedDateTime] = json match {
@@ -583,8 +587,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.date.isoformat", parsing))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.date.isoformat",
+                                          parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -627,8 +632,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.date.isoformat", parsing))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.date.isoformat",
+                                          parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -672,8 +678,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.date.isoformat", parsing))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.date.isoformat",
+                                          parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -734,9 +741,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `java.text.SimpleDateFormat`.
     * @param corrector a simple string transformation function that can be used to transform input String before parsing. Useful when standards are not exactly respected and require a few tweaks
     */
-  def jodaDateReads(pattern: String,
-                    corrector: String => String =
-                      identity): Reads[org.joda.time.DateTime] =
+  def jodaDateReads(
+      pattern: String,
+      corrector: String => String = identity): Reads[org.joda.time.DateTime] =
     new Reads[org.joda.time.DateTime] {
       import org.joda.time.DateTime
 
@@ -749,8 +756,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.jodadate.format", pattern))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.jodadate.format",
+                                          pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -758,7 +766,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
 
       private def parseDate(input: String): Option[DateTime] =
         scala.util.control.Exception.allCatch[DateTime] opt
-        (DateTime.parse(input, df))
+          (DateTime.parse(input, df))
     }
 
   /**
@@ -772,9 +780,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `org.joda.time.format.DateTimeFormat`.
     * @param corrector string transformation function (See jodaDateReads)
     */
-  def jodaLocalDateReads(pattern: String,
-                         corrector: String => String =
-                           identity): Reads[org.joda.time.LocalDate] =
+  def jodaLocalDateReads(
+      pattern: String,
+      corrector: String => String = identity): Reads[org.joda.time.LocalDate] =
     new Reads[org.joda.time.LocalDate] {
 
       import org.joda.time.LocalDate
@@ -790,8 +798,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.jodadate.format", pattern))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.jodadate.format",
+                                          pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -799,7 +808,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
 
       private def parseDate(input: String): Option[LocalDate] =
         scala.util.control.Exception.allCatch[LocalDate] opt
-        (LocalDate.parse(input, df))
+          (LocalDate.parse(input, df))
     }
 
   /**
@@ -813,9 +822,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `org.joda.time.format.DateTimeFormat`.
     * @param corrector string transformation function (See jodaTimeReads)
     */
-  def jodaLocalTimeReads(pattern: String,
-                         corrector: String => String =
-                           identity): Reads[org.joda.time.LocalTime] =
+  def jodaLocalTimeReads(
+      pattern: String,
+      corrector: String => String = identity): Reads[org.joda.time.LocalTime] =
     new Reads[org.joda.time.LocalTime] {
 
       import org.joda.time.LocalTime
@@ -832,8 +841,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
-                  Seq(JsPath() -> Seq(ValidationError(
-                              "error.expected.jodatime.format", pattern))))
+                  Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.jodatime.format",
+                                          pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.time"))))
@@ -841,7 +851,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
 
       private def parseTime(input: String): Option[LocalTime] =
         scala.util.control.Exception.allCatch[LocalTime] opt
-        (LocalTime.parse(input, df))
+          (LocalTime.parse(input, df))
     }
 
   /**
@@ -855,9 +865,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `java.text.SimpleDateFormat`.
     * @param corrector a simple string transformation function that can be used to transform input String before parsing. Useful when standards are not exactly respected and require a few tweaks
     */
-  def sqlDateReads(pattern: String,
-                   corrector: String => String =
-                     identity): Reads[java.sql.Date] =
+  def sqlDateReads(
+      pattern: String,
+      corrector: String => String = identity): Reads[java.sql.Date] =
     dateReads(pattern, corrector).map(d => new java.sql.Date(d.getTime))
 
   /**
@@ -1013,22 +1023,22 @@ trait DefaultReads extends LowPriorityDefaultReads {
       def reads(json: JsValue) = json match {
         case JsObject(m) => {
 
-            type Errors = Seq[(JsPath, Seq[ValidationError])]
-            def locate(e: Errors, key: String) = e.map {
-              case (p, valerr) => (JsPath \ key) ++ p -> valerr
-            }
-
-            m.foldLeft(Right(Map.empty): Either[Errors, Map[String, V]]) {
-                case (acc, (key, value)) =>
-                  (acc, fromJson[V](value)(fmtv)) match {
-                    case (Right(vs), JsSuccess(v, _)) => Right(vs + (key -> v))
-                    case (Right(_), JsError(e)) => Left(locate(e, key))
-                    case (Left(e), _: JsSuccess[_]) => Left(e)
-                    case (Left(e1), JsError(e2)) => Left(e1 ++ locate(e2, key))
-                  }
-              }
-              .fold(JsError.apply, res => JsSuccess(res.toMap))
+          type Errors = Seq[(JsPath, Seq[ValidationError])]
+          def locate(e: Errors, key: String) = e.map {
+            case (p, valerr) => (JsPath \ key) ++ p -> valerr
           }
+
+          m.foldLeft(Right(Map.empty): Either[Errors, Map[String, V]]) {
+              case (acc, (key, value)) =>
+                (acc, fromJson[V](value)(fmtv)) match {
+                  case (Right(vs), JsSuccess(v, _)) => Right(vs + (key -> v))
+                  case (Right(_), JsError(e)) => Left(locate(e, key))
+                  case (Left(e), _: JsSuccess[_]) => Left(e)
+                  case (Left(e1), JsError(e2)) => Left(e1 ++ locate(e2, key))
+                }
+            }
+            .fold(JsError.apply, res => JsSuccess(res.toMap))
+        }
         case _ =>
           JsError(
               Seq(JsPath() -> Seq(ValidationError("error.expected.jsobject"))))
@@ -1063,11 +1073,11 @@ trait DefaultReads extends LowPriorityDefaultReads {
 
     def reads(json: JsValue) = json match {
       case JsString(s) => {
-          parseUuid(s)
-            .map(JsSuccess(_))
-            .getOrElse(JsError(Seq(JsPath() -> Seq(
-                            ValidationError("error.expected.uuid")))))
-        }
+        parseUuid(s)
+          .map(JsSuccess(_))
+          .getOrElse(JsError(Seq(JsPath() -> Seq(
+                          ValidationError("error.expected.uuid")))))
+      }
       case _ =>
         JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.uuid"))))
     }

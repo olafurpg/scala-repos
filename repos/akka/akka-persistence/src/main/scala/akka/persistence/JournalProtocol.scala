@@ -27,8 +27,9 @@ private[persistence] object JournalProtocol {
     * Request to delete all persistent messages with sequence numbers up to `toSequenceNr`
     * (inclusive).
     */
-  final case class DeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long, persistentActor: ActorRef)
+  final case class DeleteMessagesTo(persistenceId: String,
+                                    toSequenceNr: Long,
+                                    persistentActor: ActorRef)
       extends Request
 
   /**
@@ -63,8 +64,8 @@ private[persistence] object JournalProtocol {
     *
     * @param persistent successfully written message.
     */
-  final case class WriteMessageSuccess(
-      persistent: PersistentRepr, actorInstanceId: Int)
+  final case class WriteMessageSuccess(persistent: PersistentRepr,
+                                       actorInstanceId: Int)
       extends Response
 
   /**
@@ -75,8 +76,9 @@ private[persistence] object JournalProtocol {
     * @param message message rejected to be written.
     * @param cause failure cause.
     */
-  final case class WriteMessageRejected(
-      message: PersistentRepr, cause: Throwable, actorInstanceId: Int)
+  final case class WriteMessageRejected(message: PersistentRepr,
+                                        cause: Throwable,
+                                        actorInstanceId: Int)
       extends Response
       with NoSerializationVerificationNeeded
 
@@ -87,8 +89,9 @@ private[persistence] object JournalProtocol {
     * @param message message failed to be written.
     * @param cause failure cause.
     */
-  final case class WriteMessageFailure(
-      message: PersistentRepr, cause: Throwable, actorInstanceId: Int)
+  final case class WriteMessageFailure(message: PersistentRepr,
+                                       cause: Throwable,
+                                       actorInstanceId: Int)
       extends Response
       with NoSerializationVerificationNeeded
 

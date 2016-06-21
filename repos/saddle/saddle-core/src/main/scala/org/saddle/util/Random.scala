@@ -139,7 +139,8 @@ object XorShift {
     var seedL = seed
     val (a, b, c) = tup
     () =>
-      seedL ^= (seedL << a); seedL ^= (seedL >> b); seedL ^= (seedL << c); seedL
+      seedL ^= (seedL << a); seedL ^= (seedL >> b); seedL ^= (seedL << c);
+      seedL
   }
 }
 

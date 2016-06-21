@@ -84,8 +84,9 @@ case class SetCommand(kv: Option[(String, Option[String])])
 
   private def keyValueOutput: Seq[Attribute] = {
     val schema = StructType(
-        StructField("key", StringType, false) :: StructField(
-            "value", StringType, false) :: Nil)
+        StructField("key", StringType, false) :: StructField("value",
+                                                             StringType,
+                                                             false) :: Nil)
     schema.toAttributes
   }
 
@@ -96,11 +97,11 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.MAPRED_REDUCE_TASKS} is deprecated, " +
-              s"automatically converted to ${SQLConf.SHUFFLE_PARTITIONS.key} instead.")
+                s"automatically converted to ${SQLConf.SHUFFLE_PARTITIONS.key} instead.")
           if (value.toInt < 1) {
             val msg =
               s"Setting negative ${SQLConf.Deprecated.MAPRED_REDUCE_TASKS} for automatically " +
-              "determining the number of reducers is not supported."
+                "determining the number of reducers is not supported."
             throw new IllegalArgumentException(msg)
           } else {
             sqlContext.setConf(SQLConf.SHUFFLE_PARTITIONS.key, value)
@@ -113,7 +114,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.EXTERNAL_SORT} is deprecated and will be ignored. " +
-              s"External sort will continue to be used.")
+                s"External sort will continue to be used.")
           Seq(Row(SQLConf.Deprecated.EXTERNAL_SORT, "true"))
         }
         (keyValueOutput, runFunc)
@@ -122,8 +123,8 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.USE_SQL_AGGREGATE2} is deprecated and " +
-              s"will be ignored. ${SQLConf.Deprecated.USE_SQL_AGGREGATE2} will " +
-              s"continue to be true.")
+                s"will be ignored. ${SQLConf.Deprecated.USE_SQL_AGGREGATE2} will " +
+                s"continue to be true.")
           Seq(Row(SQLConf.Deprecated.USE_SQL_AGGREGATE2, "true"))
         }
         (keyValueOutput, runFunc)
@@ -132,7 +133,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.TUNGSTEN_ENABLED} is deprecated and " +
-              s"will be ignored. Tungsten will continue to be used.")
+                s"will be ignored. Tungsten will continue to be used.")
           Seq(Row(SQLConf.Deprecated.TUNGSTEN_ENABLED, "true"))
         }
         (keyValueOutput, runFunc)
@@ -141,7 +142,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.CODEGEN_ENABLED} is deprecated and " +
-              s"will be ignored. Codegen will continue to be used.")
+                s"will be ignored. Codegen will continue to be used.")
           Seq(Row(SQLConf.Deprecated.CODEGEN_ENABLED, "true"))
         }
         (keyValueOutput, runFunc)
@@ -150,7 +151,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.UNSAFE_ENABLED} is deprecated and " +
-              s"will be ignored. Unsafe mode will continue to be used.")
+                s"will be ignored. Unsafe mode will continue to be used.")
           Seq(Row(SQLConf.Deprecated.UNSAFE_ENABLED, "true"))
         }
         (keyValueOutput, runFunc)
@@ -159,7 +160,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.SORTMERGE_JOIN} is deprecated and " +
-              s"will be ignored. Sort merge join will continue to be used.")
+                s"will be ignored. Sort merge join will continue to be used.")
           Seq(Row(SQLConf.Deprecated.SORTMERGE_JOIN, "true"))
         }
         (keyValueOutput, runFunc)
@@ -170,7 +171,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.PARQUET_UNSAFE_ROW_RECORD_READER_ENABLED} is " +
-              s"deprecated and will be ignored. Vectorized parquet reader will be used instead.")
+                s"deprecated and will be ignored. Vectorized parquet reader will be used instead.")
           Seq(Row(SQLConf.PARQUET_VECTORIZED_READER_ENABLED, "true"))
         }
         (keyValueOutput, runFunc)
@@ -202,8 +203,9 @@ case class SetCommand(kv: Option[(String, Option[String])])
         }
         val schema = StructType(
             StructField("key", StringType, false) :: StructField(
-                "default", StringType, false) :: StructField(
-                "meaning", StringType, false) :: Nil)
+                "default",
+                StringType,
+                false) :: StructField("meaning", StringType, false) :: Nil)
         (schema.toAttributes, runFunc)
 
       // Queries the deprecated "mapred.reduce.tasks" property.
@@ -211,7 +213,7 @@ case class SetCommand(kv: Option[(String, Option[String])])
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
               s"Property ${SQLConf.Deprecated.MAPRED_REDUCE_TASKS} is deprecated, " +
-              s"showing ${SQLConf.SHUFFLE_PARTITIONS.key} instead.")
+                s"showing ${SQLConf.SHUFFLE_PARTITIONS.key} instead.")
           Seq(Row(SQLConf.SHUFFLE_PARTITIONS.key,
                   sqlContext.conf.numShufflePartitions.toString))
         }
@@ -258,18 +260,20 @@ case class ExplainCommand(
     } catch {
       case cause: TreeNodeException[_] =>
         ("Error occurred during query planning: \n" +
-            cause.getMessage).split("\n").map(Row(_))
+              cause.getMessage).split("\n").map(Row(_))
     }
 }
 
-case class CacheTableCommand(
-    tableName: String, plan: Option[LogicalPlan], isLazy: Boolean)
+case class CacheTableCommand(tableName: String,
+                             plan: Option[LogicalPlan],
+                             isLazy: Boolean)
     extends RunnableCommand {
 
   override def run(sqlContext: SQLContext): Seq[Row] = {
     plan.foreach { logicalPlan =>
       sqlContext.registerDataFrameAsTable(
-          Dataset.newDataFrame(sqlContext, logicalPlan), tableName)
+          Dataset.newDataFrame(sqlContext, logicalPlan),
+          tableName)
     }
     sqlContext.cacheTable(tableName)
 
@@ -339,7 +343,9 @@ case class ShowTablesCommand(databaseName: Option[String])
   override val output: Seq[Attribute] = {
     val schema = StructType(
         StructField("tableName", StringType, false) :: StructField(
-            "isTemporary", BooleanType, false) :: Nil)
+            "isTemporary",
+            BooleanType,
+            false) :: Nil)
 
     schema.toAttributes
   }
@@ -406,8 +412,8 @@ case class DescribeFunction(functionName: String, isExtended: Boolean)
     schema.toAttributes
   }
 
-  private def replaceFunctionName(
-      usage: String, functionName: String): String = {
+  private def replaceFunctionName(usage: String,
+                                  functionName: String): String = {
     if (usage == null) {
       "To be added."
     } else {

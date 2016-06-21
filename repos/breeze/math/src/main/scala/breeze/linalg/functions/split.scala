@@ -39,8 +39,8 @@ object split extends UFunc {
   implicit def implSeqVec[T: ClassTag]
     : Impl2[DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] =
     new Impl2[DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] {
-      def apply(
-          v: DenseVector[T], nSeq: Seq[Int]): IndexedSeq[DenseVector[T]] = {
+      def apply(v: DenseVector[T],
+                nSeq: Seq[Int]): IndexedSeq[DenseVector[T]] = {
         require(nSeq.size < v.size)
 
         val result = new collection.mutable.ArrayBuffer[DenseVector[T]]()
@@ -68,8 +68,9 @@ object split extends UFunc {
   implicit def implIntMatrix[T: ClassTag](implicit zero: Zero[T])
     : Impl3[DenseMatrix[T], Int, Int, IndexedSeq[DenseMatrix[T]]] =
     new Impl3[DenseMatrix[T], Int, Int, IndexedSeq[DenseMatrix[T]]] {
-      def apply(
-          v: DenseMatrix[T], n: Int, axis: Int): IndexedSeq[DenseMatrix[T]] =
+      def apply(v: DenseMatrix[T],
+                n: Int,
+                axis: Int): IndexedSeq[DenseMatrix[T]] =
         axis match {
           case 0 => vsplit(v, n)
           case 1 => hsplit(v, n)

@@ -89,8 +89,10 @@ trait GenSymbols { self: Reifier =>
                  sym.owner.info.decl(sym.name).isOverloaded) {
           val index = sym.owner.info.decl(sym.name).alternatives indexOf sym
           assert(index >= 0, sym)
-          mirrorBuildCall(
-              nme.selectOverloadedMethod, rowner, rname, reify(index))
+          mirrorBuildCall(nme.selectOverloadedMethod,
+                          rowner,
+                          rname,
+                          reify(index))
         } else mirrorBuildCall(nme.selectTerm, rowner, rname)
       }
     } else {
@@ -106,9 +108,9 @@ trait GenSymbols { self: Reifier =>
       if (reifyDebug)
         println(
             "Free term" + (if (sym.isCapturedVariable) " (captured)" else "") +
-            ": " + sym + "(" + sym.accurateKindString + ")")
+              ": " + sym + "(" + sym.accurateKindString + ")")
       val name = newTermName("" + nme.REIFY_FREE_PREFIX + sym.name +
-          (if (sym.isType) nme.REIFY_FREE_THIS_SUFFIX else ""))
+            (if (sym.isType) nme.REIFY_FREE_THIS_SUFFIX else ""))
       // We need to note whether the free value being reified is stable or not to guide subsequent reflective compilation.
       // Here's why reflection compilation needs our help.
       //

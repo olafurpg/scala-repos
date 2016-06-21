@@ -177,8 +177,8 @@ object DialogsDemo extends JFXApp {
       contentText = "Choose your option."
       // Note that we override here default dialog buttons, OK and Cancel, with new ones.
       // We could also just add to existing button using `++=`.
-      buttonTypes = Seq(
-          ButtonTypeOne, ButtonTypeTwo, ButtonTypeThree, ButtonType.Cancel)
+      buttonTypes =
+        Seq(ButtonTypeOne, ButtonTypeTwo, ButtonTypeThree, ButtonType.Cancel)
     }
 
     val result = alert.showAndWait()

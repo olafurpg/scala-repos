@@ -25,8 +25,7 @@ trait HasColumnProjection {
     * Instead, we use a Set() here and will eventually join the set on the ; character for you.
     */
   @deprecated(
-      message =
-        "Use withColumnProjections, which uses a different glob syntax",
+      message = "Use withColumnProjections, which uses a different glob syntax",
       since = "0.15.1")
   def withColumns: Set[String] = Set()
 

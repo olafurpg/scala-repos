@@ -66,9 +66,9 @@ object CORSWithCSRFSpec extends CORSCommonSpec {
     def filters = Seq(csrfFilter)
   }
 
-  def withApp[T](filters: Class[_ <: HttpFilters] = classOf[Filters],
-                 conf: Map[String, _ <: Any] = Map())(
-      block: Application => T): T = {
+  def withApp[T](
+      filters: Class[_ <: HttpFilters] = classOf[Filters],
+      conf: Map[String, _ <: Any] = Map())(block: Application => T): T = {
     running(
         _.configure(conf).overrides(
             bind[Router].to(Router.from {
@@ -133,8 +133,8 @@ object CORSActionBuilderSpec extends CORSCommonSpec {
   }
 
   def withApplicationWithPathConfiguredAction[T](
-      configPath: String, conf: Map[String, _ <: Any] = Map.empty)(
-      block: => T): T = {
+      configPath: String,
+      conf: Map[String, _ <: Any] = Map.empty)(block: => T): T = {
     running(_.configure(conf).routes {
       case (_, "/error") =>
         CORSActionBuilder(Configuration.reference ++ Configuration.from(conf),
@@ -154,7 +154,8 @@ object CORSActionBuilderSpec extends CORSCommonSpec {
                                          "http://localhost:9000"))
 
     "handle a cors request with a subpath of app configuration" in withApplicationWithPathConfiguredAction(
-        configPath = "myaction", conf = restrictOriginsPathConf) {
+        configPath = "myaction",
+        conf = restrictOriginsPathConf) {
       val result =
         route(fakeRequest().withHeaders(ORIGIN -> "http://localhost:9000")).get
 

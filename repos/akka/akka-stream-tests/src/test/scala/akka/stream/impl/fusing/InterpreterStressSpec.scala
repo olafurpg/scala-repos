@@ -42,7 +42,7 @@ class InterpreterStressSpec extends AkkaSpec with GraphInterpreterSpecKit {
       val time = (System.nanoTime() - tstamp) / (1000.0 * 1000.0 * 1000.0)
       // Not a real benchmark, just for sanity check
       info(s"Chain finished in $time seconds ${(chainLength * repetition) /
-      (time * 1000 * 1000)} million maps/s")
+        (time * 1000 * 1000)} million maps/s")
     }
 
     "work with a massive chain of maps with early complete" in new OneBoundedSetup[
@@ -72,7 +72,7 @@ class InterpreterStressSpec extends AkkaSpec with GraphInterpreterSpecKit {
       val time = (System.nanoTime() - tstamp) / (1000.0 * 1000.0 * 1000.0)
       // Not a real benchmark, just for sanity check
       info(s"Chain finished in $time seconds ${(chainLength * repetition) /
-      (time * 1000 * 1000)} million maps/s")
+        (time * 1000 * 1000)} million maps/s")
     }
 
     "work with a massive chain of takes" in new OneBoundedSetup[Int](

@@ -69,7 +69,7 @@ object AutoUpdate {
                         originalRepoName) == 0) {
                   conn.update(
                       "UPDATE REPOSITORY SET ORIGIN_USER_NAME = NULL, ORIGIN_REPOSITORY_NAME = NULL " +
-                      "WHERE USER_NAME = ? AND REPOSITORY_NAME = ?",
+                        "WHERE USER_NAME = ? AND REPOSITORY_NAME = ?",
                       userName,
                       repoName)
                 }
@@ -84,7 +84,7 @@ object AutoUpdate {
                         parentRepoName) == 0) {
                   conn.update(
                       "UPDATE REPOSITORY SET PARENT_USER_NAME = NULL, PARENT_REPOSITORY_NAME = NULL " +
-                      "WHERE USER_NAME = ? AND REPOSITORY_NAME = ?",
+                        "WHERE USER_NAME = ? AND REPOSITORY_NAME = ?",
                       userName,
                       repoName)
                 }
@@ -148,7 +148,7 @@ object AutoUpdate {
                           if (mimeType.startsWith("image/")) {
                             file.renameTo(new File(file.getParent,
                                                    file.getName + "." +
-                                                   mimeType.split("/")(1)))
+                                                     mimeType.split("/")(1)))
                           }
                         }
                     }
@@ -210,11 +210,11 @@ object AutoUpdate {
     if (versionFile.exists) {
       FileUtils.readFileToString(versionFile, "UTF-8").trim.split("\\.") match {
         case Array(majorVersion, minorVersion) => {
-            versions.find { v =>
-              v.majorVersion == majorVersion.toInt &&
-              v.minorVersion == minorVersion.toInt
-            }.getOrElse(Version(0, 0))
-          }
+          versions.find { v =>
+            v.majorVersion == majorVersion.toInt &&
+            v.minorVersion == minorVersion.toInt
+          }.getOrElse(Version(0, 0))
+        }
         case _ => Version(0, 0)
       }
     } else Version(0, 0)

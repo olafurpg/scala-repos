@@ -254,8 +254,8 @@ object Trees {
 
   case class This()(implicit val pos: Position) extends Tree
 
-  case class Function(args: List[ParamDef], body: Tree)(
-      implicit val pos: Position)
+  case class Function(args: List[ParamDef],
+                      body: Tree)(implicit val pos: Position)
       extends Tree
 
   // Named function definition
@@ -271,18 +271,20 @@ object Trees {
                       members: List[Tree])(implicit val pos: Position)
       extends Tree
 
-  case class MethodDef(
-      static: Boolean, name: PropertyName, args: List[ParamDef], body: Tree)(
-      implicit val pos: Position)
+  case class MethodDef(static: Boolean,
+                       name: PropertyName,
+                       args: List[ParamDef],
+                       body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class GetterDef(static: Boolean, name: PropertyName, body: Tree)(
       implicit val pos: Position)
       extends Tree
 
-  case class SetterDef(
-      static: Boolean, name: PropertyName, param: ParamDef, body: Tree)(
-      implicit val pos: Position)
+  case class SetterDef(static: Boolean,
+                       name: PropertyName,
+                       param: ParamDef,
+                       body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class Super()(implicit val pos: Position) extends Tree

@@ -73,7 +73,8 @@ object JaasTestUtils {
   }
 
   private def writeKafkaToOutputStream(
-      jaasOutputStream: java.io.FileOutputStream, keytabLocation: String) {
+      jaasOutputStream: java.io.FileOutputStream,
+      keytabLocation: String) {
     jaasOutputStream.write(
         s"$kafkaClientContextName {\n\t$kafkaModule required debug=true\n".getBytes)
     jaasOutputStream.write(s"\tuseKeyTab=true\n".getBytes)

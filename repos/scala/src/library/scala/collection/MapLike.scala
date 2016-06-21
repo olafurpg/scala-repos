@@ -193,16 +193,16 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *
     *  @return the keys of this map as an iterable.
     */
-  @migration(
-      "`keys` returns `Iterable[A]` rather than `Iterator[A]`.", "2.8.0")
+  @migration("`keys` returns `Iterable[A]` rather than `Iterator[A]`.",
+             "2.8.0")
   def keys: Iterable[A] = keySet
 
   /** Collects all values of this map in an iterable collection.
     *
     *  @return the values of this map as an iterable.
     */
-  @migration(
-      "`values` returns `Iterable[B]` rather than `Iterator[B]`.", "2.8.0")
+  @migration("`values` returns `Iterable[B]` rather than `Iterator[B]`.",
+             "2.8.0")
   def values: Iterable[B] = new DefaultValuesIterable
 
   /** The implementation class of the iterable returned by `values`.
@@ -334,9 +334,9 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     */
   override def filterNot(p: ((A, B)) => Boolean): This = {
     var res: This = repr
-    for (kv <- this) if (p(kv))
-      res =
-        (res - kv._1).asInstanceOf[This] // !!! concrete overrides abstract problem
+    for (kv <- this)
+      if (p(kv))
+        res = (res - kv._1).asInstanceOf[This] // !!! concrete overrides abstract problem
     res
   }
 
@@ -384,5 +384,5 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   override def stringPrefix: String = "Map"
 
   override /*PartialFunction*/
-  def toString = super [IterableLike].toString
+  def toString = super[IterableLike].toString
 }

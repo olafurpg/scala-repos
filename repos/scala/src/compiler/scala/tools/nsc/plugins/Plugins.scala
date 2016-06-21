@@ -28,7 +28,7 @@ trait Plugins { global: Global =>
     def asPath(p: String) = ClassPath split p
     val paths =
       settings.plugin.value filter (_ != "") map
-      (s => asPath(s) map Path.apply)
+        (s => asPath(s) map Path.apply)
     val dirs = {
       def injectDefault(s: String) =
         if (s.isEmpty) Defaults.scalaPluginPath else s
@@ -81,34 +81,33 @@ trait Plugins { global: Global =>
       else if (settings.disable.value contains plug.name)
         fail("[disabling plugin: %s]")
       else if (!commonPhases.isEmpty)
-        fail(
-            "[skipping plugin %s because it repeats phase names: " +
-            (commonPhases mkString ", ") + "]")
+        fail("[skipping plugin %s because it repeats phase names: " +
+              (commonPhases mkString ", ") + "]")
       else {
         note("[loaded plugin %s]")
         withPlug
       }
     }
 
-    val plugs = pick(
-        roughPluginsList, Set(), (phasesSet map (_.phaseName)).toSet)
+    val plugs =
+      pick(roughPluginsList, Set(), (phasesSet map (_.phaseName)).toSet)
 
     // Verify required plugins are present.
     for (req <- settings.require.value;
-         if !(plugs exists (_.name == req))) globalError(
-        "Missing required plugin: " + req)
+         if !(plugs exists (_.name == req)))
+      globalError("Missing required plugin: " + req)
 
     // Verify no non-existent plugin given with -P
     for {
       opt <- settings.pluginOptions.value if !(plugs exists
-          (opt startsWith _.name + ":"))
+            (opt startsWith _.name + ":"))
     } globalError("bad option: -P:" + opt)
 
     // Plugins may opt out, unless we just want to show info
     plugs filter
     (p =>
           p.init(p.options, globalError) ||
-          (settings.debug && settings.isInfo))
+            (settings.debug && settings.isInfo))
   }
 
   lazy val plugins: List[Plugin] = loadPlugins()

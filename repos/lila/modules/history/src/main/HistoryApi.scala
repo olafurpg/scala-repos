@@ -29,10 +29,10 @@ final class HistoryApi(coll: Coll) {
         game.ratingVariant.crazyhouse.option("crazyhouse" -> perfs.crazyhouse),
         (isStd && game.speed == Speed.Bullet).option("bullet" -> perfs.bullet),
         (isStd && game.speed == Speed.Blitz).option("blitz" -> perfs.blitz),
-        (isStd && game.speed == Speed.Classical).option(
-            "classical" -> perfs.classical),
-        (isStd && game.speed == Speed.Correspondence)
-          .option("correspondence" -> perfs.correspondence)
+        (isStd && game.speed == Speed.Classical)
+          .option("classical" -> perfs.classical),
+        (isStd && game.speed == Speed.Correspondence).option(
+            "correspondence" -> perfs.correspondence)
     ).flatten.map {
       case (k, p) => k -> p.intRating
     }

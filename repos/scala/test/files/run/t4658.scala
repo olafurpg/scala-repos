@@ -48,8 +48,8 @@ object Test {
     rangeData.map(
         r =>
           if (r.inclusive)
-            NumericRange.inclusive(
-                BigInt(r.start), BigInt(r.end), BigInt(r.step))
+            NumericRange
+              .inclusive(BigInt(r.start), BigInt(r.end), BigInt(r.step))
           else NumericRange(BigInt(r.start), BigInt(r.end), BigInt(r.step)))
 
   def main(args: Array[String]) {
@@ -69,20 +69,17 @@ object Test {
     numericBigIntRanges.foreach { range =>
       println(range.sum)
     }
-    println(
-        "BigInt agrees with Long: " +
-        (numericLongRanges zip numericBigIntRanges).forall {
-      case (lr, bir) => lr.sum == bir.sum
-    })
-    println(
-        "Long agrees with Int when rounded: " +
-        (numericLongRanges zip numericIntRanges).forall {
-      case (lr, ir) => lr.sum.toInt == ir.sum
-    })
-    println(
-        "Numeric Int agrees with Range: " +
-        (numericIntRanges zip ranges).forall {
-      case (ir, r) => ir.sum == r.sum
-    })
+    println("BigInt agrees with Long: " +
+          (numericLongRanges zip numericBigIntRanges).forall {
+        case (lr, bir) => lr.sum == bir.sum
+      })
+    println("Long agrees with Int when rounded: " +
+          (numericLongRanges zip numericIntRanges).forall {
+        case (lr, ir) => lr.sum.toInt == ir.sum
+      })
+    println("Numeric Int agrees with Range: " +
+          (numericIntRanges zip ranges).forall {
+        case (ir, r) => ir.sum == r.sum
+      })
   }
 }

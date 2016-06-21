@@ -47,8 +47,8 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
 
   def defaultSliceSize = 10
 
-  private def makeSlice(
-      sampleData: Stream[JValue], sliceSize: Int): (Slice, Stream[JValue]) = {
+  private def makeSlice(sampleData: Stream[JValue],
+                        sliceSize: Int): (Slice, Stream[JValue]) = {
     @tailrec
     def buildColArrays(
         from: Stream[JValue],
@@ -66,7 +66,9 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
     val (prefix, suffix) = sampleData.splitAt(sliceSize)
     val slice = new Slice {
       val (columns, size) = buildColArrays(
-          prefix.toStream, Map.empty[ColumnRef, ArrayColumn[_]], 0)
+          prefix.toStream,
+          Map.empty[ColumnRef, ArrayColumn[_]],
+          0)
     }
 
     (slice, suffix)
@@ -74,8 +76,8 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
 
   // production-path code uses fromRValues, but all the tests use fromJson
   // this will need to be changed when our tests support non-json such as CDate and CPeriod
-  def fromJson0(
-      values: Stream[JValue], maxSliceSize: Option[Int] = None): Table = {
+  def fromJson0(values: Stream[JValue],
+                maxSliceSize: Option[Int] = None): Table = {
     val sliceSize = maxSliceSize.getOrElse(yggConfig.maxSliceSize)
 
     Table(
@@ -90,8 +92,8 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
     )
   }
 
-  def fromJson(
-      values: Stream[JValue], maxSliceSize: Option[Int] = None): Table =
+  def fromJson(values: Stream[JValue],
+               maxSliceSize: Option[Int] = None): Table =
     fromJson0(values, maxSliceSize orElse Some(defaultSliceSize))
 
   def lookupF1(namespace: List[String], name: String): F1 = {
@@ -138,24 +140,24 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
             val (a2, arr) =
               mask.toList.foldLeft((a, new Array[BigDecimal](range.end))) {
                 case ((acc, arr), i) => {
-                    val col = prioritized find { _ isDefinedAt i }
+                  val col = prioritized find { _ isDefinedAt i }
 
-                    val acc2 =
-                      col map {
-                        case lc: LongColumn =>
-                          acc + lc(i)
+                  val acc2 =
+                    col map {
+                      case lc: LongColumn =>
+                        acc + lc(i)
 
-                        case dc: DoubleColumn =>
-                          acc + dc(i)
+                      case dc: DoubleColumn =>
+                        acc + dc(i)
 
-                        case nc: NumColumn =>
-                          acc + nc(i)
-                      }
+                      case nc: NumColumn =>
+                        acc + nc(i)
+                    }
 
-                    acc2 foreach { arr(i) = _ }
+                  acc2 foreach { arr(i) = _ }
 
-                    (acc2 getOrElse acc, arr)
-                  }
+                  (acc2 getOrElse acc, arr)
+                }
               }
 
             (a2,

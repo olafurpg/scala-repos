@@ -33,7 +33,7 @@ object ORMap {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class ORMap[A <: ReplicatedData] private[akka](
+final class ORMap[A <: ReplicatedData] private[akka] (
     private[akka] val keys: ORSet[String],
     private[akka] val values: Map[String, A])
     extends ReplicatedData
@@ -101,8 +101,8 @@ final class ORMap[A <: ReplicatedData] private[akka](
     if (value.isInstanceOf[ORSet[_]] && values.contains(key))
       throw new IllegalArgumentException(
           "`ORMap.put` must not be used to replace an existing `ORSet` " +
-          "value, because important history can be lost when replacing the `ORSet` and " +
-          "undesired effects of merging will occur. Use `ORMultiMap` or `ORMap.updated` instead.")
+            "value, because important history can be lost when replacing the `ORSet` and " +
+            "undesired effects of merging will occur. Use `ORMultiMap` or `ORMap.updated` instead.")
     else new ORMap(keys.add(node, key), values.updated(key, value))
 
   /**
@@ -170,7 +170,7 @@ final class ORMap[A <: ReplicatedData] private[akka](
           if (thisValue.getClass != thatValue.getClass) {
             val errMsg =
               s"Wrong type for merging [$key] in [${getClass.getName}], existing type " +
-              s"[${thisValue.getClass.getName}], got [${thatValue.getClass.getName}]"
+                s"[${thisValue.getClass.getName}], got [${thatValue.getClass.getName}]"
             throw new IllegalArgumentException(errMsg)
           }
           // TODO can we get rid of these (safe) casts?
@@ -197,8 +197,8 @@ final class ORMap[A <: ReplicatedData] private[akka](
     }
   }
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): ORMap[A] = {
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): ORMap[A] = {
     val prunedKeys = keys.prune(removedNode, collapseInto)
     val prunedValues = values.foldLeft(values) {
       case (acc, (key, data: RemovedNodePruning))

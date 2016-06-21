@@ -19,12 +19,13 @@ class PatternMayNeverMatchInspection
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case pat @ ScPatternExpectedAndPatternType(exTp, patType)
         if !PatternAnnotatorUtil.matchesPattern(exTp, patType) &&
-        !Conformance.conforms(exTp, patType) =>
+          !Conformance.conforms(exTp, patType) =>
       if (!isNeverSubType(exTp, patType)) {
         //need to check so inspection highlighting doesn't interfere with PatterAnnotator's
         val message = PatternMayNeverMatchInspection.message(exTp, patType)
-        holder.registerProblem(
-            pat, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        holder.registerProblem(pat,
+                               message,
+                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
   }
 }

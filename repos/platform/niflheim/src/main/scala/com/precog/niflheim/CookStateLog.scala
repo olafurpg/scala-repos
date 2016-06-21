@@ -56,7 +56,7 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
   def close = {
     if (pendingCookIds0.size > 0) {
       logger.warn("Closing txLog with pending cooks: " +
-          pendingCookIds0.keys.mkString("[", ", ", "]"))
+            pendingCookIds0.keys.mkString("[", ", ", "]"))
     }
     txLog.close()
     workLock.release
@@ -126,8 +126,7 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
     // mark if cooks are performed out-of-order.
     pendingCookIds0 -= blockId
 
-    txLog.mark(
-        pendingCookIds0.headOption match {
+    txLog.mark(pendingCookIds0.headOption match {
       case Some((_, txKey)) => txKey
       case None => completeTxKey
     })

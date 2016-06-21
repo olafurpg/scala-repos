@@ -25,8 +25,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{DataFrame, Row}
 
 @BeanInfo
-case class NGramTestData(
-    inputTokens: Array[String], wantedNGrams: Array[String])
+case class NGramTestData(inputTokens: Array[String],
+                         wantedNGrams: Array[String])
 
 class NGramSuite
     extends SparkFunSuite

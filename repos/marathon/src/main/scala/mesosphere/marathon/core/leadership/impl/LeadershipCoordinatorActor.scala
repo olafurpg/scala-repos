@@ -56,8 +56,9 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
                                            whenLeaderActorsWithoutAck))
 
         case PreparationMessages.Prepared(whenLeaderRef) =>
-          context.become(preparingForStart(
-                  ackStartRefs, whenLeaderActorsWithoutAck - whenLeaderRef))
+          context.become(
+              preparingForStart(ackStartRefs,
+                                whenLeaderActorsWithoutAck - whenLeaderRef))
 
         case Terminated(actorRef) =>
           log.error("unexpected death of {}", actorRef)

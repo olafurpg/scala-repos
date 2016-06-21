@@ -409,8 +409,8 @@ trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
       f: (A, => C) => C)(g: (B, => C) => C): C =
     G.bifoldRight(biNaturalTrans(fab), z)(f)(g)
 
-  override final def bifoldLeft[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(
-      g: (C, B) => C): C =
+  override final def bifoldLeft[A, B, C](fa: F[A, B], z: C)(
+      f: (C, A) => C)(g: (C, B) => C): C =
     G.bifoldLeft(biNaturalTrans(fa), z)(f)(g)
 }
 
@@ -422,7 +422,7 @@ trait IsomorphismBitraverse[F[_, _], G[_, _]]
 
   implicit def G: Bitraverse[G]
 
-  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(
-      f: A => H[C], g: B => H[D]): H[F[C, D]] =
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](
+      fab: F[A, B])(f: A => H[C], g: B => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
 }

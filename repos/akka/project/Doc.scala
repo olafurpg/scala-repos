@@ -29,12 +29,11 @@ object Scaladoc extends AutoPlugin {
               (version, baseDirectory in ThisBuild) map scaladocOptions,
             autoAPIMappings := CliOptions.scaladocAutoAPI.get
         )) ++ Seq(validateDiagrams in Compile := true) ++ CliOptions.scaladocDiagramsEnabled
-      .ifTrue(
-        doc in Compile := {
-      val docs = (doc in Compile).value
-      if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
-      docs
-    })
+      .ifTrue(doc in Compile := {
+        val docs = (doc in Compile).value
+        if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
+        docs
+      })
   }
 
   def scaladocOptions(ver: String, base: File): List[String] = {
@@ -67,7 +66,8 @@ object Scaladoc extends AutoPlugin {
                         "<div class=\"toggleContainer block diagram-container\" id=\"inheritance-diagram-container\">")) catch {
                 case e: Exception =>
                   throw new IllegalStateException(
-                      "Scaladoc verification failed for file '" + f + "'", e)
+                      "Scaladoc verification failed for file '" + f + "'",
+                      e)
               } finally source.close()
               hd
             } else false

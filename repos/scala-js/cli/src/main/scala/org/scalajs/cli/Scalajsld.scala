@@ -120,8 +120,8 @@ object Scalajsld {
           c.copy(stdLib = Some(x))
         }
         .text("Location of Scala.js standard libarary. This is set by the " +
-            "runner script and automatically prepended to the classpath. " +
-            "Use -n to not include it.")
+              "runner script and automatically prepended to the classpath. " +
+              "Use -n to not include it.")
       opt[Unit]('d', "debug").action { (_, c) =>
         c.copy(logLevel = Level.Debug)
       }.text("Debug mode: Show full log")
@@ -148,16 +148,16 @@ object Scalajsld {
       if (options.jsoutput) {
         Console.err.println(
             "Support for the --jsoutput flag has been dropped. " +
-            "JS dependencies will not be written to disk. " +
-            "Comment on https://github.com/scala-js/scala-js/issues/2163 " +
-            "if you rely on this feature.")
+              "JS dependencies will not be written to disk. " +
+              "Comment on https://github.com/scala-js/scala-js/issues/2163 " +
+              "if you rely on this feature.")
       }
 
       // Warn if bypassing linking errors was requested.
       if (options.bypassLinkingErrors) {
         Console.err.println(
             "Support for bypassing linking errors with -b or " +
-            "--bypassLinkingErrors will be dropped in the next major version.")
+              "--bypassLinkingErrors will be dropped in the next major version.")
       }
 
       val semantics =

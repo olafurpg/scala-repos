@@ -217,8 +217,10 @@ abstract class BCodeIdiomatic extends SubComponent {
      * can-multi-thread
      */
     final def genEndConcat(pos: Position): Unit = {
-      invokevirtual(
-          JavaStringBuilderClassName, "toString", "()Ljava/lang/String;", pos)
+      invokevirtual(JavaStringBuilderClassName,
+                    "toString",
+                    "()Ljava/lang/String;",
+                    pos)
     }
 
     /*
@@ -382,23 +384,31 @@ abstract class BCodeIdiomatic extends SubComponent {
     final def rem(tk: BType) { emitPrimitive(JCodeMethodN.remOpcodes, tk) } // can-multi-thread
 
     // can-multi-thread
-    final def invokespecial(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokespecial(owner: String,
+                            name: String,
+                            desc: String,
+                            pos: Position) {
       addInvoke(Opcodes.INVOKESPECIAL, owner, name, desc, false, pos)
     }
     // can-multi-thread
-    final def invokestatic(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokestatic(owner: String,
+                           name: String,
+                           desc: String,
+                           pos: Position) {
       addInvoke(Opcodes.INVOKESTATIC, owner, name, desc, false, pos)
     }
     // can-multi-thread
-    final def invokeinterface(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokeinterface(owner: String,
+                              name: String,
+                              desc: String,
+                              pos: Position) {
       addInvoke(Opcodes.INVOKEINTERFACE, owner, name, desc, true, pos)
     }
     // can-multi-thread
-    final def invokevirtual(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokevirtual(owner: String,
+                            name: String,
+                            desc: String,
+                            pos: Position) {
       addInvoke(Opcodes.INVOKEVIRTUAL, owner, name, desc, false, pos)
     }
 
@@ -526,8 +536,8 @@ abstract class BCodeIdiomatic extends SubComponent {
           i += 1
         }
         assert(oldPos == keys.length, "emitSWITCH")
-        jmethod.visitTableSwitchInsn(
-            keyMin, keyMax, defaultBranch, newBranches: _*)
+        jmethod
+          .visitTableSwitchInsn(keyMin, keyMax, defaultBranch, newBranches: _*)
       } else {
         jmethod.visitLookupSwitchInsn(defaultBranch, keys, branches)
       }

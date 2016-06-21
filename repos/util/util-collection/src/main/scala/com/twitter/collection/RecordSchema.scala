@@ -33,7 +33,7 @@ final class RecordSchema {
     * concurrently, and at least one of the threads modifies the record, it ''must'' be synchronized
     * externally.
     */
-  final class Record private[RecordSchema](
+  final class Record private[RecordSchema] (
       fields: IdentityHashMap[Field[_], Entry] =
         new IdentityHashMap[Field[_], Entry]) {
 

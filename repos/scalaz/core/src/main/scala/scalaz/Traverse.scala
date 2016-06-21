@@ -99,8 +99,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A =
       Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
-    Kleisli[G, S, F[B]](
-        s => {
+    Kleisli[G, S, F[B]](s => {
       val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z =>
             Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
       kl.run
@@ -137,18 +136,16 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   def reverse[A](fa: F[A]): F[A] = {
     val (as, shape) = mapAccumL(fa, scala.List[A]())((t, h) => (h :: t, h))
-    runTraverseS(shape, as)(
-        _ =>
+    runTraverseS(shape, as)(_ =>
           for {
         e <- State.get
         _ <- State.put(e.tail)
       } yield e.head)._2
   }
 
-  def zipWith[A, B, C](fa: F[A], fb: F[B])(
-      f: (A, Option[B]) => C): (List[B], F[C]) =
-    runTraverseS(fa, toList(fb))(
-        a =>
+  def zipWith[A, B, C](fa: F[A],
+                       fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) =
+    runTraverseS(fa, toList(fb))(a =>
           for {
         bs <- State.get
         _ <- State.put(if (bs.isEmpty) bs else bs.tail)
@@ -168,8 +165,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     zipWithR(fa, fb)((_, _))
 
   def mapAccumL[S, A, B](fa: F[A], z: S)(f: (S, A) => (S, B)): (S, F[B]) =
-    runTraverseS(fa, z)(
-        a =>
+    runTraverseS(fa, z)(a =>
           for {
         s1 <- State.init[S]
         (s2, b) = f(s1, a)
@@ -187,8 +183,9 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     }
 
     /** Two sequentially dependent effects can be fused into one, their composition */
-    def sequentialFusion[N[_], M[_], A, B, C](
-        fa: F[A], amb: A => M[B], bnc: B => N[C])(
+    def sequentialFusion[N[_], M[_], A, B, C](fa: F[A],
+                                              amb: A => M[B],
+                                              bnc: B => N[C])(
         implicit N: Applicative[N],
         M: Applicative[M],
         MN: Equal[M[N[F[C]]]]): Boolean = {
@@ -201,8 +198,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     }
 
     /** Traversal with the `point` function is the same as applying the `point` function directly */
-    def purity[G[_], A](fa: F[A])(
-        implicit G: Applicative[G], GFA: Equal[G[F[A]]]): Boolean =
+    def purity[G[_], A](fa: F[A])(implicit G: Applicative[G],
+                                  GFA: Equal[G[F[A]]]): Boolean =
       GFA.equal(traverse[G, A, A](fa)(G.point[A](_)), G.point(fa))
 
     /**
@@ -210,18 +207,19 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
       *            `(a: A) => nat(Applicative[M].point[A](a)) === Applicative[N].point[A](a)`
       *            `(f: M[A => B], ma: M[A]) => nat(Applicative[M].ap(ma)(f)) === Applicative[N].ap(nat(ma))(nat(f))`
       */
-    def naturality[N[_], M[_], A](nat: (M ~> N))(
-        fma: F[M[A]])(implicit N: Applicative[N],
-                      M: Applicative[M],
-                      NFA: Equal[N[F[A]]]): Boolean = {
+    def naturality[N[_], M[_], A](nat: (M ~> N))(fma: F[M[A]])(
+        implicit N: Applicative[N],
+        M: Applicative[M],
+        NFA: Equal[N[F[A]]]): Boolean = {
       val n1: N[F[A]] = nat[F[A]](sequence[M, A](fma))
       val n2: N[F[A]] = sequence[N, A](map(fma)(ma => nat(ma)))
       NFA.equal(n1, n2)
     }
 
     /** Two independent effects can be fused into a single effect, their product. */
-    def parallelFusion[N[_], M[_], A, B](
-        fa: F[A], amb: A => M[B], anb: A => N[B])(
+    def parallelFusion[N[_], M[_], A, B](fa: F[A],
+                                         amb: A => M[B],
+                                         anb: A => N[B])(
         implicit N: Applicative[N],
         M: Applicative[M],
         MN: Equal[(M[F[B]], N[F[B]])]): Boolean = {

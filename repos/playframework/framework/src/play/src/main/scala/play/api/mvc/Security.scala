@@ -131,10 +131,10 @@ object Security {
     * @param userinfo The function that looks up the user info.
     * @param onUnauthorized The function to get the result for when no authenticated user can be found.
     */
-  class AuthenticatedBuilder[U](userinfo: RequestHeader => Option[U],
-                                onUnauthorized: RequestHeader => Result = _ =>
-                                  Unauthorized(
-                                      views.html.defaultpages.unauthorized()))
+  class AuthenticatedBuilder[U](
+      userinfo: RequestHeader => Option[U],
+      onUnauthorized: RequestHeader => Result =
+        _ => Unauthorized(views.html.defaultpages.unauthorized()))
       extends ActionBuilder[({ type R[A] = AuthenticatedRequest[A, U] })#R] {
 
     def invokeBlock[A](request: Request[A],

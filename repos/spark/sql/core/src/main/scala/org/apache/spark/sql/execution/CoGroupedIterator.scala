@@ -33,8 +33,8 @@ class CoGroupedIterator(left: Iterator[(InternalRow, Iterator[InternalRow])],
                       Iterator[InternalRow],
                       Iterator[InternalRow])] {
 
-  private val keyOrdering = GenerateOrdering.generate(
-      groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
+  private val keyOrdering = GenerateOrdering
+    .generate(groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
 
   private var currentLeftData: (InternalRow, Iterator[InternalRow]) = _
   private var currentRightData: (InternalRow, Iterator[InternalRow]) = _

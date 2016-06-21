@@ -60,8 +60,10 @@ object ZookeeperSystemCoordination {
             yggCheckpointsEnabled: Boolean,
             createCheckpointFlag: Option[String] = None) = {
     val zkc = new ZkClient(zkHosts)
-    new ZookeeperSystemCoordination(
-        zkc, uid, yggCheckpointsEnabled, createCheckpointFlag)
+    new ZookeeperSystemCoordination(zkc,
+                                    uid,
+                                    yggCheckpointsEnabled,
+                                    createCheckpointFlag)
   }
 
   def extractServiceUID(config: Configuration): ServiceUID = {
@@ -150,8 +152,8 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
     }
   }
 
-  def acquireIdSequenceBlock(
-      producerId: Int, blockSize: Int): IdSequenceBlock = {
+  def acquireIdSequenceBlock(producerId: Int,
+                             blockSize: Int): IdSequenceBlock = {
     val updater = new BlockUpdater(blockSize)
     zkc.updateDataSerialized(producerPath(producerId), updater)
 
@@ -166,10 +168,10 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
     }
   }
 
-  private def acquireActivePath(base: String,
-                                retries: Int = defaultRetries,
-                                delay: Int =
-                                  defaultDelay): Validation[Error, Unit] = {
+  private def acquireActivePath(
+      base: String,
+      retries: Int = defaultRetries,
+      delay: Int = defaultDelay): Validation[Error, Unit] = {
     val activePath = base + delimeter + active
     if (retries < 0) {
       Failure(Invalid("Unable to acquire relay agent lock"))
@@ -192,7 +194,8 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
   }
 
   def registerRelayAgent(
-      agent: String, blockSize: Int): Validation[Error, EventRelayState] = {
+      agent: String,
+      blockSize: Int): Validation[Error, EventRelayState] = {
     val agentPath = relayAgentPath(agent)
 
     acquireActivePath(agentPath) flatMap { _ =>

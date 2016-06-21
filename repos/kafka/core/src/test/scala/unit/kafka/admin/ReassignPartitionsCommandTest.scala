@@ -61,7 +61,10 @@ class ReassignPartitionsCommandTest
         case (topicPartition, replicas) =>
           (topicPartition.partition, replicas)
       }
-    checkReplicaDistribution(
-        assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
+    checkReplicaDistribution(assignment,
+                             rackInfo,
+                             rackInfo.size,
+                             numPartitions,
+                             replicationFactor)
   }
 }

@@ -18,10 +18,10 @@ import scala.language.implicitConversions
   */
 class DottyCompiler(scalaInstance: ScalaInstance, compilerJars: CompilerJars)
     extends Compiler {
-  override def compile(
-      compilationData: CompilationData, client: Client): Unit = {
-    val cArgs = new CompilerArguments(
-        scalaInstance, ClasspathOptions.javac(compiler = false))
+  override def compile(compilationData: CompilationData,
+                       client: Client): Unit = {
+    val cArgs = new CompilerArguments(scalaInstance,
+                                      ClasspathOptions.javac(compiler = false))
     val scalaOptions = compilationData.scalaOptions.flatMap(splitArg)
     val args: Array[String] = cArgs(compilationData.sources,
                                     compilationData.classpath,
@@ -54,8 +54,7 @@ class DottyCompiler(scalaInstance: ScalaInstance, compilerJars: CompilerJars)
     }
   }
 
-  private val emptyPrintStream = new PrintStream(
-      new OutputStream {
+  private val emptyPrintStream = new PrintStream(new OutputStream {
     override def write(b: Int): Unit = {}
   })
 
@@ -85,8 +84,9 @@ class ClientDottyCallback(client: Client) extends CompilerCallback {
     else new File(f.path())
   }
 
-  override def onClassGenerated(
-      sourceFile: SourceFile, abstractFile: AbstractFile, s: String): Unit = {
+  override def onClassGenerated(sourceFile: SourceFile,
+                                abstractFile: AbstractFile,
+                                s: String): Unit = {
     val source = toJFile(sourceFile)
     val classFile = toJFile(abstractFile)
     client.generated(source, classFile, sourceFile.name())

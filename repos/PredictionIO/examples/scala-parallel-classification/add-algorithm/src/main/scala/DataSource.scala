@@ -18,8 +18,10 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -44,10 +46,10 @@ class DataSource(val dsp: DataSourceParams)
                              )))
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
+              logger.error(s"Failed to get properties ${properties} of" +
                     s" ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              throw e
+            }
           }
       }
 
@@ -57,5 +59,4 @@ class DataSource(val dsp: DataSourceParams)
 
 class TrainingData(
     val labeledPoints: RDD[LabeledPoint]
-)
-    extends Serializable
+) extends Serializable

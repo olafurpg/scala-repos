@@ -31,8 +31,8 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
       /_/
 """.format(SPARK_VERSION))
     import Properties._
-    val welcomeMsg = "Using Scala %s (%s, Java %s)".format(
-        versionString, javaVmName, javaVersion)
+    val welcomeMsg = "Using Scala %s (%s, Java %s)"
+      .format(versionString, javaVmName, javaVersion)
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")
@@ -43,10 +43,8 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
   }
 
   private val initLock = new java.util.concurrent.locks.ReentrantLock()
-  private val initCompilerCondition =
-    initLock.newCondition() // signal the compiler is initialized
-  private val initLoopCondition =
-    initLock.newCondition() // signal the whole repl is initialized
+  private val initCompilerCondition = initLock.newCondition() // signal the compiler is initialized
+  private val initLoopCondition = initLock.newCondition() // signal the whole repl is initialized
   private val initStart = System.nanoTime
 
   private def withLock[T](body: => T): T = {
@@ -82,7 +80,8 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
       withLock { while (!initIsComplete) initLoopCondition.await() }
     if (initError != null) {
       // scalastyle:off println
-      println("""
+      println(
+          """
         |Failed to initialize the REPL due to an unexpected error.
         |This is a bug, please, report it along with the error diagnostics printed below.
         |%s.""".stripMargin.format(initError))
@@ -131,7 +130,8 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
           _sc
         }
         """)
-      command("""
+      command(
+          """
         @transient val sqlContext = {
           val _sqlContext = org.apache.spark.repl.Main.interp.createSQLContext()
           println("SQL context available as sqlContext.")

@@ -136,8 +136,7 @@ object util {
         case (_, _: BoolColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[BoolColumn]) =>
           val boolColumns = copyCastArray[BoolColumn](columns)
-          Some(
-              new NConcatColumn(offsets, boolColumns) with BoolColumn {
+          Some(new NConcatColumn(offsets, boolColumns) with BoolColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               boolColumns(i)(row - offsets(i))
@@ -147,8 +146,7 @@ object util {
         case (_, _: LongColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[LongColumn]) =>
           val longColumns = copyCastArray[LongColumn](columns)
-          Some(
-              new NConcatColumn(offsets, longColumns) with LongColumn {
+          Some(new NConcatColumn(offsets, longColumns) with LongColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               longColumns(i)(row - offsets(i))
@@ -158,8 +156,7 @@ object util {
         case (_, _: DoubleColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[DoubleColumn]) =>
           val doubleColumns = copyCastArray[DoubleColumn](columns)
-          Some(
-              new NConcatColumn(offsets, doubleColumns) with DoubleColumn {
+          Some(new NConcatColumn(offsets, doubleColumns) with DoubleColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               doubleColumns(i)(row - offsets(i))
@@ -169,8 +166,7 @@ object util {
         case (_, _: NumColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[NumColumn]) =>
           val numColumns = copyCastArray[NumColumn](columns)
-          Some(
-              new NConcatColumn(offsets, numColumns) with NumColumn {
+          Some(new NConcatColumn(offsets, numColumns) with NumColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               numColumns(i)(row - offsets(i))
@@ -180,8 +176,7 @@ object util {
         case (_, _: StrColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[StrColumn]) =>
           val strColumns = copyCastArray[StrColumn](columns)
-          Some(
-              new NConcatColumn(offsets, strColumns) with StrColumn {
+          Some(new NConcatColumn(offsets, strColumns) with StrColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               strColumns(i)(row - offsets(i))
@@ -191,8 +186,7 @@ object util {
         case (_, _: DateColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[DateColumn]) =>
           val dateColumns = copyCastArray[DateColumn](columns)
-          Some(
-              new NConcatColumn(offsets, dateColumns) with DateColumn {
+          Some(new NConcatColumn(offsets, dateColumns) with DateColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               dateColumns(i)(row - offsets(i))
@@ -202,8 +196,7 @@ object util {
         case (_, _: PeriodColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[PeriodColumn]) =>
           val periodColumns = copyCastArray[PeriodColumn](columns)
-          Some(
-              new NConcatColumn(offsets, periodColumns) with PeriodColumn {
+          Some(new NConcatColumn(offsets, periodColumns) with PeriodColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               periodColumns(i)(row - offsets(i))

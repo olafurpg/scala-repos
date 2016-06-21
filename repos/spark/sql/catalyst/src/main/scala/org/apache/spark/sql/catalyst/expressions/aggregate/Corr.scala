@@ -44,8 +44,8 @@ case class Corr(x: Expression, y: Expression) extends DeclarativeAggregate {
   protected val xMk = AttributeReference("xMk", DoubleType, nullable = false)()
   protected val yMk = AttributeReference("yMk", DoubleType, nullable = false)()
 
-  override val aggBufferAttributes: Seq[AttributeReference] = Seq(
-      n, xAvg, yAvg, ck, xMk, yMk)
+  override val aggBufferAttributes: Seq[AttributeReference] =
+    Seq(n, xAvg, yAvg, ck, xMk, yMk)
 
   override val initialValues: Seq[Expression] = Array.fill(6)(Literal(0.0))
 

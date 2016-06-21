@@ -103,8 +103,9 @@ object Auth extends LilaController {
     }
   }
 
-  private def doSignup(
-      username: String, password: String, rawEmail: Option[String])(
+  private def doSignup(username: String,
+                       password: String,
+                       rawEmail: Option[String])(
       implicit ctx: Context): Fu[(UserModel, Option[String])] = {
     val email =
       rawEmail.map(e => env.emailAddress.validate(e) err s"Invalid email $e")
@@ -119,68 +120,41 @@ object Auth extends LilaController {
     Firewall {
       negotiate(
           html = forms.signup.website.bindFromRequest.fold(err =>
-                                                             forms.anyCaptcha map {
-                                                               captcha =>
-                                                                 BadRequest(
-                                                                     html.auth.signup(
-                                                                         err,
-                                                                         captcha,
-                                                                         env.RecaptchaPublicKey))
-                                                           },
-                                                           data =>
-                                                             env.recaptcha
-                                                               .verify(
-                                                                   data.recaptchaResponse,
-                                                                   req)
-                                                               .flatMap {
-                                                                 case false =>
-                                                                   forms.signup.websiteWithCaptcha map {
-                                                                     case (
-                                                                         form,
-                                                                         captcha) =>
-                                                                       BadRequest(
-                                                                           html.auth
-                                                                             .signup(
-                                                                               form fill data,
-                                                                               captcha,
-                                                                               env.RecaptchaPublicKey))
-                                                                   }
-                                                                 case true =>
-                                                                   lila.mon.user.register
-                                                                     .website()
-                                                                   val email =
-                                                                     env.emailAddress
-                                                                       .validate(
-                                                                         data.email) err s"Invalid email ${data.email}"
-                                                                   UserRepo
-                                                                     .create(
-                                                                         data.username,
-                                                                         data.password,
-                                                                         email.some,
-                                                                         ctx.blindMode,
-                                                                         none)
-                                                                     .flatten(
-                                                                         s"No user could be created for ${data.username}")
-                                                                     .map(_ -> email)
-                                                                     .flatMap {
-                                                                       case (
-                                                                           user,
-                                                                           email) =>
-                                                                         env.emailConfirm
-                                                                           .send(
-                                                                             user,
-                                                                             email) >> {
-                                                                           if (env.emailConfirm.effective)
-                                                                             Redirect(
-                                                                                 routes.Auth
-                                                                                   .checkYourEmail(
-                                                                                     user.username)).fuccess
-                                                                           else
-                                                                             saveAuthAndRedirect(
-                                                                                 user)
-                                                                         }
-                                                                     }
-                                                             }),
+                forms.anyCaptcha map { captcha =>
+              BadRequest(html.auth.signup(err,
+                                          captcha,
+                                          env.RecaptchaPublicKey))
+          }, data =>
+                env.recaptcha.verify(data.recaptchaResponse, req).flatMap {
+              case false =>
+                forms.signup.websiteWithCaptcha map {
+                  case (form, captcha) =>
+                    BadRequest(html.auth.signup(form fill data,
+                                                captcha,
+                                                env.RecaptchaPublicKey))
+                }
+              case true =>
+                lila.mon.user.register.website()
+                val email =
+                  env.emailAddress.validate(data.email) err s"Invalid email ${data.email}"
+                UserRepo
+                  .create(data.username,
+                          data.password,
+                          email.some,
+                          ctx.blindMode,
+                          none)
+                  .flatten(s"No user could be created for ${data.username}")
+                  .map(_ -> email)
+                  .flatMap {
+                    case (user, email) =>
+                      env.emailConfirm.send(user, email) >> {
+                        if (env.emailConfirm.effective)
+                          Redirect(routes.Auth.checkYourEmail(user.username)).fuccess
+                        else
+                          saveAuthAndRedirect(user)
+                      }
+                  }
+          }),
           api = apiVersion =>
             forms.signup.mobile.bindFromRequest.fold(
                 err => fuccess(BadRequest(jsonError(errorsAsJson(err)))),
@@ -215,8 +189,8 @@ object Auth extends LilaController {
   private def saveAuthAndRedirect(user: UserModel)(implicit ctx: Context) = {
     implicit val req = ctx.req
     api.saveAuthentication(user.id, ctx.mobileApiVersion) map { sessionId =>
-      Redirect(routes.User.show(user.username)) withCookies LilaCookie.session(
-          "sessionId", sessionId)
+      Redirect(routes.User.show(user.username)) withCookies LilaCookie
+        .session("sessionId", sessionId)
     } recoverWith authRecovery
   }
 
@@ -283,8 +257,8 @@ object Auth extends LilaController {
   def passwordResetConfirm(token: String) = Open { implicit ctx =>
     Env.security.passwordReset confirm token flatMap {
       case Some(user) =>
-        fuccess(html.auth.passwordResetConfirm(
-                user, token, forms.passwdReset, none))
+        fuccess(html.auth
+              .passwordResetConfirm(user, token, forms.passwdReset, none))
       case _ => notFound
     }
   }

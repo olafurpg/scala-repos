@@ -60,12 +60,13 @@ object NoStackAndThen {
 
   private sealed trait ReversedStack[-A, +B]
   private case class EmptyStack[-A, +B](fn: A => B) extends ReversedStack[A, B]
-  private case class NonEmpty[-A, B, +C](
-      head: A => B, rest: ReversedStack[B, C])
+  private case class NonEmpty[-A, B, +C](head: A => B,
+                                         rest: ReversedStack[B, C])
       extends ReversedStack[A, C]
 
   private[scalding] case class WithStackTrace[A, B](
-      inner: NoStackAndThen[A, B], stackEntry: Array[StackTraceElement])
+      inner: NoStackAndThen[A, B],
+      stackEntry: Array[StackTraceElement])
       extends NoStackAndThen[A, B] {
     override def apply(a: A): B = inner(a)
 
@@ -82,8 +83,8 @@ object NoStackAndThen {
     def apply(a: A) = fn(a)
   }
   // This is the defunctionalized andThen
-  private case class NoStackMore[A, B, C](
-      first: NoStackAndThen[A, B], andThenFn: (B) => C)
+  private case class NoStackMore[A, B, C](first: NoStackAndThen[A, B],
+                                          andThenFn: (B) => C)
       extends NoStackAndThen[A, C] {
     /*
      * scala cannot optimize tail calls if the types change.

@@ -44,15 +44,17 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     var maybeRelation: Option[HadoopFsRelation] = None
     val maybeAnalyzedPredicate = query.queryExecution.optimizedPlan.collect {
       case PhysicalOperation(
-          _, filters, LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
+          _,
+          filters,
+          LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
         maybeRelation = Some(orcRelation)
         filters
     }.flatten.reduceLeftOption(_ && _)
     assert(maybeAnalyzedPredicate.isDefined,
            "No filter is analyzed from the given query")
 
-    val (_, selectedFilters) = DataSourceStrategy.selectFilters(
-        maybeRelation.get, maybeAnalyzedPredicate.toSeq)
+    val (_, selectedFilters) = DataSourceStrategy
+      .selectFilters(maybeRelation.get, maybeAnalyzedPredicate.toSeq)
     assert(selectedFilters.nonEmpty, "No filter is pushed down")
 
     val maybeFilter = OrcFilters.createFilter(selectedFilters.toArray)
@@ -62,8 +64,8 @@ class OrcFilterSuite extends QueryTest with OrcTest {
   }
 
   private def checkFilterPredicate(
-      predicate: Predicate, filterOperator: PredicateLeaf.Operator)(
-      implicit df: DataFrame): Unit = {
+      predicate: Predicate,
+      filterOperator: PredicateLeaf.Operator)(implicit df: DataFrame): Unit = {
     def checkComparisonOperator(filter: SearchArgument) = {
       val operator = filter.getLeaves.asScala
       assert(operator.map(_.getOperator).contains(filterOperator))

@@ -164,8 +164,8 @@ object NameTree {
     case Alt(tree) => simplify(tree)
     case Alt(trees @ _ *) =>
       @tailrec
-      def loop(
-          trees: Seq[NameTree[T]], accum: Seq[NameTree[T]]): Seq[NameTree[T]] =
+      def loop(trees: Seq[NameTree[T]],
+               accum: Seq[NameTree[T]]): Seq[NameTree[T]] =
         trees match {
           case Nil => accum
           case Seq(head, tail @ _ *) =>
@@ -185,8 +185,8 @@ object NameTree {
     case Union(Weighted(_, tree)) => simplify(tree)
     case Union(trees @ _ *) =>
       @tailrec
-      def loop(
-          trees: Seq[Weighted[T]], accum: Seq[Weighted[T]]): Seq[Weighted[T]] =
+      def loop(trees: Seq[Weighted[T]],
+               accum: Seq[Weighted[T]]): Seq[Weighted[T]] =
         trees match {
           case Nil => accum
           case Seq(Weighted(w, tree), tail @ _ *) =>

@@ -62,8 +62,8 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
   private[challenge] def countCreatedByDestId(userId: String): Fu[Int] =
     coll.count(Some(selectCreated ++ BSONDocument("destUser.id" -> userId)))
 
-  private[challenge] def realTimeUnseenSince(
-      date: DateTime, max: Int): Fu[List[Challenge]] =
+  private[challenge] def realTimeUnseenSince(date: DateTime,
+                                             max: Int): Fu[List[Challenge]] =
     coll
       .find(selectCreated ++ selectClock ++ BSONDocument(
               "seenAt" -> BSONDocument("$lt" -> date)
@@ -119,8 +119,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
     coll
       .update(
           selectCreated ++ selectId(challenge.id),
-          BSONDocument(
-              "$set" -> BSONDocument(
+          BSONDocument("$set" -> BSONDocument(
                   "status" -> status.id,
                   "expiresAt" -> expiresAt.fold(inTwoWeeks) {
                 _ (DateTime.now)

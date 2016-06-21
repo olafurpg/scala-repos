@@ -41,8 +41,7 @@ object ClusterSingletonManagerSettings {
     new ClusterSingletonManagerSettings(
         singletonName = config.getString("singleton-name"),
         role = roleOption(config.getString("role")),
-        removalMargin =
-          Duration.Zero, // defaults to ClusterSettins.DownRemovalMargin
+        removalMargin = Duration.Zero, // defaults to ClusterSettins.DownRemovalMargin
         handOverRetryInterval =
           config.getDuration("hand-over-retry-interval", MILLISECONDS).millis)
 
@@ -114,8 +113,10 @@ final class ClusterSingletonManagerSettings(
                    removalMargin: FiniteDuration = removalMargin,
                    handOverRetryInterval: FiniteDuration =
                      handOverRetryInterval): ClusterSingletonManagerSettings =
-    new ClusterSingletonManagerSettings(
-        singletonName, role, removalMargin, handOverRetryInterval)
+    new ClusterSingletonManagerSettings(singletonName,
+                                        role,
+                                        removalMargin,
+                                        handOverRetryInterval)
 }
 
 /**
@@ -131,9 +132,10 @@ object ClusterSingletonManager {
   def props(singletonProps: Props,
             terminationMessage: Any,
             settings: ClusterSingletonManagerSettings): Props =
-    Props(new ClusterSingletonManager(
-            singletonProps, terminationMessage, settings))
-      .withDeploy(Deploy.local)
+    Props(
+        new ClusterSingletonManager(singletonProps,
+                                    terminationMessage,
+                                    settings)).withDeploy(Deploy.local)
 
   /**
     * INTERNAL API
@@ -204,15 +206,15 @@ object ClusterSingletonManager {
     final case class YoungerData(oldestOption: Option[Address]) extends Data
     final case class BecomingOldestData(previousOldestOption: Option[Address])
         extends Data
-    final case class OldestData(
-        singleton: ActorRef, singletonTerminated: Boolean = false)
+    final case class OldestData(singleton: ActorRef,
+                                singletonTerminated: Boolean = false)
         extends Data
     final case class WasOldestData(singleton: ActorRef,
                                    singletonTerminated: Boolean,
                                    newOldestOption: Option[Address])
         extends Data
-    final case class HandingOverData(
-        singleton: ActorRef, handOverTo: Option[ActorRef])
+    final case class HandingOverData(singleton: ActorRef,
+                                     handOverTo: Option[ActorRef])
         extends Data
     case object EndData extends Data
     final case class DelayedMemberRemoved(member: Member)
@@ -231,8 +233,8 @@ object ClusterSingletonManager {
       /**
         * The first event, corresponding to CurrentClusterState.
         */
-      final case class InitialOldestState(
-          oldest: Option[Address], safeToBeOldest: Boolean)
+      final case class InitialOldestState(oldest: Option[Address],
+                                          safeToBeOldest: Boolean)
 
       final case class OldestChanged(oldest: Option[Address])
     }
@@ -279,12 +281,13 @@ object ClusterSingletonManager {
         membersByAge =
           immutable.SortedSet.empty(ageOrdering) union state.members.filter(m ⇒
                 (m.status == MemberStatus.Up ||
-                    m.status == MemberStatus.Leaving) && matchingRole(m))
+                      m.status == MemberStatus.Leaving) && matchingRole(m))
         val safeToBeOldest = !state.members.exists { m ⇒
           (m.status == MemberStatus.Down || m.status == MemberStatus.Exiting)
         }
         val initial = InitialOldestState(
-            membersByAge.headOption.map(_.address), safeToBeOldest)
+            membersByAge.headOption.map(_.address),
+            safeToBeOldest)
         changes :+= initial
       }
 
@@ -314,7 +317,7 @@ object ClusterSingletonManager {
         case MemberUp(m) ⇒ add(m)
         case mEvent: MemberEvent
             if (mEvent.isInstanceOf[MemberExited] ||
-                mEvent.isInstanceOf[MemberRemoved]) ⇒
+                  mEvent.isInstanceOf[MemberRemoved]) ⇒
           remove(mEvent.member)
         case GetNext if changes.isEmpty ⇒
           context.become(deliverNext, discardOld = false)
@@ -336,7 +339,7 @@ object ClusterSingletonManager {
           }
         case mEvent: MemberEvent
             if (mEvent.isInstanceOf[MemberExited] ||
-                mEvent.isInstanceOf[MemberRemoved]) ⇒
+                  mEvent.isInstanceOf[MemberRemoved]) ⇒
           remove(mEvent.member)
           if (changes.nonEmpty) {
             sendFirstChange()
@@ -514,8 +517,8 @@ class ClusterSingletonManager(singletonProps: Props,
   }
 
   when(Younger) {
-    case Event(
-        OldestChanged(oldestOption), YoungerData(previousOldestOption)) ⇒
+    case Event(OldestChanged(oldestOption),
+               YoungerData(previousOldestOption)) ⇒
       oldestChangedReceived = true
       if (oldestOption == selfAddressOption) {
         logInfo("Younger observed OldestChanged: [{} -> myself]",
@@ -577,8 +580,8 @@ class ClusterSingletonManager(singletonProps: Props,
       scheduleDelayedMemberRemoved(m)
       stay
 
-    case Event(
-        DelayedMemberRemoved(m), BecomingOldestData(Some(previousOldest)))
+    case Event(DelayedMemberRemoved(m),
+               BecomingOldestData(Some(previousOldest)))
         if m.address == previousOldest ⇒
       logInfo("Previous oldest [{}] removed", previousOldest)
       addRemoved(m.address)
@@ -597,8 +600,8 @@ class ClusterSingletonManager(singletonProps: Props,
             previousOldest)
       stay
 
-    case Event(
-        HandOverRetry(count), BecomingOldestData(previousOldestOption)) ⇒
+    case Event(HandOverRetry(count),
+               BecomingOldestData(previousOldestOption)) ⇒
       if (count <= maxHandOverRetries) {
         logInfo("Retry [{}], sending HandOverToMe to [{}]",
                 count,
@@ -624,8 +627,9 @@ class ClusterSingletonManager(singletonProps: Props,
   def scheduleDelayedMemberRemoved(m: Member): Unit = {
     if (removalMargin > Duration.Zero) {
       log.debug("Schedule DelayedMemberRemoved for [{}]", m.address)
-      context.system.scheduler.scheduleOnce(
-          removalMargin, self, DelayedMemberRemoved(m))(context.dispatcher)
+      context.system.scheduler
+        .scheduleOnce(removalMargin, self, DelayedMemberRemoved(m))(
+            context.dispatcher)
     } else self ! DelayedMemberRemoved(m)
   }
 
@@ -656,16 +660,18 @@ class ClusterSingletonManager(singletonProps: Props,
                    TakeOverRetry(1),
                    handOverRetryInterval,
                    repeat = false)
-          goto(WasOldest) using WasOldestData(
-              singleton, singletonTerminated, newOldestOption = Some(a))
+          goto(WasOldest) using WasOldestData(singleton,
+                                              singletonTerminated,
+                                              newOldestOption = Some(a))
         case None ⇒
           // new oldest will initiate the hand-over
           setTimer(TakeOverRetryTimer,
                    TakeOverRetry(1),
                    handOverRetryInterval,
                    repeat = false)
-          goto(WasOldest) using WasOldestData(
-              singleton, singletonTerminated, newOldestOption = None)
+          goto(WasOldest) using WasOldestData(singleton,
+                                              singletonTerminated,
+                                              newOldestOption = None)
       }
 
     case Event(HandOverToMe, OldestData(singleton, singletonTerminated)) ⇒
@@ -693,8 +699,8 @@ class ClusterSingletonManager(singletonProps: Props,
         throw new ClusterSingletonManagerIsStuck(
             s"Expected hand-over to [${newOldestOption}] never occured")
 
-    case Event(
-        HandOverToMe, WasOldestData(singleton, singletonTerminated, _)) ⇒
+    case Event(HandOverToMe,
+               WasOldestData(singleton, singletonTerminated, _)) ⇒
       gotoHandingOver(singleton, singletonTerminated, Some(sender()))
 
     case Event(MemberRemoved(m, _), _)

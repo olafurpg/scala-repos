@@ -231,8 +231,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         blobResult <- IOT {
                        writeResult traverse { size =>
                          logger.debug("Write complete on " + file)
-                         val metadata = BlobMetadata(
-                             mimeType, size, clock.now(), authorities)
+                         val metadata = BlobMetadata(mimeType,
+                                                     size,
+                                                     clock.now(),
+                                                     authorities)
                          //val metadataStore = PersistentJValue(versionDir, blobMetadataFilename)
                          //metadataStore.json = metadata.serialize
                          IOUtils.writeToFile(
@@ -291,8 +293,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
     /** Suck the file into a String */
     def asString(implicit M: Monad[Future]): OptionT[Future, String] =
-      OptionT(
-          M point {
+      OptionT(M point {
         stringTypes
           .contains(mimeType)
           .option(IOUtils.readFileToString(dataFile))
@@ -564,8 +565,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                     }
                   logger.debug(
                       "Sending %d archives, %d storeFiles, and %d events to %s"
-                        .format(
-                          totalArchives, totalStoreFiles, totalEvents, path))
+                        .format(totalArchives,
+                                totalStoreFiles,
+                                totalEvents,
+                                path))
                   pathActor.tell(IngestBundle(pathMessages, allPerms),
                                  requestor)
                 }
@@ -620,7 +623,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                           permissions: Set[WritePermission],
                           authorities: Authorities): Boolean = {
       logger.trace("Checking write permission for " + path + " as " +
-          authorities + " among " + permissions)
+            authorities + " among " + permissions)
       PermissionsFinder.canWriteAs(permissions filter {
         _.path.isEqualOrParentOf(path)
       }, authorities)
@@ -645,10 +648,11 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         versionLog.find(version) map {
           case VersionEntry(v, _, _) =>
             val dir = versionDir(v)
-            val openf =
-              if (NIHDB.hasProjection(dir)) { resourceBuilder.openNIHDB _ } else {
-                resourceBuilder.openBlob _
-              }
+            val openf = if (NIHDB.hasProjection(dir)) {
+              resourceBuilder.openNIHDB _
+            } else {
+              resourceBuilder.openBlob _
+            }
 
             for {
               resource <- EitherT {
@@ -709,8 +713,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       }
     }
 
-    private def maybeExpireCache(
-        apiKey: APIKey, resource: Resource): IO[PrecogUnit] = {
+    private def maybeExpireCache(apiKey: APIKey,
+                                 resource: Resource): IO[PrecogUnit] = {
       resource.fold(
           blobr =>
             IO {
@@ -730,11 +734,12 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       )
     }
 
-    private def maybeCompleteJob(
-        msg: EventMessage, terminal: Boolean, response: PathActionResponse) = {
+    private def maybeCompleteJob(msg: EventMessage,
+                                 terminal: Boolean,
+                                 response: PathActionResponse) = {
       //TODO: Add job progress updates
       (response == UpdateSuccess(msg.path) &&
-          terminal).option(msg.jobId).join traverse {
+            terminal).option(msg.jobId).join traverse {
         jobManager.finish(_, clock.now())
       } map { _ =>
         response
@@ -744,8 +749,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
     def processEventMessages(msgs: Stream[(Long, EventMessage)],
                              permissions: Map[APIKey, Set[WritePermission]],
                              requestor: ActorRef): IO[PrecogUnit] = {
-      logger.debug("About to persist %d messages; replying to %s".format(
-              msgs.size, requestor.toString))
+      logger.debug("About to persist %d messages; replying to %s"
+            .format(msgs.size, requestor.toString))
 
       def openNIHDB(
           version: UUID): EitherT[IO, ResourceError, ProjectionResource] = {
@@ -851,7 +856,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                             versionLog.current.isEmpty,
                             versionLog.isCompleted(streamId)))
               persistNIHDB(versionLog.current.isEmpty &&
-                           !versionLog.isCompleted(streamId),
+                             !versionLog.isCompleted(streamId),
                            offset,
                            msg,
                            streamId,
@@ -860,7 +865,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
             case StreamRef.Replace(streamId, terminal) =>
               logger.trace(
                   "Received replace for %s stream %s: complete: %b".format(
-                      path.path, streamId, versionLog.isCompleted(streamId)))
+                      path.path,
+                      streamId,
+                      versionLog.isCompleted(streamId)))
               persistNIHDB(!versionLog.isCompleted(streamId),
                            offset,
                            msg,
@@ -893,7 +900,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                       .format(path))
               }
               persistFile(versionLog.current.isEmpty &&
-                          !versionLog.isCompleted(streamId),
+                            !versionLog.isCompleted(streamId),
                           offset,
                           msg,
                           streamId,
@@ -936,7 +943,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
             "Resource entering state of quiescence after receive timeout.")
         val quiesce =
           versions.values.toStream collect { case NIHDBResource(db) => db } traverse
-          (_.quiesce)
+            (_.quiesce)
         quiesce.unsafePerformIO
 
       case IngestBundle(messages, permissions) =>

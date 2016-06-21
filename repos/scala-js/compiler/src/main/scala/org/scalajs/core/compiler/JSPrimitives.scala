@@ -44,8 +44,7 @@ abstract class JSPrimitives {
   val DEBUGGER = 345 // js.debugger()
   val HASPROP = 346 // js.Object.hasProperty(o, p), equiv to `p in o` in JS
   val OBJPROPS = 347 // js.Object.properties(o), equiv to `for (p in o)` in JS
-  val JS_NATIVE =
-    348 // js.native. Marker method. Fails if tried to be emitted.
+  val JS_NATIVE = 348 // js.native. Marker method. Fails if tried to be emitted.
 
   val UNITVAL = 349 // () value, which is undefined
 

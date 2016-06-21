@@ -30,10 +30,10 @@ final class PerfStatIndexer(storage: PerfStatStorage, sequencer: ActorRef) {
       .cursor[Game]()
       .enumerate(Int.MaxValue, stopOnError = true) |>>> Iteratee
       .fold[Game, PerfStat](PerfStat.init(user.id, perfType)) {
-      case (perfStat, game) if game.perfType.contains(perfType) =>
-        Pov.ofUserId(game, user.id).fold(perfStat)(perfStat.agg)
-      case (perfStat, _) => perfStat
-    }
+        case (perfStat, game) if game.perfType.contains(perfType) =>
+          Pov.ofUserId(game, user.id).fold(perfStat)(perfStat.agg)
+        case (perfStat, _) => perfStat
+      }
   } flatMap storage.insert
 
   def addGame(game: Game): Funit =

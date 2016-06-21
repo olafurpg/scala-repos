@@ -41,8 +41,8 @@ object Serialization {
     */
   implicit val statusCodec: Injection[Status, String] = Injection
     .buildCatchInvert[Status, String](DataObjectFactory.getRawJSON(_))(
-      json => DataObjectFactory.createStatus(json)
-  )
+        json => DataObjectFactory.createStatus(json)
+    )
 
   /**
     * We can chain the Status <-> String injection above with the

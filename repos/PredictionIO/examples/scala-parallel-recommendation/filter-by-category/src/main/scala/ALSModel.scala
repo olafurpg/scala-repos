@@ -23,8 +23,9 @@ class ALSModel(override val rank: Int,
     extends MatrixFactorizationModel(rank, userFeatures, productFeatures)
     with IPersistentModel[ALSAlgorithmParams] {
 
-  def recommendProductsFromCategory(
-      user: Int, num: Int, categoryItems: Array[Set[Int]]) = {
+  def recommendProductsFromCategory(user: Int,
+                                    num: Int,
+                                    categoryItems: Array[Set[Int]]) = {
     val filteredProductFeatures = productFeatures.filter {
       case (id, _) => categoryItems.exists(_.contains(id))
     }

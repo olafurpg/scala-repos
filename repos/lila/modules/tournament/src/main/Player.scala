@@ -35,8 +35,9 @@ private[tournament] case class Player(_id: String, // random
 
 private[tournament] object Player {
 
-  private[tournament] def make(
-      tourId: String, user: User, perfLens: Perfs => Perf): Player =
+  private[tournament] def make(tourId: String,
+                               user: User,
+                               perfLens: Perfs => Perf): Player =
     new Player(
         _id = lila.game.IdGenerator.game,
         tourId = tourId,

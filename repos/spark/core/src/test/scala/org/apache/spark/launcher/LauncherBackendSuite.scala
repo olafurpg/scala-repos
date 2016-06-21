@@ -29,8 +29,8 @@ import org.apache.spark._
 
 class LauncherBackendSuite extends SparkFunSuite with Matchers {
 
-  private val tests = Seq(
-      "local" -> "local", "standalone/client" -> "local-cluster[1,1,1024]")
+  private val tests =
+    Seq("local" -> "local", "standalone/client" -> "local-cluster[1,1,1024]")
 
   tests.foreach {
     case (name, master) =>

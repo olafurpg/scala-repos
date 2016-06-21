@@ -20,8 +20,8 @@ class ImplementMethodsQuickFix(clazz: ScTemplateDefinition)
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     clazz.isValid && clazz.getManager.isInProject(file) && file.isWritable
   def invoke(project: Project, editor: Editor, file: PsiFile) {
-    ScalaOIUtil.invokeOverrideImplement(
-        project, editor, file, isImplement = true)
+    ScalaOIUtil
+      .invokeOverrideImplement(project, editor, file, isImplement = true)
   }
   def getFamilyName: String = ScalaBundle.message("implement.methods.fix")
 }

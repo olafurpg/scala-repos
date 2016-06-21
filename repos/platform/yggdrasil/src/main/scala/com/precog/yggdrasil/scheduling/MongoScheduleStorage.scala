@@ -77,8 +77,10 @@ object MongoScheduleStorage {
   }
 }
 
-class MongoScheduleStorage private[MongoScheduleStorage](
-    mongo: Mongo, database: Database, settings: MongoScheduleStorageSettings)(
+class MongoScheduleStorage private[MongoScheduleStorage] (
+    mongo: Mongo,
+    database: Database,
+    settings: MongoScheduleStorageSettings)(
     implicit executor: ExecutionContext)
     extends ScheduleStorage[Future]
     with Logging {

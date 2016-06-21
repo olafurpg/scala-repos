@@ -49,7 +49,7 @@ import scala.reflect.ClassTag
   *
   */
 @SerialVersionUID(1L)
-class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
+class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
     extends ParSeq[T]
     with GenericParTemplate[T, ParArray]
     with ParSeqLike[T, ParArray[T], ArraySeq[T]]
@@ -80,8 +80,9 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
     pit
   }
 
-  class ParArrayIterator(
-      var i: Int = 0, val until: Int = length, val arr: Array[Any] = array)
+  class ParArrayIterator(var i: Int = 0,
+                         val until: Int = length,
+                         val arr: Array[Any] = array)
       extends SeqSplitter[T] {
     def hasNext = i < until
 
@@ -102,15 +103,16 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       val sizes =
         if (total >= left) sizesIncomplete
         else sizesIncomplete :+ (left - total)
-      for (sz <- sizes) yield
-        if (traversed < until) {
-          val start = traversed
-          val end = (traversed + sz) min until
-          traversed = end
-          new ParArrayIterator(start, end, arr)
-        } else {
-          new ParArrayIterator(traversed, traversed, arr)
-        }
+      for (sz <- sizes)
+        yield
+          if (traversed < until) {
+            val start = traversed
+            val end = (traversed + sz) min until
+            traversed = end
+            new ParArrayIterator(start, end, arr)
+          } else {
+            new ParArrayIterator(traversed, traversed, arr)
+          }
     }
 
     override def split: Seq[ParArrayIterator] = {
@@ -137,8 +139,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       i = until
     }
 
-    private def foreach_quick[U](
-        f: T => U, a: Array[Any], ntil: Int, from: Int) = {
+    private def foreach_quick[U](f: T => U,
+                                 a: Array[Any],
+                                 ntil: Int,
+                                 from: Int) = {
       var j = from
       while (j < ntil) {
         f(a(j).asInstanceOf[T])
@@ -152,8 +156,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       c
     }
 
-    private def count_quick(
-        p: T => Boolean, a: Array[Any], ntil: Int, from: Int) = {
+    private def count_quick(p: T => Boolean,
+                            a: Array[Any],
+                            ntil: Int,
+                            from: Int) = {
       var cnt = 0
       var j = from
       while (j < ntil) {
@@ -169,8 +175,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       r
     }
 
-    private def foldLeft_quick[S](
-        a: Array[Any], ntil: Int, op: (S, T) => S, z: S): S = {
+    private def foldLeft_quick[S](a: Array[Any],
+                                  ntil: Int,
+                                  op: (S, T) => S,
+                                  z: S): S = {
       var j = i
       var sum = z
       while (j < ntil) {
@@ -182,8 +190,9 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
 
     override def fold[U >: T](z: U)(op: (U, U) => U): U = foldLeft[U](z)(op)
 
-    override def aggregate[S](z: => S)(
-        seqop: (S, T) => S, combop: (S, S) => S): S = foldLeft[S](z)(seqop)
+    override def aggregate[S](z: => S)(seqop: (S, T) => S,
+                                       combop: (S, S) => S): S =
+      foldLeft[S](z)(seqop)
 
     override def sum[U >: T](implicit num: Numeric[U]): U = {
       val s = sum_quick(num, arr, until, i, num.zero)
@@ -191,8 +200,11 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       s
     }
 
-    private def sum_quick[U >: T](
-        num: Numeric[U], a: Array[Any], ntil: Int, from: Int, zero: U): U = {
+    private def sum_quick[U >: T](num: Numeric[U],
+                                  a: Array[Any],
+                                  ntil: Int,
+                                  from: Int,
+                                  zero: U): U = {
       var j = from
       var sum = zero
       while (j < ntil) {
@@ -208,8 +220,11 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       p
     }
 
-    private def product_quick[U >: T](
-        num: Numeric[U], a: Array[Any], ntil: Int, from: Int, one: U): U = {
+    private def product_quick[U >: T](num: Numeric[U],
+                                      a: Array[Any],
+                                      ntil: Int,
+                                      from: Int,
+                                      one: U): U = {
       var j = from
       var prod = one
       while (j < ntil) {
@@ -332,8 +347,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       r
     }
 
-    private def prefixLength_quick(
-        pred: T => Boolean, a: Array[Any], ntil: Int, startpos: Int): Int = {
+    private def prefixLength_quick(pred: T => Boolean,
+                                   a: Array[Any],
+                                   ntil: Int,
+                                   startpos: Int): Int = {
       var j = startpos
       var endpos = ntil
       while (j < endpos) {
@@ -350,8 +367,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       ret
     }
 
-    private def indexWhere_quick(
-        pred: T => Boolean, a: Array[Any], ntil: Int, from: Int): Int = {
+    private def indexWhere_quick(pred: T => Boolean,
+                                 a: Array[Any],
+                                 ntil: Int,
+                                 from: Int): Int = {
       var j = from
       var pos = -1
       while (j < ntil) {
@@ -370,8 +389,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       ret
     }
 
-    private def lastIndexWhere_quick(
-        pred: T => Boolean, a: Array[Any], from: Int, ntil: Int): Int = {
+    private def lastIndexWhere_quick(pred: T => Boolean,
+                                     a: Array[Any],
+                                     from: Int,
+                                     ntil: Int): Int = {
       var pos = -1
       var j = ntil - 1
       while (j >= from) {
@@ -398,7 +419,8 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
     /* transformers */
 
     override def map2combiner[S, That](
-        f: T => S, cb: Combiner[S, That]): Combiner[S, That] = {
+        f: T => S,
+        cb: Combiner[S, That]): Combiner[S, That] = {
       //val cb = cbf(self.repr)
       cb.sizeHint(remaining)
       map2combiner_quick(f, arr, cb, until, i)
@@ -406,8 +428,11 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       cb
     }
 
-    private def map2combiner_quick[S, That](
-        f: T => S, a: Array[Any], cb: Builder[S, That], ntil: Int, from: Int) {
+    private def map2combiner_quick[S, That](f: T => S,
+                                            a: Array[Any],
+                                            cb: Builder[S, That],
+                                            ntil: Int,
+                                            from: Int) {
       var j = from
       while (j < ntil) {
         cb += f(a(j).asInstanceOf[T])
@@ -452,8 +477,8 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       cb
     }
 
-    override def filter2combiner[U >: T, This](
-        pred: T => Boolean, cb: Combiner[U, This]) = {
+    override def filter2combiner[U >: T, This](pred: T => Boolean,
+                                               cb: Combiner[U, This]) = {
       filter2combiner_quick(pred, cb, arr, until, i)
       i = until
       cb
@@ -472,8 +497,8 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       }
     }
 
-    override def filterNot2combiner[U >: T, This](
-        pred: T => Boolean, cb: Combiner[U, This]) = {
+    override def filterNot2combiner[U >: T, This](pred: T => Boolean,
+                                                  cb: Combiner[U, This]) = {
       filterNot2combiner_quick(pred, cb, arr, until, i)
       i = until
       cb
@@ -517,8 +542,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       cb
     }
 
-    private def copy2builder_quick[U >: T, Coll](
-        b: Builder[U, Coll], a: Array[Any], ntil: Int, from: Int) {
+    private def copy2builder_quick[U >: T, Coll](b: Builder[U, Coll],
+                                                 a: Array[Any],
+                                                 ntil: Int,
+                                                 from: Int) {
       var j = from
       while (j < ntil) {
         b += a(j).asInstanceOf[T]
@@ -610,10 +637,17 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
       }
     }
 
-    override def scanToArray[U >: T, A >: U](
-        z: U, op: (U, U) => U, destarr: Array[A], from: Int) {
-      scanToArray_quick[U](
-          array, destarr.asInstanceOf[Array[Any]], op, z, i, until, from)
+    override def scanToArray[U >: T, A >: U](z: U,
+                                             op: (U, U) => U,
+                                             destarr: Array[A],
+                                             from: Int) {
+      scanToArray_quick[U](array,
+                           destarr.asInstanceOf[Array[Any]],
+                           op,
+                           z,
+                           i,
+                           until,
+                           from)
       i = until
     }
 
@@ -641,8 +675,8 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
   private def buildsArray[S, That](c: Builder[S, That]) =
     c.isInstanceOf[ParArrayCombiner[_]]
 
-  override def map[S, That](
-      f: T => S)(implicit bf: CanBuildFrom[ParArray[T], S, That]) =
+  override def map[S, That](f: T => S)(
+      implicit bf: CanBuildFrom[ParArray[T], S, That]) =
     if (buildsArray(bf(repr))) {
       // reserve an array
       val targarrseq = new ArraySeq[S](length)
@@ -677,8 +711,10 @@ class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
 
   /* tasks */
 
-  class ScanToArray[U >: T](
-      tree: ScanTree[U], z: U, op: (U, U) => U, targetarr: Array[Any])
+  class ScanToArray[U >: T](tree: ScanTree[U],
+                            z: U,
+                            op: (U, U) => U,
+                            targetarr: Array[Any])
       extends Task[Unit, ScanToArray[U]] {
     var result = ()
 
@@ -780,8 +816,9 @@ object ParArray extends ParFactory[ParArray] {
   private def wrapOrRebuild[T](arr: AnyRef, sz: Int) = arr match {
     case arr: Array[AnyRef] => new ParArray[T](new ExposedArraySeq[T](arr, sz))
     case _ =>
-      new ParArray[T](new ExposedArraySeq[T](
-              scala.runtime.ScalaRunTime.toObjectArray(arr), sz))
+      new ParArray[T](
+          new ExposedArraySeq[T](scala.runtime.ScalaRunTime.toObjectArray(arr),
+                                 sz))
   }
 
   def createFromCopy[T <: AnyRef: ClassTag](arr: Array[T]): ParArray[T] = {

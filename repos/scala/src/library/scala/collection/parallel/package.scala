@@ -151,10 +151,13 @@ package parallel {
   final case class CompositeThrowable(throwables: Set[Throwable])
       extends Exception(
           "Multiple exceptions thrown during a parallel computation: " +
-          throwables
-            .map(t =>
-                  t + "\n" + t.getStackTrace.take(10).++("...").mkString("\n"))
-            .mkString("\n\n")
+            throwables
+              .map(t =>
+                    t + "\n" + t.getStackTrace
+                      .take(10)
+                      .++("...")
+                      .mkString("\n"))
+              .mkString("\n\n")
       )
 
   /** A helper iterator for iterating very small array buffers.

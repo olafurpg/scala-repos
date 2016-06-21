@@ -13,8 +13,7 @@ object Test extends App {
     }
   }
 
-  val expr = foo(
-      new C {
+  val expr = foo(new C {
     type T = AnyRef
   })
 

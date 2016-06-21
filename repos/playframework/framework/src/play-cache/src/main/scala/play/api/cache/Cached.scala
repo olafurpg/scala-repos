@@ -139,8 +139,8 @@ object Cached {
     * @param duration Cache duration (in seconds)
     */
   @deprecated("Inject Cached into your component", "2.5.0")
-  def apply(
-      key: RequestHeader => String, duration: Int): UnboundCachedBuilder = {
+  def apply(key: RequestHeader => String,
+            duration: Int): UnboundCachedBuilder = {
     new UnboundCachedBuilder(key, {
       case (_: ResponseHeader) => Duration(duration, SECONDS)
     })
@@ -165,8 +165,8 @@ object Cached {
     * Caches everything for the specified seconds
     */
   @deprecated("Inject Cached into your component", "2.5.0")
-  def everything(
-      key: RequestHeader => String, duration: Int): UnboundCachedBuilder =
+  def everything(key: RequestHeader => String,
+                 duration: Int): UnboundCachedBuilder =
     empty(key).default(duration)
 
   /**
@@ -219,7 +219,7 @@ final class CachedBuilder(cache: CacheApi,
       val notModified = for {
         requestEtag <- request.headers.get(IF_NONE_MATCH)
         etag <- cache.get[String](etagKey) if requestEtag == "*" ||
-        etag == requestEtag
+          etag == requestEtag
       } yield Accumulator.done(NotModified)
 
       notModified.orElse {
@@ -250,8 +250,9 @@ final class CachedBuilder(cache: CacheApi,
     }
   }
 
-  private def handleResult(
-      result: Result, etagKey: String, resultKey: String): Result = {
+  private def handleResult(result: Result,
+                           etagKey: String,
+                           resultKey: String): Result = {
     cachingWithEternity.andThen { duration =>
       // Format expiration date according to http standard
       val expirationDate =
@@ -298,8 +299,8 @@ final class CachedBuilder(cache: CacheApi,
     */
   def includeStatus(status: Int, duration: Duration): CachedBuilder = compose {
     case e if e.status == status => {
-        duration
-      }
+      duration
+    }
   }
 
   /**
@@ -392,8 +393,8 @@ class UnboundCachedBuilder(
   def includeStatus(status: Int, duration: Duration): UnboundCachedBuilder =
     compose {
       case e if e.status == status => {
-          duration
-        }
+        duration
+      }
     }
 
   /**

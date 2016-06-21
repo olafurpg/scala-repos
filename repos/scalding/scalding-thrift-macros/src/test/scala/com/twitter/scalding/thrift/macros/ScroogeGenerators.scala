@@ -144,8 +144,15 @@ object ScroogeGenerators {
                          TestEnum.Huge)
       aBinary <- Gen.alphaStr.map(s => ByteBuffer.wrap(s.getBytes("UTF-8")))
     } yield
-      TestTypes(
-          aBool, aByte, aI16, aI32, aI64, aDouble, aString, aEnum, aBinary)
+      TestTypes(aBool,
+                aByte,
+                aI16,
+                aI32,
+                aI64,
+                aDouble,
+                aString,
+                aEnum,
+                aBinary)
   }
 
   implicit def arbitraryTestUnion: Arbitrary[TestUnion] = Arbitrary {

@@ -22,10 +22,11 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
     element match {
-      case Parent(Both(ref: ScStableCodeReferenceElement,
-                       Parent(Parent(param: ScParameterizedTypeElement))))
+      case Parent(
+          Both(ref: ScStableCodeReferenceElement,
+               Parent(Parent(param: ScParameterizedTypeElement))))
           if param.typeArgList.typeArgs.size == 2 &&
-          !ref.refName.forall(_.isLetterOrDigit) =>
+            !ref.refName.forall(_.isLetterOrDigit) =>
         true
       case _ => false
     }
@@ -33,9 +34,8 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     if (element == null || !element.isValid) return
-    val paramTypeElement: ScParameterizedTypeElement =
-      PsiTreeUtil.getParentOfType(
-          element, classOf[ScParameterizedTypeElement], false)
+    val paramTypeElement: ScParameterizedTypeElement = PsiTreeUtil
+      .getParentOfType(element, classOf[ScParameterizedTypeElement], false)
     val Seq(targ1, targ2) = paramTypeElement.typeArgList.typeArgs
     val needParens = paramTypeElement.getParent match {
       case _: ScTypeArgs | _: ScParenthesisedTypeElement => false
@@ -45,15 +45,15 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
       .map(_.getText)
       .mkString(" ")
       .parenthesisedIf(needParens)
-    val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
-        newTypeText, element.getManager)
+    val newTypeElement = ScalaPsiElementFactory
+      .createTypeElementFromText(newTypeText, element.getManager)
     if (paramTypeElement.isValid) {
       val replaced = try {
         paramTypeElement.replace(newTypeElement)
       } catch {
         case npe: NullPointerException =>
-          throw new RuntimeException("Unable to replace: %s with %s".format(
-                                         paramTypeElement, newTypeText),
+          throw new RuntimeException("Unable to replace: %s with %s"
+                                       .format(paramTypeElement, newTypeText),
                                      npe)
       }
       UndoUtil.markPsiFileForUndo(replaced.getContainingFile)

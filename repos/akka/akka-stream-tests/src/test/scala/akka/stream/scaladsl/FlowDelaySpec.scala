@@ -54,7 +54,11 @@ class FlowDelaySpec extends AkkaSpec {
       val c = TestSubscriber.manualProbe[Int]()
       val p = TestPublisher.manualProbe[Int]()
 
-      Source.fromPublisher(p).delay(300.millis).to(Sink.fromSubscriber(c)).run()
+      Source
+        .fromPublisher(p)
+        .delay(300.millis)
+        .to(Sink.fromSubscriber(c))
+        .run()
       val cSub = c.expectSubscription()
       val pSub = p.expectSubscription()
       cSub.request(100)

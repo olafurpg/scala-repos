@@ -24,9 +24,8 @@ trait AbstractTestConfigurationProducer {
                                    context: ConfigurationContext)
     : Option[(PsiElement, RunnerAndConfigurationSettings)] = {
     if (context.getModule == null) return null
-    val scope: GlobalSearchScope =
-      GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(
-          context.getModule, true)
+    val scope: GlobalSearchScope = GlobalSearchScope
+      .moduleWithDependenciesAndLibrariesScope(context.getModule, true)
     if (suitePaths.forall(suitePath =>
               ScalaPsiManager
                 .instance(context.getProject)

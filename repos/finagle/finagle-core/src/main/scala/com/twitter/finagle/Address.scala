@@ -76,8 +76,8 @@ object Addresses {
   /**
     * @see com.twitter.finagle.Address.Inet
     */
-  def newInetAddress(
-      ia: InetSocketAddress, metadata: JMap[String, Any]): Address =
+  def newInetAddress(ia: InetSocketAddress,
+                     metadata: JMap[String, Any]): Address =
     Address.Inet(ia, metadata.asScala.toMap)
 
   /**

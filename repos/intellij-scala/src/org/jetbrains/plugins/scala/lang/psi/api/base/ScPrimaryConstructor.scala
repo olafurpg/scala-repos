@@ -55,8 +55,8 @@ trait ScPrimaryConstructor
   @CachedInsidePsiElement(this, ModCount.getBlockModificationCount)
   def effectiveParameterClauses: Seq[ScParameterClause] = {
     def emptyParameterList: ScParameterClause =
-      ScalaPsiElementFactory.createEmptyClassParamClauseWithContext(
-          getManager, parameterList)
+      ScalaPsiElementFactory
+        .createEmptyClassParamClauseWithContext(getManager, parameterList)
     val clausesWithInitialEmpty = parameterList.clauses match {
       case Seq() => Seq(emptyParameterList)
       case Seq(clause) if clause.isImplicit => Seq(emptyParameterList, clause)
@@ -81,30 +81,33 @@ trait ScPrimaryConstructor
   def methodType(result: Option[ScType]): ScType = {
     val parameters: ScParameters = parameterList
     val clauses = parameters.clauses
-    val returnType: ScType = result.getOrElse({
-      val clazz = getParent.asInstanceOf[ScTypeDefinition]
-      val typeParameters = clazz.typeParameters
-      val parentClazz = ScalaPsiUtil.getPlaceTd(clazz)
-      val designatorType: ScType =
-        if (parentClazz != null)
-          ScProjectionType(
-              ScThisType(parentClazz), clazz, superReference = false)
-        else ScDesignatorType(clazz)
-      if (typeParameters.isEmpty) designatorType
-      else {
-        ScParameterizedType(
-            designatorType,
-            typeParameters.map(
-                new ScTypeParameterType(_, ScSubstitutor.empty)))
-      }
-    })
+    val returnType: ScType =
+      result.getOrElse({
+        val clazz = getParent.asInstanceOf[ScTypeDefinition]
+        val typeParameters = clazz.typeParameters
+        val parentClazz = ScalaPsiUtil.getPlaceTd(clazz)
+        val designatorType: ScType =
+          if (parentClazz != null)
+            ScProjectionType(ScThisType(parentClazz),
+                             clazz,
+                             superReference = false)
+          else ScDesignatorType(clazz)
+        if (typeParameters.isEmpty) designatorType
+        else {
+          ScParameterizedType(
+              designatorType,
+              typeParameters.map(
+                  new ScTypeParameterType(_, ScSubstitutor.empty)))
+        }
+      })
     if (clauses.isEmpty)
-      return new ScMethodType(returnType, Seq.empty, false)(
-          getProject, getResolveScope)
+      return new ScMethodType(returnType, Seq.empty, false)(getProject,
+                                                            getResolveScope)
     val res = clauses.foldRight[ScType](returnType) {
       (clause: ScParameterClause, tp: ScType) =>
         new ScMethodType(tp, clause.getSmartParameters, clause.isImplicit)(
-            getProject, getResolveScope)
+            getProject,
+            getResolveScope)
     }
     res.asInstanceOf[ScMethodType]
   }
@@ -114,25 +117,25 @@ trait ScPrimaryConstructor
       getParent.asInstanceOf[ScTypeDefinition].typeParameters
     if (typeParameters.isEmpty) methodType
     else
-      ScTypePolymorphicType(
-          methodType, typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(methodType,
+                            typeParameters.map(new TypeParameter(_)))
   }
 
-  def getParamByName(
-      name: String, clausePosition: Int = -1): Option[ScParameter] = {
+  def getParamByName(name: String,
+                     clausePosition: Int = -1): Option[ScParameter] = {
     clausePosition match {
       case -1 =>
         for (param <- parameters
-             if ScalaPsiUtil.memberNamesEquals(param.name, name)) return Some(
-            param)
+             if ScalaPsiUtil.memberNamesEquals(param.name, name))
+          return Some(param)
         None
       case i if i < 0 => None
       case i if i >= effectiveParameterClauses.length => None
       case i =>
         val clause: ScParameterClause = effectiveParameterClauses.apply(i)
         for (param <- clause.parameters
-             if ScalaPsiUtil.memberNamesEquals(param.name, name)) return Some(
-            param)
+             if ScalaPsiUtil.memberNamesEquals(param.name, name))
+          return Some(param)
         None
     }
   }

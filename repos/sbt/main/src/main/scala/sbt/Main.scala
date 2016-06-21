@@ -39,8 +39,10 @@ final class xMain extends xsbti.AppMain {
 }
 final class ScriptMain extends xsbti.AppMain {
   def run(configuration: xsbti.AppConfiguration): xsbti.MainResult =
-    runManaged(initialState(
-            configuration, BuiltinCommands.ScriptCommands, Script.Name :: Nil))
+    runManaged(
+        initialState(configuration,
+                     BuiltinCommands.ScriptCommands,
+                     Script.Name :: Nil))
 }
 final class ConsoleMain extends xsbti.AppMain {
   def run(configuration: xsbti.AppConfiguration): xsbti.MainResult =
@@ -177,7 +179,7 @@ object BuiltinCommands {
       }
       val current =
         "The current project is " + Reference.display(e.currentRef) + version +
-        "\n"
+          "\n"
       val sc = aboutScala(s, e)
       val built =
         if (sc.isEmpty) ""
@@ -202,7 +204,7 @@ object BuiltinCommands {
     (scalaVersion, scalaHome, instance) match {
       case (sv, Some(home), Some(si)) =>
         "local Scala version " + selectScalaVersion(sv, si) + " at " +
-        home.getAbsolutePath
+          home.getAbsolutePath
       case (_, Some(home), None) =>
         "a local Scala build at " + home.getAbsolutePath
       case (sv, None, Some(si)) => "Scala " + selectScalaVersion(sv, si)
@@ -218,8 +220,8 @@ object BuiltinCommands {
 			|%s, %s plugins, and build definitions are using Scala %s
 			|""".stripMargin.format(name, ver, about, name, name, scalaVer)
   }
-  private[this] def selectScalaVersion(
-      sv: Option[String], si: ScalaInstance): String = sv match {
+  private[this] def selectScalaVersion(sv: Option[String],
+                                       si: ScalaInstance): String = sv match {
     case Some(si.version) => si.version; case _ => si.actualVersion
   }
   private[this] def quiet[T](t: => T): Option[T] = try { Some(t) } catch {
@@ -249,8 +251,8 @@ object BuiltinCommands {
         val prominentOnly = verbosity <= 1
         val verboseFilter =
           if (prominentOnly) highPass(cutoff) else topNRanked(25 * verbosity)
-        System.out.println(
-            tasksHelp(s, keys => verboseFilter(keys filter keep), selected))
+        System.out.println(tasksHelp(s, keys =>
+                  verboseFilter(keys filter keep), selected))
         System.out.println()
         if (prominentOnly)
           System.out.println(moreAvailableMessage(command, selected.isDefined))
@@ -259,13 +261,13 @@ object BuiltinCommands {
   def showSettingParser(keepKeys: AttributeKey[_] => Boolean)(
       s: State): Parser[(Int, Option[String])] =
     verbosityParser ~ selectedParser(s, keepKeys).?
-  def selectedParser(
-      s: State, keepKeys: AttributeKey[_] => Boolean): Parser[String] =
+  def selectedParser(s: State,
+                     keepKeys: AttributeKey[_] => Boolean): Parser[String] =
     singleArgument(
         allTaskAndSettingKeys(s).filter(keepKeys).map(_.label).toSet)
   def verbosityParser: Parser[Int] =
     success(1) |
-    ((Space ~ "-") ~> ('v'.id.+.map(_.size + 1) | ("V" ^^^ Int.MaxValue)))
+      ((Space ~ "-") ~> ('v'.id.+.map(_.size + 1) | ("V" ^^^ Int.MaxValue)))
   def taskDetail(keys: Seq[AttributeKey[_]]): Seq[(String, String)] =
     sortByLabel(withDescription(keys)) flatMap taskStrings
 
@@ -296,7 +298,7 @@ object BuiltinCommands {
   def isTask(mf: Manifest[_])(implicit taskMF: Manifest[Task[_]],
                               inputMF: Manifest[InputTask[_]]): Boolean =
     mf.runtimeClass == taskMF.runtimeClass ||
-    mf.runtimeClass == inputMF.runtimeClass
+      mf.runtimeClass == inputMF.runtimeClass
   def topNRanked(n: Int) =
     (keys: Seq[AttributeKey[_]]) => sortByRank(keys).take(n)
   def highPass(rankCutoff: Int) =
@@ -402,8 +404,9 @@ object BuiltinCommands {
     }
 
   @deprecated("Use Inspect.output", "0.13.0")
-  def inspectOutput(
-      s: State, option: Inspect.Mode, sk: Def.ScopedKey[_]): String =
+  def inspectOutput(s: State,
+                    option: Inspect.Mode,
+                    sk: Def.ScopedKey[_]): String =
     Inspect.output(s, option, sk)
 
   def lastGrep =
@@ -413,8 +416,8 @@ object BuiltinCommands {
         Output.lastGrep(sks, str.streams(s), pattern, printLast(s))(display)
         keepLastLog(s)
       case (s, (pattern, None)) =>
-        for (logFile <- lastLogFile(s)) yield
-          Output.lastGrep(logFile, pattern, printLast(s))
+        for (logFile <- lastLogFile(s))
+          yield Output.lastGrep(logFile, pattern, printLast(s))
         keepLastLog(s)
     }
   def extractLast(s: State) = {
@@ -426,8 +429,8 @@ object BuiltinCommands {
     (s: State) => {
       val extracted = Project.extract(s)
       import extracted._
-      token(Space ~> flag("every" ~ Space)) ~ SettingCompletions.settingParser(
-          structure.data, structure.index.keyMap, currentProject)
+      token(Space ~> flag("every" ~ Space)) ~ SettingCompletions
+        .settingParser(structure.data, structure.index.keyMap, currentProject)
     }
 
   @deprecated("Use Inspect.parser", "0.13.0")
@@ -486,16 +489,17 @@ object BuiltinCommands {
     Command(LastCommand, lastBrief, lastDetailed)(aggregatedKeyValueParser) {
       case (s, Some(sks)) => lastImpl(s, sks, None)
       case (s, None) =>
-        for (logFile <- lastLogFile(s)) yield
-          Output.last(logFile, printLast(s))
+        for (logFile <- lastLogFile(s))
+          yield Output.last(logFile, printLast(s))
         keepLastLog(s)
     }
   def export =
     Command(ExportCommand, exportBrief, exportDetailed)(exportParser)((s, f) =>
           f())
 
-  private[this] def lastImpl(
-      s: State, sks: AnyKeys, sid: Option[String]): State = {
+  private[this] def lastImpl(s: State,
+                             sks: AnyKeys,
+                             sid: Option[String]): State = {
     val (str, ref, display) = extractLast(s)
     Output.last(sks, str.streams(s), printLast(s), sid)(display)
     keepLastLog(s)
@@ -539,8 +543,8 @@ object BuiltinCommands {
     log.info("In " + uri)
     def prefix(id: String) =
       if (currentID != id) "   " else if (current) " * " else "(*)"
-    for (id <- build.defined.keys.toSeq.sorted) log.info(
-        "\t" + prefix(id) + id)
+    for (id <- build.defined.keys.toSeq.sorted)
+      log.info("\t" + prefix(id) + id)
   }
 
   def act = Command.customHelp(Act.actParser, actHelp)
@@ -579,8 +583,8 @@ object BuiltinCommands {
     import extracted._
     import currentRef.{build => curi, project => cid}
     listBuild(curi, structure.units(curi), true, cid, s.log)
-    for ((uri, build) <- structure.units if curi != uri) listBuild(
-        uri, build, false, cid, s.log)
+    for ((uri, build) <- structure.units if curi != uri)
+      listBuild(uri, build, false, cid, s.log)
   }
   def transformExtraBuilds(s: State, f: List[URI] => List[URI]): State = {
     val original = Project.extraBuilds(s)
@@ -624,8 +628,8 @@ object BuiltinCommands {
     else if (matches("ignore")) {
       val hadPrevious = Project.isProjectLoaded(s)
       s.log.warn("Ignoring load failure: " +
-          (if (hadPrevious) "using previously loaded project."
-           else "no project loaded."))
+            (if (hadPrevious) "using previously loaded project."
+             else "no project loaded."))
       s
     } else if (matches("last"))
       LastCommand :: loadProjectCommand(LoadFailed, loadArg) :: s
@@ -637,8 +641,9 @@ object BuiltinCommands {
 
   def loadProjectCommands(arg: String) =
     StashOnFailure :: (OnFailure + " " +
-        loadProjectCommand(LoadFailed, arg)) :: loadProjectCommand(
-        LoadProjectImpl, arg) :: PopOnFailure :: State.FailureWall :: Nil
+          loadProjectCommand(LoadFailed, arg)) :: loadProjectCommand(
+        LoadProjectImpl,
+        arg) :: PopOnFailure :: State.FailureWall :: Nil
   def loadProject =
     Command(LoadProject, LoadProjectBrief, LoadProjectDetailed)(
         loadProjectParser) { (s, arg) =>
@@ -682,7 +687,8 @@ object BuiltinCommands {
         val num = try maxCompilers.toInt catch {
           case e: NumberFormatException =>
             throw new RuntimeException(
-                "Resident compiler limit must be an integer.", e)
+                "Resident compiler limit must be an integer.",
+                e)
         }
         if (num <= 0) CompilerCache.fresh else CompilerCache(num)
       }

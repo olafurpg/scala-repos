@@ -86,7 +86,8 @@ object ExecutionContexts {
       false // No point since we execute on same thread
     override def reportFailure(t: Throwable): Unit =
       throw new IllegalStateException(
-          "exception in sameThreadExecutionContext", t)
+          "exception in sameThreadExecutionContext",
+          t)
   }
 }
 
@@ -147,8 +148,8 @@ object Futures {
   /**
     * Returns a Future to the result of the first future in the list that is completed
     */
-  def firstCompletedOf[T <: AnyRef](
-      futures: JIterable[Future[T]], executor: ExecutionContext): Future[T] =
+  def firstCompletedOf[T <: AnyRef](futures: JIterable[Future[T]],
+                                    executor: ExecutionContext): Future[T] =
     Future.firstCompletedOf(futures.asScala)(executor)
 
   /**

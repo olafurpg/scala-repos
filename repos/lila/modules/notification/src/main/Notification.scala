@@ -4,8 +4,10 @@ import ornicar.scalalib.Random.nextStringUppercase
 
 import lila.user.User
 
-case class Notification(
-    id: String, user: String, html: String, from: Option[String])
+case class Notification(id: String,
+                        user: String,
+                        html: String,
+                        from: Option[String])
 
 object Notification {
 

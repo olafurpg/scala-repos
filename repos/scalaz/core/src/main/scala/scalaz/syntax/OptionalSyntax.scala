@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Optional` */
-final class OptionalOps[F[_], A] private[syntax](val self: F[A])(
+final class OptionalOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Optional[F])
     extends Ops[F[A]] {
   ////

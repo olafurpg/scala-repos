@@ -23,14 +23,15 @@ trait EnumeratorT[E, F[_]] { self =>
   def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]) =
     EnumerateeT.flatMap(f) run self
 
-  def flatten[B, G[_]](
-      implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[B, F] = {
+  def flatten[B, G[_]](implicit ev: E =:= G[B],
+                       MO: F |>=| G): EnumeratorT[B, F] = {
     import MO._
     flatMap(e => EnumeratorT.enumeratorTMonadTrans.liftM(MO.promote(ev(e))))
   }
 
   def bindM[B, G[_]](f: E => G[EnumeratorT[B, F]])(
-      implicit F: Monad[F], G: Monad[G]): F[G[EnumeratorT[B, F]]] = {
+      implicit F: Monad[F],
+      G: Monad[G]): F[G[EnumeratorT[B, F]]] = {
     import scalaz.syntax.semigroup._
     val iter = fold[G[EnumeratorT[B, F]], F, G[EnumeratorT[B, F]]](
         G.point(EnumeratorT.empty[B, F])) {
@@ -55,8 +56,9 @@ trait EnumeratorT[E, F[_]] { self =>
   def zipWithIndex(implicit M: Monad[F]): EnumeratorT[(E, Long), F] =
     EnumerateeT.zipWithIndex[E, F] run self
 
-  def drainTo[M[_]](
-      implicit M: Monad[F], P: PlusEmpty[M], Z: Applicative[M]): F[M[E]] =
+  def drainTo[M[_]](implicit M: Monad[F],
+                    P: PlusEmpty[M],
+                    Z: Applicative[M]): F[M[E]] =
     (IterateeT.consume[E, F, M] &= self).run
 
   def reduced[B](b: B)(
@@ -212,8 +214,8 @@ trait EnumeratorTFunctions {
         )
     }
 
-  def enumReader[F[_]](r: => java.io.Reader)(
-      implicit MO: MonadPartialOrder[F, IO])
+  def enumReader[F[_]](
+      r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO])
     : EnumeratorT[IoExceptionOr[Char], F] = {
     lazy val src = r
     enumIoSource(get = () => IoExceptionOr(src.read),
@@ -251,8 +253,9 @@ trait EnumeratorTFunctions {
   /**
     * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
     */
-  def enumArray[E, F[_]: Monad](
-      a: Array[E], min: Int = 0, max: Option[Int] = None): EnumeratorT[E, F] =
+  def enumArray[E, F[_]: Monad](a: Array[E],
+                                min: Int = 0,
+                                max: Option[Int] = None): EnumeratorT[E, F] =
     enumIndexedSeq(a, min, max)
 
   def repeat[E, F[_]: Monad](e: E): EnumeratorT[E, F] =

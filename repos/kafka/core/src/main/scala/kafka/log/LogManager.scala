@@ -85,7 +85,7 @@ class LogManager(val logDirs: Array[File],
     for (dir <- dirs) {
       if (!dir.exists) {
         info("Log directory '" + dir.getAbsolutePath +
-            "' not found, creating it.")
+              "' not found, creating it.")
         val created = dir.mkdirs()
         if (!created)
           throw new KafkaException(
@@ -104,10 +104,9 @@ class LogManager(val logDirs: Array[File],
     dirs.map { dir =>
       val lock = new FileLock(new File(dir, LockFile))
       if (!lock.tryLock())
-        throw new KafkaException(
-            "Failed to acquire lock on file .lock in " +
-            lock.file.getParentFile.getAbsolutePath +
-            ". A Kafka instance in another process or thread is using this directory.")
+        throw new KafkaException("Failed to acquire lock on file .lock in " +
+              lock.file.getParentFile.getAbsolutePath +
+              ". A Kafka instance in another process or thread is using this directory.")
       lock
     }
   }
@@ -130,8 +129,8 @@ class LogManager(val logDirs: Array[File],
       if (cleanShutdownFile.exists) {
         debug(
             "Found clean shutdown file. " +
-            "Skipping recovery for all logs in data directory: " +
-            dir.getAbsolutePath)
+              "Skipping recovery for all logs in data directory: " +
+              dir.getAbsolutePath)
       } else {
         // log recovery itself is being performed by `Log` class during initialization
         brokerState.newState(RecoveringFromUncleanShutdown)
@@ -142,12 +141,12 @@ class LogManager(val logDirs: Array[File],
         recoveryPoints = this.recoveryPointCheckpoints(dir).read
       } catch {
         case e: Exception => {
-            warn(
-                "Error occured while reading recovery-point-offset-checkpoint file of directory " +
+          warn(
+              "Error occured while reading recovery-point-offset-checkpoint file of directory " +
                 dir,
-                e)
-            warn("Resetting the recovery checkpoint to 0")
-          }
+              e)
+          warn("Resetting the recovery checkpoint to 0")
+        }
       }
 
       val jobsForDir = for {
@@ -169,7 +168,8 @@ class LogManager(val logDirs: Array[File],
           if (previous != null) {
             throw new IllegalArgumentException(
                 "Duplicate log directories found: %s, %s!".format(
-                    current.dir.getAbsolutePath, previous.dir.getAbsolutePath))
+                    current.dir.getAbsolutePath,
+                    previous.dir.getAbsolutePath))
           }
         }
       }
@@ -184,11 +184,11 @@ class LogManager(val logDirs: Array[File],
       }
     } catch {
       case e: ExecutionException => {
-          error(
-              "There was an error in one of the threads during logs loading: " +
+        error(
+            "There was an error in one of the threads during logs loading: " +
               e.getCause)
-          throw e.getCause
-        }
+        throw e.getCause
+      }
     } finally {
       threadPools.foreach(_.shutdown())
     }
@@ -274,11 +274,11 @@ class LogManager(val logDirs: Array[File],
       }
     } catch {
       case e: ExecutionException => {
-          error(
-              "There was an error in one of the threads during LogManager shutdown: " +
+        error(
+            "There was an error in one of the threads during LogManager shutdown: " +
               e.getCause)
-          throw e.getCause
-        }
+        throw e.getCause
+      }
     } finally {
       threadPools.foreach(_.shutdown())
       // regardless of whether the close succeeded, we need to unlock the data directories
@@ -319,8 +319,8 @@ class LogManager(val logDirs: Array[File],
     *  Delete all data in a partition and start the log at the new offset
     *  @param newOffset The new offset to start the log with
     */
-  def truncateFullyAndStartAt(
-      topicAndPartition: TopicAndPartition, newOffset: Long) {
+  def truncateFullyAndStartAt(topicAndPartition: TopicAndPartition,
+                              newOffset: Long) {
     val log = logs.get(topicAndPartition)
     // If the log does not exist, skip it
     if (log != null) {
@@ -379,8 +379,9 @@ class LogManager(val logDirs: Array[File],
 
       // if not, create it
       val dataDir = nextLogDir()
-      val dir = new File(
-          dataDir, topicAndPartition.topic + "-" + topicAndPartition.partition)
+      val dir =
+        new File(dataDir,
+                 topicAndPartition.topic + "-" + topicAndPartition.partition)
       dir.mkdirs()
       log = new Log(dir,
                     config,
@@ -481,9 +482,8 @@ class LogManager(val logDirs: Array[File],
       debug("Garbage collecting '" + log.name + "'")
       total += cleanupExpiredSegments(log) + cleanupSegmentsToMaintainSize(log)
     }
-    debug(
-        "Log cleanup completed. " + total + " files deleted in " +
-        (time.milliseconds - startMs) / 1000 + " seconds")
+    debug("Log cleanup completed. " + total + " files deleted in " +
+          (time.milliseconds - startMs) / 1000 + " seconds")
   }
 
   /**
@@ -516,9 +516,9 @@ class LogManager(val logDirs: Array[File],
         val timeSinceLastFlush = time.milliseconds - log.lastFlushTime
         debug(
             "Checking if flush is needed on " + topicAndPartition.topic +
-            " flush interval  " + log.config.flushMs + " last flushed " +
-            log.lastFlushTime + " time since last flush: " +
-            timeSinceLastFlush)
+              " flush interval  " + log.config.flushMs + " last flushed " +
+              log.lastFlushTime + " time since last flush: " +
+              timeSinceLastFlush)
         if (timeSinceLastFlush >= log.config.flushMs) log.flush
       } catch {
         case e: Throwable =>

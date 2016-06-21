@@ -30,9 +30,8 @@ object TestThrows {
     val method = cls.getMethod(name)
     println(
         name + " throws: " + method.getExceptionTypes.mkString("", ", ", ""))
-    println(
-        name + " annotations: " +
-        method.getDeclaredAnnotations.mkString("", ", ", ""))
+    println(name + " annotations: " +
+          method.getDeclaredAnnotations.mkString("", ", ", ""))
   }
 
   def run(cls: Class[_]) {

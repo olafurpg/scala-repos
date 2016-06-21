@@ -45,8 +45,9 @@ trait JoinOptimizerModule[M[+ _]]
       def compareAncestor(lhs: DepGraph, rhs: DepGraph): Boolean =
         findAncestor(lhs, ctx) == findAncestor(rhs, ctx)
 
-      def liftRewrite(
-          graph: DepGraph, eq: DepGraph, lifted: DepGraph): DepGraph =
+      def liftRewrite(graph: DepGraph,
+                      eq: DepGraph,
+                      lifted: DepGraph): DepGraph =
         transformBottomUp(graph) { g =>
           if (g == eq) lifted else g
         }
@@ -83,24 +84,24 @@ trait JoinOptimizerModule[M[+ _]]
 
           case j @ Join(op, Cross(_), lhs, rhs)
               if (compareAncestor(lhs, eqA) && compareAncestor(rhs, eqB)) ||
-              (compareAncestor(lhs, eqB) && compareAncestor(rhs, eqA)) => {
+                (compareAncestor(lhs, eqB) && compareAncestor(rhs, eqA)) => {
 
-              val (eqLHS, eqRHS) = {
-                if (compareAncestor(lhs, eqA)) (eqA, eqB)
-                else (eqB, eqA)
-              }
-
-              val ancestorLHS = findOrderAncestor(lhs, ctx) getOrElse lhs
-              val ancestorRHS = findOrderAncestor(rhs, ctx) getOrElse rhs
-
-              val liftedLHS = lift(eqLHS, ancestorLHS)
-              val liftedRHS = lift(eqRHS, ancestorRHS)
-
-              Join(op,
-                   ValueSort(sortId),
-                   liftRewrite(lhs, ancestorLHS, liftedLHS),
-                   liftRewrite(rhs, ancestorRHS, liftedRHS))(j.loc)
+            val (eqLHS, eqRHS) = {
+              if (compareAncestor(lhs, eqA)) (eqA, eqB)
+              else (eqB, eqA)
             }
+
+            val ancestorLHS = findOrderAncestor(lhs, ctx) getOrElse lhs
+            val ancestorRHS = findOrderAncestor(rhs, ctx) getOrElse rhs
+
+            val liftedLHS = lift(eqLHS, ancestorLHS)
+            val liftedRHS = lift(eqRHS, ancestorRHS)
+
+            Join(op,
+                 ValueSort(sortId),
+                 liftRewrite(lhs, ancestorLHS, liftedLHS),
+                 liftRewrite(rhs, ancestorRHS, liftedRHS))(j.loc)
+          }
 
           case other => other
         }

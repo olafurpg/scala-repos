@@ -44,8 +44,8 @@ private[ui] class ExecutorsTab(parent: SparkUI)
   * A SparkListener that prepares information to be displayed on the ExecutorsTab
   */
 @DeveloperApi
-class ExecutorsListener(
-    storageStatusListener: StorageStatusListener, conf: SparkConf)
+class ExecutorsListener(storageStatusListener: StorageStatusListener,
+                        conf: SparkConf)
     extends SparkListener {
   val executorToTotalCores = HashMap[String, Int]()
   val executorToTasksMax = HashMap[String, Int]()
@@ -137,25 +137,25 @@ class ExecutorsListener(
             executorToInputBytes.getOrElse(eid, 0L) + inputMetrics.bytesRead
           executorToInputRecords(eid) =
             executorToInputRecords.getOrElse(eid, 0L) +
-            inputMetrics.recordsRead
+              inputMetrics.recordsRead
         }
         metrics.outputMetrics.foreach { outputMetrics =>
           executorToOutputBytes(eid) =
             executorToOutputBytes.getOrElse(eid, 0L) +
-            outputMetrics.bytesWritten
+              outputMetrics.bytesWritten
           executorToOutputRecords(eid) =
             executorToOutputRecords.getOrElse(eid, 0L) +
-            outputMetrics.recordsWritten
+              outputMetrics.recordsWritten
         }
         metrics.shuffleReadMetrics.foreach { shuffleRead =>
           executorToShuffleRead(eid) =
             executorToShuffleRead.getOrElse(eid, 0L) +
-            shuffleRead.remoteBytesRead
+              shuffleRead.remoteBytesRead
         }
         metrics.shuffleWriteMetrics.foreach { shuffleWrite =>
           executorToShuffleWrite(eid) =
             executorToShuffleWrite.getOrElse(eid, 0L) +
-            shuffleWrite.bytesWritten
+              shuffleWrite.bytesWritten
         }
         executorToJvmGCTime(eid) =
           executorToJvmGCTime.getOrElse(eid, 0L) + metrics.jvmGCTime

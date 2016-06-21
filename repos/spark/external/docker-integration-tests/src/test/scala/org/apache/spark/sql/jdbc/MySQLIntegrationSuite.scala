@@ -46,36 +46,36 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
     conn
       .prepareStatement(
           "CREATE TABLE numbers (onebit BIT(1), tenbits BIT(10), " +
-          "small SMALLINT, med MEDIUMINT, nor INT, big BIGINT, deci DECIMAL(40,20), flt FLOAT, " +
-          "dbl DOUBLE)")
+            "small SMALLINT, med MEDIUMINT, nor INT, big BIGINT, deci DECIMAL(40,20), flt FLOAT, " +
+            "dbl DOUBLE)")
       .executeUpdate()
     conn
       .prepareStatement("INSERT INTO numbers VALUES (b'0', b'1000100101', " +
-          "17, 77777, 123456789, 123456789012345, 123456789012345.123456789012345, " +
-          "42.75, 1.0000000000000002)")
+            "17, 77777, 123456789, 123456789012345, 123456789012345.123456789012345, " +
+            "42.75, 1.0000000000000002)")
       .executeUpdate()
 
     conn
       .prepareStatement(
           "CREATE TABLE dates (d DATE, t TIME, dt DATETIME, ts TIMESTAMP, " +
-          "yr YEAR)")
+            "yr YEAR)")
       .executeUpdate()
     conn
       .prepareStatement(
           "INSERT INTO dates VALUES ('1991-11-09', '13:31:24', " +
-          "'1996-01-01 01:23:45', '2009-02-13 23:31:30', '2001')")
+            "'1996-01-01 01:23:45', '2009-02-13 23:31:30', '2001')")
       .executeUpdate()
 
     // TODO: Test locale conversion for strings.
     conn
       .prepareStatement(
           "CREATE TABLE strings (a CHAR(10), b VARCHAR(10), c TINYTEXT, " +
-          "d TEXT, e MEDIUMTEXT, f LONGTEXT, g BINARY(4), h VARBINARY(10), i BLOB)")
+            "d TEXT, e MEDIUMTEXT, f LONGTEXT, g BINARY(4), h VARBINARY(10), i BLOB)")
       .executeUpdate()
     conn
       .prepareStatement(
           "INSERT INTO strings VALUES ('the', 'quick', 'brown', 'fox', " +
-          "'jumps', 'over', 'the', 'lazy', 'dog')")
+            "'jumps', 'over', 'the', 'lazy', 'dog')")
       .executeUpdate()
   }
 

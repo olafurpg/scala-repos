@@ -14,8 +14,8 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * @since 19.03.12
   */
 object LookupElementManager {
-  def getKeywrodLookupElement(
-      keyword: String, position: PsiElement): LookupElement = {
+  def getKeywrodLookupElement(keyword: String,
+                              position: PsiElement): LookupElement = {
     ScalaKeywordLookupItem.getLookupElement(keyword, position)
   }
 
@@ -76,10 +76,10 @@ object LookupElementManager {
       }
     }
 
-    def getLookupElementInternal(
-        isAssignment: Boolean, name: String): ScalaLookupItem = {
-      val lookupItem: ScalaLookupItem = new ScalaLookupItem(
-          element, name, containingClass)
+    def getLookupElementInternal(isAssignment: Boolean,
+                                 name: String): ScalaLookupItem = {
+      val lookupItem: ScalaLookupItem =
+        new ScalaLookupItem(element, name, containingClass)
       lookupItem.isClassName = isClassName
       lookupItem.isNamedParameter = resolveResult.isNamedParameter
       lookupItem.isDeprecated = isDeprecated

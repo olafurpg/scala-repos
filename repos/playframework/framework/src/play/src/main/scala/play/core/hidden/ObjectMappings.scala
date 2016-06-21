@@ -104,11 +104,11 @@ class ObjectMapping1[R, A1](apply: Function1[A1, R],
     merge(field1.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1]
+            ))
+      }
     }
   }
 
@@ -136,8 +136,11 @@ class ObjectMapping1[R, A1](apply: Function1[A1, R],
       .getOrElse(this)
 
   def verifying(addConstraints: Constraint[R]*): ObjectMapping1[R, A1] = {
-    new ObjectMapping1(
-        apply, unapply, f1, key, constraints ++ addConstraints.toSeq)
+    new ObjectMapping1(apply,
+                       unapply,
+                       f1,
+                       key,
+                       constraints ++ addConstraints.toSeq)
   }
 
   val mappings = Seq(this) ++ field1.mappings
@@ -160,12 +163,12 @@ class ObjectMapping2[R, A1, A2](apply: Function2[A1, A2, R],
     merge(field1.bind(data), field2.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2]
+            ))
+      }
     }
   }
 
@@ -194,8 +197,12 @@ class ObjectMapping2[R, A1, A2](apply: Function2[A1, A2, R],
       .getOrElse(this)
 
   def verifying(addConstraints: Constraint[R]*): ObjectMapping2[R, A1, A2] = {
-    new ObjectMapping2(
-        apply, unapply, f1, f2, key, constraints ++ addConstraints.toSeq)
+    new ObjectMapping2(apply,
+                       unapply,
+                       f1,
+                       f2,
+                       key,
+                       constraints ++ addConstraints.toSeq)
   }
 
   val mappings = Seq(this) ++ field1.mappings ++ field2.mappings
@@ -222,13 +229,13 @@ class ObjectMapping3[R, A1, A2, A3](
     merge(field1.bind(data), field2.bind(data), field3.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3]
+            ))
+      }
     }
   }
 
@@ -253,15 +260,26 @@ class ObjectMapping3[R, A1, A2, A3](
 
   def withPrefix(prefix: String): ObjectMapping3[R, A1, A2, A3] =
     addPrefix(prefix)
-      .map(newKey =>
-            new ObjectMapping3(
-                apply, unapply, f1, f2, f3, newKey, constraints))
+      .map(
+          newKey =>
+            new ObjectMapping3(apply,
+                               unapply,
+                               f1,
+                               f2,
+                               f3,
+                               newKey,
+                               constraints))
       .getOrElse(this)
 
   def verifying(
       addConstraints: Constraint[R]*): ObjectMapping3[R, A1, A2, A3] = {
-    new ObjectMapping3(
-        apply, unapply, f1, f2, f3, key, constraints ++ addConstraints.toSeq)
+    new ObjectMapping3(apply,
+                       unapply,
+                       f1,
+                       f2,
+                       f3,
+                       key,
+                       constraints ++ addConstraints.toSeq)
   }
 
   val mappings =
@@ -295,14 +313,14 @@ class ObjectMapping4[R, A1, A2, A3, A4](
           field4.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4]
+            ))
+      }
     }
   }
 
@@ -329,9 +347,16 @@ class ObjectMapping4[R, A1, A2, A3, A4](
 
   def withPrefix(prefix: String): ObjectMapping4[R, A1, A2, A3, A4] =
     addPrefix(prefix)
-      .map(newKey =>
-            new ObjectMapping4(
-                apply, unapply, f1, f2, f3, f4, newKey, constraints))
+      .map(
+          newKey =>
+            new ObjectMapping4(apply,
+                               unapply,
+                               f1,
+                               f2,
+                               f3,
+                               f4,
+                               newKey,
+                               constraints))
       .getOrElse(this)
 
   def verifying(
@@ -381,15 +406,15 @@ class ObjectMapping5[R, A1, A2, A3, A4, A5](
           field5.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5]
+            ))
+      }
     }
   }
 
@@ -418,9 +443,17 @@ class ObjectMapping5[R, A1, A2, A3, A4, A5](
 
   def withPrefix(prefix: String): ObjectMapping5[R, A1, A2, A3, A4, A5] =
     addPrefix(prefix)
-      .map(newKey =>
-            new ObjectMapping5(
-                apply, unapply, f1, f2, f3, f4, f5, newKey, constraints))
+      .map(
+          newKey =>
+            new ObjectMapping5(apply,
+                               unapply,
+                               f1,
+                               f2,
+                               f3,
+                               f4,
+                               f5,
+                               newKey,
+                               constraints))
       .getOrElse(this)
 
   def verifying(addConstraints: Constraint[R]*)
@@ -475,16 +508,16 @@ class ObjectMapping6[R, A1, A2, A3, A4, A5, A6](
           field6.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6]
+            ))
+      }
     }
   }
 
@@ -514,9 +547,18 @@ class ObjectMapping6[R, A1, A2, A3, A4, A5, A6](
 
   def withPrefix(prefix: String): ObjectMapping6[R, A1, A2, A3, A4, A5, A6] =
     addPrefix(prefix)
-      .map(newKey =>
-            new ObjectMapping6(
-                apply, unapply, f1, f2, f3, f4, f5, f6, newKey, constraints))
+      .map(
+          newKey =>
+            new ObjectMapping6(apply,
+                               unapply,
+                               f1,
+                               f2,
+                               f3,
+                               f4,
+                               f5,
+                               f6,
+                               newKey,
+                               constraints))
       .getOrElse(this)
 
   def verifying(addConstraints: Constraint[R]*)
@@ -576,17 +618,17 @@ class ObjectMapping7[R, A1, A2, A3, A4, A5, A6, A7](
           field7.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7]
+            ))
+      }
     }
   }
 
@@ -696,18 +738,18 @@ class ObjectMapping8[R, A1, A2, A3, A4, A5, A6, A7, A8](
           field8.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8]
+            ))
+      }
     }
   }
 
@@ -824,19 +866,19 @@ class ObjectMapping9[R, A1, A2, A3, A4, A5, A6, A7, A8, A9](
           field9.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9]
+            ))
+      }
     }
   }
 
@@ -960,20 +1002,20 @@ class ObjectMapping10[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
           field10.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10]
+            ))
+      }
     }
   }
 
@@ -1051,8 +1093,8 @@ class ObjectMapping10[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
 
 class ObjectMapping11[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11](
     apply: Function11[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, R],
-    unapply: Function1[
-        R, Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)]],
+    unapply: Function1[R,
+                       Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)]],
     f1: (String, Mapping[A1]),
     f2: (String, Mapping[A2]),
     f3: (String, Mapping[A3]),
@@ -1105,21 +1147,21 @@ class ObjectMapping11[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11](
           field11.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11]
+            ))
+      }
     }
   }
 
@@ -1202,7 +1244,8 @@ class ObjectMapping11[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11](
 class ObjectMapping12[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12](
     apply: Function12[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, R],
     unapply: Function1[
-        R, Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)]],
+        R,
+        Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)]],
     f1: (String, Mapping[A1]),
     f2: (String, Mapping[A2]),
     f3: (String, Mapping[A3]),
@@ -1259,22 +1302,22 @@ class ObjectMapping12[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12](
           field12.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12]
+            ))
+      }
     }
   }
 
@@ -1357,12 +1400,37 @@ class ObjectMapping12[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12](
     Seq(this) ++ field1.mappings ++ field2.mappings ++ field3.mappings ++ field4.mappings ++ field5.mappings ++ field6.mappings ++ field7.mappings ++ field8.mappings ++ field9.mappings ++ field10.mappings ++ field11.mappings ++ field12.mappings
 }
 
-class ObjectMapping13[
-    R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13](
-    apply: Function13[
-        A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, R],
+class ObjectMapping13[R,
+                      A1,
+                      A2,
+                      A3,
+                      A4,
+                      A5,
+                      A6,
+                      A7,
+                      A8,
+                      A9,
+                      A10,
+                      A11,
+                      A12,
+                      A13](
+    apply: Function13[A1,
+                      A2,
+                      A3,
+                      A4,
+                      A5,
+                      A6,
+                      A7,
+                      A8,
+                      A9,
+                      A10,
+                      A11,
+                      A12,
+                      A13,
+                      R],
     unapply: Function1[
-        R, Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)]],
+        R,
+        Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)]],
     f1: (String, Mapping[A1]),
     f2: (String, Mapping[A2]),
     f3: (String, Mapping[A3]),
@@ -1423,23 +1491,23 @@ class ObjectMapping13[
           field13.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13]
+            ))
+      }
     }
   }
 
@@ -1477,8 +1545,20 @@ class ObjectMapping13[
             FormError(key, "unbind.failed")))
   }
 
-  def withPrefix(prefix: String): ObjectMapping13[
-      R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13] =
+  def withPrefix(prefix: String): ObjectMapping13[R,
+                                                  A1,
+                                                  A2,
+                                                  A3,
+                                                  A4,
+                                                  A5,
+                                                  A6,
+                                                  A7,
+                                                  A8,
+                                                  A9,
+                                                  A10,
+                                                  A11,
+                                                  A12,
+                                                  A13] =
     addPrefix(prefix)
       .map(
           newKey =>
@@ -1501,8 +1581,20 @@ class ObjectMapping13[
                                 constraints))
       .getOrElse(this)
 
-  def verifying(addConstraints: Constraint[R]*): ObjectMapping13[
-      R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13] = {
+  def verifying(addConstraints: Constraint[R]*): ObjectMapping13[R,
+                                                                 A1,
+                                                                 A2,
+                                                                 A3,
+                                                                 A4,
+                                                                 A5,
+                                                                 A6,
+                                                                 A7,
+                                                                 A8,
+                                                                 A9,
+                                                                 A10,
+                                                                 A11,
+                                                                 A12,
+                                                                 A13] = {
     new ObjectMapping13(apply,
                         unapply,
                         f1,
@@ -1526,10 +1618,36 @@ class ObjectMapping13[
     Seq(this) ++ field1.mappings ++ field2.mappings ++ field3.mappings ++ field4.mappings ++ field5.mappings ++ field6.mappings ++ field7.mappings ++ field8.mappings ++ field9.mappings ++ field10.mappings ++ field11.mappings ++ field12.mappings ++ field13.mappings
 }
 
-class ObjectMapping14[
-    R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14](
-    apply: Function14[
-        A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, R],
+class ObjectMapping14[R,
+                      A1,
+                      A2,
+                      A3,
+                      A4,
+                      A5,
+                      A6,
+                      A7,
+                      A8,
+                      A9,
+                      A10,
+                      A11,
+                      A12,
+                      A13,
+                      A14](
+    apply: Function14[A1,
+                      A2,
+                      A3,
+                      A4,
+                      A5,
+                      A6,
+                      A7,
+                      A8,
+                      A9,
+                      A10,
+                      A11,
+                      A12,
+                      A13,
+                      A14,
+                      R],
     unapply: Function1[
         R,
         Option[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)]],
@@ -1597,24 +1715,24 @@ class ObjectMapping14[
           field14.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14]
+            ))
+      }
     }
   }
 
@@ -1655,8 +1773,21 @@ class ObjectMapping14[
             FormError(key, "unbind.failed")))
   }
 
-  def withPrefix(prefix: String): ObjectMapping14[
-      R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14] =
+  def withPrefix(prefix: String): ObjectMapping14[R,
+                                                  A1,
+                                                  A2,
+                                                  A3,
+                                                  A4,
+                                                  A5,
+                                                  A6,
+                                                  A7,
+                                                  A8,
+                                                  A9,
+                                                  A10,
+                                                  A11,
+                                                  A12,
+                                                  A13,
+                                                  A14] =
     addPrefix(prefix)
       .map(
           newKey =>
@@ -1680,8 +1811,21 @@ class ObjectMapping14[
                                 constraints))
       .getOrElse(this)
 
-  def verifying(addConstraints: Constraint[R]*): ObjectMapping14[
-      R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14] = {
+  def verifying(addConstraints: Constraint[R]*): ObjectMapping14[R,
+                                                                 A1,
+                                                                 A2,
+                                                                 A3,
+                                                                 A4,
+                                                                 A5,
+                                                                 A6,
+                                                                 A7,
+                                                                 A8,
+                                                                 A9,
+                                                                 A10,
+                                                                 A11,
+                                                                 A12,
+                                                                 A13,
+                                                                 A14] = {
     new ObjectMapping14(apply,
                         unapply,
                         f1,
@@ -1706,43 +1850,70 @@ class ObjectMapping14[
     Seq(this) ++ field1.mappings ++ field2.mappings ++ field3.mappings ++ field4.mappings ++ field5.mappings ++ field6.mappings ++ field7.mappings ++ field8.mappings ++ field9.mappings ++ field10.mappings ++ field11.mappings ++ field12.mappings ++ field13.mappings ++ field14.mappings
 }
 
-class ObjectMapping15[
-    R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15](
-    apply: Function15[
-        A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, R],
-    unapply: Function1[R,
-                       Option[(A1,
-                               A2,
-                               A3,
-                               A4,
-                               A5,
-                               A6,
-                               A7,
-                               A8,
-                               A9,
-                               A10,
-                               A11,
-                               A12,
-                               A13,
-                               A14,
-                               A15)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
+class ObjectMapping15[R,
+                      A1,
+                      A2,
+                      A3,
+                      A4,
+                      A5,
+                      A6,
+                      A7,
+                      A8,
+                      A9,
+                      A10,
+                      A11,
+                      A12,
+                      A13,
+                      A14,
+                      A15](apply: Function15[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
     extends Mapping[R]
     with ObjectMapping {
 
@@ -1794,25 +1965,25 @@ class ObjectMapping15[
           field15.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15]
+            ))
+      }
     }
   }
 
@@ -1854,8 +2025,22 @@ class ObjectMapping15[
             FormError(key, "unbind.failed")))
   }
 
-  def withPrefix(prefix: String): ObjectMapping15[
-      R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15] =
+  def withPrefix(prefix: String): ObjectMapping15[R,
+                                                  A1,
+                                                  A2,
+                                                  A3,
+                                                  A4,
+                                                  A5,
+                                                  A6,
+                                                  A7,
+                                                  A8,
+                                                  A9,
+                                                  A10,
+                                                  A11,
+                                                  A12,
+                                                  A13,
+                                                  A14,
+                                                  A15] =
     addPrefix(prefix)
       .map(
           newKey =>
@@ -1880,8 +2065,22 @@ class ObjectMapping15[
                                 constraints))
       .getOrElse(this)
 
-  def verifying(addConstraints: Constraint[R]*): ObjectMapping15[
-      R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15] = {
+  def verifying(addConstraints: Constraint[R]*): ObjectMapping15[R,
+                                                                 A1,
+                                                                 A2,
+                                                                 A3,
+                                                                 A4,
+                                                                 A5,
+                                                                 A6,
+                                                                 A7,
+                                                                 A8,
+                                                                 A9,
+                                                                 A10,
+                                                                 A11,
+                                                                 A12,
+                                                                 A13,
+                                                                 A14,
+                                                                 A15] = {
     new ObjectMapping15(apply,
                         unapply,
                         f1,
@@ -1907,9 +2106,8 @@ class ObjectMapping15[
     Seq(this) ++ field1.mappings ++ field2.mappings ++ field3.mappings ++ field4.mappings ++ field5.mappings ++ field6.mappings ++ field7.mappings ++ field8.mappings ++ field9.mappings ++ field10.mappings ++ field11.mappings ++ field12.mappings ++ field13.mappings ++ field14.mappings ++ field15.mappings
 }
 
-class ObjectMapping16[
-    R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16](
-    apply: Function16[A1,
+class ObjectMapping16[R,
+                      A1,
                       A2,
                       A3,
                       A4,
@@ -1924,43 +2122,58 @@ class ObjectMapping16[
                       A13,
                       A14,
                       A15,
-                      A16,
-                      R],
-    unapply: Function1[R,
-                       Option[(A1,
-                               A2,
-                               A3,
-                               A4,
-                               A5,
-                               A6,
-                               A7,
-                               A8,
-                               A9,
-                               A10,
-                               A11,
-                               A12,
-                               A13,
-                               A14,
-                               A15,
-                               A16)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
+                      A16](apply: Function16[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
     extends Mapping[R]
     with ObjectMapping {
 
@@ -2015,34 +2228,47 @@ class ObjectMapping16[
           field16.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16]
+            ))
+      }
     }
   }
 
   def unbind(value: R): Map[String, String] = {
     unapply(value).map { fields =>
-      val (
-      v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16) =
-        fields
+      val (v1,
+           v2,
+           v3,
+           v4,
+           v5,
+           v6,
+           v7,
+           v8,
+           v9,
+           v10,
+           v11,
+           v12,
+           v13,
+           v14,
+           v15,
+           v16) = fields
       field1.unbind(v1) ++ field2.unbind(v2) ++ field3.unbind(v3) ++ field4
         .unbind(v4) ++ field5.unbind(v5) ++ field6.unbind(v6) ++ field7
         .unbind(v7) ++ field8.unbind(v8) ++ field9.unbind(v9) ++ field10
@@ -2054,9 +2280,22 @@ class ObjectMapping16[
 
   def unbindAndValidate(value: R): (Map[String, String], Seq[FormError]) = {
     unapply(value).map { fields =>
-      val (
-      v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16) =
-        fields
+      val (v1,
+           v2,
+           v3,
+           v4,
+           v5,
+           v6,
+           v7,
+           v8,
+           v9,
+           v10,
+           v11,
+           v12,
+           v13,
+           v14,
+           v15,
+           v16) = fields
       val a1 = field1.unbindAndValidate(v1)
       val a2 = field2.unbindAndValidate(v2)
       val a3 = field3.unbindAndValidate(v3)
@@ -2294,27 +2533,27 @@ class ObjectMapping17[R,
           field17.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16],
+                values(16).asInstanceOf[A17]
+            ))
+      }
     }
   }
 
@@ -2614,28 +2853,28 @@ class ObjectMapping18[R,
           field18.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17],
-                  values(17).asInstanceOf[A18]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16],
+                values(16).asInstanceOf[A17],
+                values(17).asInstanceOf[A18]
+            ))
+      }
     }
   }
 
@@ -2949,29 +3188,29 @@ class ObjectMapping19[R,
           field19.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17],
-                  values(17).asInstanceOf[A18],
-                  values(18).asInstanceOf[A19]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16],
+                values(16).asInstanceOf[A17],
+                values(17).asInstanceOf[A18],
+                values(18).asInstanceOf[A19]
+            ))
+      }
     }
   }
 
@@ -3300,30 +3539,30 @@ class ObjectMapping20[R,
           field20.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17],
-                  values(17).asInstanceOf[A18],
-                  values(18).asInstanceOf[A19],
-                  values(19).asInstanceOf[A20]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16],
+                values(16).asInstanceOf[A17],
+                values(17).asInstanceOf[A18],
+                values(18).asInstanceOf[A19],
+                values(19).asInstanceOf[A20]
+            ))
+      }
     }
   }
 
@@ -3666,31 +3905,31 @@ class ObjectMapping21[R,
           field21.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17],
-                  values(17).asInstanceOf[A18],
-                  values(18).asInstanceOf[A19],
-                  values(19).asInstanceOf[A20],
-                  values(20).asInstanceOf[A21]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16],
+                values(16).asInstanceOf[A17],
+                values(17).asInstanceOf[A18],
+                values(18).asInstanceOf[A19],
+                values(19).asInstanceOf[A20],
+                values(20).asInstanceOf[A21]
+            ))
+      }
     }
   }
 
@@ -3905,78 +4144,76 @@ class ObjectMapping22[R,
                       A19,
                       A20,
                       A21,
-                      A22](
-    apply: Function22[A1,
-                      A2,
-                      A3,
-                      A4,
-                      A5,
-                      A6,
-                      A7,
-                      A8,
-                      A9,
-                      A10,
-                      A11,
-                      A12,
-                      A13,
-                      A14,
-                      A15,
-                      A16,
-                      A17,
-                      A18,
-                      A19,
-                      A20,
-                      A21,
-                      A22,
-                      R],
-    unapply: Function1[R,
-                       Option[
-                           (A1,
-                            A2,
-                            A3,
-                            A4,
-                            A5,
-                            A6,
-                            A7,
-                            A8,
-                            A9,
-                            A10,
-                            A11,
-                            A12,
-                            A13,
-                            A14,
-                            A15,
-                            A16,
-                            A17,
-                            A18,
-                            A19,
-                            A20,
-                            A21,
-                            A22)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    f17: (String, Mapping[A17]),
-    f18: (String, Mapping[A18]),
-    f19: (String, Mapping[A19]),
-    f20: (String, Mapping[A20]),
-    f21: (String, Mapping[A21]),
-    f22: (String, Mapping[A22]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
+                      A22](apply: Function22[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             A17,
+                                             A18,
+                                             A19,
+                                             A20,
+                                             A21,
+                                             A22,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16,
+                                                      A17,
+                                                      A18,
+                                                      A19,
+                                                      A20,
+                                                      A21,
+                                                      A22)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           f17: (String, Mapping[A17]),
+                           f18: (String, Mapping[A18]),
+                           f19: (String, Mapping[A19]),
+                           f20: (String, Mapping[A20]),
+                           f21: (String, Mapping[A21]),
+                           f22: (String, Mapping[A22]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
     extends Mapping[R]
     with ObjectMapping {
 
@@ -4049,32 +4286,32 @@ class ObjectMapping22[R,
           field22.bind(data)) match {
       case Left(errors) => Left(errors)
       case Right(values) => {
-          applyConstraints(
-              apply(
-                  values(0).asInstanceOf[A1],
-                  values(1).asInstanceOf[A2],
-                  values(2).asInstanceOf[A3],
-                  values(3).asInstanceOf[A4],
-                  values(4).asInstanceOf[A5],
-                  values(5).asInstanceOf[A6],
-                  values(6).asInstanceOf[A7],
-                  values(7).asInstanceOf[A8],
-                  values(8).asInstanceOf[A9],
-                  values(9).asInstanceOf[A10],
-                  values(10).asInstanceOf[A11],
-                  values(11).asInstanceOf[A12],
-                  values(12).asInstanceOf[A13],
-                  values(13).asInstanceOf[A14],
-                  values(14).asInstanceOf[A15],
-                  values(15).asInstanceOf[A16],
-                  values(16).asInstanceOf[A17],
-                  values(17).asInstanceOf[A18],
-                  values(18).asInstanceOf[A19],
-                  values(19).asInstanceOf[A20],
-                  values(20).asInstanceOf[A21],
-                  values(21).asInstanceOf[A22]
-              ))
-        }
+        applyConstraints(
+            apply(
+                values(0).asInstanceOf[A1],
+                values(1).asInstanceOf[A2],
+                values(2).asInstanceOf[A3],
+                values(3).asInstanceOf[A4],
+                values(4).asInstanceOf[A5],
+                values(5).asInstanceOf[A6],
+                values(6).asInstanceOf[A7],
+                values(7).asInstanceOf[A8],
+                values(8).asInstanceOf[A9],
+                values(9).asInstanceOf[A10],
+                values(10).asInstanceOf[A11],
+                values(11).asInstanceOf[A12],
+                values(12).asInstanceOf[A13],
+                values(13).asInstanceOf[A14],
+                values(14).asInstanceOf[A15],
+                values(15).asInstanceOf[A16],
+                values(16).asInstanceOf[A17],
+                values(17).asInstanceOf[A18],
+                values(18).asInstanceOf[A19],
+                values(19).asInstanceOf[A20],
+                values(20).asInstanceOf[A21],
+                values(21).asInstanceOf[A22]
+            ))
+      }
     }
   }
 

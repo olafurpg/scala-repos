@@ -61,8 +61,8 @@ object WriterReaderProperties extends Properties("WriterReaderProperties") {
   def writerReader[T: Writer: Reader: Equiv: Arbitrary]: Prop =
     writerReader(implicitly[Arbitrary[T]].arbitrary)
 
-  def writerReaderCollection[
-      T: Writer: Reader, C <: Iterable[T]: Arbitrary: Equiv](
+  def writerReaderCollection[T: Writer: Reader,
+                             C <: Iterable[T]: Arbitrary: Equiv](
       implicit cbf: CanBuildFrom[Nothing, T, C]): Prop = {
     implicit val cwriter = Writer.collection[T, C]
     implicit val creader = Reader.collection[T, C]

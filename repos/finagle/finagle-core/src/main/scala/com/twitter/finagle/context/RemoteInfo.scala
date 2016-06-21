@@ -63,7 +63,7 @@ object RemoteInfo {
 
     override def toString(): String =
       s"Upstream Address: $upstreamAddrStr, Upstream Client Id: $upstreamIdStr, " +
-      s"Downstream Address: $downstreamAddrStr, Downstream Client Id: $downstreamIdStr, " +
-      s"Trace Id: $traceId"
+        s"Downstream Address: $downstreamAddrStr, Downstream Client Id: $downstreamIdStr, " +
+        s"Trace Id: $traceId"
   }
 }

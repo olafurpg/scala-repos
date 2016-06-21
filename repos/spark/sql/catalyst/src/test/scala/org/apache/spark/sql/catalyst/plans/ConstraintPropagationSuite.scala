@@ -26,28 +26,27 @@ import org.apache.spark.sql.catalyst.plans.logical._
 
 class ConstraintPropagationSuite extends SparkFunSuite {
 
-  private def resolveColumn(
-      tr: LocalRelation, columnName: String): Expression =
+  private def resolveColumn(tr: LocalRelation,
+                            columnName: String): Expression =
     resolveColumn(tr.analyze, columnName)
 
-  private def resolveColumn(
-      plan: LogicalPlan, columnName: String): Expression =
+  private def resolveColumn(plan: LogicalPlan,
+                            columnName: String): Expression =
     plan.resolveQuoted(columnName, caseInsensitiveResolution).get
 
-  private def verifyConstraints(
-      found: ExpressionSet, expected: ExpressionSet): Unit = {
+  private def verifyConstraints(found: ExpressionSet,
+                                expected: ExpressionSet): Unit = {
     val missing = expected -- found
     val extra = found -- expected
     if (missing.nonEmpty || extra.nonEmpty) {
-      fail(
-          s"""
+      fail(s"""
            |== FAIL: Constraints do not match ===
            |Found: ${found.mkString(",")}
            |Expected: ${expected.mkString(",")}
            |== Result ==
            |Missing: ${if (missing.isEmpty) "N/A" else missing.mkString(",")}
            |Found but not expected: ${if (extra.isEmpty) "N/A"
-         else extra.mkString(",")}
+          else extra.mkString(",")}
          """.stripMargin)
     }
   }
@@ -119,7 +118,8 @@ class ConstraintPropagationSuite extends SparkFunSuite {
             Seq(resolveColumn(aliasedRelation.analyze, "x") > 10,
                 IsNotNull(resolveColumn(aliasedRelation.analyze, "x")),
                 resolveColumn(aliasedRelation.analyze, "b") <=> resolveColumn(
-                    aliasedRelation.analyze, "y"),
+                    aliasedRelation.analyze,
+                    "y"),
                 resolveColumn(aliasedRelation.analyze, "z") > 10,
                 IsNotNull(resolveColumn(aliasedRelation.analyze, "z")))))
   }

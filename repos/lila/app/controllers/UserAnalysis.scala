@@ -41,8 +41,11 @@ object UserAnalysis extends LilaController with TheftPrevention {
       } | SituationPlus(Situation(variant), 1)
     val pov = makePov(situation)
     val orientation = get("color").flatMap(chess.Color.apply) | pov.color
-    Env.api.roundApi.userAnalysisJson(
-        pov, ctx.pref, decodedFen, orientation, owner = false) map { data =>
+    Env.api.roundApi.userAnalysisJson(pov,
+                                      ctx.pref,
+                                      decodedFen,
+                                      orientation,
+                                      owner = false) map { data =>
       Ok(html.board.userAnalysis(data, pov))
     }
   }
@@ -133,8 +136,8 @@ object UserAnalysis extends LilaController with TheftPrevention {
                   def wait = 50 + (Forecast maxPlies forecasts min 10) * 50
                   Env.round.forecastApi.playAndSave(pov, uci, forecasts) >> Env.current.scheduler
                     .after(wait.millis) {
-                    Ok(Json.obj("reload" -> true))
-                  }
+                      Ok(Json.obj("reload" -> true))
+                    }
                 }
             )
         }

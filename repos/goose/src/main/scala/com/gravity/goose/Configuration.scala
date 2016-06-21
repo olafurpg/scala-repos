@@ -80,8 +80,8 @@ class Configuration {
   var publishDateExtractor: PublishDateExtractor = new PublishDateExtractor {
     import PublishDateExtractor._
 
-    def extractCandidate(
-        rootElement: Element, selector: String): Seq[java.util.Date] = {
+    def extractCandidate(rootElement: Element,
+                         selector: String): Seq[java.util.Date] = {
       import scala.collection.JavaConversions._
 
       try {

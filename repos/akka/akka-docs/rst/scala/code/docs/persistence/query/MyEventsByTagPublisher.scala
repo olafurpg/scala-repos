@@ -14,14 +14,16 @@ import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
 import scala.concurrent.duration.FiniteDuration
 
 object MyEventsByTagPublisher {
-  def props(
-      tag: String, offset: Long, refreshInterval: FiniteDuration): Props =
+  def props(tag: String,
+            offset: Long,
+            refreshInterval: FiniteDuration): Props =
     Props(new MyEventsByTagPublisher(tag, offset, refreshInterval))
 }
 
 //#events-by-tag-publisher
-class MyEventsByTagPublisher(
-    tag: String, offset: Long, refreshInterval: FiniteDuration)
+class MyEventsByTagPublisher(tag: String,
+                             offset: Long,
+                             refreshInterval: FiniteDuration)
     extends ActorPublisher[EventEnvelope] {
 
   private case object Continue
@@ -83,8 +85,10 @@ class MyEventsByTagPublisher(
           case (id, bytes) ⇒
             val p =
               serialization.deserialize(bytes, classOf[PersistentRepr]).get
-            EventEnvelope(
-                offset = id, p.persistenceId, p.sequenceNr, p.payload)
+            EventEnvelope(offset = id,
+                          p.persistenceId,
+                          p.sequenceNr,
+                          p.payload)
         }
       } catch {
         case e: Exception ⇒

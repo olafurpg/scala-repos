@@ -159,8 +159,10 @@ class VersionsSuite extends SparkFunSuite with Logging {
               locationUri = None,
               inputFormat = Some(
                   classOf[org.apache.hadoop.mapred.TextInputFormat].getName),
-              outputFormat = Some(classOf[org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat[
-                          _, _]].getName),
+              outputFormat = Some(
+                  classOf[org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat[
+                          _,
+                          _]].getName),
               serde = Some(
                   classOf[org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe]
                     .getName()),
@@ -239,7 +241,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
     test(s"$version: create index and reset") {
       client.runSqlHive("CREATE TABLE indexed_table (key INT)")
       client.runSqlHive("CREATE INDEX index_1 ON TABLE indexed_table(key) " +
-          "as 'COMPACT' WITH DEFERRED REBUILD")
+            "as 'COMPACT' WITH DEFERRED REBUILD")
       client.reset()
     }
   }

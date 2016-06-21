@@ -69,16 +69,16 @@ object Merge {
   def merge[A <: JValue, B <: JValue, R <: JValue](val1: A, val2: B)(
       implicit instance: MergeDep[A, B, R]): R = instance(val1, val2)
 
-  private[json] def mergeFields(
-      vs1: List[JField], vs2: List[JField]): List[JField] = {
+  private[json] def mergeFields(vs1: List[JField],
+                                vs2: List[JField]): List[JField] = {
     def mergeRec(xleft: List[JField], yleft: List[JField]): List[JField] =
       xleft match {
         case Nil => yleft
         case JField(xn, xv) :: xs =>
           yleft find (_.name == xn) match {
             case Some(y @ JField(yn, yv)) =>
-              JField(xn, merge(xv, yv)) :: mergeRec(
-                  xs, yleft filterNot (_ == y))
+              JField(xn, merge(xv, yv)) :: mergeRec(xs,
+                                                    yleft filterNot (_ == y))
             case None => JField(xn, xv) :: mergeRec(xs, yleft)
           }
       }
@@ -86,8 +86,8 @@ object Merge {
     mergeRec(vs1, vs2)
   }
 
-  private[json] def mergeVals(
-      vs1: List[JValue], vs2: List[JValue]): List[JValue] = {
+  private[json] def mergeVals(vs1: List[JValue],
+                              vs2: List[JValue]): List[JValue] = {
     def mergeRec(xleft: List[JValue], yleft: List[JValue]): List[JValue] =
       xleft match {
         case Nil => yleft

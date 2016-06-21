@@ -451,8 +451,9 @@ class HttpServerSpec
              |""")
       inside(expectRequest()) {
         case HttpRequest(GET, _, _, _, _) ⇒
-          responses.sendNext(HttpResponse(entity = HttpEntity.Strict(
-                      ContentTypes.`text/plain(UTF-8)`, ByteString("abcd"))))
+          responses.sendNext(HttpResponse(
+                  entity = HttpEntity.Strict(ContentTypes.`text/plain(UTF-8)`,
+                                             ByteString("abcd"))))
           expectResponseWithWipedDate("""|HTTP/1.1 200 OK
                |Server: akka-http/test
                |Date: XXXX
@@ -788,7 +789,8 @@ class HttpServerSpec
       "are defined via the config" in new RequestTimeoutTestSetup(10.millis) {
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
         expectRequest().header[`Timeout-Access`] shouldBe defined
-        expectResponseWithWipedDate("""HTTP/1.1 503 Service Unavailable
+        expectResponseWithWipedDate(
+            """HTTP/1.1 503 Service Unavailable
             |Server: akka-http/test
             |Date: XXXX
             |Content-Type: text/plain; charset=UTF-8
@@ -821,7 +823,8 @@ class HttpServerSpec
           .header[`Timeout-Access`]
           .foreach(_.timeoutAccess.updateTimeout(50.millis))
         netOut.expectNoBytes(30.millis)
-        expectResponseWithWipedDate("""HTTP/1.1 503 Service Unavailable
+        expectResponseWithWipedDate(
+            """HTTP/1.1 503 Service Unavailable
             |Server: akka-http/test
             |Date: XXXX
             |Content-Type: text/plain; charset=UTF-8
@@ -838,7 +841,8 @@ class HttpServerSpec
           .header[`Timeout-Access`]
           .foreach(_.timeoutAccess.updateTimeout(10.millis))
         val mark = System.nanoTime()
-        expectResponseWithWipedDate("""HTTP/1.1 503 Service Unavailable
+        expectResponseWithWipedDate(
+            """HTTP/1.1 503 Service Unavailable
             |Server: akka-http/test
             |Date: XXXX
             |Content-Type: text/plain; charset=UTF-8

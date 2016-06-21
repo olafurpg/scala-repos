@@ -266,10 +266,10 @@ class GroupsResource @Inject()(groupManager: GroupManager,
       deploymentResult(deployment)
   }
 
-  private def applyGroupUpdate(group: Group,
-                               groupUpdate: GroupUpdate,
-                               newVersion: Timestamp)(
-      implicit identity: Identity) = {
+  private def applyGroupUpdate(
+      group: Group,
+      groupUpdate: GroupUpdate,
+      newVersion: Timestamp)(implicit identity: Identity) = {
     def versionChange = groupUpdate.version.map { targetVersion =>
       checkAuthorization(UpdateGroup, group)
       val versionedGroup = result(groupManager.group(group.id, targetVersion))

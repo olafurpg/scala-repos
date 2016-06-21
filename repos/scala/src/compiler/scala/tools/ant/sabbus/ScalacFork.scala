@@ -163,6 +163,6 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
     if (failOnError && res != 0)
       throw new BuildException(
           "Compilation failed because of an internal compiler error;" +
-          " see the error output for details.")
+            " see the error output for details.")
   }
 }

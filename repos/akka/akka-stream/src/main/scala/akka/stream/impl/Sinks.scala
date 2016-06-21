@@ -70,8 +70,8 @@ private[akka] abstract class SinkModule[-In, Mat](val shape: SinkShape[In])
   * elements to fill the internal buffers it will assert back-pressure until
   * a subscriber connects and creates demand for elements to be emitted.
   */
-private[akka] class PublisherSink[In](
-    val attributes: Attributes, shape: SinkShape[In])
+private[akka] class PublisherSink[In](val attributes: Attributes,
+                                      shape: SinkShape[In])
     extends SinkModule[In, Publisher[In]](shape) {
 
   /*
@@ -95,8 +95,8 @@ private[akka] class PublisherSink[In](
 /**
   * INTERNAL API
   */
-private[akka] final class FanoutPublisherSink[In](
-    val attributes: Attributes, shape: SinkShape[In])
+private[akka] final class FanoutPublisherSink[In](val attributes: Attributes,
+                                                  shape: SinkShape[In])
     extends SinkModule[In, Publisher[In]](shape) {
 
   override def create(
@@ -123,8 +123,8 @@ private[akka] final class FanoutPublisherSink[In](
   * Attaches a subscriber to this stream which will just discard all received
   * elements.
   */
-private[akka] final class SinkholeSink(
-    val attributes: Attributes, shape: SinkShape[Any])
+private[akka] final class SinkholeSink(val attributes: Attributes,
+                                       shape: SinkShape[Any])
     extends SinkModule[Any, Future[Done]](shape) {
 
   override def create(context: MaterializationContext) = {
@@ -164,8 +164,8 @@ private[akka] final class SubscriberSink[In](subscriber: Subscriber[In],
   * INTERNAL API
   * A sink that immediately cancels its upstream upon materialization.
   */
-private[akka] final class CancelSink(
-    val attributes: Attributes, shape: SinkShape[Any])
+private[akka] final class CancelSink(val attributes: Attributes,
+                                     shape: SinkShape[Any])
     extends SinkModule[Any, NotUsed](shape) {
   override def create(
       context: MaterializationContext): (Subscriber[Any], NotUsed) =
@@ -182,8 +182,9 @@ private[akka] final class CancelSink(
   * Creates and wraps an actor into [[org.reactivestreams.Subscriber]] from the given `props`,
   * which should be [[akka.actor.Props]] for an [[akka.stream.actor.ActorSubscriber]].
   */
-private[akka] final class ActorSubscriberSink[In](
-    props: Props, val attributes: Attributes, shape: SinkShape[In])
+private[akka] final class ActorSubscriberSink[In](props: Props,
+                                                  val attributes: Attributes,
+                                                  shape: SinkShape[In])
     extends SinkModule[In, ActorRef](shape) {
 
   override def create(context: MaterializationContext) = {
@@ -214,8 +215,8 @@ private[akka] final class ActorRefSink[In](ref: ActorRef,
       actorMaterializer.effectiveSettings(context.effectiveAttributes)
     val subscriberRef = actorMaterializer.actorOf(
         context,
-        ActorRefSinkActor.props(
-            ref, effectiveSettings.maxInputBufferSize, onCompleteMessage))
+        ActorRefSinkActor
+          .props(ref, effectiveSettings.maxInputBufferSize, onCompleteMessage))
     (akka.stream.actor.ActorSubscriber[In](subscriberRef), NotUsed)
   }
 
@@ -300,8 +301,8 @@ private[akka] final class HeadOptionStage[T]
 }
 
 private[akka] final class SeqStage[T]
-    extends GraphStageWithMaterializedValue[
-        SinkShape[T], Future[immutable.Seq[T]]] {
+    extends GraphStageWithMaterializedValue[SinkShape[T],
+                                            Future[immutable.Seq[T]]] {
   val in = Inlet[T]("seq.in")
 
   override def toString: String = "SeqStage"

@@ -36,8 +36,8 @@ class MockMappable[T](val id: String)(implicit tconv: TupleConverter[T])
   }
   override def hashCode = id.hashCode
 
-  override def createTap(readOrWrite: AccessMode)(
-      implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(
+      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
     TestTapFactory(
         this,
         new NullScheme[JobConf,

@@ -32,12 +32,12 @@ import scala.collection.JavaConverters._
   * 2014-05-20
   */
 object ExtractSuperUtil {
-  def afterClassChoosing(element: PsiElement,
-                         project: Project,
-                         editor: Editor,
-                         file: PsiFile,
-                         isSuitableClass: PsiClass => Boolean)(
-      action: => Unit) {
+  def afterClassChoosing(
+      element: PsiElement,
+      project: Project,
+      editor: Editor,
+      file: PsiFile,
+      isSuitableClass: PsiClass => Boolean)(action: => Unit) {
     try {
       val classes = ScalaPsiUtil
         .getParents(element, file)
@@ -100,15 +100,14 @@ object ExtractSuperUtil {
     val templParents = oldExtBlock.templateParents match {
       case Some(tp: ScTemplateParents) =>
         val tpText = s"${tp.getText} with $text"
-        val (_, newTp) = ScalaPsiElementFactory.createClassTemplateParents(
-            tpText, clazz.getManager)
+        val (_, newTp) = ScalaPsiElementFactory
+          .createClassTemplateParents(tpText, clazz.getManager)
         tp.replace(newTp).asInstanceOf[ScTemplateParents]
       case None =>
-        val (extKeyword, newTp) =
-          ScalaPsiElementFactory.createClassTemplateParents(
-              text, clazz.getManager)
-        oldExtBlock.addRangeBefore(
-            extKeyword, newTp, oldExtBlock.getFirstChild)
+        val (extKeyword, newTp) = ScalaPsiElementFactory
+          .createClassTemplateParents(text, clazz.getManager)
+        oldExtBlock
+          .addRangeBefore(extKeyword, newTp, oldExtBlock.getFirstChild)
         oldExtBlock.templateParents.get
     }
     templParents.typeElementsWithoutConstructor.foreach {
@@ -119,7 +118,8 @@ object ExtractSuperUtil {
   }
 
   def getDirUnderSameSourceRoot(
-      clazz: PsiClass, directories: Array[PsiDirectory]): PsiDirectory = {
+      clazz: PsiClass,
+      directories: Array[PsiDirectory]): PsiDirectory = {
     val sourceFile: VirtualFile = clazz.getContainingFile.getVirtualFile
     if (sourceFile != null) {
       val fileIndex: ProjectFileIndex =
@@ -156,8 +156,8 @@ object ExtractSuperUtil {
 
     val dir: PsiDirectory =
       ExtractSuperUtil.getDirUnderSameSourceRoot(sourceClass, dirs)
-    val cantCreateFile: String = RefactoringMessageUtil.checkCanCreateFile(
-        dir, targetClassName + ".scala")
+    val cantCreateFile: String = RefactoringMessageUtil
+      .checkCanCreateFile(dir, targetClassName + ".scala")
     if (cantCreateFile != null) return cantCreateFile
 
     null

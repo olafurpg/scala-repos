@@ -616,12 +616,13 @@ class ActorDocSpec extends AkkaSpec("""
 
   "using ActorDSL outside of akka.actor package" in {
     import akka.actor.ActorDSL._
-    actor(
-        new Act {
-      superviseWith(
-          OneForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
-      superviseWith(
-          AllForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
+    actor(new Act {
+      superviseWith(OneForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
+      superviseWith(AllForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
     })
   }
 }

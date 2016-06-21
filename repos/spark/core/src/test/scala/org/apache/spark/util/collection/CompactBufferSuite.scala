@@ -88,12 +88,19 @@ class CompactBufferSuite extends SparkFunSuite {
     b ++= b3
     assert(
         b.iterator.toList === (1 to 4).flatMap(i => 0 until 10).toList ++ List(
-            0, 0, 1))
+            0,
+            0,
+            1))
     b3 += 2
     b ++= b3
     assert(
         b.iterator.toList === (1 to 4).flatMap(i => 0 until 10).toList ++ List(
-            0, 0, 1, 0, 1, 2))
+            0,
+            0,
+            1,
+            0,
+            1,
+            2))
   }
 
   test("adding the same buffer to itself") {

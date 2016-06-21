@@ -36,8 +36,8 @@ object TupleConverterImpl {
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] =
     caseClassTupleConverterCommonImpl(c, true)
 
-  def caseClassTupleConverterCommonImpl[T](
-      c: Context, allowUnknownTypes: Boolean)(
+  def caseClassTupleConverterCommonImpl[T](c: Context,
+                                           allowUnknownTypes: Boolean)(
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] = {
     import c.universe._
 
@@ -47,8 +47,8 @@ object TupleConverterImpl {
       outerTpe.declarations.collect {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.map { accessorMethod =>
-        accessorMethod.returnType.asSeenFrom(
-            outerTpe, outerTpe.typeSymbol.asClass)
+        accessorMethod.returnType.asSeenFrom(outerTpe,
+                                             outerTpe.typeSymbol.asClass)
       }.toVector
 
     sealed trait ConverterBuilder {
@@ -120,7 +120,7 @@ object TupleConverterImpl {
           }
         case tpe
             if (tpe.typeSymbol.isClass &&
-                tpe.typeSymbol.asClass.isCaseClass) =>
+                  tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(tpe, membersOf(tpe).map(matchField))
         case tpe if allowUnknownTypes =>
           PrimitiveBuilder(

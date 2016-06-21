@@ -14,8 +14,9 @@ case class MProcedure(name: MQName,
 
 object MProcedure {
   def getProcedures(namePattern: MQName) =
-    ResultSetAction[MProcedure](_.metaData.getProcedures(
-            namePattern.catalog_?, namePattern.schema_?, namePattern.name)) {
+    ResultSetAction[MProcedure](_.metaData.getProcedures(namePattern.catalog_?,
+                                                         namePattern.schema_?,
+                                                         namePattern.name)) {
       r =>
         MProcedure(MQName.from(r), r.skip.skip.skip.<<, r.nextShort match {
           case DatabaseMetaData.procedureNoResult => Some(false)

@@ -22,8 +22,7 @@ object MaterializationBenchmark {
   }
 
   val graphWithJunctionsBuilder = (numOfJunctions: Int) =>
-    RunnableGraph.fromGraph(
-        GraphDSL.create() { implicit b =>
+    RunnableGraph.fromGraph(GraphDSL.create() { implicit b =>
       import GraphDSL.Implicits._
 
       val broadcast = b.add(Broadcast[Unit](numOfJunctions))
@@ -48,8 +47,7 @@ object MaterializationBenchmark {
       }
     }
 
-    RunnableGraph.fromGraph(
-        GraphDSL.create(flow) { implicit b ⇒ flow ⇒
+    RunnableGraph.fromGraph(GraphDSL.create(flow) { implicit b ⇒ flow ⇒
       import GraphDSL.Implicits._
       Source.single(()) ~> flow ~> Sink.ignore
       ClosedShape
@@ -57,18 +55,18 @@ object MaterializationBenchmark {
   }
 
   val graphWithImportedFlowBuilder = (numOfFlows: Int) =>
-    RunnableGraph.fromGraph(
-        GraphDSL.create(Source.single(())) { implicit b ⇒ source ⇒
-      import GraphDSL.Implicits._
-      val flow = Flow[Unit].map(identity)
-      var out: Outlet[Unit] = source.out
-      for (i <- 0 until numOfFlows) {
-        val flowShape = b.add(flow)
-        out ~> flowShape
-        out = flowShape.outlet
-      }
-      out ~> Sink.ignore
-      ClosedShape
+    RunnableGraph.fromGraph(GraphDSL.create(Source.single(())) {
+      implicit b ⇒ source ⇒
+        import GraphDSL.Implicits._
+        val flow = Flow[Unit].map(identity)
+        var out: Outlet[Unit] = source.out
+        for (i <- 0 until numOfFlows) {
+          val flowShape = b.add(flow)
+          out ~> flowShape
+          out = flowShape.outlet
+        }
+        out ~> Sink.ignore
+        ClosedShape
     })
 }
 

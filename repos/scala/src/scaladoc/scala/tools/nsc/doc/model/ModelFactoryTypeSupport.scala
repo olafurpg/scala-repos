@@ -164,7 +164,7 @@ trait ModelFactoryTypeSupport {
         case RefinedType(parents, defs) =>
           val ignoreParents = Set[Symbol](AnyClass, ObjectClass)
           val filtParents = parents filterNot
-          (x => ignoreParents(x.typeSymbol)) match {
+            (x => ignoreParents(x.typeSymbol)) match {
             case Nil => parents
             case ps => ps
           }
@@ -178,7 +178,7 @@ trait ModelFactoryTypeSupport {
             case x :: Nil => nameBuffer append (" { " + x.defString + " }")
             case xs =>
               nameBuffer append
-              (" { ... /* %d definitions in type refinement */ }" format xs.size)
+                (" { ... /* %d definitions in type refinement */ }" format xs.size)
           }
         /* Eval-by-name types */
         case NullaryMethodType(result) =>

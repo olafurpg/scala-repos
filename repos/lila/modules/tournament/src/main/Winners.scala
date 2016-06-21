@@ -6,14 +6,16 @@ import scala.concurrent.duration.FiniteDuration
 import lila.db.BSON._
 import lila.user.{User, UserRepo}
 
-final class Winners(
-    mongoCache: lila.memo.MongoCache.Builder, ttl: FiniteDuration) {
+final class Winners(mongoCache: lila.memo.MongoCache.Builder,
+                    ttl: FiniteDuration) {
 
   private implicit val WinnerBSONHandler =
     reactivemongo.bson.Macros.handler[Winner]
 
   private val scheduledCache = mongoCache[Int, List[Winner]](
-      prefix = "tournament:winner", f = fetchScheduled, timeToLive = ttl)
+      prefix = "tournament:winner",
+      f = fetchScheduled,
+      timeToLive = ttl)
 
   import Schedule.Freq
   private def fetchScheduled(nb: Int): Fu[List[Winner]] = {

@@ -138,9 +138,11 @@ sealed trait DBIOAction[+R, +S <: NoStream, -E <: Effect] extends Dumpable {
       implicit executor: ExecutionContext): DBIOAction[R2, NoStream, E] =
     map(
         r1 =>
-          pf.applyOrElse(r1,
-                         (r: R) =>
-                           throw new NoSuchElementException(s"DBIOAction.collect partial function is not defined at: $r")))
+          pf.applyOrElse(
+              r1,
+              (r: R) =>
+                throw new NoSuchElementException(
+                    s"DBIOAction.collect partial function is not defined at: $r")))
 
   /** Return an action which contains the Throwable with which this action failed as its result.
     * If this action succeeded, the resulting action fails with a NoSuchElementException. */
@@ -188,8 +190,8 @@ object DBIOAction {
       in: TraversableOnce[DBIOAction[R, NoStream, E]])
     : Vector[Vector[DBIOAction[R, NoStream, E]]] = {
     var state = 0 // no current = 0, sync = 1, async = 2
-    var current: mutable.Builder[
-        DBIOAction[R, NoStream, E], Vector[DBIOAction[R, NoStream, E]]] = null
+    var current: mutable.Builder[DBIOAction[R, NoStream, E],
+                                 Vector[DBIOAction[R, NoStream, E]]] = null
     val total = Vector.newBuilder[Vector[DBIOAction[R, NoStream, E]]]
     (in: TraversableOnce[Any]).foreach { a =>
       val msgState =
@@ -237,8 +239,10 @@ object DBIOAction {
       if (g.length == 1) {
         if (g.head.isInstanceOf[SynchronousDatabaseAction[_, _, _, _]]) {
           // fuse synchronous group
-          new SynchronousDatabaseAction.Fused[
-              Seq[R], NoStream, BasicBackend, E] {
+          new SynchronousDatabaseAction.Fused[Seq[R],
+                                              NoStream,
+                                              BasicBackend,
+                                              E] {
             def run(context: BasicBackend#Context) =
               g.head
                 .asInstanceOf[SynchronousDatabaseAction[R,
@@ -252,8 +256,10 @@ object DBIOAction {
       } else {
         if (g.head.isInstanceOf[SynchronousDatabaseAction[_, _, _, _]]) {
           // fuse synchronous group
-          new SynchronousDatabaseAction.Fused[
-              Seq[R], NoStream, BasicBackend, E] {
+          new SynchronousDatabaseAction.Fused[Seq[R],
+                                              NoStream,
+                                              BasicBackend,
+                                              E] {
             def run(context: BasicBackend#Context) = {
               val b = new ArrayBuffer[R](g.length)
               g.foreach(
@@ -336,8 +342,8 @@ object DBIOAction {
   /** Create a DBIOAction that runs some other actions in sequence and combines their results
     * with the given function. */
   def fold[T, E <: Effect](actions: Seq[DBIOAction[T, NoStream, E]], zero: T)(
-      f: (T, T) => T)(
-      implicit ec: ExecutionContext): DBIOAction[T, NoStream, E] =
+      f: (T,
+          T) => T)(implicit ec: ExecutionContext): DBIOAction[T, NoStream, E] =
     actions.foldLeft[DBIOAction[T, NoStream, E]](DBIO.successful(zero)) {
       (za, va) =>
         za.flatMap(z => va.map(v => f(z, v)))
@@ -478,7 +484,8 @@ case class AsTryAction[+R, -E <: Effect](a: DBIOAction[R, NoStream, E])
 
 /** A DBIOAction that attaches a name for logging purposes to another action. */
 case class NamedAction[+R, +S <: NoStream, -E <: Effect](
-    a: DBIOAction[R, S, E], name: String)
+    a: DBIOAction[R, S, E],
+    name: String)
     extends DBIOAction[R, S, E] {
   def getDumpInfo = DumpInfo("named", mainInfo = DumpInfo.highlight(name))
   override def isLogged = true
@@ -596,8 +603,10 @@ trait SynchronousDatabaseAction[
             .run(context)
           (r1, r2)
         }
-        override def nonFusedEquivalentAction: DBIOAction[
-            (R, R2), NoStream, E with E2] = superZip(a)
+        override def nonFusedEquivalentAction: DBIOAction[(R, R2),
+                                                          NoStream,
+                                                          E with E2] =
+          superZip(a)
       }
     case a => superZip(a)
   }
@@ -723,8 +732,10 @@ object SynchronousDatabaseAction {
         new SynchronousDatabaseAction.Fused[R, S, BasicBackend, E] {
           def run(context: BasicBackend#Context): R = {
             val b = base
-              .asInstanceOf[SynchronousDatabaseAction[
-                      Any, NoStream, BasicBackend, Effect]]
+              .asInstanceOf[SynchronousDatabaseAction[Any,
+                                                      NoStream,
+                                                      BasicBackend,
+                                                      Effect]]
               .run(context)
             val a2 = f(b)
             a2.asInstanceOf[SynchronousDatabaseAction[R, S, BasicBackend, E]]
@@ -733,29 +744,34 @@ object SynchronousDatabaseAction {
           override def nonFusedEquivalentAction = a
         }
 
-      case CleanUpAction(
-          base: SynchronousDatabaseAction[_, _, _, _], f, keepFailure, ec)
-          if ec eq DBIO.sameThreadExecutionContext =>
+      case CleanUpAction(base: SynchronousDatabaseAction[_, _, _, _],
+                         f,
+                         keepFailure,
+                         ec) if ec eq DBIO.sameThreadExecutionContext =>
         new SynchronousDatabaseAction.Fused[R, S, BasicBackend, E] {
           def run(context: BasicBackend#Context): R = {
             val res = try {
               base
-                .asInstanceOf[SynchronousDatabaseAction[
-                        R, S, BasicBackend, Effect]]
+                .asInstanceOf[
+                    SynchronousDatabaseAction[R, S, BasicBackend, Effect]]
                 .run(context)
             } catch {
               case NonFatal(ex) =>
                 try {
                   val a2 = f(Some(ex))
-                  a2.asInstanceOf[SynchronousDatabaseAction[
-                            Any, NoStream, BasicBackend, Effect]]
+                  a2.asInstanceOf[SynchronousDatabaseAction[Any,
+                                                            NoStream,
+                                                            BasicBackend,
+                                                            Effect]]
                     .run(context)
                 } catch { case NonFatal(_) if keepFailure => () }
                 throw ex
             }
             val a2 = f(None)
-            a2.asInstanceOf[SynchronousDatabaseAction[
-                      Any, NoStream, BasicBackend, Effect]]
+            a2.asInstanceOf[SynchronousDatabaseAction[Any,
+                                                      NoStream,
+                                                      BasicBackend,
+                                                      Effect]]
               .run(context)
             res
           }

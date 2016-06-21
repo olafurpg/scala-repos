@@ -226,15 +226,15 @@ object ApplicationBuild extends Build {
   lazy val timeline =
     project("timeline", Seq(common, db, game, user, hub, security, relation))
       .settings(
-        libraryDependencies ++= provided(play.api, play.test, RM, PRM)
-    )
+          libraryDependencies ++= provided(play.api, play.test, RM, PRM)
+      )
 
   lazy val mod = project(
       "mod",
       Seq(common, db, user, hub, security, game, analyse, evaluation, report))
     .settings(
-      libraryDependencies ++= provided(play.api, play.test, RM, PRM)
-  )
+        libraryDependencies ++= provided(play.api, play.test, RM, PRM)
+    )
 
   lazy val user =
     project("user", Seq(common, memo, db, hub, chess, rating)).settings(
@@ -344,11 +344,12 @@ object ApplicationBuild extends Build {
       libraryDependencies ++= provided(play.api, RM, PRM)
   )
 
-  lazy val simul = project(
-      "simul", Seq(common, hub, socket, chess, game, round, chat, memo, quote))
-    .settings(
-      libraryDependencies ++= provided(play.api, RM, PRM)
-  )
+  lazy val simul =
+    project("simul",
+            Seq(common, hub, socket, chess, game, round, chat, memo, quote))
+      .settings(
+          libraryDependencies ++= provided(play.api, RM, PRM)
+      )
 
   lazy val fishnet =
     project("fishnet", Seq(common, chess, game, analyse, db)).settings(
@@ -391,10 +392,11 @@ object ApplicationBuild extends Build {
       libraryDependencies ++= provided(play.api, RM, PRM)
   )
 
-  lazy val message = project(
-      "message", Seq(common, db, user, hub, relation, security)).settings(
-      libraryDependencies ++= provided(play.api, RM, PRM, spray.caching)
-  )
+  lazy val message =
+    project("message", Seq(common, db, user, hub, relation, security))
+      .settings(
+          libraryDependencies ++= provided(play.api, RM, PRM, spray.caching)
+      )
 
   lazy val forum =
     project("forum", Seq(common, db, user, security, hub, mod)).settings(
@@ -406,10 +408,11 @@ object ApplicationBuild extends Build {
         libraryDependencies ++= provided(play.api, RM, PRM)
     )
 
-  lazy val team = project(
-      "team", Seq(common, memo, db, user, forum, security, hub)).settings(
-      libraryDependencies ++= provided(play.api, RM, PRM)
-  )
+  lazy val team =
+    project("team", Seq(common, memo, db, user, forum, security, hub))
+      .settings(
+          libraryDependencies ++= provided(play.api, RM, PRM)
+      )
 
   lazy val teamSearch =
     project("teamSearch", Seq(common, hub, team, search)).settings(

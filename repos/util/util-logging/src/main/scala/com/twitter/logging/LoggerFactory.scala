@@ -61,7 +61,7 @@ case class LoggerFactory(node: String = "",
 /**
   * Shim for java compatibility.  Make a new LoggerFactoryBuilder with `LoggerFactory#newBuilder()`.
   */
-class LoggerFactoryBuilder private[logging](factory: LoggerFactory) {
+class LoggerFactoryBuilder private[logging] (factory: LoggerFactory) {
   def node(_node: String): LoggerFactoryBuilder =
     new LoggerFactoryBuilder(factory.copy(node = _node))
 

@@ -24,11 +24,11 @@ import kafka.message.{DefaultCompressionCodec, NoCompressionCodec, CompressionCo
 
 trait BaseMessageSetTestCases extends JUnitSuite {
 
-  val messages = Array(
-      new Message("abcd".getBytes()), new Message("efgh".getBytes()))
-  def createMessageSet(messages: Seq[Message],
-                       compressed: CompressionCodec =
-                         NoCompressionCodec): MessageSet
+  val messages =
+    Array(new Message("abcd".getBytes()), new Message("efgh".getBytes()))
+  def createMessageSet(
+      messages: Seq[Message],
+      compressed: CompressionCodec = NoCompressionCodec): MessageSet
   def toMessageIterator(messageSet: MessageSet): Iterator[Message] = {
     import scala.collection.JavaConversions._
     messageSet.map(m => m.message).iterator

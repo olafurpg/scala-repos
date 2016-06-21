@@ -130,7 +130,8 @@ trait ScalaResultsHandlingSpec
       )(0)
       response.status must_== 200
       response.headers.get(CONNECTION).map(_.toLowerCase(ENGLISH)) must beOneOf(
-          None, Some("close"))
+          None,
+          Some("close"))
     }
 
     "close the connection when the connection close header is present" in withServer(
@@ -138,8 +139,11 @@ trait ScalaResultsHandlingSpec
     ) { port =>
       BasicHttpClient
         .makeRequests(port, checkClosed = true)(
-            BasicRequest(
-                "GET", "/", "HTTP/1.1", Map("Connection" -> "close"), "")
+            BasicRequest("GET",
+                         "/",
+                         "HTTP/1.1",
+                         Map("Connection" -> "close"),
+                         "")
         )(0)
         .status must_== 200
     }
@@ -158,8 +162,11 @@ trait ScalaResultsHandlingSpec
         Results.Ok
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest(
-              "GET", "/", "HTTP/1.0", Map("Connection" -> "keep-alive"), ""),
+          BasicRequest("GET",
+                       "/",
+                       "HTTP/1.0",
+                       Map("Connection" -> "keep-alive"),
+                       ""),
           BasicRequest("GET", "/", "HTTP/1.0", Map(), "")
       )
       responses(0).status must_== 200
@@ -186,8 +193,11 @@ trait ScalaResultsHandlingSpec
       // will timeout if not closed
       BasicHttpClient
         .makeRequests(port, checkClosed = true)(
-            BasicRequest(
-                "GET", "/", "HTTP/1.1", Map("Connection" -> "close"), "")
+            BasicRequest("GET",
+                         "/",
+                         "HTTP/1.1",
+                         Map("Connection" -> "close"),
+                         "")
         )
         .head
         .status must_== 200
@@ -206,8 +216,9 @@ trait ScalaResultsHandlingSpec
 
     "allow sending trailers" in withServer(
         Result(
-            ResponseHeader(
-                200, Map(TRANSFER_ENCODING -> CHUNKED, TRAILER -> "Chunks")),
+            ResponseHeader(200,
+                           Map(TRANSFER_ENCODING -> CHUNKED,
+                               TRAILER -> "Chunks")),
             HttpEntity.Chunked(
                 Source(List(
                         chunk("aa"),
@@ -296,7 +307,7 @@ trait ScalaResultsHandlingSpec
                 Cookies.decodeSetCookieHeader(headerValue).to[Set]
             }.to[Set]
             decodedCookieHeaders must_==
-              (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
+            (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
         }
       }
     }

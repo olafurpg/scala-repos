@@ -50,8 +50,10 @@ class SnapshotRecoveryLocalStoreSpec
         Props(classOf[SaveSnapshotTestPersistentActor],
               persistenceId,
               testActor))
-    val persistentActor2 = system.actorOf(Props(
-            classOf[SaveSnapshotTestPersistentActor], extendedName, testActor))
+    val persistentActor2 = system.actorOf(
+        Props(classOf[SaveSnapshotTestPersistentActor],
+              extendedName,
+              testActor))
     persistentActor1 ! TakeSnapshot
     persistentActor2 ! TakeSnapshot
     expectMsgAllOf(0L, 0L)

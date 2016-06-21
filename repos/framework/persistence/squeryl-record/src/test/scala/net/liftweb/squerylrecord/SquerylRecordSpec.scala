@@ -92,7 +92,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
         // ids must containInOrder(
         //   td.allCompanies.sortBy(_.name.get).map(_.id))
         ids.mkString("(", ",", ")") must_==
-          td.allCompanies.sortBy(_.name.get).map(_.id).mkString("(", ",", ")")
+        td.allCompanies.sortBy(_.name.get).map(_.id).mkString("(", ",", ")")
       }
     }
 
@@ -121,7 +121,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
           val companiesAndEmployeesWithSameName =
             join(companies, employees.leftOuter)((c, e) =>
                   groupBy(c.id) compute (countDistinct(e.map(_.id))) on
-                  (c.name === e.map(_.name)))
+                    (c.name === e.map(_.name)))
 
           // There are three companies
           companiesAndEmployeesWithSameName must haveSize(3)
@@ -145,7 +145,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
           val employeesWithSameDepartmentNumber =
             join(employees, employees.leftOuter)((e1, e2) =>
                   select(e1, e2) on
-                  (e1.departmentNumber === e2.map(_.departmentNumber)))
+                    (e1.departmentNumber === e2.map(_.departmentNumber)))
           employeesWithSameDepartmentNumber must not(beEmpty)
 
           val employeesWithSameRoles =
@@ -258,56 +258,56 @@ class SquerylRecordSpec extends Specification with AroundExample {
         val companyId: Long = from(companies)(c =>
               where(c.id in from(companies)(c2 =>
                         where(c2.id === td.c1.id) select (c2.id))) select
-              (c.id)).single
+                (c.id)).single
         companyId must_== td.c1.id
 
         // It should also be possible to select the ID field directly:
         val companyIdField: LongField[Company] = from(companies)(c =>
               where(c.idField in from(companies)(c2 =>
                         where(c2.id === td.c1.id) select (c2.idField))) select
-              (c.idField)).single
+                (c.idField)).single
         companyIdField.get must_== td.c1.id
 
         // Strings should also be selectable in inner queries
         val companyIdByName: Long = from(companies)(c =>
               where(c.name in from(companies)(c2 =>
                         where(c2.name === td.c1.name) select (c2.name))) select
-              (c.id)).single
+                (c.id)).single
         companyIdByName must_== td.c1.id
 
         // ...And DateTime-Fields:
         val companyIdByCreated: DateTimeField[Company] = from(companies)(c =>
               where(c.created in from(companies)(c2 =>
                         where(c2.id === td.c1.id) select (c2.created))) select
-              (c.created)).single
+                (c.created)).single
         companyIdByCreated.get must_== td.c1.created.get
 
         // Decimal Fields:
         val empSalary: DecimalField[Employee] = from(employees)(e =>
               where(e.salary in from(employees)(e2 =>
                         where(e2.id === td.e1.id) select (e2.salary))) select
-              (e.salary)).single
+                (e.salary)).single
         empSalary.get must_== td.e1.salary.get
 
         // Email fields:
         val empEmail: EmailField[Employee] = from(employees)(e =>
               where(e.email in from(employees)(e2 =>
                         where(e2.id === td.e1.id) select (e2.email))) select
-              (e.email)).single
+                (e.email)).single
         empSalary.get must_== td.e1.salary.get
 
         // Boolean fields:
         val empAdmin: BooleanField[Employee] = from(employees)(e =>
               where(e.admin in from(employees)(e2 =>
                         where(e2.id === td.e2.id) select (e2.admin))) select
-              (e.admin)).single
+                (e.admin)).single
         empAdmin.get must_== td.e2.admin.get
 
         // Enum fields:
         val empRoleQuery = from(employees)(e =>
               where(e.role in from(employees)(e2 =>
                         where(e2.id === td.e2.id) select (e2.role))) select
-              (e.role.get))
+                (e.role.get))
         val empRole = empRoleQuery.single
         empRole must_== td.e2.role.get
       }
@@ -351,8 +351,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
         companies.insert(company)
       }
       //Retrieve and modify in another transaction
-      val innerUpdate = new Thread(
-          new Runnable {
+      val innerUpdate = new Thread(new Runnable {
         override def run() {
           transaction {
             val company2 = companies.lookup(company.id).get
@@ -375,7 +374,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
       inTransaction {
         val created = from(companies)(c =>
               where(c.name === "First Company USA") select
-              (&(toChar(c.created, "EEE, d MMM yyyy"))))
+                (&(toChar(c.created, "EEE, d MMM yyyy"))))
         created.head must_== new SimpleDateFormat("EEE, d MMM yyyy")
           .format(Calendar.getInstance().getTime())
       }
@@ -389,7 +388,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
         .writeColumnDeclaration(fieldMetaData, false, MySchema)
       columnDefinition.endsWith(
           "numeric(" + Company.employeeSatisfaction.context.getPrecision() +
-          "," + Company.employeeSatisfaction.scale + ")") must_== true
+            "," + Company.employeeSatisfaction.scale + ")") must_== true
     }
 
     "Properly reset the dirty_? flag after loading entities" >> inTransaction {
@@ -460,14 +459,14 @@ class SquerylRecordSpec extends Specification with AroundExample {
     // Photo must be checked separately
     e1.photo.get match {
       case Some(p) => {
-          val p2 = e2.photo.get
-          p2 must beSome[Array[Byte]]
-          p2.get.size must_== p.size
+        val p2 = e2.photo.get
+        p2 must beSome[Array[Byte]]
+        p2.get.size must_== p.size
 
-          (0 until p.size) map { i =>
-            p2.get(i) must_== p(i)
-          }
+        (0 until p.size) map { i =>
+          p2.get(i) must_== p(i)
         }
+      }
       case None => e2.photo.get must beNone
     }
   }

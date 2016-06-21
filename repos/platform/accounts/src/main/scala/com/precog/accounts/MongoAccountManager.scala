@@ -64,8 +64,8 @@ trait ZKAccountIdSource extends AccountManager[Future] {
       zkc.createPersistent(settings.zkAccountIdPath, true)
     }
 
-    val createdPath = zkc.createPersistentSequential(
-        settings.zkAccountIdPath, Array.empty[Byte])
+    val createdPath = zkc.createPersistentSequential(settings.zkAccountIdPath,
+                                                     Array.empty[Byte])
     createdPath.substring(createdPath.length - 10) //last 10 characters are a sequential int
   }
 }
@@ -80,8 +80,9 @@ trait MongoAccountManagerSettings {
 }
 
 abstract class MongoAccountManager(
-    mongo: Mongo, database: Database, settings: MongoAccountManagerSettings)(
-    implicit val M: Monad[Future])
+    mongo: Mongo,
+    database: Database,
+    settings: MongoAccountManagerSettings)(implicit val M: Monad[Future])
     extends AccountManager[Future] {
   import Account._
 
@@ -134,8 +135,9 @@ abstract class MongoAccountManager(
     } yield account
   }
 
-  private def findOneMatching[A](
-      keyName: String, keyValue: String, collection: String)(
+  private def findOneMatching[A](keyName: String,
+                                 keyValue: String,
+                                 collection: String)(
       implicit extractor: Extractor[A]): Future[Option[A]] = {
     database(selectOne().from(collection).where(keyName === keyValue)) map {
       _.map(_.deserialize(extractor))
@@ -143,8 +145,9 @@ abstract class MongoAccountManager(
   }
 
   private def findAllMatching[A](
-      keyName: String, keyValue: String, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
+      keyName: String,
+      keyValue: String,
+      collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database(selectAll.from(collection).where(keyName === keyValue)) map {
       _.map(_.deserialize(extractor)).toSet
     }
@@ -161,12 +164,12 @@ abstract class MongoAccountManager(
         account,
         (new DateTime).plusMinutes(settings.resetTokenExpirationMinutes))
 
-  def generateResetToken(
-      account: Account, expiration: DateTime): Future[ResetTokenId] = {
+  def generateResetToken(account: Account,
+                         expiration: DateTime): Future[ResetTokenId] = {
     val tokenId = java.util.UUID.randomUUID.toString.replace("-", "")
 
-    val token = ResetToken(
-        tokenId, account.accountId, account.email, expiration)
+    val token =
+      ResetToken(tokenId, account.accountId, account.email, expiration)
 
     logger.debug("Saving new reset token " + token)
     database(insert(token.serialize.asInstanceOf[JObject])

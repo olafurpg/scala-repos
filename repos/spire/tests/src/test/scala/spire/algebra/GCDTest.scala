@@ -18,15 +18,13 @@ import org.scalacheck.Prop._
 
 class GCDTest extends FunSuite with Checkers {
   implicit def ArbBigDecimal: Arbitrary[BigDecimal] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       value <- arbitrary[Long]
       scale <- arbitrary[Short]
     } yield BigDecimal(value, scale.toInt))
 
   implicit def ArbRational: Arbitrary[Rational] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       n <- arbitrary[Long]
       d <- arbitrary[Long] if d != 0
     } yield Rational(n, d))

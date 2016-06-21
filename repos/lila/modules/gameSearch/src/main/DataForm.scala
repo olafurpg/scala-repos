@@ -140,7 +140,8 @@ private[gameSearch] case class SearchPlayer(a: Option[String] = None,
 }
 
 private[gameSearch] case class SearchSort(
-    field: String = Sorting.default.f, order: String = Sorting.default.order)
+    field: String = Sorting.default.f,
+    order: String = Sorting.default.order)
 
 private[gameSearch] case class SearchClock(initMin: Option[Int] = None,
                                            initMax: Option[Int] = None,

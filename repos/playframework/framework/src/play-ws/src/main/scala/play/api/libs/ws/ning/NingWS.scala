@@ -28,7 +28,8 @@ case class NingWSClient(
   def underlying[T]: T = ahcWsClient.underlying
 
   private[libs] def executeRequest[T](
-      request: Request, handler: AsyncHandler[T]): ListenableFuture[T] =
+      request: Request,
+      handler: AsyncHandler[T]): ListenableFuture[T] =
     ahcWsClient.executeRequest(request, handler)
 
   def close(): Unit = ahcWsClient.close()
@@ -90,8 +91,9 @@ trait NingWSComponents {
 
   lazy val wsClientConfig: WSClientConfig =
     new WSConfigParser(configuration, environment).parse()
-  private lazy val ahcWsClientConfig = new AhcWSClientConfigParser(
-      wsClientConfig, configuration, environment).parse()
+  private lazy val ahcWsClientConfig =
+    new AhcWSClientConfigParser(wsClientConfig, configuration, environment)
+      .parse()
   lazy val ningWsClientConfig: NingWSClientConfig = NingWSClientConfig(
       wsClientConfig = wsClientConfig,
       maxConnectionsPerHost = ahcWsClientConfig.maxConnectionsPerHost,
@@ -105,7 +107,8 @@ trait NingWSComponents {
       keepAlive = ahcWsClientConfig.keepAlive
   )
 
-  lazy val wsApi: WSAPI = new AhcWSAPI(
-      environment, ahcWsClientConfig, applicationLifecycle)(materializer)
+  lazy val wsApi: WSAPI =
+    new AhcWSAPI(environment, ahcWsClientConfig, applicationLifecycle)(
+        materializer)
   lazy val wsClient: WSClient = wsApi.client
 }

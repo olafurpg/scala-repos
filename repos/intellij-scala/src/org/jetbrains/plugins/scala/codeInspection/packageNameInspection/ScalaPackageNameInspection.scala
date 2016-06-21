@@ -45,7 +45,7 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
                 file,
                 range,
                 "Package names doesn't correspond to directories structure, this may cause " +
-                "problems with resolve to classes from this file",
+                  "problems with resolve to classes from this file",
                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                 isOnTheFly,
                 buffer: _*)

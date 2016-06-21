@@ -85,8 +85,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
     val annotationHolder = new AnnotationHolderImpl(
         new AnnotationSession(file))
     val annotations = mutable.Buffer[Annotation]()
-    val state = UnusedPassState(
-        annotationHolder, annotations, readConfig(sFile))
+    val state =
+      UnusedPassState(annotationHolder, annotations, readConfig(sFile))
     val config = state.config
     if (!config.checkLocalAssign && !config.checkLocalUnused) return
 
@@ -117,8 +117,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
                  severity(localAssignShortName))
   }
 
-  private def processDeclaredElementHolder(
-      x: ScDeclaredElementsHolder, state: UnusedPassState) {
+  private def processDeclaredElementHolder(x: ScDeclaredElementsHolder,
+                                           state: UnusedPassState) {
     x.getContext match {
       case _: ScPackageLike | _: ScalaFile | _: ScEarlyDefinitions =>
       // ignore, too expensive to check for references.
@@ -139,7 +139,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   /** Processes a ScDeclaredElementsHolder that is not accessible outside of the defining class/companion, ie locals or private or private[this] */
   private def processLocalDeclaredElementHolder(
-      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState) {
+      declElementHolder: ScDeclaredElementsHolder,
+      state: UnusedPassState) {
     val isSpecialDef = declElementHolder match {
       case x: PsiMethod => ScFunction.isSpecial(x.name)
       case _ => false
@@ -155,7 +156,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   /** Highlight unused local symbols, and vals that could be vars */
   private def checkUnusedAndVarCouldBeVal(
-      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState) {
+      declElementHolder: ScDeclaredElementsHolder,
+      state: UnusedPassState) {
     val isVar = declElementHolder.isInstanceOf[ScVariableDefinition]
 
     var hasAssign = !state.config.checkLocalAssign || !isVar
@@ -215,11 +217,12 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
         .getStartOffset
       val end = declElementHolder.getTextRange.getEndOffset
       val range = TextRange.create(start, end)
-      val annotation = state.annotationHolder.createAnnotation(
-          severity, new TextRange(start, end), message)
+      val annotation = state.annotationHolder
+        .createAnnotation(severity, new TextRange(start, end), message)
       val key = HighlightDisplayKey.find(VarCouldBeValInspection.ShortName)
       val fix = new VarToValFix(
-          declElementHolder.asInstanceOf[ScVariableDefinition], nameOpt)
+          declElementHolder.asInstanceOf[ScVariableDefinition],
+          nameOpt)
       annotation.registerFix(fix, range, key)
       state.annotations += annotation
     }
@@ -229,13 +232,13 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
   override def getInfos: java.util.List[HighlightInfo] = highlightInfos.toList
 
   private def isUnusedSymbolSuppressed(element: PsiElement) = {
-    inspectionSuppressor.isSuppressedFor(
-        element, ScalaUnusedSymbolInspection.ShortName)
+    inspectionSuppressor
+      .isSuppressedFor(element, ScalaUnusedSymbolInspection.ShortName)
   }
 
   private def isVarCouldBeValSuppressed(element: PsiElement) = {
-    inspectionSuppressor.isSuppressedFor(
-        element, VarCouldBeValInspection.ShortName)
+    inspectionSuppressor
+      .isSuppressedFor(element, VarCouldBeValInspection.ShortName)
   }
 }
 
@@ -290,7 +293,7 @@ class VarToValFix(varDef: ScVariableDefinition, name: Option[String])
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     if (!varDef.isValid) return
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
-    varDef.replace(ScalaPsiElementFactory.createValFromVarDefinition(
-            varDef, varDef.getManager))
+    varDef.replace(ScalaPsiElementFactory
+          .createValFromVarDefinition(varDef, varDef.getManager))
   }
 }

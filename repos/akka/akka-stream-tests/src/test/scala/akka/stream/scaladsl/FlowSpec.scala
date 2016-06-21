@@ -36,8 +36,8 @@ class FlowSpec
             "akka.actor.debug.receive=off\nakka.loglevel=INFO")) {
   import FlowSpec._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -46,8 +46,8 @@ class FlowSpec
   val identity2: Flow[Any, Any, NotUsed] ⇒ Flow[Any, Any, NotUsed] = in ⇒
     identity(in)
 
-  class BrokenActorInterpreter(
-      _shell: GraphInterpreterShell, brokenMessage: Any)
+  class BrokenActorInterpreter(_shell: GraphInterpreterShell,
+                               brokenMessage: Any)
       extends ActorGraphInterpreter(_shell) {
 
     override protected[akka] def aroundReceive(receive: Receive, msg: Any) = {
@@ -62,10 +62,9 @@ class FlowSpec
   val faultyFlow: Flow[Any, Any, NotUsed] ⇒ Flow[Any, Any, NotUsed] = in ⇒
     in.via({
       val stage = new PushPullGraphStage((_) ⇒
-                                           fusing.Map({ x: Any ⇒
-                                             x
-                                           }, stoppingDecider),
-                                         Attributes.none)
+            fusing.Map({ x: Any ⇒
+          x
+        }, stoppingDecider), Attributes.none)
 
       val assembly = new GraphAssembly(Array(stage),
                                        Array(Attributes.none),
@@ -103,8 +102,8 @@ class FlowSpec
 
       impl ! ActorGraphInterpreter.ExposedPublisher(shell, 0, publisher)
 
-      Flow.fromSinkAndSource(
-          Sink.fromSubscriber(subscriber), Source.fromPublisher(publisher))
+      Flow.fromSinkAndSource(Sink.fromSubscriber(subscriber),
+                             Source.fromPublisher(publisher))
     })
 
   val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] =

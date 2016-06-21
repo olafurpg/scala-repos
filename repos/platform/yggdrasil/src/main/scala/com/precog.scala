@@ -47,8 +47,9 @@ package object yggdrasil {
     def apply(id: Identities, sv: SValue): SEvent = (id, sv)
   }
 
-  def prefixIdentityOrdering(
-      ids1: Identities, ids2: Identities, prefixLength: Int): Ordering = {
+  def prefixIdentityOrdering(ids1: Identities,
+                             ids2: Identities,
+                             prefixLength: Int): Ordering = {
     var result: Ordering = EQ
     var i = 0
     while (i < prefixLength && (result eq EQ)) {

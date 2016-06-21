@@ -33,12 +33,13 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
   import LDASuite._
 
   test("LocalLDAModel") {
-    val model = new LocalLDAModel(
-        tinyTopics,
-        Vectors.dense(
-            Array.fill(tinyTopics.numRows)(1.0 / tinyTopics.numRows)),
-        1D,
-        100D)
+    val model =
+      new LocalLDAModel(
+          tinyTopics,
+          Vectors.dense(
+              Array.fill(tinyTopics.numRows)(1.0 / tinyTopics.numRows)),
+          1D,
+          100D)
 
     // Check: basic parameters
     assert(model.k === tinyK)
@@ -422,7 +423,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     expectedPredictions.zip(topTopics).foreach {
       case (expected, actual) =>
         assert(expected._1 === actual._1 &&
-            (expected._2 ~== actual._2 relTol 1E-3D))
+              (expected._2 ~== actual._2 relTol 1E-3D))
     }
 
     docs
@@ -715,7 +716,10 @@ private[clustering] object LDASuite {
                                                 1.94615165,
                                                 1.95204124))
     val ldaModel: LocalLDAModel = new LocalLDAModel(
-        topics, Vectors.dense(Array.fill(k)(alpha)), eta, gammaShape)
+        topics,
+        Vectors.dense(Array.fill(k)(alpha)),
+        eta,
+        gammaShape)
     ldaModel
   }
 }

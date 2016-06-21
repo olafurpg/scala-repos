@@ -91,7 +91,7 @@ object Form extends DispatchSnippet {
 
     val attr = S.currentAttrsToMetaData(name =>
           name != "id" && name != "onsubmit" && name != "action" &&
-          name != "form")
+            name != "form")
 
     val pre = S.attr.~("onsubmit").map(_.text + ";") getOrElse ""
 

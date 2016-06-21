@@ -24,7 +24,9 @@ object RemoteGatePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(
+      debugConfig(on = false).withFallback(ConfigFactory.parseString(
+              """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.transport-failure-detector.acceptable-heartbeat-pause = 5 s

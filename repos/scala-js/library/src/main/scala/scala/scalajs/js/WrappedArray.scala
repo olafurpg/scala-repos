@@ -60,7 +60,8 @@ final class WrappedArray[A](val array: Array[A])
     this
   }
 
-  @inline def insertAll(n: Int, elems: scala.collection.Traversable[A]): Unit = {
+  @inline
+  def insertAll(n: Int, elems: scala.collection.Traversable[A]): Unit = {
     array.splice(n, 0, elems.toSeq: _*)
   }
 

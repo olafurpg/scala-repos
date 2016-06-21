@@ -23,14 +23,15 @@ class ScIdListElementType[Func <: ScIdList]
   }
 
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScIdList, parentStub: StubElement[ParentPsi]): ScIdListStub = {
+      psi: ScIdList,
+      parentStub: StubElement[ParentPsi]): ScIdListStub = {
     new ScIdListStubImpl(parentStub, this)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScIdListStub = {
-    new ScIdListStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScIdListStub = {
+    new ScIdListStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                         this)
   }
 
   def indexStub(stub: ScIdListStub, sink: IndexSink): Unit = {}

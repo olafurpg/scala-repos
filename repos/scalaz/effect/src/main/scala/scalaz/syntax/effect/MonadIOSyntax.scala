@@ -5,8 +5,8 @@ package effect
 import scalaz.effect.MonadIO
 
 /** Wraps a value `self` and provides methods related to `MonadIO` */
-final class MonadIOOps[F[_], A] private[syntax](val self: F[A])(
-    implicit val F: MonadIO[F])
+final class MonadIOOps[F[_], A] private[syntax] (
+    val self: F[A])(implicit val F: MonadIO[F])
     extends Ops[F[A]] {
   ////
 

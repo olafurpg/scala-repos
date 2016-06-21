@@ -74,23 +74,23 @@ object Msgs extends DispatchSnippet {
          (NoticeType.Warning, MsgsWarningMeta),
          (NoticeType.Notice, MsgsNoticeMeta)).foreach {
       case (noticeType, ajaxStorage) => {
-          // Extract the title if provided, or default to none. Allow for XML nodes
-          // so that people can localize, etc.
-          val title: NodeSeq = (styles \\ noticeType.titleTag)
-            .filter(_.prefix == "lift")
-            .flatMap(_.child)
+        // Extract the title if provided, or default to none. Allow for XML nodes
+        // so that people can localize, etc.
+        val title: NodeSeq = (styles \\ noticeType.titleTag)
+          .filter(_.prefix == "lift")
+          .flatMap(_.child)
 
-          // Extract any provided classes for the messages
-          val cssClasses = ((styles \\ noticeType.styleTag) ++
+        // Extract any provided classes for the messages
+        val cssClasses = ((styles \\ noticeType.styleTag) ++
               (styles \\ noticeType.titleTag \\ "@class")).toList
-            .map(_.text.trim) match {
-            case Nil => Empty
-            case classes => Full(classes.mkString(" "))
-          }
-
-          // Save the settings for AJAX usage
-          ajaxStorage(Full(AjaxMessageMeta(title, cssClasses)))
+          .map(_.text.trim) match {
+          case Nil => Empty
+          case classes => Full(classes.mkString(" "))
         }
+
+        // Save the settings for AJAX usage
+        ajaxStorage(Full(AjaxMessageMeta(title, cssClasses)))
+      }
     }
 
     // Delegate the actual rendering to a shared method so that we don't
@@ -107,12 +107,11 @@ object Msgs extends DispatchSnippet {
     */
   def renderNotices(): NodeSeq = {
     // Determine which formatting function to use based on tag usage
-    val f =
-      if (ShowAll.is) {
-        S.messages _
-      } else {
-        S.noIdMessages _
-      }
+    val f = if (ShowAll.is) {
+      S.messages _
+    } else {
+      S.noIdMessages _
+    }
 
     // Compute the formatted set of messages for a given input
     def computeMessageDiv(
@@ -128,10 +127,10 @@ object Msgs extends DispatchSnippet {
         f(messages).toList.map(e => ( <li>{e}</li>)) match {
           case Nil => Nil
           case msgList => {
-              val ret = <div id={noticeType.id}>{title}<ul>{msgList}</ul></div>
-              styles.foldLeft(ret)((xml, style) =>
-                    xml % new UnprefixedAttribute("class", Text(style), Null))
-            }
+            val ret = <div id={noticeType.id}>{title}<ul>{msgList}</ul></div>
+            styles.foldLeft(ret)((xml, style) =>
+                  xml % new UnprefixedAttribute("class", Text(style), Null))
+          }
         }
     }
 
@@ -159,13 +158,13 @@ object Msgs extends DispatchSnippet {
     *
     * @see net.liftweb.http.LiftRules.noticesAutoFadeOut
     */
-  def noticesFadeOut[T](
-      noticeType: NoticeType.Value, default: T, wrap: JsCmd => T): T =
+  def noticesFadeOut[T](noticeType: NoticeType.Value,
+                        default: T,
+                        wrap: JsCmd => T): T =
     LiftRules.noticesAutoFadeOut()(noticeType) map {
       case (duration, fadeTime) => {
-          wrap(
-              LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
-        }
+        wrap(LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
+      }
     } openOr default
 
   /**

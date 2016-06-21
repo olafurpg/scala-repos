@@ -10,8 +10,8 @@ protected[model] trait TemplateComponent { self: Profile =>
     def byRepository(owner: String, repository: String) =
       (userName === owner.bind) && (repositoryName === repository.bind)
 
-    def byRepository(
-        userName: Column[String], repositoryName: Column[String]) =
+    def byRepository(userName: Column[String],
+                     repositoryName: Column[String]) =
       (this.userName === userName) && (this.repositoryName === repositoryName)
   }
 
@@ -48,13 +48,13 @@ protected[model] trait TemplateComponent { self: Profile =>
 
     def byMilestone(owner: String, repository: String, milestoneId: Int) =
       byRepository(owner, repository) &&
-      (this.milestoneId === milestoneId.bind)
+        (this.milestoneId === milestoneId.bind)
 
     def byMilestone(userName: Column[String],
                     repositoryName: Column[String],
                     milestoneId: Column[Int]) =
       byRepository(userName, repositoryName) &&
-      (this.milestoneId === milestoneId)
+        (this.milestoneId === milestoneId)
   }
 
   trait CommitTemplate extends BasicTemplate { self: Table[_] =>

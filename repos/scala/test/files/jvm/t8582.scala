@@ -73,7 +73,7 @@ object Test extends BytecodeTest {
     printInner("A1$B1")
     println(
         "C1 is a nested class, so it has an InnerClass attribute for itself.\n" +
-        "Because that attribute leads to an entry for B1 in the constant pool, C1 needs an InnerClass attribute for B1.")
+          "Because that attribute leads to an entry for B1 in the constant pool, C1 needs an InnerClass attribute for B1.")
     printInner("A1$B1$C1")
 
     nprintln(

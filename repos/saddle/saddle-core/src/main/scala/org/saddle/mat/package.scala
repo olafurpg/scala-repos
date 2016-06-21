@@ -141,7 +141,9 @@ package object mat {
     * @tparam T type of elements in array
     */
   def repeat[@spec(Boolean, Int, Long, Double) T: ST](
-      v: Array[T], n: Int, asRows: Boolean = false): Mat[T] = {
+      v: Array[T],
+      n: Int,
+      asRows: Boolean = false): Mat[T] = {
 
     if (asRows) {
       val tmp = array.flatten(for (i <- 1 to n) yield v)

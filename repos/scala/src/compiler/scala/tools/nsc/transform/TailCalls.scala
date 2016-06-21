@@ -130,9 +130,9 @@ abstract class TailCalls extends Transform {
         def msg =
           "Creating new `this` during tailcalls\n  method: %s\n  current class: %s"
             .format(
-              method.ownerChain.mkString(" -> "),
-              currentClass.ownerChain.mkString(" -> ")
-          )
+                method.ownerChain.mkString(" -> "),
+                currentClass.ownerChain.mkString(" -> ")
+            )
         logResult(msg)(
             method.newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
       }
@@ -176,8 +176,8 @@ abstract class TailCalls extends Transform {
       private def mkLabel() = {
         val label = method.newLabel(newTermName("_" + method.name), method.pos)
         val thisParam = method.newSyntheticValueParam(currentClass.typeOfThis)
-        label setInfo MethodType(
-            thisParam :: method.tpe.params, method.tpe_*.finalResultType)
+        label setInfo MethodType(thisParam :: method.tpe.params,
+                                 method.tpe_*.finalResultType)
         if (isEligible) label substInfo (method.tpe.typeParams, tparams)
 
         label
@@ -191,8 +191,8 @@ abstract class TailCalls extends Transform {
       }
       def containsRecursiveCall(t: Tree) = t exists isRecursiveCall
     }
-    class ClonedTailContext(
-        val that: TailContext, override val tailPos: Boolean)
+    class ClonedTailContext(val that: TailContext,
+                            override val tailPos: Boolean)
         extends TailContext {
       def method = that.method
       def tparams = that.tparams
@@ -255,7 +255,7 @@ abstract class TailCalls extends Transform {
         def fail(reason: String) = {
           debuglog(
               "Cannot rewrite recursive call at: " + fun.pos + " because: " +
-              reason)
+                reason)
           if (ctx.isMandatory) failReasons(ctx) = reason
           treeCopy.Apply(tree, noTailTransform(target), transformArgs)
         }
@@ -335,10 +335,11 @@ abstract class TailCalls extends Transform {
               typedPos(tree.pos)(
                   Block(
                       List(ValDef(newThis, This(currentClass))),
-                      LabelDef(newCtx.label,
-                               newThis :: vpSyms,
-                               mkAttributedCastHack(
-                                   newRHS, newCtx.label.tpe.resultType))
+                      LabelDef(
+                          newCtx.label,
+                          newThis :: vpSyms,
+                          mkAttributedCastHack(newRHS,
+                                               newCtx.label.tpe.resultType))
                   ))
             } else {
               if (newCtx.isMandatory && (newCtx containsRecursiveCall newRHS))
@@ -448,8 +449,7 @@ abstract class TailCalls extends Transform {
   class TailPosLabelsTraverser extends Traverser {
     val tailLabels = new scala.collection.mutable.HashSet[Symbol]()
 
-    private var maybeTail: Boolean =
-      true // since we start in the rhs of a DefDef
+    private var maybeTail: Boolean = true // since we start in the rhs of a DefDef
 
     def traverse(tree: Tree, maybeTailNew: Boolean): Unit = {
       val saved = maybeTail

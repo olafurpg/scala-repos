@@ -25,7 +25,7 @@ object Test extends InteractiveTest {
     compiler.getUnitOf(source) match {
       case Some(unit) =>
         reporter.println("Compilation Unit for " + source.file.name +
-            " still loaded after askLoadedTyped")
+              " still loaded after askLoadedTyped")
 
       case None => reporter.println("Test OK")
     }

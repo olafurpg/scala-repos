@@ -37,6 +37,8 @@ object Main {
                  TestSubject,
                  MetaTestSubject,
                  MappedForeignKey[Long, TestRun, TestSubject]](
-        List(), TestSubject, (tr: TestRun) => tr.testSubject)
+        List(),
+        TestSubject,
+        (tr: TestRun) => tr.testSubject)
   }
 }

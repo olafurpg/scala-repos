@@ -30,8 +30,10 @@ class JavaUniverse
   // TODO: why put output under isLogging? Calls to inform are already conditional on debug/verbose/...
   import scala.reflect.internal.{Reporter, ReporterImpl}
   override def reporter: Reporter = new ReporterImpl {
-    protected def info0(
-        pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
+    protected def info0(pos: Position,
+                        msg: String,
+                        severity: Severity,
+                        force: Boolean): Unit =
       log(msg)
   }
 
@@ -53,14 +55,16 @@ class JavaUniverse
 
   override lazy val internal: Internal = new SymbolTableInternal {
     override def typeTagToManifest[T: ClassTag](
-        mirror0: Any, tag: Universe#TypeTag[T]): Manifest[T] = {
+        mirror0: Any,
+        tag: Universe#TypeTag[T]): Manifest[T] = {
       // SI-6239: make this conversion more precise
       val mirror = mirror0.asInstanceOf[Mirror]
       val runtimeClass = mirror.runtimeClass(tag.in(mirror).tpe)
       Manifest.classType(runtimeClass).asInstanceOf[Manifest[T]]
     }
     override def manifestToTypeTag[T](
-        mirror0: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
+        mirror0: Any,
+        manifest: Manifest[T]): Universe#TypeTag[T] =
       TypeTag(mirror0.asInstanceOf[Mirror], new TypeCreator {
         def apply[U <: Universe with Singleton](
             mirror: scala.reflect.api.Mirror[U]): U#Type = {
@@ -73,9 +77,9 @@ class JavaUniverse
                 else {
                   val tags =
                     manifest.typeArguments map
-                    (targ => ju.internal.manifestToTypeTag(jm, targ))
-                  ju.appliedType(
-                      sym.toTypeConstructor, tags map (_.in(jm).tpe))
+                      (targ => ju.internal.manifestToTypeTag(jm, targ))
+                  ju.appliedType(sym.toTypeConstructor,
+                                 tags map (_.in(jm).tpe))
                 }
               tpe.asInstanceOf[U#Type]
             case u =>

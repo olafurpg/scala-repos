@@ -41,8 +41,10 @@ class EncoderTest extends FunSuite with MockitoSugar {
     encodeIsPure(TokensWithData(Seq(Buf.Utf8("foo")), Buf.Utf8("bar"), None))
 
     info("tokens with data and cas")
-    encodeIsPure(TokensWithData(
-            Seq(Buf.Utf8("foo")), Buf.Utf8("baz"), Some(Buf.Utf8("quux"))))
+    encodeIsPure(
+        TokensWithData(Seq(Buf.Utf8("foo")),
+                       Buf.Utf8("baz"),
+                       Some(Buf.Utf8("quux"))))
 
     info("stat lines")
     encodeIsPure(

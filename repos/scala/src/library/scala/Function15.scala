@@ -96,8 +96,21 @@ trait Function15[-T1,
                       T13,
                       T14,
                       T15] => R = {
-    case Tuple15(
-        x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15) =>
+    case Tuple15(x1,
+                 x2,
+                 x3,
+                 x4,
+                 x5,
+                 x6,
+                 x7,
+                 x8,
+                 x9,
+                 x10,
+                 x11,
+                 x12,
+                 x13,
+                 x14,
+                 x15) =>
       apply(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15)
   }
   override def toString() = "<function15>"

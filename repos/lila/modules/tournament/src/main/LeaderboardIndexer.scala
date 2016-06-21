@@ -8,8 +8,8 @@ import scala.concurrent.duration._
 import lila.db.BSON._
 import lila.db.Types.Coll
 
-private final class LeaderboardIndexer(
-    tournamentColl: Coll, leaderboardColl: Coll) {
+private final class LeaderboardIndexer(tournamentColl: Coll,
+                                       leaderboardColl: Coll) {
 
   import LeaderboardApi._
   import BSONHandlers._
@@ -26,11 +26,11 @@ private final class LeaderboardIndexer(
         .mapConcat[Seq[Entry]]
         .apply[Entry](identity) &> Enumeratee.grouped(Iteratee takeUpTo 500) |>>> Iteratee
         .foldM[Seq[Entry], Int](0) {
-        case (number, entries) =>
-          if (number % 10000 == 0)
-            logger.info(s"Generating leaderboards... $number")
-          saveEntries(entries) inject (number + entries.size)
-      }
+          case (number, entries) =>
+            if (number % 10000 == 0)
+              logger.info(s"Generating leaderboards... $number")
+            saveEntries(entries) inject (number + entries.size)
+        }
     }.void
 
   def indexOne(tour: Tournament): Funit =

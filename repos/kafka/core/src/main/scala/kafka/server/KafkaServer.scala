@@ -59,32 +59,32 @@ object KafkaServer {
     val logProps = new util.HashMap[String, Object]()
     logProps.put(LogConfig.SegmentBytesProp, kafkaConfig.logSegmentBytes)
     logProps.put(LogConfig.SegmentMsProp, kafkaConfig.logRollTimeMillis)
-    logProps.put(
-        LogConfig.SegmentJitterMsProp, kafkaConfig.logRollTimeJitterMillis)
-    logProps.put(
-        LogConfig.SegmentIndexBytesProp, kafkaConfig.logIndexSizeMaxBytes)
-    logProps.put(
-        LogConfig.FlushMessagesProp, kafkaConfig.logFlushIntervalMessages)
+    logProps
+      .put(LogConfig.SegmentJitterMsProp, kafkaConfig.logRollTimeJitterMillis)
+    logProps
+      .put(LogConfig.SegmentIndexBytesProp, kafkaConfig.logIndexSizeMaxBytes)
+    logProps
+      .put(LogConfig.FlushMessagesProp, kafkaConfig.logFlushIntervalMessages)
     logProps.put(LogConfig.FlushMsProp, kafkaConfig.logFlushIntervalMs)
     logProps.put(LogConfig.RetentionBytesProp, kafkaConfig.logRetentionBytes)
     logProps.put(LogConfig.RetentionMsProp,
                  kafkaConfig.logRetentionTimeMillis: java.lang.Long)
     logProps.put(LogConfig.MaxMessageBytesProp, kafkaConfig.messageMaxBytes)
-    logProps.put(
-        LogConfig.IndexIntervalBytesProp, kafkaConfig.logIndexIntervalBytes)
+    logProps
+      .put(LogConfig.IndexIntervalBytesProp, kafkaConfig.logIndexIntervalBytes)
     logProps.put(LogConfig.DeleteRetentionMsProp,
                  kafkaConfig.logCleanerDeleteRetentionMs)
     logProps.put(LogConfig.FileDeleteDelayMsProp, kafkaConfig.logDeleteDelayMs)
     logProps.put(LogConfig.MinCleanableDirtyRatioProp,
                  kafkaConfig.logCleanerMinCleanRatio)
     logProps.put(LogConfig.CleanupPolicyProp, kafkaConfig.logCleanupPolicy)
-    logProps.put(
-        LogConfig.MinInSyncReplicasProp, kafkaConfig.minInSyncReplicas)
+    logProps
+      .put(LogConfig.MinInSyncReplicasProp, kafkaConfig.minInSyncReplicas)
     logProps.put(LogConfig.CompressionTypeProp, kafkaConfig.compressionType)
     logProps.put(LogConfig.UncleanLeaderElectionEnableProp,
                  kafkaConfig.uncleanLeaderElectionEnable)
-    logProps.put(
-        LogConfig.PreAllocateEnableProp, kafkaConfig.logPreAllocateEnable)
+    logProps
+      .put(LogConfig.PreAllocateEnableProp, kafkaConfig.logPreAllocateEnable)
     logProps.put(LogConfig.MessageFormatVersionProp,
                  kafkaConfig.logMessageFormatVersion.version)
     logProps.put(LogConfig.MessageTimestampTypeProp,
@@ -233,8 +233,8 @@ class KafkaServer(val config: KafkaConfig,
         kafkaController.startup()
 
         /* start kafka coordinator */
-        consumerCoordinator = GroupCoordinator(
-            config, zkUtils, replicaManager, kafkaMetricsTime)
+        consumerCoordinator =
+          GroupCoordinator(config, zkUtils, replicaManager, kafkaMetricsTime)
         consumerCoordinator.startup()
 
         /* Get the authorizer and initialize it if one is specified.*/
@@ -281,8 +281,8 @@ class KafkaServer(val config: KafkaConfig,
         }
 
         // Create the config manager. start listening to notifications
-        dynamicConfigManager = new DynamicConfigManager(
-            zkUtils, dynamicConfigHandlers)
+        dynamicConfigManager =
+          new DynamicConfigManager(zkUtils, dynamicConfigHandlers)
         dynamicConfigManager.startup()
 
         /* tell everyone we are alive */
@@ -452,8 +452,8 @@ class KafkaServer(val config: KafkaConfig,
           if (prevController != null) {
             try {
 
-              if (!networkClient.blockingReady(
-                      node(prevController), socketTimeoutMs))
+              if (!networkClient.blockingReady(node(prevController),
+                                               socketTimeoutMs))
                 throw socketTimeoutException
 
               // send the controlled shutdown request
@@ -463,8 +463,10 @@ class KafkaServer(val config: KafkaConfig,
                   node(prevController).idString,
                   requestHeader,
                   new ControlledShutdownRequest(config.brokerId).toStruct)
-              val request = new ClientRequest(
-                  kafkaMetricsTime.milliseconds(), true, send, null)
+              val request = new ClientRequest(kafkaMetricsTime.milliseconds(),
+                                              true,
+                                              send,
+                                              null)
               val clientResponse = networkClient
                 .blockingSendAndReceive(request, socketTimeoutMs)
                 .getOrElse {
@@ -550,7 +552,10 @@ class KafkaServer(val config: KafkaConfig,
             try {
               // send the controlled shutdown request
               val request = new kafka.api.ControlledShutdownRequest(
-                  0, correlationId.getAndIncrement, None, config.brokerId)
+                  0,
+                  correlationId.getAndIncrement,
+                  None,
+                  config.brokerId)
               channel.send(request)
 
               response = channel.receive()
@@ -676,8 +681,8 @@ class KafkaServer(val config: KafkaConfig,
   def boundPort(protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT): Int =
     socketServer.boundPort(protocol)
 
-  private def createLogManager(
-      zkClient: ZkClient, brokerState: BrokerState): LogManager = {
+  private def createLogManager(zkClient: ZkClient,
+                               brokerState: BrokerState): LogManager = {
     val defaultProps = KafkaServer.copyKafkaConfigToLog(config)
     val defaultLogConfig = LogConfig(defaultProps)
 
@@ -733,13 +738,13 @@ class KafkaServer(val config: KafkaConfig,
     if (brokerIdSet.size > 1)
       throw new InconsistentBrokerIdException(
           s"Failed to match broker.id across log.dirs. This could happen if multiple brokers shared a log directory (log.dirs) " +
-          s"or partial data was manually copied from another broker. Found $brokerIdSet")
+            s"or partial data was manually copied from another broker. Found $brokerIdSet")
     else if (brokerId >= 0 && brokerIdSet.size == 1 &&
              brokerIdSet.last != brokerId)
       throw new InconsistentBrokerIdException(
           s"Configured broker.id $brokerId doesn't match stored broker.id ${brokerIdSet.last} in meta.properties. " +
-          s"If you moved your data, make sure your configured broker.id matches. " +
-          s"If you intend to create a new broker, you should remove all data in your data directories (log.dirs).")
+            s"If you moved your data, make sure your configured broker.id matches. " +
+            s"If you intend to create a new broker, you should remove all data in your data directories (log.dirs).")
     else if (brokerIdSet.size == 0 && brokerId < 0 &&
              config.brokerIdGenerationEnable) // generate a new brokerId from Zookeeper
       brokerId = generateBrokerId

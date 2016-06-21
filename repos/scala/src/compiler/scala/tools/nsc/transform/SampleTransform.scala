@@ -23,8 +23,7 @@ abstract class SampleTransform extends Transform {
   class SampleTransformer(unit: CompilationUnit) extends Transformer {
 
     override def transform(tree: Tree): Tree = {
-      val tree1 =
-        super.transform(tree); // transformers always maintain `currentOwner`.
+      val tree1 = super.transform(tree); // transformers always maintain `currentOwner`.
       tree1 match {
         case Block(List(), expr) => // a simple optimization
           expr

@@ -46,8 +46,8 @@ class ParquetHiveCompatibilitySuite
        """.stripMargin)
   }
 
-  private def testParquetHiveCompatibility(
-      row: Row, hiveTypes: String*): Unit = {
+  private def testParquetHiveCompatibility(row: Row,
+                                           hiveTypes: String*): Unit = {
     withTable("parquet_compat") {
       withTempPath { dir =>
         val path = dir.getCanonicalPath
@@ -110,8 +110,8 @@ class ParquetHiveCompatibilitySuite
   }
 
   test("SPARK-10177 timestamp") {
-    testParquetHiveCompatibility(
-        Row(Timestamp.valueOf("2015-08-24 00:31:00")), "TIMESTAMP")
+    testParquetHiveCompatibility(Row(Timestamp.valueOf("2015-08-24 00:31:00")),
+                                 "TIMESTAMP")
   }
 
   test("array") {

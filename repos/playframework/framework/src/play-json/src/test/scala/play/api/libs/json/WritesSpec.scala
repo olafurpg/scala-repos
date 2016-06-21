@@ -30,12 +30,12 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30'" in {
       writes(dateTime("2011-12-03T10:15:30")) aka "written date" must_==
-        (JsString("2011-12-03T10:15:30"))
+      (JsString("2011-12-03T10:15:30"))
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30'" in {
       CustomWrites1.writes(dateTime("2011-12-03T10:15:30")).aka("written date") must_==
-        JsString("03/12/2011, 10:15:30")
+      JsString("03/12/2011, 10:15:30")
     }
   }
 
@@ -48,7 +48,7 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30-01:30'" in {
       writes(OffsetDateTime.parse("2011-12-03T10:15:30-01:30")) aka "written date" must_==
-        (JsString("2011-12-03T10:15:30-01:30"))
+      (JsString("2011-12-03T10:15:30-01:30"))
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30 (-01:30)'" in {
@@ -78,12 +78,12 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30+01:00[Europe/Paris]'" in {
       writes(dateTime("2011-12-03T10:15:30+01:00[Europe/Paris]")) aka "written date" must_==
-        (JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
+      (JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
     }
 
     "be written with default implicit as '2011-12-03T10:15:30+06:30'" in {
       writes(dateTime("2011-12-03T10:15:30+06:30")) aka "written date" must_==
-        (JsString("2011-12-03T10:15:30+06:30"))
+      (JsString("2011-12-03T10:15:30+06:30"))
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30'" in {
@@ -103,17 +103,17 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written as number" in {
       Writes.LocalDateNumberWrites.writes(LocalDate ofEpochDay 1234567890L) aka "written date" must_==
-        JsNumber(BigDecimal valueOf 106666665696000000L)
+      JsNumber(BigDecimal valueOf 106666665696000000L)
     }
 
     "be written with default implicit as '2011-12-03'" in {
       writes(date("2011-12-03")) aka "written date" must_==
-        JsString("2011-12-03")
+      JsString("2011-12-03")
     }
 
     "be written with custom pattern as '03/12/2011'" in {
       CustomWrites1.writes(date("2011-12-03")).aka("written date") must_==
-        JsString("03/12/2011")
+      JsString("03/12/2011")
     }
   }
 
@@ -134,12 +134,12 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30Z'" in {
       writes(instant) aka "written date" must_==
-        JsString("2011-12-03T10:15:30Z")
+      JsString("2011-12-03T10:15:30Z")
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30'" in {
       CustomWrites1.writes(instant).aka("written date") must_==
-        JsString("03/12/2011, 10:15:30")
+      JsString("03/12/2011, 10:15:30")
     }
   }
 
@@ -159,10 +159,10 @@ object WritesSpec extends org.specs2.mutable.Specification {
     }
 
     "be transformed with another OWrites" in {
-      val transformed: OWrites[Foo] =
-        writes.transform(OWrites[JsObject] { obj =>
+      val transformed: OWrites[Foo] = writes.transform(OWrites[JsObject] {
+        obj =>
           obj ++ Json.obj("time" -> time)
-        })
+      })
       val written: JsObject = transformed.writes(Foo("Lorem"))
 
       written must_== Json.obj("bar" -> "Lorem", "time" -> time)

@@ -6,8 +6,8 @@ import mesosphere.mesos.protos.TaskID
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 
 object MarathonTaskStatusTestHelper {
-  def mesosStatus(
-      state: TaskState, maybeHealthy: Option[Boolean] = None): TaskStatus = {
+  def mesosStatus(state: TaskState,
+                  maybeHealthy: Option[Boolean] = None): TaskStatus = {
     import mesosphere.mesos.protos.Implicits._
     val builder = TaskStatus.newBuilder()
     builder.setTaskId(TaskID(UUID.randomUUID().toString)).setState(state)

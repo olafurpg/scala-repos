@@ -43,8 +43,9 @@ class TFinagleBinaryProtocolTest
     val fastEncodeFailed = stats.counter("fastEncodeFailed")
     val largerThanTlOutBuffer = stats.counter("largerThanTlOutBuffer")
     val trans = new TMemoryBuffer(128)
-    val proto = new TFinagleBinaryProtocol(
-        trans, fastEncodeFailed, largerThanTlOutBuffer)
+    val proto = new TFinagleBinaryProtocol(trans,
+                                           fastEncodeFailed,
+                                           largerThanTlOutBuffer)
 
     proto.writeString("abc")
     assertSerializedBytes("abc", trans)
@@ -54,8 +55,9 @@ class TFinagleBinaryProtocolTest
 
   test("writeString fallsback on encoding failure") {
     // use multi-byte chars so that we overflow on encode
-    val str =
-      new String(Array.fill(TFinagleBinaryProtocol.OutBufferSize) { '\u2603' })
+    val str = new String(Array.fill(TFinagleBinaryProtocol.OutBufferSize) {
+      '\u2603'
+    })
     val byteLength = str.getBytes(Charsets.UTF_8).length
     str.length should be < byteLength
     byteLength should be > TFinagleBinaryProtocol.OutBufferSize

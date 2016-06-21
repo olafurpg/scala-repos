@@ -79,8 +79,8 @@ class JobTest(cons: (Args) => Job) {
     this
   }
 
-  private def sourceBuffer[T: TupleSetter](
-      s: Source, tups: Iterable[T]): JobTest = {
+  private def sourceBuffer[T: TupleSetter](s: Source,
+                                           tups: Iterable[T]): JobTest = {
     source { src =>
       if (src == s) Some(tups) else None
     }
@@ -139,8 +139,8 @@ class JobTest(cons: (Args) => Job) {
     this
   }
 
-  def typedSink[A](s: Source with TypedSink[A])(
-      op: Buffer[A] => Unit)(implicit conv: TupleConverter[A]) =
+  def typedSink[A](s: Source with TypedSink[A])(op: Buffer[A] => Unit)(
+      implicit conv: TupleConverter[A]) =
     sink[A](s)(op)
 
   // Used to pass an assertion about a counter defined by the given group and name.
@@ -156,7 +156,7 @@ class JobTest(cons: (Args) => Job) {
   // Used to check an assertion on all custom counters of a given scalding job.
   def counters(op: Map[String, Long] => Unit) = {
     statsCallbacks +=
-      ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
+    ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
     this
   }
 
@@ -199,20 +199,18 @@ class JobTest(cons: (Args) => Job) {
   // Registers test files, initializes the global mode, and creates a job.
   private def initJob(useHadoop: Boolean, job: Option[JobConf] = None): Job = {
     // Create a global mode to use for testing.
-    val testMode: TestMode =
-      if (useHadoop) {
-        val conf = job.getOrElse(new JobConf)
-        // Set the polling to a lower value to speed up tests:
-        conf.set("jobclient.completion.poll.interval", "100")
-        conf.set("cascading.flow.job.pollinginterval", "5")
-        // Work around for local hadoop race
-        conf.set(
-            "mapred.local.dir",
-            "/tmp/hadoop/%s/mapred/local".format(java.util.UUID.randomUUID))
-        HadoopTest(conf, sourceMap)
-      } else {
-        Test(sourceMap)
-      }
+    val testMode: TestMode = if (useHadoop) {
+      val conf = job.getOrElse(new JobConf)
+      // Set the polling to a lower value to speed up tests:
+      conf.set("jobclient.completion.poll.interval", "100")
+      conf.set("cascading.flow.job.pollinginterval", "5")
+      // Work around for local hadoop race
+      conf.set("mapred.local.dir",
+               "/tmp/hadoop/%s/mapred/local".format(java.util.UUID.randomUUID))
+      HadoopTest(conf, sourceMap)
+    } else {
+      Test(sourceMap)
+    }
     testMode.registerTestFiles(fileSet)
     val args = new Args(argsMap)
 
@@ -248,25 +246,25 @@ class JobTest(cons: (Args) => Job) {
     next match {
       case Some(nextjob) => runJob(nextjob, runNext)
       case None => {
-          job.mode match {
-            case hadoopTest @ HadoopTest(_, _) => {
-                /* NOTE: `HadoopTest.finalize` depends on `sinkSet` matching the set of
-                 * "keys" in the `sourceMap`.  Do not change the following line unless
-                 * you also modify the `finalize` function accordingly.
-                 */
-                // The sinks are written to disk, we need to clean them up:
-                sinkSet.foreach { hadoopTest.finalize(_) }
-              }
-            case _ => ()
+        job.mode match {
+          case hadoopTest @ HadoopTest(_, _) => {
+            /* NOTE: `HadoopTest.finalize` depends on `sinkSet` matching the set of
+             * "keys" in the `sourceMap`.  Do not change the following line unless
+             * you also modify the `finalize` function accordingly.
+             */
+            // The sinks are written to disk, we need to clean them up:
+            sinkSet.foreach { hadoopTest.finalize(_) }
           }
-          // Now it is time to check the test conditions:
-          callbacks.foreach { cb =>
-            cb()
-          }
-          statsCallbacks.foreach { cb =>
-            cb(job.scaldingCascadingStats.get)
-          }
+          case _ => ()
         }
+        // Now it is time to check the test conditions:
+        callbacks.foreach { cb =>
+          cb()
+        }
+        statsCallbacks.foreach { cb =>
+          cb(job.scaldingCascadingStats.get)
+        }
+      }
     }
   }
 }

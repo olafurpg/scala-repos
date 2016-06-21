@@ -29,8 +29,9 @@ final case class Insert(tableSym: TermSymbol,
 }
 
 /** A column in an Insert operation. */
-final case class InsertColumn(
-    children: ConstArray[Node], fs: FieldSymbol, buildType: Type)
+final case class InsertColumn(children: ConstArray[Node],
+                              fs: FieldSymbol,
+                              buildType: Type)
     extends Node
     with SimplyTypedNode {
   type Self = InsertColumn

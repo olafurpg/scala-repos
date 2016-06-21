@@ -11,8 +11,8 @@ class DepthFirstIteratorTest extends TreeIteratorTestBase {
   }
 
   def testComplex() = {
-    assertIterates(
-        "0, 1.1, 2.1, 2.2, 1.2, 2.3", "0 (1.1 (2.1, 2.2), 1.2 (2.3))")
+    assertIterates("0, 1.1, 2.1, 2.2, 1.2, 2.3",
+                   "0 (1.1 (2.1, 2.2), 1.2 (2.3))")
   }
 
   def testPredicate() = {

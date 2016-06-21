@@ -48,8 +48,7 @@ object StabilizingGroup {
       grace: Duration,
       statsReceiver: StatsReceiver,
       implicit val timer: Timer
-  )
-      extends Group[T] {
+  ) extends Group[T] {
     import State._
 
     private[this] val newSet = new Broker[Set[T]]()

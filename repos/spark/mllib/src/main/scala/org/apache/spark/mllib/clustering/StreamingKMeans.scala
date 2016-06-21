@@ -181,8 +181,8 @@ class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
   @Since("1.2.0")
   def this() = this(2, 1.0, StreamingKMeans.BATCHES)
 
-  protected var model: StreamingKMeansModel = new StreamingKMeansModel(
-      null, null)
+  protected var model: StreamingKMeansModel =
+    new StreamingKMeansModel(null, null)
 
   /**
     * Set the number of clusters.
@@ -224,8 +224,8 @@ class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
     * Specify initial centers directly.
     */
   @Since("1.2.0")
-  def setInitialCenters(
-      centers: Array[Vector], weights: Array[Double]): this.type = {
+  def setInitialCenters(centers: Array[Vector],
+                        weights: Array[Double]): this.type = {
     model = new StreamingKMeansModel(centers, weights)
     this
   }

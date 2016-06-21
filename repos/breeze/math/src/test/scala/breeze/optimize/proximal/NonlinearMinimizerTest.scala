@@ -1529,8 +1529,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
                                0.04082)
 
     val s = octaveL1.foldLeft(0.0) { case (agg, entry) => agg + abs(entry) }
-    val nlResult = NonlinearMinimizer(25, SPARSE, s).minimizeAndReturnState(
-        cost, DenseVector.zeros[Double](25))
+    val nlResult = NonlinearMinimizer(25, SPARSE, s)
+      .minimizeAndReturnState(cost, DenseVector.zeros[Double](25))
 
     println(s"L1 projection iter ${nlResult.iter}")
     assert(norm(nlResult.x - octaveL1, 2) < 1e-4)

@@ -48,7 +48,8 @@ trait PrecedenceHelper[T] {
     ignoredSet.forall { result =>
       set.forall { otherResult =>
         if (!ScEquivalenceUtil.smartEquivalence(
-                result.getActualElement, otherResult.getActualElement)) {
+                result.getActualElement,
+                otherResult.getActualElement)) {
           (result.getActualElement, otherResult.getActualElement) match {
             case (ta: ScTypeAliasDefinition, cls: PsiClass) =>
               ta.isExactAliasFor(cls)
@@ -86,8 +87,8 @@ trait PrecedenceHelper[T] {
   protected def getQualifiedName(result: ScalaResolveResult): T
 
   private lazy val suspiciousPackages: Set[String] = {
-    def collectPackages(
-        elem: PsiElement, res: Set[String] = Set.empty): Set[String] = {
+    def collectPackages(elem: PsiElement,
+                        res: Set[String] = Set.empty): Set[String] = {
       PsiTreeUtil.getContextOfType(elem, true, classOf[ScPackaging]) match {
         case null => res
         case p: ScPackaging => collectPackages(p, res + p.fullPackageName)
@@ -123,8 +124,8 @@ trait PrecedenceHelper[T] {
     */
   protected def getTopPrecedence(result: ScalaResolveResult): Int
   protected def setTopPrecedence(result: ScalaResolveResult, i: Int)
-  protected def filterNot(
-      p: ScalaResolveResult, n: ScalaResolveResult): Boolean = {
+  protected def filterNot(p: ScalaResolveResult,
+                          n: ScalaResolveResult): Boolean = {
     getPrecedence(p) < getTopPrecedence(n)
   }
   protected def isCheckForEqualPrecedence = true

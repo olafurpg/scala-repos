@@ -64,8 +64,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
       val connFlow = Http().outgoingConnection(serverHostName, serverPort)
 
       val C = 4
-      val doubleConnection = Flow.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      val doubleConnection = Flow.fromGraph(GraphDSL.create() { implicit b ⇒
         import GraphDSL.Implicits._
 
         val bcast = b.add(Broadcast[HttpRequest](C))

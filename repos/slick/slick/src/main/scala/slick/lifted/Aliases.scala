@@ -44,8 +44,12 @@ trait Aliases {
                       LiftedTuple,
                       LiftedCaseClass <: P,
                       PlainTuple,
-                      PlainCaseClass <: P] = lifted.CaseClassShape[
-      P, LiftedTuple, LiftedCaseClass, PlainTuple, PlainCaseClass]
+                      PlainCaseClass <: P] =
+    lifted.CaseClassShape[P,
+                          LiftedTuple,
+                          LiftedCaseClass,
+                          PlainTuple,
+                          PlainCaseClass]
   type ProductClassShape[E <: Product, C <: Product] =
     lifted.ProductClassShape[E, C]
   type ShapeLevel = lifted.ShapeLevel

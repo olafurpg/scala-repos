@@ -36,7 +36,9 @@ class CSVTypeCastSuite extends SparkFunSuite {
       case (strVal, decimalVal) =>
         val decimalValue = new BigDecimal(decimalVal.toString)
         assert(CSVTypeCast.castTo(strVal, decimalType) === Decimal(
-                decimalValue, decimalType.precision, decimalType.scale))
+                decimalValue,
+                decimalType.precision,
+                decimalType.scale))
     }
   }
 

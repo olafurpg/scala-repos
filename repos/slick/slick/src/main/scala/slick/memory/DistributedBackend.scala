@@ -36,7 +36,8 @@ trait DistributedBackend extends RelationalBackend with Logging {
       new BasicActionContext { val useSameThread = _useSameThread }
 
     protected[this] def createStreamingDatabaseActionContext[T](
-        s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext =
+        s: Subscriber[_ >: T],
+        useSameThread: Boolean): StreamingContext =
       new BasicStreamingActionContext(s, useSameThread, DatabaseDef.this)
 
     def createSession(): Session = {

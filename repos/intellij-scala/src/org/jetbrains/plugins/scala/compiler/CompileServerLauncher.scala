@@ -106,7 +106,7 @@ class CompileServerLauncher extends ApplicationComponent {
           if (bootClassPathLibs.isEmpty) Nil
           else
             Seq("-Xbootclasspath/a:" +
-                bootClassPathLibs.mkString(File.pathSeparator))
+                  bootClassPathLibs.mkString(File.pathSeparator))
         val classpath = (jdk.tools +: presentFiles)
           .map(_.canonicalPath)
           .mkString(File.pathSeparator)
@@ -273,7 +273,7 @@ object CompileServerLauncher {
           .USE_PROJECT_HOME_AS_WORKING_DIR
         val workingDirChanged =
           useProjectHome &&
-          projectHome(project) != serverInstance.map(_.workingDir)
+            projectHome(project) != serverInstance.map(_.workingDir)
         workingDirChanged ||
         instance.bootClasspath != withTimestamps(bootClasspath(project))
     }

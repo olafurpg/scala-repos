@@ -128,13 +128,12 @@ class JsonFormatSpec extends FunSuite {
       ]
     }"""
 
-  val apiComment =
-    ApiComment(id = 1,
-               user = apiUser,
-               body = "Me too",
-               created_at = date1,
-               updated_at =
-                 date1)(RepositoryName("octocat", "Hello-World"), 100, false)
+  val apiComment = ApiComment(
+      id = 1,
+      user = apiUser,
+      body = "Me too",
+      created_at = date1,
+      updated_at = date1)(RepositoryName("octocat", "Hello-World"), 100, false)
   val apiCommentJson = s"""{
     "id": 1,
     "body": "Me too",
@@ -144,13 +143,12 @@ class JsonFormatSpec extends FunSuite {
     "updated_at": "2011-04-14T16:00:49Z"
   }"""
 
-  val apiCommentPR =
-    ApiComment(id = 1,
-               user = apiUser,
-               body = "Me too",
-               created_at = date1,
-               updated_at =
-                 date1)(RepositoryName("octocat", "Hello-World"), 100, true)
+  val apiCommentPR = ApiComment(
+      id = 1,
+      user = apiUser,
+      body = "Me too",
+      created_at = date1,
+      updated_at = date1)(RepositoryName("octocat", "Hello-World"), 100, true)
   val apiCommentPRJson = s"""{
     "id": 1,
     "body": "Me too",
@@ -160,8 +158,8 @@ class JsonFormatSpec extends FunSuite {
     "updated_at": "2011-04-14T16:00:49Z"
   }"""
 
-  val apiPersonIdent = ApiPersonIdent(
-      "Monalisa Octocat", "support@example.com", date1)
+  val apiPersonIdent =
+    ApiPersonIdent("Monalisa Octocat", "support@example.com", date1)
   val apiPersonIdentJson = """ {
     "name": "Monalisa Octocat",
     "email": "support@example.com",
@@ -222,15 +220,14 @@ class JsonFormatSpec extends FunSuite {
     "url": "${context.baseUrl}/api/v3/repos/octocat/Hello-World/labels/bug"
   }"""
 
-  val apiIssue =
-    ApiIssue(number = 1347,
-             title = "Found a bug",
-             user = apiUser,
-             state = "open",
-             body = "I'm having a problem with this.",
-             created_at = date1,
-             updated_at =
-               date1)(RepositoryName("octocat", "Hello-World"), false)
+  val apiIssue = ApiIssue(
+      number = 1347,
+      title = "Found a bug",
+      user = apiUser,
+      state = "open",
+      body = "I'm having a problem with this.",
+      created_at = date1,
+      updated_at = date1)(RepositoryName("octocat", "Hello-World"), false)
   val apiIssueJson = s"""{
     "number": 1347,
     "state": "open",
@@ -243,15 +240,14 @@ class JsonFormatSpec extends FunSuite {
     "updated_at": "2011-04-14T16:00:49Z"
   }"""
 
-  val apiIssuePR =
-    ApiIssue(number = 1347,
-             title = "Found a bug",
-             user = apiUser,
-             state = "open",
-             body = "I'm having a problem with this.",
-             created_at = date1,
-             updated_at =
-               date1)(RepositoryName("octocat", "Hello-World"), true)
+  val apiIssuePR = ApiIssue(
+      number = 1347,
+      title = "Found a bug",
+      user = apiUser,
+      state = "open",
+      body = "I'm having a problem with this.",
+      created_at = date1,
+      updated_at = date1)(RepositoryName("octocat", "Hello-World"), true)
   val apiIssuePRJson = s"""{
     "number": 1347,
     "state": "open",
@@ -397,13 +393,13 @@ class JsonFormatSpec extends FunSuite {
       parse(json2)
     } catch {
       case e: com.fasterxml.jackson.core.JsonParseException => {
-          val p =
-            java.lang.Math.max(e.getLocation.getCharOffset() - 10, 0).toInt
-          val message =
-            json2.substring(p, java.lang.Math.min(p + 100, json2.length))
-          throw new com.fasterxml.jackson.core.JsonParseException(
-              message + e.getMessage, e.getLocation)
-        }
+        val p = java.lang.Math.max(e.getLocation.getCharOffset() - 10, 0).toInt
+        val message =
+          json2.substring(p, java.lang.Math.min(p + 100, json2.length))
+        throw new com.fasterxml.jackson.core.JsonParseException(
+            message + e.getMessage,
+            e.getLocation)
+      }
     }
     val js1 = parse(resultJson)
     assert(js1 === js2)
@@ -429,8 +425,8 @@ class JsonFormatSpec extends FunSuite {
     assertJson(JsonFormat(apiCommitStatus), apiCommitStatusJson)
   }
   test("apiCombinedCommitStatus") {
-    assertJson(
-        JsonFormat(apiCombinedCommitStatus), apiCombinedCommitStatusJson)
+    assertJson(JsonFormat(apiCombinedCommitStatus),
+               apiCombinedCommitStatusJson)
   }
   test("apiLabel") {
     assertJson(JsonFormat(apiLabel), apiLabelJson)

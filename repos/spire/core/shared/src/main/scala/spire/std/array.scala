@@ -16,7 +16,8 @@ object ArraySupport {
   }
 
   def vectorEqv[@sp A](x: Array[A], y: Array[A])(
-      implicit ev: Eq[A], sc: AdditiveMonoid[A]): Boolean = {
+      implicit ev: Eq[A],
+      sc: AdditiveMonoid[A]): Boolean = {
     var i = 0
     while (i < x.length && i < y.length && x(i) === y(i)) i += 1
     while (i < x.length && x(i) === sc.zero) i += 1
@@ -35,7 +36,8 @@ object ArraySupport {
   }
 
   def vectorCompare[@sp A](x: Array[A], y: Array[A])(
-      implicit ev: Order[A], sc: AdditiveMonoid[A]): Int = {
+      implicit ev: Order[A],
+      sc: AdditiveMonoid[A]): Int = {
     var i = 0
     while (i < x.length && i < y.length) {
       val cmp = x(i) compare y(i)
@@ -72,7 +74,8 @@ object ArraySupport {
   }
 
   def plus[@sp(Int, Long, Float, Double) A: ClassTag: AdditiveMonoid](
-      x: Array[A], y: Array[A]): Array[A] = {
+      x: Array[A],
+      y: Array[A]): Array[A] = {
     val z = new Array[A](spire.math.max(x.length, y.length))
     var i = 0
     while (i < x.length && i < y.length) { z(i) = x(i) + y(i); i += 1 }
@@ -82,7 +85,8 @@ object ArraySupport {
   }
 
   def minus[@sp(Int, Long, Float, Double) A: ClassTag: AdditiveGroup](
-      x: Array[A], y: Array[A]): Array[A] = {
+      x: Array[A],
+      y: Array[A]): Array[A] = {
     val z = new Array[A](spire.math.max(x.length, y.length))
     var i = 0
     while (i < x.length && i < y.length) { z(i) = x(i) - y(i); i += 1 }
@@ -93,7 +97,8 @@ object ArraySupport {
 
   def timesl[
       @sp(Int, Long, Float, Double) A: ClassTag: MultiplicativeSemigroup](
-      r: A, x: Array[A]): Array[A] = {
+      r: A,
+      x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
     var i = 0
     while (i < y.length) { y(i) = r * x(i); i += 1 }
@@ -109,7 +114,8 @@ object ArraySupport {
   }
 
   def axis[@sp(Float, Double) A](dimensions: Int, i: Int)(
-      implicit ct: ClassTag[A], sc: Rig[A]): Array[A] = {
+      implicit ct: ClassTag[A],
+      sc: Rig[A]): Array[A] = {
     val v = new Array[A](dimensions)
     var j = 0
     while (j < v.length) { v(j) = sc.zero; j += 1 }

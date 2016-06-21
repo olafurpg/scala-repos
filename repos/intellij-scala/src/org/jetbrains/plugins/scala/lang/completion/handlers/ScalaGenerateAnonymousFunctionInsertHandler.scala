@@ -20,8 +20,8 @@ import scala.collection.mutable
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaGenerateAnonymousFunctionInsertHandler(
-    params: Seq[ScType], braceArgs: Boolean)
+class ScalaGenerateAnonymousFunctionInsertHandler(params: Seq[ScType],
+                                                  braceArgs: Boolean)
     extends InsertHandler[LookupElement] {
   def handleInsert(context: InsertionContext, item: LookupElement) {
     val abstracts = new mutable.HashSet[ScAbstractType]
@@ -42,7 +42,8 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
     val startOffset = context.getStartOffset
     val endOffset = startOffset + text.length()
     val commonParent = PsiTreeUtil.findCommonParent(
-        file.findElementAt(startOffset), file.findElementAt(endOffset - 1))
+        file.findElementAt(startOffset),
+        file.findElementAt(endOffset - 1))
     if (commonParent.getTextRange.getStartOffset != startOffset ||
         commonParent.getTextRange.getEndOffset != endOffset) {
       document.insertString(endOffset, " ")
@@ -71,7 +72,7 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
                   ScTypePresentation.ABSTRACT_TYPE_PREFIX.length
                 val node = abstracts.find(a =>
                       ScTypePresentation.ABSTRACT_TYPE_PREFIX +
-                      a.tpt.name == refName) match {
+                        a.tpt.name == refName) match {
                   case Some(abstr) =>
                     import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing}
                     abstr.simplifyType match {

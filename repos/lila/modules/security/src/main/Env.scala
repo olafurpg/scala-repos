@@ -70,12 +70,12 @@ final class Env(config: Config,
 
   lazy val recaptcha: Recaptcha =
     if (RecaptchaEnabled)
-      new RecaptchaGoogle(
-          privateKey = RecaptchaPrivateKey, endpoint = RecaptchaEndpoint)
+      new RecaptchaGoogle(privateKey = RecaptchaPrivateKey,
+                          endpoint = RecaptchaEndpoint)
     else RecaptchaSkip
 
-  lazy val forms = new DataForm(
-      captcher = captcher, emailAddress = emailAddress)
+  lazy val forms =
+    new DataForm(captcher = captcher, emailAddress = emailAddress)
 
   lazy val geoIP = new GeoIP(file = GeoIPFile, cacheTtl = GeoIPCacheTtl)
 
@@ -109,8 +109,8 @@ final class Env(config: Config,
 
   scheduler.once(10 seconds)(disposableEmailDomain.refresh)
   scheduler.effect(
-      DisposableEmailRefreshDelay, "Refresh disposable email domains")(
-      disposableEmailDomain.refresh)
+      DisposableEmailRefreshDelay,
+      "Refresh disposable email domains")(disposableEmailDomain.refresh)
 
   lazy val tor = new Tor(TorProviderUrl)
   scheduler.once(30 seconds)(tor.refresh(_ => funit))

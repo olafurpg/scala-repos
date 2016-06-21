@@ -131,12 +131,11 @@ case class GetJsonObject(json: Expression, path: Expression)
       return null
     }
 
-    val parsed =
-      if (path.foldable) {
-        parsedPath
-      } else {
-        parsePath(path.eval(input).asInstanceOf[UTF8String])
-      }
+    val parsed = if (path.foldable) {
+      parsedPath
+    } else {
+      parsePath(path.eval(input).asInstanceOf[UTF8String])
+    }
 
     if (parsed.isDefined) {
       try {
@@ -238,8 +237,8 @@ case class GetJsonObject(json: Expression, path: Expression)
         }
         dirty
 
-      case (
-          START_ARRAY, Subscript :: Wildcard :: Subscript :: Wildcard :: xs) =>
+      case (START_ARRAY,
+            Subscript :: Wildcard :: Subscript :: Wildcard :: xs) =>
         // special handling for the non-structure preserving double wildcard behavior in Hive
         var dirty = false
         g.writeStartArray()
@@ -372,8 +371,7 @@ case class JsonTuple(children: Seq[Expression])
     if (children.length < 2) {
       TypeCheckResult.TypeCheckFailure(
           s"$prettyName requires at least two arguments")
-    } else if (children.forall(
-                   child => StringType.acceptsType(child.dataType))) {
+    } else if (children.forall(child => StringType.acceptsType(child.dataType))) {
       TypeCheckResult.TypeCheckSuccess
     } else {
       TypeCheckResult.TypeCheckFailure(
@@ -398,8 +396,8 @@ case class JsonTuple(children: Seq[Expression])
     }
   }
 
-  private def parseRow(
-      parser: JsonParser, input: InternalRow): Seq[InternalRow] = {
+  private def parseRow(parser: JsonParser,
+                       input: InternalRow): Seq[InternalRow] = {
     // only objects are supported
     if (parser.nextToken() != JsonToken.START_OBJECT) {
       return nullRow
@@ -407,23 +405,22 @@ case class JsonTuple(children: Seq[Expression])
 
     // evaluate the field names as String rather than UTF8String to
     // optimize lookups from the json token, which is also a String
-    val fieldNames =
-      if (constantFields == fieldExpressions.length) {
-        // typically the user will provide the field names as foldable expressions
-        // so we can use the cached copy
-        foldableFieldNames
-      } else if (constantFields == 0) {
-        // none are foldable so all field names need to be evaluated from the input row
-        fieldExpressions.map(_.eval(input).asInstanceOf[UTF8String].toString)
-      } else {
-        // if there is a mix of constant and non-constant expressions
-        // prefer the cached copy when available
-        foldableFieldNames.zip(fieldExpressions).map {
-          case (null, expr) =>
-            expr.eval(input).asInstanceOf[UTF8String].toString
-          case (fieldName, _) => fieldName
-        }
+    val fieldNames = if (constantFields == fieldExpressions.length) {
+      // typically the user will provide the field names as foldable expressions
+      // so we can use the cached copy
+      foldableFieldNames
+    } else if (constantFields == 0) {
+      // none are foldable so all field names need to be evaluated from the input row
+      fieldExpressions.map(_.eval(input).asInstanceOf[UTF8String].toString)
+    } else {
+      // if there is a mix of constant and non-constant expressions
+      // prefer the cached copy when available
+      foldableFieldNames.zip(fieldExpressions).map {
+        case (null, expr) =>
+          expr.eval(input).asInstanceOf[UTF8String].toString
+        case (fieldName, _) => fieldName
       }
+    }
 
     val row = Array.ofDim[Any](fieldNames.length)
 
@@ -456,8 +453,8 @@ case class JsonTuple(children: Seq[Expression])
     new GenericInternalRow(row) :: Nil
   }
 
-  private def copyCurrentStructure(
-      generator: JsonGenerator, parser: JsonParser): Unit = {
+  private def copyCurrentStructure(generator: JsonGenerator,
+                                   parser: JsonParser): Unit = {
     parser.getCurrentToken match {
       // if the user requests a string field it needs to be returned without enclosing
       // quotes which is accomplished via JsonGenerator.writeRaw instead of JsonGenerator.write

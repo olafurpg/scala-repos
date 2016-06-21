@@ -103,8 +103,9 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
         case Some(fin) =>
           fin.expression match {
             case Some(expr) =>
-              processExpression(
-                  expr, tryStmt, scalaSettings.FINALLY_BRACE_FORCE)
+              processExpression(expr,
+                                tryStmt,
+                                scalaSettings.FINALLY_BRACE_FORCE)
             case _ =>
           }
         case _ =>
@@ -134,8 +135,9 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
     }
   }
 
-  private def processExpression(
-      expr: ScExpression, stmt: PsiElement, option: Int) {
+  private def processExpression(expr: ScExpression,
+                                stmt: PsiElement,
+                                option: Int) {
     expr match {
       case b: ScBlockExpr =>
       case _ =>
@@ -156,7 +158,8 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
     try {
       val project = expr.getProject
       val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-          "{\n" + expr.getText + "\n}", expr.getManager)
+          "{\n" + expr.getText + "\n}",
+          expr.getManager)
       val prev = expr.getPrevSibling
       if (ScalaPsiUtil.isLineTerminator(prev) ||
           prev.isInstanceOf[PsiWhiteSpace]) {

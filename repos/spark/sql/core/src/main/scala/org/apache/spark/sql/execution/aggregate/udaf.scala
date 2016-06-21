@@ -248,8 +248,9 @@ private[sql] class MutableAggregationBufferImpl(
           s"Could not update ${i}th value in this buffer because it only has $length values.")
     }
 
-    bufferValueSetters(i)(
-        underlyingBuffer, offsets(i), toCatalystConverters(i)(value))
+    bufferValueSetters(i)(underlyingBuffer,
+                          offsets(i),
+                          toCatalystConverters(i)(value))
   }
 
   // Because get method call specialized getter based on the schema, we cannot use the
@@ -271,7 +272,7 @@ private[sql] class MutableAggregationBufferImpl(
 /**
   * A [[Row]] representing an immutable aggregation buffer.
   */
-private[sql] class InputAggregationBuffer private[sql](
+private[sql] class InputAggregationBuffer private[sql] (
     schema: StructType,
     toCatalystConverters: Array[Any => Any],
     toScalaConverters: Array[Any => Any],
@@ -362,8 +363,10 @@ private[sql] case class ScalaUDAF(children: Seq[Expression],
   private[this] lazy val childrenSchema: StructType = {
     val inputFields = children.zipWithIndex.map {
       case (child, index) =>
-        StructField(
-            s"input$index", child.dataType, child.nullable, Metadata.empty)
+        StructField(s"input$index",
+                    child.dataType,
+                    child.nullable,
+                    Metadata.empty)
     }
     StructType(inputFields)
   }

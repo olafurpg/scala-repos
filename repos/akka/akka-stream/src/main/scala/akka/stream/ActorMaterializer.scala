@@ -54,8 +54,8 @@ object ActorMaterializer {
     * the processing steps. The default `namePrefix` is `"flow"`. The actor names are built up of
     * `namePrefix-flowNumber-flowStepNumber-stepName`.
     */
-  def apply(
-      materializerSettings: ActorMaterializerSettings, namePrefix: String)(
+  def apply(materializerSettings: ActorMaterializerSettings,
+            namePrefix: String)(
       implicit context: ActorRefFactory): ActorMaterializer = {
     val haveShutDown = new AtomicBoolean(false)
     val system = actorSystemOf(context)
@@ -150,7 +150,7 @@ object ActorMaterializer {
       case _ ⇒
         throw new IllegalArgumentException(
             s"required [${classOf[ActorMaterializer].getName}] " +
-            s"but got [${materializer.getClass.getName}]")
+              s"but got [${materializer.getClass.getName}]")
     }
 }
 
@@ -182,8 +182,8 @@ abstract class ActorMaterializer extends Materializer {
   /**
     * INTERNAL API: this might become public later
     */
-  private[akka] def actorOf(
-      context: MaterializationContext, props: Props): ActorRef
+  private[akka] def actorOf(context: MaterializationContext,
+                            props: Props): ActorRef
 
   /**
     * INTERNAL API
@@ -256,8 +256,7 @@ object ActorMaterializerSettings {
         maxInputBufferSize = config.getInt("max-input-buffer-size"),
         dispatcher = config.getString("dispatcher"),
         supervisionDecider = Supervision.stoppingDecider,
-        subscriptionTimeoutSettings =
-          StreamSubscriptionTimeoutSettings(config),
+        subscriptionTimeoutSettings = StreamSubscriptionTimeoutSettings(config),
         debugLogging = config.getBoolean("debug-logging"),
         outputBurstLimit = config.getInt("output-burst-limit"),
         fuzzingMode = config.getBoolean("debug.fuzzing-mode"),
@@ -385,8 +384,8 @@ final class ActorMaterializerSettings private (
     *
     * FIXME: Currently only the initialSize is used, auto-tuning is not yet implemented.
     */
-  def withInputBuffer(
-      initialSize: Int, maxSize: Int): ActorMaterializerSettings = {
+  def withInputBuffer(initialSize: Int,
+                      maxSize: Int): ActorMaterializerSettings = {
     if (initialSize == this.initialInputBufferSize &&
         maxSize == this.maxInputBufferSize) this
     else
@@ -423,8 +422,7 @@ final class ActorMaterializerSettings private (
       decider: function.Function[Throwable, Supervision.Directive])
     : ActorMaterializerSettings = {
     import Supervision._
-    copy(
-        supervisionDecider = decider match {
+    copy(supervisionDecider = decider match {
       case `resumingDecider` ⇒ resumingDecider
       case `restartingDecider` ⇒ restartingDecider
       case `stoppingDecider` ⇒ stoppingDecider
@@ -496,14 +494,14 @@ final class ActorMaterializerSettings private (
   override def equals(other: Any): Boolean = other match {
     case s: ActorMaterializerSettings ⇒
       s.initialInputBufferSize == initialInputBufferSize &&
-      s.maxInputBufferSize == maxInputBufferSize &&
-      s.dispatcher == dispatcher &&
-      s.supervisionDecider == supervisionDecider &&
-      s.subscriptionTimeoutSettings == subscriptionTimeoutSettings &&
-      s.debugLogging == debugLogging &&
-      s.outputBurstLimit == outputBurstLimit &&
-      s.syncProcessingLimit == syncProcessingLimit &&
-      s.fuzzingMode == fuzzingMode && s.autoFusing == autoFusing
+        s.maxInputBufferSize == maxInputBufferSize &&
+        s.dispatcher == dispatcher &&
+        s.supervisionDecider == supervisionDecider &&
+        s.subscriptionTimeoutSettings == subscriptionTimeoutSettings &&
+        s.debugLogging == debugLogging &&
+        s.outputBurstLimit == outputBurstLimit &&
+        s.syncProcessingLimit == syncProcessingLimit &&
+        s.fuzzingMode == fuzzingMode && s.autoFusing == autoFusing
     case _ ⇒ false
   }
 
@@ -541,10 +539,11 @@ object StreamSubscriptionTimeoutSettings {
     val c = config.getConfig("subscription-timeout")
     StreamSubscriptionTimeoutSettings(
         mode = c.getString("mode").toLowerCase(Locale.ROOT) match {
-      case "no" | "off" | "false" | "noop" ⇒ NoopTermination
-      case "warn" ⇒ WarnTermination
-      case "cancel" ⇒ CancelTermination
-    }, timeout = c.getDuration("timeout", TimeUnit.MILLISECONDS).millis)
+          case "no" | "off" | "false" | "noop" ⇒ NoopTermination
+          case "warn" ⇒ WarnTermination
+          case "cancel" ⇒ CancelTermination
+        },
+        timeout = c.getDuration("timeout", TimeUnit.MILLISECONDS).millis)
   }
 }
 

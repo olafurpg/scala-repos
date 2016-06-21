@@ -95,7 +95,7 @@ class OptimizeInSuite extends PlanTest {
   }
 
   test("OptimizedIn test: Inset optimization disabled as " +
-      "list expression contains attribute)") {
+        "list expression contains attribute)") {
     val originalQuery = testRelation
       .where(In(Literal.create(null, StringType),
                 Seq(Literal(1), UnresolvedAttribute("b"))))
@@ -109,7 +109,7 @@ class OptimizeInSuite extends PlanTest {
   }
 
   test("OptimizedIn test: Inset optimization disabled as " +
-      "list expression contains attribute - select)") {
+        "list expression contains attribute - select)") {
     val originalQuery = testRelation
       .select(In(Literal.create(null, StringType),
                  Seq(Literal(1), UnresolvedAttribute("b"))).as("a"))

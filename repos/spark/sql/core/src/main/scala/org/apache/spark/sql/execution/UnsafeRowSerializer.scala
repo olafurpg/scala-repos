@@ -183,7 +183,7 @@ private class UnsafeRowSerializerInstance(numFields: Int)
     throw new UnsupportedOperationException
   override def deserialize[T: ClassTag](bytes: ByteBuffer): T =
     throw new UnsupportedOperationException
-  override def deserialize[T: ClassTag](
-      bytes: ByteBuffer, loader: ClassLoader): T =
+  override def deserialize[T: ClassTag](bytes: ByteBuffer,
+                                        loader: ClassLoader): T =
     throw new UnsupportedOperationException
 }

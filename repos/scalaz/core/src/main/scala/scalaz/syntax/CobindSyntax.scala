@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Cobind` */
-final class CobindOps[F[_], A] private[syntax](val self: F[A])(
+final class CobindOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Cobind[F])
     extends Ops[F[A]] {
   ////

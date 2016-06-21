@@ -23,7 +23,8 @@ import org.jetbrains.plugins.scala.lang.refactoring.move.ScalaMoveUtil
   */
 class ScalaMoveToPackageQuickFix(myFile: ScalaFile, packQualName: String)
     extends AbstractFixOnPsiElement(
-        s"Move File ${myFile.name} To Package " + packQualName, myFile) {
+        s"Move File ${myFile.name} To Package " + packQualName,
+        myFile) {
   def doApplyFix(project: Project): Unit = {
     val file = getElement
     if (!file.isValid) return
@@ -32,16 +33,18 @@ class ScalaMoveToPackageQuickFix(myFile: ScalaFile, packQualName: String)
     val fileIndex: ProjectFileIndex =
       ProjectRootManager.getInstance(project).getFileIndex
     val currentModule: Module = fileIndex.getModuleForFile(file.getVirtualFile)
-    val directory = PackageUtil.findOrCreateDirectoryForPackage(
-        currentModule, packageName, null, true)
+    val directory = PackageUtil
+      .findOrCreateDirectoryForPackage(currentModule, packageName, null, true)
 
     if (directory == null) {
       return
     }
     val error = RefactoringMessageUtil.checkCanCreateFile(directory, file.name)
     if (error != null) {
-      Messages.showMessageDialog(
-          project, error, CommonBundle.getErrorTitle, Messages.getErrorIcon)
+      Messages.showMessageDialog(project,
+                                 error,
+                                 CommonBundle.getErrorTitle,
+                                 Messages.getErrorIcon)
       return
     }
     ScalaMoveUtil.saveMoveDestination(file, directory)

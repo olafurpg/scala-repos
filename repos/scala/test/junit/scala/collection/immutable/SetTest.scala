@@ -34,8 +34,8 @@ class SetTest {
 
     // Make sure BitSet correctly rebuilds itself on widening with toSet
     // Need to cover empty, values 0-63, values 0-127 as special cases
-    val bitsets = Seq(
-        BitSet.empty, BitSet(23), BitSet(23, 99), BitSet(23, 99, 141))
+    val bitsets =
+      Seq(BitSet.empty, BitSet(23), BitSet(23, 99), BitSet(23, 99, 141))
     bitsets.foreach { b =>
       val ba = any(b)
       assert(b ne ba)

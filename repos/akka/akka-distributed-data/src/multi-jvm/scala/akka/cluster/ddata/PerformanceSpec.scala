@@ -23,7 +23,8 @@ object PerformanceSpec extends MultiNodeConfig {
   val n4 = role("n4")
   val n5 = role("n5")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(ConfigFactory.parseString(
+          """
     akka.loglevel = ERROR
     akka.stdout-loglevel = ERROR
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
@@ -79,9 +80,9 @@ class PerformanceSpec
   def repeat(description: String,
              keys: Iterable[ORSetKey[Int]],
              n: Int,
-             expectedAfterReplication: Option[Set[Int]] =
-               None)(block: (ORSetKey[Int], Int, ActorRef) ⇒ Unit,
-                     afterEachKey: ORSetKey[Int] ⇒ Unit = _ ⇒ ()): Unit = {
+             expectedAfterReplication: Option[Set[Int]] = None)(
+      block: (ORSetKey[Int], Int, ActorRef) ⇒ Unit,
+      afterEachKey: ORSetKey[Int] ⇒ Unit = _ ⇒ ()): Unit = {
 
     keys.foreach { key ⇒
       val startTime = System.nanoTime()
@@ -113,8 +114,8 @@ class PerformanceSpec
     }
   }
 
-  def awaitReplicated(
-      keys: Iterable[ORSetKey[Int]], expectedData: Set[Int]): Unit =
+  def awaitReplicated(keys: Iterable[ORSetKey[Int]],
+                      expectedData: Set[Int]): Unit =
     keys.foreach { key ⇒
       awaitReplicated(key, expectedData)
     }
@@ -207,8 +208,8 @@ class PerformanceSpec
       runOn(n1, n2, n3) {
         val latch = TestLatch(n)
         val replyTo = system.actorOf(countDownProps(latch))
-        for (_ ← 0 until n) replicator.tell(
-            Update(key, GCounter(), WriteLocal)(_ + 1), replyTo)
+        for (_ ← 0 until n)
+          replicator.tell(Update(key, GCounter(), WriteLocal)(_ + 1), replyTo)
         Await.ready(latch, 5.seconds + (1.second * factor))
         enterBarrier("update-done-6")
         runOn(n1) {

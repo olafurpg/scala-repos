@@ -61,7 +61,7 @@ class HistoryServerArgumentsSuite extends SparkFunSuite {
       File.createTempFile("test-load-spark-properties", "test", tmpDir)
     try {
       Files.write("spark.test.CustomPropertyA blah\n" +
-                  "spark.test.CustomPropertyB notblah\n",
+                    "spark.test.CustomPropertyB notblah\n",
                   outFile,
                   UTF_8)
       val argStrings = Array("--properties-file", outFile.getAbsolutePath)

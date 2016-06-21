@@ -15,9 +15,8 @@ class BinaryClockTest extends Specification {
   def write(c: Clock): List[String] =
     (BinaryFormat.clock(since) write c).showBytes.split(',').toList
   def read(bytes: List[String]): Clock =
-    (BinaryFormat
-      .clock(since)
-      .read(ByteArray.parseBytes(bytes), false, false))(chess.White)
+    (BinaryFormat.clock(since).read(ByteArray.parseBytes(bytes), false, false))(
+        chess.White)
   def isomorphism(c: Clock): Clock =
     (BinaryFormat
       .clock(since)

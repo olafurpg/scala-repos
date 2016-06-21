@@ -22,11 +22,10 @@ import sbt.io.IO
   * It is safe to use for its intended purpose: copying resources to a class output directory.
   */
 object Sync {
-  def apply(
-      cacheFile: File,
-      inStyle: FileInfo.Style = FileInfo.lastModified,
-      outStyle: FileInfo.Style =
-        FileInfo.exists): Traversable[(File, File)] => Relation[File, File] =
+  def apply(cacheFile: File,
+            inStyle: FileInfo.Style = FileInfo.lastModified,
+            outStyle: FileInfo.Style = FileInfo.exists)
+    : Traversable[(File, File)] => Relation[File, File] =
     mappings => {
       val relation = Relation.empty ++ mappings
       noDuplicateTargets(relation)
@@ -38,8 +37,8 @@ object Sync {
 
       def outofdate(source: File, target: File): Boolean =
         !previousRelation.contains(source, target) ||
-        (previousInfo get source) != (currentInfo get source) ||
-        !target.exists || target.isDirectory != source.isDirectory
+          (previousInfo get source) != (currentInfo get source) ||
+          !target.exists || target.isDirectory != source.isDirectory
 
       val updates = relation filter outofdate
 
@@ -88,8 +87,9 @@ object Sync {
         Relation.make _)(r => (r.forwardMap, r.reverseMap))(af, bf)
 
   def writeInfo[F <: FileInfo](
-      file: File, relation: Relation[File, File], info: Map[File, F])(
-      implicit infoFormat: Format[F]): Unit =
+      file: File,
+      relation: Relation[File, File],
+      info: Map[File, F])(implicit infoFormat: Format[F]): Unit =
     IO.gzipFileOut(file) { out =>
       write(out, (relation, info))
     }

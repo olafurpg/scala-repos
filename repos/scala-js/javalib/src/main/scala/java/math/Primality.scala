@@ -479,7 +479,7 @@ private[math] object Primality {
         do {
           x = new BigInteger(bitLength, rnd)
         } while ((x.compareTo(n) >= BigInteger.EQUALS) || x.sign == 0 ||
-        x.isOne)
+          x.isOne)
       }
 
       y = x.modPow(q, n)

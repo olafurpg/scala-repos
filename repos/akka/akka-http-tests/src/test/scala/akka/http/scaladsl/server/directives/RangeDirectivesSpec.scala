@@ -82,7 +82,8 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
       Get() ~> addHeader(Range(ByteRange(100, 200))) ~> completeWithRangedBytes(
           10) ~> check {
         rejection shouldEqual UnsatisfiableRangeRejection(
-            ByteRange(100, 200) :: Nil, 10)
+            ByteRange(100, 200) :: Nil,
+            10)
       }
     }
 
@@ -90,7 +91,8 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
       Get() ~> addHeader(Range(ByteRange.suffix(0))) ~> completeWithRangedBytes(
           42) ~> check {
         rejection shouldEqual UnsatisfiableRangeRejection(
-            ByteRange.suffix(0) :: Nil, 42)
+            ByteRange.suffix(0) :: Nil,
+            42)
       }
     }
 

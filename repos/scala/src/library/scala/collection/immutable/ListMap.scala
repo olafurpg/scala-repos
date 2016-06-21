@@ -109,8 +109,9 @@ class ListMap[A, +B]
     *  @param elem2 the second element to add.
     *  @param elems the remaining elements to add.
     */
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): ListMap[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): ListMap[A, B1] =
     this + elem1 + elem2 ++ elems
 
   /** Adds a number of elements provided by a traversable object
@@ -219,8 +220,9 @@ class ListMap[A, +B]
       */
     override def -(k: A): ListMap[A, B1] = remove0(k, this, Nil)
 
-    @tailrec private def remove0(
-        k: A, cur: ListMap[A, B1], acc: List[ListMap[A, B1]]): ListMap[A, B1] =
+    @tailrec private def remove0(k: A,
+                                 cur: ListMap[A, B1],
+                                 acc: List[ListMap[A, B1]]): ListMap[A, B1] =
       if (cur.isEmpty) acc.last
       else if (k == cur.key)
         (cur.next /: acc) {

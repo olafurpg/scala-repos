@@ -39,8 +39,9 @@ object StackRegistry {
   /**
     * The module describing a given Param for a Stack element.
     */
-  case class Module(
-      name: String, description: String, fields: Seq[(String, String)])
+  case class Module(name: String,
+                    description: String,
+                    fields: Seq[(String, String)])
 }
 
 /**

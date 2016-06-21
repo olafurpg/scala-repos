@@ -177,31 +177,31 @@ object ArrayUtil {
     else {
       a match {
         case x: Array[Double] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Double]], b.asInstanceOf[Array[Double]])
+          Arrays.equals(a.asInstanceOf[Array[Double]],
+                        b.asInstanceOf[Array[Double]])
         case x: Array[Int] =>
           Arrays.equals(a.asInstanceOf[Array[Int]], b.asInstanceOf[Array[Int]])
         case x: Array[Float] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Float]], b.asInstanceOf[Array[Float]])
+          Arrays
+            .equals(a.asInstanceOf[Array[Float]], b.asInstanceOf[Array[Float]])
         case x: Array[Boolean] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Boolean]], b.asInstanceOf[Array[Boolean]])
+          Arrays.equals(a.asInstanceOf[Array[Boolean]],
+                        b.asInstanceOf[Array[Boolean]])
         case x: Array[Long] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])
+          Arrays
+            .equals(a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])
         case x: Array[Short] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Short]], b.asInstanceOf[Array[Short]])
+          Arrays
+            .equals(a.asInstanceOf[Array[Short]], b.asInstanceOf[Array[Short]])
         case x: Array[Char] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Char]], b.asInstanceOf[Array[Char]])
+          Arrays
+            .equals(a.asInstanceOf[Array[Char]], b.asInstanceOf[Array[Char]])
         case x: Array[Byte] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[Byte]], b.asInstanceOf[Array[Byte]])
+          Arrays
+            .equals(a.asInstanceOf[Array[Byte]], b.asInstanceOf[Array[Byte]])
         case x: Array[_] =>
-          Arrays.equals(
-              a.asInstanceOf[Array[AnyRef]], b.asInstanceOf[Array[AnyRef]])
+          Arrays.equals(a.asInstanceOf[Array[AnyRef]],
+                        b.asInstanceOf[Array[AnyRef]])
         case _ => throw new RuntimeException("shouldn't be here!")
       }
     }
@@ -336,8 +336,10 @@ object ArrayUtil {
     }
   }
 
-  def gallopSearch(
-      objs: Array[Int], fromIndex: Int, toIndex: Int, toFind: Int): Int = {
+  def gallopSearch(objs: Array[Int],
+                   fromIndex: Int,
+                   toIndex: Int,
+                   toFind: Int): Int = {
     if (objs.length == 0) return ~0
 
 //    if(toIndex - fromIndex <= 16) return linearSearch(objs, fromIndex, toIndex, toFind)
@@ -360,8 +362,10 @@ object ArrayUtil {
     }
   }
 
-  def zeroSkippingHashCode[V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+  def zeroSkippingHashCode[V](data: Array[V],
+                              offset: Int,
+                              stride: Int,
+                              length: Int): Int = {
     (data: Any) match {
       case x: Array[Double] =>
         zeroSkippingHashCodeImpl_Double(x, offset, stride, length)
@@ -384,9 +388,12 @@ object ArrayUtil {
   }
 
   @expand
-  private def zeroSkippingHashCodeImpl[@expand.args(
-          Int, Float, Double, Long, Byte, Short, Char, Boolean) V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+  private def zeroSkippingHashCodeImpl[
+      @expand.args(Int, Float, Double, Long, Byte, Short, Char, Boolean) V](
+      data: Array[V],
+      offset: Int,
+      stride: Int,
+      length: Int): Int = {
     var hash = 43
     var i = offset
     cforRange(0 until length) { _ =>
@@ -398,8 +405,10 @@ object ArrayUtil {
     hash
   }
 
-  private def zeroSkippingHashCodeImplSlow[V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+  private def zeroSkippingHashCodeImplSlow[V](data: Array[V],
+                                              offset: Int,
+                                              stride: Int,
+                                              length: Int): Int = {
     var hash = 43
     var i = offset
     cforRange(0 until length) { _ =>

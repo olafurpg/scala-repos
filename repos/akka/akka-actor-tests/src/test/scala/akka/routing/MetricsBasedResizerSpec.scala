@@ -42,7 +42,8 @@ object MetricsBasedResizerSpec {
     (1 to num).map(_ ⇒ routee).toVector
 
   case class TestRouter(routees: Vector[ActorRefRoutee])(
-      implicit system: ActorSystem, timeout: Timeout) {
+      implicit system: ActorSystem,
+      timeout: Timeout) {
 
     var msgs: Set[TestLatch] = Set()
 
@@ -167,9 +168,9 @@ class MetricsBasedResizerSpec
 
     "leave the underutilizationStreak highestUtilization unchanged if current utilization is lower" in {
       val resizer = DefaultOptimalSizeExploringResizer()
-      resizer.record =
-        ResizeRecord(underutilizationStreak = Some(UnderUtilizationStreak(
-                    start = LocalDateTime.now, highestUtilization = 2)))
+      resizer.record = ResizeRecord(underutilizationStreak =
+            Some(UnderUtilizationStreak(start = LocalDateTime.now,
+                                        highestUtilization = 2)))
 
       val router = TestRouter(routees(2))
       router.mockSend(await = true)
@@ -182,9 +183,9 @@ class MetricsBasedResizerSpec
 
     "update the underutilizationStreak highestUtilization if current utilization is higher" in {
       val resizer = DefaultOptimalSizeExploringResizer()
-      resizer.record =
-        ResizeRecord(underutilizationStreak = Some(UnderUtilizationStreak(
-                    start = LocalDateTime.now, highestUtilization = 1)))
+      resizer.record = ResizeRecord(underutilizationStreak =
+            Some(UnderUtilizationStreak(start = LocalDateTime.now,
+                                        highestUtilization = 1)))
 
       val router = TestRouter(routees(3))
       router.mockSend(await = true, routeeIdx = 0)
@@ -244,8 +245,7 @@ class MetricsBasedResizerSpec
       val resizer = DefaultOptimalSizeExploringResizer()
       val router = TestRouter(routees(2))
       val msgs1 = router.sendToAll(await = true)
-      val msgs2 =
-        router.sendToAll(await = false) //make sure the routees are still busy after the first batch of messages get processed.
+      val msgs2 = router.sendToAll(await = false) //make sure the routees are still busy after the first batch of messages get processed.
 
       val before = LocalDateTime.now
       resizer.reportMessageCount(router.routees, router.msgs.size) //updates the records
@@ -273,8 +273,7 @@ class MetricsBasedResizerSpec
 
       val router = TestRouter(routees(2))
       val msgs1 = router.sendToAll(await = true)
-      val msgs2 =
-        router.sendToAll(await = false) //make sure the routees are still busy after the first batch of messages get processed.
+      val msgs2 = router.sendToAll(await = false) //make sure the routees are still busy after the first batch of messages get processed.
 
       val before = LocalDateTime.now
       resizer.reportMessageCount(router.routees, router.msgs.size) //updates the records
@@ -298,8 +297,10 @@ class MetricsBasedResizerSpec
 
   "MetricsBasedResizer resize" must {
     "downsize to close to the highest retention when a streak of underutilization started downsizeAfterUnderutilizedFor" in {
-      val resizer = DefaultOptimalSizeExploringResizer(
-          downsizeAfterUnderutilizedFor = 72.hours, downsizeRatio = 0.5)
+      val resizer =
+        DefaultOptimalSizeExploringResizer(downsizeAfterUnderutilizedFor =
+                                             72.hours,
+                                           downsizeRatio = 0.5)
 
       resizer.record = ResizeRecord(underutilizationStreak = Some(
               UnderUtilizationStreak(start = LocalDateTime.now.minusHours(73),
@@ -324,8 +325,9 @@ class MetricsBasedResizerSpec
     }
 
     "explore when there is performance log but not go beyond exploreStepSize" in {
-      val resizer = DefaultOptimalSizeExploringResizer(
-          exploreStepSize = 0.3, explorationProbability = 1)
+      val resizer = DefaultOptimalSizeExploringResizer(exploreStepSize = 0.3,
+                                                       explorationProbability =
+                                                         1)
       resizer.performanceLog = Map(11 → 1.milli, 13 → 1.millis, 12 → 3.millis)
 
       val exploreSamples = (1 to 100).map(_ ⇒ resizer.resize(routees(10)))

@@ -21,8 +21,8 @@ final class Env(config: Config,
   private val analysisColl = db(config getString "collection.analysis")
   private val clientColl = db(config getString "collection.client")
 
-  private val repo = new FishnetRepo(
-      analysisColl = analysisColl, clientColl = clientColl)
+  private val repo =
+    new FishnetRepo(analysisColl = analysisColl, clientColl = clientColl)
 
   private val moveDb = new MoveDB
 

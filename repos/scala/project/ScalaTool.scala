@@ -17,8 +17,7 @@ case class ScalaTool(mainClass: String,
   //  `%SCALA_HOME%`) can be specified in a platform independent way (e.g.
   //  `@SCALA_HOME@`) and automatically translated for you.
   def patchedToolScript(template: String, forWindows: Boolean) = {
-    val varRegex =
-      """@(\w+)@""" // the group should be able to capture each of the keys of the map below
+    val varRegex = """@(\w+)@""" // the group should be able to capture each of the keys of the map below
     val platformClasspath =
       if (forWindows)
         classpath.mkString(";").replace('/', '\\').replaceAll(varRegex, "%$1%")
@@ -39,7 +38,7 @@ case class ScalaTool(mainClass: String,
         ("@@" -> "@"), // for backwards compatibility
         ("@class@" -> mainClass),
         ("@properties@" ->
-            (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
+              (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
         ("@javaflags@" -> javaOpts),
         ("@toolflags@" -> toolFlags),
         ("@classpath@" -> platformClasspath)
@@ -49,8 +48,10 @@ case class ScalaTool(mainClass: String,
     replaceEach(template, from.toArray, to.toArray)
   }
 
-  def writeScript(
-      file: String, platform: String, rootDir: File, outDir: File): File = {
+  def writeScript(file: String,
+                  platform: String,
+                  rootDir: File,
+                  outDir: File): File = {
     val forWindows = platform match {
       case "windows" => true
       case _ => false
@@ -59,9 +60,10 @@ case class ScalaTool(mainClass: String,
     val suffix = if (forWindows) ".bat" else ""
     val scriptFile = outDir / s"$file$suffix"
     val patched = patchedToolScript(
-        IO.read(rootDir / templatePath).replace("\r", ""), forWindows)
-    IO.write(
-        scriptFile, if (forWindows) patched.replace("\n", "\r\n") else patched)
+        IO.read(rootDir / templatePath).replace("\r", ""),
+        forWindows)
+    IO.write(scriptFile,
+             if (forWindows) patched.replace("\n", "\r\n") else patched)
     scriptFile
   }
 }

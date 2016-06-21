@@ -29,8 +29,10 @@ import scalaz.NonEmptyList._
 import scalaz.syntax.applicative._
 import scalaz.syntax.std.option._
 
-case class ServiceLocation(
-    protocol: String, host: String, port: Int, pathPrefix: Option[String]) {
+case class ServiceLocation(protocol: String,
+                           host: String,
+                           port: Int,
+                           pathPrefix: Option[String]) {
   def toURI: URI =
     URI(scheme = Some(protocol),
         host = Some(host),

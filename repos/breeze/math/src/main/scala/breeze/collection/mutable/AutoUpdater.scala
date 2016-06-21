@@ -6,8 +6,8 @@ import scala.collection.mutable._
   * AutoUpdater wraps a Map such that any call to apply updates the map with an instance of the default value
   * @author dlwh
   */
-class AutoUpdater[M, K, V](
-    val theMap: M, default: => V)(implicit ev: M <:< Map[K, V])
+class AutoUpdater[M, K, V](val theMap: M, default: => V)(
+    implicit ev: M <:< Map[K, V])
     extends Map[K, V] {
   override def apply(k: K) = theMap.getOrElseUpdate(k, default);
   override def update(k: K, v: V) = theMap.update(k, v);

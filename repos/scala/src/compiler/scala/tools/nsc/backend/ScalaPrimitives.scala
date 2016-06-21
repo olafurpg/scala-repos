@@ -523,8 +523,8 @@ abstract class ScalaPrimitives {
 
   /** Return the code for the given symbol. */
   def getPrimitive(sym: Symbol): Int =
-    primitives.getOrElse(
-        sym, throw new AssertionError(s"Unknown primitive $sym"))
+    primitives
+      .getOrElse(sym, throw new AssertionError(s"Unknown primitive $sym"))
 
   /**
     * Return the primitive code of the given operation. If the
@@ -546,7 +546,7 @@ abstract class ScalaPrimitives {
           case TypeRef(_, ArrayClass, elem :: Nil) => elem
         }
       arrayParent getOrElse sys.error(fun.fullName + " : " +
-          (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
+            (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
     }
 
     code match {

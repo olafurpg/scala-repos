@@ -29,8 +29,9 @@ class HelpersSpec extends Specification {
     }
 
     "add options" in {
-      val inMemoryDatabaseConfiguration = inMemoryDatabase(
-          "test", Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
+      val inMemoryDatabaseConfiguration =
+        inMemoryDatabase("test",
+                         Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
       inMemoryDatabaseConfiguration.get("db.test.driver") must beSome(
           "org.h2.Driver")
       inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which {
@@ -61,7 +62,7 @@ class HelpersSpec extends Specification {
 
     "extract the content from Result as Bytes" in {
       contentAsBytes(Future.successful(Ok("abc"))) must_==
-        ByteString(97, 98, 99)
+      ByteString(97, 98, 99)
     }
 
     "extract the content from chunked Result as Bytes" in {
@@ -70,7 +71,7 @@ class HelpersSpec extends Specification {
         implicit val mat = ActorMaterializer()
         contentAsBytes(
             Future.successful(Ok.chunked(Source(List("a", "b", "c"))))) must_==
-          ByteString(97, 98, 99)
+        ByteString(97, 98, 99)
       } finally {
         system.terminate()
       }
@@ -91,7 +92,7 @@ class HelpersSpec extends Specification {
       val jsonResult =
         Ok("""{"play":["java","scala"]}""").as("application/json")
       (contentAsJson(Future.successful(jsonResult)) \ "play").as[List[String]] must_==
-        List("java", "scala")
+      List("java", "scala")
     }
 
     "extract the content from Content as Json" in {
@@ -100,7 +101,7 @@ class HelpersSpec extends Specification {
         val contentType: String = "application/json"
       }
       (contentAsJson(jsonContent) \ "play").as[List[String]] must_==
-        List("java", "scala")
+      List("java", "scala")
     }
   }
 }

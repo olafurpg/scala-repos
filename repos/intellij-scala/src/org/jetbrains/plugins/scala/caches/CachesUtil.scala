@@ -101,8 +101,8 @@ object CachesUtil {
             val fun =
               PsiTreeUtil.getContextOfType(e, true, classOf[ScFunction])
             if (fun == null || fun.isProbablyRecursive) {
-              return new CachedValueProvider.Result(
-                  defaultValue, provider.getDependencyItem)
+              return new CachedValueProvider.Result(defaultValue,
+                                                    provider.getDependencyItem)
             } else {
               fun.setProbablyRecursive(true)
               throw new ProbablyRecursionException(e, (), key, Set(fun))
@@ -123,20 +123,22 @@ object CachesUtil {
                       } finally set.foreach(_.setProbablyRecursive(false))
                     case t @ ProbablyRecursionException(ee, data, k, set)
                         if k == key =>
-                      val fun = PsiTreeUtil.getContextOfType(
-                          e, true, classOf[ScFunction])
+                      val fun = PsiTreeUtil
+                        .getContextOfType(e, true, classOf[ScFunction])
                       if (fun == null || fun.isProbablyRecursive) throw t
                       else {
                         fun.setProbablyRecursive(true)
-                        throw ProbablyRecursionException(
-                            ee, data, k, set + fun)
+                        throw ProbablyRecursionException(ee,
+                                                         data,
+                                                         k,
+                                                         set + fun)
                       }
                   }
                 }
               }) match {
             case null =>
-              new CachedValueProvider.Result(
-                  defaultValue, provider.getDependencyItem)
+              new CachedValueProvider.Result(defaultValue,
+                                             provider.getDependencyItem)
             case notNull => notNull
           }
         }
@@ -191,8 +193,9 @@ object CachesUtil {
     *
     * Do not use this method directly. You should use CachedMappedWithRecursionGuard annotation instead
     */
-  def getMappedWithRecursionPreventingWithRollback[
-      Dom <: PsiElement, Data, Result](
+  def getMappedWithRecursionPreventingWithRollback[Dom <: PsiElement,
+                                                   Data,
+                                                   Result](
       e: Dom,
       data: Data,
       key: Key[CachedValue[ConcurrentMap[Data, Result]]],
@@ -204,12 +207,14 @@ object CachesUtil {
       val manager = CachedValuesManager.getManager(e.getProject)
       computed = manager.createCachedValue(
           new CachedValueProvider[ConcurrentMap[Data, Result]] {
-        def compute(
-            ): CachedValueProvider.Result[ConcurrentMap[Data, Result]] = {
-          new CachedValueProvider.Result(
-              ContainerUtil.newConcurrentMap[Data, Result](), dependencyItem)
-        }
-      }, false)
+            def compute(
+                ): CachedValueProvider.Result[ConcurrentMap[Data, Result]] = {
+              new CachedValueProvider.Result(
+                  ContainerUtil.newConcurrentMap[Data, Result](),
+                  dependencyItem)
+            }
+          },
+          false)
       e.putUserData(key, computed)
     }
     val map = computed.getValue
@@ -231,30 +236,32 @@ object CachesUtil {
             throw new ProbablyRecursionException(e, data, key, Set(fun))
           }
         } else {
-          guard.doPreventingRecursion(
-              (e, data), false, new Computable[Result] {
-            def compute(): Result = {
-              try {
-                builder(e, data)
-              } catch {
-                case ProbablyRecursionException(`e`, `data`, k, set)
-                    if k == key =>
-                  try {
-                    builder(e, data)
-                  } finally set.foreach(_.setProbablyRecursive(false))
-                case t @ ProbablyRecursionException(ee, innerData, k, set)
-                    if k == key =>
-                  val fun =
-                    PsiTreeUtil.getContextOfType(e, true, classOf[ScFunction])
-                  if (fun == null || fun.isProbablyRecursive) throw t
-                  else {
-                    fun.setProbablyRecursive(true)
-                    throw ProbablyRecursionException(
-                        ee, innerData, k, set + fun)
-                  }
+          guard
+            .doPreventingRecursion((e, data), false, new Computable[Result] {
+              def compute(): Result = {
+                try {
+                  builder(e, data)
+                } catch {
+                  case ProbablyRecursionException(`e`, `data`, k, set)
+                      if k == key =>
+                    try {
+                      builder(e, data)
+                    } finally set.foreach(_.setProbablyRecursive(false))
+                  case t @ ProbablyRecursionException(ee, innerData, k, set)
+                      if k == key =>
+                    val fun = PsiTreeUtil
+                      .getContextOfType(e, true, classOf[ScFunction])
+                    if (fun == null || fun.isProbablyRecursive) throw t
+                    else {
+                      fun.setProbablyRecursive(true)
+                      throw ProbablyRecursionException(ee,
+                                                       innerData,
+                                                       k,
+                                                       set + fun)
+                    }
+                }
               }
-            }
-          }) match {
+            }) match {
             case null => defaultValue
             case notNull => notNull
           }
@@ -295,7 +302,9 @@ object CachesUtil {
     def calc(element: PsiElement): ModificationTracker = {
       Option(
           PsiTreeUtil.getContextOfType(
-              element, false, classOf[ScModificationTrackerOwner])) match {
+              element,
+              false,
+              classOf[ScModificationTrackerOwner])) match {
         case Some(owner) if owner.isValidModificationTrackerOwner() =>
           owner.getModificationTracker
         case Some(owner) => calc(owner.getContext)
@@ -310,8 +319,8 @@ object CachesUtil {
   }
 
   @tailrec
-  def updateModificationCount(
-      elem: PsiElement, incModCountOnTopLevel: Boolean = false): Unit = {
+  def updateModificationCount(elem: PsiElement,
+                              incModCountOnTopLevel: Boolean = false): Unit = {
     Option(
         PsiTreeUtil.getContextOfType(elem,
                                      false,
@@ -331,7 +340,10 @@ object CachesUtil {
   }
 
   case class ProbablyRecursionException[Dom <: PsiElement, Data, T](
-      elem: Dom, data: Data, key: Key[T], set: Set[ScFunction])
+      elem: Dom,
+      data: Data,
+      key: Key[T],
+      set: Set[ScFunction])
       extends ControlThrowable
 
   private[this] val funsRetTpToCheck =
@@ -373,8 +385,8 @@ object CachesUtil {
             ScalaPsiManager.instance(proj).incModificationCount()
             clearQueue()
           } else {
-            updateModificationCount(
-                fun.getContext, incModCountOnTopLevel = true)
+            updateModificationCount(fun.getContext,
+                                    incModCountOnTopLevel = true)
           }
         }
 

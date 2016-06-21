@@ -20,10 +20,14 @@ class ScalaUnusedImportsPassFactory(
     extends AbstractProjectComponent(project)
     with MainHighlightingPassFactory {
   highlightingPassRegistrar.registerTextEditorHighlightingPass(
-      this, Array[Int](Pass.UPDATE_ALL), null, false, -1)
+      this,
+      Array[Int](Pass.UPDATE_ALL),
+      null,
+      false,
+      -1)
 
-  def createHighlightingPass(
-      file: PsiFile, editor: Editor): TextEditorHighlightingPass = {
+  def createHighlightingPass(file: PsiFile,
+                             editor: Editor): TextEditorHighlightingPass = {
     val textRange: TextRange =
       FileStatusMap.getDirtyTextRange(editor, Pass.UPDATE_ALL)
     if (textRange == null && ScalaUnusedImportPass.isUpToDate(file))

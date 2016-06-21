@@ -88,7 +88,7 @@ abstract class HiveComparisonTest
   /** The local directory with cached golden answer will be stored. */
   protected val answerCache = new File(
       "src" + File.separator + "test" + File.separator + "resources" +
-      File.separator + "golden")
+        File.separator + "golden")
   if (!answerCache.exists) {
     answerCache.mkdir()
   }
@@ -376,7 +376,7 @@ abstract class HiveComparisonTest
                   // from Seq("").
                   stringToFile(cachedAnswerFile,
                                answer.mkString("\n") +
-                               (if (answer.nonEmpty) "\n" else ""))
+                                 (if (answer.nonEmpty) "\n" else ""))
                   answer
                 } catch {
                   case e: Exception =>
@@ -594,7 +594,7 @@ abstract class HiveComparisonTest
               case e: Exception =>
                 logError(
                     s"FATAL ERROR: Canary query threw $e This implies that the " +
-                    "testing environment has likely been corrupted.")
+                      "testing environment has likely been corrupted.")
                 // The testing setup traps exits so wait here for a long time so the developer
                 // can see when things started to go wrong.
                 Thread.sleep(1000000)

@@ -36,8 +36,10 @@ abstract class HttpServerTestSetupBase {
     val netOut = ByteStringSinkProbe()
 
     RunnableGraph
-      .fromGraph(GraphDSL.create(HttpServerBluePrint(
-                  settings, remoteAddress = remoteAddress, log = NoLogging)) {
+      .fromGraph(
+          GraphDSL.create(HttpServerBluePrint(settings,
+                                              remoteAddress = remoteAddress,
+                                              log = NoLogging)) {
         implicit b ⇒ server ⇒
           import GraphDSL.Implicits._
           Source.fromPublisher(netIn) ~> Flow[ByteString].map(

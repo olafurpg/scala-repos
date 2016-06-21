@@ -146,8 +146,12 @@ object Date {
   }
 
   @Deprecated
-  def UTC(
-      year: Int, month: Int, date: Int, hrs: Int, min: Int, sec: Int): Long =
+  def UTC(year: Int,
+          month: Int,
+          date: Int,
+          hrs: Int,
+          min: Int,
+          sec: Int): Long =
     js.Date.UTC(year + 1900, month, date, hrs, min, sec).toLong
 
   @Deprecated

@@ -84,8 +84,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
     evaluateField(obj, context)
   }
 
-  private def evaluateField(
-      obj: AnyRef, context: EvaluationContextImpl): AnyRef = {
+  private def evaluateField(obj: AnyRef,
+                            context: EvaluationContextImpl): AnyRef = {
     obj match {
       case refType: ReferenceType =>
         var field: Field = findField(refType, context)
@@ -94,8 +94,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
         }
         if (field == null || !field.isStatic) {
           throw EvaluationException(
-              DebuggerBundle.message(
-                  "evaluation.error.no.static.field", fieldName))
+              DebuggerBundle.message("evaluation.error.no.static.field",
+                                     fieldName))
         }
         myEvaluatedField = field
         myEvaluatedQualifier = refType
@@ -103,10 +103,11 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
       case objRef: ObjectReference =>
         val refType: ReferenceType = objRef.referenceType
         if (!(refType.isInstanceOf[ClassType] ||
-                refType.isInstanceOf[ArrayType])) {
+                  refType.isInstanceOf[ArrayType])) {
           throw EvaluationException(
               DebuggerBundle.message(
-                  "evaluation.error.class.or.array.expected", fieldName))
+                  "evaluation.error.class.or.array.expected",
+                  fieldName))
         }
         objRef match {
           case arrayRef: ArrayReference if "length" == fieldName =>
@@ -122,8 +123,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
         }
         if (field == null) {
           throw EvaluationException(
-              DebuggerBundle.message(
-                  "evaluation.error.no.instance.field", fieldName))
+              DebuggerBundle.message("evaluation.error.no.instance.field",
+                                     fieldName))
         }
         myEvaluatedQualifier = if (field.isStatic) refType else objRef
         myEvaluatedField = field
@@ -131,8 +132,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
       case null => throw EvaluationException(new NullPointerException)
       case _ =>
         throw EvaluationException(
-            DebuggerBundle.message(
-                "evaluation.error.evaluating.field", fieldName))
+            DebuggerBundle.message("evaluation.error.evaluating.field",
+                                   fieldName))
     }
   }
 

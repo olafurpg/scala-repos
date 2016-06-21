@@ -122,7 +122,8 @@ class NamedTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "(a = B, b = A)") {
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
-          Expression("A"), Type("B")) :: Nil =>
+          Expression("A"),
+          Type("B")) :: Nil =>
     }
   }
 }

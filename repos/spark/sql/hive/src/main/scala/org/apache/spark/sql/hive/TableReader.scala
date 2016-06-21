@@ -66,13 +66,12 @@ private[hive] class HadoopTableReader(
   // https://hadoop.apache.org/docs/r1.0.4/mapred-default.html
   //
   // In order keep consistency with Hive, we will let it be 0 in local mode also.
-  private val _minSplitsPerRDD =
-    if (sc.sparkContext.isLocal) {
-      0 // will splitted based on block by default.
-    } else {
-      math.max(sc.hiveconf.getInt("mapred.map.tasks", 1),
-               sc.sparkContext.defaultMinPartitions)
-    }
+  private val _minSplitsPerRDD = if (sc.sparkContext.isLocal) {
+    0 // will splitted based on block by default.
+  } else {
+    math.max(sc.hiveconf.getInt("mapred.map.tasks", 1),
+             sc.sparkContext.defaultMinPartitions)
+  }
 
   // TODO: set aws s3 credentials.
 
@@ -124,8 +123,11 @@ private[hive] class HadoopTableReader(
       val hconf = broadcastedHiveConf.value.value
       val deserializer = deserializerClass.newInstance()
       deserializer.initialize(hconf, tableDesc.getProperties)
-      HadoopTableReader.fillObject(
-          iter, deserializer, attrsWithIndex, mutableRow, deserializer)
+      HadoopTableReader.fillObject(iter,
+                                   deserializer,
+                                   attrsWithIndex,
+                                   mutableRow,
+                                   deserializer)
     }
 
     deserializedHadoopRDD
@@ -210,12 +212,11 @@ private[hive] class HadoopTableReader(
         // Partitioning columns are delimited by "/"
         val partCols = partColsDelimited.trim().split("/").toSeq
         // 'partValues[i]' contains the value for the partitioning column at 'partCols[i]'.
-        val partValues =
-          if (partSpec == null) {
-            Array.fill(partCols.size)(new String)
-          } else {
-            partCols.map(col => new String(partSpec.get(col))).toArray
-          }
+        val partValues = if (partSpec == null) {
+          Array.fill(partCols.size)(new String)
+        } else {
+          partCols.map(col => new String(partSpec.get(col))).toArray
+        }
 
         // Create local references so that the outer object isn't serialized.
         val tableDesc = relation.tableDesc
@@ -231,8 +232,8 @@ private[hive] class HadoopTableReader(
               relation.partitionKeys.contains(attr)
           }
 
-        def fillPartitionKeys(
-            rawPartValues: Array[String], row: MutableRow): Unit = {
+        def fillPartitionKeys(rawPartValues: Array[String],
+                              row: MutableRow): Unit = {
           partitionKeyAttrs.foreach {
             case (attr, ordinal) =>
               val partOrdinal = relation.partitionKeys.indexOf(attr)
@@ -253,8 +254,11 @@ private[hive] class HadoopTableReader(
           tableSerDe.initialize(hconf, tableDesc.getProperties)
 
           // fill the non partition key attributes
-          HadoopTableReader.fillObject(
-              iter, deserializer, nonPartitionKeyAttrs, mutableRow, tableSerDe)
+          HadoopTableReader.fillObject(iter,
+                                       deserializer,
+                                       nonPartitionKeyAttrs,
+                                       mutableRow,
+                                       tableSerDe)
         }
     }.toSeq
 
@@ -270,8 +274,8 @@ private[hive] class HadoopTableReader(
     * If `filterOpt` is defined, then it will be used to filter files from `path`. These files are
     * returned in a single, comma-separated string.
     */
-  private def applyFilterIfNeeded(
-      path: Path, filterOpt: Option[PathFilter]): String = {
+  private def applyFilterIfNeeded(path: Path,
+                                  filterOpt: Option[PathFilter]): String = {
     filterOpt match {
       case Some(filter) =>
         val fs = path.getFileSystem(sc.hiveconf)
@@ -294,15 +298,15 @@ private[hive] class HadoopTableReader(
     val initializeJobConfFunc =
       HadoopTableReader.initializeLocalJobConfFunc(path, tableDesc) _
 
-    val rdd = new HadoopRDD(
-        sc.sparkContext,
-        _broadcastedHiveConf
-          .asInstanceOf[Broadcast[SerializableConfiguration]],
-        Some(initializeJobConfFunc),
-        inputFormatClass,
-        classOf[Writable],
-        classOf[Writable],
-        _minSplitsPerRDD)
+    val rdd =
+      new HadoopRDD(sc.sparkContext,
+                    _broadcastedHiveConf
+                      .asInstanceOf[Broadcast[SerializableConfiguration]],
+                    Some(initializeJobConfFunc),
+                    inputFormatClass,
+                    classOf[Writable],
+                    classOf[Writable],
+                    _minSplitsPerRDD)
 
     // Only take the value (skip the key) because Hive works only with values.
     rdd.map(_._2)
@@ -314,8 +318,9 @@ private[hive] object HiveTableUtil {
   // copied from PlanUtils.configureJobPropertiesForStorageHandler(tableDesc)
   // that calls Hive.get() which tries to access metastore, but it's not valid in runtime
   // it would be fixed in next version of hive but till then, we should use this instead
-  def configureJobPropertiesForStorageHandler(
-      tableDesc: TableDesc, jobConf: JobConf, input: Boolean) {
+  def configureJobPropertiesForStorageHandler(tableDesc: TableDesc,
+                                              jobConf: JobConf,
+                                              input: Boolean) {
     val property = tableDesc.getProperties.getProperty(META_TABLE_STORAGE)
     val storageHandler = HiveUtils.getStorageHandler(jobConf, property)
     if (storageHandler != null) {
@@ -342,8 +347,8 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
       jobConf: JobConf) {
     FileInputFormat.setInputPaths(jobConf, Seq[Path](new Path(path)): _*)
     if (tableDesc != null) {
-      HiveTableUtil.configureJobPropertiesForStorageHandler(
-          tableDesc, jobConf, true)
+      HiveTableUtil
+        .configureJobPropertiesForStorageHandler(tableDesc, jobConf, true)
       Utilities.copyTableJobPropertiesToConf(tableDesc, jobConf)
     }
     val bufferSize = System.getProperty("spark.buffer.size", "65536")
@@ -372,8 +377,8 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
         rawDeser.getObjectInspector.asInstanceOf[StructObjectInspector]
       } else {
         ObjectInspectorConverters
-          .getConvertedOI(
-              rawDeser.getObjectInspector, tableDeser.getObjectInspector)
+          .getConvertedOI(rawDeser.getObjectInspector,
+                          tableDeser.getObjectInspector)
           .asInstanceOf[StructObjectInspector]
       }
 

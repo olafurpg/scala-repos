@@ -109,8 +109,8 @@ trait Formats { self: Formats =>
   def customDeserializer(implicit format: Formats) =
     customSerializers
       .foldLeft(Map(): PartialFunction[(TypeInfo, JValue), Any]) { (acc, x) =>
-      acc.orElse(x.deserialize)
-    }
+        acc.orElse(x.deserialize)
+      }
 }
 
 /** Conversions between String and Date.
@@ -193,7 +193,7 @@ trait TypeHints {
     def classFor(hint: String): Option[Class[_]] = {
       def hasClass(h: TypeHints) =
         scala.util.control.Exception.allCatch opt (h.classFor(hint)) map
-        (_.isDefined) getOrElse (false)
+          (_.isDefined) getOrElse (false)
 
       components find (hasClass) flatMap (_.classFor(hint))
     }

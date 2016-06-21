@@ -7,29 +7,29 @@ import scala.util.matching.Regex
 
 object Validation {
 
-  def nonEmptyString(fieldName: String,
-                     value: ⇒ String,
-                     messageFormat: String =
-                       "%s is required."): FieldValidation[String] =
+  def nonEmptyString(
+      fieldName: String,
+      value: ⇒ String,
+      messageFormat: String = "%s is required."): FieldValidation[String] =
     Validators.nonEmptyString(fieldName, messageFormat).validate(value)
 
-  def notNull(fieldName: String,
-              value: ⇒ AnyRef,
-              messageFormat: String =
-                "%s is required."): FieldValidation[AnyRef] =
+  def notNull(
+      fieldName: String,
+      value: ⇒ AnyRef,
+      messageFormat: String = "%s is required."): FieldValidation[AnyRef] =
     Validators.notNull(fieldName, messageFormat).validate(value)
 
   def nonEmptyCollection[TResult <: Traversable[_]](
       fieldName: String,
       value: ⇒ TResult,
-      messageFormat: String =
-        "%s must not be empty."): FieldValidation[TResult] =
+      messageFormat: String = "%s must not be empty.")
+    : FieldValidation[TResult] =
     Validators.nonEmptyCollection(fieldName, messageFormat).validate(value)
 
   def validEmail(fieldName: String,
                  value: ⇒ String,
-                 messageFormat: String =
-                   "%s must be a valid email."): FieldValidation[String] =
+                 messageFormat: String = "%s must be a valid email.")
+    : FieldValidation[String] =
     Validators.validEmail(fieldName, messageFormat).validate(value)
 
   def validAbsoluteUrl(fieldName: String,
@@ -51,46 +51,48 @@ object Validation {
       .validUrl(fieldName, allowLocalHost, messageFormat, schemes)
       .validate(value)
 
-  def validFormat(fieldName: String,
-                  value: ⇒ String,
-                  regex: Regex,
-                  messageFormat: String =
-                    "%s is invalid."): FieldValidation[String] =
+  def validFormat(
+      fieldName: String,
+      value: ⇒ String,
+      regex: Regex,
+      messageFormat: String = "%s is invalid."): FieldValidation[String] =
     Validators.validFormat(fieldName, regex, messageFormat).validate(value)
 
-  def validConfirmation(fieldName: String,
-                        value: ⇒ String,
-                        confirmationFieldName: String,
-                        confirmationValue: => String,
-                        messageFormat: String =
-                          "%%s must match %s."): FieldValidation[String] =
+  def validConfirmation(
+      fieldName: String,
+      value: ⇒ String,
+      confirmationFieldName: String,
+      confirmationValue: => String,
+      messageFormat: String = "%%s must match %s."): FieldValidation[String] =
     Validators
-      .validConfirmation(
-          fieldName, confirmationFieldName, confirmationValue, messageFormat)
+      .validConfirmation(fieldName,
+                         confirmationFieldName,
+                         confirmationValue,
+                         messageFormat)
       .validate(value)
 
   def greaterThan[T <% Ordered[T]](
       fieldName: String,
       value: ⇒ T,
       min: T,
-      messageFormat: String =
-        "%%s must be greater than %s."): FieldValidation[T] =
+      messageFormat: String = "%%s must be greater than %s.")
+    : FieldValidation[T] =
     Validators.greaterThan(fieldName, min, messageFormat).validate(value)
 
-  def lessThan[T <% Ordered[T]](
-      fieldName: String,
-      value: ⇒ T,
-      max: T,
-      messageFormat: String =
-        "%%s must be less than %s."): FieldValidation[T] =
+  def lessThan[T <% Ordered[T]](fieldName: String,
+                                value: ⇒ T,
+                                max: T,
+                                messageFormat: String =
+                                  "%%s must be less than %s.")
+    : FieldValidation[T] =
     Validators.lessThan(fieldName, max, messageFormat).validate(value)
 
   def greaterThanOrEqualTo[T <% Ordered[T]](
       fieldName: String,
       value: ⇒ T,
       min: T,
-      messageFormat: String =
-        "%%s must be greater than or equal to %s."): FieldValidation[T] =
+      messageFormat: String = "%%s must be greater than or equal to %s.")
+    : FieldValidation[T] =
     Validators
       .greaterThanOrEqualTo(fieldName, min, messageFormat)
       .validate(value)
@@ -99,16 +101,16 @@ object Validation {
       fieldName: String,
       value: ⇒ T,
       max: T,
-      messageFormat: String =
-        "%%s must be less than or equal to %s."): FieldValidation[T] =
+      messageFormat: String = "%%s must be less than or equal to %s.")
+    : FieldValidation[T] =
     Validators.lessThanOrEqualTo(fieldName, max, messageFormat).validate(value)
 
-  def minLength(
-      fieldName: String,
-      value: ⇒ String,
-      min: Int,
-      messageFormat: String =
-        "%%s must be at least %s characters long."): FieldValidation[String] =
+  def minLength(fieldName: String,
+                value: ⇒ String,
+                min: Int,
+                messageFormat: String =
+                  "%%s must be at least %s characters long.")
+    : FieldValidation[String] =
     Validators.minLength(fieldName, min, messageFormat).validate(value)
 
   def oneOf[TResult](fieldName: String,
@@ -120,7 +122,7 @@ object Validation {
   def enumValue(fieldName: String,
                 value: ⇒ String,
                 enum: Enumeration,
-                messageFormat: String =
-                  "%%s must be one of %s."): FieldValidation[String] =
+                messageFormat: String = "%%s must be one of %s.")
+    : FieldValidation[String] =
     oneOf(fieldName, value, messageFormat, enum.values.map(_.toString).toSeq)
 }

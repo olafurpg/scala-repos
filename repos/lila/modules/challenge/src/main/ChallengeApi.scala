@@ -71,14 +71,14 @@ final class ChallengeApi(repo: ChallengeRepo,
                           Challenge.make(
                               variant = pov.game.variant,
                               initialFen = initialFen,
-                              timeControl =
-                                (pov.game.clock, pov.game.daysPerTurn) match {
-                              case (Some(clock), _) =>
-                                TimeControl.Clock(clock.limit, clock.increment)
-                              case (_, Some(days)) =>
-                                TimeControl.Correspondence(days)
-                              case _ => TimeControl.Unlimited
-                            },
+                              timeControl = (pov.game.clock,
+                                             pov.game.daysPerTurn) match {
+                            case (Some(clock), _) =>
+                              TimeControl.Clock(clock.limit, clock.increment)
+                            case (_, Some(days)) =>
+                              TimeControl.Correspondence(days)
+                            case _ => TimeControl.Unlimited
+                          },
                               mode = pov.game.mode,
                               color = (!pov.color).name,
                               challenger = Right(challenger),
@@ -114,7 +114,8 @@ final class ChallengeApi(repo: ChallengeRepo,
   private def notify(userId: User.ID) {
     allFor(userId) foreach { all =>
       userRegister ! SendTo(
-          userId, lila.socket.Socket.makeMessage("challenges", jsonView(all)))
+          userId,
+          lila.socket.Socket.makeMessage("challenges", jsonView(all)))
     }
   }
 }

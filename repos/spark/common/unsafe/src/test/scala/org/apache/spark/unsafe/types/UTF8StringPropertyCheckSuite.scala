@@ -168,8 +168,10 @@ class UTF8StringPropertyCheckSuite
   }
 
   test("lpad, rpad") {
-    def padding(
-        origin: String, pad: String, length: Int, isLPad: Boolean): String = {
+    def padding(origin: String,
+                pad: String,
+                length: Int,
+                isLPad: Boolean): String = {
       if (length <= 0) return ""
       if (length <= origin.length) {
         if (length <= 0) "" else origin.substring(0, length)

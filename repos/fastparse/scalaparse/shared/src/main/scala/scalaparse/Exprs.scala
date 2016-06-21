@@ -31,7 +31,7 @@ trait Exprs extends Core with Types with Xml {
       val Generator = P(`<-` ~/ Expr ~ Guard.?)
       val Assign = P(`=` ~/ Expr)
       val Enumerator = P(Semis ~ `val`.? ~ TypeOrBindPattern ~/
-          (Generator | Assign) | Semis.? ~ Guard)
+            (Generator | Assign) | Semis.? ~ Guard)
       P(TypeOrBindPattern ~ Generator ~~ Enumerator.repX)
     }
 
@@ -74,7 +74,7 @@ trait Exprs extends Core with Types with Xml {
     val ExprPrefix = P(WL ~ CharIn("-+!~") ~~ !syntax.Basic.OpChar ~ WS)
     val ExprSuffix = P(
         (WL ~ "." ~/ Id | WL ~ TypeArgs | NoSemis ~ ArgList).repX ~~
-        (NoSemis ~ `_`).?)
+          (NoSemis ~ `_`).?)
     val PrefixExpr = P(ExprPrefix.? ~ SimpleExpr)
 
     // Intermediate `WL` needs to always be non-cutting, because you need to

@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ToolBarSpec
     extends SimpleSFXDelegateSpec[jfxsc.ToolBar, ToolBar](
-        classOf[jfxsc.ToolBar], classOf[ToolBar])
+        classOf[jfxsc.ToolBar],
+        classOf[ToolBar])
     with RunOnApplicationThread

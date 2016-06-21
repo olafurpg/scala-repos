@@ -33,8 +33,9 @@ class OffsetIndexTest extends JUnitSuite {
 
   @Before
   def setup() {
-    this.idx = new OffsetIndex(
-        file = nonExistantTempFile(), baseOffset = 45L, maxIndexSize = 30 * 8)
+    this.idx = new OffsetIndex(file = nonExistantTempFile(),
+                               baseOffset = 45L,
+                               maxIndexSize = 30 * 8)
   }
 
   @After
@@ -58,10 +59,10 @@ class OffsetIndexTest extends JUnitSuite {
     }
 
     // should be able to find all those values
-    for ((logical, physical) <- vals) assertEquals(
-        "Should be able to find values that are present.",
-        OffsetPosition(logical, physical),
-        idx.lookup(logical))
+    for ((logical, physical) <- vals)
+      assertEquals("Should be able to find values that are present.",
+                   OffsetPosition(logical, physical),
+                   idx.lookup(logical))
 
     // for non-present values we should find the offset of the largest value less than or equal to this 
     val valMap =
@@ -72,8 +73,8 @@ class OffsetIndexTest extends JUnitSuite {
       val rightAnswer =
         if (offset < valMap.firstKey) OffsetPosition(idx.baseOffset, 0)
         else
-          OffsetPosition(
-              valMap.to(offset).last._1, valMap.to(offset).last._2._2)
+          OffsetPosition(valMap.to(offset).last._1,
+                         valMap.to(offset).last._2._2)
       assertEquals("The index should give the same answer as the sorted map",
                    rightAnswer,
                    idx.lookup(offset))
@@ -131,8 +132,9 @@ class OffsetIndexTest extends JUnitSuite {
 
   @Test
   def truncate() {
-    val idx = new OffsetIndex(
-        file = nonExistantTempFile(), baseOffset = 0L, maxIndexSize = 10 * 8)
+    val idx = new OffsetIndex(file = nonExistantTempFile(),
+                              baseOffset = 0L,
+                              maxIndexSize = 10 * 8)
     idx.truncate()
     for (i <- 1 until 10) idx.append(i, i)
 
@@ -170,8 +172,10 @@ class OffsetIndexTest extends JUnitSuite {
     idx.append(0, 0)
   }
 
-  def assertWriteFails[T](
-      message: String, idx: OffsetIndex, offset: Int, klass: Class[T]) {
+  def assertWriteFails[T](message: String,
+                          idx: OffsetIndex,
+                          offset: Int,
+                          klass: Class[T]) {
     try {
       idx.append(offset, 1)
       fail(message)

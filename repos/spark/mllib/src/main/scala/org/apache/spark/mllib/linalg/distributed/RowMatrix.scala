@@ -63,7 +63,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
         case err: UnsupportedOperationException =>
           sys.error(
               "Cannot determine the number of cols because it is not specified in the " +
-              "constructor and the rows RDD is empty.")
+                "constructor and the rows RDD is empty.")
       }
     }
     nCols
@@ -77,7 +77,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
       if (nRows == 0L) {
         sys.error(
             "Cannot determine the number of rows because it is not specified in the " +
-            "constructor and the rows RDD is empty.")
+              "constructor and the rows RDD is empty.")
       }
     }
     nRows
@@ -122,9 +122,10 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     // Compute the upper triangular part of the gram matrix.
     val GU = rows.treeAggregate(new BDV[Double](new Array[Double](nt)))(
         seqOp = (U, v) => {
-      BLAS.spr(1.0, v, U.data)
-      U
-    }, combOp = (U1, U2) => U1 += U2)
+          BLAS.spr(1.0, v, U.data)
+          U
+        },
+        combOp = (U1, U2) => U1 += U2)
 
     RowMatrix.triuToFull(n, GU.data)
   }
@@ -186,10 +187,10 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     * @return SingularValueDecomposition(U, s, V). U = null if computeU = false.
     */
   @Since("1.0.0")
-  def computeSVD(k: Int,
-                 computeU: Boolean = false,
-                 rCond: Double =
-                   1e-9): SingularValueDecomposition[RowMatrix, Matrix] = {
+  def computeSVD(
+      k: Int,
+      computeU: Boolean = false,
+      rCond: Double = 1e-9): SingularValueDecomposition[RowMatrix, Matrix] = {
     // maximum number of Arnoldi update iterations for invoking ARPACK
     val maxIter = math.max(300, k * 3)
     // numerical tolerance for invoking ARPACK
@@ -272,13 +273,13 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
         if (rows.getStorageLevel == StorageLevel.NONE) {
           logWarning(
               "The input data is not directly cached, which may hurt performance if its" +
-              " parent RDDs are also uncached.")
+                " parent RDDs are also uncached.")
         }
         require(
             k < n,
             s"k must be smaller than n in dist-eigs mode but got k=$k and n=$n.")
-        EigenValueDecomposition.symmetricEigs(
-            multiplyGramianMatrixBy, n, k, tol, maxIter)
+        EigenValueDecomposition
+          .symmetricEigs(multiplyGramianMatrixBy, n, k, tol, maxIter)
     }
 
     val sigmas: BDV[Double] = brzSqrt(sigmaSquares)
@@ -308,7 +309,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
         rows.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data was not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     val s = Vectors.dense(Arrays.copyOfRange(sigmas.data, 0, sk))
@@ -356,7 +357,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     if (m <= 1) {
       sys.error(
           s"RowMatrix.computeCovariance called on matrix with only $m rows." +
-          "  Cannot compute the covariance of a RowMatrix with <= 1 row.")
+            "  Cannot compute the covariance of a RowMatrix with <= 1 row.")
     }
     updateNumRows(m)
 
@@ -542,19 +543,18 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     if (threshold > 1) {
       logWarning(
           s"Threshold is greater than 1: $threshold " +
-          "Computation will be more efficient with promoted sparsity, " +
-          " however there is no correctness guarantee.")
+            "Computation will be more efficient with promoted sparsity, " +
+            " however there is no correctness guarantee.")
     }
 
-    val gamma =
-      if (threshold < 1e-6) {
-        Double.PositiveInfinity
-      } else {
-        10 * math.log(numCols()) / threshold
-      }
+    val gamma = if (threshold < 1e-6) {
+      Double.PositiveInfinity
+    } else {
+      10 * math.log(numCols()) / threshold
+    }
 
-    columnSimilaritiesDIMSUM(
-        computeColumnSummaryStatistics().normL2.toArray, gamma)
+    columnSimilaritiesDIMSUM(computeColumnSummaryStatistics().normL2.toArray,
+                             gamma)
   }
 
   /**
@@ -588,19 +588,18 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
       breeze.linalg.qr.reduced(stackedR).r
     }
     val finalR = Matrices.fromBreeze(combinedR.toDenseMatrix)
-    val finalQ =
-      if (computeQ) {
-        try {
-          val invR = inv(combinedR)
-          this.multiply(Matrices.fromBreeze(invR))
-        } catch {
-          case err: MatrixSingularException =>
-            logWarning("R is not invertible and return Q as null")
-            null
-        }
-      } else {
-        null
+    val finalQ = if (computeQ) {
+      try {
+        val invR = inv(combinedR)
+        this.multiply(Matrices.fromBreeze(invR))
+      } catch {
+        case err: MatrixSingularException =>
+          logWarning("R is not invertible and return Q as null")
+          null
       }
+    } else {
+      null
+    }
     QRDecomposition(finalQ, finalR)
   }
 
@@ -618,7 +617,8 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     *         between columns of this matrix.
     */
   private[mllib] def columnSimilaritiesDIMSUM(
-      colMags: Array[Double], gamma: Double): CoordinateMatrix = {
+      colMags: Array[Double],
+      gamma: Double): CoordinateMatrix = {
     require(gamma > 1.0, s"Oversampling should be greater than 1: $gamma")
     require(colMags.size == this.numCols(),
             "Number of magnitudes didn't match column dimension")

@@ -182,8 +182,9 @@ trait ClassfileIndexer {
       addRef(ClassName.fromInternal(name))
     }
 
-    override def visitOuterClass(
-        owner: String, name: String, desc: String): Unit = {
+    override def visitOuterClass(owner: String,
+                                 name: String,
+                                 desc: String): Unit = {
       addRef(ClassName.fromInternal(owner))
     }
 
@@ -261,8 +262,10 @@ trait ClassfileIndexer {
       internalRefs = internalRefs.enqueue(classesInDescriptor(desc))
     }
 
-    override def visitInvokeDynamicInsn(
-        name: String, desc: String, bsm: Handle, bsmArgs: AnyRef*): Unit = {
+    override def visitInvokeDynamicInsn(name: String,
+                                        desc: String,
+                                        bsm: Handle,
+                                        bsmArgs: AnyRef*): Unit = {
       internalRefs :+= memberOrInit(bsm.getOwner, bsm.getName)
       internalRefs = internalRefs.enqueue(classesInDescriptor(bsm.getDesc))
     }

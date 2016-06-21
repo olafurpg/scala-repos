@@ -21,7 +21,9 @@ import org.saddle._
   * Helper class to do combine or transform after a groupBy
   */
 class FrameGrouper[Z: ST: ORD, X: ST: ORD, Y: ST: ORD, T: ST](
-    ix: Index[Z], frame: Frame[X, Y, T], sorted: Boolean = true) {
+    ix: Index[Z],
+    frame: Frame[X, Y, T],
+    sorted: Boolean = true) {
 
   private lazy val uniq: Array[Z] = {
     val arr = ix.uniques.toArray
@@ -59,6 +61,7 @@ object FrameGrouper {
   def apply[Z: ST: ORD, Y: ST: ORD, T: ST](frame: Frame[Z, Y, T]) =
     new FrameGrouper(frame.rowIx, frame)
 
-  def apply[Z: ST: ORD, X: ST: ORD, Y: ST: ORD, T: ST](
-      ix: Index[Z], frame: Frame[X, Y, T]) = new FrameGrouper(ix, frame)
+  def apply[Z: ST: ORD, X: ST: ORD, Y: ST: ORD, T: ST](ix: Index[Z],
+                                                       frame: Frame[X, Y, T]) =
+    new FrameGrouper(ix, frame)
 }

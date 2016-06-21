@@ -36,8 +36,7 @@ import org.apache.spark.util.{ThreadUtils, Utils}
 private[streaming] abstract class ReceiverSupervisor(
     receiver: Receiver[_],
     conf: SparkConf
-)
-    extends Logging {
+) extends Logging {
 
   /** Enumeration to identify current state of the Receiver */
   object ReceiverState extends Enumeration {
@@ -155,7 +154,7 @@ private[streaming] abstract class ReceiverSupervisor(
         // The driver refused us
         stop(
             "Registered unsuccessfully because Driver refused to start receiver " +
-            streamId,
+              streamId,
             None)
       }
     } catch {
@@ -169,7 +168,7 @@ private[streaming] abstract class ReceiverSupervisor(
     synchronized {
       try {
         logInfo("Stopping receiver with message: " + message + ": " +
-            error.getOrElse(""))
+              error.getOrElse(""))
         receiverState match {
           case Initialized =>
             logWarning("Skip stopping receiver because it has not yet stared")
@@ -201,7 +200,8 @@ private[streaming] abstract class ReceiverSupervisor(
       logWarning("Restarting receiver with delay " + delay + " ms: " + message,
                  error.getOrElse(null))
       stopReceiver(
-          "Restarting receiver with delay " + delay + "ms: " + message, error)
+          "Restarting receiver with delay " + delay + "ms: " + message,
+          error)
       logDebug("Sleeping for " + delay)
       Thread.sleep(delay)
       logInfo("Starting receiver again")

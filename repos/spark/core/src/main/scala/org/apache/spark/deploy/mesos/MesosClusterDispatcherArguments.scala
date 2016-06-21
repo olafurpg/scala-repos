@@ -22,8 +22,8 @@ import scala.annotation.tailrec
 import org.apache.spark.SparkConf
 import org.apache.spark.util.{IntParam, Utils}
 
-private[mesos] class MesosClusterDispatcherArguments(
-    args: Array[String], conf: SparkConf) {
+private[mesos] class MesosClusterDispatcherArguments(args: Array[String],
+                                                     conf: SparkConf) {
   var host = Utils.localHostName()
   var port = 7077
   var name = "Spark Cluster"
@@ -78,13 +78,13 @@ private[mesos] class MesosClusterDispatcherArguments(
       printUsageAndExit(0)
 
     case Nil => {
-        if (masterUrl == null) {
-          // scalastyle:off println
-          System.err.println("--master is required")
-          // scalastyle:on println
-          printUsageAndExit(1)
-        }
+      if (masterUrl == null) {
+        // scalastyle:off println
+        System.err.println("--master is required")
+        // scalastyle:on println
+        printUsageAndExit(1)
       }
+    }
 
     case _ =>
       printUsageAndExit(1)
@@ -94,15 +94,15 @@ private[mesos] class MesosClusterDispatcherArguments(
     // scalastyle:off println
     System.err.println(
         "Usage: MesosClusterDispatcher [options]\n" + "\n" + "Options:\n" +
-        "  -h HOST, --host HOST    Hostname to listen on\n" +
-        "  -p PORT, --port PORT    Port to listen on (default: 7077)\n" +
-        "  --webui-port WEBUI_PORT WebUI Port to listen on (default: 8081)\n" +
-        "  --name NAME             Framework name to show in Mesos UI\n" +
-        "  -m --master MASTER      URI for connecting to Mesos master\n" +
-        "  -z --zk ZOOKEEPER       Comma delimited URLs for connecting to \n" +
-        "                          Zookeeper for persistence\n" +
-        "  --properties-file FILE  Path to a custom Spark properties file.\n" +
-        "                          Default is conf/spark-defaults.conf.")
+          "  -h HOST, --host HOST    Hostname to listen on\n" +
+          "  -p PORT, --port PORT    Port to listen on (default: 7077)\n" +
+          "  --webui-port WEBUI_PORT WebUI Port to listen on (default: 8081)\n" +
+          "  --name NAME             Framework name to show in Mesos UI\n" +
+          "  -m --master MASTER      URI for connecting to Mesos master\n" +
+          "  -z --zk ZOOKEEPER       Comma delimited URLs for connecting to \n" +
+          "                          Zookeeper for persistence\n" +
+          "  --properties-file FILE  Path to a custom Spark properties file.\n" +
+          "                          Default is conf/spark-defaults.conf.")
     // scalastyle:on println
     System.exit(exitCode)
   }

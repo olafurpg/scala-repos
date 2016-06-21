@@ -106,8 +106,7 @@ class UnsafeRowSerializerSuite extends SparkFunSuite with LocalSparkContext {
   test("SPARK-10466: external sorter spilling with unsafe row serializer") {
     var sc: SparkContext = null
     var outputFile: File = null
-    val oldEnv =
-      SparkEnv.get // save the old SparkEnv, as it will be overwritten
+    val oldEnv = SparkEnv.get // save the old SparkEnv, as it will be overwritten
     Utils.tryWithSafeFinally {
       val conf = new SparkConf()
         .set("spark.shuffle.spill.initialMemoryThreshold", "1")
@@ -122,8 +121,13 @@ class UnsafeRowSerializerSuite extends SparkFunSuite with LocalSparkContext {
         (i, converter(Row(i)))
       }
       val taskMemoryManager = new TaskMemoryManager(sc.env.memoryManager, 0)
-      val taskContext = new TaskContextImpl(
-          0, 0, 0, 0, taskMemoryManager, null, InternalAccumulator.create(sc))
+      val taskContext = new TaskContextImpl(0,
+                                            0,
+                                            0,
+                                            0,
+                                            taskMemoryManager,
+                                            null,
+                                            InternalAccumulator.create(sc))
 
       val sorter = new ExternalSorter[Int, UnsafeRow, UnsafeRow](
           taskContext,

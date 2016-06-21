@@ -47,8 +47,7 @@ case class IssueComment(
     content: String,
     registeredDate: java.util.Date,
     updatedDate: java.util.Date
-)
-    extends Comment
+) extends Comment
 
 trait CommitCommentComponent extends TemplateComponent { self: Profile =>
   import profile.simple._
@@ -101,5 +100,4 @@ case class CommitComment(
     registeredDate: java.util.Date,
     updatedDate: java.util.Date,
     issueId: Option[Int]
-)
-    extends Comment
+) extends Comment

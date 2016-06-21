@@ -27,8 +27,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaDirectoryService
   * Nikolay.Tropin
   * 2014-07-28
   */
-abstract class CreateTypeDefinitionQuickFix(
-    ref: ScReferenceElement, description: String, kind: ClassKind)
+abstract class CreateTypeDefinitionQuickFix(ref: ScReferenceElement,
+                                            description: String,
+                                            kind: ClassKind)
     extends CreateFromUsageQuickFixBase(ref, description) {
   private final val LOG: Logger = Logger.getInstance(
       "#org.jetbrains.plugins.scala.annotator.createFromUsage.CreateTemplateDefinitionQuickFix")
@@ -44,8 +45,9 @@ abstract class CreateTypeDefinitionQuickFix(
     super.isAvailable(project, editor, file) && goodQualifier
   }
 
-  override protected def invokeInner(
-      project: Project, editor: Editor, file: PsiFile) = {
+  override protected def invokeInner(project: Project,
+                                     editor: Editor,
+                                     file: PsiFile) = {
     inWriteAction {
       ref.qualifier match {
         case Some(InstanceOfClass(typeDef: ScTypeDefinition)) =>
@@ -89,18 +91,18 @@ abstract class CreateTypeDefinitionQuickFix(
     createClassIn(targetBody, Some(targetBody.getLastChild))
   }
 
-  private def createClassIn(
-      parent: PsiElement, anchorAfter: Option[PsiElement]): Unit = {
+  private def createClassIn(parent: PsiElement,
+                            anchorAfter: Option[PsiElement]): Unit = {
     try {
       if (!FileModificationService.getInstance.preparePsiElementForWrite(
               parent)) return
 
       val text = s"${kind.keyword} $name"
-      val newTd = ScalaPsiElementFactory.createTemplateDefinitionFromText(
-          text, parent, parent.getFirstChild)
+      val newTd = ScalaPsiElementFactory
+        .createTemplateDefinitionFromText(text, parent, parent.getFirstChild)
       val anchor = anchorAfter.orNull
-      parent.addBefore(
-          ScalaPsiElementFactory.createNewLine(parent.getManager), anchor)
+      parent.addBefore(ScalaPsiElementFactory.createNewLine(parent.getManager),
+                       anchor)
       val result = parent.addBefore(newTd, anchor)
       afterCreationWork(result.asInstanceOf[ScTypeDefinition])
     } catch {
@@ -109,8 +111,8 @@ abstract class CreateTypeDefinitionQuickFix(
     }
   }
 
-  private def createClassWithLevelChoosing(
-      editor: Editor, siblings: Seq[PsiElement]): Unit = {
+  private def createClassWithLevelChoosing(editor: Editor,
+                                           siblings: Seq[PsiElement]): Unit = {
     val renderer = new PsiElementListCellRenderer[PsiElement] {
       override def getElementText(element: PsiElement) = element match {
         case f: PsiFile => "New file"
@@ -140,8 +142,11 @@ abstract class CreateTypeDefinitionQuickFix(
           }
         }
         NavigationUtil
-          .getPsiElementPopup(
-              siblings.toArray, renderer, "Choose level", processor, selection)
+          .getPsiElementPopup(siblings.toArray,
+                              renderer,
+                              "Choose level",
+                              processor,
+                              selection)
           .showInBestPositionFor(editor)
     }
   }
@@ -160,7 +165,10 @@ abstract class CreateTypeDefinitionQuickFix(
 
   private def createClassInDirectory(directory: PsiDirectory) = {
     val clazz = ScalaDirectoryService.createClassFromTemplate(
-        directory, name, kind.templateName, askToDefineVariables = false)
+        directory,
+        name,
+        kind.templateName,
+        askToDefineVariables = false)
     afterCreationWork(clazz.asInstanceOf[ScTypeDefinition])
   }
 
@@ -171,8 +179,8 @@ abstract class CreateTypeDefinitionQuickFix(
     runTemplate(clazz)
   }
 
-  protected def addMoreElementsToTemplate(
-      builder: TemplateBuilder, clazz: ScTypeDefinition): Unit = {}
+  protected def addMoreElementsToTemplate(builder: TemplateBuilder,
+                                          clazz: ScTypeDefinition): Unit = {}
 
   private def runTemplate(clazz: ScTypeDefinition): Unit = {
     val builder = new TemplateBuilderImpl(clazz)
@@ -196,8 +204,8 @@ abstract class CreateTypeDefinitionQuickFix(
       val newEditor = positionCursor(clazz.nameId)
       if (template.getSegmentsCount != 0) {
         val range = clazz.getTextRange
-        newEditor.getDocument.deleteString(
-            range.getStartOffset, range.getEndOffset)
+        newEditor.getDocument
+          .deleteString(range.getStartOffset, range.getEndOffset)
         TemplateManager
           .getInstance(clazz.getProject)
           .startTemplate(newEditor, template)
@@ -216,7 +224,9 @@ abstract class CreateTypeDefinitionQuickFix(
         val nameId = clazz.nameId
         val clause =
           ScalaPsiElementFactory.createTypeParameterClauseFromTextWithContext(
-              paramsText, clazz, nameId)
+              paramsText,
+              clazz,
+              nameId)
         clazz.addAfter(clause, nameId)
       case _ =>
     }
@@ -226,8 +236,8 @@ abstract class CreateTypeDefinitionQuickFix(
       case cl: ScClass =>
         val constr = cl.constructor.get
         val text = parametersText(ref)
-        val parameters = ScalaPsiElementFactory.createParamClausesWithContext(
-            text, constr, constr.getFirstChild)
+        val parameters = ScalaPsiElementFactory
+          .createParamClausesWithContext(text, constr, constr.getFirstChild)
         constr.parameterList.replace(parameters)
       case _ =>
     }

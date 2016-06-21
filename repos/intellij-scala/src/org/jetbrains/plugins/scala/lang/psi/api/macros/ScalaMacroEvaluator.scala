@@ -59,8 +59,8 @@ class ScalaMacroEvaluator(project: Project)
     }
   }
 
-  override def checkMacro(
-      macros: ScFunction, context: MacroContext): Option[ScType] = {
+  override def checkMacro(macros: ScFunction,
+                          context: MacroContext): Option[ScType] = {
     typingRules
       .filter(_.isApplicable(macros))
       .head

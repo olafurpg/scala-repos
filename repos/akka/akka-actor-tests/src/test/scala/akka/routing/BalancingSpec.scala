@@ -56,8 +56,7 @@ class BalancingSpec extends AkkaSpec("""
     """) with ImplicitSender with BeforeAndAfterEach {
   import BalancingSpec._
 
-  val poolSize =
-    5 // must be less than fork-join parallelism-min, which is 8 in AkkaSpec
+  val poolSize = 5 // must be less than fork-join parallelism-min, which is 8 in AkkaSpec
 
   override def beforeEach(): Unit = {
     counter.set(1)

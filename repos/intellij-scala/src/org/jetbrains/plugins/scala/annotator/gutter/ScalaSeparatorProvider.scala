@@ -39,8 +39,8 @@ trait ScalaSeparatorProvider {
   }
 
   def getGroup(element: PsiElement) = {
-    for (g <- groupOf(element)) yield
-      if (isMultiline(element)) MultilineLevel + g else g
+    for (g <- groupOf(element))
+      yield if (isMultiline(element)) MultilineLevel + g else g
   }
 
   def groupOf(element: PsiElement): Option[Int] = {

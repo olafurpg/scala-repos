@@ -30,8 +30,11 @@ class JGitUtilSpec extends FunSuite {
       assert(list("branch", ".") == Nil)
       assert(list("branch", "dir/subdir") == Nil)
 
-      createFile(
-          git, "master", "dir/subdir/File3.md", "body3", message = "commit3")
+      createFile(git,
+                 "master",
+                 "dir/subdir/File3.md",
+                 "body3",
+                 message = "commit3")
 
       assert(list("master", ".") == List(("dir/subdir", "commit3", true),
                                          ("README.md", "commit2", false)))
@@ -40,8 +43,11 @@ class JGitUtilSpec extends FunSuite {
       assert(list("branch", ".") == Nil)
       assert(list("branch", "dir/subdir") == Nil)
 
-      createFile(
-          git, "master", "dir/subdir/File4.md", "body4", message = "commit4")
+      createFile(git,
+                 "master",
+                 "dir/subdir/File4.md",
+                 "body4",
+                 message = "commit4")
 
       assert(list("master", ".") == List(("dir/subdir", "commit4", true),
                                          ("README.md", "commit2", false)))
@@ -88,8 +94,11 @@ class JGitUtilSpec extends FunSuite {
           list("branch", "dir/subdir") == List(("File3.md", "commit3", false),
                                                ("File4.md", "commit4", false)))
 
-      createFile(
-          git, "branch", "dir/subdir/File3.md", "body7", message = "commit7")
+      createFile(git,
+                 "branch",
+                 "dir/subdir/File3.md",
+                 "body7",
+                 message = "commit7")
 
       assert(list("master", ".") == List(("dir/subdir", "commit4", true),
                                          ("README.md", "commit6", false),
@@ -121,8 +130,11 @@ class JGitUtilSpec extends FunSuite {
           list("branch", "dir/subdir") == List(("File3.md", "commit7", false),
                                                ("File4.md", "commit4", false)))
 
-      createFile(
-          git, "branch", "dir/subdir9/File9.md", "body9", message = "commit9")
+      createFile(git,
+                 "branch",
+                 "dir/subdir9/File9.md",
+                 "body9",
+                 message = "commit9")
 
       assert(
           list("master", ".") == List(("dir/subdir", "commit4", true),

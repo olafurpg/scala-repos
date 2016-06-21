@@ -436,7 +436,7 @@ trait Bug396C extends Bug396A {
   }
 }
 object Bug396Test extends Bug396B with Bug396C {
-  class I2 extends super [Bug396B].I with super [Bug396C].I;
+  class I2 extends super[Bug396B].I with super[Bug396C].I;
   def test(args: Array[String]): Unit = (new I2).run
 }
 
@@ -469,7 +469,7 @@ object Test {
     } catch {
       case exception: Throwable =>
         Console.print("Exception in thread \"" + Thread.currentThread + "\" " +
-            exception);
+              exception);
         Console.println;
         errors += 1
     }

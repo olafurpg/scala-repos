@@ -411,8 +411,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
     while (c < n) {
-      tr(c) = converter.bytesToInt32(
-          ba(c * 4), ba(c * 4 + 1), ba(c * 4 + 2), ba(c * 4 + 3))
+      tr(c) = converter
+        .bytesToInt32(ba(c * 4), ba(c * 4 + 1), ba(c * 4 + 2), ba(c * 4 + 3))
       c += 1
     }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
@@ -486,8 +486,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
     while (c < n) {
-      tr(c) = converter.bytesToUInt32(
-          ba(c * 4), ba(c * 4 + 1), ba(c * 4 + 2), ba(c * 4 + 3))
+      tr(c) = converter
+        .bytesToUInt32(ba(c * 4), ba(c * 4 + 1), ba(c * 4 + 2), ba(c * 4 + 3))
       c += 1
     }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
@@ -522,8 +522,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   @throws(classOf[IOException])
   def readInt64(): Long = {
     val ba = readByte(8)
-    converter.bytesToInt64(
-        ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
+    converter
+      .bytesToInt64(ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
   }
 
   /** Tries to read n Int64s from the current getFilePointer().
@@ -606,8 +606,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   @throws(classOf[IOException])
   final def readUInt64(): ULong = {
     val ba = readByte(8)
-    converter.bytesToUInt64(
-        ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
+    converter
+      .bytesToUInt64(ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
   }
 
   /** Tries to read n UInt64s from the current getFilePointer().
@@ -669,8 +669,14 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   @throws(classOf[IOException])
   final def readUInt64Shifted(): Long = {
     val ba = readByte(8)
-    converter.bytesToUInt64Shifted(
-        ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
+    converter.bytesToUInt64Shifted(ba(0),
+                                   ba(1),
+                                   ba(2),
+                                   ba(3),
+                                   ba(4),
+                                   ba(5),
+                                   ba(6),
+                                   ba(7))
   }
 
   /** Tries to read n UInt64s, shifted down in value to fit into Int64/Longs from the current getFilePointer().

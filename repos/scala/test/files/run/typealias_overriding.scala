@@ -13,8 +13,7 @@ object Test extends App {
   }
 
   class Linked extends AddRemove {
-    type TNode =
-      Node // can also directly write `class Node extends super.NodeImpl' -- doesn't change the bug
+    type TNode = Node // can also directly write `class Node extends super.NodeImpl' -- doesn't change the bug
     class Node extends super.NodeImpl { override def toString = "LinkedNode" }
 
     removing.printNode(new Node, (x: removing.TNode) => x.toString) // make inference explicit, doesn't affect the bug

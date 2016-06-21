@@ -37,7 +37,8 @@ class JdbcRDDSuite
 
       try {
         val create = conn.createStatement
-        create.execute("""
+        create.execute(
+            """
           CREATE TABLE FOO(
             ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
             DATA INTEGER

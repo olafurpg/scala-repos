@@ -122,7 +122,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       .build()
 
     "feed a not fully buffered body once a check has been done and passes" in new WithServer(
-        notBufferedFakeApp, testServerPort) {
+        notBufferedFakeApp,
+        testServerPort) {
       val token = crypto.generateSignedToken
       val response = await(
           WS.url("http://localhost:" + port)
@@ -179,8 +180,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
     }
   }
 
-  def buildCsrfCheckRequest(
-      sendUnauthorizedResult: Boolean, configuration: (String, String)*) =
+  def buildCsrfCheckRequest(sendUnauthorizedResult: Boolean,
+                            configuration: (String, String)*) =
     new CsrfTester {
       def apply[T](makeRequest: (WSRequest) => Future[WSResponse])(
           handleResponse: (WSResponse) => T) = {

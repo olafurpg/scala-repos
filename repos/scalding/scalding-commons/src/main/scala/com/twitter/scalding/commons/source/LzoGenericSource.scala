@@ -41,8 +41,9 @@ abstract class LzoGenericSource[T]
 }
 
 object LzoGenericSource {
-  def apply[T](
-      passedConv: BinaryConverter[T], passedClass: Class[T], paths: String*) =
+  def apply[T](passedConv: BinaryConverter[T],
+               passedClass: Class[T],
+               paths: String*) =
     new LzoGenericSource[T] {
       override val conv: BinaryConverter[T] = passedConv
       override val clazz = passedClass

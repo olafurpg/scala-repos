@@ -57,8 +57,8 @@ trait PerfTestRunner[M[+ _], T] {
       Tree.node((test, a, t), kids)
   }
 
-  private def merge[A: Monoid](
-      run: RunResult[A], f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
+  private def merge[A: Monoid](run: RunResult[A],
+                               f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
     fill(run) match {
       case Tree.Node((test, a, time), children) =>
         Tree.node((test, a |+| f(time)), children map (merge(_, f)))
@@ -72,8 +72,8 @@ trait PerfTestRunner[M[+ _], T] {
     * Runs `test` `n` times, merging the times for queries together by converting
     * the times to `A`s, then appending them.
     */
-  def runAllM[A: Monoid](test: Tree[PerfTest], n: Int)(
-      f: Option[(T, T)] => A) = {
+  def runAllM[A: Monoid](test: Tree[PerfTest],
+                         n: Int)(f: Option[(T, T)] => A) = {
     require(n > 0)
 
     (1 to n).foldLeft((test map (_ -> Monoid[A].zero)).pure[M]) { (acc, _) =>
@@ -129,8 +129,8 @@ trait PerfTestRunner[M[+ _], T] {
   }
 }
 
-class MockPerfTestRunner[M[+ _]](evalTime: => Int)(
-    implicit val M: Monad[M] with Comonad[M])
+class MockPerfTestRunner[M[+ _]](
+    evalTime: => Int)(implicit val M: Monad[M] with Comonad[M])
     extends PerfTestRunner[M, Long] {
   import scalaz.syntax.monad._
 

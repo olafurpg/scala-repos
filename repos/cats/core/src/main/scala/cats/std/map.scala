@@ -20,8 +20,8 @@ trait MapInstances extends algebra.std.MapInstances {
       }
     }
 
-  implicit def MapShow[A, B](
-      implicit showA: Show[A], showB: Show[B]): Show[Map[A, B]] =
+  implicit def MapShow[A, B](implicit showA: Show[A],
+                             showB: Show[B]): Show[Map[A, B]] =
     Show.show[Map[A, B]] { m =>
       val body = m.map {
         case (a, b) =>

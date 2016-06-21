@@ -34,8 +34,8 @@ object Multipart {
     * @param partHandler The accumulator to handle the parts.
     */
   def partParser[A](maxMemoryBufferSize: Int)(
-      partHandler: Accumulator[
-          Part[Source[ByteString, _]], Either[Result, A]])(
+      partHandler: Accumulator[Part[Source[ByteString, _]],
+                               Either[Result, A]])(
       implicit mat: Materializer): BodyParser[A] = BodyParser { request =>
     val maybeBoundary = for {
       mt <- request.mediaType
@@ -46,8 +46,9 @@ object Multipart {
     maybeBoundary.map { boundary =>
       val multipartFlow = Flow[ByteString]
         .transform(() =>
-              new BodyPartParser(
-                  boundary, maxMemoryBufferSize, maxHeaderBuffer))
+              new BodyPartParser(boundary,
+                                 maxMemoryBufferSize,
+                                 maxHeaderBuffer))
         .splitWhen(_.isLeft)
         .prefixAndTail(1)
         .map {
@@ -75,8 +76,8 @@ object Multipart {
     * @param maxMemoryBufferSize The maximum amount of data to parse into memory.
     * @param filePartHandler The accumulator to handle the file parts.
     */
-  def multipartParser[A](
-      maxMemoryBufferSize: Int, filePartHandler: FilePartHandler[A])(
+  def multipartParser[A](maxMemoryBufferSize: Int,
+                         filePartHandler: FilePartHandler[A])(
       implicit mat: Materializer): BodyParser[MultipartFormData[A]] =
     BodyParser { request =>
       partParser(maxMemoryBufferSize) {
@@ -101,15 +102,12 @@ object Multipart {
             }
 
             parseError orElse bufferExceededError getOrElse {
-              Future.successful(
-                  Right(
-                      MultipartFormData(
+              Future.successful(Right(MultipartFormData(
                           parts.collect {
                     case dp: DataPart => dp
-                  }.groupBy(_.key)
-                            .map {
-                      case (key, partValues) => key -> partValues.map(_.value)
-                    },
+                  }.groupBy(_.key).map {
+                    case (key, partValues) => key -> partValues.map(_.value)
+                  },
                           parts.collect {
                     case fp: FilePart[A] => fp
                   },
@@ -188,8 +186,7 @@ object Multipart {
       for {
         values <- headers
                    .get("content-disposition")
-                   .map(
-                       split(_)
+                   .map(split(_)
                          .map(_.trim)
                          .map {
                        // unescape escaped quotes
@@ -228,12 +225,10 @@ object Multipart {
     }
   }
 
-  private def createBadResult[A](
-      msg: String,
-      status: Int =
-        BAD_REQUEST): RequestHeader => Future[Either[Result, A]] = { request =>
-    Play.privateMaybeApplication
-      .fold(Future.successful(Left(Results.Status(status): Result)))(
+  private def createBadResult[A](msg: String, status: Int = BAD_REQUEST)
+    : RequestHeader => Future[Either[Result, A]] = { request =>
+    Play.privateMaybeApplication.fold(
+        Future.successful(Left(Results.Status(status): Result)))(
         _.errorHandler.onClientError(request, status, msg).map(Left(_)))
   }
 
@@ -259,8 +254,9 @@ object Multipart {
     *
     * see: http://tools.ietf.org/html/rfc2046#section-5.1.1
     */
-  private final class BodyPartParser(
-      boundary: String, maxMemoryBufferSize: Int, maxHeaderSize: Int)
+  private final class BodyPartParser(boundary: String,
+                                     maxMemoryBufferSize: Int,
+                                     maxHeaderSize: Int)
       extends PushPullStage[ByteString, RawPart] {
 
     require(boundary.nonEmpty,
@@ -278,8 +274,8 @@ object Multipart {
       array(1) = '\n'.toByte
       array(2) = '-'.toByte
       array(3) = '-'.toByte
-      System.arraycopy(
-          boundary.getBytes("US-ASCII"), 0, array, 4, boundary.length)
+      System
+        .arraycopy(boundary.getBytes("US-ASCII"), 0, array, 4, boundary.length)
       array
     }
 
@@ -291,8 +287,8 @@ object Multipart {
     private var state: ByteString ⇒ StateResult = tryParseInitialBoundary
     private var terminated = false
 
-    override def onPush(
-        input: ByteString, ctx: Context[RawPart]): SyncDirective =
+    override def onPush(input: ByteString,
+                        ctx: Context[RawPart]): SyncDirective =
       if (!terminated) {
         state(input)
         if (output.nonEmpty) ctx.push(dequeue())
@@ -382,11 +378,15 @@ object Multipart {
                              fileName,
                              contentType)
             case PartInfoMatcher(name) =>
-              handleDataPart(
-                  input, partStart, memoryBufferSize + name.length, name)
+              handleDataPart(input,
+                             partStart,
+                             memoryBufferSize + name.length,
+                             name)
             case _ =>
-              handleBadPart(
-                  input, partStart, memoryBufferSize + headersSize, headers)
+              handleBadPart(input,
+                            partStart,
+                            memoryBufferSize + headersSize,
+                            headers)
           }
       }
     }
@@ -406,8 +406,9 @@ object Multipart {
       }
     }
 
-    def handleFileData(
-        input: ByteString, offset: Int, memoryBufferSize: Int): StateResult = {
+    def handleFileData(input: ByteString,
+                       offset: Int,
+                       memoryBufferSize: Int): StateResult = {
       try {
         val currentPartEnd = boyerMoore.nextIndex(input, offset)
         val needleEnd = currentPartEnd + needle.length
@@ -446,12 +447,14 @@ object Multipart {
         if (newMemoryBufferSize > maxMemoryBufferSize) {
           bufferExceeded("Memory buffer full on part " + partName)
         } else if (crlf(input, needleEnd)) {
-          emit(DataPart(
-                  partName, input.slice(partStart, currentPartEnd).utf8String))
+          emit(
+              DataPart(partName,
+                       input.slice(partStart, currentPartEnd).utf8String))
           parseHeader(input, needleEnd + 2, newMemoryBufferSize)
         } else if (doubleDash(input, needleEnd)) {
-          emit(DataPart(
-                  partName, input.slice(partStart, currentPartEnd).utf8String))
+          emit(
+              DataPart(partName,
+                       input.slice(partStart, currentPartEnd).utf8String))
           terminate()
         } else {
           fail("Unexpected boundary")
@@ -544,8 +547,8 @@ object Multipart {
     @tailrec def boundary(input: ByteString, offset: Int, ix: Int = 2)
       : Boolean =
       (ix == needle.length) ||
-      (byteAt(input, offset + ix - 2) == needle(ix)) &&
-      boundary(input, offset, ix + 1)
+        (byteAt(input, offset + ix - 2) == needle(ix)) &&
+          boundary(input, offset, ix + 1)
 
     def crlf(input: ByteString, offset: Int): Boolean =
       byteChar(input, offset) == '\r' && byteChar(input, offset + 1) == '\n'

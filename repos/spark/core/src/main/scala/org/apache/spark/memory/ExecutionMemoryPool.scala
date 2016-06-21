@@ -42,8 +42,7 @@ import org.apache.spark.internal.Logging
 private[memory] class ExecutionMemoryPool(
     lock: Object,
     poolName: String
-)
-    extends MemoryPool(lock)
+) extends MemoryPool(lock)
     with Logging {
 
   /**
@@ -85,12 +84,12 @@ private[memory] class ExecutionMemoryPool(
     *
     * @return the number of bytes granted to the task.
     */
-  private[memory] def acquireMemory(
-      numBytes: Long,
-      taskAttemptId: Long,
-      maybeGrowPool: Long => Unit = (additionalSpaceNeeded: Long) => Unit,
-      computeMaxPoolSize: () => Long = () =>
-        poolSize): Long = lock.synchronized {
+  private[memory] def acquireMemory(numBytes: Long,
+                                    taskAttemptId: Long,
+                                    maybeGrowPool: Long => Unit =
+                                      (additionalSpaceNeeded: Long) => Unit,
+                                    computeMaxPoolSize: () => Long = () =>
+                                      poolSize): Long = lock.synchronized {
     assert(numBytes > 0, s"invalid number of bytes requested: $numBytes")
 
     // TODO: clean up this clunky method signature
@@ -152,15 +151,14 @@ private[memory] class ExecutionMemoryPool(
   def releaseMemory(numBytes: Long, taskAttemptId: Long): Unit =
     lock.synchronized {
       val curMem = memoryForTask.getOrElse(taskAttemptId, 0L)
-      var memoryToFree =
-        if (curMem < numBytes) {
-          logWarning(
-              s"Internal error: release called on $numBytes bytes but task only has $curMem bytes " +
+      var memoryToFree = if (curMem < numBytes) {
+        logWarning(
+            s"Internal error: release called on $numBytes bytes but task only has $curMem bytes " +
               s"of memory from the $poolName pool")
-          curMem
-        } else {
-          numBytes
-        }
+        curMem
+      } else {
+        numBytes
+      }
       if (memoryForTask.contains(taskAttemptId)) {
         memoryForTask(taskAttemptId) -= memoryToFree
         if (memoryForTask(taskAttemptId) <= 0) {

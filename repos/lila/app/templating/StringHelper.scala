@@ -83,11 +83,11 @@ trait StringHelper { self: NumberHelper =>
   def splitNumber(s: String)(implicit ctx: UserContext): Html = Html {
     s match {
       case NumberFirstRegex(number, text) =>
-        "<strong>%s</strong><br />%s".format(
-            (~parseIntOption(number)).localize, text)
+        "<strong>%s</strong><br />%s"
+          .format((~parseIntOption(number)).localize, text)
       case NumberLastRegex(text, number) =>
-        "%s<br /><strong>%s</strong>".format(
-            text, (~parseIntOption(number)).localize)
+        "%s<br /><strong>%s</strong>"
+          .format(text, (~parseIntOption(number)).localize)
       case h => h.replace("\n", "<br />")
     }
   }

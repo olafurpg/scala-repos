@@ -113,8 +113,8 @@ private[scalding] object InternalService {
     recurse(depsOfSummer.head)
   }
 
-  def storeIsJoined[K, V](
-      dag: Dependants[Scalding], store: Store[K, V]): Boolean =
+  def storeIsJoined[K, V](dag: Dependants[Scalding],
+                          store: Store[K, V]): Boolean =
     dag.nodes.exists {
       case LeftJoinedProducer(l, StoreService(s)) => s == store
       case _ => false
@@ -146,8 +146,8 @@ private[scalding] object InternalService {
       (flowMode: (FlowDef, Mode)) =>
         val left = input(flowMode)
         val right = toJoin(flowMode)
-        LookupJoin.rightSumming(left, right, reducers)(
-            implicitly, implicitly, sg)
+        LookupJoin
+          .rightSumming(left, right, reducers)(implicitly, implicitly, sg)
     }
 
   /**
@@ -179,12 +179,12 @@ private[scalding] object InternalService {
           case ValueFlatMappedProducer(prod, fn) =>
             cummulativeFn match {
               case Some(cfn) => {
-                  val newFn = (e: Any) =>
-                    fn(e).flatMap { r =>
-                      cfn(r)
-                  }
-                  recurse(prod, Some(newFn))
+                val newFn = (e: Any) =>
+                  fn(e).flatMap { r =>
+                    cfn(r)
                 }
+                recurse(prod, Some(newFn))
+              }
               case None => recurse(prod, Some(fn))
             }
           case IdentityKeyedProducer(prod) =>
@@ -259,8 +259,7 @@ private[scalding] object InternalService {
             /*
              * This is a lookup, and there is an existing value
              */
-            val currentU =
-              Some(sum(optu, u)) // isn't u already a sum and optu prev value?
+            val currentU = Some(sum(optu, u)) // isn't u already a sum and optu prev value?
             val joinResult = Some((time, (v, currentU)))
             val sumResult = Semigroup
               .sumOption(valueExpansion((v, currentU)))

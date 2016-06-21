@@ -3,7 +3,8 @@ object Main {
   val f: Foo = null
   f match {
     case Foo(guid, stuff @ _ *) =>
-      /*start*/ stuff /*end*/
+      /*start*/
+      stuff /*end*/
   }
 }
 //Seq[String]

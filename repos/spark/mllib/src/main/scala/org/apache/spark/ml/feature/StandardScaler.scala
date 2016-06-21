@@ -45,8 +45,8 @@ private[feature] trait StandardScalerParams
     * Default: false
     * @group param
     */
-  val withMean: BooleanParam = new BooleanParam(
-      this, "withMean", "Whether to center data with mean")
+  val withMean: BooleanParam =
+    new BooleanParam(this, "withMean", "Whether to center data with mean")
 
   /** @group getParam */
   def getWithMean: Boolean = $(withMean)
@@ -57,7 +57,9 @@ private[feature] trait StandardScalerParams
     * @group param
     */
   val withStd: BooleanParam = new BooleanParam(
-      this, "withStd", "Whether to scale the data to unit standard deviation")
+      this,
+      "withStd",
+      "Whether to scale the data to unit standard deviation")
 
   /** @group getParam */
   def getWithStd: Boolean = $(withStd)
@@ -131,8 +133,9 @@ object StandardScaler extends DefaultParamsReadable[StandardScaler] {
   * @param mean Mean of the StandardScalerModel
   */
 @Experimental
-class StandardScalerModel private[ml](
-    override val uid: String, val std: Vector, val mean: Vector)
+class StandardScalerModel private[ml] (override val uid: String,
+                                       val std: Vector,
+                                       val mean: Vector)
     extends Model[StandardScalerModel]
     with StandardScalerParams
     with MLWritable {

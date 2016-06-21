@@ -99,8 +99,14 @@ case class PartitionedDelimitedSource[P, T](path: String,
   // see sinkFields in PartitionSchemed for other half of this work around.
   override def localScheme = {
     val scheme = new LocalTextDelimited(
-        fields, skipHeader, writeHeader, separator, strict, quote, types, safe)
-      .asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
+        fields,
+        skipHeader,
+        writeHeader,
+        separator,
+        strict,
+        quote,
+        types,
+        safe).asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
     scheme.setSinkFields(fields)
     scheme
   }
@@ -115,7 +121,8 @@ trait PartitionedDelimited extends Serializable {
 
   def apply[P: Manifest: TupleConverter: TupleSetter,
             T: Manifest: TupleConverter: TupleSetter](
-      path: String, template: String): PartitionedDelimitedSource[P, T] =
+      path: String,
+      template: String): PartitionedDelimitedSource[P, T] =
     PartitionedDelimitedSource(
         path,
         template,

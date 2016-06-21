@@ -74,8 +74,9 @@ object GameFilterMenu {
   def currentOf(filters: NonEmptyList[GameFilter], name: String) =
     (filters.list find (_.name == name)) | filters.head
 
-  private def cachedNbOf(
-      user: User, info: Option[UserInfo], filter: GameFilter): Option[Int] =
+  private def cachedNbOf(user: User,
+                         info: Option[UserInfo],
+                         filter: GameFilter): Option[Int] =
     filter match {
       case Bookmark => info.map(_.nbBookmark)
       case Imported => info.map(_.nbImported)
@@ -120,9 +121,10 @@ object GameFilterMenu {
   }
 
   def searchForm(
-      userGameSearch: lila.gameSearch.UserGameSearch, filter: GameFilter)(
-      implicit req: Request[_]): play.api.data.Form[_] = filter match {
-    case Search => userGameSearch.requestForm
-    case _ => userGameSearch.defaultForm
-  }
+      userGameSearch: lila.gameSearch.UserGameSearch,
+      filter: GameFilter)(implicit req: Request[_]): play.api.data.Form[_] =
+    filter match {
+      case Search => userGameSearch.requestForm
+      case _ => userGameSearch.defaultForm
+    }
 }

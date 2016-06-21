@@ -23,8 +23,8 @@ object FreeTListOption {
           f(a).f
         })
 
-      def tailrecM[A, B](f: A => FreeTListOption[A \/ B])(
-          a: A): FreeTListOption[B] =
+      def tailrecM[A, B](
+          f: A => FreeTListOption[A \/ B])(a: A): FreeTListOption[B] =
         FreeTListOption(
             BindRec[FreeT[List, Option, ?]].tailrecM((x: A) => f(x).f)(a))
 
@@ -34,8 +34,8 @@ object FreeTListOption {
       def empty[A] =
         FreeTListOption(PlusEmpty[FreeT[List, Option, ?]].empty[A])
 
-      def traverseImpl[G[_]: Applicative, A, B](fa: FreeTListOption[A])(
-          f: A => G[B]) =
+      def traverseImpl[G[_]: Applicative, A, B](
+          fa: FreeTListOption[A])(f: A => G[B]) =
         Functor[G].map(Traverse[FreeT[List, Option, ?]].traverseImpl(fa.f)(f))(
             FreeTListOption.apply)
 
@@ -67,10 +67,10 @@ object FreeTListOption {
 }
 
 object FreeTTest extends SpecLite {
-  def freeTGen[F[_], G[_], A](
-      g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F],
-                                 G: Applicative[G],
-                                 A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
+  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(
+      implicit F: Functor[F],
+      G: Applicative[G],
+      A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(
         (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
         (1,

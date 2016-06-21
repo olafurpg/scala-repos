@@ -173,8 +173,8 @@ class TaskTrackerActorTest
       MarathonTestHelper.runningTaskProto(stagedTask.getId)
     val taskState = TaskSerializer.fromProto(stagedTaskNowRunning)
     probe.send(f.taskTrackerActor,
-               TaskTrackerActor.TaskUpdated(
-                   taskState, TaskTrackerActor.Ack(probe.ref, ())))
+               TaskTrackerActor
+                 .TaskUpdated(taskState, TaskTrackerActor.Ack(probe.ref, ())))
     probe.expectMsg(())
 
     Then("it will have set the correct metric counts")
@@ -200,8 +200,8 @@ class TaskTrackerActorTest
     val newTask = MarathonTestHelper.stagedTaskProto(appId)
     val taskState = TaskSerializer.fromProto(newTask)
     probe.send(f.taskTrackerActor,
-               TaskTrackerActor.TaskUpdated(
-                   taskState, TaskTrackerActor.Ack(probe.ref, ())))
+               TaskTrackerActor
+                 .TaskUpdated(taskState, TaskTrackerActor.Ack(probe.ref, ())))
     probe.expectMsg(())
 
     Then("it will have set the correct metric counts")
@@ -211,8 +211,7 @@ class TaskTrackerActorTest
 
   class Fixture {
     def failProps =
-      Props(
-          new Actor {
+      Props(new Actor {
         override def receive: Receive = {
           case _: Any => throw new RuntimeException("severe simulated failure")
         }
@@ -221,8 +220,7 @@ class TaskTrackerActorTest
     lazy val spyProbe = TestProbe()
 
     def spyActor =
-      Props(
-          new Actor {
+      Props(new Actor {
         override def receive: Receive = {
           case msg: Any => spyProbe.ref.forward(msg)
         }

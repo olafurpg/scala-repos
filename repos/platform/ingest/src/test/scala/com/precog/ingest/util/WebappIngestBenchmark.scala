@@ -105,8 +105,10 @@ abstract class IngestProducer(args: Array[String])
 
       println(
           "Time: %.02f Messages: %d Throughput: %.01f msgs/s Errors: %d"
-            .format(
-              seconds, totalMessages, totalMessages / seconds, totalErrors))
+            .format(seconds,
+                    totalMessages,
+                    totalMessages / seconds,
+                    totalErrors))
     }
     close
   }
@@ -272,7 +274,7 @@ class WebappIngestProducer(args: Array[String]) extends IngestProducer(args) {
 
   override def usageMessage =
     super.usageMessage +
-    """
+      """
 serviceUrl - base url for web application (default: http://localhost:30050/vfs/)
   """
 

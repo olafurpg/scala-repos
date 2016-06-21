@@ -36,8 +36,8 @@ class HttpModelIntegrationSpec
     with Matchers
     with BeforeAndAfterAll {
 
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -150,8 +150,8 @@ class HttpModelIntegrationSpec
 
       // Finally we can create our HttpResponse.
 
-      HttpResponse(entity = HttpEntity.Default(
-              contentType.get, contentLength.get, publisherBody))
+      HttpResponse(entity = HttpEntity
+            .Default(contentType.get, contentLength.get, publisherBody))
     }
 
     "be able to wrap HttpHeaders with custom typed headers" in {

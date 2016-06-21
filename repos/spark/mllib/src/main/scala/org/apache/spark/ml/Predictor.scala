@@ -188,7 +188,7 @@ abstract class PredictionModel[
       transformImpl(dataset)
     } else {
       this.logWarning(s"$uid: Predictor.transform() was called as NOOP" +
-          " since no output columns were set.")
+            " since no output columns were set.")
       dataset
     }
   }

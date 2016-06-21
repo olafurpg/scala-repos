@@ -46,9 +46,14 @@ object User extends LilaController {
       (ctx.isAuth ?? { Env.pref.api.followable(user.id) }) zip
       (ctx.userId ?? { relationApi.fetchRelation(_, user.id) }) map {
         case (((((pov, donor), blocked), crosstable), followable), relation) =>
-          Ok(html.user.mini(
-                  user, pov, blocked, followable, relation, crosstable, donor))
-            .withHeaders(CACHE_CONTROL -> "max-age=5")
+          Ok(
+              html.user.mini(user,
+                             pov,
+                             blocked,
+                             followable,
+                             relation,
+                             crosstable,
+                             donor)).withHeaders(CACHE_CONTROL -> "max-age=5")
       }
     }
   }
@@ -201,13 +206,10 @@ object User extends LilaController {
   }
 
   def topWeek = Open { implicit ctx =>
-    negotiate(html = notFound,
-              api = _ =>
-                env.cached
-                  .topWeek(true)
-                  .map { users =>
-                    Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
-                })
+    negotiate(html = notFound, api = _ =>
+          env.cached.topWeek(true).map { users =>
+        Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
+    })
   }
 
   def mod(username: String) = Secure(_.UserSpy) { implicit ctx => me =>
@@ -218,8 +220,8 @@ object User extends LilaController {
         .userHistory(user.id) flatMap {
         case ((((email, spy), playerAggregateAssessment), history)) =>
           (Env.playban.api bans spy.usersSharingIp.map(_.id)) map { bans =>
-            html.user.mod(
-                user, email, spy, playerAggregateAssessment, bans, history)
+            html.user
+              .mod(user, email, spy, playerAggregateAssessment, bans, history)
           }
       }
     }
@@ -269,11 +271,12 @@ object User extends LilaController {
             distribution <- u.perfs(perfType).established ?? {
                              Env.user.cached.ratingDistribution(perfType) map some
                            }
-            data = Env.perfStat.jsonView(
-                u, perfStat, ranks get perfType.key, distribution)
-            response <- negotiate(html = Ok(html.user.perfStat(
-                                          u, ranks, perfType, data)).fuccess,
-                                  api = _ => Ok(data).fuccess)
+            data = Env.perfStat
+              .jsonView(u, perfStat, ranks get perfType.key, distribution)
+            response <- negotiate(
+                           html = Ok(html.user
+                                 .perfStat(u, ranks, perfType, data)).fuccess,
+                           api = _ => Ok(data).fuccess)
           } yield response
         }
     }

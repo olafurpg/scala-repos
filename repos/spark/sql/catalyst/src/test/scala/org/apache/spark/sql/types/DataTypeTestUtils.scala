@@ -64,7 +64,7 @@ object DataTypeTestUtils {
     */
   val ordered: Set[DataType] =
     numericTypeWithoutDecimal + BooleanType + TimestampType + DateType +
-    StringType + BinaryType
+      StringType + BinaryType
 
   /**
     * All the types that we can use in a property check

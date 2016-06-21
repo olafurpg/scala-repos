@@ -53,8 +53,8 @@ object CheckpointCoordination {
 }
 
 trait SystemCoordination extends CheckpointCoordination {
-  def registerRelayAgent(
-      agent: String, blockSize: Int): Validation[Error, EventRelayState]
+  def registerRelayAgent(agent: String,
+                         blockSize: Int): Validation[Error, EventRelayState]
   def unregisterRelayAgent(agent: String, state: EventRelayState): Unit
 
   def renewEventRelayState(agent: String,
@@ -78,8 +78,9 @@ case object EmptyIdSequence extends IdSequence {
   def next() = sys.error("No ids available from empty id sequence block")
 }
 
-case class IdSequenceBlock(
-    producerId: Int, firstSequenceId: Int, lastSequenceId: Int)
+case class IdSequenceBlock(producerId: Int,
+                           firstSequenceId: Int,
+                           lastSequenceId: Int)
     extends IdSequence {
   private val currentSequenceId = new AtomicInteger(firstSequenceId)
 
@@ -104,8 +105,9 @@ object IdSequenceBlock {
   implicit val extractor = extractorV1 <+> extractorPreV
 }
 
-case class EventRelayState(
-    offset: Long, nextSequenceId: Int, idSequenceBlock: IdSequenceBlock) {
+case class EventRelayState(offset: Long,
+                           nextSequenceId: Int,
+                           idSequenceBlock: IdSequenceBlock) {
   override def toString() =
     "EventRelayState[ offset: %d prodId: %d seqId: %d in [%d,%d] ]".format(
         offset,

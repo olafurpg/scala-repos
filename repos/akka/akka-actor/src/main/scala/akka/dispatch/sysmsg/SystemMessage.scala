@@ -24,8 +24,8 @@ private[akka] object SystemMessageList {
     if (head eq null) acc else sizeInner(head.next, acc + 1)
 
   @tailrec
-  private[sysmsg] def reverseInner(
-      head: SystemMessage, acc: SystemMessage): SystemMessage = {
+  private[sysmsg] def reverseInner(head: SystemMessage,
+                                   acc: SystemMessage): SystemMessage = {
     if (head eq null) acc
     else {
       val next = head.next
@@ -262,8 +262,8 @@ private[akka] final case class Supervise(child: ActorRef, async: Boolean)
   * INTERNAL API
   */
 @SerialVersionUID(1L)
-private[akka] final case class Watch(
-    watchee: InternalActorRef, watcher: InternalActorRef)
+private[akka] final case class Watch(watchee: InternalActorRef,
+                                     watcher: InternalActorRef)
     extends SystemMessage // sent to establish a DeathWatch
 /**
   * INTERNAL API
@@ -281,14 +281,17 @@ private[akka] case object NoMessage extends SystemMessage // switched into the m
   * INTERNAL API
   */
 @SerialVersionUID(1L)
-private[akka] final case class Failed(
-    child: ActorRef, cause: Throwable, uid: Int)
+private[akka] final case class Failed(child: ActorRef,
+                                      cause: Throwable,
+                                      uid: Int)
     extends SystemMessage
     with StashWhenFailed
     with StashWhenWaitingForChildren
 
 @SerialVersionUID(1L)
 private[akka] final case class DeathWatchNotification(
-    actor: ActorRef, existenceConfirmed: Boolean, addressTerminated: Boolean)
+    actor: ActorRef,
+    existenceConfirmed: Boolean,
+    addressTerminated: Boolean)
     extends SystemMessage
     with DeadLetterSuppression

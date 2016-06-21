@@ -72,7 +72,8 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       val data =
         Row(Seq(1L, 2L, 3L), Map("m1" -> Row(4L))) :: Row(
-            Seq(5L, 6L, 7L), Map("m2" -> Row(10L))) :: Nil
+            Seq(5L, 6L, 7L),
+            Map("m2" -> Row(10L))) :: Nil
       val df =
         hiveContext.createDataFrame(sparkContext.parallelize(data), schema)
 

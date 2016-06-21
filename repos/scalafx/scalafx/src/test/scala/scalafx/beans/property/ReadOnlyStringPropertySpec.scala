@@ -52,8 +52,8 @@ class ReadOnlyStringPropertySpec extends FlatSpec with BeforeAndAfterEach {
 
   override def beforeEach() {
     booleanProperty = new BooleanProperty(bean, "Test Boolean")
-    readOnlyStringProperty = new ReadOnlyStringProperty(
-        bean, "Test Read-only String", "read-only")
+    readOnlyStringProperty =
+      new ReadOnlyStringProperty(bean, "Test Read-only String", "read-only")
     stringProperty = new StringProperty(bean, "Test String")
     stringProperty2 = new StringProperty(bean, "Test String 2")
     sfxStringProperty = new StringProperty(bean, "Test SFX String")

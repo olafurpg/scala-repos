@@ -147,24 +147,24 @@ object SizeEstimator extends Logging {
       // scalastyle:off classforname
       val hotSpotMBeanClass =
         Class.forName("com.sun.management.HotSpotDiagnosticMXBean")
-      val getVMMethod = hotSpotMBeanClass.getDeclaredMethod(
-          "getVMOption", Class.forName("java.lang.String"))
+      val getVMMethod = hotSpotMBeanClass
+        .getDeclaredMethod("getVMOption", Class.forName("java.lang.String"))
       // scalastyle:on classforname
 
-      val bean = ManagementFactory.newPlatformMXBeanProxy(
-          server, hotSpotMBeanName, hotSpotMBeanClass)
+      val bean = ManagementFactory
+        .newPlatformMXBeanProxy(server, hotSpotMBeanName, hotSpotMBeanClass)
       // TODO: We could use reflection on the VMOption returned ?
       getVMMethod.invoke(bean, "UseCompressedOops").toString.contains("true")
     } catch {
       case e: Exception => {
-          // Guess whether they've enabled UseCompressedOops based on whether maxMemory < 32 GB
-          val guess = Runtime.getRuntime.maxMemory < (32L * 1024 * 1024 * 1024)
-          val guessInWords = if (guess) "yes" else "not"
-          logWarning(
-              "Failed to check whether UseCompressedOops is set; assuming " +
+        // Guess whether they've enabled UseCompressedOops based on whether maxMemory < 32 GB
+        val guess = Runtime.getRuntime.maxMemory < (32L * 1024 * 1024 * 1024)
+        val guessInWords = if (guess) "yes" else "not"
+        logWarning(
+            "Failed to check whether UseCompressedOops is set; assuming " +
               guessInWords)
-          return guess
-        }
+        return guess
+      }
     }
   }
 
@@ -200,8 +200,8 @@ object SizeEstimator extends Logging {
     */
   private class ClassInfo(val shellSize: Long, val pointerFields: List[Field]) {}
 
-  private def estimate(
-      obj: AnyRef, visited: IdentityHashMap[AnyRef, AnyRef]): Long = {
+  private def estimate(obj: AnyRef,
+                       visited: IdentityHashMap[AnyRef, AnyRef]): Long = {
     val state = new SearchState(visited)
     state.enqueue(obj)
     while (!state.isFinished) {
@@ -234,11 +234,11 @@ object SizeEstimator extends Logging {
 
   // Estimate the size of arrays larger than ARRAY_SIZE_FOR_SAMPLING by sampling.
   private val ARRAY_SIZE_FOR_SAMPLING = 400
-  private val ARRAY_SAMPLE_SIZE =
-    100 // should be lower than ARRAY_SIZE_FOR_SAMPLING
+  private val ARRAY_SAMPLE_SIZE = 100 // should be lower than ARRAY_SIZE_FOR_SAMPLING
 
-  private def visitArray(
-      array: AnyRef, arrayClass: Class[_], state: SearchState) {
+  private def visitArray(array: AnyRef,
+                         arrayClass: Class[_],
+                         state: SearchState) {
     val length = ScalaRunTime.array_length(array)
     val elementClass = arrayClass.getComponentType()
 

@@ -64,17 +64,17 @@ object UserInfo {
             isDonor: String => Fu[Boolean],
             isHostingSimul: String => Fu[Boolean],
             isStreamer: String => Boolean,
-            insightShare: lila.insight.Share)(
-      user: User, ctx: Context): Fu[UserInfo] =
+            insightShare: lila.insight.Share)(user: User,
+                                              ctx: Context): Fu[UserInfo] =
     countUsers() zip getRanks(user.id) zip (gameCached nbPlaying user.id) zip gameCached
       .nbImportedBy(user.id) zip
-    (ctx.me.filter(user !=) ?? { me =>
-          crosstableApi(me.id, user.id)
-        }) zip getRatingChart(user) zip relationApi.countFollowing(user.id) zip relationApi
+      (ctx.me.filter(user !=) ?? { me =>
+            crosstableApi(me.id, user.id)
+          }) zip getRatingChart(user) zip relationApi.countFollowing(user.id) zip relationApi
       .countFollowers(user.id) zip
-    (ctx.me ?? Granter(_.UserSpy) ?? {
-          relationApi.countBlockers(user.id) map (_.some)
-        }) zip postApi.nbByUser(user.id) zip isDonor(user.id) zip trophyApi
+      (ctx.me ?? Granter(_.UserSpy) ?? {
+            relationApi.countBlockers(user.id) map (_.some)
+          }) zip postApi.nbByUser(user.id) zip isDonor(user.id) zip trophyApi
       .findByUser(user) zip (user.count.rated >= 10)
       .??(insightShare.grant(user, ctx.me)) zip PlayTime(user) flatMap {
       case (((((((((((((nbUsers, ranks), nbPlaying), nbImported), crosstable),

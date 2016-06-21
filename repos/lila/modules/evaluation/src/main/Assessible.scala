@@ -14,11 +14,11 @@ case class Assessible(analysed: Analysed) {
 
   def suspiciousErrorRate(color: Color): Boolean =
     listAverage(Accuracy.diffsList(Pov(game, color), analysis)) <
-    (game.speed match {
-          case Speed.Bullet => 25
-          case Speed.Blitz => 20
-          case _ => 15
-        })
+      (game.speed match {
+            case Speed.Bullet => 25
+            case Speed.Blitz => 20
+            case _ => 15
+          })
 
   def alwaysHasAdvantage(color: Color): Boolean =
     !analysis.infos.exists { info =>

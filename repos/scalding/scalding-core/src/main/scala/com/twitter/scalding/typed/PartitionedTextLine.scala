@@ -66,8 +66,8 @@ case class PartitionedTextLine[P](path: String,
     with java.io.Serializable {
 
   // The partition fields, offset by the value arity.
-  val partitionFields = PartitionUtil.toFields(
-      valueSetter.arity, valueSetter.arity + partitionSetter.arity)
+  val partitionFields = PartitionUtil
+    .toFields(valueSetter.arity, valueSetter.arity + partitionSetter.arity)
 
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
@@ -97,29 +97,29 @@ case class PartitionedTextLine[P](path: String,
     PartitionUtil.toFields(0, valueSetter.arity + partitionSetter.arity)
 
   /** Creates the taps for local and hdfs mode.*/
-  override def createTap(
-      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(readOrWrite: AccessMode)(
+      implicit mode: Mode): Tap[_, _, _] =
     mode match {
       case Local(_) => {
-          val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
-          new LocalPartitionTap(
-              fileTap,
-              new TemplatePartition(partitionFields, template),
-              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
+        new LocalPartitionTap(fileTap,
+                              new TemplatePartition(partitionFields, template),
+                              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case Hdfs(_, _) => {
-          val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
-          new PartitionTap(hfs,
-                           new TemplatePartition(partitionFields, template),
-                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
+        new PartitionTap(hfs,
+                         new TemplatePartition(partitionFields, template),
+                         SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case hdfsTest @ HadoopTest(_, _) => {
-          val hfs = createHfsTap(
-              hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
-          new PartitionTap(hfs,
-                           new TemplatePartition(partitionFields, template),
-                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val hfs = createHfsTap(hdfsScheme,
+                               hdfsTest.getWritePathFor(this),
+                               SinkMode.REPLACE)
+        new PartitionTap(hfs,
+                         new TemplatePartition(partitionFields, template),
+                         SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
     }
 
@@ -128,8 +128,8 @@ case class PartitionedTextLine[P](path: String,
     * into a pair of `P` and `(offset, line)`.
     */
   override def converter[U >: (P, (Long, String))] =
-    PartitionUtil.converter[P, (Long, String), U](
-        valueConverter, partitionConverter)
+    PartitionUtil
+      .converter[P, (Long, String), U](valueConverter, partitionConverter)
 
   /** Flatten a pair of `P` and `line` into a cascading tuple.*/
   override def setter[U <: (P, String)] =

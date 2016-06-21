@@ -50,8 +50,8 @@ object ColorSelector extends JFXApp {
 
   // VAL'S DEFINITION - BEGIN
 
-  lazy val allControls = List(
-      controlRed, controlGreen, controlBlue, controlAlpha)
+  lazy val allControls =
+    List(controlRed, controlGreen, controlBlue, controlAlpha)
 
   val currentColor = ObjectProperty(this, "Color", Color.White)
   currentColor.onChange(colorChanged())
@@ -152,8 +152,8 @@ object ColorSelector extends JFXApp {
   }
 
   currentColor.onChange(
-      rectangleRegion.setStyle("-fx-background-color: " + RgbFormatter.format(
-              currentColor(), !this.chbDisableAlpha.selected.value)))
+      rectangleRegion.setStyle("-fx-background-color: " + RgbFormatter
+            .format(currentColor(), !this.chbDisableAlpha.selected.value)))
 
   val controlRed = new SliderControl("R") {
     value = 255
@@ -184,12 +184,12 @@ object ColorSelector extends JFXApp {
   }
   controlBlue.value.onChange({
     changeColor()
-    controlBlue.changeColor(
-        Color.rgb(0, 0, controlBlue.value.value.toInt), Color.White)
+    controlBlue.changeColor(Color.rgb(0, 0, controlBlue.value.value.toInt),
+                            Color.White)
   })
   controlBlue.selectedControl.onChange(controlSelected(controlBlue))
-  controlBlue.changeColor(
-      Color.rgb(0, 0, controlBlue.value.value.toInt), Color.White)
+  controlBlue
+    .changeColor(Color.rgb(0, 0, controlBlue.value.value.toInt), Color.White)
 
   val controlAlpha = new SliderControl("A") {
     value = 255

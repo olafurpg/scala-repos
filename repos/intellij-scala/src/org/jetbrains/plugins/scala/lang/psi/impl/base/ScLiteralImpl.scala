@@ -229,7 +229,7 @@ class ScLiteralImpl(node: ASTNode)
       assert(assertion = false,
              message =
                "Only null literals accepted, type: " +
-               getFirstChild.getNode.getElementType)
+                 getFirstChild.getNode.getElementType)
     typeWithoutImplicits = tp
   }
 
@@ -272,7 +272,7 @@ class ScLiteralImpl(node: ASTNode)
       myAnnotationOwner = annotationOwnerLookUp(this)
       expirationTime =
         System.currentTimeMillis() +
-        (2 + expTimeLengthGenerator.nextInt(8)) * 1000
+          (2 + expTimeLengthGenerator.nextInt(8)) * 1000
     }
 
     myAnnotationOwner

@@ -44,7 +44,7 @@ object DumpLogSegments {
     val indexSanityOpt = parser.accepts(
         "index-sanity-check",
         "if set, just checks the index sanity without printing its content. " +
-        "This is the same check that is executed on broker startup to determine if an index needs rebuilding or not.")
+          "This is the same check that is executed on broker startup to determine if an index needs rebuilding or not.")
     val filesOpt = parser
       .accepts(
           "files",
@@ -59,7 +59,8 @@ object DumpLogSegments {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(5 * 1024 * 1024)
     val deepIterationOpt = parser.accepts(
-        "deep-iteration", "if set, uses deep instead of shallow iteration")
+        "deep-iteration",
+        "if set, uses deep instead of shallow iteration")
     val valueDecoderOpt = parser
       .accepts(
           "value-decoder-class",
@@ -95,16 +96,17 @@ object DumpLogSegments {
     val maxMessageSize = options.valueOf(maxMessageSizeOpt).intValue()
     val isDeepIteration = if (options.has(deepIterationOpt)) true else false
 
-    val messageParser =
-      if (options.has(offsetsOpt)) {
-        new OffsetsMessageParser
-      } else {
-        val valueDecoder: Decoder[_] = CoreUtils.createObject[Decoder[_]](
-            options.valueOf(valueDecoderOpt), new VerifiableProperties)
-        val keyDecoder: Decoder[_] = CoreUtils.createObject[Decoder[_]](
-            options.valueOf(keyDecoderOpt), new VerifiableProperties)
-        new DecoderMessageParser(keyDecoder, valueDecoder)
-      }
+    val messageParser = if (options.has(offsetsOpt)) {
+      new OffsetsMessageParser
+    } else {
+      val valueDecoder: Decoder[_] = CoreUtils.createObject[Decoder[_]](
+          options.valueOf(valueDecoderOpt),
+          new VerifiableProperties)
+      val keyDecoder: Decoder[_] = CoreUtils.createObject[Decoder[_]](
+          options.valueOf(keyDecoderOpt),
+          new VerifiableProperties)
+      new DecoderMessageParser(keyDecoder, valueDecoder)
+    }
 
     val misMatchesForIndexFilesMap =
       new mutable.HashMap[String, List[(Long, Long)]]
@@ -132,20 +134,20 @@ object DumpLogSegments {
     }
     misMatchesForIndexFilesMap.foreach {
       case (fileName, listOfMismatches) => {
-          System.err.println("Mismatches in :" + fileName)
-          listOfMismatches.foreach(m => {
-            System.err
-              .println("  Index offset: %d, log offset: %d".format(m._1, m._2))
-          })
-        }
+        System.err.println("Mismatches in :" + fileName)
+        listOfMismatches.foreach(m => {
+          System.err.println(
+              "  Index offset: %d, log offset: %d".format(m._1, m._2))
+        })
+      }
     }
     nonConsecutivePairsForLogFilesMap.foreach {
       case (fileName, listOfNonConsecutivePairs) => {
-          System.err.println("Non-secutive offsets in :" + fileName)
-          listOfNonConsecutivePairs.foreach(m => {
-            System.err.println("  %d is followed by %d".format(m._1, m._2))
-          })
-        }
+        System.err.println("Non-secutive offsets in :" + fileName)
+        listOfNonConsecutivePairs.foreach(m => {
+          System.err.println("  %d is followed by %d".format(m._1, m._2))
+        })
+      }
     }
   }
 
@@ -176,18 +178,18 @@ object DumpLogSegments {
       val messageAndOffset =
         getIterator(partialFileMessageSet.head, isDeepIteration = true).next()
       if (messageAndOffset.offset != entry.offset + index.baseOffset) {
-        var misMatchesSeq = misMatchesForIndexFilesMap.getOrElse(
-            file.getAbsolutePath, List[(Long, Long)]())
+        var misMatchesSeq = misMatchesForIndexFilesMap
+          .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
         misMatchesSeq ::=
-          (entry.offset + index.baseOffset, messageAndOffset.offset)
+        (entry.offset + index.baseOffset, messageAndOffset.offset)
         misMatchesForIndexFilesMap.put(file.getAbsolutePath, misMatchesSeq)
       }
       // since it is a sparse file, in the event of a crash there may be many zero entries, stop if we see one
       if (entry.offset == 0 && i > 0) return
       if (!verifyOnly)
         println(
-            "offset: %d position: %d".format(
-                entry.offset + index.baseOffset, entry.position))
+            "offset: %d position: %d".format(entry.offset + index.baseOffset,
+                                             entry.position))
     }
   }
 
@@ -195,8 +197,8 @@ object DumpLogSegments {
     def parse(message: Message): (Option[K], Option[V])
   }
 
-  private class DecoderMessageParser[K, V](
-      keyDecoder: Decoder[K], valueDecoder: Decoder[V])
+  private class DecoderMessageParser[K, V](keyDecoder: Decoder[K],
+                                           valueDecoder: Decoder[V])
       extends MessageParser[K, V] {
     override def parse(message: Message): (Option[K], Option[V]) = {
       if (message.isNull) {
@@ -235,8 +237,8 @@ object DumpLogSegments {
       (Some(keyString), Some(valueString))
     }
 
-    private def parseGroupMetadata(
-        groupMetadataKey: GroupMetadataKey, payload: ByteBuffer) = {
+    private def parseGroupMetadata(groupMetadataKey: GroupMetadataKey,
+                                   payload: ByteBuffer) = {
       val groupId = groupMetadataKey.key
       val group = GroupMetadataManager.readGroupMessageValue(groupId, payload)
       val protocolType = group.protocolType
@@ -282,13 +284,14 @@ object DumpLogSegments {
   }
 
   /* print out the contents of the log */
-  private def dumpLog(file: File,
-                      printContents: Boolean,
-                      nonConsecutivePairsForLogFilesMap: mutable.HashMap[
-                          String, List[(Long, Long)]],
-                      isDeepIteration: Boolean,
-                      maxMessageSize: Int,
-                      parser: MessageParser[_, _]) {
+  private def dumpLog(
+      file: File,
+      printContents: Boolean,
+      nonConsecutivePairsForLogFilesMap: mutable.HashMap[String,
+                                                         List[(Long, Long)]],
+      isDeepIteration: Boolean,
+      maxMessageSize: Int,
+      parser: MessageParser[_, _]) {
     val startOffset = file.getName().split("\\.")(0).toLong
     println("Starting offset: " + startOffset)
     val messageSet = new FileMessageSet(file, false)
@@ -305,20 +308,19 @@ object DumpLogSegments {
         // If we are iterating uncompressed messages, offsets must be consecutive
         else if (msg.compressionCodec == NoCompressionCodec &&
                  messageAndOffset.offset != lastOffset + 1) {
-          var nonConsecutivePairsSeq =
-            nonConsecutivePairsForLogFilesMap.getOrElse(
-                file.getAbsolutePath, List[(Long, Long)]())
+          var nonConsecutivePairsSeq = nonConsecutivePairsForLogFilesMap
+            .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
           nonConsecutivePairsSeq ::= (lastOffset, messageAndOffset.offset)
-          nonConsecutivePairsForLogFilesMap.put(
-              file.getAbsolutePath, nonConsecutivePairsSeq)
+          nonConsecutivePairsForLogFilesMap
+            .put(file.getAbsolutePath, nonConsecutivePairsSeq)
         }
         lastOffset = messageAndOffset.offset
 
         print(
             "offset: " + messageAndOffset.offset + " position: " + validBytes +
-            " isvalid: " + msg.isValid + " payloadsize: " + msg.payloadSize +
-            " magic: " + msg.magic + " compresscodec: " +
-            msg.compressionCodec + " crc: " + msg.checksum)
+              " isvalid: " + msg.isValid + " payloadsize: " + msg.payloadSize +
+              " magic: " + msg.magic + " compresscodec: " +
+              msg.compressionCodec + " crc: " + msg.checksum)
         if (msg.hasKey) print(" keysize: " + msg.keySize)
         if (printContents) {
           val (key, payload) = parser.parse(msg)
@@ -332,12 +334,12 @@ object DumpLogSegments {
     val trailingBytes = messageSet.sizeInBytes - validBytes
     if (trailingBytes > 0)
       println(
-          "Found %d invalid bytes at the end of %s".format(
-              trailingBytes, file.getName))
+          "Found %d invalid bytes at the end of %s".format(trailingBytes,
+                                                           file.getName))
   }
 
-  private def getIterator(
-      messageAndOffset: MessageAndOffset, isDeepIteration: Boolean) = {
+  private def getIterator(messageAndOffset: MessageAndOffset,
+                          isDeepIteration: Boolean) = {
     if (isDeepIteration) {
       val message = messageAndOffset.message
       message.compressionCodec match {

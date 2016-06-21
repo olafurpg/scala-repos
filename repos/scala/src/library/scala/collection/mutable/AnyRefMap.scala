@@ -28,8 +28,10 @@ import generic.CanBuildFrom
   *
   */
 @SerialVersionUID(1L)
-final class AnyRefMap[K <: AnyRef, V] private[collection](
-    defaultEntry: K => V, initialBufferSize: Int, initBlank: Boolean)
+final class AnyRefMap[K <: AnyRef, V] private[collection] (
+    defaultEntry: K => V,
+    initialBufferSize: Int,
+    initBlank: Boolean)
     extends AbstractMap[K, V]
     with Map[K, V]
     with MapLike[K, V, AnyRefMap[K, V]]
@@ -475,8 +477,8 @@ object AnyRefMap {
   /** Creates a new `AnyRefMap` from arrays of keys and values.
     *  Equivalent to but more efficient than `AnyRefMap((keys zip values): _*)`.
     */
-  def fromZip[K <: AnyRef, V](
-      keys: Array[K], values: Array[V]): AnyRefMap[K, V] = {
+  def fromZip[K <: AnyRef, V](keys: Array[K],
+                              values: Array[V]): AnyRefMap[K, V] = {
     val sz = math.min(keys.length, values.length)
     val arm = new AnyRefMap[K, V](sz * 2)
     var i = 0
@@ -488,8 +490,8 @@ object AnyRefMap {
   /** Creates a new `AnyRefMap` from keys and values.
     *  Equivalent to but more efficient than `AnyRefMap((keys zip values): _*)`.
     */
-  def fromZip[K <: AnyRef, V](
-      keys: Iterable[K], values: Iterable[V]): AnyRefMap[K, V] = {
+  def fromZip[K <: AnyRef, V](keys: Iterable[K],
+                              values: Iterable[V]): AnyRefMap[K, V] = {
     val sz = math.min(keys.size, values.size)
     val arm = new AnyRefMap[K, V](sz * 2)
     val ki = keys.iterator

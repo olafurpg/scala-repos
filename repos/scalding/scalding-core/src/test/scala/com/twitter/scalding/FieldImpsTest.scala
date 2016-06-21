@@ -130,7 +130,8 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       // Try a custom ordering
       val ord = implicitly[Ordering[java.math.BigInteger]].reverse
       setAndCheckField(Field[java.math.BigInteger]("bell")(
-              ord, implicitly[Manifest[java.math.BigInteger]]))
+              ord,
+              implicitly[Manifest[java.math.BigInteger]]))
       setAndCheckFieldS(List(Field[java.math.BigInteger](0),
                              Field[java.math.BigDecimal]("bar")))
     }
@@ -158,8 +159,10 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       vf shouldBe (new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
       vf = (1, 2, 3, 4)
       vf shouldBe
-      (new Fields(
-              int2Integer(1), int2Integer(2), int2Integer(3), int2Integer(4)))
+      (new Fields(int2Integer(1),
+                  int2Integer(2),
+                  int2Integer(3),
+                  int2Integer(4)))
     }
     "convert from general string tuples" in {
       var vf: Fields = Tuple1("hey")

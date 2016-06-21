@@ -17,11 +17,11 @@ abstract class AsyncRecovery extends SAsyncReplay with AsyncRecoveryPlugin {
   this: Actor ⇒
   import context.dispatcher
 
-  final def asyncReplayMessages(persistenceId: String,
-                                fromSequenceNr: Long,
-                                toSequenceNr: Long,
-                                max: Long)(
-      replayCallback: (PersistentRepr) ⇒ Unit) =
+  final def asyncReplayMessages(
+      persistenceId: String,
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long)(replayCallback: (PersistentRepr) ⇒ Unit) =
     doAsyncReplayMessages(persistenceId,
                           fromSequenceNr,
                           toSequenceNr,
@@ -30,8 +30,8 @@ abstract class AsyncRecovery extends SAsyncReplay with AsyncRecoveryPlugin {
                             def accept(p: PersistentRepr) = replayCallback(p)
                           }).map(Unit.unbox)
 
-  final def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] =
+  final def asyncReadHighestSequenceNr(persistenceId: String,
+                                       fromSequenceNr: Long): Future[Long] =
     doAsyncReadHighestSequenceNr(persistenceId, fromSequenceNr: Long)
       .map(_.longValue)
 }

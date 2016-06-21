@@ -113,8 +113,9 @@ trait JobQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   protected def mkMessage(pos: P, msg: String): JValue = {
     JObject(
         JField("message", JString(msg)) :: JField(
-            "timestamp", clock.now().serialize) :: JField(
-            "position", decomposer.decompose(pos)) :: Nil)
+            "timestamp",
+            clock.now().serialize) :: JField("position",
+                                             decomposer.decompose(pos)) :: Nil)
   }
 
   private def send(channel: String, pos: P, msg: String): M[Unit] =
@@ -201,14 +202,21 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
         case (pos, stats) =>
           log(pos,
               """{"count":%d,"sum":%d,"sumSq":%d,"min":%d,"max":%d}""".format(
-                  stats.count, stats.sum, stats.sumSq, stats.min, stats.max))
+                  stats.count,
+                  stats.sum,
+                  stats.sumSq,
+                  stats.min,
+                  stats.max))
       }
 
     logging reduceOption { _ >> _ } getOrElse (M point ())
   }
 
-  private case class Stats(
-      count: Long, sum: Long, sumSq: Long, min: Long, max: Long) {
+  private case class Stats(count: Long,
+                           sum: Long,
+                           sumSq: Long,
+                           min: Long,
+                           max: Long) {
     final def derive(nanos: Long): Stats = {
       copy(count = count + 1,
            sum = sum + nanos,

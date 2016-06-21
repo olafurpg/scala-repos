@@ -23,8 +23,8 @@ class AsyncSemaphoreTest extends FunSpec {
 
   override def withFixture(test: OneArgTest) = {
     val sem = new AsyncSemaphore(2)
-    val helper = new AsyncSemaphoreHelper(
-        sem, 0, new ConcurrentLinkedQueue[Permit])
+    val helper =
+      new AsyncSemaphoreHelper(sem, 0, new ConcurrentLinkedQueue[Permit])
     withFixture(test.toNoArgTest(helper))
   }
 

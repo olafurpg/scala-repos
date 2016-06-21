@@ -10,9 +10,9 @@ object OrderTest extends SpecLite {
     val F = Foldable[List]
     val xsdual: List[Int @@ Tags.Dual] = Tag subst xs
     (F maximum xs: Option[Int]) must_===
-      (Tag unsubst (F minimum xsdual: Option[Int @@ Tags.Dual]))
+    (Tag unsubst (F minimum xsdual: Option[Int @@ Tags.Dual]))
     (F minimum xs: Option[Int]) must_===
-      (Tag unsubst (F maximum xsdual: Option[Int @@ Tags.Dual]))
+    (Tag unsubst (F maximum xsdual: Option[Int @@ Tags.Dual]))
   }
 
   "semigroups min" ! forAll { (xs: NonEmptyList[Int]) =>

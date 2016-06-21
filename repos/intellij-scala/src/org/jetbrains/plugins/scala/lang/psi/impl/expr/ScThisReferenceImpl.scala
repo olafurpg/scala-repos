@@ -39,14 +39,13 @@ class ScThisReferenceImpl(node: ASTNode)
         case _ => None
       }
     case None => {
-        val encl =
-          PsiTreeUtil.getContextOfType(this, false, classOf[ScTemplateBody])
-        if (encl != null)
-          Some(
-              PsiTreeUtil.getContextOfType(
-                  encl, false, classOf[ScTemplateDefinition]))
-        else None
-      }
+      val encl =
+        PsiTreeUtil.getContextOfType(this, false, classOf[ScTemplateBody])
+      if (encl != null)
+        Some(PsiTreeUtil
+              .getContextOfType(encl, false, classOf[ScTemplateDefinition]))
+      else None
+    }
   }
 
   override def accept(visitor: ScalaElementVisitor) {
@@ -62,8 +61,8 @@ class ScThisReferenceImpl(node: ASTNode)
 }
 
 object ScThisReferenceImpl {
-  def getThisTypeForTypeDefinition(
-      td: ScTemplateDefinition, expr: ScExpression): TypeResult[ScType] = {
+  def getThisTypeForTypeDefinition(td: ScTemplateDefinition,
+                                   expr: ScExpression): TypeResult[ScType] = {
     lazy val selfTypeOfClass = td
       .getTypeWithProjections(TypingContext.empty, thisProjections = true)
       .map(tp =>

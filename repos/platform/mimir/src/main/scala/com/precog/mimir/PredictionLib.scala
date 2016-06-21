@@ -58,8 +58,8 @@ trait PredictionLibModule[M[+ _]]
     val fitStr = "fit"
 
     trait LinearPredictionBase extends LinearModelBase {
-      protected def morph1Apply(
-          models: Models, trans: Double => Double): Morph1Apply =
+      protected def morph1Apply(models: Models,
+                                trans: Double => Double): Morph1Apply =
         new Morph1Apply {
           def scanner(modelSet: ModelSet): CScanner = new CScanner {
             type A = Unit
@@ -83,8 +83,8 @@ trait PredictionLibModule[M[+ _]]
 
                       val varCovarMatrix = new Matrix(model.varCovar)
 
-                      case class Intervals(
-                          confidence: Array[Double], prediction: Array[Double])
+                      case class Intervals(confidence: Array[Double],
+                                           prediction: Array[Double])
 
                       val res = Model
                         .filteredRange(scannerPrelims.includedModel, range)
@@ -93,9 +93,9 @@ trait PredictionLibModule[M[+ _]]
                           case (Intervals(arrConf, arrPred), i) =>
                             val includedDoubles =
                               1.0 +:
-                              (scannerPrelims.cpaths map {
-                                    scannerPrelims.includedCols(_).apply(i)
-                                  })
+                                (scannerPrelims.cpaths map {
+                                      scannerPrelims.includedCols(_).apply(i)
+                                    })
                             val includedMatrix =
                               new Matrix(Array(includedDoubles.toArray))
 
@@ -147,15 +147,20 @@ trait PredictionLibModule[M[+ _]]
                       val pathPredictionUpper = makeCPath(predIntvStr, 1)
 
                       Map(ColumnRef(pathFit, CDouble) -> ArrayDoubleColumn(
-                              definedModel, resultArray),
+                              definedModel,
+                              resultArray),
                           ColumnRef(pathConfidenceUpper, CDouble) -> ArrayDoubleColumn(
-                              definedModel, confidenceUpper),
+                              definedModel,
+                              confidenceUpper),
                           ColumnRef(pathConfidenceLower, CDouble) -> ArrayDoubleColumn(
-                              definedModel, confidenceLower),
+                              definedModel,
+                              confidenceLower),
                           ColumnRef(pathPredictionUpper, CDouble) -> ArrayDoubleColumn(
-                              definedModel, predictionUpper),
+                              definedModel,
+                              predictionUpper),
                           ColumnRef(pathPredictionLower, CDouble) -> ArrayDoubleColumn(
-                              definedModel, predictionLower))
+                              definedModel,
+                              predictionLower))
                   }
 
                 val identitiesResult = Model.idRes(cols, modelSet)
@@ -195,8 +200,8 @@ trait PredictionLibModule[M[+ _]]
     }
 
     trait LogisticPredictionBase extends LogisticModelBase {
-      protected def morph1Apply(
-          models: Models, trans: Double => Double): Morph1Apply =
+      protected def morph1Apply(models: Models,
+                                trans: Double => Double): Morph1Apply =
         new Morph1Apply {
           def scanner(modelSet: ModelSet): CScanner = new CScanner {
             type A = Unit

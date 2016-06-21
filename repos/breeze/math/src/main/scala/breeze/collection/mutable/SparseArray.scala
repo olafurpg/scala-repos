@@ -333,20 +333,32 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
         val newData = ArrayUtil.copyOf(data, newLength)
 
         // copy existing data into new arrays
-        System.arraycopy(
-            index, insertPos, newIndex, insertPos + 1, used - insertPos - 1)
-        System.arraycopy(
-            data, insertPos, newData, insertPos + 1, used - insertPos - 1)
+        System.arraycopy(index,
+                         insertPos,
+                         newIndex,
+                         insertPos + 1,
+                         used - insertPos - 1)
+        System.arraycopy(data,
+                         insertPos,
+                         newData,
+                         insertPos + 1,
+                         used - insertPos - 1)
 
         // update pointers
         index = newIndex
         data = newData
       } else if (used - insertPos > 1) {
         // need to make room for new element mid-array
-        System.arraycopy(
-            index, insertPos, index, insertPos + 1, used - insertPos - 1)
-        System.arraycopy(
-            data, insertPos, data, insertPos + 1, used - insertPos - 1)
+        System.arraycopy(index,
+                         insertPos,
+                         index,
+                         insertPos + 1,
+                         used - insertPos - 1)
+        System.arraycopy(data,
+                         insertPos,
+                         data,
+                         insertPos + 1,
+                         used - insertPos - 1)
       }
 
       // assign new value
@@ -421,8 +433,8 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
     new SparseArray((this.index.slice(0, this.used) union that.index
                           .slice(0, that.used)
                           .map(_ + this.size)).toArray,
-                    (this.data.slice(0, this.used) union that.data.slice(
-                            0, that.used)).toArray,
+                    (this.data.slice(0, this.used) union that.data
+                          .slice(0, that.used)).toArray,
                     this.used + that.used,
                     this.size + that.size,
                     this.default)

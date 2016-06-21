@@ -47,7 +47,8 @@ trait TaskFailureListener extends EventListener {
   * Exception thrown when there is an exception in executing the callback in TaskCompletionListener.
   */
 private[spark] class TaskCompletionListenerException(
-    errorMessages: Seq[String], val previousError: Option[Throwable] = None)
+    errorMessages: Seq[String],
+    val previousError: Option[Throwable] = None)
     extends RuntimeException {
 
   override def getMessage: String = {

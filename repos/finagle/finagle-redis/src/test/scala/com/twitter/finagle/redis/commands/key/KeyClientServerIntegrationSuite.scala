@@ -329,7 +329,7 @@ final class KeyClientServerIntegrationSuite
 
   test(
       "RENAMENX should return an IntegerReply of 0 to verify a key rename did not occur when the" +
-      " the new key name already exists",
+        " the new key name already exists",
       ClientServerTest,
       RedisTest) {
     withRedisClient { client =>

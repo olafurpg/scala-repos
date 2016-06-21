@@ -78,8 +78,7 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
   }
 
   test("sum distributes over softmax") {
-    check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+    check(Prop.forAll { (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       (a + softmax(b, c)) =~=
       (softmax(a + b, a + c))
@@ -87,8 +86,7 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
   }
 
   test("exp(digamma(x)) ≈ x - .5, x >= 10") {
-    check(
-        Prop.forAll { (a: Double) =>
+    check(Prop.forAll { (a: Double) =>
       a.abs < 10 || a.abs > Double.MaxValue / 2 ||
       exp(breeze.numerics.digamma(a.abs)) =~= (a.abs - .5)
     })
@@ -114,7 +112,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     assert(lg(DenseVector(3.0, 3.0), 4.0) === DenseVector(lg(3.0, 4.0),
                                                           lg(3.0, 4.0)))
     assert(lg(DenseVector(3.0, 3.0), DenseVector(4.0, 1.0)) === DenseVector(
-            lg(3.0, 4.0), lg(3.0, 1.0)))
+            lg(3.0, 4.0),
+            lg(3.0, 1.0)))
     gammp(3.0, 1.0) should be(0.08030139707139419 +- 1E-8)
     gammp(3.0, 4.0) should be(0.7618966944464557 +- 1E-8)
     gammp(3.0, 10.0) should be(0.9972306042844884 +- 1E-8)

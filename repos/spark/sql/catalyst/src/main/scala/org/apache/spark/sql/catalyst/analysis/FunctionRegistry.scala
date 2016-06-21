@@ -37,8 +37,9 @@ trait FunctionRegistry {
         builder)
   }
 
-  def registerFunction(
-      name: String, info: ExpressionInfo, builder: FunctionBuilder): Unit
+  def registerFunction(name: String,
+                       info: ExpressionInfo,
+                       builder: FunctionBuilder): Unit
 
   @throws[AnalysisException]("If function does not exist")
   def lookupFunction(name: String, children: Seq[Expression]): Expression
@@ -55,14 +56,15 @@ class SimpleFunctionRegistry extends FunctionRegistry {
   private[sql] val functionBuilders =
     StringKeyHashMap[(ExpressionInfo, FunctionBuilder)](caseSensitive = false)
 
-  override def registerFunction(
-      name: String, info: ExpressionInfo, builder: FunctionBuilder): Unit =
+  override def registerFunction(name: String,
+                                info: ExpressionInfo,
+                                builder: FunctionBuilder): Unit =
     synchronized {
       functionBuilders.put(name, (info, builder))
     }
 
-  override def lookupFunction(
-      name: String, children: Seq[Expression]): Expression = {
+  override def lookupFunction(name: String,
+                              children: Seq[Expression]): Expression = {
     val func = synchronized {
       functionBuilders.get(name).map(_._2).getOrElse {
         throw new AnalysisException(s"undefined function $name")
@@ -95,13 +97,14 @@ class SimpleFunctionRegistry extends FunctionRegistry {
   * functions are already filled in and the analyzer needs only to resolve attribute references.
   */
 object EmptyFunctionRegistry extends FunctionRegistry {
-  override def registerFunction(
-      name: String, info: ExpressionInfo, builder: FunctionBuilder): Unit = {
+  override def registerFunction(name: String,
+                                info: ExpressionInfo,
+                                builder: FunctionBuilder): Unit = {
     throw new UnsupportedOperationException
   }
 
-  override def lookupFunction(
-      name: String, children: Seq[Expression]): Expression = {
+  override def lookupFunction(name: String,
+                              children: Seq[Expression]): Expression = {
     throw new UnsupportedOperationException
   }
 
@@ -347,8 +350,10 @@ object FunctionRegistry {
     val df = clazz.getAnnotation(classOf[ExpressionDescription])
     if (df != null) {
       (name,
-       (new ExpressionInfo(
-            clazz.getCanonicalName, name, df.usage(), df.extended()),
+       (new ExpressionInfo(clazz.getCanonicalName,
+                           name,
+                           df.usage(),
+                           df.extended()),
         builder))
     } else {
       (name, (new ExpressionInfo(clazz.getCanonicalName, name), builder))

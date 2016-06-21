@@ -131,7 +131,8 @@ trait AtmosphereSupport
           .getInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT)
           .isBlank)
       cfg.getServletContext.setInitParameter(
-          ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true")
+          ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT,
+          "true")
     if (trackMessageSize || cfg
           .getInitParameter(TrackMessageSize)
           .blankOption
@@ -163,8 +164,8 @@ trait AtmosphereSupport
     * $ 3. Binds the current `request`, `response`, and `multiParams`, and calls
     * `executeRoutes()`.
     */
-  abstract override def handle(
-      request: HttpServletRequest, response: HttpServletResponse) {
+  abstract override def handle(request: HttpServletRequest,
+                               response: HttpServletResponse) {
     withRequestResponse(request, response) {
       val atmoRoute = atmosphereRoute(request)
       if (atmoRoute.isDefined) {
@@ -182,7 +183,7 @@ trait AtmosphereSupport
   private[this] def noGetRoute =
     sys.error(
         "You are using the AtmosphereSupport without defining any Get route," +
-        "you should get rid of it.")
+          "you should get rid of it.")
 
   private[this] def atmosphereRoutes =
     routes.methodRoutes
@@ -197,7 +198,8 @@ trait AtmosphereSupport
 
   private[this] def configureBroadcasterFactory() {
     val factory = new ScalatraBroadcasterFactory(
-        atmosphereFramework.getAtmosphereConfig, broadcasterConfig)
+        atmosphereFramework.getAtmosphereConfig,
+        broadcasterConfig)
     atmosphereFramework.setDefaultBroadcasterClassName(
         broadcasterConfig.broadcasterClass.getName)
     atmosphereFramework.setBroadcasterFactory(factory)

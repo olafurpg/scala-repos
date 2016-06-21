@@ -78,11 +78,12 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
     * sending using this mechanism is not suitable if replies are expected, use
     * [[Bind]] in that case.
     */
-  final case class Send(
-      payload: ByteString, target: InetSocketAddress, ack: Event)
+  final case class Send(payload: ByteString,
+                        target: InetSocketAddress,
+                        ack: Event)
       extends Command {
-    require(
-        ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
+    require(ack != null,
+            "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }
@@ -199,7 +200,7 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
 
     val NrOfSelectors: Int =
       getInt("nr-of-selectors") requiring
-      (_ > 0, "nr-of-selectors must be > 0")
+        (_ > 0, "nr-of-selectors must be > 0")
     val DirectBufferSize: Int = getIntBytes("direct-buffer-size")
     val MaxDirectBufferPoolSize: Int = getInt("direct-buffer-pool-limit")
     val BatchReceiveLimit: Int = getInt("receive-throughput")
@@ -239,7 +240,8 @@ class UdpExt(system: ExtendedActorSystem) extends IO.Extension {
     * INTERNAL API
     */
   private[io] val bufferPool: BufferPool = new DirectByteBufferPool(
-      settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
+      settings.DirectBufferSize,
+      settings.MaxDirectBufferPoolSize)
 }
 
 /**
@@ -280,8 +282,9 @@ object UdpMessage {
     * sending using this mechanism is not suitable if replies are expected, use
     * [[Udp.Bind]] in that case.
     */
-  def send(
-      payload: ByteString, target: InetSocketAddress, ack: Event): Command =
+  def send(payload: ByteString,
+           target: InetSocketAddress,
+           ack: Event): Command =
     Send(payload, target, ack)
 
   /**

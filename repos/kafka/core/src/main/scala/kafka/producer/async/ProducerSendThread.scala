@@ -37,8 +37,9 @@ class ProducerSendThread[K, V](val threadName: String,
     with KafkaMetricsGroup {
 
   private val shutdownLatch = new CountDownLatch(1)
-  private val shutdownCommand = new KeyedMessage[K, V](
-      "shutdown", null.asInstanceOf[K], null.asInstanceOf[V])
+  private val shutdownCommand = new KeyedMessage[K, V]("shutdown",
+                                                       null.asInstanceOf[K],
+                                                       null.asInstanceOf[V])
 
   newGauge("ProducerQueueSize", new Gauge[Int] {
     def value = queue.size
@@ -68,10 +69,10 @@ class ProducerSendThread[K, V](val threadName: String,
 
     // drain the queue until you get a shutdown command
     Iterator
-      .continually(
-          queue.poll(scala.math.max(
-                         0, (lastSend + queueTime) - SystemTime.milliseconds),
-                     TimeUnit.MILLISECONDS))
+      .continually(queue.poll(
+              scala.math.max(0,
+                             (lastSend + queueTime) - SystemTime.milliseconds),
+              TimeUnit.MILLISECONDS))
       .takeWhile(item => if (item != null) item ne shutdownCommand else true)
       .foreach { currentQueueItem =>
         val elapsed = (SystemTime.milliseconds - lastSend)

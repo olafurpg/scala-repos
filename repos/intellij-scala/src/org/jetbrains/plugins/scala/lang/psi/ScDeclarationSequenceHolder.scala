@@ -27,7 +27,7 @@ trait ScDeclarationSequenceHolder extends ScalaPsiElement {
         (processor match {
           case b: BaseProcessor =>
             b.kinds.contains(ResolveTargets.OBJECT) ||
-            b.kinds.contains(ResolveTargets.VAL)
+              b.kinds.contains(ResolveTargets.VAL)
           case _ => true
         }) && t.fakeCompanionModule.isDefined
       }

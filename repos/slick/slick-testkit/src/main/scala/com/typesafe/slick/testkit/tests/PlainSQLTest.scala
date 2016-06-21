@@ -124,9 +124,7 @@ class PlainSQLTest extends AsyncTest[JdbcTestDB] {
                                (3, "foo"))
           } yield sqlu"insert into USERS values ($id, $name)"), 0)(_ + _)
           .map(_ shouldBe 4),
-        sql"select id from USERS"
-          .as[Int]
-          .map(_.toSet shouldBe Set(0, 1, 2, 3)), //TODO Support `to` in Plain SQL Actions
+        sql"select id from USERS".as[Int].map(_.toSet shouldBe Set(0, 1, 2, 3)), //TODO Support `to` in Plain SQL Actions
         userForID(2).map(_.head shouldBe User(2, "guest")), //TODO Support `head` and `headOption` in Plain SQL Actions
         s1.map(_ shouldBe List(1)),
         s2.map(_ shouldBe List(2)),

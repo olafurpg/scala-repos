@@ -7,7 +7,8 @@ import reflect.ClassTag
 object Test {
 
   def printResult[A, B](msg: String, obj: A, expected: B)(
-      implicit tag: ClassTag[A], tag2: ClassTag[B]) = {
+      implicit tag: ClassTag[A],
+      tag2: ClassTag[B]) = {
     print("  :" + msg + ": ")
     val isArray = obj match {
       case x: Array[Int] => true
@@ -36,8 +37,8 @@ object Test {
   val testParVector = ParVector(1, 2, 3)
   val testParArray = ParArray(1, 2, 3)
 
-  def testConversion[A: ClassTag](
-      name: String, col: => GenTraversableOnce[A]): Unit = {
+  def testConversion[A: ClassTag](name: String,
+                                  col: => GenTraversableOnce[A]): Unit = {
     val tmp = col
     println("-- Testing " + name + " ---")
     printResult("[Direct] Vector   ", col.toVector, testVector)

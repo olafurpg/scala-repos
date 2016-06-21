@@ -211,8 +211,8 @@ case class MoreThanOrEqual(x: Int) extends ExpressionSymbol {
   override def toString = " keySize >= " + x
 }
 
-case class AlgorithmConstraint(
-    algorithm: String, constraint: Option[ExpressionSymbol] = None) {
+case class AlgorithmConstraint(algorithm: String,
+                               constraint: Option[ExpressionSymbol] = None) {
 
   /**
     * Returns true only if the algorithm matches.  Useful for signature algorithms where we don't care about key size.

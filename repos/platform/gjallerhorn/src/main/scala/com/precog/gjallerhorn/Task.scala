@@ -115,8 +115,10 @@ abstract class Task(settings: Settings) extends Specification {
     res()
   }
 
-  def ingestFile(
-      account: Account, path: String, file: File, contentType: String) {
+  def ingestFile(account: Account,
+                 path: String,
+                 file: File,
+                 contentType: String) {
     val req =
       ((ingest / "sync" / "fs" / path).POST <:< List(
               "Content-Type" -> contentType) <<? List(
@@ -160,9 +162,9 @@ abstract class Task(settings: Settings) extends Specification {
     Http(req OK as.String)()
   }
 
-  def metadataFor(
-      apiKey: String, tpe: Option[String] = None, prop: Option[String] = None)(
-      f: Req => Req): JValue = {
+  def metadataFor(apiKey: String,
+                  tpe: Option[String] = None,
+                  prop: Option[String] = None)(f: Req => Req): JValue = {
     val params = List(
         Some("apiKey" -> apiKey),
         tpe map ("type" -> _),
@@ -182,8 +184,7 @@ abstract class Task(settings: Settings) extends Specification {
           .addQueryParameter("apiKey", authApiKey))()
 
   def grantBody(perms: List[(String, String, List[String])]): String =
-    JObject(
-        "permissions" -> JArray(perms.map {
+    JObject("permissions" -> JArray(perms.map {
       case (accessType, path, owners) =>
         val ids = JArray(owners.map(JString(_)))
         JObject("accessType" -> JString(accessType),
@@ -191,8 +192,8 @@ abstract class Task(settings: Settings) extends Specification {
                 "ownerAccountIds" -> ids)
     })).renderCompact
 
-  def createGrant(
-      apiKey: String, perms: List[(String, String, List[String])]): ApiResult =
+  def createGrant(apiKey: String,
+                  perms: List[(String, String, List[String])]): ApiResult =
     http((grants / "").POST.addQueryParameter("apiKey", apiKey) << grantBody(
             perms))()
 
@@ -203,16 +204,18 @@ abstract class Task(settings: Settings) extends Specification {
     http((grants / grantId / "children" / "").POST
           .addQueryParameter("apiKey", apiKey) << grantBody(perms))()
 
-  def addToGrant(
-      targetApiKey: String, authApiKey: String, grantId: String): ApiResult = {
+  def addToGrant(targetApiKey: String,
+                 authApiKey: String,
+                 grantId: String): ApiResult = {
     val body = JObject("grantId" -> JString(grantId)).renderCompact
     val url = security / targetApiKey / "grants" / ""
     val req = (url).addQueryParameter("apiKey", authApiKey) << body
     http(req)()
   }
 
-  def removeGrant(
-      targetApiKey: String, authApiKey: String, grantId: String): ApiResult = {
+  def removeGrant(targetApiKey: String,
+                  authApiKey: String,
+                  grantId: String): ApiResult = {
     val url = security / targetApiKey / "grants" / grantId
     val req = (url).DELETE.addQueryParameter("apiKey", authApiKey)
     http(req)()

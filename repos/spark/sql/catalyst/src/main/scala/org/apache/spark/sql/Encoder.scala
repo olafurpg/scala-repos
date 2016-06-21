@@ -71,9 +71,9 @@ import org.apache.spark.sql.types._
 @Experimental
 @implicitNotFound(
     "Unable to find encoder for type stored in a Dataset.  Primitive types " +
-    "(Int, String, etc) and Product types (case classes) are supported by importing " +
-    "sqlContext.implicits._  Support for serializing other types will be added in future " +
-    "releases.")
+      "(Int, String, etc) and Product types (case classes) are supported by importing " +
+      "sqlContext.implicits._  Support for serializing other types will be added in future " +
+      "releases.")
 trait Encoder[T] extends Serializable {
 
   /** Returns the schema of encoding this type of object as a Row. */
@@ -234,7 +234,7 @@ object Encoders {
     if (!Modifier.isPublic(classTag[T].runtimeClass.getModifiers)) {
       throw new UnsupportedOperationException(
           s"${classTag[T].runtimeClass.getName} is not a public class. " +
-          "Only public classes are supported.")
+            "Only public classes are supported.")
     }
   }
 
@@ -289,8 +289,8 @@ object Encoders {
                             e2: Encoder[T2],
                             e3: Encoder[T3],
                             e4: Encoder[T4]): Encoder[(T1, T2, T3, T4)] = {
-    ExpressionEncoder.tuple(
-        encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4))
+    ExpressionEncoder
+      .tuple(encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4))
   }
 
   /**

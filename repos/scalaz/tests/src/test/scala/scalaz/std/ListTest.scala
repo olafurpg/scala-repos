@@ -28,7 +28,7 @@ object ListTest extends SpecLite {
     (a: List[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must_===
-        (a)
+      (a)
   }
 
   "intercalate is same as a.intersperse(b).flatten" ! forAll {
@@ -129,13 +129,13 @@ object ListTest extends SpecLite {
   "foldl is foldLeft" ! forAll { (rnge: List[List[Int]]) =>
     val F = Foldable[List]
     (rnge.foldLeft(List[Int]())(_ ++ _) must_===
-          (F.foldLeft(rnge, List[Int]())(_ ++ _)))
+        (F.foldLeft(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldr is foldRight" ! forAll { (rnge: List[List[Int]]) =>
     val F = Foldable[List]
     (rnge.foldRight(List[Int]())(_ ++ _) must_===
-          (F.foldRight(rnge, List[Int]())(_ ++ _)))
+        (F.foldRight(rnge, List[Int]())(_ ++ _)))
   }
 
   "index" ! forAll { (xs: List[Int], n: Int) =>
@@ -150,13 +150,13 @@ object ListTest extends SpecLite {
   "mapAccumLeft" ! forAll { (xs: List[Int]) =>
     val f = (_: Int) + 1
     xs.mapAccumLeft(List[Int](), (c: List[Int], a) => (c :+ a, f(a))) must_===
-      (xs, xs.map(f))
+    (xs, xs.map(f))
   }
 
   "mapAccumRight" ! forAll { (xs: List[Int]) =>
     val f = (_: Int) + 1
     xs.mapAccumRight(List[Int](), (c: List[Int], a) => (c :+ a, f(a))) must_===
-      (xs.reverse, xs.map(f))
+    (xs.reverse, xs.map(f))
   }
 
   checkAll(FoldableTests.anyAndAllLazy[List])

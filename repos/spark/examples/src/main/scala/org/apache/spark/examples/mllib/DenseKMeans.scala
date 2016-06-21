@@ -62,7 +62,7 @@ object DenseKMeans {
       opt[String]("initMode")
         .text(
             s"initialization mode (${InitializationMode.values.mkString(",")}), " +
-            s"default: ${defaultParams.initializationMode}")
+              s"default: ${defaultParams.initializationMode}")
         .action((x, c) =>
               c.copy(initializationMode = InitializationMode.withName(x)))
       arg[String]("<input>")

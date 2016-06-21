@@ -84,8 +84,10 @@ object WiringUI {
     * there's none already defined)
     */
   def apply[T](
-      in: NodeSeq, cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
-      f: T => NodeSeq => NodeSeq): NodeSeq =
+      in: NodeSeq,
+      cell: Cell[T],
+      jsEffect: (String, Boolean,
+                 JsCmd) => JsCmd)(f: T => NodeSeq => NodeSeq): NodeSeq =
     toNode(in, cell, jsEffect)((t, ns) => f(t)(ns))
 
   /**
@@ -126,12 +128,12 @@ object WiringUI {
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
-  def toNode[T](in: NodeSeq, cell: Cell[T])(
-      f: (T, NodeSeq) => NodeSeq): NodeSeq =
+  def toNode[T](in: NodeSeq, cell: Cell[T])(f: (T,
+                                                NodeSeq) => NodeSeq): NodeSeq =
     toNode(in, cell, (id, first, js) => js)(f)
 
-  def history[T](
-      cell: Cell[T])(f: (Box[T], T, NodeSeq) => JsCmd): NodeSeq => NodeSeq =
+  def history[T](cell: Cell[T])(f: (Box[T],
+                                    T, NodeSeq) => JsCmd): NodeSeq => NodeSeq =
     in => {
       val myElem: Elem = in.find {
         case e: Elem => true
@@ -260,8 +262,10 @@ object WiringUI {
     * there's none already defined)
     */
   def toNode[T](
-      in: NodeSeq, cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
-      f: (T, NodeSeq) => NodeSeq): NodeSeq = {
+      in: NodeSeq,
+      cell: Cell[T],
+      jsEffect: (String, Boolean,
+                 JsCmd) => JsCmd)(f: (T, NodeSeq) => NodeSeq): NodeSeq = {
     val myElem: Elem = in.find {
       case e: Elem => true
       case _ => false
@@ -330,8 +334,7 @@ object WiringUI {
     var lastValue: T = null.asInstanceOf[T]
     for {
       sess <- S.session
-    } sess.addPostPageJavaScript(
-        () => {
+    } sess.addPostPageJavaScript(() => {
       val (value, ct) = trc.get
       val first = lastTime == 0L
       if (first || (ct > lastTime && value != lastValue)) {

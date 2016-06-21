@@ -55,8 +55,8 @@ object PrinterJob {
     * Companion Object for [[scalafx.print.PrinterJob.JobStatus]].
     */
   object JobStatus
-      extends SFXEnumDelegateCompanion[
-          jfxp.PrinterJob.JobStatus, PrinterJob.JobStatus] {
+      extends SFXEnumDelegateCompanion[jfxp.PrinterJob.JobStatus,
+                                       PrinterJob.JobStatus] {
 
     /**
       * The job has been cancelled by the application.

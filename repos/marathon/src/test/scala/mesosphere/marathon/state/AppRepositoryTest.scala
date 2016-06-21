@@ -131,8 +131,10 @@ class AppRepositoryTest extends MarathonSpec {
     val repo = new AppRepository(store, None, metrics)
     val res = repo.listVersions(appDef1.id)
 
-    val expected = Seq(
-        appDef1.version, version1.version, version2.version, version3.version)
+    val expected = Seq(appDef1.version,
+                       version1.version,
+                       version2.version,
+                       version3.version)
     assert(expected == Await.result(res, 5.seconds),
            "Should return all versions of given app")
     verify(store).names()

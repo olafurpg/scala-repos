@@ -77,8 +77,8 @@ class ProducerCompressionTest(compression: String)
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
               "org.apache.kafka.common.serialization.ByteArraySerializer")
     var producer = new KafkaProducer[Array[Byte], Array[Byte]](props)
-    val consumer = new SimpleConsumer(
-        "localhost", server.boundPort(), 100, 1024 * 1024, "")
+    val consumer =
+      new SimpleConsumer("localhost", server.boundPort(), 100, 1024 * 1024, "")
 
     try {
       // create topic
@@ -90,9 +90,14 @@ class ProducerCompressionTest(compression: String)
 
       // make sure the returned messages are correct
       val now = System.currentTimeMillis()
-      val responses = for (message <- messages) yield
-        producer.send(new ProducerRecord[Array[Byte], Array[Byte]](
-                topic, null, now, null, message))
+      val responses = for (message <- messages)
+        yield
+          producer.send(
+              new ProducerRecord[Array[Byte], Array[Byte]](topic,
+                                                           null,
+                                                           now,
+                                                           null,
+                                                           message))
       val futures = responses.toList
       for ((future, offset) <- futures zip (0 until numRecords)) {
         assertEquals(offset.toLong, future.get.offset)

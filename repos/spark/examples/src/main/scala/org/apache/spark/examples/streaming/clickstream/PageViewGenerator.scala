@@ -23,8 +23,10 @@ import java.net.ServerSocket
 import java.util.Random
 
 /** Represents a page view on a website with associated dimension data. */
-class PageView(
-    val url: String, val status: Int, val zipCode: Int, val userID: Int)
+class PageView(val url: String,
+               val status: Int,
+               val zipCode: Int,
+               val userID: Int)
     extends Serializable {
   override def toString(): String = {
     "%s\t%s\t%s\t%s\n".format(url, status, zipCode, userID)

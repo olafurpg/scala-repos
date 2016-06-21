@@ -62,8 +62,8 @@ trait PresentationCompilation { self: IMain =>
     * You may downcast the `reporter` to `StoreReporter` to access type errors.
     */
   def newPresentationCompiler(): interactive.Global = {
-    val replOutClasspath: DirectoryClassPath = new DirectoryClassPath(
-        replOutput.dir, DefaultJavaContext)
+    val replOutClasspath: DirectoryClassPath =
+      new DirectoryClassPath(replOutput.dir, DefaultJavaContext)
     val mergedClasspath = new MergedClassPath[AbstractFile](
         replOutClasspath :: global.platform.classPath :: Nil,
         DefaultJavaContext)
@@ -113,7 +113,8 @@ trait PresentationCompilation { self: IMain =>
 
   object PresentationCompileResult {
     def apply(compiler0: interactive.Global)(
-        unit0: compiler0.RichCompilationUnit, preambleLength0: Int) =
+        unit0: compiler0.RichCompilationUnit,
+        preambleLength0: Int) =
       new PresentationCompileResult {
 
         override val compiler = compiler0

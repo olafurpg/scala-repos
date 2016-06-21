@@ -40,8 +40,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
       if (set ne null) {
         set.synchronized {
           if (set.isEmpty)
-            retry =
-              true //IF the set is empty then it has been removed, so signal retry
+            retry = true //IF the set is empty then it has been removed, so signal retry
           else {
             //Else add the value to the set and signal that retry is not needed
             added = set add v
@@ -57,8 +56,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
         if (oldSet ne null) {
           oldSet.synchronized {
             if (oldSet.isEmpty)
-              retry =
-                true //IF the set is empty then it has been removed, so signal retry
+              retry = true //IF the set is empty then it has been removed, so signal retry
             else {
               //Else try to add the value to the set and signal that retry is not needed
               added = oldSet add v
@@ -150,8 +148,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
     if (set ne null) {
       set.synchronized {
         container.remove(key, set)
-        val ret =
-          collectionAsScalaIterableConverter(set.clone()).asScala // Make copy since we need to clear the original
+        val ret = collectionAsScalaIterableConverter(set.clone()).asScala // Make copy since we need to clear the original
         set.clear() // Clear the original set to signal to any pending writers that there was a conflict
         Some(ret)
       }

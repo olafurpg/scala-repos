@@ -3,8 +3,8 @@ object Test extends App {
   class SymbolType
   case class SymbolInfo(tp: SymbolType, regions: List[Region], x: Any)
 
-  def findRegionsWithSymbolType(
-      rawSymbolInfos: Seq[SymbolInfo], symbolType: SymbolType): Set[Region] =
+  def findRegionsWithSymbolType(rawSymbolInfos: Seq[SymbolInfo],
+                                symbolType: SymbolType): Set[Region] =
     rawSymbolInfos.collect {
       case SymbolInfo(`symbolType`, regions, _) => regions
     }.flatten.toSet

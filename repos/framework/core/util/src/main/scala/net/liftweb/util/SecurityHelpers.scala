@@ -126,16 +126,16 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
       case (null, _) => false
       case (_, null) => false
       case (a, b) => {
-          val la = a.length
-          val lb = b.length
-          var ret = true
-          var pos = 0
-          while (pos < la && pos < lb) {
-            ret &= (a(pos) == b(pos))
-            pos += 1
-          }
-          ret && la == lb
+        val la = a.length
+        val lb = b.length
+        var ret = true
+        var pos = 0
+        while (pos < la && pos < lb) {
+          ret &= (a(pos) == b(pos))
+          pos += 1
         }
+        ret && la == lb
+      }
     }
 
   /** create a SHA-256 hash from a Byte array */
@@ -234,13 +234,13 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
 
     parserFactory.setNamespaceAware(false)
     parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                             Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+                               Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
                              false)
     parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                             Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
+                               Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
                              false)
     parserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                             Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                               Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
                              true)
     parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
 

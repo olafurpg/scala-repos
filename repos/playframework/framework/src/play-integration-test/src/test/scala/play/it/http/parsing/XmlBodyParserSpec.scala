@@ -19,9 +19,8 @@ object XmlBodyParserSpec extends PlaySpecification {
     def parse(xml: String,
               contentType: Option[String],
               encoding: String,
-              bodyParser: BodyParser[NodeSeq] =
-                BodyParsers.parse.tolerantXml(1048576))(
-        implicit mat: Materializer) = {
+              bodyParser: BodyParser[NodeSeq] = BodyParsers.parse.tolerantXml(
+                  1048576))(implicit mat: Materializer) = {
       await(
           bodyParser(FakeRequest().withHeaders(
                   contentType.map(CONTENT_TYPE -> _).toSeq: _*))
@@ -165,9 +164,10 @@ object XmlBodyParserSpec extends PlaySpecification {
     }
 
     "gracefully fail when there are too many nested entities" in new WithApplication() {
-      val nested = for (x <- 1 to 30) yield
-        "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
-        ";\">"
+      val nested = for (x <- 1 to 30)
+        yield
+          "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
+            ";\">"
       val xml = s"""<?xml version="1.0"?>
                   | <!DOCTYPE billion [
                   | <!ELEMENT billion (#PCDATA)>

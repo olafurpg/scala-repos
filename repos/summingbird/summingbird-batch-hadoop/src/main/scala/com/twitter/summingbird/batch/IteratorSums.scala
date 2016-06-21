@@ -117,7 +117,8 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
   }
 
   def groupedSum[K1: Equiv, V1: Semigroup](
-      in: Iterator[(K1, V1)], bufferSize: Int = 1000): Iterator[(K1, V1)] =
+      in: Iterator[(K1, V1)],
+      bufferSize: Int = 1000): Iterator[(K1, V1)] =
     sumWith(in, groupedStatefulSummer(bufferSize))
 
   /**

@@ -31,7 +31,8 @@ class RemoveRedundantReturnInspection
 
 class RemoveReturnKeywordQuickFix(r: ScReturnStmt)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("remove.return.keyword"), r) {
+        ScalaBundle.message("remove.return.keyword"),
+        r) {
   def doApplyFix(project: Project) {
     val ret = getElement
     if (!ret.isValid) return

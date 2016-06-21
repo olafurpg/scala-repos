@@ -67,8 +67,8 @@ class ReplicaFetcherThread(name: String,
 
   private def clientId = name
 
-  private val sourceNode = new Node(
-      sourceBroker.id, sourceBroker.host, sourceBroker.port)
+  private val sourceNode =
+    new Node(sourceBroker.id, sourceBroker.host, sourceBroker.port)
 
   // we need to include both the broker id and the fetcher id
   // as the metrics tag to avoid metric name conflicts with
@@ -145,8 +145,10 @@ class ReplicaFetcherThread(name: String,
       if (logger.isTraceEnabled)
         trace(
             "Follower %d set replica high watermark for partition [%s,%d] to %s"
-              .format(
-                replica.brokerId, topic, partitionId, followerHighWatermark))
+              .format(replica.brokerId,
+                      topic,
+                      partitionId,
+                      followerHighWatermark))
     } catch {
       case e: KafkaStorageException =>
         fatal("Disk error while replicating data.", e)
@@ -158,9 +160,9 @@ class ReplicaFetcherThread(name: String,
     if (messageSet.sizeInBytes > 0 && messageSet.validBytes <= 0)
       error(
           "Replication is failing due to a message that is greater than replica.fetch.max.bytes. This " +
-          "generally occurs when the max.message.bytes has been overridden to exceed this value and a suitably large " +
-          "message has also been sent. To fix this problem increase replica.fetch.max.bytes in your broker config to be " +
-          "equal or larger than your settings for max.message.bytes, both at a broker and topic level.")
+            "generally occurs when the max.message.bytes has been overridden to exceed this value and a suitably large " +
+            "message has also been sent. To fix this problem increase replica.fetch.max.bytes in your broker config to be " +
+            "equal or larger than your settings for max.message.bytes, both at a broker and topic level.")
   }
 
   /**
@@ -200,11 +202,11 @@ class ReplicaFetcherThread(name: String,
         fatal(
             "Halting because log truncation is not allowed for topic %s,"
               .format(topicAndPartition.topic) +
-            " Current leader %d's latest offset %d is less than replica %d's latest offset %d"
-              .format(sourceBroker.id,
-                      leaderEndOffset,
-                      brokerConfig.brokerId,
-                      replica.logEndOffset.messageOffset))
+              " Current leader %d's latest offset %d is less than replica %d's latest offset %d"
+                .format(sourceBroker.id,
+                        leaderEndOffset,
+                        brokerConfig.brokerId,
+                        replica.logEndOffset.messageOffset))
         Runtime.getRuntime.halt(1)
       }
 
@@ -257,8 +259,8 @@ class ReplicaFetcherThread(name: String,
         Math.max(leaderStartOffset, replica.logEndOffset.messageOffset)
       // Only truncate log when current leader's log start offset is greater than follower's log end offset.
       if (leaderStartOffset > replica.logEndOffset.messageOffset)
-        replicaMgr.logManager.truncateFullyAndStartAt(
-            topicAndPartition, leaderStartOffset)
+        replicaMgr.logManager
+          .truncateFullyAndStartAt(topicAndPartition, leaderStartOffset)
       offsetToFetch
     }
   }
@@ -270,8 +272,9 @@ class ReplicaFetcherThread(name: String,
 
   protected def fetch(
       fetchRequest: FetchRequest): Map[TopicAndPartition, PartitionData] = {
-    val clientResponse = sendRequest(
-        ApiKeys.FETCH, Some(fetchRequestVersion), fetchRequest.underlying)
+    val clientResponse = sendRequest(ApiKeys.FETCH,
+                                     Some(fetchRequestVersion),
+                                     fetchRequest.underlying)
     new FetchResponse(clientResponse.responseBody).responseData.asScala.map {
       case (key, value) =>
         TopicAndPartition(key.topic, key.partition) -> new PartitionData(value)
@@ -289,10 +292,10 @@ class ReplicaFetcherThread(name: String,
         throw new SocketTimeoutException(
             s"Failed to connect within $socketTimeout ms")
       else {
-        val send = new RequestSend(
-            sourceBroker.id.toString, header, request.toStruct)
-        val clientRequest = new ClientRequest(
-            time.milliseconds(), true, send, null)
+        val send =
+          new RequestSend(sourceBroker.id.toString, header, request.toStruct)
+        val clientRequest =
+          new ClientRequest(time.milliseconds(), true, send, null)
         networkClient
           .blockingSendAndReceive(clientRequest, socketTimeout)(time)
           .getOrElse {
@@ -310,8 +313,8 @@ class ReplicaFetcherThread(name: String,
   private def earliestOrLatestOffset(topicAndPartition: TopicAndPartition,
                                      earliestOrLatest: Long,
                                      consumerId: Int): Long = {
-    val topicPartition = new TopicPartition(
-        topicAndPartition.topic, topicAndPartition.partition)
+    val topicPartition =
+      new TopicPartition(topicAndPartition.topic, topicAndPartition.partition)
     val partitions = Map(
         topicPartition -> new ListOffsetRequest.PartitionData(earliestOrLatest,
                                                               1)
@@ -336,8 +339,8 @@ class ReplicaFetcherThread(name: String,
       case ((TopicAndPartition(topic, partition), partitionFetchState)) =>
         if (partitionFetchState.isActive)
           requestMap(new TopicPartition(topic, partition)) =
-            new JFetchRequest.PartitionData(
-                partitionFetchState.offset, fetchSize)
+            new JFetchRequest.PartitionData(partitionFetchState.offset,
+                                            fetchSize)
     }
 
     new FetchRequest(
@@ -352,8 +355,8 @@ object ReplicaFetcherThread {
     def isEmpty: Boolean = underlying.fetchData.isEmpty
     def offset(topicAndPartition: TopicAndPartition): Long =
       underlying.fetchData
-        .asScala(new TopicPartition(
-                topicAndPartition.topic, topicAndPartition.partition))
+        .asScala(new TopicPartition(topicAndPartition.topic,
+                                    topicAndPartition.partition))
         .offset
   }
 

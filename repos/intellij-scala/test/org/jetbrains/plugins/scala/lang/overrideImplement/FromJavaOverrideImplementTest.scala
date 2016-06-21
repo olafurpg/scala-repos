@@ -27,7 +27,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
               needsInferType: Boolean = true) {
     myFixture.addFileToProject("JavaDummy.java", javaText.stripMargin.trim)
     val scalaFile = myFixture.configureByText(
-        "ScalaDummy.scala", scalaText.replace("\r", "").stripMargin.trim)
+        "ScalaDummy.scala",
+        scalaText.replace("\r", "").stripMargin.trim)
     val oldSpecifyRetType =
       ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =

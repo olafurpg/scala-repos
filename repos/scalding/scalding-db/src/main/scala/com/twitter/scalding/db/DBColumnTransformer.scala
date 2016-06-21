@@ -53,8 +53,8 @@ object DBColumnTransformer {
     Definition(sqlType + sizeStr + defStr + preparedCol.nullable.toStr)
   }
 
-  private def defaultColumnMutator: PartialFunction[
-      DBColumnDefinition, DBColumnDefinition] = {
+  private def defaultColumnMutator: PartialFunction[DBColumnDefinition,
+                                                    DBColumnDefinition] = {
     case t @ DBColumnDefinition(BIGINT, _, _, None, _, _) =>
       t.copy(sizeOpt = Some(20))
     case t @ DBColumnDefinition(INT, _, _, None, _, _) =>
@@ -78,8 +78,8 @@ object DBColumnTransformer {
       columnMutator: PartialFunction[DBColumnDefinition, DBColumnDefinition],
       columns: Iterable[ColumnDefinition]): Iterable[Definition] =
     columns.map(c =>
-          columnDefnToDefinition(
-              c, columnMutator.orElse(defaultColumnMutator)))
+          columnDefnToDefinition(c,
+                                 columnMutator.orElse(defaultColumnMutator)))
 
   def columnDefnsToCreate(
       columns: Iterable[ColumnDefinition]): Iterable[Definition] =

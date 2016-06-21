@@ -59,8 +59,9 @@ class ClusterClientTest
 
     // create serverset
     val serverSet = boundedWait(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+                          zkPath)
     )
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
@@ -93,7 +94,7 @@ class ClusterClientTest
 
       // destination of the test cache endpoints
       dest = Resolver.eval("twcache!localhost:" +
-          zookeeperServer.getPort.toString + "!" + zkPath)
+            zookeeperServer.getPort.toString + "!" + zkPath)
     }
   }
 
@@ -118,8 +119,10 @@ class ClusterClientTest
 
   test("Simple ClusterClient using finagle load balancing - many keys") {
     // create simple cluster client
-    val mycluster = new ZookeeperServerSetCluster(ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath))
+    val mycluster = new ZookeeperServerSetCluster(
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+                          zkPath))
     Await.result(mycluster.ready, TimeOut) // give it sometime for the cluster to get the initial set of memberships
     val client = Client(mycluster)
 
@@ -382,12 +385,12 @@ class ClusterClientTest
     val myClusterWithCustomKey =
       mycluster map {
         case node: CacheNode => {
-            shardId += 1
-            CacheNode(node.host,
-                      node.port,
-                      node.weight,
-                      Some(customKey + shardId.toString))
-          }
+          shardId += 1
+          CacheNode(node.host,
+                    node.port,
+                    node.weight,
+                    Some(customKey + shardId.toString))
+        }
       }
     val client = KetamaClientBuilder()
       .clientBuilder(ClientBuilder()
@@ -582,8 +585,8 @@ class ClusterClientTest
   ): Cluster[CacheNode] = {
     val myCachePool =
       if (!ignoreConfigData)
-        CachePoolCluster.newZkCluster(
-            zkPath, zookeeperClient, backupPool = backupPool)
+        CachePoolCluster
+          .newZkCluster(zkPath, zookeeperClient, backupPool = backupPool)
       else CachePoolCluster.newUnmanagedZkCluster(zkPath, zookeeperClient)
 
     Await.result(myCachePool.ready, TimeOut) // wait until the pool is ready
@@ -646,7 +649,7 @@ class ClusterClientTest
 
   def trackCacheShards(client: PartitionedClient) =
     mutable.Set.empty[Client] ++
-    ((0 until 100).map { n =>
-          client.clientOf("foo" + n)
-        })
+      ((0 until 100).map { n =>
+            client.clientOf("foo" + n)
+          })
 }

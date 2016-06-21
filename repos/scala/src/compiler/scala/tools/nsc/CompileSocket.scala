@@ -67,7 +67,7 @@ class CompileSocket extends CompileOutputCommon {
   protected val serverClass = "scala.tools.nsc.CompileServer"
   protected def serverClassArgs =
     (if (verbose) List("-v") else Nil) :::
-    (if (fixPort > 0) List("-p", fixPort.toString) else Nil)
+      (if (fixPort > 0) List("-p", fixPort.toString) else Nil)
 
   /** A temporary directory to use */
   val tmpDir = {
@@ -90,7 +90,7 @@ class CompileSocket extends CompileOutputCommon {
     */
   private def serverCommand(vmArgs: Seq[String]): Seq[String] =
     Seq(vmCommand) ++ vmArgs ++ Seq(serverClass) ++ serverClassArgs filterNot
-    (_ == "")
+      (_ == "")
 
   /** Start a new server. */
   private def startNewServer(vmArgs: String) = {
@@ -146,7 +146,7 @@ class CompileSocket extends CompileOutputCommon {
     info("[Port number: " + port + "]")
     if (port < 0)
       fatal("Could not connect to compilation daemon after " + attempts +
-          " attempts.")
+            " attempts.")
     port
   }
 
@@ -207,18 +207,19 @@ class CompileSocket extends CompileOutputCommon {
     try { Some(x.toInt) } catch { case _: NumberFormatException => None }
 
   def getSocket(serverAdr: String): Option[Socket] =
-    (for ((name, portStr) <- splitWhere(
-                                serverAdr, _ == ':', doDropIndex = true);
-          port <- parseInt(portStr)) yield
-      getSocket(name, port)) getOrElse fatal(
+    (for ((name, portStr) <- splitWhere(serverAdr,
+                                        _ == ':',
+                                        doDropIndex = true);
+          port <- parseInt(portStr))
+      yield getSocket(name, port)) getOrElse fatal(
         "Malformed server address: %s; exiting" format serverAdr)
 
   def getSocket(hostName: String, port: Int): Option[Socket] = {
     val sock = Socket(hostName, port).opt
     if (sock.isEmpty)
       warn(
-          "Unable to establish connection to server %s:%d".format(
-              hostName, port))
+          "Unable to establish connection to server %s:%d".format(hostName,
+                                                                  port))
     sock
   }
 

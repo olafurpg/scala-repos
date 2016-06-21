@@ -44,7 +44,7 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
     val javaMethods = classOf[jfxa.Platform].getMethods
     val scalaMethods = Platform.getClass.getMethods
     for (jm <- javaMethods if Modifier.isPublic(jm.getModifiers) &&
-         Modifier.isStatic(jm.getModifiers)) {
+           Modifier.isStatic(jm.getModifiers)) {
       val found = scalaMethods.exists(
           sm => {
             def firstToUpper(s: String) = s.head.toUpper + s.tail
@@ -100,11 +100,10 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
   }
 
   /** Check if Platform has a `method` with exactly one parameter of a given `parameterType`. */
-  def hasMethodWithSingleArgument(
-      method: String, parameterType: Class[_]): Boolean = {
+  def hasMethodWithSingleArgument(method: String,
+                                  parameterType: Class[_]): Boolean = {
     val methods = Platform.getClass.getMethods.filter(m => m.getName == method)
-    methods.exists(
-        m => {
+    methods.exists(m => {
       val parameterTypes = m.getParameterTypes
       parameterTypes.length == 1 && parameterTypes(0) == parameterType
     })

@@ -65,8 +65,11 @@ class CornerRadii(override val delegate: jfxsl.CornerRadii)
            bottomLeft: Double,
            asPercent: Boolean) =
     this(
-        new jfxsl.CornerRadii(
-            topLeft, topRight, bottomRight, bottomLeft, asPercent))
+        new jfxsl.CornerRadii(topLeft,
+                              topRight,
+                              bottomRight,
+                              bottomLeft,
+                              asPercent))
 
   /**
     * Creates a new `CornerRadii`, allowing for specification of each component of each corner radii

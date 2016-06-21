@@ -44,14 +44,14 @@ object MediaRangeSpec extends Specification {
       mediaType.mediaType must_== "application"
       mediaType.mediaSubType must_== "ld+json"
       mediaType.parameters must_==
-        Seq("profile" -> Some("http://www.w3.org/ns/json-ld#compacted"))
+      Seq("profile" -> Some("http://www.w3.org/ns/json-ld#compacted"))
     }
     "not choke on invalid media types" in {
       MediaType.parse("foo") must beNone
     }
     "allow anything in a quoted string" in {
       MediaRange.parse("""foo/bar, foo2/bar2; p="v,/\"\\vv"; p2=v2""") must_==
-        Seq(
+      Seq(
           new MediaRange("foo", "bar", Nil, None, Nil),
           new MediaRange("foo2",
                          "bar2",
@@ -66,15 +66,19 @@ object MediaRangeSpec extends Specification {
     }
     "extract the qvalue from the parameters" in {
       parseSingleMediaRange("foo/bar;q=0.25") must_==
-        new MediaRange("foo", "bar", Nil, Some(0.25f), Nil)
+      new MediaRange("foo", "bar", Nil, Some(0.25f), Nil)
     }
     "differentiate between media type parameters and accept extensions" in {
       parseSingleMediaRange("foo/bar;p1;q=0.25;p2") must_== new MediaRange(
-          "foo", "bar", Seq("p1" -> None), Some(0.25f), Seq("p2" -> None))
+          "foo",
+          "bar",
+          Seq("p1" -> None),
+          Some(0.25f),
+          Seq("p2" -> None))
     }
     "support non spec compliant everything media ranges" in {
       parseSingleMediaRange("*") must_==
-        new MediaRange("*", "*", Nil, None, Nil)
+      new MediaRange("*", "*", Nil, None, Nil)
     }
     "maintain the original order of media ranges in the accept header" in {
       MediaRange.parse("foo1/bar1, foo3/bar3, foo2/bar2") must contain(exactly(
@@ -162,15 +166,19 @@ object MediaRangeSpec extends Specification {
 
         parsed aka description must haveSize(1)
         parsed.head aka description must_== new MediaRange(
-            "text", "plain", Seq("charset" -> Some("utf-8")), None, Nil)
+            "text",
+            "plain",
+            Seq("charset" -> Some("utf-8")),
+            None,
+            Nil)
       }
       success
     }
     "gracefully handle invalid q values" in {
       parseSingleMediaRange("foo/bar;q=a") must_==
-        new MediaRange("foo", "bar", Nil, None, Nil)
+      new MediaRange("foo", "bar", Nil, None, Nil)
       parseSingleMediaRange("foo/bar;q=1.01") must_==
-        new MediaRange("foo", "bar", Nil, None, Nil)
+      new MediaRange("foo", "bar", Nil, None, Nil)
     }
   }
 }

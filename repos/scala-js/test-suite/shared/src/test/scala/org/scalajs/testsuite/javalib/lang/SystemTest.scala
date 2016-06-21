@@ -125,8 +125,8 @@ class SystemTest {
     val list2 = List(1, 3, 5)
     assertEquals(list2, list1)
     assertEquals(list2.hashCode(), list1.hashCode())
-    assertNotEquals(
-        System.identityHashCode(list1), System.identityHashCode(list2))
+    assertNotEquals(System.identityHashCode(list1),
+                    System.identityHashCode(list2))
   }
 
   @Test def identityHashCode_of_null(): Unit = {

@@ -47,8 +47,10 @@ class Testkit(clazz: Class[_ <: ProfileTest], runnerBuilder: RunnerBuilder)
         }
         ms.map { m =>
           val tname = m.getName + '[' + tdb.confName + ']'
-          new TestMethod(
-              tname, Description.createTestDescription(t, tname), m, t)
+          new TestMethod(tname,
+                         Description.createTestDescription(t, tname),
+                         m,
+                         t)
         }
       }
     } else Nil
@@ -74,7 +76,7 @@ class Testkit(clazz: Class[_ <: ProfileTest], runnerBuilder: RunnerBuilder)
           try ch.run(testObject) finally {
             val skipCleanup =
               idx == last ||
-              (testObject.reuseInstance && (ch.cl eq is(idx + 1)._1._1.cl))
+                (testObject.reuseInstance && (ch.cl eq is(idx + 1)._1._1.cl))
             if (skipCleanup) {
               if (idx == last) testObject.closeKeepAlive()
               else previousTestObject = testObject
@@ -181,7 +183,8 @@ sealed abstract class GenericTest[TDB >: Null <: TestDB](
   }
 
   final def mark[R, S <: NoStream, E <: Effect](
-      id: String, f: => DBIOAction[R, S, E]): DBIOAction[R, S, E] =
+      id: String,
+      f: => DBIOAction[R, S, E]): DBIOAction[R, S, E] =
     mark[DBIOAction[R, S, E]](id, f.named(id))
 
   def assertNesting(q: Rep[_], exp: Int): Unit = {
@@ -247,24 +250,30 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
 
   /** Test Action: Get the current database session */
   object GetSession
-      extends SynchronousDatabaseAction[
-          TDB#Profile#Backend#Session, NoStream, TDB#Profile#Backend, Effect] {
+      extends SynchronousDatabaseAction[TDB#Profile#Backend#Session,
+                                        NoStream,
+                                        TDB#Profile#Backend,
+                                        Effect] {
     def run(context: TDB#Profile#Backend#Context) = context.session
     def getDumpInfo = DumpInfo(name = "<GetSession>")
   }
 
   /** Test Action: Check if the current database session is pinned */
   object IsPinned
-      extends SynchronousDatabaseAction[
-          Boolean, NoStream, TDB#Profile#Backend, Effect] {
+      extends SynchronousDatabaseAction[Boolean,
+                                        NoStream,
+                                        TDB#Profile#Backend,
+                                        Effect] {
     def run(context: TDB#Profile#Backend#Context) = context.isPinned
     def getDumpInfo = DumpInfo(name = "<IsPinned>")
   }
 
   /** Test Action: Get the current transactionality level and autoCommit flag */
   object GetTransactionality
-      extends SynchronousDatabaseAction[
-          (Int, Boolean), NoStream, JdbcBackend, Effect] {
+      extends SynchronousDatabaseAction[(Int, Boolean),
+                                        NoStream,
+                                        JdbcBackend,
+                                        Effect] {
     def run(context: JdbcBackend#Context) =
       context.session.asInstanceOf[JdbcBackend#BaseSession].getTransactionality
     def getDumpInfo = DumpInfo(name = "<GetTransactionality>")
@@ -272,8 +281,10 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
 
   /** Test Action: Get the current statement parameters, except for `statementInit` which is always set to null */
   object GetStatementParameters
-      extends SynchronousDatabaseAction[
-          JdbcBackend.StatementParameters, NoStream, JdbcBackend, Effect] {
+      extends SynchronousDatabaseAction[JdbcBackend.StatementParameters,
+                                        NoStream,
+                                        JdbcBackend,
+                                        Effect] {
     def run(context: JdbcBackend#Context) = {
       val s = context.session
       JdbcBackend.StatementParameters(s.resultSetType,
@@ -316,8 +327,7 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
   def materialize[T](p: Publisher[T]): Future[Vector[T]] = {
     val builder = Vector.newBuilder[T]
     val pr = Promise[Vector[T]]()
-    try p.subscribe(
-        new Subscriber[T] {
+    try p.subscribe(new Subscriber[T] {
       def onSubscribe(s: Subscription): Unit = s.request(Long.MaxValue)
       def onComplete(): Unit = pr.success(builder.result())
       def onError(t: Throwable): Unit = pr.failure(t)
@@ -329,8 +339,7 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
   /** Iterate synchronously over a Reactive Stream. */
   def foreach[T](p: Publisher[T])(f: T => Any): Future[Unit] = {
     val pr = Promise[Unit]()
-    try p.subscribe(
-        new Subscriber[T] {
+    try p.subscribe(new Subscriber[T] {
       def onSubscribe(s: Subscription): Unit = s.request(Long.MaxValue)
       def onComplete(): Unit = pr.success(())
       def onError(t: Throwable): Unit = pr.failure(t)
@@ -343,13 +352,16 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
     * elements one by one and transforming them after the specified delay. This ensures that the
     * transformation does not run in the synchronous database context but still preserves
     * proper sequencing. */
-  def materializeAsync[T, R](
-      p: Publisher[T],
-      tr: T => Future[R],
-      delay: Duration =
-        Duration(100L, TimeUnit.MILLISECONDS)): Future[Vector[R]] = {
-    val exe = new ThreadPoolExecutor(
-        1, 1, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue[Runnable]())
+  def materializeAsync[T, R](p: Publisher[T],
+                             tr: T => Future[R],
+                             delay: Duration = Duration(
+                                 100L,
+                                 TimeUnit.MILLISECONDS)): Future[Vector[R]] = {
+    val exe = new ThreadPoolExecutor(1,
+                                     1,
+                                     1L,
+                                     TimeUnit.SECONDS,
+                                     new LinkedBlockingQueue[Runnable]())
     val ec = ExecutionContext.fromExecutor(exe)
     val builder = Vector.newBuilder[R]
     val pr = Promise[Vector[R]]()
@@ -417,7 +429,7 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
       if (!ct.runtimeClass.isInstance(v))
         fixStack(
             Assert.fail("Expected value of type " + ct.runtimeClass.getName +
-                ", got " + v.getClass.getName))
+                  ", got " + v.getClass.getName))
     }
   }
 

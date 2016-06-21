@@ -166,8 +166,8 @@ class AppDefinitionFormatsTest
   }
 
   test("""ToJSON should correctly handle acceptedResourceRoles""") {
-    val appDefinition = AppDefinition(
-        id = PathId("test"), acceptedResourceRoles = Some(Set("a")))
+    val appDefinition = AppDefinition(id = PathId("test"),
+                                      acceptedResourceRoles = Some(Set("a")))
     val json = Json.toJson(appDefinition)
     (json \ "acceptedResourceRoles").asOpt[Set[String]] should be(
         Some(Set("a")))
@@ -241,10 +241,7 @@ class AppDefinitionFormatsTest
   test("ToJson should serialize residency") {
     import Fixture._
 
-    val json = Json
-      .toJson(
-        a1.copy(residency = Some(
-                Residency(
+    val json = Json.toJson(a1.copy(residency = Some(Residency(
                     7200,
                     Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER))))
     (json \ "residency" \ "relaunchEscalationTimeoutSeconds").as[Long] should equal(

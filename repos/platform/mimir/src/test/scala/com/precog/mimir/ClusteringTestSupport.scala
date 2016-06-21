@@ -33,8 +33,8 @@ import java.io.File
 
 trait ClusteringTestSupport {
 
-  case class GeneratedPointSet(
-      points: Array[Array[Double]], centers: Array[Array[Double]])
+  case class GeneratedPointSet(points: Array[Array[Double]],
+                               centers: Array[Array[Double]])
 
   def genPoints(n: Int, dimension: Int, k: Int): GeneratedPointSet = {
 

@@ -12,7 +12,7 @@ object SCL6785 {
   object Main {
     val intContainer = IntContainer(1)
     val anInt = IntContainerContainer(intContainer copy
-        (/* line: 3 */ anInt = 2)) // incorrectly reported error here
+          (/* line: 3 */ anInt = 2)) // incorrectly reported error here
     def main(args: Array[String]) {
       println(anInt.intContainer.anInt)
     }

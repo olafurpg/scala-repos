@@ -71,12 +71,15 @@ more text
                 new OtherLine("more text")
             ),
             Map(
-                "bar" -> new LinkDefinition(
-                    "bar", "http://www.example.com/bla", Some("Also a title")),
-                "baz" -> new LinkDefinition(
-                    "baz", "http://foo.bar", Some("Title next line")),
-                "foo" -> new LinkDefinition(
-                    "foo", "http://www.example.com", Some("A Title"))
+                "bar" -> new LinkDefinition("bar",
+                                            "http://www.example.com/bla",
+                                            Some("Also a title")),
+                "baz" -> new LinkDefinition("baz",
+                                            "http://foo.bar",
+                                            Some("Title next line")),
+                "foo" -> new LinkDefinition("foo",
+                                            "http://www.example.com",
+                                            Some("A Title"))
             )))
   }
 

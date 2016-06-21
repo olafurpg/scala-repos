@@ -78,8 +78,12 @@ class StreamingContextSuite
   }
 
   test("from no conf + spark home + env") {
-    ssc = new StreamingContext(
-        master, appName, batchDuration, sparkHome, Nil, Map(envPair))
+    ssc = new StreamingContext(master,
+                               appName,
+                               batchDuration,
+                               sparkHome,
+                               Nil,
+                               Map(envPair))
     assert(ssc.conf.getExecutorEnv.contains(envPair))
   }
 
@@ -327,7 +331,7 @@ class StreamingContextSuite
       assert(
           TestReceiver.counter.get() == runningCount + 1,
           "Received records = " + TestReceiver.counter.get() + ", " +
-          "processed records = " + runningCount
+            "processed records = " + runningCount
       )
       Thread.sleep(100)
     }
@@ -554,14 +558,16 @@ class StreamingContextSuite
 
     // getOrCreate should throw exception with fake checkpoint file
     intercept[Exception] {
-      ssc = StreamingContext.getOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = false)
+      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
+                                         creatingFunction _,
+                                         createOnError = false)
     }
 
     // getOrCreate should create new context with fake checkpoint file and createOnError = true
     testGetOrCreate {
-      ssc = StreamingContext.getOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = true)
+      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
+                                         creatingFunction _,
+                                         createOnError = true)
       assert(ssc != null, "no context created")
       assert(newContextCreated, "new context not created")
     }
@@ -707,15 +713,17 @@ class StreamingContextSuite
 
     // getActiveOrCreate should throw exception with fake checkpoint file
     intercept[Exception] {
-      ssc = StreamingContext.getActiveOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = false)
+      ssc = StreamingContext.getActiveOrCreate(corruptedCheckpointPath,
+                                               creatingFunction _,
+                                               createOnError = false)
     }
 
     // getActiveOrCreate should create new context with fake
     // checkpoint file and createOnError = true
     testGetActiveOrCreate {
-      ssc = StreamingContext.getActiveOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = true)
+      ssc = StreamingContext.getActiveOrCreate(corruptedCheckpointPath,
+                                               creatingFunction _,
+                                               createOnError = true)
       assert(ssc != null, "no context created")
       assert(newContextCreated, "new context not created")
     }
@@ -773,8 +781,8 @@ class StreamingContextSuite
       rdd.count
     }
 
-    def testForException(clue: String, expectedErrorMsg: String)(
-        body: => Unit): Unit = {
+    def testForException(clue: String,
+                         expectedErrorMsg: String)(body: => Unit): Unit = {
       withClue(clue) {
         val ex = intercept[IllegalStateException] {
           body
@@ -839,7 +847,7 @@ class StreamingContextSuite
     // StreamingContext.validate changes the message, so use "contains" here
     assert(e.getCause.getMessage.contains(
             "queueStream doesn't support checkpointing. " +
-            "Please don't use queueStream when checkpointing is enabled."))
+              "Please don't use queueStream when checkpointing is enabled."))
   }
 
   test("Creating an InputDStream but not using it should not crash") {
@@ -867,8 +875,8 @@ class StreamingContextSuite
   def createValidCheckpoint(): String = {
     val testDirectory = Utils.createTempDir().getAbsolutePath()
     val checkpointDirectory = Utils.createTempDir().getAbsolutePath()
-    ssc = new StreamingContext(
-        conf.clone.set("someKey", "someValue"), batchDuration)
+    ssc = new StreamingContext(conf.clone.set("someKey", "someValue"),
+                               batchDuration)
     ssc.checkpoint(checkpointDirectory)
     ssc.textFileStream(testDirectory).foreachRDD { rdd =>
       rdd.count()
@@ -908,7 +916,7 @@ class TestReceiver
           store(TestReceiver.counter.getAndIncrement)
         }
         logInfo("Receiving stopped at count value of " +
-            TestReceiver.counter.get())
+              TestReceiver.counter.get())
       }
     }
     receivingThreadOption = Some(thread)
@@ -972,9 +980,8 @@ package object testPackage extends Assertions {
 
       // Verify creation site of DStream
       val creationSite = inputStream.creationSite
-      assert(
-          creationSite.shortForm.contains("receiverStream") &&
-          creationSite.shortForm.contains("StreamingContextSuite"))
+      assert(creationSite.shortForm.contains("receiverStream") &&
+            creationSite.shortForm.contains("StreamingContextSuite"))
       assert(creationSite.longForm.contains("testPackage"))
 
       // Verify creation site of generated RDDs

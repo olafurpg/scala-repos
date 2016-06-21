@@ -243,8 +243,7 @@ object Transport {
       chunkOfA: A => Future[Option[Buf]]): Reader with Future[Unit] =
     new Promise[Unit] with Reader {
       private[this] val rw = Reader.writable()
-      become(
-          Transport.copyToWriter(trans, rw)(chunkOfA) respond {
+      become(Transport.copyToWriter(trans, rw)(chunkOfA) respond {
         case Throw(exc) => rw.fail(exc)
         case Return(_) => rw.close()
       })

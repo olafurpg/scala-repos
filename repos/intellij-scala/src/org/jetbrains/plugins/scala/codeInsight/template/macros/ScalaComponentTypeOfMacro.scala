@@ -14,8 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @since 23.09.2015.
   */
 class ScalaComponentTypeOfMacro extends Macro {
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     if (params.length != 1) return null
     params.head.calculateResult(context) match {
       case scTypeRes: ScalaTypeResult =>

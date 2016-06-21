@@ -93,8 +93,7 @@ private[prediction] case class EventOp(
     val setProp: Option[SetProp] = None,
     val unsetProp: Option[UnsetProp] = None,
     val deleteEntity: Option[DeleteEntity] = None
-)
-    extends Serializable {
+) extends Serializable {
 
   def ++(that: EventOp): EventOp = {
     EventOp(
@@ -138,27 +137,27 @@ private[prediction] object EventOp {
     val t = e.eventTime.getMillis
     e.event match {
       case "$set" => {
-          val fields =
-            e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
+        val fields =
+          e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
 
-          EventOp(
-              setProp = Some(SetProp(fields = fields, t = t))
-          )
-        }
+        EventOp(
+            setProp = Some(SetProp(fields = fields, t = t))
+        )
+      }
       case "$unset" => {
-          val fields = e.properties.fields.mapValues(jv => t).map(identity)
-          EventOp(
-              unsetProp = Some(UnsetProp(fields = fields))
-          )
-        }
+        val fields = e.properties.fields.mapValues(jv => t).map(identity)
+        EventOp(
+            unsetProp = Some(UnsetProp(fields = fields))
+        )
+      }
       case "$delete" => {
-          EventOp(
-              deleteEntity = Some(DeleteEntity(t))
-          )
-        }
+        EventOp(
+            deleteEntity = Some(DeleteEntity(t))
+        )
+      }
       case _ => {
-          EventOp()
-        }
+        EventOp()
+      }
     }
   }
 }
@@ -191,7 +190,7 @@ class PBatchView(val appId: Int,
     _events
       .filter(e =>
             ((e.entityType == entityType) &&
-                (EventValidation.isSpecialEvents(e.event))))
+                  (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
           // within same partition

@@ -31,7 +31,8 @@ class ScalaBracesUnwrapper extends ScalaUnwrapper {
     CodeInsightBundle.message("unwrap.braces")
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e match {
+      e: PsiElement,
+      toExtract: util.List[PsiElement]) = e match {
     case b: ScBlock if b.hasRBrace && canBeUnwrapped(b) =>
       super.collectAffectedElements(e, toExtract)
       b.getParent

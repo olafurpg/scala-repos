@@ -175,7 +175,7 @@ class CommandSpec extends Specification {
 
       form.fullName must beSome[String]
       form.fullName.get must_==
-        params("name").toUpperCase + " " + params("surname").toLowerCase
+      params("name").toUpperCase + " " + params("surname").toLowerCase
     }
   }
 }

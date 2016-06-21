@@ -113,7 +113,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     }
     assert(thrown.getClass === classOf[SparkException])
     assert(thrown.getMessage.contains("serializable") ||
-           thrown.getCause.getClass === classOf[NotSerializableException],
+             thrown.getCause.getClass === classOf[NotSerializableException],
            "Exception does not contain \"serializable\": " + thrown.getMessage)
 
     FailureSuiteState.clear()
@@ -129,7 +129,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     }
     assert(thrown.getClass === classOf[SparkException])
     assert(thrown.getMessage.contains("NotSerializableException") ||
-        thrown.getCause.getClass === classOf[NotSerializableException])
+          thrown.getCause.getClass === classOf[NotSerializableException])
 
     // Non-serializable closure in an earlier stage
     val thrown1 = intercept[SparkException] {
@@ -140,7 +140,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     }
     assert(thrown1.getClass === classOf[SparkException])
     assert(thrown1.getMessage.contains("NotSerializableException") ||
-        thrown1.getCause.getClass === classOf[NotSerializableException])
+          thrown1.getCause.getClass === classOf[NotSerializableException])
 
     // Non-serializable closure in foreach function
     val thrown2 = intercept[SparkException] {
@@ -150,7 +150,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     }
     assert(thrown2.getClass === classOf[SparkException])
     assert(thrown2.getMessage.contains("NotSerializableException") ||
-        thrown2.getCause.getClass === classOf[NotSerializableException])
+          thrown2.getCause.getClass === classOf[NotSerializableException])
 
     FailureSuiteState.clear()
   }
@@ -197,7 +197,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
           FailureSuiteState.tasksFailed += 1
           throw new UserException("oops",
                                   new IllegalArgumentException("failed=" +
-                                      FailureSuiteState.tasksFailed))
+                                        FailureSuiteState.tasksFailed))
         }
       }
       x * x

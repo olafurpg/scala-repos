@@ -33,8 +33,8 @@ private[thrift] class ChannelBufferToTransport(underlying: ChannelBuffer)
   * @param  output  a netty channelBuffer to write to
   *
   */
-private[thrift] class DuplexChannelBufferTransport(
-    input: ChannelBuffer, output: ChannelBuffer)
+private[thrift] class DuplexChannelBufferTransport(input: ChannelBuffer,
+                                                   output: ChannelBuffer)
     extends TTransport {
   override def isOpen = true
   override def open() {}

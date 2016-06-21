@@ -148,8 +148,11 @@ object ParserSpecs
         |   import std::time::*
         |   //foo
         | foo""".stripMargin) must beLike {
-        case Let(
-            _, _, _, Import(_, WildcardImport(Vector("std", "time")), _), _) =>
+        case Let(_,
+                 _,
+                 _,
+                 Import(_, WildcardImport(Vector("std", "time")), _),
+                 _) =>
           ok
       }
     }
@@ -174,13 +177,14 @@ object ParserSpecs
 
     "accept an assertion with a compound expression" in {
       parseSingle("assert a < 12 [a]") must beLike {
-        case Assert(
-            _,
-            Lt(_,
-               Dispatch(_, Identifier(Vector(), "a"), Vector()),
-               NumLit(_, "12")),
-            ArrayDef(
-            _, Vector(Dispatch(_, Identifier(Vector(), "a"), Vector())))) =>
+        case Assert(_,
+                    Lt(_,
+                       Dispatch(_, Identifier(Vector(), "a"), Vector()),
+                       NumLit(_, "12")),
+                    ArrayDef(
+                    _,
+                    Vector(
+                    Dispatch(_, Identifier(Vector(), "a"), Vector())))) =>
           ok
       }
     }
@@ -273,11 +277,11 @@ object ParserSpecs
 
     "accept a solve expression with a nested solve expression with two tic variables as a constraint" in {
       parseSingle("solve solve 'a, 'b 1 2") must beLike {
-        case Solve(
-            _,
-            Vector(Solve(
-            _, Vector(TicVar(_, "'a"), TicVar(_, "'b")), NumLit(_, "1"))),
-            NumLit(_, "2")) =>
+        case Solve(_,
+                   Vector(Solve(_,
+                                Vector(TicVar(_, "'a"), TicVar(_, "'b")),
+                                NumLit(_, "1"))),
+                   NumLit(_, "2")) =>
           ok
       }
     }
@@ -684,8 +688,10 @@ object ParserSpecs
 
     "accept an array definition with multiple actuals" in {
       parseSingle("[1, 2, 3]") must beLike {
-        case ArrayDef(
-            _, Vector(NumLit(_, "1"), NumLit(_, "2"), NumLit(_, "3"))) =>
+        case ArrayDef(_,
+                      Vector(NumLit(_, "1"),
+                             NumLit(_, "2"),
+                             NumLit(_, "3"))) =>
           ok
       }
     }

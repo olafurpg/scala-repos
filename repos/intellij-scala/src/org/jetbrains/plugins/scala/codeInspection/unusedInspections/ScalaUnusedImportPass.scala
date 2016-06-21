@@ -49,8 +49,8 @@ class ScalaUnusedImportPass(val file: PsiFile,
         highlightInfoProcessor)
     with ScalaUnusedImportPassBase {
   protected def getFixes: List[IntentionAction] =
-    List(
-        new ScalaOptimizeImportsFix, new ScalaEnableOptimizeImportsOnTheFlyFix)
+    List(new ScalaOptimizeImportsFix,
+         new ScalaEnableOptimizeImportsOnTheFlyFix)
 
   private var myHighlights: util.List[HighlightInfo] = null
   private var myOptimizeImportsRunnable: Runnable = null
@@ -91,8 +91,8 @@ class ScalaUnusedImportPass(val file: PsiFile,
           ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY &&
           ScalaUnusedImportPass.timeToOptimizeImports(file) &&
           file.isWritable) {
-        ScalaUnusedImportPass.invokeOnTheFlyImportOptimizer(
-            myOptimizeImportsRunnable, file)
+        ScalaUnusedImportPass
+          .invokeOnTheFlyImportOptimizer(myOptimizeImportsRunnable, file)
       }
     }
   }
@@ -104,8 +104,8 @@ object ScalaUnusedImportPass {
   private val LOG = Logger.getInstance(getClass)
 
   //todo: copy/paste from QuickFixFactoryImpl
-  private def invokeOnTheFlyImportOptimizer(
-      runnable: Runnable, file: PsiFile) {
+  private def invokeOnTheFlyImportOptimizer(runnable: Runnable,
+                                            file: PsiFile) {
     val project: Project = file.getProject
     val document: Document =
       PsiDocumentManager.getInstance(project).getDocument(file)
@@ -125,7 +125,8 @@ object ScalaUnusedImportPass {
         if (oldStamp != document.getModificationStamp) {
           val afterText: String = file.getText
           if (Comparing.strEqual(beforeText, afterText)) {
-            LOG.error(LogMessageEx.createEvent(
+            LOG.error(
+                LogMessageEx.createEvent(
                     "Import optimizer  hasn't optimized any imports",
                     file.getViewProvider.getVirtualFile.getPath,
                     AttachmentFactory.createAttachment(

@@ -42,7 +42,7 @@ class SharedLeveldbStore extends {
         if (results.nonEmpty && results.size != atomicWriteCount)
           throw new IllegalStateException(
               "asyncWriteMessages returned invalid number of results. " +
-              s"Expected [${prepared.get.size}], but got [${results.size}]")
+                s"Expected [${prepared.get.size}], but got [${results.size}]")
         results
       }
 

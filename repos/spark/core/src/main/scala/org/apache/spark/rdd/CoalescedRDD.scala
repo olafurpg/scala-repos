@@ -94,8 +94,8 @@ private[spark] class CoalescedRDD[T: ClassTag](@transient var prev: RDD[T],
     }
   }
 
-  override def compute(
-      partition: Partition, context: TaskContext): Iterator[T] = {
+  override def compute(partition: Partition,
+                       context: TaskContext): Iterator[T] = {
     partition.asInstanceOf[CoalescedRDDPartition].parents.iterator.flatMap {
       parentPartition =>
         firstParent[T].iterator(parentPartition, context)
@@ -103,8 +103,7 @@ private[spark] class CoalescedRDD[T: ClassTag](@transient var prev: RDD[T],
   }
 
   override def getDependencies: Seq[Dependency[_]] = {
-    Seq(
-        new NarrowDependency(prev) {
+    Seq(new NarrowDependency(prev) {
       def getParents(id: Int): Seq[Int] =
         partitions(id).asInstanceOf[CoalescedRDDPartition].parentsIndices
     })
@@ -155,13 +154,14 @@ private[spark] class CoalescedRDD[T: ClassTag](@transient var prev: RDD[T],
   * according to locality. (contact alig for questions)
   *
   */
-private class PartitionCoalescer(
-    maxPartitions: Int, prev: RDD[_], balanceSlack: Double) {
+private class PartitionCoalescer(maxPartitions: Int,
+                                 prev: RDD[_],
+                                 balanceSlack: Double) {
 
   def compare(o1: PartitionGroup, o2: PartitionGroup): Boolean =
     o1.size < o2.size
-  def compare(
-      o1: Option[PartitionGroup], o2: Option[PartitionGroup]): Boolean =
+  def compare(o1: Option[PartitionGroup],
+              o2: Option[PartitionGroup]): Boolean =
     if (o1 == None) false
     else if (o2 == None) true
     else compare(o1.get, o2.get)
@@ -181,8 +181,7 @@ private class PartitionCoalescer(
   // e.g. balanceSlack=0.10 means that it allows up to 10% imbalance in favor of locality
   val slack = (balanceSlack * prev.partitions.length).toInt
 
-  var noLocality =
-    true // if true if no preferredLocations exists for parent RDD
+  var noLocality = true // if true if no preferredLocations exists for parent RDD
 
   // gets the *current* preferred locations from the DAGScheduler (as opposed to the static ones)
   def currPrefLocs(part: Partition): Seq[String] = {
@@ -217,8 +216,7 @@ private class PartitionCoalescer(
       if (it.hasNext) {
         it.next()
       } else {
-        it =
-          resetIterator() // ran out of preferred locations, reset and rotate to the beginning
+        it = resetIterator() // ran out of preferred locations, reset and rotate to the beginning
         it.next()
       }
     }
@@ -304,8 +302,7 @@ private class PartitionCoalescer(
     * @return partition group (bin to be put in)
     */
   def pickBin(p: Partition): PartitionGroup = {
-    val pref =
-      currPrefLocs(p).map(getLeastGroupHash(_)).sortWith(compare) // least loaded pref locs
+    val pref = currPrefLocs(p).map(getLeastGroupHash(_)).sortWith(compare) // least loaded pref locs
     val prefPart = if (pref == Nil) None else pref.head
 
     val r1 = rnd.nextInt(groupArr.size)

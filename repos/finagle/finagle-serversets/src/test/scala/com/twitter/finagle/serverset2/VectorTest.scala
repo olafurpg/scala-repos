@@ -53,8 +53,8 @@ class VectorTest extends FunSuite {
     val ep4 = ep3.copy(host = "1.1.1.1", port = 333)
     assert(vec.weightOf(ep4) == 1.0)
 
-    for (ep <- Seq(ep1, ep2, ep3, ep4)) assert(
-        Vector(Seq.empty).weightOf(ep) == 1.0)
+    for (ep <- Seq(ep1, ep2, ep3, ep4))
+      assert(Vector(Seq.empty).weightOf(ep) == 1.0)
   }
 
   test("Vector.parseJson") {

@@ -185,8 +185,8 @@ class NingAsyncHttpClientConfigBuilder(
     definedProtocols
   }
 
-  def configureCipherSuites(
-      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
+  def configureCipherSuites(existingCiphers: Array[String],
+                            sslConfig: SSLConfig): Array[String] = {
     val definedCiphers = sslConfig.enabledCipherSuites match {
       case Some(configuredCiphers) =>
         // If we are given a specific list of ciphers, return it in that order.
@@ -214,19 +214,19 @@ class NingAsyncHttpClientConfigBuilder(
   def configureSSL(sslConfig: SSLConfig) {
 
     // context!
-    val sslContext =
-      if (sslConfig.default) {
-        logger.info(
-            "buildSSLContext: ws.ssl.default is true, using default SSLContext")
-        validateDefaultTrustManager(sslConfig)
-        SSLContext.getDefault
-      } else {
-        // break out the static methods as much as we can...
-        val keyManagerFactory = buildKeyManagerFactory(sslConfig)
-        val trustManagerFactory = buildTrustManagerFactory(sslConfig)
-        new ConfigSSLContextBuilder(
-            sslConfig, keyManagerFactory, trustManagerFactory).build()
-      }
+    val sslContext = if (sslConfig.default) {
+      logger.info(
+          "buildSSLContext: ws.ssl.default is true, using default SSLContext")
+      validateDefaultTrustManager(sslConfig)
+      SSLContext.getDefault
+    } else {
+      // break out the static methods as much as we can...
+      val keyManagerFactory = buildKeyManagerFactory(sslConfig)
+      val trustManagerFactory = buildTrustManagerFactory(sslConfig)
+      new ConfigSSLContextBuilder(sslConfig,
+                                  keyManagerFactory,
+                                  trustManagerFactory).build()
+    }
 
     // protocols!
     val defaultParams = sslContext.getDefaultSSLParameters
@@ -279,8 +279,8 @@ class NingAsyncHttpClientConfigBuilder(
               .parseAll(AlgorithmConstraintsParser.expression, a)
               .get)
       .toSet
-    val algorithmChecker = new AlgorithmChecker(
-        keyConstraints = constraints, signatureConstraints = Set())
+    val algorithmChecker = new AlgorithmChecker(keyConstraints = constraints,
+                                                signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)

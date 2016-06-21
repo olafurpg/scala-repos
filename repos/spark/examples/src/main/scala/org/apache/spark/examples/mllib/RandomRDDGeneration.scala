@@ -42,7 +42,7 @@ object RandomRDDGeneration {
     // Example: RandomRDDs.normalRDD
     val normalRDD: RDD[Double] = RandomRDDs.normalRDD(sc, numExamples)
     println(s"Generated RDD of ${normalRDD.count()}" +
-        " examples sampled from the standard normal distribution")
+          " examples sampled from the standard normal distribution")
     println("  First 5 samples:")
     normalRDD.take(5).foreach(x => println(s"    $x"))
 

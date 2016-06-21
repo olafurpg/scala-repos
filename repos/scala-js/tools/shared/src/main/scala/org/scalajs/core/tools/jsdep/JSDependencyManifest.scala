@@ -18,8 +18,8 @@ final class JSDependencyManifest(val origin: Origin,
   override def equals(that: Any): Boolean = that match {
     case that: JSDependencyManifest =>
       this.origin == that.origin && this.libDeps == that.libDeps &&
-      this.requiresDOM == that.requiresDOM &&
-      this.compliantSemantics == that.compliantSemantics
+        this.requiresDOM == that.requiresDOM &&
+        this.compliantSemantics == that.compliantSemantics
     case _ =>
       false
   }

@@ -214,11 +214,11 @@ object Test {
 
   Console.println(
       true // Foo(3,'a',Bar()).caseElement( -1 ) == null // throws Exception now
-      && Foo(3, 'a', Bar()).productElement(0) == 3 &&
-      Foo(3, 'a', Bar()).productElement(1) == 'a' &&
-      Foo(3, 'a', Bar()).productElement(2) == Bar() &&
-      true // Foo(3,'a',Bar()).caseElement( 3 ) == null // throws Exception now
-      && Bar().productArity == 0 && Foo(3, 'a', Bar()).productArity == 3);
+        && Foo(3, 'a', Bar()).productElement(0) == 3 &&
+        Foo(3, 'a', Bar()).productElement(1) == 'a' &&
+        Foo(3, 'a', Bar()).productElement(2) == Bar() &&
+        true // Foo(3,'a',Bar()).caseElement( 3 ) == null // throws Exception now
+        && Bar().productArity == 0 && Foo(3, 'a', Bar()).productArity == 3);
 
 //############################################################################
 

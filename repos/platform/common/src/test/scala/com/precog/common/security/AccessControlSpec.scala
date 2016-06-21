@@ -193,8 +193,11 @@ class AccessControlSpec extends Specification {
       )
 
       apiKeyManager
-        .deriveAndAddGrant(
-            None, None, otherAPIKey, readReduceOther, userAPIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           otherAPIKey,
+                           readReduceOther,
+                           userAPIKey)
         .get
 
       hasCapability(
@@ -257,8 +260,11 @@ class AccessControlSpec extends Specification {
       )
 
       apiKeyManager
-        .deriveAndAddGrant(
-            None, None, otherAPIKey, writeDeleteOther, userAPIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           otherAPIKey,
+                           writeDeleteOther,
+                           userAPIKey)
         .get
 
       hasCapability(userAPIKey,
@@ -516,12 +522,18 @@ class AccessControlSpec extends Specification {
       hasCapability(customer2APIKey, readCustomer1AddOn) must beFalse
 
       val customer1CanRead = apiKeyManager
-        .deriveAndAddGrant(
-            None, None, addOnAPIKey, readCustomer1AddOn, customer1APIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           addOnAPIKey,
+                           readCustomer1AddOn,
+                           customer1APIKey)
         .get
       val customer2CanRead = apiKeyManager
-        .deriveAndAddGrant(
-            None, None, addOnAPIKey, readCustomer2AddOn, customer2APIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           addOnAPIKey,
+                           readCustomer2AddOn,
+                           customer2APIKey)
         .get
 
       hasCapability(customer1APIKey, readCustomer1Customer1) must beTrue

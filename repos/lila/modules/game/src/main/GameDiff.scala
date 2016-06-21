@@ -28,8 +28,9 @@ private[game] object GameDiff {
       }
     }
 
-    def dOpt[A, B <: BSONValue](
-        name: String, getter: Game => A, toBson: A => Option[B]) {
+    def dOpt[A, B <: BSONValue](name: String,
+                                getter: Game => A,
+                                toBson: A => Option[B]) {
       val (va, vb) = (getter(a), getter(b))
       if (va != vb) {
         if (vb == None || vb == null || vb == "")
@@ -56,16 +57,12 @@ private[game] object GameDiff {
       (x: Vector[Int]) =>
         ByteArray.ByteArrayBSONHandler.write(BinaryFormat.moveTime write x))
     dOpt(positionHashes, _.positionHashes, w.bytesO)
-    dOpt(clock,
-         _.clock,
-         (o: Option[Clock]) =>
-           o map { c =>
-             BSONHandlers.clockBSONWrite(a.createdAt, c)
-         })
-    dOpt(checkCount,
-         _.checkCount,
-         (o: CheckCount) =>
-           o.nonEmpty option { BSONHandlers.checkCountWriter write o })
+    dOpt(clock, _.clock, (o: Option[Clock]) =>
+          o map { c =>
+        BSONHandlers.clockBSONWrite(a.createdAt, c)
+    })
+    dOpt(checkCount, _.checkCount, (o: CheckCount) =>
+          o.nonEmpty option { BSONHandlers.checkCountWriter write o })
     if (a.variant == Crazyhouse)
       dOpt(crazyData,
            _.crazyData,
@@ -91,7 +88,6 @@ private[game] object GameDiff {
   private def addUa(sets: List[Set]): List[Set] = sets match {
     case Nil => Nil
     case sets =>
-      (Game.BSONFields.updatedAt -> BSONJodaDateTimeHandler.write(
-              DateTime.now)) :: sets
+      (Game.BSONFields.updatedAt -> BSONJodaDateTimeHandler.write(DateTime.now)) :: sets
   }
 }

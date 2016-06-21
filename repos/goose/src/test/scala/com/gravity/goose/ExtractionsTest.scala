@@ -17,8 +17,8 @@ import java.util.Date
 class ExtractionsTest {
 
   def getHtml(filename: String): String = {
-    FileHelper.loadResourceFile(
-        TestUtils.staticHtmlDir + filename, Goose.getClass)
+    FileHelper
+      .loadResourceFile(TestUtils.staticHtmlDir + filename, Goose.getClass)
   }
 
   @Test
@@ -30,8 +30,9 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url = url, rawHTML = html)
     val title = "Democrats to use Social Security against GOP this fall"
     val content = "Washington (CNN) -- Democrats pledged "
-    TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedTitle = title,
+                                   expectedStart = content)
   }
 
   @Test
@@ -74,8 +75,9 @@ class ExtractionsTest {
       "The Huffington Post has come across this fascinating five-minute interview"
     val title = "2005 Zuckerberg Didn’t Want To Take Over The World"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
-    TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedTitle = title,
+                                   expectedStart = content)
   }
 
   @Test
@@ -88,8 +90,9 @@ class ExtractionsTest {
     val content =
       "Six years ago, Olivia Munn arrived in Hollywood with fading ambitions of making it as a sports reporter and set about deploying"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
-    TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedTitle = title,
+                                   expectedStart = content)
   }
 
   @Test
@@ -365,10 +368,11 @@ class ExtractionsTest {
     val html = getHtml("businessinsider2.txt")
     val article = TestUtils.getArticle(url, html)
 
-    TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart =
-          "From Goldman on the FOMC operation twist announcement")
+    TestUtils
+      .runArticleAssertions(
+          article = article,
+          expectedStart =
+            "From Goldman on the FOMC operation twist announcement")
   }
 
   @Test

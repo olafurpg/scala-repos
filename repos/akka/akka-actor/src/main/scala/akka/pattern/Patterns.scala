@@ -233,8 +233,8 @@ object Patterns {
     *   Patterns.pipe(transformed).to(nextActor);
     * }}}
     */
-  def pipe[T](
-      future: Future[T], context: ExecutionContext): PipeableFuture[T] =
+  def pipe[T](future: Future[T],
+              context: ExecutionContext): PipeableFuture[T] =
     scalaPipe(future)(context)
 
   /**
@@ -247,8 +247,8 @@ object Patterns {
     * If the target actor isn't terminated within the timeout the [[scala.concurrent.Future]]
     * is completed with failure [[akka.pattern.AskTimeoutException]].
     */
-  def gracefulStop(
-      target: ActorRef, timeout: FiniteDuration): Future[java.lang.Boolean] =
+  def gracefulStop(target: ActorRef,
+                   timeout: FiniteDuration): Future[java.lang.Boolean] =
     scalaGracefulStop(target, timeout).asInstanceOf[Future[java.lang.Boolean]]
 
   /**

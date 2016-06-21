@@ -65,8 +65,8 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
         // exists.
         throw new AnalysisException(
             s"View $tableIdentifier already exists. " +
-            "If you want to update the view definition, please use ALTER VIEW AS or " +
-            "CREATE OR REPLACE VIEW AS")
+              "If you want to update the view definition, please use ALTER VIEW AS or " +
+              "CREATE OR REPLACE VIEW AS")
 
       case false =>
         hiveContext.sessionState.catalog.client
@@ -77,14 +77,13 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
   }
 
   private def prepareTable(sqlContext: SQLContext): CatalogTable = {
-    val expandedText =
-      if (sqlContext.conf.canonicalView) {
-        try rebuildViewQueryString(sqlContext) catch {
-          case NonFatal(e) => wrapViewTextWithSelect
-        }
-      } else {
-        wrapViewTextWithSelect
+    val expandedText = if (sqlContext.conf.canonicalView) {
+      try rebuildViewQueryString(sqlContext) catch {
+        case NonFatal(e) => wrapViewTextWithSelect
       }
+    } else {
+      wrapViewTextWithSelect
+    }
 
     val viewSchema = {
       if (tableDesc.schema.isEmpty) {
@@ -129,15 +128,14 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
   }
 
   private def rebuildViewQueryString(sqlContext: SQLContext): String = {
-    val logicalPlan =
-      if (tableDesc.schema.isEmpty) {
-        child
-      } else {
-        val projectList = childSchema.zip(tableDesc.schema).map {
-          case (attr, col) => Alias(attr, col.name)()
-        }
-        sqlContext.executePlan(Project(projectList, child)).analyzed
+    val logicalPlan = if (tableDesc.schema.isEmpty) {
+      child
+    } else {
+      val projectList = childSchema.zip(tableDesc.schema).map {
+        case (attr, col) => Alias(attr, col.name)()
       }
+      sqlContext.executePlan(Project(projectList, child)).analyzed
+    }
     new SQLBuilder(logicalPlan, sqlContext).toSQL
   }
 

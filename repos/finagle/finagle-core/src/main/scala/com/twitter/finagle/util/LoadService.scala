@@ -109,14 +109,15 @@ private object ClassPath {
                         buf: mutable.Buffer[Info]) {
     if (ignoredPackages contains prefix) return
 
-    for (f <- dir.listFiles) if (f.isDirectory && f.canRead)
-      browseDir(f, loader, prefix + f.getName + "/", buf)
-    else
-      for (iface <- ifaceOfName(prefix + f.getName)) {
-        val source = Source.fromFile(f, "UTF-8")
-        val lines = readLines(source)
-        buf += Info(prefix + f.getName, iface, lines)
-      }
+    for (f <- dir.listFiles)
+      if (f.isDirectory && f.canRead)
+        browseDir(f, loader, prefix + f.getName + "/", buf)
+      else
+        for (iface <- ifaceOfName(prefix + f.getName)) {
+          val source = Source.fromFile(f, "UTF-8")
+          val lines = readLines(source)
+          buf += Info(prefix + f.getName, iface, lines)
+        }
   }
 
   private def browseJar(file: File,
@@ -128,8 +129,8 @@ private object ClassPath {
     }
 
     try {
-      for (uri <- jarClasspath(file, jarFile.getManifest)) browseUri0(
-          uri, loader, buf, history)
+      for (uri <- jarClasspath(file, jarFile.getManifest))
+        browseUri0(uri, loader, buf, history)
 
       for {
         e <- jarFile.entries.asScala if !e.isDirectory
@@ -147,8 +148,8 @@ private object ClassPath {
     }
   }
 
-  private def jarClasspath(
-      jarFile: File, manifest: java.util.jar.Manifest): Seq[URI] =
+  private def jarClasspath(jarFile: File,
+                           manifest: java.util.jar.Manifest): Seq[URI] =
     for {
       m <- Option(manifest).toSeq
       attr <- Option(m.getMainAttributes.getValue("Class-Path")).toSeq
@@ -208,7 +209,7 @@ object loadServiceDenied
     extends GlobalFlag[Set[String]](
         Set.empty,
         "A deny list of implementations to ignore. Keys are the fully qualified class names. " +
-        "Any other implementations that are found via `LoadService.apply` are eligible to be used.")
+          "Any other implementations that are found via `LoadService.apply` are eligible to be used.")
 
 /**
   * Load a singleton class in the manner of [[java.util.ServiceLoader]]. It is
@@ -265,7 +266,7 @@ object LoadService {
           DefaultLogger.log(
               Level.FATAL,
               s"LoadService: failed to instantiate '$className' for the requested " +
-              s"service '$ifaceName'",
+                s"service '$ifaceName'",
               ex
           )
           None

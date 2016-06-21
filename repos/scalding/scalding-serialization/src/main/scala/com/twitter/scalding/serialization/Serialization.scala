@@ -166,9 +166,9 @@ object Serialization {
     })
 
   def transitivity[T: Serialization]: Law3[T] =
-    Law3(
-        "equiv(a, b) && equiv(b, c) => equiv(a, c)", { (t1: T, t2: T, t3: T) =>
-      !(equiv(t1, t2) && equiv(t2, t3)) || equiv(t1, t3)
+    Law3("equiv(a, b) && equiv(b, c) => equiv(a, c)", {
+      (t1: T, t2: T, t3: T) =>
+        !(equiv(t1, t2) && equiv(t2, t3)) || equiv(t1, t3)
     })
 
   def allLaws[T: Serialization]: Iterable[Law[T]] =

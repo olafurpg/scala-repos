@@ -57,10 +57,10 @@ class EventServiceActor(val eventClient: LEvents,
   object Json4sProtocol extends Json4sSupport {
     implicit def json4sFormats: Formats =
       DefaultFormats + new EventJson4sSupport.APISerializer +
-      new BatchEventsJson4sSupport.APISerializer +
-      // NOTE: don't use Json4s JodaTimeSerializers since it has issues,
-      // some format not converted, or timezone not correct
-      new DateTimeJson4sSupport.Serializer
+        new BatchEventsJson4sSupport.APISerializer +
+        // NOTE: don't use Json4s JodaTimeSerializers since it has issues,
+        // some format not converted, or timezone not correct
+        new DateTimeJson4sSupport.Serializer
   }
 
   val MaxNumberOfEventsPerBatchRequest = 50
@@ -330,14 +330,14 @@ class EventServiceActor(val eventClient: LEvents,
                   respondWithMediaType(MediaTypes.`application/json`) {
                     complete {
                       logger.debug(s"GET events of appId=${appId} " +
-                          s"st=${startTimeStr} ut=${untilTimeStr} " +
-                          s"et=${entityType} eid=${entityId} " +
-                          s"li=${limit} rev=${reversed} ")
+                            s"st=${startTimeStr} ut=${untilTimeStr} " +
+                            s"et=${entityType} eid=${entityId} " +
+                            s"li=${limit} rev=${reversed} ")
 
                       require(!((reversed == Some(true)) &&
-                                  (entityType.isEmpty || entityId.isEmpty)),
+                                    (entityType.isEmpty || entityId.isEmpty)),
                               "the parameter reversed can only be used with" +
-                              " both entityType and entityId specified.")
+                                " both entityType and entityId specified.")
 
                       val parseTime = Future {
                         val startTime =
@@ -397,44 +397,44 @@ class EventServiceActor(val eventClient: LEvents,
               val handleEvent: PartialFunction[Try[Event],
                                                Future[Map[String, Any]]] = {
                 case Success(event) => {
-                    if (allowedEvents.isEmpty ||
-                        allowedEvents.contains(event.event)) {
-                      pluginContext.inputBlockers.values.foreach(
-                          _.process(EventInfo(appId = appId,
-                                              channelId = channelId,
-                                              event = event),
-                                    pluginContext))
-                      val data = eventClient
-                        .futureInsert(event, appId, channelId)
-                        .map { id =>
-                          pluginsActorRef ! EventInfo(appId = appId,
-                                                      channelId = channelId,
-                                                      event = event)
-                          val status = StatusCodes.Created
-                          val result = Map("status" -> status.intValue,
-                                           "eventId" -> s"${id}")
-                          if (config.stats) {
-                            statsActorRef ! Bookkeeping(appId, status, event)
-                          }
-                          result
+                  if (allowedEvents.isEmpty ||
+                      allowedEvents.contains(event.event)) {
+                    pluginContext.inputBlockers.values.foreach(
+                        _.process(EventInfo(appId = appId,
+                                            channelId = channelId,
+                                            event = event),
+                                  pluginContext))
+                    val data = eventClient
+                      .futureInsert(event, appId, channelId)
+                      .map { id =>
+                        pluginsActorRef ! EventInfo(appId = appId,
+                                                    channelId = channelId,
+                                                    event = event)
+                        val status = StatusCodes.Created
+                        val result = Map("status" -> status.intValue,
+                                         "eventId" -> s"${id}")
+                        if (config.stats) {
+                          statsActorRef ! Bookkeeping(appId, status, event)
                         }
-                        .recover {
-                          case exception =>
-                            Map("status" -> StatusCodes.InternalServerError.intValue,
-                                "message" -> s"${exception.getMessage()}")
-                        }
-                      data
-                    } else {
-                      Future.successful(
-                          Map("status" -> StatusCodes.Forbidden.intValue,
-                              "message" -> s"${event.event} events are not allowed"))
-                    }
-                  }
-                case Failure(exception) => {
+                        result
+                      }
+                      .recover {
+                        case exception =>
+                          Map("status" -> StatusCodes.InternalServerError.intValue,
+                              "message" -> s"${exception.getMessage()}")
+                      }
+                    data
+                  } else {
                     Future.successful(
-                        Map("status" -> StatusCodes.BadRequest.intValue,
-                            "message" -> s"${exception.getMessage()}"))
+                        Map("status" -> StatusCodes.Forbidden.intValue,
+                            "message" -> s"${event.event} events are not allowed"))
                   }
+                }
+                case Failure(exception) => {
+                  Future.successful(
+                      Map("status" -> StatusCodes.BadRequest.intValue,
+                          "message" -> s"${exception.getMessage()}"))
+                }
               }
 
               entity(as[Seq[Try[Event]]]) { events =>
@@ -444,8 +444,8 @@ class EventServiceActor(val eventClient: LEvents,
                   } else {
                     (StatusCodes.BadRequest,
                      Map("message" ->
-                         (s"Batch request must have less than or equal to " +
-                             s"${MaxNumberOfEventsPerBatchRequest} events")))
+                           (s"Batch request must have less than or equal to " +
+                                 s"${MaxNumberOfEventsPerBatchRequest} events")))
                   }
                 }
               }
@@ -474,7 +474,7 @@ class EventServiceActor(val eventClient: LEvents,
                       StatusCodes.NotFound,
                       parse(
                           """{"message": "To see stats, launch Event Server """ +
-                          """with --stats argument."}"""))
+                            """with --stats argument."}"""))
                 }
               }
             }
@@ -598,8 +598,8 @@ class EventServerActor(val eventClient: LEvents,
 
   def receive: Actor.Receive = {
     case StartServer(host, portNum) => {
-        IO(Http) ! Http.Bind(child, interface = host, port = portNum)
-      }
+      IO(Http) ! Http.Bind(child, interface = host, port = portNum)
+    }
     case m: Http.Bound => log.info("Bound received. EventServer is ready.")
     case m: Http.CommandFailed => log.error("Command failed.")
     case _ => log.error("Unknown message.")

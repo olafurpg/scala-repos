@@ -30,7 +30,7 @@ object GnipSubSyntaxTest extends TestSuite {
     private def keywordsInParentheses = P("(" ~ gnipKeywordPhrase ~ ")")
     private def orClause =
       P(!(("-" ~~ keywordGroupWithoutOrClause.rep(min = 1)) ~ "OR") ~ keywordGroupWithoutOrClause ~
-          ("OR" !) ~ gnipKeywordPhrase)
+            ("OR" !) ~ gnipKeywordPhrase)
     private def gnipKeywordPhrase: Parser[String] =
       P(keywordGroup.rep(min = 1)) !
 

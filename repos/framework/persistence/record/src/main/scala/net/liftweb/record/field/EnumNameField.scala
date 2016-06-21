@@ -58,9 +58,10 @@ trait EnumNameTypedField[EnumType <: Enumeration]
   }
 
   private def elem =
-    SHtml.selectObj[Box[EnumType#Value]](
-        buildDisplayList, Full(valueBox), setBox(_)) %
-    ("tabindex" -> tabIndex.toString)
+    SHtml.selectObj[Box[EnumType#Value]](buildDisplayList,
+                                         Full(valueBox),
+                                         setBox(_)) %
+      ("tabindex" -> tabIndex.toString)
 
   def toForm: Box[NodeSeq] =
     uniqueFieldId match {
@@ -88,8 +89,8 @@ trait EnumNameTypedField[EnumType <: Enumeration]
 }
 
 class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
-    rec: OwnerType, protected val enum: EnumType)(
-    implicit m: Manifest[EnumType#Value])
+    rec: OwnerType,
+    protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
     with MandatoryTypedField[EnumType#Value]
     with EnumNameTypedField[EnumType] {
@@ -103,10 +104,10 @@ class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
   protected val valueManifest = m
 }
 
-class OptionalEnumNameField[
-    OwnerType <: Record[OwnerType], EnumType <: Enumeration](
-    rec: OwnerType, protected val enum: EnumType)(
-    implicit m: Manifest[EnumType#Value])
+class OptionalEnumNameField[OwnerType <: Record[OwnerType],
+                            EnumType <: Enumeration](
+    rec: OwnerType,
+    protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
     with OptionalTypedField[EnumType#Value]
     with EnumNameTypedField[EnumType] {

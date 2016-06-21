@@ -126,8 +126,8 @@ object Serializers {
       def writeIntOptField(key: String, value: Integer): Unit = {
         builder.putField(key, { b =>
           b.hintTag(intOptPickler.tag)
-          intOptPickler.pickle(
-              if (value == null) None else Some(value.intValue), b)
+          intOptPickler
+            .pickle(if (value == null) None else Some(value.intValue), b)
         })
       }
       def writeStringField(key: String, value: String): Unit = {
@@ -243,8 +243,8 @@ object Serializers {
   }
 
   object LocalRegisteredSerializer {
-    def fromSbtSerializer[U](
-        _serializer: Pickler[U], _unserializer: Unpickler[U])(
+    def fromSbtSerializer[U](_serializer: Pickler[U],
+                             _unserializer: Unpickler[U])(
         implicit mf: Manifest[U]): LocalRegisteredSerializer =
       new LocalRegisteredSerializer {
         type T = U
@@ -255,10 +255,10 @@ object Serializers {
   }
 
   val serializers: Seq[LocalRegisteredSerializer] = List(
-      LocalRegisteredSerializer.fromSbtSerializer(
-          forkConfigPickler, forkConfigUnpickler),
-      LocalRegisteredSerializer.fromSbtSerializer(
-          compileResultPickler, compileResultUnpickler),
-      LocalRegisteredSerializer.fromSbtSerializer(
-          playServerStartedPickler, playServerStartedUnpickler))
+      LocalRegisteredSerializer.fromSbtSerializer(forkConfigPickler,
+                                                  forkConfigUnpickler),
+      LocalRegisteredSerializer
+        .fromSbtSerializer(compileResultPickler, compileResultUnpickler),
+      LocalRegisteredSerializer.fromSbtSerializer(playServerStartedPickler,
+                                                  playServerStartedUnpickler))
 }

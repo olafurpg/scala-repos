@@ -86,11 +86,10 @@ private[sql] class DefaultSource
 
     if (conf.get(SQLConf.PARQUET_OUTPUT_COMMITTER_CLASS.key) == null) {
       logInfo("Using default output committer for Parquet: " +
-          classOf[ParquetOutputCommitter].getCanonicalName)
+            classOf[ParquetOutputCommitter].getCanonicalName)
     } else {
-      logInfo(
-          "Using user defined output committer for Parquet: " +
-          committerClass.getCanonicalName)
+      logInfo("Using user defined output committer for Parquet: " +
+            committerClass.getCanonicalName)
     }
 
     val compressionCodec: Option[String] = options.get("compression").map {
@@ -102,7 +101,7 @@ private[sql] class DefaultSource
           val availableCodecs =
             shortParquetCompressionCodecNames.keys.map(_.toLowerCase)
           throw new IllegalArgumentException(s"Codec [$codecName] " +
-              s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
+                s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
         }
         codecName.toLowerCase
     }
@@ -117,8 +116,8 @@ private[sql] class DefaultSource
     // bundled with `ParquetOutputFormat[Row]`.
     job.setOutputFormatClass(classOf[ParquetOutputFormat[Row]])
 
-    ParquetOutputFormat.setWriteSupportClass(
-        job, classOf[CatalystWriteSupport])
+    ParquetOutputFormat
+      .setWriteSupportClass(job, classOf[CatalystWriteSupport])
 
     // We want to clear this temporary metadata from saving into Parquet file.
     // This metadata is only useful for detecting optional columns when pushdowning filters.
@@ -192,54 +191,52 @@ private[sql] class DefaultSource
     // Here we tend to be pessimistic and take the second case into account.  Basically this means
     // we can't trust the summary files if users require a merged schema, and must touch all part-
     // files to do the merge.
-    val filesToTouch =
-      if (shouldMergeSchemas) {
-        // Also includes summary files, 'cause there might be empty partition directories.
+    val filesToTouch = if (shouldMergeSchemas) {
+      // Also includes summary files, 'cause there might be empty partition directories.
 
-        // If mergeRespectSummaries config is true, we assume that all part-files are the same for
-        // their schema with summary files, so we ignore them when merging schema.
-        // If the config is disabled, which is the default setting, we merge all part-files.
-        // In this mode, we only need to merge schemas contained in all those summary files.
-        // You should enable this configuration only if you are very sure that for the parquet
-        // part-files to read there are corresponding summary files containing correct schema.
+      // If mergeRespectSummaries config is true, we assume that all part-files are the same for
+      // their schema with summary files, so we ignore them when merging schema.
+      // If the config is disabled, which is the default setting, we merge all part-files.
+      // In this mode, we only need to merge schemas contained in all those summary files.
+      // You should enable this configuration only if you are very sure that for the parquet
+      // part-files to read there are corresponding summary files containing correct schema.
 
-        // As filed in SPARK-11500, the order of files to touch is a matter, which might affect
-        // the ordering of the output columns. There are several things to mention here.
-        //
-        //  1. If mergeRespectSummaries config is false, then it merges schemas by reducing from
-        //     the first part-file so that the columns of the lexicographically first file show
-        //     first.
-        //
-        //  2. If mergeRespectSummaries config is true, then there should be, at least,
-        //     "_metadata"s for all given files, so that we can ensure the columns of
-        //     the lexicographically first file show first.
-        //
-        //  3. If shouldMergeSchemas is false, but when multiple files are given, there is
-        //     no guarantee of the output order, since there might not be a summary file for the
-        //     lexicographically first file, which ends up putting ahead the columns of
-        //     the other files. However, this should be okay since not enabling
-        //     shouldMergeSchemas means (assumes) all the files have the same schemas.
+      // As filed in SPARK-11500, the order of files to touch is a matter, which might affect
+      // the ordering of the output columns. There are several things to mention here.
+      //
+      //  1. If mergeRespectSummaries config is false, then it merges schemas by reducing from
+      //     the first part-file so that the columns of the lexicographically first file show
+      //     first.
+      //
+      //  2. If mergeRespectSummaries config is true, then there should be, at least,
+      //     "_metadata"s for all given files, so that we can ensure the columns of
+      //     the lexicographically first file show first.
+      //
+      //  3. If shouldMergeSchemas is false, but when multiple files are given, there is
+      //     no guarantee of the output order, since there might not be a summary file for the
+      //     lexicographically first file, which ends up putting ahead the columns of
+      //     the other files. However, this should be okay since not enabling
+      //     shouldMergeSchemas means (assumes) all the files have the same schemas.
 
-        val needMerged: Seq[FileStatus] =
-          if (mergeRespectSummaries) {
-            Seq()
-          } else {
-            filesByType.data
-          }
-        needMerged ++ filesByType.metadata ++ filesByType.commonMetadata
+      val needMerged: Seq[FileStatus] = if (mergeRespectSummaries) {
+        Seq()
       } else {
-        // Tries any "_common_metadata" first. Parquet files written by old versions or Parquet
-        // don't have this.
-        filesByType.commonMetadata.headOption
-        // Falls back to "_metadata"
-          .orElse(filesByType.metadata.headOption)
-          // Summary file(s) not found, the Parquet file is either corrupted, or different part-
-          // files contain conflicting user defined metadata (two or more values are associated
-          // with a same key in different files).  In either case, we fall back to any of the
-          // first part-file, and just assume all schemas are consistent.
-          .orElse(filesByType.data.headOption)
-          .toSeq
+        filesByType.data
       }
+      needMerged ++ filesByType.metadata ++ filesByType.commonMetadata
+    } else {
+      // Tries any "_common_metadata" first. Parquet files written by old versions or Parquet
+      // don't have this.
+      filesByType.commonMetadata.headOption
+      // Falls back to "_metadata"
+        .orElse(filesByType.metadata.headOption)
+        // Summary file(s) not found, the Parquet file is either corrupted, or different part-
+        // files contain conflicting user defined metadata (two or more values are associated
+        // with a same key in different files).  In either case, we fall back to any of the
+        // first part-file, and just assume all schemas are consistent.
+        .orElse(filesByType.data.headOption)
+        .toSeq
+    }
     ParquetRelation.mergeSchemasInParallel(filesToTouch, sqlContext)
   }
 
@@ -301,8 +298,8 @@ private[sql] class DefaultSource
     val inputFiles = splitFiles(allFiles).data.toArray
 
     // Create the function to set input paths at the driver side.
-    val setInputPaths = ParquetRelation.initializeDriverSideJobFunc(
-        inputFiles, parquetBlockSize) _
+    val setInputPaths = ParquetRelation
+      .initializeDriverSideJobFunc(inputFiles, parquetBlockSize) _
 
     Utils.withDummyCallSite(sqlContext.sparkContext) {
       new SqlNewHadoopRDD(sqlContext = sqlContext,
@@ -360,7 +357,9 @@ private[sql] class DefaultSource
 
           Array.tabulate[SparkPartition](rawSplits.size) { i =>
             new SqlNewHadoopPartition(
-                id, i, rawSplits.get(i).asInstanceOf[InputSplit with Writable])
+                id,
+                i,
+                rawSplits.get(i).asInstanceOf[InputSplit with Writable])
           }
         }
       }
@@ -369,8 +368,9 @@ private[sql] class DefaultSource
 }
 
 // NOTE: This class is instantiated and used on executor side only, no need to be serializable.
-private[sql] class ParquetOutputWriter(
-    path: String, bucketId: Option[Int], context: TaskAttemptContext)
+private[sql] class ParquetOutputWriter(path: String,
+                                       bucketId: Option[Int],
+                                       context: TaskAttemptContext)
     extends OutputWriter {
 
   private val recordWriter: RecordWriter[Void, InternalRow] = {
@@ -385,8 +385,8 @@ private[sql] class ParquetOutputWriter(
         //  2. To allow dynamic partitioning.  Default `getDefaultWorkFile` uses
         //     `FileOutputCommitter.getWorkPath()`, which points to the base directory of all
         //     partitions in the case of dynamic partitioning.
-        override def getDefaultWorkFile(
-            context: TaskAttemptContext, extension: String): Path = {
+        override def getDefaultWorkFile(context: TaskAttemptContext,
+                                        extension: String): Path = {
           val configuration = context.getConfiguration
           val uniqueWriteJobId =
             configuration.get("spark.sql.sources.writeJobUUID")
@@ -434,17 +434,17 @@ private[sql] object ParquetRelation extends Logging {
     * tasks processing nothing (because a split does not cover the starting point of a
     * parquet block). See https://issues.apache.org/jira/browse/SPARK-10143 for more information.
     */
-  private def overrideMinSplitSize(
-      parquetBlockSize: Long, conf: Configuration): Unit = {
+  private def overrideMinSplitSize(parquetBlockSize: Long,
+                                   conf: Configuration): Unit = {
     val minSplitSize = math.max(
         conf.getLong("mapred.min.split.size", 0L),
         conf.getLong("mapreduce.input.fileinputformat.split.minsize", 0L))
     if (parquetBlockSize > minSplitSize) {
       val message =
         s"Parquet's block size (row group size) is larger than " +
-        s"mapred.min.split.size/mapreduce.input.fileinputformat.split.minsize. Setting " +
-        s"mapred.min.split.size and mapreduce.input.fileinputformat.split.minsize to " +
-        s"$parquetBlockSize."
+          s"mapred.min.split.size/mapreduce.input.fileinputformat.split.minsize. Setting " +
+          s"mapred.min.split.size and mapreduce.input.fileinputformat.split.minsize to " +
+          s"$parquetBlockSize."
       logDebug(message)
       conf.set("mapred.min.split.size", parquetBlockSize.toString)
       conf.set("mapreduce.input.fileinputformat.split.minsize",
@@ -453,15 +453,15 @@ private[sql] object ParquetRelation extends Logging {
   }
 
   /** This closure sets various Parquet configurations at both driver side and executor side. */
-  private[parquet] def initializeLocalJobFunc(requiredColumns: Array[String],
-                                              filters: Array[Filter],
-                                              dataSchema: StructType,
-                                              parquetBlockSize: Long,
-                                              useMetadataCache: Boolean,
-                                              parquetFilterPushDown: Boolean,
-                                              assumeBinaryIsString: Boolean,
-                                              assumeInt96IsTimestamp: Boolean)(
-      job: Job): Unit = {
+  private[parquet] def initializeLocalJobFunc(
+      requiredColumns: Array[String],
+      filters: Array[Filter],
+      dataSchema: StructType,
+      parquetBlockSize: Long,
+      useMetadataCache: Boolean,
+      parquetFilterPushDown: Boolean,
+      assumeBinaryIsString: Boolean,
+      assumeInt96IsTimestamp: Boolean)(job: Job): Unit = {
     val conf = job.getConfiguration
     conf.set(ParquetInputFormat.READ_SUPPORT_CLASS,
              classOf[CatalystReadSupport].getName)
@@ -490,8 +490,8 @@ private[sql] object ParquetRelation extends Logging {
 
     // Sets flags for `CatalystSchemaConverter`
     conf.setBoolean(SQLConf.PARQUET_BINARY_AS_STRING.key, assumeBinaryIsString)
-    conf.setBoolean(
-        SQLConf.PARQUET_INT96_AS_TIMESTAMP.key, assumeInt96IsTimestamp)
+    conf.setBoolean(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key,
+                    assumeInt96IsTimestamp)
 
     overrideMinSplitSize(parquetBlockSize, conf)
   }
@@ -511,7 +511,8 @@ private[sql] object ParquetRelation extends Logging {
   }
 
   private[parquet] def readSchema(
-      footers: Seq[Footer], sqlContext: SQLContext): Option[StructType] = {
+      footers: Seq[Footer],
+      sqlContext: SQLContext): Option[StructType] = {
 
     def parseParquetSchema(schema: MessageType): StructType = {
       val converter = new CatalystSchemaConverter(
@@ -539,19 +540,19 @@ private[sql] object ParquetRelation extends Logging {
           case _: Throwable =>
             logInfo(
                 s"Serialized Spark schema in Parquet key-value metadata is not in JSON format, " +
-                "falling back to the deprecated DataType.fromCaseClassString parser.")
+                  "falling back to the deprecated DataType.fromCaseClassString parser.")
             LegacyTypeStringParser.parse(serializedSchema.get)
         }.recover {
           case cause: Throwable =>
-            logWarning(s"""Failed to parse serialized Spark schema in Parquet key-value metadata:
+            logWarning(
+                s"""Failed to parse serialized Spark schema in Parquet key-value metadata:
                  |\t$serializedSchema
                """.stripMargin,
-                       cause)
-        }.map(_.asInstanceOf[StructType])
-              .getOrElse {
-            // Falls back to Parquet schema if Spark SQL schema can't be parsed.
-            parseParquetSchema(metadata.getSchema)
-          })
+                cause)
+        }.map(_.asInstanceOf[StructType]).getOrElse {
+          // Falls back to Parquet schema if Spark SQL schema can't be parsed.
+          parseParquetSchema(metadata.getSchema)
+        })
       } else {
         None
       }
@@ -561,7 +562,8 @@ private[sql] object ParquetRelation extends Logging {
       try left.merge(right) catch {
         case e: Throwable =>
           throw new SparkException(
-              s"Failed to merge incompatible schemas $left and $right", e)
+              s"Failed to merge incompatible schemas $left and $right",
+              e)
       }
     }
   }
@@ -576,7 +578,8 @@ private[sql] object ParquetRelation extends Logging {
     * schema data types and Parquet schema field names.
     */
   private[sql] def mergeMetastoreParquetSchema(
-      metastoreSchema: StructType, parquetSchema: StructType): StructType = {
+      metastoreSchema: StructType,
+      parquetSchema: StructType): StructType = {
     def schemaConflictMessage: String =
       s"""Converting Hive Metastore Parquet, but detected conflicting schemas. Metastore schema:
          |${metastoreSchema.prettyJson}
@@ -585,8 +588,8 @@ private[sql] object ParquetRelation extends Logging {
          |${parquetSchema.prettyJson}
        """.stripMargin
 
-    val mergedParquetSchema = mergeMissingNullableFields(
-        metastoreSchema, parquetSchema)
+    val mergedParquetSchema =
+      mergeMissingNullableFields(metastoreSchema, parquetSchema)
 
     assert(metastoreSchema.size <= mergedParquetSchema.size,
            schemaConflictMessage)
@@ -598,17 +601,14 @@ private[sql] object ParquetRelation extends Logging {
     val reorderedParquetSchema = mergedParquetSchema.sortBy(f =>
           ordinalMap.getOrElse(f.name.toLowerCase, metastoreSchema.size + 1))
 
-    StructType(
-        metastoreSchema
-          .zip(reorderedParquetSchema)
-          .map {
-        // Uses Parquet field names but retains Metastore data types.
-        case (mSchema, pSchema)
-            if mSchema.name.toLowerCase == pSchema.name.toLowerCase =>
-          mSchema.copy(name = pSchema.name)
-        case _ =>
-          throw new SparkException(schemaConflictMessage)
-      })
+    StructType(metastoreSchema.zip(reorderedParquetSchema).map {
+      // Uses Parquet field names but retains Metastore data types.
+      case (mSchema, pSchema)
+          if mSchema.name.toLowerCase == pSchema.name.toLowerCase =>
+        mSchema.copy(name = pSchema.name)
+      case _ =>
+        throw new SparkException(schemaConflictMessage)
+    })
   }
 
   /**
@@ -625,7 +625,8 @@ private[sql] object ParquetRelation extends Logging {
     * merged in.
     */
   private[parquet] def mergeMissingNullableFields(
-      metastoreSchema: StructType, parquetSchema: StructType): StructType = {
+      metastoreSchema: StructType,
+      parquetSchema: StructType): StructType = {
     val fieldMap = metastoreSchema.map(f => f.name.toLowerCase -> f).toMap
     val missingFields = metastoreSchema
       .map(_.name.toLowerCase)
@@ -678,8 +679,16 @@ private[sql] object ParquetRelation extends Logging {
         // Resembles fake `FileStatus`es with serialized path and length information.
         val fakeFileStatuses = iterator.map {
           case (path, length) =>
-            new FileStatus(
-                length, false, 0, 0, 0, 0, null, null, null, new Path(path))
+            new FileStatus(length,
+                           false,
+                           0,
+                           0,
+                           0,
+                           0,
+                           null,
+                           null,
+                           null,
+                           new Path(path))
         }.toSeq
 
         // Skips row group information since we only need the schema
@@ -687,8 +696,9 @@ private[sql] object ParquetRelation extends Logging {
 
         // Reads footers in multi-threaded manner within each task
         val footers = ParquetFileReader
-          .readAllFootersInParallel(
-              serializedConf.value, fakeFileStatuses.asJava, skipRowGroups)
+          .readAllFootersInParallel(serializedConf.value,
+                                    fakeFileStatuses.asJava,
+                                    skipRowGroups)
           .asScala
 
         // Converter used to convert Parquet `MessageType` to Spark SQL `StructType`
@@ -729,7 +739,8 @@ private[sql] object ParquetRelation extends Logging {
         } catch {
           case cause: SparkException =>
             throw new SparkException(
-                s"Failed merging schema:\n${schema.treeString}", cause)
+                s"Failed merging schema:\n${schema.treeString}",
+                cause)
         }
       }
       Some(finalSchema)
@@ -741,8 +752,8 @@ private[sql] object ParquetRelation extends Logging {
     * can be found in the file metadata, returns the deserialized [[StructType]], otherwise, returns
     * a [[StructType]] converted from the [[MessageType]] stored in this footer.
     */
-  def readSchemaFromFooter(
-      footer: Footer, converter: CatalystSchemaConverter): StructType = {
+  def readSchemaFromFooter(footer: Footer,
+                           converter: CatalystSchemaConverter): StructType = {
     val fileMetaData = footer.getParquetMetadata.getFileMetaData
     fileMetaData.getKeyValueMetaData.asScala.toMap
       .get(CatalystReadSupport.SPARK_METADATA_KEY)
@@ -758,12 +769,12 @@ private[sql] object ParquetRelation extends Logging {
       case _: Throwable =>
         logInfo(
             s"Serialized Spark schema in Parquet key-value metadata is not in JSON format, " +
-            "falling back to the deprecated DataType.fromCaseClassString parser.")
+              "falling back to the deprecated DataType.fromCaseClassString parser.")
         LegacyTypeStringParser.parse(schemaString).asInstanceOf[StructType]
     }.recoverWith {
       case cause: Throwable =>
         logWarning("Failed to parse and ignored serialized Spark schema in " +
-                   s"Parquet key-value metadata:\n\t$schemaString",
+                     s"Parquet key-value metadata:\n\t$schemaString",
                    cause)
         Failure(cause)
     }.toOption

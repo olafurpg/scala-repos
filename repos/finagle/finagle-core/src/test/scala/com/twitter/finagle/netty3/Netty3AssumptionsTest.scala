@@ -23,8 +23,8 @@ class Netty3AssumptionsTest extends FunSuite {
       def getPipeline = {
         val pipeline = Channels.pipeline()
         pipeline.addLast("stfu", new SimpleChannelUpstreamHandler {
-          override def messageReceived(
-              ctx: ChannelHandlerContext, e: MessageEvent) {
+          override def messageReceived(ctx: ChannelHandlerContext,
+                                       e: MessageEvent) {
             /* nothing */
           }
         })

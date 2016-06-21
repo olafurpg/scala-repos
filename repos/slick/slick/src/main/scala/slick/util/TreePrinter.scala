@@ -35,9 +35,9 @@ case class TreePrinter(name: String = "",
       val markedDiName = if (marked) "< " + di.name + " >" else di.name
       out.print(
           prefix1 + cCyan + (if (name.nonEmpty) name + ": " else "") +
-          (if (marked) cNormal + bYellow + cBlack else cYellow) +
-          (if (multiLine) multi1 else "") + markedDiName + cNormal +
-          (if (di.name.nonEmpty && di.mainInfo.nonEmpty) " " else "")
+            (if (marked) cNormal + bYellow + cBlack else cYellow) +
+            (if (multiLine) multi1 else "") + markedDiName + cNormal +
+            (if (di.name.nonEmpty && di.mainInfo.nonEmpty) " " else "")
       )
       if (multiLine) {
         val lines = di.mainInfo.replace("\r", "").split('\n')
@@ -132,8 +132,7 @@ object Ellipsis {
       if (poss.isEmpty) parent
       else if (poss contains Nil) DumpInfo("...")
       else
-        parent.copy(
-            children = parent.children.zipWithIndex.map {
+        parent.copy(children = parent.children.zipWithIndex.map {
           case ((name, ch), idx) =>
             val chposs = poss.filter(_.head == idx).map(_.tail)
             (name, apply(ch, chposs: _*))

@@ -77,11 +77,15 @@ object Settings {
         q(host, "host") ++ q(id, "id") ++ q(token, "token") ++ q(
             accountsPort,
             "accountsPort") ++ q(accountsPath, "accountsPath") ++ q(
-            authPort, "authPort") ++ q(authPath, "authPath") ++ q(
-            ingestPort, "ingestPort") ++ q(ingestPath, "ingestPath") ++ q(
-            jobsPort, "jobsPort") ++ q(jobsPath, "jobsPath") ++ q(
-            shardPort, "shardPort") ++ q(shardPath, "shardPath") ++ q(
-            secure, "secure")
+            authPort,
+            "authPort") ++ q(authPath, "authPath") ++ q(
+            ingestPort,
+            "ingestPort") ++ q(ingestPath, "ingestPath") ++ q(jobsPort,
+                                                              "jobsPort") ++ q(
+            jobsPath,
+            "jobsPath") ++ q(shardPort, "shardPort") ++ q(
+            shardPath,
+            "shardPath") ++ q(secure, "secure")
       }
 
       def settings: Option[Settings] =
@@ -141,7 +145,7 @@ object Settings {
     }
     ps.settings.getOrElse {
       sys.error("missing settings in %s:\n  %s" format
-          (f, ps.missing.mkString("\n  ")))
+            (f, ps.missing.mkString("\n  ")))
     }
   }
 }

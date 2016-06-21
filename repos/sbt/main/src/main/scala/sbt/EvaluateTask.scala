@@ -127,8 +127,8 @@ final object EvaluateTaskConfig {
     AdaptedTaskConfig
   }
 
-  @deprecated(
-      "Use the alternative that specifies minForcegcInterval", "0.13.9")
+  @deprecated("Use the alternative that specifies minForcegcInterval",
+              "0.13.9")
   def apply(restrictions: Seq[Tags.Rule],
             checkCycles: Boolean,
             progressReporter: ExecuteProgress[Task],
@@ -182,10 +182,13 @@ object PluginData {
             definitionClasspath: Seq[Attributed[File]],
             resolvers: Option[Seq[Resolver]],
             report: Option[UpdateReport]): PluginData =
-    PluginData(
-        dependencyClasspath, definitionClasspath, resolvers, report, Nil)
-  @deprecated(
-      "Use the alternative that specifies the specific classpaths.", "0.13.0")
+    PluginData(dependencyClasspath,
+               definitionClasspath,
+               resolvers,
+               report,
+               Nil)
+  @deprecated("Use the alternative that specifies the specific classpaths.",
+              "0.13.0")
   def apply(classpath: Seq[Attributed[File]],
             resolvers: Option[Seq[Resolver]],
             report: Option[UpdateReport]): PluginData =
@@ -211,12 +214,13 @@ object EvaluateTask {
 
   @deprecated("Use extractedTaskConfig.", "0.13.0")
   def defaultConfig(extracted: Extracted, structure: BuildStructure) =
-    EvaluateConfig(
-        false, restrictions(extracted, structure), progress = defaultProgress)
+    EvaluateConfig(false,
+                   restrictions(extracted, structure),
+                   progress = defaultProgress)
 
   @deprecated("Use other extractedTaskConfig", "0.13.2")
-  def extractedConfig(
-      extracted: Extracted, structure: BuildStructure): EvaluateConfig = {
+  def extractedConfig(extracted: Extracted,
+                      structure: BuildStructure): EvaluateConfig = {
     val workers = restrictions(extracted, structure)
     val canCancel = cancelable(extracted, structure)
     EvaluateConfig(cancelable = canCancel,
@@ -230,8 +234,9 @@ object EvaluateTask {
     val workers = restrictions(extracted, structure)
     val canCancel = cancelable(extracted, structure)
     val progress = executeProgress(extracted, structure, state)
-    EvaluateConfig(
-        cancelable = canCancel, restrictions = workers, progress = progress)
+    EvaluateConfig(cancelable = canCancel,
+                   restrictions = workers,
+                   progress = progress)
   }
   def extractedTaskConfig(extracted: Extracted,
                           structure: BuildStructure,
@@ -245,16 +250,16 @@ object EvaluateTask {
   }
 
   def defaultRestrictions(maxWorkers: Int) = Tags.limitAll(maxWorkers) :: Nil
-  def defaultRestrictions(
-      extracted: Extracted, structure: BuildStructure): Seq[Tags.Rule] =
+  def defaultRestrictions(extracted: Extracted,
+                          structure: BuildStructure): Seq[Tags.Rule] =
     Tags.limitAll(maxWorkers(extracted, structure)) :: Nil
 
   def restrictions(state: State): Seq[Tags.Rule] = {
     val extracted = Project.extract(state)
     restrictions(extracted, extracted.structure)
   }
-  def restrictions(
-      extracted: Extracted, structure: BuildStructure): Seq[Tags.Rule] =
+  def restrictions(extracted: Extracted,
+                   structure: BuildStructure): Seq[Tags.Rule] =
     getSetting(Keys.concurrentRestrictions,
                defaultRestrictions(extracted, structure),
                extracted,
@@ -284,15 +289,15 @@ object EvaluateTask {
     maker(state).progress
   }
   // TODO - Should this pull from Global or from the project itself?
-  private[sbt] def forcegc(
-      extracted: Extracted, structure: BuildStructure): Boolean =
+  private[sbt] def forcegc(extracted: Extracted,
+                           structure: BuildStructure): Boolean =
     getSetting(Keys.forcegc in Global,
                GCUtil.defaultForceGarbageCollection,
                extracted,
                structure)
   // TODO - Should this pull from Global or from the project itself?
-  private[sbt] def minForcegcInterval(
-      extracted: Extracted, structure: BuildStructure): Duration =
+  private[sbt] def minForcegcInterval(extracted: Extracted,
+                                      structure: BuildStructure): Duration =
     getSetting(Keys.minForcegcInterval in Global,
                GCUtil.defaultMinForcegcInterval,
                extracted,
@@ -310,10 +315,10 @@ object EvaluateTask {
       (executionRoots in GlobalScope) ::= dummyRoots
   )
 
-  def evalPluginDef(log: Logger)(
-      pluginDef: BuildStructure, state: State): PluginData = {
-    val root = ProjectRef(
-        pluginDef.root, Load.getRootProject(pluginDef.units)(pluginDef.root))
+  def evalPluginDef(log: Logger)(pluginDef: BuildStructure,
+                                 state: State): PluginData = {
+    val root = ProjectRef(pluginDef.root,
+                          Load.getRootProject(pluginDef.units)(pluginDef.root))
     val pluginKey = pluginData
     val config = extractedTaskConfig(Project.extract(state), pluginDef, state)
     val evaluated = apply(pluginDef,
@@ -324,7 +329,7 @@ object EvaluateTask {
     val (newS, result) =
       evaluated getOrElse sys.error(
           "Plugin data does not exist for plugin definition at " +
-          pluginDef.root)
+            pluginDef.root)
     Project.runUnloadHooks(newS) // discard states
     processResult(result, log)
   }
@@ -378,8 +383,9 @@ object EvaluateTask {
                ref: ProjectRef,
                config: EvaluateTaskConfig): Option[(State, Result[T])] = {
     withStreams(structure, state) { str =>
-      for ((task, toNode) <- getTask(structure, taskKey, state, str, ref)) yield
-        runTask(task, state, str, structure.index.triggers, config)(toNode)
+      for ((task, toNode) <- getTask(structure, taskKey, state, str, ref))
+        yield
+          runTask(task, state, str, structure.index.triggers, config)(toNode)
     }
   }
   def logIncResult(result: Result[_], state: State, streams: Streams) =
@@ -388,9 +394,8 @@ object EvaluateTask {
     }
   def logIncomplete(result: Incomplete, state: State, streams: Streams): Unit = {
     val all = Incomplete linearize result
-    val keyed =
-      for (Incomplete(Some(key: ScopedKey[_]), _, msg, _, ex) <- all) yield
-        (key, msg, ex)
+    val keyed = for (Incomplete(Some(key: ScopedKey[_]), _, msg, _, ex) <- all)
+      yield (key, msg, ex)
     val un = all.filter { i =>
       i.node.isEmpty || i.message.isEmpty
     }
@@ -416,8 +421,8 @@ object EvaluateTask {
   }
   private[this] def contextDisplay(state: State, highlight: Boolean) =
     Project.showContextKey(state, if (highlight) Some(RED) else None)
-  def suppressedMessage(key: ScopedKey[_])(
-      implicit display: Show[ScopedKey[_]]): String =
+  def suppressedMessage(
+      key: ScopedKey[_])(implicit display: Show[ScopedKey[_]]): String =
     "Stack trace suppressed.  Run 'last %s' for the full log.".format(
         display(key))
 
@@ -436,14 +441,14 @@ object EvaluateTask {
                  ref: ProjectRef): Option[(Task[T], NodeView[Task])] = {
     val thisScope = Load.projectScope(ref)
     val resolvedScope = Scope.replaceThis(thisScope)(taskKey.scope)
-    for (t <- structure.data.get(resolvedScope, taskKey.key)) yield
-      (t, nodeView(state, streams, taskKey :: Nil))
+    for (t <- structure.data.get(resolvedScope, taskKey.key))
+      yield (t, nodeView(state, streams, taskKey :: Nil))
   }
-  def nodeView[HL <: HList](state: State,
-                            streams: Streams,
-                            roots: Seq[ScopedKey[_]],
-                            dummies: DummyTaskMap =
-                              DummyTaskMap(Nil)): NodeView[Task] =
+  def nodeView[HL <: HList](
+      state: State,
+      streams: Streams,
+      roots: Seq[ScopedKey[_]],
+      dummies: DummyTaskMap = DummyTaskMap(Nil)): NodeView[Task] =
     Transform(
         (dummyRoots, roots) :: (dummyStreamsManager, streams) :: (dummyState,
                                                                   state) :: dummies)
@@ -515,8 +520,9 @@ object EvaluateTask {
     try run() finally strat.onTaskEngineFinish(cancelState)
   }
 
-  private[this] def storeValuesForPrevious(
-      results: RMap[Task, Result], state: State, streams: Streams): Unit =
+  private[this] def storeValuesForPrevious(results: RMap[Task, Result],
+                                           state: State,
+                                           streams: Streams): Unit =
     for (referenced <- Previous.references in Global get Project
                         .structure(state)
                         .data) Previous.complete(referenced, results, streams)
@@ -565,7 +571,7 @@ object EvaluateTask {
     case i @ Incomplete(node, tpe, None, causes, None) =>
       causes.find(inc =>
             inc.node.isEmpty &&
-            (inc.message.isDefined || inc.directCause.isDefined)) match {
+              (inc.message.isDefined || inc.directCause.isDefined)) match {
         case Some(lift) =>
           i.copy(directCause = lift.directCause, message = lift.message)
         case None => i
@@ -573,8 +579,9 @@ object EvaluateTask {
     case i => i
   }
 
-  def processResult[T](
-      result: Result[T], log: Logger, show: Boolean = false): T =
+  def processResult[T](result: Result[T],
+                       log: Logger,
+                       show: Boolean = false): T =
     onResult(result, log) { v =>
       if (show) println("Result: " + v); v
     }
@@ -587,8 +594,7 @@ object EvaluateTask {
   // if the return type Seq[Setting[_]] is not explicitly given, scalac hangs
   val injectStreams: ScopedKey[_] => Seq[Setting[_]] = scoped =>
     if (scoped.key == streams.key)
-      Seq(
-          streams in scoped.scope <<= streamsManager map { mgr =>
+      Seq(streams in scoped.scope <<= streamsManager map { mgr =>
         val stream = mgr(scoped)
         stream.open()
         stream

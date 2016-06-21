@@ -107,8 +107,8 @@ object Menu extends DispatchSnippet {
     val expandAny: Boolean =
       S.attr("expand").map(Helpers.toBoolean) openOr true
 
-    val level: Box[Int] =
-      for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs)) yield i
+    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs))
+      yield i
 
     val toRender: Seq[MenuItem] = (S.attr("item"), S.attr("group")) match {
       case (Full(item), _) =>
@@ -158,11 +158,11 @@ object Menu extends DispatchSnippet {
                        true,
                        // Is a placeholder useful if we don't display the kids? I say no (DCB, 20101108)
                        <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>) %
-                  (if (m.path)
-                     S.prefixedAttrsToMetaData("li_path", liMap)
-                   else Null) %
-                  (if (m.current) S.prefixedAttrsToMetaData("li_item", liMap)
-                   else Null))
+                    (if (m.path)
+                       S.prefixedAttrsToMetaData("li_path", liMap)
+                     else Null) %
+                    (if (m.current) S.prefixedAttrsToMetaData("li_item", liMap)
+                     else Null))
 
             case MenuItem(text, uri, kids, true, _, _) if linkToSelf =>
               Helpers.addCssClass(
@@ -318,25 +318,24 @@ object Menu extends DispatchSnippet {
 
     text match {
       case TitleText(attrs, str) => {
-          r.map { rt =>
-            {
-              val rts = rt.text
-              val idx = str.indexOf("%*%")
-              val bodyStr =
-                if (idx >= 0) {
-                  str.substring(0, idx) + rts + str.substring(idx + 3)
-                } else {
-                  str + " " + rts
-                }
-
-              <title>{bodyStr}</title> % attrs
+        r.map { rt =>
+          {
+            val rts = rt.text
+            val idx = str.indexOf("%*%")
+            val bodyStr = if (idx >= 0) {
+              str.substring(0, idx) + rts + str.substring(idx + 3)
+            } else {
+              str + " " + rts
             }
-          } openOr text
-        }
+
+            <title>{bodyStr}</title> % attrs
+          }
+        } openOr text
+      }
 
       case _ => {
-          r openOr Text("")
-        }
+        r openOr Text("")
+      }
     }
   }
 
@@ -469,11 +468,11 @@ object Menu extends DispatchSnippet {
       (S.attr("linkToSelf") or S.attr("linktoself")).map(Helpers.toBoolean) openOr false
 
     val text = ("a" #>
-        ((n: NodeSeq) =>
-              n match {
-                case e: Elem => e.child
-                case xs => xs
-            })).apply(_text)
+          ((n: NodeSeq) =>
+                n match {
+                  case e: Elem => e.child
+                  case xs => xs
+              })).apply(_text)
 
     for {
       name <- S.attr("name").toList
@@ -482,8 +481,7 @@ object Menu extends DispatchSnippet {
 
       // Builds a link for the given loc
       def buildLink[T](loc: Loc[T]) = {
-        Group(
-            SiteMap.buildLink(name, text) match {
+        Group(SiteMap.buildLink(name, text) match {
           case e: Elem =>
             Helpers.addCssClass(loc.cssClassForMenuItem,
                                 e % S.prefixedAttrsToMetaData("a"))
@@ -495,33 +493,33 @@ object Menu extends DispatchSnippet {
        S.attr("param"),
        SiteMap.findAndTestLoc(name)) match {
         case (_, Full(param), Full(loc: Loc[_] with ConvertableLoc[_])) => {
-            val typedLoc = loc.asInstanceOf[Loc[T] with ConvertableLoc[T]]
+          val typedLoc = loc.asInstanceOf[Loc[T] with ConvertableLoc[T]]
 
-            (for {
-              pv <- typedLoc.convert(param)
-              link <- typedLoc.createLink(pv)
-            } yield {
-              Helpers.addCssClass(
-                  typedLoc.cssClassForMenuItem,
-                  <a href={link}></a> % S.prefixedAttrsToMetaData("a"))
-            }) openOr {
-              Text("")
-            }
+          (for {
+            pv <- typedLoc.convert(param)
+            link <- typedLoc.createLink(pv)
+          } yield {
+            Helpers.addCssClass(
+                typedLoc.cssClassForMenuItem,
+                <a href={link}></a> % S.prefixedAttrsToMetaData("a"))
+          }) openOr {
+            Text("")
           }
+        }
 
         case (Full(loc), _, _) if loc.name == name => {
-            (linkToSelf, donthide) match {
-              case (true, _) => buildLink(loc)
-              case (_, true) => {
-                  if (!text.isEmpty) {
-                    Group(text)
-                  } else {
-                    Group(loc.linkText openOr Text(loc.name))
-                  }
-                }
-              case _ => Text("")
+          (linkToSelf, donthide) match {
+            case (true, _) => buildLink(loc)
+            case (_, true) => {
+              if (!text.isEmpty) {
+                Group(text)
+              } else {
+                Group(loc.linkText openOr Text(loc.name))
+              }
             }
+            case _ => Text("")
           }
+        }
 
         case (Full(loc), _, _) => buildLink(loc)
 

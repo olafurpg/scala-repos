@@ -26,7 +26,7 @@ class ScalaConsoleExecuteAction extends AnAction {
     }
     val isEnabled: Boolean =
       !editor.asInstanceOf[EditorEx].isRendererMode &&
-      !ScalaConsoleInfo.getProcessHandler(editor).isProcessTerminated
+        !ScalaConsoleInfo.getProcessHandler(editor).isProcessTerminated
 
     e.getPresentation.setEnabled(isEnabled)
   }
@@ -47,8 +47,8 @@ class ScalaConsoleExecuteAction extends AnAction {
       // Process input and add to history
       extensions.inWriteAction {
         val range: TextRange = new TextRange(0, document.getTextLength)
-        editor.getSelectionModel.setSelection(
-            range.getStartOffset, range.getEndOffset)
+        editor.getSelectionModel
+          .setSelection(range.getStartOffset, range.getEndOffset)
         console.addToHistory(range, console.getConsoleEditor, true)
         model.addToHistory(text)
 

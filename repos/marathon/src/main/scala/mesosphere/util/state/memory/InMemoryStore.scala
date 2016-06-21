@@ -24,7 +24,8 @@ class InMemoryStore(
     }
 
   override def create(
-      key: ID, content: IndexedSeq[Byte]): Future[PersistentEntity] = Future {
+      key: ID,
+      content: IndexedSeq[Byte]): Future[PersistentEntity] = Future {
     if (entities.contains(key))
       throw new StoreCommandFailedException(
           s"Entity with id $key already exists!")
@@ -59,8 +60,9 @@ class InMemoryStore(
     Future.successful(entities.keySet.toSeq)
 }
 
-case class InMemoryEntity(
-    id: String, version: Int, bytes: IndexedSeq[Byte] = Vector.empty)
+case class InMemoryEntity(id: String,
+                          version: Int,
+                          bytes: IndexedSeq[Byte] = Vector.empty)
     extends PersistentEntity {
   override def withNewContent(bytes: IndexedSeq[Byte]): PersistentEntity =
     copy(bytes = bytes)

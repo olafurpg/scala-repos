@@ -83,7 +83,7 @@ trait Inbox {
         if (!printedWarning) {
           log.warning(
               "dropping message: either your program is buggy or you might want to increase akka.actor.dsl.inbox-size, current value is " +
-              size)
+                size)
           printedWarning = true
         }
       }

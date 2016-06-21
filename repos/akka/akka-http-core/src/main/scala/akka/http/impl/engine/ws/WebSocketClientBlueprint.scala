@@ -66,7 +66,9 @@ object WebSocketClientBlueprint {
         settings.websocketRandomFactory())
     val hostHeader = Host(uri.authority)
     val renderedInitialRequest = HttpRequestRendererFactory.renderStrict(
-        RequestRenderingContext(initialRequest, hostHeader), settings, log)
+        RequestRenderingContext(initialRequest, hostHeader),
+        settings,
+        log)
 
     class UpgradeStage extends StatefulStage[ByteString, ByteString] {
       type State = StageState[ByteString, ByteString]
@@ -81,8 +83,8 @@ object WebSocketClientBlueprint {
             HttpHeaderParser(settings.parserSettings)()) {
           var first = true
           override def handleInformationalResponses = false
-          override protected def parseMessage(
-              input: ByteString, offset: Int): StateResult = {
+          override protected def parseMessage(input: ByteString,
+                                              offset: Int): StateResult = {
             if (first) {
               first = false
               super.parseMessage(input, offset)
@@ -100,8 +102,8 @@ object WebSocketClientBlueprint {
             case NeedMoreData ⇒ ctx.pull()
             case ResponseStart(status, protocol, headers, entity, close) ⇒
               val response = HttpResponse(status, headers, protocol = protocol)
-              Handshake.Client.validateResponse(
-                  response, subprotocol.toList, key) match {
+              Handshake.Client
+                .validateResponse(response, subprotocol.toList, key) match {
                 case Right(NegotiatedWebSocketSettings(protocol)) ⇒
                   result.success(ValidUpgrade(response, protocol))
 
@@ -140,8 +142,7 @@ object WebSocketClientBlueprint {
       }
     }
 
-    BidiFlow.fromGraph(
-        GraphDSL.create() { implicit b ⇒
+    BidiFlow.fromGraph(GraphDSL.create() { implicit b ⇒
       import GraphDSL.Implicits._
 
       val networkIn = b.add(Flow[ByteString].transform(() ⇒ new UpgradeStage))
@@ -161,8 +162,11 @@ object WebSocketClientBlueprint {
     }) mapMaterializedValue (_ ⇒ result.future)
   }
 
-  def simpleTls: BidiFlow[
-      SslTlsInbound, ByteString, ByteString, SendBytes, NotUsed] =
+  def simpleTls: BidiFlow[SslTlsInbound,
+                          ByteString,
+                          ByteString,
+                          SendBytes,
+                          NotUsed] =
     BidiFlow.fromFlowsMat(Flow[SslTlsInbound].collect {
       case SessionBytes(_, bytes) ⇒ bytes
     }, Flow[ByteString].map(SendBytes))(Keep.none)

@@ -25,25 +25,24 @@ class BacktrackingLineSearch(initfval: Double,
   require(cArmijo > 0.0)
   require(cWolfe > cArmijo)
   require(cWolfe < 1.0)
-  def iterations(
-      f: DiffFunction[Double], init: Double = 1.0): Iterator[State] = {
+  def iterations(f: DiffFunction[Double],
+                 init: Double = 1.0): Iterator[State] = {
     val (f0, df0) = f.calculate(0.0)
     val initfderiv = f.calculate(init)._2
     //val (initfval, initfderiv) = f.calculate(init)
     Iterator
       .iterate((State(init, initfval, initfderiv), false, 0)) {
         case (state @ State(alpha, fval, fderiv), _, iter) =>
-          val multiplier =
-            if (fval > f0 + alpha * df0 * cArmijo) {
-              shrinkStep
-            } else if (enforceWolfeConditions && (fderiv < cWolfe * df0)) {
-              growStep
-            } else if (enforceStrongWolfeConditions &&
-                       (fderiv > -cWolfe * df0)) {
-              shrinkStep
-            } else {
-              1.0
-            }
+          val multiplier = if (fval > f0 + alpha * df0 * cArmijo) {
+            shrinkStep
+          } else if (enforceWolfeConditions && (fderiv < cWolfe * df0)) {
+            growStep
+          } else if (enforceStrongWolfeConditions &&
+                     (fderiv > -cWolfe * df0)) {
+            shrinkStep
+          } else {
+            1.0
+          }
           if (multiplier == 1.0) {
             (state, true, iter)
           } else {

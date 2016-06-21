@@ -74,8 +74,9 @@ object RegressionTests extends TestSuite {
                         Seq(
                             TryExcept(
                                 Seq(Pass),
-                                Seq(excepthandler.ExceptHandler(
-                                        Some('s), None, Seq(Pass))),
+                                Seq(excepthandler.ExceptHandler(Some('s),
+                                                                None,
+                                                                Seq(Pass))),
                                 Nil
                             )
                         ),
@@ -135,8 +136,7 @@ object RegressionTests extends TestSuite {
 
     'weird_comments - TestUtils.check(
         Statements.file_input,
-        Seq(
-            While(
+        Seq(While(
                 Num(1),
                 Seq(Expr('a)),
                 Nil
@@ -148,8 +148,7 @@ object RegressionTests extends TestSuite {
     )
     'ident_looking_string - TestUtils.check(
         Statements.file_input,
-        Seq(
-            If(
+        Seq(If(
                 Call('match, Seq(Str("^[a-zA-Z0-9]")), Nil, None, None),
                 Seq(Expr('a)),
                 Nil

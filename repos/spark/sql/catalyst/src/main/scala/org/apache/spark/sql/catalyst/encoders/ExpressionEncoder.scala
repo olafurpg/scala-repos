@@ -50,8 +50,8 @@ object ExpressionEncoder {
     val cls = mirror.runtimeClass(typeTag[T].tpe)
     val flat = !classOf[Product].isAssignableFrom(cls)
 
-    val inputObject = BoundReference(
-        0, ScalaReflection.dataTypeFor[T], nullable = false)
+    val inputObject =
+      BoundReference(0, ScalaReflection.dataTypeFor[T], nullable = false)
     val toRowExpression = ScalaReflection.extractorsFor[T](inputObject)
     val fromRowExpression = ScalaReflection.constructorFor[T]
 
@@ -93,12 +93,11 @@ object ExpressionEncoder {
 
     val schema = StructType(encoders.zipWithIndex.map {
       case (e, i) =>
-        val (dataType, nullable) =
-          if (e.flat) {
-            e.schema.head.dataType -> e.schema.head.nullable
-          } else {
-            e.schema -> true
-          }
+        val (dataType, nullable) = if (e.flat) {
+          e.schema.head.dataType -> e.schema.head.nullable
+        } else {
+          e.schema -> true
+        }
         StructField(s"_${i + 1}", dataType, nullable)
     })
 
@@ -136,8 +135,10 @@ object ExpressionEncoder {
         }
     }
 
-    val fromRowExpression = NewInstance(
-        cls, fromRowExpressions, ObjectType(cls), propagateNull = false)
+    val fromRowExpression = NewInstance(cls,
+                                        fromRowExpressions,
+                                        ObjectType(cls),
+                                        propagateNull = false)
 
     new ExpressionEncoder[Any](schema,
                                flat = false,
@@ -251,7 +252,8 @@ case class ExpressionEncoder[T](schema: StructType,
     } catch {
       case e: Exception =>
         throw new RuntimeException(
-            s"Error while decoding: $e\n${fromRowExpression.treeString}", e)
+            s"Error while decoding: $e\n${fromRowExpression.treeString}",
+            e)
     }
 
   /**
@@ -275,10 +277,10 @@ case class ExpressionEncoder[T](schema: StructType,
     def fail(st: StructType, maxOrdinal: Int): Unit = {
       throw new AnalysisException(
           s"Try to map ${st.simpleString} to Tuple${maxOrdinal + 1}, " +
-          "but failed as the number of fields does not line up.\n" +
-          " - Input schema: " +
-          StructType.fromAttributes(schema).simpleString + "\n" +
-          " - Target schema: " + this.schema.simpleString)
+            "but failed as the number of fields does not line up.\n" +
+            " - Input schema: " +
+            StructType.fromAttributes(schema).simpleString + "\n" +
+            " - Target schema: " + this.schema.simpleString)
     }
 
     // If this is a tuple encoder or tupled encoder, which means its leaf nodes are all
@@ -328,8 +330,8 @@ case class ExpressionEncoder[T](schema: StructType,
   def resolve(
       schema: Seq[Attribute],
       outerScopes: ConcurrentMap[String, AnyRef]): ExpressionEncoder[T] = {
-    val deserializer = SimpleAnalyzer.ResolveReferences.resolveDeserializer(
-        fromRowExpression, schema)
+    val deserializer = SimpleAnalyzer.ResolveReferences
+      .resolveDeserializer(fromRowExpression, schema)
 
     // Make a fake plan to wrap the deserializer, so that we can go though the whole analyzer, check
     // analysis, go through optimizer, etc.
@@ -356,15 +358,13 @@ case class ExpressionEncoder[T](schema: StructType,
     * Returns a new encoder with input columns shifted by `delta` ordinals
     */
   def shift(delta: Int): ExpressionEncoder[T] = {
-    copy(
-        fromRowExpression =
+    copy(fromRowExpression =
           fromRowExpression transform {
         case r: BoundReference => r.copy(ordinal = r.ordinal + delta)
       })
   }
 
-  protected val attrs = toRowExpressions.flatMap(
-      _.collect {
+  protected val attrs = toRowExpressions.flatMap(_.collect {
     case _: UnresolvedAttribute => ""
     case a: Attribute => s"#${a.exprId}"
     case b: BoundReference => s"[${b.ordinal}]"

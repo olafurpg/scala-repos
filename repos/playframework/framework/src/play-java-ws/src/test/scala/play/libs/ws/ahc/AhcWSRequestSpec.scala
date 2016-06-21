@@ -167,8 +167,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
 
   def requestWithTimeout(timeout: Long) = {
     val client = mock[AhcWSClient]
-    val request = new AhcWSRequest(
-        client, "http://example.com", /*materializer*/ null)
+    val request =
+      new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
     request.setRequestTimeout(timeout)
     request.buildRequest().getRequestTimeout()
   }
@@ -176,8 +176,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
   def requestWithQueryString(query: String) = {
     import scala.collection.JavaConverters._
     val client = mock[AhcWSClient]
-    val request = new AhcWSRequest(
-        client, "http://example.com", /*materializer*/ null)
+    val request =
+      new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
     request.setQueryString(query)
     val queryParams = request.buildRequest().getQueryParams
     queryParams.asScala.toSeq

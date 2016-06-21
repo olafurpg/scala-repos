@@ -97,12 +97,14 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   /** @since 7.0.3 */
   implicit def OneAndArbitrary[F[_], A](
-      implicit A: Arbitrary[A], FA: Arbitrary[F[A]]): Arbitrary[OneAnd[F, A]] =
+      implicit A: Arbitrary[A],
+      FA: Arbitrary[F[A]]): Arbitrary[OneAnd[F, A]] =
     Apply[Arbitrary].apply2(arb[A], arb[F[A]])(OneAnd.apply)
 
   /** @since 7.0.3 */
   implicit def OneOrArbitrary[F[_], A](
-      implicit A: Arbitrary[A], FA: Arbitrary[F[A]]): Arbitrary[OneOr[F, A]] =
+      implicit A: Arbitrary[A],
+      FA: Arbitrary[F[A]]): Arbitrary[OneOr[F, A]] =
     Functor[Arbitrary].map(arb[F[A] \/ A])(OneOr(_))
 
   /** @since 7.1.0 */
@@ -111,8 +113,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
                                     B: Arbitrary[B]): Arbitrary[A ==>> B] =
     Functor[Arbitrary].map(arb[List[(A, B)]])(as => ==>>.fromList(as))
 
-  implicit def Arbitrary_ISet[A](
-      implicit o: Order[A], A: Arbitrary[A]): Arbitrary[ISet[A]] =
+  implicit def Arbitrary_ISet[A](implicit o: Order[A],
+                                 A: Arbitrary[A]): Arbitrary[ISet[A]] =
     Functor[Arbitrary].map(arb[List[A]])(as => ISet.fromList(as))
 
   implicit def Arbitrary_Maybe[A: Arbitrary]: Arbitrary[Maybe[A]] =
@@ -317,12 +319,11 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
         case 0 => empty[V, A]
         case 1 => arbitrary[A].map(single[V, A](_))
         case n => {
-            val nextSize = n.abs / 2
-            ^^(FingerArbitrary[V, A].arbitrary,
-               fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A],
-                                                implicitly),
-               FingerArbitrary[V, A].arbitrary)(deep[V, A](_, _, _))
-          }
+          val nextSize = n.abs / 2
+          ^^(FingerArbitrary[V, A].arbitrary,
+             fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A], implicitly),
+             FingerArbitrary[V, A].arbitrary)(deep[V, A](_, _, _))
+        }
       }
     Gen.sized(fingerTree[A] _)
   }
@@ -338,7 +339,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   import Zipper._
   implicit def ZipperArbitrary[A: Arbitrary]: Arbitrary[Zipper[A]] =
     Apply[Arbitrary].apply3[Stream[A], A, Stream[A], Zipper[A]](
-        arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
+        arb[Stream[A]],
+        arb[A],
+        arb[Stream[A]])(zipper[A](_, _, _))
 
   implicit def KleisliArbitrary[M[_], A, B](
       implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
@@ -418,8 +421,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     : Arbitrary[LazyTuple3[A, B, C]] =
     Applicative[Arbitrary].apply3(arb[A], arb[B], arb[C])(LazyTuple3(_, _, _))
 
-  implicit def lazyTuple4Arbitrary[
-      A: Arbitrary, B: Arbitrary, C: Arbitrary, D: Arbitrary]
+  implicit def lazyTuple4Arbitrary[A: Arbitrary,
+                                   B: Arbitrary,
+                                   C: Arbitrary,
+                                   D: Arbitrary]
     : Arbitrary[LazyTuple4[A, B, C, D]] =
     Applicative[Arbitrary].apply4(arb[A], arb[B], arb[C], arb[D])(
         LazyTuple4(_, _, _, _))
@@ -457,15 +462,15 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
       A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] =
     Functor[Arbitrary].map(A0)(CaseInsensitive(_))
 
-  implicit def dievArbitrary[A](
-      implicit A: Arbitrary[List[A]], E: Enum[A]): Arbitrary[Diev[A]] =
-    Functor[Arbitrary].map(A)(
-        _.grouped(2).foldLeft(Diev.empty[A]) { (working, possiblePair) =>
-      possiblePair match {
-        case first :: second :: Nil => working + ((first, second))
-        case value :: Nil => working
-        case _ => sys.error("Unexpected amount of items in paired list.")
-      }
+  implicit def dievArbitrary[A](implicit A: Arbitrary[List[A]],
+                                E: Enum[A]): Arbitrary[Diev[A]] =
+    Functor[Arbitrary].map(A)(_.grouped(2).foldLeft(Diev.empty[A]) {
+      (working, possiblePair) =>
+        possiblePair match {
+          case first :: second :: Nil => working + ((first, second))
+          case value :: Nil => working
+          case _ => sys.error("Unexpected amount of items in paired list.")
+        }
     })
 
   implicit def iterateeInputArbitrary[A: Arbitrary]

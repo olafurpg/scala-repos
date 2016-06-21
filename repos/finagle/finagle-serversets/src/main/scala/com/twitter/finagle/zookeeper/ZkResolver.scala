@@ -32,8 +32,7 @@ private[finagle] class ZkGroup(serverSet: ServerSet, path: String)
   protected[finagle] val set = Var(Set[ServiceInstance]())
 
   override def run() {
-    serverSet.watch(
-        new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
+    serverSet.watch(new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
       def onChange(newSet: ImmutableSet[ServiceInstance]) = synchronized {
         set() = newSet.asScala.toSet
       }
@@ -52,8 +51,7 @@ private class ZkOffer(serverSet: ServerSet, path: String)
 
   override def run() {
     try {
-      serverSet.watch(
-          new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
+      serverSet.watch(new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
         def onChange(newSet: ImmutableSet[ServiceInstance]) {
           inbound !! newSet.asScala.toSet
         }
@@ -65,7 +63,7 @@ private class ZkOffer(serverSet: ServerSet, path: String)
         // becomes a negative resolution).
         log.log(Level.WARNING,
                 "Exception when trying to watch a ServerSet! " +
-                "Returning negative resolution.",
+                  "Returning negative resolution.",
                 exc)
         inbound !! Set.empty
     }
@@ -101,19 +99,19 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
     val getEndpoint: PartialFunction[ServiceInstance, Endpoint] =
       endpoint match {
         case Some(epname) => {
-            case inst if inst.getAdditionalEndpoints.containsKey(epname) =>
-              inst.getAdditionalEndpoints.get(epname)
-          }
+          case inst if inst.getAdditionalEndpoints.containsKey(epname) =>
+            inst.getAdditionalEndpoints.get(epname)
+        }
         case None => {
-            case inst: ServiceInstance => inst.getServiceEndpoint()
-          }
+          case inst: ServiceInstance => inst.getServiceEndpoint()
+        }
       }
 
     val filterShardId: PartialFunction[ServiceInstance, ServiceInstance] =
       shardId match {
         case Some(id) => {
-            case inst if inst.isSetShard && inst.shard == id => inst
-          }
+          case inst if inst.isSetShard && inst.shard == id => inst
+        }
         case None => { case x => x }
       }
 

@@ -1,16 +1,15 @@
 package scalaz
 
 trait IndexedStateFunctions {
-  def constantIndexedState[S1, S2, A](
-      a: A, s: => S2): IndexedState[S1, S2, A] =
+  def constantIndexedState[S1, S2, A](a: A,
+                                      s: => S2): IndexedState[S1, S2, A] =
     IndexedState((_: S1) => (s, a))
 
   def iPut[S1, S2](s: S2): IndexedState[S1, S2, Unit] =
     IndexedState(_ => (s, ()))
 
   def iModify[S1, S2](f: S1 => S2): IndexedState[S1, S2, Unit] =
-    IndexedState(
-        s => {
+    IndexedState(s => {
       val r = f(s);
       (r, ())
     })
@@ -32,8 +31,7 @@ trait StateFunctions extends IndexedStateFunctions {
   def put[S](s: S): State[S, Unit] = State(_ => (s, ()))
 
   def modify[S](f: S => S): State[S, Unit] =
-    State(
-        s => {
+    State(s => {
       val r = f(s);
       (r, ())
     })

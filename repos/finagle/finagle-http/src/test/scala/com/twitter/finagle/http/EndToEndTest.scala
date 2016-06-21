@@ -314,8 +314,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
       }
       val client = connect(service)
       client(Request())
-      Await.ready(
-          timer.doLater(20.milliseconds) {
+      Await.ready(timer.doLater(20.milliseconds) {
         Await.ready(client.close())
         intercept[CancelledRequestException] {
           promise.isInterrupted match {
@@ -456,7 +455,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
     }
 
     test(name +
-        ": client discard terminates stream and frees up the connection") {
+          ": client discard terminates stream and frees up the connection") {
       val s = new Service[Request, Response] {
         var rep: Response = null
 
@@ -525,8 +524,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
         }
       })
 
-      val outer = connect(
-          new HttpService {
+      val outer = connect(new HttpService {
         def apply(request: Request) = {
           outerTrace = Trace.id.traceId.toString
           outerSpan = Trace.id.spanId.toString
@@ -646,7 +644,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
       assert(st.counters(Seq(clientName, "failure_accrual", "removals")) == 1)
       assert(
           st.counters(Seq(clientName, "retries", "requeues")) == failureAccrualFailures -
-          1)
+            1)
       assert(
           st.counters(Seq(clientName, "failures", "restartable")) == failureAccrualFailures)
       client.close()
@@ -679,8 +677,8 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
     val server = finagle.Http.serve(new InetSocketAddress(0), service)
     val client = finagle.Http.client
       .configured(Stats(st))
-      .configured(
-          FailureAccrualFactory.Param(failureAccrualFailures, () => 1.minute))
+      .configured(FailureAccrualFactory.Param(failureAccrualFailures, () =>
+                1.minute))
       .newService(
           Name.bound(
               Address(server.boundAddress.asInstanceOf[InetSocketAddress])),

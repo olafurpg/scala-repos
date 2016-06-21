@@ -51,8 +51,8 @@ object PlayForkProcess {
           log: Logger,
           shutdownTimeout: FiniteDuration): Unit = {
     val java = (file(sys.props("java.home")) / "bin" / "java").absolutePath
-    val (classpathEnv, options) = makeOptions(
-        jvmOptions, classpath, mainClass, arguments)
+    val (classpathEnv, options) =
+      makeOptions(jvmOptions, classpath, mainClass, arguments)
     val command = (java +: options).toArray
     val builder = new JProcessBuilder(command: _*)
     builder.directory(workingDirectory)

@@ -64,36 +64,36 @@ object LDAExample {
         .action((x, c) => c.copy(maxIterations = x))
       opt[Double]("docConcentration")
         .text(s"amount of topic smoothing to use (> 1.0) (-1=auto)." +
-            s"  default: ${defaultParams.docConcentration}")
+              s"  default: ${defaultParams.docConcentration}")
         .action((x, c) => c.copy(docConcentration = x))
       opt[Double]("topicConcentration")
         .text(s"amount of term (word) smoothing to use (> 1.0) (-1=auto)." +
-            s"  default: ${defaultParams.topicConcentration}")
+              s"  default: ${defaultParams.topicConcentration}")
         .action((x, c) => c.copy(topicConcentration = x))
       opt[Int]("vocabSize")
         .text(s"number of distinct word types to use, chosen by frequency. (-1=all)" +
-            s"  default: ${defaultParams.vocabSize}")
+              s"  default: ${defaultParams.vocabSize}")
         .action((x, c) => c.copy(vocabSize = x))
       opt[String]("stopwordFile")
         .text(s"filepath for a list of stopwords. Note: This must fit on a single machine." +
-            s"  default: ${defaultParams.stopwordFile}")
+              s"  default: ${defaultParams.stopwordFile}")
         .action((x, c) => c.copy(stopwordFile = x))
       opt[String]("algorithm")
         .text(s"inference algorithm to use. em and online are supported." +
-            s" default: ${defaultParams.algorithm}")
+              s" default: ${defaultParams.algorithm}")
         .action((x, c) => c.copy(algorithm = x))
       opt[String]("checkpointDir")
         .text(s"Directory for checkpointing intermediate results." +
-            s"  Checkpointing helps with recovery and eliminates temporary shuffle files on disk." +
-            s"  default: ${defaultParams.checkpointDir}")
+              s"  Checkpointing helps with recovery and eliminates temporary shuffle files on disk." +
+              s"  default: ${defaultParams.checkpointDir}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"Iterations between each checkpoint.  Only used if checkpointDir is set." +
-            s" default: ${defaultParams.checkpointInterval}")
+              s" default: ${defaultParams.checkpointInterval}")
         .action((x, c) => c.copy(checkpointInterval = x))
       arg[String]("<input>...")
         .text("input paths (directories) to plain text corpora." +
-            "  Each text file line should hold 1 document.")
+              "  Each text file line should hold 1 document.")
         .unbounded()
         .required()
         .action((x, c) => c.copy(input = c.input :+ x))
@@ -118,8 +118,8 @@ object LDAExample {
 
     // Load documents, and prepare them for LDA.
     val preprocessStart = System.nanoTime()
-    val (corpus, vocabArray, actualNumTokens) = preprocess(
-        sc, params.input, params.vocabSize, params.stopwordFile)
+    val (corpus, vocabArray, actualNumTokens) =
+      preprocess(sc, params.input, params.vocabSize, params.stopwordFile)
     corpus.cache()
     val actualCorpusSize = corpus.count()
     val actualVocabSize = vocabArray.length
@@ -211,13 +211,12 @@ object LDAExample {
     // this can result in a large number of small partitions, which can degrade performance.
     // In this case, consider using coalesce() to create fewer, larger partitions.
     val df = sc.textFile(paths.mkString(",")).toDF("docs")
-    val customizedStopWords: Array[String] =
-      if (stopwordFile.isEmpty) {
-        Array.empty[String]
-      } else {
-        val stopWordText = sc.textFile(stopwordFile).collect()
-        stopWordText.flatMap(_.stripMargin.split("\\s+"))
-      }
+    val customizedStopWords: Array[String] = if (stopwordFile.isEmpty) {
+      Array.empty[String]
+    } else {
+      val stopWordText = sc.textFile(stopwordFile).collect()
+      stopWordText.flatMap(_.stripMargin.split("\\s+"))
+    }
     val tokenizer =
       new RegexTokenizer().setInputCol("docs").setOutputCol("rawTokens")
     val stopWordsRemover =

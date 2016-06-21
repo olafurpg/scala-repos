@@ -17,7 +17,7 @@ case class Forecast(_id: String, // player full id
           steps = steps.collect {
             case (fst :: snd :: rest)
                 if rest.nonEmpty && g.turns == fst.ply && fst.is(lastMove) &&
-                snd.is(move) =>
+                  snd.is(move) =>
               rest
           },
           date = DateTime.now

@@ -209,8 +209,8 @@ trait TaskExtra {
     def #>(f: File): Task[Unit] = pipe0(None, toFile(f))
     def #>(sid: String, f: File): Task[Unit] = pipe0(Some(sid), toFile(f))
 
-    private def pipe0[T](
-        sid: Option[String], f: BufferedInputStream => T): Task[T] =
+    private def pipe0[T](sid: Option[String],
+                         f: BufferedInputStream => T): Task[T] =
       streams map { s =>
         f(s.readBinary(key(in), sid))
       }
@@ -224,8 +224,8 @@ trait TaskExtra {
     def text[T](sid: String)(f: BufferedReader => T): Task[T] =
       pipe0(Some(sid), f)
 
-    private def pipe0[T](
-        sid: Option[String], f: BufferedReader => T): Task[T] =
+    private def pipe0[T](sid: Option[String],
+                         f: BufferedReader => T): Task[T] =
       streams map { s =>
         f(s.readText(key(in), sid))
       }

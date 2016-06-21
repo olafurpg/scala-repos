@@ -54,8 +54,8 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
           valueSerializer = new StringSerializer
       )
 
-    var server = new KafkaServer(
-        config, threadNamePrefix = Option(this.getClass.getName))
+    var server =
+      new KafkaServer(config, threadNamePrefix = Option(this.getClass.getName))
     server.startup()
     var producer = createProducer(server)
 
@@ -74,8 +74,8 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     // do a clean shutdown and check that offset checkpoint file exists
     server.shutdown()
     for (logDir <- config.logDirs) {
-      val OffsetCheckpointFile = new File(
-          logDir, server.logManager.RecoveryPointCheckpointFile)
+      val OffsetCheckpointFile =
+        new File(logDir, server.logManager.RecoveryPointCheckpointFile)
       assertTrue(OffsetCheckpointFile.exists)
       assertTrue(OffsetCheckpointFile.length() > 0)
     }
@@ -89,8 +89,8 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     TestUtils.waitUntilMetadataIsPropagated(Seq(server), topic, 0)
 
     producer = createProducer(server)
-    val consumer = new SimpleConsumer(
-        host, server.boundPort(), 1000000, 64 * 1024, "")
+    val consumer =
+      new SimpleConsumer(host, server.boundPort(), 1000000, 64 * 1024, "")
 
     var fetchedMessage: ByteBufferMessageSet = null
     while (fetchedMessage == null || fetchedMessage.validBytes == 0) {
@@ -134,8 +134,9 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     val newProps = TestUtils.createBrokerConfig(0, zkConnect)
     newProps.setProperty("delete.topic.enable", "true")
     val newConfig = KafkaConfig.fromProps(newProps)
-    val server = new KafkaServer(
-        newConfig, threadNamePrefix = Option(this.getClass.getName))
+    val server = new KafkaServer(newConfig,
+                                 threadNamePrefix =
+                                   Option(this.getClass.getName))
     server.startup()
     server.shutdown()
     server.awaitShutdown()
@@ -148,8 +149,9 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     val newProps = TestUtils.createBrokerConfig(0, zkConnect)
     newProps.setProperty("zookeeper.connect", "fakehostthatwontresolve:65535")
     val newConfig = KafkaConfig.fromProps(newProps)
-    val server = new KafkaServer(
-        newConfig, threadNamePrefix = Option(this.getClass.getName))
+    val server = new KafkaServer(newConfig,
+                                 threadNamePrefix =
+                                   Option(this.getClass.getName))
     try {
       server.startup()
       fail("Expected KafkaServer setup to fail, throw exception")

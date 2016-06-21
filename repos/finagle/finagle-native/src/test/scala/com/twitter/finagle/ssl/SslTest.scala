@@ -45,7 +45,7 @@ class SslTest extends FunSuite {
   } catch {
     case e: java.io.IOException =>
       println("IOException: I/O error in running setupCA script: " +
-          e.getMessage())
+            e.getMessage())
       throw e
     case NonFatal(e) =>
       println("Unknown exception in running setupCA script: " + e.getMessage())
@@ -198,7 +198,7 @@ class SslTest extends FunSuite {
     } catch {
       case ex: java.io.IOException =>
         println("Test skipped: running openssl failed" +
-            " (openssl executable might be absent?)")
+              " (openssl executable might be absent?)")
     }
   }
 }
@@ -213,22 +213,23 @@ class CertChainInput(
     openSSLRootConfFilename: String
 ) {
   val setupCADirPath: Path = Files.createTempDirectory(setupCADirName)
-  def writeResourceToDir(
-      klass: Class[_], name: String, directory: Path): File = {
+  def writeResourceToDir(klass: Class[_],
+                         name: String,
+                         directory: Path): File = {
     val fullName = File.separator + setupCADirName + File.separator + name
     val url = Resources.getResource(klass, fullName)
     val newFile = new File(setupCADirPath.toFile, name)
     Resources.asByteSource(url).copyTo(GuavaFiles.asByteSink(newFile))
     newFile
   }
-  val setupCAFile = writeResourceToDir(
-      getClass, setupCAFilename, setupCADirPath)
-  val makeCertFile = writeResourceToDir(
-      getClass, makeCertFilename, setupCADirPath)
-  val openSSLIntConfFile = writeResourceToDir(
-      getClass, openSSLIntConfFilename, setupCADirPath)
-  val openSSLRootConfFile = writeResourceToDir(
-      getClass, openSSLRootConfFilename, setupCADirPath)
+  val setupCAFile =
+    writeResourceToDir(getClass, setupCAFilename, setupCADirPath)
+  val makeCertFile =
+    writeResourceToDir(getClass, makeCertFilename, setupCADirPath)
+  val openSSLIntConfFile =
+    writeResourceToDir(getClass, openSSLIntConfFilename, setupCADirPath)
+  val openSSLRootConfFile =
+    writeResourceToDir(getClass, openSSLRootConfFilename, setupCADirPath)
 
   val setupCAPath: String = setupCAFile.getAbsolutePath
   val makeCertPath: String = makeCertFile.getAbsolutePath

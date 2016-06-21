@@ -419,20 +419,20 @@ private[data] object FormUtils {
   def fromJson(prefix: String = "", js: JsValue): Map[String, String] =
     js match {
       case JsObject(fields) => {
-          fields.map {
-            case (key, value) =>
-              fromJson(Option(prefix)
-                         .filterNot(_.isEmpty)
-                         .map(_ + ".")
-                         .getOrElse("") + key,
-                       value)
-          }.foldLeft(Map.empty[String, String])(_ ++ _)
-        }
+        fields.map {
+          case (key, value) =>
+            fromJson(Option(prefix)
+                       .filterNot(_.isEmpty)
+                       .map(_ + ".")
+                       .getOrElse("") + key,
+                     value)
+        }.foldLeft(Map.empty[String, String])(_ ++ _)
+      }
       case JsArray(values) => {
-          values.zipWithIndex.map {
-            case (value, i) => fromJson(prefix + "[" + i + "]", value)
-          }.foldLeft(Map.empty[String, String])(_ ++ _)
-        }
+        values.zipWithIndex.map {
+          case (value, i) => fromJson(prefix + "[" + i + "]", value)
+        }.foldLeft(Map.empty[String, String])(_ ++ _)
+      }
       case JsNull => Map.empty
       case JsUndefined() => Map.empty
       case JsBoolean(value) => Map(prefix -> value.toString)
@@ -830,7 +830,8 @@ case class RepeatedMapping[T](wrapped: Mapping[T],
   * @param wrapped the wrapped mapping
   */
 case class OptionalMapping[T](
-    wrapped: Mapping[T], val constraints: Seq[Constraint[Option[T]]] = Nil)
+    wrapped: Mapping[T],
+    val constraints: Seq[Constraint[Option[T]]] = Nil)
     extends Mapping[Option[T]] {
 
   override val format: Option[(String, Seq[Any])] = wrapped.format
@@ -926,8 +927,8 @@ case class OptionalMapping[T](
   * @param key the field key
   * @param constraints the constraints associated with this field.
   */
-case class FieldMapping[T](
-    val key: String = "", val constraints: Seq[Constraint[T]] = Nil)(
+case class FieldMapping[T](val key: String = "",
+                           val constraints: Seq[Constraint[T]] = Nil)(
     implicit val binder: Formatter[T])
     extends Mapping[T] {
 

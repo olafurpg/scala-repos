@@ -111,8 +111,11 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
         externalConfigPath := getProject.getBasePath + "/module1"
       }
 
-      arbitraryNodes += new SbtProjectNode(
-          Seq.empty, None, Seq.empty, "", getProject.getBasePath)
+      arbitraryNodes += new SbtProjectNode(Seq.empty,
+                                           None,
+                                           Seq.empty,
+                                           "",
+                                           getProject.getBasePath)
     }.build.toDataNode
 
     importProjectData(testProject)
@@ -142,8 +145,11 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
-      arbitraryNodes += new SbtProjectNode(
-          basePackages, jdk, javacOptions, sbtVersion, getProject.getBasePath)
+      arbitraryNodes += new SbtProjectNode(basePackages,
+                                           jdk,
+                                           javacOptions,
+                                           sbtVersion,
+                                           getProject.getBasePath)
     }.build.toDataNode
 
   private def doTestBasePackages(basePackages: Seq[String]): Unit = {
@@ -166,8 +172,8 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
                         expectedSdk: Sdk,
                         expectedLanguageLevel: LanguageLevel): Unit = {
     importProjectData(generateProject(Seq.empty, sdk, javacOptions, ""))
-    assertEquals(
-        expectedSdk, ProjectRootManager.getInstance(getProject).getProjectSdk)
+    assertEquals(expectedSdk,
+                 ProjectRootManager.getInstance(getProject).getProjectSdk)
     val languageLevelProjectExtension =
       LanguageLevelProjectExtension.getInstance(getProject)
     val actualLanguageLevel = languageLevelProjectExtension.getLanguageLevel

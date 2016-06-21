@@ -57,8 +57,8 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
           }
       }
     }
-    when(codec.newClientDispatcher(any[Transport[Any, Any]],
-                                   any[Stack.Params])) thenAnswer {
+    when(
+        codec.newClientDispatcher(any[Transport[Any, Any]], any[Stack.Params])) thenAnswer {
       new Answer[SerialClientDispatcher[String, String]] {
         def answer(invocation: InvocationOnMock)
           : SerialClientDispatcher[String, String] = {
@@ -118,8 +118,7 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
         stack: Stack[ServiceFactory[String, String]] =
           StackClient.newStack[String, String],
         params: Stack.Params = StackClient.defaultParams
-    )
-        extends StdStackClient[String, String, Client] {
+    ) extends StdStackClient[String, String, Client] {
       def copy1(stack: Stack[ServiceFactory[String, String]] = this.stack,
                 params: Stack.Params = this.params): Client =
         copy(stack, params)

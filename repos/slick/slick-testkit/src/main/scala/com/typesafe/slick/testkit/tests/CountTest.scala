@@ -102,7 +102,8 @@ class CountTest extends AsyncTest[RelationalTestDB] {
   def testTableCount = {
     class T(tag: Tag)
         extends Table[(Long, String, Long, Option[Long], Option[Long])](
-            tag, "TABLECOUNT_T") {
+            tag,
+            "TABLECOUNT_T") {
       def a = column[Long]("ID")
       def b = column[String]("B")
       def c = column[Long]("C")

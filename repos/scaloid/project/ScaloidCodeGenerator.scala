@@ -1,15 +1,14 @@
 import ScaloidCodeGenerator._
 
-class ScaloidCodeGenerator(
-    cls: AndroidClass, companionTemplate: CompanionTemplate) {
+class ScaloidCodeGenerator(cls: AndroidClass,
+                           companionTemplate: CompanionTemplate) {
   import StringUtils._
 
   private val sClassName = "S" + cls.name
 
   def implicitConversion = {
     val name = cls.name
-    s"$deprecated@inline implicit def ${decapitalize(name)}2Rich$name[V <: ${genType(
-        cls.tpe, erased = true)}]" +
+    s"$deprecated@inline implicit def ${decapitalize(name)}2Rich$name[V <: ${genType(cls.tpe, erased = true)}]" +
     s"(${decapitalize(name)}: V) = new Rich$name[V](${decapitalize(name)})"
   }
 
@@ -27,7 +26,8 @@ class ScaloidCodeGenerator(
        |
        |$helperTraitScalaDoc
        |${deprecated}trait $helperTraitName[This <: ${genType(
-           cls.tpe, erased = true)}]$extendClause {
+           cls.tpe,
+           erased = true)}]$extendClause {
        |
        |  ${if (cls.parentType.isEmpty) "def basis: This" else ""}
        |
@@ -112,8 +112,8 @@ class ScaloidCodeGenerator(
   def customCompanionSuperclass =
     predefinedMapping(companionObjectExtends, separator = "\n")
 
-  private def predefinedMapping(
-      mappings: PredefinedCodeMappings, separator: String = ", ") =
+  private def predefinedMapping(mappings: PredefinedCodeMappings,
+                                separator: String = ", ") =
     mappings.collect {
       case (kind, fn) if cls.isA(kind) => fn(cls)
     }.mkString(separator)
@@ -154,8 +154,9 @@ class ScaloidCodeGenerator(
   private def constArgs(args: List[Argument]): String =
     args.map(a => s"${a.name}: ${genType(a.tpe)}").mkString(", ")
 
-  private def concatArgs(
-      args: List[Argument], customArgs: String, isImplicit: Boolean) = {
+  private def concatArgs(args: List[Argument],
+                         customArgs: String,
+                         isImplicit: Boolean) = {
     List(constArgs(args), customArgs).filter(_.nonEmpty) match {
       case Nil => ""
       case argStrings =>
@@ -282,7 +283,8 @@ class ScaloidCodeGenerator(
       }
 
     _setter("  ", s"            ${prop.name}_=(p)") + "\n" + _setter(
-        "_=", s"{ basis.${method.name}(p); basis }")
+        "_=",
+        s"{ basis.${method.name}(p); basis }")
   }
 
   def switch(name: String, setter: Option[AndroidMethod]) =
@@ -295,7 +297,7 @@ class ScaloidCodeGenerator(
 
   def setters(prop: AndroidProperty) =
     prop.setters.map(s => setter(prop, s)).mkString("\n") +
-    prop.switch.fold("")("\n\n" + switch(_, prop.setters.headOption))
+      prop.switch.fold("")("\n\n" + switch(_, prop.setters.headOption))
 
   def property(prop: AndroidProperty) =
     s"""${getter(prop)}
@@ -308,7 +310,7 @@ class ScaloidCodeGenerator(
   // Service
   def systemServiceHead =
     s"@inline def ${decapitalize(cls.name)}(implicit context: Context) = \n" +
-    s"  context.getSystemService(Context.${managerToService(cls.name)}).asInstanceOf[${cls.tpe.name}]"
+      s"  context.getSystemService(Context.${managerToService(cls.name)}).asInstanceOf[${cls.tpe.name}]"
 
   // Scaladoc
   def androidDocBase = "https://developer.android.com/reference"

@@ -118,17 +118,16 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     * @inheritdoc
     */
   def add(value: Long): Unit = {
-    val index =
-      if (value >= Int.MaxValue) {
-        total += Int.MaxValue
-        countsLength - 1
-      } else {
-        total += value
-        val asInt = value.toInt
-        // recall that limits represent upper bounds, exclusive — so take the next position (+1).
-        // we assume that no inputs can be larger than the largest value in the limits array.
-        Math.abs(util.Arrays.binarySearch(limits, asInt) + 1)
-      }
+    val index = if (value >= Int.MaxValue) {
+      total += Int.MaxValue
+      countsLength - 1
+    } else {
+      total += value
+      val asInt = value.toInt
+      // recall that limits represent upper bounds, exclusive — so take the next position (+1).
+      // we assume that no inputs can be larger than the largest value in the limits array.
+      Math.abs(util.Arrays.binarySearch(limits, asInt) + 1)
+    }
     counts(index) += 1
     num += 1
   }

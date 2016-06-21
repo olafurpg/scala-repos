@@ -75,13 +75,12 @@ private[stat] object PearsonCorrelation extends Correlation with Logging {
       sigma = cov(j, j)
       i = 0
       while (i < j) {
-        val corr =
-          if (sigma == 0.0 || cov(i, i) == 0.0) {
-            containNaN = true
-            Double.NaN
-          } else {
-            cov(i, j) / (sigma * cov(i, i))
-          }
+        val corr = if (sigma == 0.0 || cov(i, i) == 0.0) {
+          containNaN = true
+          Double.NaN
+        } else {
+          cov(i, j) / (sigma * cov(i, i))
+        }
         cov(i, j) = corr
         cov(j, i) = corr
         i += 1

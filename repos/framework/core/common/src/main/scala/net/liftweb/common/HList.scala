@@ -155,10 +155,12 @@ object ExcludeThisType {
   implicit def nsub[A, B]: A ExcludeThisType B = null
 
   implicit def `This type was excluded because it was explicitly excluded`[
-      A, B >: A]: A ExcludeThisType B = unexpected
+      A,
+      B >: A]: A ExcludeThisType B = unexpected
 
-  implicit def `Ignore me, I only exist to cause the compiler to fail`[
-      A, B >: A]: A ExcludeThisType B = unexpected
+  implicit def `Ignore me, I only exist to cause the compiler to fail`[A,
+                                                                       B >: A]
+    : A ExcludeThisType B = unexpected
 
   // Type alias for context bound
   type exclude[T] = {

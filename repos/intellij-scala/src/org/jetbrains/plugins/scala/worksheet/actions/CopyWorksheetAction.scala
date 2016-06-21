@@ -59,7 +59,7 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
       (if (textLeft.length < CopyWorksheetAction.COPY_BORDER) textLeft
        else textLeft.substring(0, CopyWorksheetAction.COPY_BORDER))
       for (_ <- 1 to (CopyWorksheetAction.COPY_BORDER -
-                   textLeft.length)) result append sym
+                     textLeft.length)) result append sym
       result append "//"
       result append textRight
       result append lineSeparator
@@ -113,8 +113,9 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
             for (i <- leftStart to leftEnd) {
               val txt = getFromLeft(i)
 
-              append2Result(
-                  txt, getFromRight(rightStart + i - currentLeftStart), " ")
+              append2Result(txt,
+                            getFromRight(rightStart + i - currentLeftStart),
+                            " ")
             }
 
             if (spaces > 0)
@@ -138,8 +139,10 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
         }
     }
 
-    for (i <- 0 until (leftDocument.getLineCount - lastLeftEnd)) append2Result(
-        getFromLeft(lastLeftEnd + i), getFromRight(lastRightEnd + i), " ")
+    for (i <- 0 until (leftDocument.getLineCount - lastLeftEnd))
+      append2Result(getFromLeft(lastLeftEnd + i),
+                    getFromRight(lastRightEnd + i),
+                    " ")
 
     result.toString()
   }

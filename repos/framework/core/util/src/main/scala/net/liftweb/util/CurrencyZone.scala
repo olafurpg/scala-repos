@@ -75,18 +75,16 @@ abstract class CurrencyZone {
       make(BigDecimal(x)) // try normal number
     } catch {
       case e: java.lang.NumberFormatException => {
-          try {
-            make(
-                BigDecimal("" + NumberFormat
-                      .getNumberInstance(locale)
-                      .parse(x))) // try with grouping separator
-          } catch {
-            case e: java.text.ParseException => {
-                make(BigDecimal("" +
-                        NumberFormat.getCurrencyInstance(locale).parse(x)))
-              } // try with currency symbol and grouping separator
-          }
+        try {
+          make(BigDecimal(
+                  "" + NumberFormat.getNumberInstance(locale).parse(x))) // try with grouping separator
+        } catch {
+          case e: java.text.ParseException => {
+            make(BigDecimal("" +
+                      NumberFormat.getCurrencyInstance(locale).parse(x)))
+          } // try with currency symbol and grouping separator
         }
+      }
     }
   }
 
@@ -126,7 +124,7 @@ abstract class CurrencyZone {
     override def equals(that: Any) = that match {
       case that: AbstractCurrency =>
         this.designation + this.format("", scale) == that.designation +
-        that.format("", scale)
+          that.format("", scale)
       case _ => false
     }
 
@@ -163,8 +161,7 @@ abstract class CurrencyZone {
       val df = nf.asInstanceOf[DecimalFormat]
       val groupingSeparator = df.getDecimalFormatSymbols.getGroupingSeparator
 
-      format("", numberOfFractionDigits).replaceAll(
-          groupingSeparator + "", "");
+      format("", numberOfFractionDigits).replaceAll(groupingSeparator + "", "");
     }
   }
 }

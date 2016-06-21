@@ -84,8 +84,11 @@ package mongotestdocs {
    * _id as ObjectId.toString
    */
   case class TCInfo(x: Int, y: Int, uuid: UUID)
-  case class TstCollection(
-      _id: String, name: String, dbtype: String, count: Int, info: TCInfo)
+  case class TstCollection(_id: String,
+                           name: String,
+                           dbtype: String,
+                           count: Int,
+                           info: TCInfo)
       extends MongoDocument[TstCollection] {
 
     def meta = TstCollection
@@ -110,8 +113,10 @@ package mongotestdocs {
     createIndex(("i" -> -1), ("name" -> "i_ix1"))
   }
 
-  case class SessCollection(
-      _id: ObjectId, name: String, dbtype: String, count: Int)
+  case class SessCollection(_id: ObjectId,
+                            name: String,
+                            dbtype: String,
+                            count: Int)
       extends MongoDocument[SessCollection] {
 
     def meta = SessCollection
@@ -137,8 +142,7 @@ package mongotestdocs {
       booleanfield: Boolean,
       shortfield: Short,
       datefield: Date
-  )
-      extends MongoDocument[Primitive] {
+  ) extends MongoDocument[Primitive] {
 
     def meta = Primitive
   }
@@ -396,8 +400,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     tc2FromDb.get must_== tc2
 
     // update
-    val tc3 =
-      TstCollection(tc._id, "MongoDB", "document", 2, info) // the new object to update with, replaces the entire document, except possibly _id
+    val tc3 = TstCollection(tc._id, "MongoDB", "document", 2, info) // the new object to update with, replaces the entire document, except possibly _id
     val q =
       ("name" -> "MongoDB") // the query to select the document(s) to update
     TstCollection.update(q, tc3)
@@ -546,12 +549,14 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
       lstjobj.size must_== 2
 
       // use regex and another clause
-      val lst2 = SessCollection.findAll(new BasicDBObject(
-              "name", Pattern.compile("^Mon")).append("count", 2))
+      val lst2 =
+        SessCollection.findAll(
+            new BasicDBObject("name", Pattern.compile("^Mon"))
+              .append("count", 2))
       lst2.size must_== 1
 
       val lstjobj2 = SessCollection.findAll(("name" ->
-              (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
+                (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
       lstjobj2.size must_== 1
 
       if (!debug) {
@@ -665,8 +670,8 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     checkMongoIsRunning
 
-    val pdoc1 = PatternDoc(
-        ObjectId.get, Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
+    val pdoc1 = PatternDoc(ObjectId.get,
+                           Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
     pdoc1.save
 
     PatternDoc.find(pdoc1._id) must beLike {

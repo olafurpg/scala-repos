@@ -53,8 +53,9 @@ class Netty4ChannelInitializerTest
       val init = new Netty4ChannelInitializer(_ => (), params, () => nop)
       init.initChannel(srv)
 
-      srv.pipeline.addBefore(
-          "writeCompletionTimeout", "writeDiscardHandler", writeDiscardHandler)
+      srv.pipeline.addBefore("writeCompletionTimeout",
+                             "writeDiscardHandler",
+                             writeDiscardHandler)
 
       // WriteCompletionTimeoutHandler throws a WriteTimeOutException after the message is lost.
       srv.writeAndFlush("hi")

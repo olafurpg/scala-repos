@@ -32,21 +32,28 @@ private[http] object WebSocket {
             log: LoggingAdapter)
     : BidiFlow[FrameEvent, Message, Message, FrameEvent, NotUsed] =
     masking(serverSide, maskingRandomFactory) atop frameHandling(
-        serverSide, closeTimeout, log) atop messageAPI(
-        serverSide, closeTimeout)
+        serverSide,
+        closeTimeout,
+        log) atop messageAPI(serverSide, closeTimeout)
 
   /** The lowest layer that implements the binary protocol */
-  def framing: BidiFlow[
-      ByteString, FrameEvent, FrameEvent, ByteString, NotUsed] =
+  def framing: BidiFlow[ByteString,
+                        FrameEvent,
+                        FrameEvent,
+                        ByteString,
+                        NotUsed] =
     BidiFlow
       .fromFlows(Flow[ByteString].via(FrameEventParser),
                  Flow[FrameEvent].transform(() ⇒ new FrameEventRenderer))
       .named("ws-framing")
 
   /** The layer that handles masking using the rules defined in the specification */
-  def masking(
-      serverSide: Boolean, maskingRandomFactory: () ⇒ Random): BidiFlow[
-      FrameEvent, FrameEventOrError, FrameEvent, FrameEvent, NotUsed] =
+  def masking(serverSide: Boolean,
+              maskingRandomFactory: () ⇒ Random): BidiFlow[FrameEvent,
+                                                           FrameEventOrError,
+                                                           FrameEvent,
+                                                           FrameEvent,
+                                                           NotUsed] =
     Masking(serverSide, maskingRandomFactory).named("ws-masking")
 
   /**

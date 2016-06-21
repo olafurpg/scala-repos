@@ -23,8 +23,7 @@ class RecipeWorkerPool extends RecipeSpec {
                             workerCount: Int): Flow[In, Out, NotUsed] = {
         import GraphDSL.Implicits._
 
-        Flow.fromGraph(
-            GraphDSL.create() { implicit b =>
+        Flow.fromGraph(GraphDSL.create() { implicit b =>
           val balancer =
             b.add(Balance[In](workerCount, waitForAllDownstreams = true))
           val merge = b.add(Merge[Out](workerCount))

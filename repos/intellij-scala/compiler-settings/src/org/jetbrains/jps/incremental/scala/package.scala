@@ -44,8 +44,9 @@ package object scala {
           using(new BufferedInputStream(it))(readProperty(_, name)))
   }
 
-  def readProperty(
-      file: File, resource: String, name: String): Option[String] = {
+  def readProperty(file: File,
+                   resource: String,
+                   name: String): Option[String] = {
     try {
       val url = new URL("jar:%s!/%s".format(file.toURI.toString, resource))
       Option(url.openStream).flatMap(it =>

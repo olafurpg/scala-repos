@@ -62,8 +62,7 @@ case class HookConfig(variant: chess.variant.Variant,
                     sid = sid,
                     ratingRange = ratingRange))
     case _ =>
-      Right(
-          user map { u =>
+      Right(user map { u =>
         Seek.make(variant = variant,
                   daysPerTurn = makeDaysPerTurn,
                   mode = mode,

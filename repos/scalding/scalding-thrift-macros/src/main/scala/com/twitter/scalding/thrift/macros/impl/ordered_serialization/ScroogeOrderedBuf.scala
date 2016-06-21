@@ -37,7 +37,7 @@ object ScroogeOrderedBuf {
     val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
       case tpe
           if tpe <:< typeOf[ThriftStruct] && !(tpe =:= typeOf[ThriftStruct]) &&
-          !(tpe <:< typeOf[ThriftUnion]) =>
+            !(tpe <:< typeOf[ThriftUnion]) =>
         ScroogeOrderedBuf(c)(buildDispatcher, tpe)
     }
     pf
@@ -70,8 +70,8 @@ object ScroogeOrderedBuf {
         .filter(m =>
               fieldNames.contains(m.name.toTermName.toString.toLowerCase))
         .map { accessorMethod =>
-          val fieldType = accessorMethod.returnType.asSeenFrom(
-              outerType, outerType.typeSymbol.asClass)
+          val fieldType = accessorMethod.returnType
+            .asSeenFrom(outerType, outerType.typeSymbol.asClass)
           val b: TreeOrderedBuf[c.type] = dispatcher(fieldType)
           (fieldType, accessorMethod.name.toTermName, b)
         }
@@ -80,8 +80,8 @@ object ScroogeOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) =
         ProductLike.compareBinary(c)(inputStreamA, inputStreamB)(elementData)
 
       override def hash(element: ctx.TermName): ctx.Tree =
@@ -107,8 +107,8 @@ object ScroogeOrderedBuf {
        ${companionSymbol}(..${getValProcessor.map(_._2)}) : $outerType
         """
       }
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree =
         ProductLike.compare(c)(elementA, elementB)(elementData)
 
       override val lazyOuterVariables: Map[String, ctx.Tree] = elementData

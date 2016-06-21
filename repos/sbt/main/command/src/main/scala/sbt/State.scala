@@ -171,8 +171,8 @@ object State {
     * @param executed the list of the most recently executed commands, with the most recent command first.
     * @param maxSize the maximum number of commands to keep, or 0 to keep an unlimited number.
     */
-  final class History private[State](
-      val executed: Seq[String], val maxSize: Int) {
+  final class History private[State] (val executed: Seq[String],
+                                      val maxSize: Int) {
 
     /** Adds `command` as the most recently executed command.*/
     def ::(command: String): History = {
@@ -247,8 +247,9 @@ object State {
       if (remaining.isEmpty) applyOnFailure(s, Nil, exit(ok = false))
       else applyOnFailure(s, remaining, s.copy(remainingCommands = remaining))
     }
-    private[this] def applyOnFailure(
-        s: State, remaining: Seq[String], noHandler: => State): State =
+    private[this] def applyOnFailure(s: State,
+                                     remaining: Seq[String],
+                                     noHandler: => State): State =
       s.onFailure match {
         case Some(c) =>
           s.copy(remainingCommands = c +: remaining, onFailure = None)
@@ -279,8 +280,9 @@ object State {
 
   import ExceptionCategory._
 
-  private[sbt] def handleException(
-      t: Throwable, s: State, log: Logger): State = {
+  private[sbt] def handleException(t: Throwable,
+                                   s: State,
+                                   log: Logger): State = {
     ExceptionCategory(t) match {
       case AlreadyHandled => ()
       case m: MessageOnly => log.error(m.message)
@@ -293,7 +295,8 @@ object State {
     log.error(ErrorHandling reducedToString e)
     log.error("Use 'last' for the full log.")
   }
-  private[sbt] def getBoolean(
-      s: State, key: AttributeKey[Boolean], default: Boolean): Boolean =
+  private[sbt] def getBoolean(s: State,
+                              key: AttributeKey[Boolean],
+                              default: Boolean): Boolean =
     s.get(key) getOrElse default
 }

@@ -37,9 +37,10 @@ class SupervisorMiscSpec
       filterEvents(EventFilter[Exception]("Kill")) {
         val countDownLatch = new CountDownLatch(4)
 
-        val supervisor = system.actorOf(Props(new Supervisor(OneForOneStrategy(
-                        maxNrOfRetries = 3, withinTimeRange = 5 seconds)(List(
-                            classOf[Exception])))))
+        val supervisor = system.actorOf(Props(
+                new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
+                                                 withinTimeRange = 5 seconds)(
+                        List(classOf[Exception])))))
 
         val workerProps = Props(new Actor {
           override def postRestart(cause: Throwable) {
@@ -85,8 +86,7 @@ class SupervisorMiscSpec
     }
 
     "be able to create named children in its constructor" in {
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         context.actorOf(Props.empty, "bob")
         def receive = { case x: Exception ⇒ throw x }
         override def preStart(): Unit = testActor ! "preStart"

@@ -79,13 +79,12 @@ trait MongoDocumentMeta[BaseDocument]
     * Find a single row by a qry, using a DBObject.
     */
   def find(qry: DBObject): Option[BaseDocument] = {
-    MongoDB.useCollection(connectionIdentifier, collectionName)(
-        coll =>
+    MongoDB.useCollection(connectionIdentifier, collectionName)(coll =>
           coll.findOne(qry) match {
         case null => None
         case dbo => {
-            Some(create(dbo))
-          }
+          Some(create(dbo))
+        }
     })
   }
 
@@ -126,8 +125,7 @@ trait MongoDocumentMeta[BaseDocument]
   def findAll: List[BaseDocument] = {
     import scala.collection.JavaConversions._
 
-    MongoDB.useCollection(connectionIdentifier, collectionName)(
-        coll => {
+    MongoDB.useCollection(connectionIdentifier, collectionName)(coll => {
 
       /** Mongo Cursors are both Iterable and Iterator,
         * so we need to reduce ambiguity for implicits
@@ -173,8 +171,9 @@ trait MongoDocumentMeta[BaseDocument]
   /**
     * Find all documents using a DBObject query with sort
     */
-  def findAll(
-      qry: DBObject, sort: DBObject, opts: FindOption*): List[BaseDocument] =
+  def findAll(qry: DBObject,
+              sort: DBObject,
+              opts: FindOption*): List[BaseDocument] =
     findAll(qry, Some(sort), opts: _*)
 
   /**
@@ -186,10 +185,12 @@ trait MongoDocumentMeta[BaseDocument]
   /**
     * Find all documents using a JObject query with sort
     */
-  def findAll(
-      qry: JObject, sort: JObject, opts: FindOption*): List[BaseDocument] =
-    findAll(
-        JObjectParser.parse(qry), Some(JObjectParser.parse(sort)), opts: _*)
+  def findAll(qry: JObject,
+              sort: JObject,
+              opts: FindOption*): List[BaseDocument] =
+    findAll(JObjectParser.parse(qry),
+            Some(JObjectParser.parse(sort)),
+            opts: _*)
 
   /**
     * Find all documents using a k, v query

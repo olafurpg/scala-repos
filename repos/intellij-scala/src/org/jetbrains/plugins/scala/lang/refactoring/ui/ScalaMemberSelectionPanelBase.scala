@@ -13,15 +13,16 @@ import com.intellij.ui.{ScrollPaneFactory, SeparatorFactory}
   * Nikolay.Tropin
   * 8/20/13
   */
-abstract class ScalaMemberSelectionPanelBase[
-    M <: PsiElement, I <: ScalaMemberInfoBase[M]](title: String,
-                                                  memberInfo: util.List[I],
-                                                  abstractColumnHeader: String)
+abstract class ScalaMemberSelectionPanelBase[M <: PsiElement,
+                                             I <: ScalaMemberInfoBase[M]](
+    title: String,
+    memberInfo: util.List[I],
+    abstractColumnHeader: String)
     extends AbstractMemberSelectionPanel[M, I] {
 
   setLayout(new BorderLayout)
-  private val myTable = createMemberSelectionTable(
-      memberInfo, abstractColumnHeader)
+  private val myTable =
+    createMemberSelectionTable(memberInfo, abstractColumnHeader)
   val scrollPane: JScrollPane = ScrollPaneFactory.createScrollPane(myTable)
   add(SeparatorFactory.createSeparator(title, myTable), BorderLayout.NORTH)
   add(scrollPane, BorderLayout.CENTER)

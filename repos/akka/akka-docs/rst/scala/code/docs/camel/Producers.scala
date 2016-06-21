@@ -103,8 +103,8 @@ object Producers {
     val system = ActorSystem("some-system")
     val producer = system.actorOf(Props[Producer2])
 
-    producer ! CamelMessage(
-        "bar", Map(CamelMessage.MessageExchangeId -> "123"))
+    producer ! CamelMessage("bar",
+                            Map(CamelMessage.MessageExchangeId -> "123"))
     //#Correlate
   }
   object Sample6 {

@@ -88,8 +88,8 @@ object InterpreterBenchmark {
     override def subscribe(subscriber: Subscriber, to: Classifier): Boolean =
       true
     override def publish(event: Event): Unit = ()
-    override def unsubscribe(
-        subscriber: Subscriber, from: Classifier): Boolean = true
+    override def unsubscribe(subscriber: Subscriber,
+                             from: Classifier): Boolean = true
     override def unsubscribe(subscriber: Subscriber): Unit = ()
   }
 }

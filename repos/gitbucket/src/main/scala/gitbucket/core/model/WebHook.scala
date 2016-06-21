@@ -12,7 +12,7 @@ trait WebHookComponent extends TemplateComponent { self: Profile =>
     val token = column[Option[String]]("TOKEN", O.Nullable)
     def * =
       (userName, repositoryName, url, token) <>
-      ((WebHook.apply _).tupled, WebHook.unapply)
+        ((WebHook.apply _).tupled, WebHook.unapply)
 
     def byPrimaryKey(owner: String, repository: String, url: String) =
       byRepository(owner, repository) && (this.url === url.bind)

@@ -54,8 +54,8 @@ trait MiscDirectives {
     * has equal preference for (even if this preference is zero!)
     * the order of the arguments is used as a tie breaker (First one wins).
     */
-  def selectPreferredLanguage(
-      first: Language, more: Language*): Directive1[Language] =
+  def selectPreferredLanguage(first: Language,
+                              more: Language*): Directive1[Language] =
     BasicDirectives.extractRequest.map { request ⇒
       LanguageNegotiator(request.headers).pickLanguage(first :: List(more: _*)) getOrElse first
     }

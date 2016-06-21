@@ -115,7 +115,7 @@ class FastScalac extends Scalac {
           s.debuginfo,
           s.target
       ) filter (x => x.value != x.default) map
-      (x => "%s:%s".format(x.name, x.value))
+        (x => "%s:%s".format(x.name, x.value))
 
     val booleanSettings =
       List(
@@ -140,7 +140,7 @@ class FastScalac extends Scalac {
           /*fsc*/
           s.idleMins
       ) filter (x => x.value != x.default) flatMap
-      (x => List(x.name, x.value.toString))
+        (x => List(x.name, x.value.toString))
 
     val phaseSetting = {
       val s = settings.log
@@ -166,7 +166,7 @@ class FastScalac extends Scalac {
           case _ =>
             buildError(
                 "Compilation failed because of an internal compiler error;" +
-                " see the error output for details.")
+                  " see the error output for details.")
         }
       path
     }
@@ -180,7 +180,7 @@ class FastScalac extends Scalac {
       case _: Throwable =>
         buildError(
             "Compilation failed because of an internal compiler error;" +
-            " couldn't determine value for -Dscala.home=<value>")
+              " couldn't determine value for -Dscala.home=<value>")
     }
     java.createJvmarg() setValue "-Dscala.usejavacp=true"
     java.createJvmarg() setValue ("-Dscala.home=" + scalaHome)
@@ -209,6 +209,6 @@ class FastScalac extends Scalac {
 
     if (failonerror && res != 0)
       buildError("Compilation failed because of an internal compiler error;" +
-          " see the error output for details.")
+            " see the error output for details.")
   }
 }

@@ -33,7 +33,8 @@ import org.apache.spark.sql.types.DataType
 
 object RDDConversions {
   def productToRowRdd[A <: Product](
-      data: RDD[A], outputTypes: Seq[DataType]): RDD[InternalRow] = {
+      data: RDD[A],
+      outputTypes: Seq[DataType]): RDD[InternalRow] = {
     data.mapPartitions { iterator =>
       val numColumns = outputTypes.length
       val mutableRow = new GenericMutableRow(numColumns)
@@ -54,8 +55,8 @@ object RDDConversions {
   /**
     * Convert the objects inside Row into the types Catalyst expected.
     */
-  def rowToRowRdd(
-      data: RDD[Row], outputTypes: Seq[DataType]): RDD[InternalRow] = {
+  def rowToRowRdd(data: RDD[Row],
+                  outputTypes: Seq[DataType]): RDD[InternalRow] = {
     data.mapPartitions { iterator =>
       val numColumns = outputTypes.length
       val mutableRow = new GenericMutableRow(numColumns)
@@ -76,7 +77,8 @@ object RDDConversions {
 
 /** Logical plan node for scanning data from an RDD. */
 private[sql] case class LogicalRDD(
-    output: Seq[Attribute], rdd: RDD[InternalRow])(sqlContext: SQLContext)
+    output: Seq[Attribute],
+    rdd: RDD[InternalRow])(sqlContext: SQLContext)
     extends LogicalPlan
     with MultiInstanceRelation {
 
@@ -173,7 +175,7 @@ private[sql] case class DataSourceScan(
       output.find(_.name == colName).getOrElse {
         throw new AnalysisException(
             s"bucket column $colName not found in existing columns " +
-            s"(${output.map(_.name).mkString(", ")})")
+              s"(${output.map(_.name).mkString(", ")})")
       }
 
     bucketSpec.map { spec =>
@@ -186,15 +188,14 @@ private[sql] case class DataSourceScan(
   }
 
   protected override def doExecute(): RDD[InternalRow] = {
-    val unsafeRow =
-      if (outputUnsafeRows) {
-        rdd
-      } else {
-        rdd.mapPartitionsInternal { iter =>
-          val proj = UnsafeProjection.create(schema)
-          iter.map(proj)
-        }
+    val unsafeRow = if (outputUnsafeRows) {
+      rdd
+    } else {
+      rdd.mapPartitionsInternal { iter =>
+        val proj = UnsafeProjection.create(schema)
+        iter.map(proj)
       }
+    }
 
     val numOutputRows = longMetric("numOutputRows")
     unsafeRow.map { r =>
@@ -204,8 +205,8 @@ private[sql] case class DataSourceScan(
   }
 
   override def simpleString: String = {
-    val metadataEntries = for ((key, value) <- metadata.toSeq.sorted) yield
-      s"$key: $value"
+    val metadataEntries = for ((key, value) <- metadata.toSeq.sorted)
+      yield s"$key: $value"
     s"Scan $nodeName${output.mkString("[", ",", "]")}${metadataEntries
       .mkString(" ", ", ", "")}"
   }
@@ -223,8 +224,9 @@ private[sql] case class DataSourceScan(
     val idx = ctx.freshName("batchIdx")
     val batch = ctx.freshName("batch")
     // PhysicalRDD always just has one input
-    ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        input,
+                        s"$input = inputs[0];")
     ctx.addMutableState(columnarBatchClz, batch, s"$batch = null;")
     ctx.addMutableState("int", idx, s"$idx = 0;")
 

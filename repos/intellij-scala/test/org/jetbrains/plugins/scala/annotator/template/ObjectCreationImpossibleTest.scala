@@ -67,10 +67,10 @@ class ObjectCreationImpossibleTest
   }
 
   def testNeedsToBeAbstractPlaceDiffer() {
-    val Message = ObjectCreationImpossible.message(
-        ("b: Unit", "Holder.B"), ("a: Unit", "Holder.A"))
-    val ReversedMessage = ObjectCreationImpossible.message(
-        ("a: Unit", "Holder.A"), ("b: Unit", "Holder.B"))
+    val Message = ObjectCreationImpossible
+      .message(("b: Unit", "Holder.B"), ("a: Unit", "Holder.A"))
+    val ReversedMessage = ObjectCreationImpossible
+      .message(("a: Unit", "Holder.A"), ("b: Unit", "Holder.B"))
 
     assertMatches(
         messages("trait A { def a }; trait B { def b }; new A with B {}")) {

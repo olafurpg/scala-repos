@@ -105,11 +105,10 @@ case class Handshake(
     clientCap: Capability = Capability.baseCap,
     charset: Short = Utf8_general_ci,
     maxPacketSize: StorageUnit = 1.gigabyte
-)
-    extends (HandshakeInit => Try[HandshakeResponse]) {
+) extends (HandshakeInit => Try[HandshakeResponse]) {
   import Capability._
-  require(
-      maxPacketSize <= 1.gigabyte, "max packet size can't exceed 1 gigabyte")
+  require(maxPacketSize <= 1.gigabyte,
+          "max packet size can't exceed 1 gigabyte")
 
   private[this] val newClientCap =
     if (database.isDefined) clientCap + ConnectWithDB

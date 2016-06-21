@@ -82,7 +82,7 @@ class MatAny[T: ST](r: Int, c: Int, values: Array[T]) extends Mat[T] {
   override def equals(o: Any): Boolean = o match {
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+        this.numCols == rv.numCols && {
         var i = 0
         var eq = true
         while (eq && i < length) {

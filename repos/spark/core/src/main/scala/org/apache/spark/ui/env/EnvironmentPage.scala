@@ -28,8 +28,10 @@ private[ui] class EnvironmentPage(parent: EnvironmentTab)
   private val listener = parent.listener
 
   def render(request: HttpServletRequest): Seq[Node] = {
-    val runtimeInformationTable = UIUtils.listingTable(
-        propertyHeader, jvmRow, listener.jvmInformation, fixedWidth = true)
+    val runtimeInformationTable = UIUtils.listingTable(propertyHeader,
+                                                       jvmRow,
+                                                       listener.jvmInformation,
+                                                       fixedWidth = true)
     val sparkPropertiesTable = UIUtils.listingTable(propertyHeader,
                                                     propertyRow,
                                                     listener.sparkProperties,

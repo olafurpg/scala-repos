@@ -34,12 +34,12 @@ import scala.reflect.ClassTag
 trait PEvents extends Serializable {
   @transient protected lazy val logger = Logger[this.type]
   @deprecated("Use PEventStore.find() instead.", "0.9.2")
-  def getByAppIdAndTimeAndEntity(appId: Int,
-                                 startTime: Option[DateTime],
-                                 untilTime: Option[DateTime],
-                                 entityType: Option[String],
-                                 entityId: Option[String])(
-      sc: SparkContext): RDD[Event] = {
+  def getByAppIdAndTimeAndEntity(
+      appId: Int,
+      startTime: Option[DateTime],
+      untilTime: Option[DateTime],
+      entityType: Option[String],
+      entityId: Option[String])(sc: SparkContext): RDD[Event] = {
     find(
         appId = appId,
         startTime = startTime,
@@ -147,12 +147,11 @@ trait PEvents extends Serializable {
           (id, extract(dm))
         } catch {
           case e: Exception => {
-              logger.error(
-                  s"Failed to get extract entity from DataMap $dm of " +
-                  s"entityId $id.",
-                  e)
-              throw e
-            }
+            logger.error(s"Failed to get extract entity from DataMap $dm of " +
+                           s"entityId $id.",
+                         e)
+            throw e
+          }
         }
     }.collectAsMap.toMap
 

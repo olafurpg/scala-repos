@@ -58,14 +58,14 @@ class HeaderDirectivesExamplesSpec extends RoutingSpec with Inside {
         case Some(port) => complete(s"The port was $port")
         case None => complete(s"The port was not provided explicitly")
       } ~ // can also be written as:
-      optionalHeaderValue(extractHostPort) { port =>
-        complete {
-          port match {
-            case Some(p) => s"The port was $p"
-            case _ => "The port was not provided explicitly"
+        optionalHeaderValue(extractHostPort) { port =>
+          complete {
+            port match {
+              case Some(p) => s"The port was $p"
+              case _ => "The port was not provided explicitly"
+            }
           }
         }
-      }
 
     // tests:
     Get("/") ~> Host("example.com", 5043) ~> route ~> check {
@@ -81,14 +81,14 @@ class HeaderDirectivesExamplesSpec extends RoutingSpec with Inside {
         case Some(userId) => complete(s"The user is $userId")
         case None => complete(s"No user was provided")
       } ~ // can also be written as:
-      optionalHeaderValueByName("port") { port =>
-        complete {
-          port match {
-            case Some(p) => s"The user is $p"
-            case _ => "No user was provided"
+        optionalHeaderValueByName("port") { port =>
+          complete {
+            port match {
+              case Some(p) => s"The user is $p"
+              case _ => "No user was provided"
+            }
           }
         }
-      }
 
     // tests:
     Get("/") ~> RawHeader("X-User-Id", "Joe42") ~> route ~> check {
@@ -126,14 +126,14 @@ class HeaderDirectivesExamplesSpec extends RoutingSpec with Inside {
         case Some(port) => complete(s"The port was $port")
         case None => complete(s"The port was not provided explicitly")
       } ~ // can also be written as:
-      optionalHeaderValuePF(extractHostPort) { port =>
-        complete {
-          port match {
-            case Some(p) => s"The port was $p"
-            case _ => "The port was not provided explicitly"
+        optionalHeaderValuePF(extractHostPort) { port =>
+          complete {
+            port match {
+              case Some(p) => s"The port was $p"
+              case _ => "The port was not provided explicitly"
+            }
           }
         }
-      }
 
     // tests:
     Get("/") ~> Host("example.com", 5043) ~> route ~> check {

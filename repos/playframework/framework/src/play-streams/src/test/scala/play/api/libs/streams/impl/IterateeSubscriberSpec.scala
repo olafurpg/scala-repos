@@ -35,8 +35,7 @@ class IterateeSubscriberSpec extends Specification {
     def contStep(): Unit = {
       val oldPromise = nextIterateePromise
       nextIterateePromise = Promise[Iteratee[T, T]]()
-      oldPromise.success(
-          Cont { input =>
+      oldPromise.success(Cont { input =>
         record(ContInput(input))
         nextIteratee
       })
@@ -59,7 +58,7 @@ class IterateeSubscriberSpec extends Specification {
       val subr = new IterateeSubscriber(iter)
       pubr.subscribe(subr)
       Await.result(subr.result.unflatten, ScalaFiniteDuration(2, SECONDS)) must_==
-        Done(List(1, 2, 3), Input.EOF)
+      Done(List(1, 2, 3), Input.EOF)
     }
 
     "consume one element (on-subscribe/cont-step/on-next/cont-step/on-complete/done-step)" in {
@@ -217,7 +216,7 @@ class IterateeSubscriberSpec extends Specification {
 
       testEnv.errorStep("iteratee error", Input.El(99))
       testEnv.next must_==
-        Result(Success(Error("iteratee error", Input.El(99))))
+      Result(Success(Error("iteratee error", Input.El(99))))
       testEnv.isEmptyAfterDelay() must beTrue
 
       testEnv.onSubscribe()
@@ -234,7 +233,7 @@ class IterateeSubscriberSpec extends Specification {
       testEnv.errorStep("iteratee error", Input.El(99))
       testEnv.next must_== Cancel
       testEnv.next must_==
-        Result(Success(Error("iteratee error", Input.El(99))))
+      Result(Success(Error("iteratee error", Input.El(99))))
       testEnv.isEmptyAfterDelay() must beTrue
     }
   }

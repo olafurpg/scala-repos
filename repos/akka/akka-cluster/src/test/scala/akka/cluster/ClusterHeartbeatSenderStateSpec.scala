@@ -258,8 +258,8 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
         } catch {
           case e: Throwable ⇒
             println(s"Failure context: i=$i, node=$node, op=$operation, " +
-                s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
-                s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
+                  s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
+                  s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
             throw e
         }
       }

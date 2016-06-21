@@ -87,8 +87,8 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
     val body = Random.nextString(1000)
 
     "not buffer more than the configured threshold" in withApplication(
-        Ok.sendEntity(HttpEntity.Streamed(
-                Source.single(ByteString(body)), Some(1000), None)),
+        Ok.sendEntity(HttpEntity
+              .Streamed(Source.single(ByteString(body)), Some(1000), None)),
         chunkedThreshold = 512) { implicit mat =>
       val result = makeGzipRequest
       checkGzippedBody(result, body)
@@ -96,7 +96,8 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
     }
 
     "zip a strict body even if it exceeds the threshold" in withApplication(
-        Ok(body), 512) { implicit mat =>
+        Ok(body),
+        512) { implicit mat =>
       val result = makeGzipRequest
       checkGzippedBody(result, body)
       await(result).body must beAnInstanceOf[HttpEntity.Strict]
@@ -172,8 +173,8 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
         "gzip")
   }
 
-  def checkGzippedBody(result: Future[Result], body: String)(
-      implicit mat: Materializer) = {
+  def checkGzippedBody(result: Future[Result],
+                       body: String)(implicit mat: Materializer) = {
     checkGzipped(result)
     val resultBody = contentAsBytes(result)
     await(result).body.contentLength.foreach { cl =>
@@ -182,8 +183,8 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
     gunzip(resultBody) must_== body
   }
 
-  def checkNotGzipped(result: Future[Result], body: String)(
-      implicit mat: Materializer) = {
+  def checkNotGzipped(result: Future[Result],
+                      body: String)(implicit mat: Materializer) = {
     header(CONTENT_ENCODING, result) must beNone
     contentAsString(result) must_== body
   }

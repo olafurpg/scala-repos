@@ -124,9 +124,9 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
     * This method useful in case if you want to update some polymorphic type
     * according to method call expected type
     */
-  def updateAccordingToExpectedType(nonValueType: TypeResult[ScType],
-                                    check: Boolean =
-                                      false): TypeResult[ScType] = {
+  def updateAccordingToExpectedType(
+      nonValueType: TypeResult[ScType],
+      check: Boolean = false): TypeResult[ScType] = {
     InferUtil.updateAccordingToExpectedType(nonValueType,
                                             fromImplicitParameters = false,
                                             filterTypeParams = false,
@@ -150,7 +150,8 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
   }
 
   private def tryToGetInnerType(
-      ctx: TypingContext, useExpectedType: Boolean): TypeResult[ScType] = {
+      ctx: TypingContext,
+      useExpectedType: Boolean): TypeResult[ScType] = {
     var nonValueType: TypeResult[ScType] =
       getEffectiveInvokedExpr.getNonValueType(TypingContext.empty)
     this match {
@@ -163,7 +164,7 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
 
     val withExpectedType =
       useExpectedType &&
-      expectedType().isDefined //optimization to avoid except
+        expectedType().isDefined //optimization to avoid except
 
     if (useExpectedType)
       nonValueType = updateAccordingToExpectedType(nonValueType, check = true)
@@ -187,8 +188,12 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
                                       typeParams: Seq[TypeParameter],
                                       parameters: Seq[Parameter]) = {
       tuplizyCase(psiExprs) { t =>
-        InferUtil.localTypeInferenceWithApplicabilityExt(
-            retType, parameters, t, typeParams, safeCheck = withExpectedType)
+        InferUtil.localTypeInferenceWithApplicabilityExt(retType,
+                                                         parameters,
+                                                         t,
+                                                         typeParams,
+                                                         safeCheck =
+                                                           withExpectedType)
       }
     }
 
@@ -201,8 +206,7 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       def tail: ScType = {
         setApplicabilityProblemsVar(c._2)
         setMatchedParametersVar(c._3)
-        val dependentSubst = new ScSubstitutor(
-            () => {
+        val dependentSubst = new ScSubstitutor(() => {
           this.scalaLanguageLevel match {
             case Some(level) if level < Scala_2_10 => Map.empty
             case _ => c._4.toMap
@@ -212,16 +216,17 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       }
       if (c._2.nonEmpty) {
         ScalaPsiUtil
-          .tuplizy(
-              exprs, getResolveScope, getManager, ScalaPsiUtil.firstLeaf(this))
+          .tuplizy(exprs,
+                   getResolveScope,
+                   getManager,
+                   ScalaPsiUtil.firstLeaf(this))
           .map { e =>
             val cd = fun(e)
             if (cd._2.nonEmpty) tail
             else {
               setApplicabilityProblemsVar(cd._2)
               setMatchedParametersVar(cd._3)
-              val dependentSubst = new ScSubstitutor(
-                  () => {
+              val dependentSubst = new ScSubstitutor(() => {
                 this.scalaLanguageLevel match {
                   case Some(level) if level < Scala_2_10 => Map.empty
                   case _ => cd._4.toMap
@@ -265,15 +270,17 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       tpe match {
         case ScMethodType(retType, params, _) =>
           Some(checkConformance(retType, args, params))
-        case ScTypePolymorphicType(
-            ScMethodType(retType, params, _), typeParams) =>
+        case ScTypePolymorphicType(ScMethodType(retType, params, _),
+                                   typeParams) =>
           Some(
               checkConformanceWithInference(retType, args, typeParams, params))
-        case ScTypePolymorphicType(
-            ScFunctionType(retType, params), typeParams) =>
+        case ScTypePolymorphicType(ScFunctionType(retType, params),
+                                   typeParams) =>
           Some(
-              checkConformanceWithInference(
-                  retType, args, typeParams, functionParams(params)))
+              checkConformanceWithInference(retType,
+                                            args,
+                                            typeParams,
+                                            functionParams(params)))
         case any if ScalaPsiUtil.isSAMEnabled(this) =>
           ScalaPsiUtil.toSAMType(any, getResolveScope) match {
             case Some(ScFunctionType(retType: ScType, params: Seq[ScType])) =>
@@ -311,8 +318,10 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
                 case ScTupleType(comps) if comps.length == 2 => comps(1)
                 case t => t
               }
-              val (res, imports) = super.getTypeAfterImplicitConversion(
-                  checkImplicits, isShape, expectedOption)
+              val (res, imports) =
+                super.getTypeAfterImplicitConversion(checkImplicits,
+                                                     isShape,
+                                                     expectedOption)
               val str = ScalaPsiManager
                 .instance(getProject)
                 .getCachedClass(getResolveScope, "java.lang.String")
@@ -335,13 +344,14 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
             .bind()
             .exists(result =>
                   result.isDynamic &&
-                  result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
+                    result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
         case _ => false
       }
     }
 
     var res: ScType = checkApplication(
-        invokedType, args(isNamedDynamic = isApplyDynamicNamed)).getOrElse {
+        invokedType,
+        args(isNamedDynamic = isApplyDynamicNamed)).getOrElse {
       var (processedType, importsUsed, implicitFunction, applyOrUpdateResult) =
         ScalaPsiUtil
           .processTypeForUpdateOrApply(invokedType, this, isShape = false)
@@ -360,7 +370,7 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       setImplicitFunction(implicitFunction)
       val isNamedDynamic: Boolean = applyOrUpdateResult.exists(result =>
             result.isDynamic &&
-            result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
+              result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
       checkApplication(
           processedType,
           args(includeUpdateCall = true, isNamedDynamic)).getOrElse {
@@ -374,8 +384,11 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
     //Implicit parameters
     val checkImplicitParameters = withEtaExpansion(this)
     if (checkImplicitParameters) {
-      val tuple = InferUtil.updateTypeWithImplicitParameters(
-          res, this, None, useExpectedType, fullInfo = false)
+      val tuple = InferUtil.updateTypeWithImplicitParameters(res,
+                                                             this,
+                                                             None,
+                                                             useExpectedType,
+                                                             fullInfo = false)
       res = tuple._1
       implicitParameters = tuple._2
     }
@@ -385,8 +398,8 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
 
   def setApplicabilityProblemsVar(seq: Seq[ApplicabilityProblem]) {
     val modCount: Long = getManager.getModificationTracker.getModificationCount
-    putUserData(
-        MethodInvocation.APPLICABILITY_PROBLEMS_VAR_KEY, (modCount, seq))
+    putUserData(MethodInvocation.APPLICABILITY_PROBLEMS_VAR_KEY,
+                (modCount, seq))
   }
 
   private def setMatchedParametersVar(seq: Seq[(Parameter, ScExpression)]) {

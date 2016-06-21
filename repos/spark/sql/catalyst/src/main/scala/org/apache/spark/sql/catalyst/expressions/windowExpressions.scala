@@ -47,7 +47,7 @@ case class WindowSpecDefinition(partitionSpec: Seq[Expression],
     case UnspecifiedFrame =>
       Some(
           "Found a UnspecifiedFrame. It should be converted to a SpecifiedWindowFrame " +
-          "during analysis. Please file a bug report.")
+            "during analysis. Please file a bug report.")
     case frame: SpecifiedWindowFrame =>
       frame.validate.orElse {
         def checkValueBasedBoundaryForRangeFrame(): Option[String] = {
@@ -81,26 +81,24 @@ case class WindowSpecDefinition(partitionSpec: Seq[Expression],
 
   override lazy val resolved: Boolean =
     childrenResolved && checkInputDataTypes().isSuccess &&
-    frameSpecification.isInstanceOf[SpecifiedWindowFrame]
+      frameSpecification.isInstanceOf[SpecifiedWindowFrame]
 
   override def nullable: Boolean = true
   override def foldable: Boolean = false
   override def dataType: DataType = throw new UnsupportedOperationException
 
   override def sql: String = {
-    val partition =
-      if (partitionSpec.isEmpty) {
-        ""
-      } else {
-        "PARTITION BY " + partitionSpec.map(_.sql).mkString(", ")
-      }
+    val partition = if (partitionSpec.isEmpty) {
+      ""
+    } else {
+      "PARTITION BY " + partitionSpec.map(_.sql).mkString(", ")
+    }
 
-    val order =
-      if (orderSpec.isEmpty) {
-        ""
-      } else {
-        "ORDER BY " + orderSpec.map(_.sql).mkString(", ")
-      }
+    val order = if (orderSpec.isEmpty) {
+      ""
+    } else {
+      "ORDER BY " + orderSpec.map(_.sql).mkString(", ")
+    }
 
     s"($partition $order ${frameSpecification.toString})"
   }
@@ -254,7 +252,7 @@ case class SpecifiedWindowFrame(frameType: FrameType,
       } else {
         val reason =
           s"The end of this Window Frame $end is smaller than the start of " +
-          s"this Window Frame $start."
+            s"this Window Frame $start."
         Some(reason)
       }
   }
@@ -287,8 +285,8 @@ object SpecifiedWindowFrame {
   }
 }
 
-case class UnresolvedWindowExpression(
-    child: Expression, windowSpec: WindowSpecReference)
+case class UnresolvedWindowExpression(child: Expression,
+                                      windowSpec: WindowSpecReference)
     extends UnaryExpression
     with Unevaluable {
 
@@ -301,8 +299,8 @@ case class UnresolvedWindowExpression(
   override lazy val resolved = false
 }
 
-case class WindowExpression(
-    windowFunction: Expression, windowSpec: WindowSpecDefinition)
+case class WindowExpression(windowFunction: Expression,
+                            windowSpec: WindowSpecDefinition)
     extends Expression
     with Unevaluable {
 
@@ -455,8 +453,8 @@ abstract class AggregateWindowFunction
     extends DeclarativeAggregate
     with WindowFunction {
   self: Product =>
-  override val frame = SpecifiedWindowFrame(
-      RowFrame, UnboundedPreceding, CurrentRow)
+  override val frame =
+    SpecifiedWindowFrame(RowFrame, UnboundedPreceding, CurrentRow)
   override def dataType: DataType = IntegerType
   override def nullable: Boolean = true
   override def supportsPartial: Boolean = false
@@ -484,8 +482,9 @@ trait SizeBasedWindowFunction extends AggregateWindowFunction {
 }
 
 object SizeBasedWindowFunction {
-  val n = AttributeReference(
-      "window__partition__size", IntegerType, nullable = false)()
+  val n = AttributeReference("window__partition__size",
+                             IntegerType,
+                             nullable = false)()
 }
 
 /**
@@ -518,10 +517,10 @@ case class CumeDist() extends RowNumberLike with SizeBasedWindowFunction {
   override def dataType: DataType = DoubleType
   // The frame for CUME_DIST is Range based instead of Row based, because CUME_DIST must
   // return the same value for equal values in the partition.
-  override val frame = SpecifiedWindowFrame(
-      RangeFrame, UnboundedPreceding, CurrentRow)
-  override val evaluateExpression = Divide(
-      Cast(rowNumber, DoubleType), Cast(n, DoubleType))
+  override val frame =
+    SpecifiedWindowFrame(RangeFrame, UnboundedPreceding, CurrentRow)
+  override val evaluateExpression =
+    Divide(Cast(rowNumber, DoubleType), Cast(n, DoubleType))
   override def sql: String = "CUME_DIST()"
 }
 
@@ -658,8 +657,8 @@ abstract class RankLike extends AggregateWindowFunction {
   protected def rankSource: Expression = rowNumber
 
   /** Increase the rank when the current rank == 0 or when the one of order attributes changes. */
-  protected val increaseRank = If(
-      And(orderEquals, Not(EqualTo(rank, zero))), rank, rankSource)
+  protected val increaseRank =
+    If(And(orderEquals, Not(EqualTo(rank, zero))), rank, rankSource)
 
   override val aggBufferAttributes: Seq[AttributeReference] =
     rank +: rowNumber +: orderAttrs

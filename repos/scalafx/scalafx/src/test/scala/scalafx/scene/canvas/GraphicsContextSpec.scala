@@ -41,7 +41,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class GraphicsContextSpec
     extends SimpleSFXDelegateSpec[jfxsc.GraphicsContext, GraphicsContext](
-        classOf[jfxsc.GraphicsContext], classOf[GraphicsContext]) {
+        classOf[jfxsc.GraphicsContext],
+        classOf[GraphicsContext]) {
 
   override def getScalaClassInstance = (new Canvas).graphicsContext2D
 

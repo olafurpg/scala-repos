@@ -148,7 +148,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
         // dot cluster containing thisNode
         val thisCluster =
           "subgraph clusterThis {\n" + "style=\"invis\"\n" +
-          node2Dot(thisNode) + "}"
+            node2Dot(thisNode) + "}"
         // dot cluster containing incoming implicit nodes, if any
         val incomingCluster = {
           if (incomingImplicits.isEmpty) ""
@@ -179,10 +179,10 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
         // assemble clusters into another cluster
         val incomingTooltip =
           incomingImplicits.map(_.name).mkString(", ") +
-          " can be implicitly converted to " + thisNode.name
+            " can be implicitly converted to " + thisNode.name
         val outgoingTooltip =
           thisNode.name + " can be implicitly converted to " +
-          outgoingImplicits.map(_.name).mkString(", ")
+            outgoingImplicits.map(_.name).mkString(", ")
         "subgraph clusterAll {\n" + "style=\"invis\"\n" + outgoingCluster +
         "\n" + thisCluster + "\n" + incomingCluster + "\n" +
         // incoming implicit edge
@@ -206,29 +206,30 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
     // assemble graph
     val graph =
       "digraph G {\n" + // graph / node / edge attributes
-      graphAttributesStr + "node [" + nodeAttributesStr + "];\n" + "edge [" +
-      edgeAttributesStr + "];\n" + implicitsDot + "\n" + // inheritance nodes
-      nodes.map(n => node2Dot(n)).mkString +
-      subClasses.map(n => node2Dot(n)).mkString +
-      superClasses.map(n => node2Dot(n)).mkString + // inheritance edges
-      edges.map {
-        case (from, tos) =>
-          tos
-            .map(to => {
-              val id =
-                "graph" +
-                counter + "_" + node2Index(to) + "_" + node2Index(from)
-              // the X -> Y edge is inverted twice to keep the diagram flowing the right way
-              // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
-              "node" + node2Index(to) + " -> node" + node2Index(from) +
-              " [id=\"" + cssClass(to, from) + "|" + id + "\", " +
-              "tooltip=\"" + from.name + (if (from.name.endsWith(MultiSuffix))
-                                            " are subtypes of "
-                                          else " is a subtype of ") + to.name +
-              "\", dir=\"back\", arrowtail=\"empty\"];\n"
-            })
-            .mkString
-      }.mkString + "}"
+        graphAttributesStr + "node [" + nodeAttributesStr + "];\n" + "edge [" +
+        edgeAttributesStr + "];\n" + implicitsDot + "\n" + // inheritance nodes
+        nodes.map(n => node2Dot(n)).mkString +
+        subClasses.map(n => node2Dot(n)).mkString +
+        superClasses.map(n => node2Dot(n)).mkString + // inheritance edges
+        edges.map {
+          case (from, tos) =>
+            tos
+              .map(to => {
+                val id =
+                  "graph" +
+                    counter + "_" + node2Index(to) + "_" + node2Index(from)
+                // the X -> Y edge is inverted twice to keep the diagram flowing the right way
+                // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
+                "node" + node2Index(to) + " -> node" + node2Index(from) +
+                " [id=\"" + cssClass(to, from) + "|" + id + "\", " +
+                "tooltip=\"" + from.name + (if (from.name.endsWith(MultiSuffix))
+                                              " are subtypes of "
+                                            else
+                                              " is a subtype of ") + to.name +
+                "\", dir=\"back\", arrowtail=\"empty\"];\n"
+              })
+              .mkString
+        }.mkString + "}"
 
     tDot += System.currentTimeMillis
     DiagramStats.addDotGenerationTime(tDot)
@@ -285,12 +286,12 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
     if (!img.equals("")) {
       img =
         "<TD><IMG SCALE=\"TRUE\" SRC=\"" + settings.outdir.value + "/lib/" +
-        img + "\" /></TD>"
+          img + "\" /></TD>"
       name = name + " "
     }
     val label =
       "<<TABLE BORDER=\"0\" CELLBORDER=\"0\">" + "<TR>" + img +
-      "<TD VALIGN=\"MIDDLE\">" + name + "</TD></TR>" + "</TABLE>>"
+        "<TD VALIGN=\"MIDDLE\">" + name + "</TD></TR>" + "</TABLE>>"
 
     // dot does not allow to specify a CSS class, therefore
     // set the id to "{class}|{id}", which will be used in
@@ -338,45 +339,44 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
     val dotOutput = dotRunner.feedToDot(dotInput, template)
     var tSVG = -System.currentTimeMillis
 
-    val result =
-      if (dotOutput != null) {
-        val src = scala.io.Source.fromString(dotOutput)
-        try {
-          val cpa = scala.xml.parsing.ConstructingParser
-            .fromSource(src, preserveWS = false)
-          val doc = cpa.document()
-          if (doc != null) transform(doc.docElem)
-          else NodeSeq.Empty
-        } catch {
-          case exc: Exception =>
-            if (settings.docDiagramsDebug) {
-              settings.printMsg(
-                  "\n\n**********************************************************************")
-              settings.printMsg(
-                  "Encountered an error while generating page for " +
+    val result = if (dotOutput != null) {
+      val src = scala.io.Source.fromString(dotOutput)
+      try {
+        val cpa = scala.xml.parsing.ConstructingParser
+          .fromSource(src, preserveWS = false)
+        val doc = cpa.document()
+        if (doc != null) transform(doc.docElem)
+        else NodeSeq.Empty
+      } catch {
+        case exc: Exception =>
+          if (settings.docDiagramsDebug) {
+            settings.printMsg(
+                "\n\n**********************************************************************")
+            settings.printMsg(
+                "Encountered an error while generating page for " +
                   template.qualifiedName)
-              settings.printMsg(dotInput.toString
-                    .split("\n")
-                    .mkString("\nDot input:\n\t", "\n\t", ""))
-              settings.printMsg(dotOutput.toString
-                    .split("\n")
-                    .mkString("\nDot output:\n\t", "\n\t", ""))
-              settings.printMsg(
-                  exc.getStackTrace.mkString(
-                      "\nException: " + exc.toString + ":\n\tat ",
-                      "\n\tat ",
-                      ""))
-              settings.printMsg(
-                  "\n\n**********************************************************************")
-            } else {
-              settings.printMsg("\nThe diagram for " + template.qualifiedName +
+            settings.printMsg(dotInput.toString
+                  .split("\n")
+                  .mkString("\nDot input:\n\t", "\n\t", ""))
+            settings.printMsg(dotOutput.toString
+                  .split("\n")
+                  .mkString("\nDot output:\n\t", "\n\t", ""))
+            settings.printMsg(
+                exc.getStackTrace.mkString(
+                    "\nException: " + exc.toString + ":\n\tat ",
+                    "\n\tat ",
+                    ""))
+            settings.printMsg(
+                "\n\n**********************************************************************")
+          } else {
+            settings.printMsg("\nThe diagram for " + template.qualifiedName +
                   " could not be created due to an internal error.")
-              settings.printMsg("Use " + settings.docDiagramsDebug.name +
+            settings.printMsg("Use " + settings.docDiagramsDebug.name +
                   " for more information and please file this as a bug.")
-            }
-            NodeSeq.Empty
-        }
-      } else NodeSeq.Empty
+          }
+          NodeSeq.Empty
+      }
+    } else NodeSeq.Empty
 
     tSVG += System.currentTimeMillis
     DiagramStats.addSvgTime(tSVG)
@@ -394,71 +394,74 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
   private def transform(e: scala.xml.Node): scala.xml.Node = e match {
     // add an id and class attribute to the SVG element
     case Elem(prefix, "svg", attribs, scope, child @ _ *) => {
-        val klass =
-          if (isInheritanceDiagram) "class-diagram" else "package-diagram"
-        Elem(prefix,
-             "svg",
-             attribs,
-             scope,
-             true,
-             child map (x => transform(x)): _*) % new UnprefixedAttribute(
-            "id", "graph" + counter, Null) % new UnprefixedAttribute(
-            "class", klass, Null)
-      }
+      val klass =
+        if (isInheritanceDiagram) "class-diagram" else "package-diagram"
+      Elem(prefix,
+           "svg",
+           attribs,
+           scope,
+           true,
+           child map (x => transform(x)): _*) % new UnprefixedAttribute(
+          "id",
+          "graph" + counter,
+          Null) % new UnprefixedAttribute("class", klass, Null)
+    }
     // change the path of the node images from absolute to relative
     case img @ <image></image> => {
-        val href = (img \ "@{http://www.w3.org/1999/xlink}href").toString
-        val file = href.substring(href.lastIndexOf("/") + 1, href.size)
-        img.asInstanceOf[Elem] % new PrefixedAttribute(
-            "xlink", "href", pathToLib + file, Null)
-      }
+      val href = (img \ "@{http://www.w3.org/1999/xlink}href").toString
+      val file = href.substring(href.lastIndexOf("/") + 1, href.size)
+      img.asInstanceOf[Elem] % new PrefixedAttribute("xlink",
+                                                     "href",
+                                                     pathToLib + file,
+                                                     Null)
+    }
     // assign id and class attributes to edges and nodes:
     // the id attribute generated by dot has the format: "{class}|{id}"
     case g @ Elem(prefix, "g", attribs, scope, children @ _ *)
         if (List("edge", "node").contains((g \ "@class").toString)) => {
-        var res = new Elem(prefix,
-                           "g",
-                           attribs,
-                           scope,
-                           true,
-                           (children map (x => transform(x))): _*)
-        val dotId = (g \ "@id").toString
-        if (dotId.count(_ == '|') == 1) {
-          val Array(klass, id) = dotId.toString.split("\\|")
-          /* Sometimes dot "forgets" to add the image -- that's very annoying, but it seems pretty random, and simple
-           * tests like execute 20K times and diff the output don't trigger the bug -- so it's up to us to place the image
-           * back in the node */
-          val kind = getKind(klass)
-          if (kind != "")
-            if (((g \ "a" \ "image").isEmpty)) {
-              DiagramStats.addBrokenImage()
-              val xposition = getPosition(g, "x", -22)
-              val yposition = getPosition(g, "y", -11.3334)
-              if (xposition.isDefined && yposition.isDefined) {
-                val imageNode =
-                  <image xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href={ ("./lib/" + kind + "_diagram.png") } width="16px" height="16px" preserveAspectRatio="xMinYMin meet" x={ xposition.get.toString } y={ yposition.get.toString }/>
-                val anchorNode = (g \ "a") match {
-                  case Seq(
-                      Elem(prefix, "a", attribs, scope, children @ _ *)) =>
-                    transform(
-                        new Elem(prefix,
-                                 "a",
-                                 attribs,
-                                 scope,
-                                 true,
-                                 (children ++ imageNode): _*))
-                  case _ =>
-                    g \ "a"
-                }
-                res = new Elem(
-                    prefix, "g", attribs, scope, true, anchorNode: _*)
-                DiagramStats.addFixedImage()
+      var res = new Elem(prefix,
+                         "g",
+                         attribs,
+                         scope,
+                         true,
+                         (children map (x => transform(x))): _*)
+      val dotId = (g \ "@id").toString
+      if (dotId.count(_ == '|') == 1) {
+        val Array(klass, id) = dotId.toString.split("\\|")
+        /* Sometimes dot "forgets" to add the image -- that's very annoying, but it seems pretty random, and simple
+         * tests like execute 20K times and diff the output don't trigger the bug -- so it's up to us to place the image
+         * back in the node */
+        val kind = getKind(klass)
+        if (kind != "")
+          if (((g \ "a" \ "image").isEmpty)) {
+            DiagramStats.addBrokenImage()
+            val xposition = getPosition(g, "x", -22)
+            val yposition = getPosition(g, "y", -11.3334)
+            if (xposition.isDefined && yposition.isDefined) {
+              val imageNode =
+                <image xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href={ ("./lib/" + kind + "_diagram.png") } width="16px" height="16px" preserveAspectRatio="xMinYMin meet" x={ xposition.get.toString } y={ yposition.get.toString }/>
+              val anchorNode = (g \ "a") match {
+                case Seq(Elem(prefix, "a", attribs, scope, children @ _ *)) =>
+                  transform(
+                      new Elem(prefix,
+                               "a",
+                               attribs,
+                               scope,
+                               true,
+                               (children ++ imageNode): _*))
+                case _ =>
+                  g \ "a"
               }
+              res = new Elem(prefix, "g", attribs, scope, true, anchorNode: _*)
+              DiagramStats.addFixedImage()
             }
-          res % new UnprefixedAttribute("id", id, Null) % new UnprefixedAttribute(
-              "class", (g \ "@class").toString + " " + klass, Null)
-        } else res
-      }
+          }
+        res % new UnprefixedAttribute("id", id, Null) % new UnprefixedAttribute(
+            "class",
+            (g \ "@class").toString + " " + klass,
+            Null)
+      } else res
+    }
     // remove titles
     case <title>{ _* }</title> =>
       scala.xml.Text("")
@@ -479,8 +482,9 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
     else if (klass.contains("object")) "object"
     else ""
 
-  def getPosition(
-      g: scala.xml.Node, axis: String, offset: Double): Option[Double] = {
+  def getPosition(g: scala.xml.Node,
+                  axis: String,
+                  offset: Double): Option[Double] = {
     val node = g \ "a" \ "text" \ ("@" + axis)
     if (node.isEmpty) None
     else Some(node.toString.toDouble + offset)

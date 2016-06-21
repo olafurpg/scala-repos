@@ -42,8 +42,8 @@ object Statistics {
   }
 
   /** If enabled, push and start a new timer in timer stack */
-  @inline final def pushTimer(
-      timers: TimerStack, timer: => StackableTimer): TimerSnapshot =
+  @inline final def pushTimer(timers: TimerStack,
+                              timer: => StackableTimer): TimerSnapshot =
     if (_enabled && timers != null) timers.push(timer) else null
 
   /** If enabled, stop and pop timer from timer stack */
@@ -225,8 +225,9 @@ object Statistics {
   /** A mutable map quantity where missing elements are automatically inserted
     *  on access by executing `initValue`.
     */
-  class QuantMap[K, V <% Ordered[V]](
-      val prefix: String, val phases: Seq[String], initValue: => V)
+  class QuantMap[K, V <% Ordered[V]](val prefix: String,
+                                     val phases: Seq[String],
+                                     initValue: => V)
       extends mutable.HashMap[K, V]
       with mutable.SynchronizedMap[K, V]
       with Quantity {
@@ -309,7 +310,7 @@ object Statistics {
       }
       val total2 = System.nanoTime() - start
       println("Enabling statistics, measuring overhead = " + total / 10000.0 +
-          "ns to " + total2 / 10000.0 + "ns per timer")
+            "ns to " + total2 / 10000.0 + "ns per timer")
       _enabled = true
     }
   }

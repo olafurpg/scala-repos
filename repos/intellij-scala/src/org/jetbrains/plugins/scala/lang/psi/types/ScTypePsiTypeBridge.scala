@@ -50,9 +50,9 @@ trait ScTypePsiTypeBridge {
             if (classType.isRaw && visitedRawTypes.contains(clazz))
               return types.Any
             val tps = clazz.getTypeParameters
-            def constructTypeForClass(clazz: PsiClass,
-                                      withTypeParameters: Boolean =
-                                        false): ScType = {
+            def constructTypeForClass(
+                clazz: PsiClass,
+                withTypeParameters: Boolean = false): ScType = {
               clazz match {
                 case wrapper: PsiClassWrapper =>
                   return constructTypeForClass(wrapper.definition)
@@ -107,7 +107,7 @@ trait ScTypePsiTypeBridge {
                                                         project,
                                                         scope,
                                                         visitedRawTypes +
-                                                        clazz)),
+                                                          clazz)),
                                              Map.empty,
                                              Map.empty)
                                      })
@@ -153,8 +153,8 @@ trait ScTypePsiTypeBridge {
                                                       visitedRawTypes)
                                              else types.Any)
                           case _ if psiType != null =>
-                            ScType.create(
-                                psiType, project, scope, visitedRawTypes)
+                            ScType
+                              .create(psiType, project, scope, visitedRawTypes)
                           case _ => ScalaPsiManager.typeVariable(tp)
                         }
                       })
@@ -295,7 +295,7 @@ trait ScTypePsiTypeBridge {
         valType.parameters.head.getRealParameterType(TypingContext.empty) match {
           case Success(tp, _)
               if !(noPrimitives &&
-                  ScalaEvaluatorBuilderUtil.isPrimitiveScType(tp)) =>
+                    ScalaEvaluatorBuilderUtil.isPrimitiveScType(tp)) =>
             toPsi(tp, project, scope, noPrimitives, skolemToWildcard)
           case _ => createType(valType)
         }
@@ -319,8 +319,8 @@ trait ScTypePsiTypeBridge {
             .getElementFactory
             .createType(c, subst)
         }
-      case ScParameterizedType(
-          proj @ ScProjectionType(pr, element, _), args) =>
+      case ScParameterizedType(proj @ ScProjectionType(pr, element, _),
+                               args) =>
         proj.actualElement match {
           case c: PsiClass =>
             if (c.qualifiedName == "scala.Array" && args.length == 1)

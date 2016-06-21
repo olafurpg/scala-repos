@@ -275,7 +275,7 @@ class InputOutputMetricsSuite
     // p1. Thus the math below for the test.
     assert(cartesianBytes != 0)
     assert(cartesianBytes == firstSize * numPartitions +
-        (cartVector.length * secondSize))
+          (cartVector.length * secondSize))
   }
 
   private def runAndReturnBytesRead(job: => Unit): Long = {
@@ -298,8 +298,7 @@ class InputOutputMetricsSuite
     // Avoid receiving earlier taskEnd events
     sc.listenerBus.waitUntilEmpty(500)
 
-    sc.addSparkListener(
-        new SparkListener() {
+    sc.addSparkListener(new SparkListener() {
       override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
         collector(taskEnd).foreach(taskMetrics += _)
       }
@@ -346,11 +345,10 @@ class InputOutputMetricsSuite
 
     if (SparkHadoopUtil.get.getFSBytesWrittenOnThreadCallback().isDefined) {
       val taskBytesWritten = new ArrayBuffer[Long]()
-      sc.addSparkListener(
-          new SparkListener() {
+      sc.addSparkListener(new SparkListener() {
         override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
           taskBytesWritten +=
-            taskEnd.taskMetrics.outputMetrics.get.bytesWritten
+          taskEnd.taskMetrics.outputMetrics.get.bytesWritten
         }
       })
 
@@ -454,8 +452,9 @@ class NewCombineTextInputFormat
   }
 }
 
-class NewCombineTextRecordReaderWrapper(
-    split: NewCombineFileSplit, context: TaskAttemptContext, idx: Integer)
+class NewCombineTextRecordReaderWrapper(split: NewCombineFileSplit,
+                                        context: TaskAttemptContext,
+                                        idx: Integer)
     extends NewRecordReader[LongWritable, Text] {
 
   val fileSplit = new NewFileSplit(split.getPath(idx),
@@ -466,8 +465,8 @@ class NewCombineTextRecordReaderWrapper(
   val delegate =
     new NewTextInputFormat().createRecordReader(fileSplit, context)
 
-  override def initialize(
-      split: NewInputSplit, context: TaskAttemptContext): Unit = {
+  override def initialize(split: NewInputSplit,
+                          context: TaskAttemptContext): Unit = {
     delegate.initialize(fileSplit, context)
   }
 

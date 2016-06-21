@@ -10,7 +10,7 @@ trait Extractors {
     case ExtractT(x) => println(x + " is a " + implicitly[ClassTag[T]])
     case _ =>
       println(a + " is not a " + implicitly[ClassTag[T]] + "; it's a " +
-          a.getClass)
+            a.getClass)
   }
 }
 
@@ -19,7 +19,7 @@ object Test extends App {
     case x: T => println(x + " is a " + implicitly[ClassTag[T]])
     case _ =>
       println(a + " is not a " + implicitly[ClassTag[T]] + "; it's a " +
-          a.getClass)
+            a.getClass)
   }
 
   // the same match as typeMatch, but using an extractor

@@ -59,8 +59,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
     precedence.put(getQualifiedName(result), i)
   }
 
-  override protected def filterNot(
-      p: ScalaResolveResult, n: ScalaResolveResult): Boolean = {
+  override protected def filterNot(p: ScalaResolveResult,
+                                   n: ScalaResolveResult): Boolean = {
     getQualifiedName(p) == getQualifiedName(n) && super.filterNot(p, n)
   }
 

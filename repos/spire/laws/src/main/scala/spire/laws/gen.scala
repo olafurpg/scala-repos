@@ -189,8 +189,7 @@ object gen {
     val domainSize = params.size / 10 + 1
     val images = new Array[Int](domainSize)
     cforRange(0 until domainSize) { i =>
-      val j =
-        nextInt(i + 1) // uses the Fisher-Yates shuffle, inside out variant
+      val j = nextInt(i + 1) // uses the Fisher-Yates shuffle, inside out variant
       images(i) = images(j)
       images(j) = i
     }

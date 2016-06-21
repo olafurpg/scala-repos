@@ -22,8 +22,8 @@ class WindowedByteCounterTest
   }
 
   // cleans up thread
-  private[this] def withCounter(
-      fakeBean: FakeGarbageCollectorMXBean, fakePool: FakeMemoryPool)(
+  private[this] def withCounter(fakeBean: FakeGarbageCollectorMXBean,
+                                fakePool: FakeMemoryPool)(
       fn: (ByteCounter, () => Unit) => Unit
   ): Unit = {
     Time.withCurrentTimeFrozen { ctl =>
@@ -125,7 +125,7 @@ class WindowedByteCounterTest
         }
 
         assert(counter.rate() ==
-            (2 * (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds))
+              (2 * (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds))
     }
   }
 

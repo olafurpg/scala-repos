@@ -59,12 +59,11 @@ abstract class SparkPlan
   // sqlContext will be null when we are being deserialized on the slaves.  In this instance
   // the value of subexpressionEliminationEnabled will be set by the deserializer after the
   // constructor has run.
-  val subexpressionEliminationEnabled: Boolean =
-    if (sqlContext != null) {
-      sqlContext.conf.subexpressionEliminationEnabled
-    } else {
-      false
-    }
+  val subexpressionEliminationEnabled: Boolean = if (sqlContext != null) {
+    sqlContext.conf.subexpressionEliminationEnabled
+  } else {
+    false
+  }
 
   /**
     * Whether the "prepare" method is called.
@@ -156,8 +155,9 @@ abstract class SparkPlan
     * The list of subqueries are added to [[subqueryResults]].
     */
   protected def prepareSubqueries(): Unit = {
-    val allSubqueries =
-      expressions.flatMap(_.collect { case e: ScalarSubquery => e })
+    val allSubqueries = expressions.flatMap(_.collect {
+      case e: ScalarSubquery => e
+    })
     allSubqueries.asInstanceOf[Seq[ScalarSubquery]].foreach { e =>
       val futureResult = Future {
         // Each subquery should return only one row (and one column). We take two here and throws
@@ -260,8 +260,8 @@ abstract class SparkPlan
   /**
     * Decode the byte arrays back to UnsafeRows and put them into buffer.
     */
-  private def decodeUnsafeRows(
-      bytes: Array[Byte], buffer: ArrayBuffer[InternalRow]): Unit = {
+  private def decodeUnsafeRows(bytes: Array[Byte],
+                               buffer: ArrayBuffer[InternalRow]): Unit = {
     val nFields = schema.length
 
     val codec = CompressionCodec.createCodec(SparkEnv.get.conf)
@@ -328,8 +328,7 @@ abstract class SparkPlan
           numPartsToTry = (1.5 * n * partsScanned / buf.size).toInt
         }
       }
-      numPartsToTry =
-        math.max(0, numPartsToTry) // guard against negative num of partitions
+      numPartsToTry = math.max(0, numPartsToTry) // guard against negative num of partitions
 
       val left = n - buf.size
       val p = partsScanned.until(
@@ -356,13 +355,13 @@ abstract class SparkPlan
 
   private[this] def isTesting: Boolean = sys.props.contains("spark.testing")
 
-  protected def newMutableProjection(expressions: Seq[Expression],
-                                     inputSchema: Seq[Attribute],
-                                     useSubexprElimination: Boolean =
-                                       false): () => MutableProjection = {
+  protected def newMutableProjection(
+      expressions: Seq[Expression],
+      inputSchema: Seq[Attribute],
+      useSubexprElimination: Boolean = false): () => MutableProjection = {
     log.debug(s"Creating MutableProj: $expressions, inputSchema: $inputSchema")
-    GenerateMutableProjection.generate(
-        expressions, inputSchema, useSubexprElimination)
+    GenerateMutableProjection
+      .generate(expressions, inputSchema, useSubexprElimination)
   }
 
   protected def newPredicate(

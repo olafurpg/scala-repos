@@ -4,8 +4,8 @@ import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.Play.current
 
-final class DisposableEmailDomain(
-    providerUrl: String, busOption: Option[lila.common.Bus]) {
+final class DisposableEmailDomain(providerUrl: String,
+                                  busOption: Option[lila.common.Bus]) {
 
   private type Matcher = String => Boolean
 

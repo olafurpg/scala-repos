@@ -28,8 +28,9 @@ trait EvolutionsApi {
     * @param schema The schema where all the play evolution tables are saved in
     * @return evolution scripts
     */
-  def scripts(
-      db: String, evolutions: Seq[Evolution], schema: String): Seq[Script]
+  def scripts(db: String,
+              evolutions: Seq[Evolution],
+              schema: String): Seq[Script]
 
   /**
     * Create evolution scripts.
@@ -39,8 +40,9 @@ trait EvolutionsApi {
     * @param schema The schema where all the play evolution tables are saved in
     * @return evolution scripts
     */
-  def scripts(
-      db: String, reader: EvolutionsReader, schema: String): Seq[Script]
+  def scripts(db: String,
+              reader: EvolutionsReader,
+              schema: String): Seq[Script]
 
   /**
     * Get all scripts necessary to reset the database state to its initial state.
@@ -92,8 +94,10 @@ class DefaultEvolutionsApi @Inject()(dbApi: DBApi) extends EvolutionsApi {
   def resetScripts(db: String, schema: String) =
     databaseEvolutions(db, schema).resetScripts()
 
-  def evolve(
-      db: String, scripts: Seq[Script], autocommit: Boolean, schema: String) =
+  def evolve(db: String,
+             scripts: Seq[Script],
+             autocommit: Boolean,
+             schema: String) =
     databaseEvolutions(db, schema).evolve(scripts, autocommit)
 
   def resolve(db: String, revision: Int, schema: String) =
@@ -144,19 +148,19 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
 
     try {
 
-      Collections
-        .unfoldLeft(executeQuery("""
+      Collections.unfoldLeft(executeQuery(
+              """
             select id, hash, apply_script, revert_script from ${schema}play_evolutions order by id
         """)) { rs =>
         rs.next match {
           case false => None
           case true => {
-              Some(
-                  (rs,
-                   Evolution(rs.getInt(1),
-                             Option(rs.getString(3)) getOrElse "",
-                             Option(rs.getString(4)) getOrElse "")))
-            }
+            Some(
+                (rs,
+                 Evolution(rs.getInt(1),
+                           Option(rs.getString(3)) getOrElse "",
+                           Option(rs.getString(4)) getOrElse "")))
+          }
         }
       }
     } finally {
@@ -168,37 +172,36 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
     def logBefore(script: Script)(implicit conn: Connection): Unit = {
       script match {
         case UpScript(e) => {
-            val ps = prepare(
-                "insert into ${schema}play_evolutions (id, hash, applied_at, apply_script, revert_script, state, last_problem) values(?, ?, ?, ?, ?, ?, ?)")
-            ps.setInt(1, e.revision)
-            ps.setString(2, e.hash)
-            ps.setDate(3, new Date(System.currentTimeMillis()))
-            ps.setString(4, e.sql_up)
-            ps.setString(5, e.sql_down)
-            ps.setString(6, "applying_up")
-            ps.setString(7, "")
-            ps.execute()
-          }
+          val ps = prepare(
+              "insert into ${schema}play_evolutions (id, hash, applied_at, apply_script, revert_script, state, last_problem) values(?, ?, ?, ?, ?, ?, ?)")
+          ps.setInt(1, e.revision)
+          ps.setString(2, e.hash)
+          ps.setDate(3, new Date(System.currentTimeMillis()))
+          ps.setString(4, e.sql_up)
+          ps.setString(5, e.sql_down)
+          ps.setString(6, "applying_up")
+          ps.setString(7, "")
+          ps.execute()
+        }
         case DownScript(e) => {
-            execute(
-                "update ${schema}play_evolutions set state = 'applying_down' where id = " +
+          execute(
+              "update ${schema}play_evolutions set state = 'applying_down' where id = " +
                 e.revision)
-          }
+        }
       }
     }
 
     def logAfter(script: Script)(implicit conn: Connection): Boolean = {
       script match {
         case UpScript(e) => {
-            execute(
-                "update ${schema}play_evolutions set state = 'applied' where id = " +
+          execute(
+              "update ${schema}play_evolutions set state = 'applied' where id = " +
                 e.revision)
-          }
+        }
         case DownScript(e) => {
-            execute(
-                "delete from ${schema}play_evolutions where id = " +
+          execute("delete from ${schema}play_evolutions where id = " +
                 e.revision)
-          }
+        }
       }
     }
 
@@ -233,34 +236,34 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
       }
     } catch {
       case NonFatal(e) => {
-          val message = e match {
-            case ex: SQLException =>
-              ex.getMessage + " [ERROR:" + ex.getErrorCode + ", SQLSTATE:" +
+        val message = e match {
+          case ex: SQLException =>
+            ex.getMessage + " [ERROR:" + ex.getErrorCode + ", SQLSTATE:" +
               ex.getSQLState + "]"
-            case ex => ex.getMessage
-          }
-          if (!autocommit) {
-            logger.error(message)
+          case ex => ex.getMessage
+        }
+        if (!autocommit) {
+          logger.error(message)
 
-            connection.rollback()
+          connection.rollback()
 
-            val humanScript =
-              "# --- Rev:" + lastScript.evolution.revision + "," +
+          val humanScript =
+            "# --- Rev:" + lastScript.evolution.revision + "," +
               (if (lastScript.isInstanceOf[UpScript]) "Ups" else "Downs") +
               " - " + lastScript.evolution.hash + "\n\n" +
               (if (lastScript.isInstanceOf[UpScript])
                  lastScript.evolution.sql_up
                else lastScript.evolution.sql_down)
 
-            throw InconsistentDatabase(database.name,
-                                       humanScript,
-                                       message,
-                                       lastScript.evolution.revision,
-                                       autocommit)
-          } else {
-            updateLastProblem(message, applying)
-          }
+          throw InconsistentDatabase(database.name,
+                                     humanScript,
+                                     message,
+                                     lastScript.evolution.revision,
+                                     autocommit)
+        } else {
+          updateLastProblem(message, applying)
         }
+      }
     } finally {
       connection.close()
     }
@@ -313,10 +316,13 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
         val humanScript =
           "# --- Rev:" + revision + "," + (if (state == "applying_up") "Ups"
                                            else "Downs") + " - " + hash +
-          "\n\n" + script
+            "\n\n" + script
 
-        throw InconsistentDatabase(
-            database.name, humanScript, error, revision, autocommit)
+        throw InconsistentDatabase(database.name,
+                                   humanScript,
+                                   error,
+                                   revision,
+                                   autocommit)
       }
     } catch {
       case e: InconsistentDatabase => throw e
@@ -336,10 +342,10 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
     try {
       execute(
           "update ${schema}play_evolutions set state = 'applied' where state = 'applying_up' and id = " +
-          revision)
+            revision)
       execute(
           "delete from ${schema}play_evolutions where state = 'applying_down' and id = " +
-          revision);
+            revision);
     } finally {
       connection.close()
     }
@@ -489,26 +495,26 @@ abstract class ResourceEvolutionsReader extends EvolutionsReader {
       .map {
         case (revision, script) => {
 
-            val parsed = Collections
-              .unfoldLeft(("", script.split('\n').toList.map(_.trim))) {
-                case (_, Nil) => None
-                case (context, lines) => {
-                    val (some, next) = lines.span(l => !isMarker(l))
-                    Some((next.headOption
-                            .map(c => (mapUpsAndDowns(c), next.tail))
-                            .getOrElse("" -> Nil),
-                          context -> some.mkString("\n")))
-                  }
+          val parsed = Collections
+            .unfoldLeft(("", script.split('\n').toList.map(_.trim))) {
+              case (_, Nil) => None
+              case (context, lines) => {
+                val (some, next) = lines.span(l => !isMarker(l))
+                Some((next.headOption
+                        .map(c => (mapUpsAndDowns(c), next.tail))
+                        .getOrElse("" -> Nil),
+                      context -> some.mkString("\n")))
               }
-              .reverse
-              .drop(1)
-              .groupBy(i => i._1)
-              .mapValues { _.map(_._2).mkString("\n").trim }
+            }
+            .reverse
+            .drop(1)
+            .groupBy(i => i._1)
+            .mapValues { _.map(_._2).mkString("\n").trim }
 
-            Evolution(revision,
-                      parsed.getOrElse(UPS, ""),
-                      parsed.getOrElse(DOWNS, ""))
-          }
+          Evolution(revision,
+                    parsed.getOrElse(UPS, ""),
+                    parsed.getOrElse(DOWNS, ""))
+        }
       }
   }
 }
@@ -543,7 +549,8 @@ class ClassLoaderEvolutionsReader(
     prefix: String = "")
     extends ResourceEvolutionsReader {
   def loadResource(db: String, revision: Int) = {
-    Option(classLoader.getResourceAsStream(
+    Option(
+        classLoader.getResourceAsStream(
             prefix + Evolutions.resourceName(db, revision)))
   }
 }
@@ -606,16 +613,19 @@ object SimpleEvolutionsReader {
   * @param error an inconsistent state error
   * @param rev the revision
   */
-case class InconsistentDatabase(
-    db: String, script: String, error: String, rev: Int, autocommit: Boolean)
+case class InconsistentDatabase(db: String,
+                                script: String,
+                                error: String,
+                                rev: Int,
+                                autocommit: Boolean)
     extends PlayException.RichDescription(
         "Database '" + db + "' is in an inconsistent state!",
         "An evolution has not been applied properly. Please check the problem and resolve it manually" +
-        (if (autocommit) " before marking it as resolved." else ".")) {
+          (if (autocommit) " before marking it as resolved." else ".")) {
 
   def subTitle =
     "We got the following error: " + error +
-    ", while trying to run this SQL script:"
+      ", while trying to run this SQL script:"
   def content = script
 
   private val resolvePathJavascript =

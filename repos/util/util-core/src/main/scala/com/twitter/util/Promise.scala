@@ -80,8 +80,9 @@ object Promise {
     * @param depth a tag used to store the chain depth of this context
     * for scheduling purposes.
     */
-  private class Monitored[A](
-      saved: Local.Context, k: Try[A] => Unit, val depth: Short)
+  private class Monitored[A](saved: Local.Context,
+                             k: Try[A] => Unit,
+                             val depth: Short)
       extends K[A] {
     def apply(result: Try[A]) {
       val current = Local.save()
@@ -154,7 +155,8 @@ object Promise {
   private sealed trait State[A]
   private case class Waiting[A](first: K[A], rest: List[K[A]]) extends State[A]
   private case class Interruptible[A](
-      waitq: List[K[A]], handler: PartialFunction[Throwable, Unit])
+      waitq: List[K[A]],
+      handler: PartialFunction[Throwable, Unit])
       extends State[A]
   private case class Transforming[A](waitq: List[K[A]], other: Future[_])
       extends State[A]
@@ -352,8 +354,8 @@ class Promise[A]
 
   override def toString = "Promise@%s(state=%s)".format(hashCode, state)
 
-  @inline private[this] def cas(
-      oldState: State[A], newState: State[A]): Boolean =
+  @inline private[this] def cas(oldState: State[A],
+                                newState: State[A]): Boolean =
     unsafe.compareAndSwapObject(this, stateOff, oldState, newState)
 
   private[this] def runq(first: K[A], rest: List[K[A]], result: Try[A]) =
@@ -560,8 +562,8 @@ class Promise[A]
   // Awaitable
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  def ready(timeout: Duration)(
-      implicit permit: Awaitable.CanAwait): this.type =
+  def ready(
+      timeout: Duration)(implicit permit: Awaitable.CanAwait): this.type =
     state match {
       case Linked(p) =>
         p.ready(timeout)
@@ -736,8 +738,7 @@ class Promise[A]
   protected[util] final def continue(k: K[A]): Unit = {
     state match {
       case Done(v) =>
-        Scheduler.submit(
-            new Runnable {
+        Scheduler.submit(new Runnable {
           def run() {
             k(v)
           }

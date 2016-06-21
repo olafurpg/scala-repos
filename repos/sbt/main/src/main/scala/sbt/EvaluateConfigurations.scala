@@ -31,8 +31,8 @@ object EvaluateConfigurations {
 
   type LazyClassLoaded[T] = ClassLoader => T
 
-  private[sbt] case class TrackedEvalResult[T](
-      generated: Seq[File], result: LazyClassLoaded[T])
+  private[sbt] case class TrackedEvalResult[T](generated: Seq[File],
+                                               result: LazyClassLoaded[T])
 
   /**
     * This represents the parsed expressions in a build sbt, as well as where they were defined.
@@ -88,8 +88,8 @@ object EvaluateConfigurations {
                                        lines: Seq[String],
                                        builtinImports: Seq[String],
                                        offset: Int): ParsedFile = {
-    val (importStatements, settingsAndDefinitions) = splitExpressions(
-        file, lines)
+    val (importStatements, settingsAndDefinitions) =
+      splitExpressions(file, lines)
     val allImports =
       builtinImports.map(s => (s, -1)) ++ addOffset(offset, importStatements)
     val (definitions, settings) = splitSettingsDefinitions(
@@ -140,8 +140,11 @@ object EvaluateConfigurations {
     val (importDefs, definitions) =
       if (parsed.definitions.isEmpty) (Nil, DefinedSbtValues.empty)
       else {
-        val definitions = evaluateDefinitions(
-            eval, name, parsed.imports, parsed.definitions, Some(file))
+        val definitions = evaluateDefinitions(eval,
+                                              name,
+                                              parsed.imports,
+                                              parsed.definitions,
+                                              Some(file))
         val imp = BuildUtil.importAllRoot(definitions.enclosingModule :: Nil)
         val projs = (loader: ClassLoader) =>
           definitions
@@ -206,8 +209,7 @@ object EvaluateConfigurations {
     * The name of the class we cast DSL "setting" (vs. definition) lines to.
     */
   val SettingsDefinitionName = {
-    val _ =
-      classOf[sbt.internals.DslEntry] // this line exists to try to provide a compile-time error when the following line needs to be changed
+    val _ = classOf[sbt.internals.DslEntry] // this line exists to try to provide a compile-time error when the following line needs to be changed
     "sbt.internals.DslEntry"
   }
 
@@ -372,8 +374,9 @@ object Index {
     val pairs = for (scope <- data.scopes;
                      AttributeEntry(key, value: Task[_]) <- data
                                                              .data(scope)
-                                                             .entries) yield
-      (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
+                                                             .entries)
+      yield
+        (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
     pairs.toMap[Task[_], ScopedKey[Task[_]]]
   }
   def allKeys(settings: Seq[Setting[_]]): Set[ScopedKey[_]] =
@@ -401,8 +404,8 @@ object Index {
           duplicates map {
         case (k, tps) => "'" + k + "' (" + tps.mkString(", ") + ")"
       } mkString
-          ("Some keys were defined with the same name but different types: ",
-              ", ", ""))
+            ("Some keys were defined with the same name but different types: ",
+                ", ", ""))
   }
   private[this] type TriggerMap =
     collection.mutable.HashMap[Task[_], Seq[Task[_]]]
@@ -421,8 +424,10 @@ object Index {
       }
     new Triggers[Task](runBefore, triggeredBy, map => { onComplete(); map })
   }
-  private[this] def update(
-      map: TriggerMap, base: Task[_], tasksOpt: Option[Seq[Task[_]]]): Unit =
-    for (tasks <- tasksOpt; task <- tasks) map(task) =
-      base +: map.getOrElse(task, Nil)
+  private[this] def update(map: TriggerMap,
+                           base: Task[_],
+                           tasksOpt: Option[Seq[Task[_]]]): Unit =
+    for (tasks <- tasksOpt; task <- tasks)
+      map(task) =
+        base +: map.getOrElse(task, Nil)
 }

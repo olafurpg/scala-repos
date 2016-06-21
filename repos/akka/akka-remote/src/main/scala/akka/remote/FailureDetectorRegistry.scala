@@ -63,8 +63,9 @@ private[akka] object FailureDetectorLoader {
     * @param system ActorSystem to be used for loading the implementation
     * @return A configured instance of the given [[FailureDetector]] implementation
     */
-  def load(
-      fqcn: String, config: Config, system: ActorSystem): FailureDetector = {
+  def load(fqcn: String,
+           config: Config,
+           system: ActorSystem): FailureDetector = {
     system
       .asInstanceOf[ExtendedActorSystem]
       .dynamicAccess

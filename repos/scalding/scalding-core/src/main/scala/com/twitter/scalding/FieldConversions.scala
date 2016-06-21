@@ -32,13 +32,13 @@ trait LowPriorityFieldConversions {
     case v: Enumeration#Value => v.toString
     case fld: Field[_] => fld.id
     case flds: Fields => {
-        if (flds.size == 1) {
-          flds.get(0)
-        } else {
-          throw new Exception("Cannot convert Fields(" + flds.toString +
+      if (flds.size == 1) {
+        flds.get(0)
+      } else {
+        throw new Exception("Cannot convert Fields(" + flds.toString +
               ") to a single fields arg")
-        }
       }
+    }
     case w =>
       throw new Exception(
           "Could not convert: " + w.toString + " to Fields argument")
@@ -137,8 +137,9 @@ trait FieldConversions extends LowPriorityFieldConversions {
   implicit def fieldToFields(f: Field[_]) = RichFields(f)
 
   @tailrec
-  final def newSymbol(
-      avoid: Set[Symbol], guess: Symbol, trial: Int = 0): Symbol = {
+  final def newSymbol(avoid: Set[Symbol],
+                      guess: Symbol,
+                      trial: Int = 0): Symbol = {
     if (!avoid(guess)) {
       //We are good:
       guess
@@ -154,8 +155,9 @@ trait FieldConversions extends LowPriorityFieldConversions {
     }
   }
 
-  final def ensureUniqueFields(
-      left: Fields, right: Fields, rightPipe: Pipe): (Fields, Pipe) = {
+  final def ensureUniqueFields(left: Fields,
+                               right: Fields,
+                               rightPipe: Pipe): (Fields, Pipe) = {
     val leftSet = asSet(left)
     val collisions = asSet(left) & asSet(right)
     if (collisions.isEmpty) {
@@ -172,8 +174,7 @@ trait FieldConversions extends LowPriorityFieldConversions {
         val newName = newSymbol(taken, name)
         (taken + newName, newName :: renames)
       }
-      val newRight =
-        fields(reversedRename.reverse) // We pushed in as a stack, so we need to reverse
+      val newRight = fields(reversedRename.reverse) // We pushed in as a stack, so we need to reverse
       (newRight, RichPipe(rightPipe).rename(right -> newRight))
     }
   }
@@ -213,7 +214,8 @@ trait FieldConversions extends LowPriorityFieldConversions {
 
   //Handle a pair generally:
   implicit def tuple2ToFieldsPair[T, U](pair: (T, U))(
-      implicit tf: T => Fields, uf: U => Fields): (Fields, Fields) = {
+      implicit tf: T => Fields,
+      uf: U => Fields): (Fields, Fields) = {
     val f1 = tf(pair._1)
     val f2 = uf(pair._2)
     (f1, f2)
@@ -241,21 +243,18 @@ trait FieldConversions extends LowPriorityFieldConversions {
     // "one at a time" by querying for a specific index, while the Comparators are only
     // available "all at once" by calling getComparators.)
 
-    new RichFields(
-        asList(fields)
-          .zip(fields.getComparators)
-          .map {
-        case (id: Comparable[_], comparator: Comparator[_]) =>
-          id match {
-            case x: java.lang.Integer =>
-              IntField(x)(Ordering.comparatorToOrdering(comparator), None)
-            case y: String =>
-              StringField(y)(Ordering.comparatorToOrdering(comparator), None)
-            case z =>
-              sys.error("not expecting object of type " + z.getClass +
+    new RichFields(asList(fields).zip(fields.getComparators).map {
+      case (id: Comparable[_], comparator: Comparator[_]) =>
+        id match {
+          case x: java.lang.Integer =>
+            IntField(x)(Ordering.comparatorToOrdering(comparator), None)
+          case y: String =>
+            StringField(y)(Ordering.comparatorToOrdering(comparator), None)
+          case z =>
+            sys.error("not expecting object of type " + z.getClass +
                   " as field name")
-          }
-      })
+        }
+    })
   }
 }
 
@@ -284,15 +283,15 @@ sealed trait Field[T] extends java.io.Serializable {
 }
 
 @DefaultSerializer(classOf[serialization.IntFieldSerializer])
-case class IntField[T](
-    override val id: java.lang.Integer)(implicit override val ord: Ordering[T],
-                                        override val mf: Option[Manifest[T]])
+case class IntField[T](override val id: java.lang.Integer)(
+    implicit override val ord: Ordering[T],
+    override val mf: Option[Manifest[T]])
     extends Field[T]
 
 @DefaultSerializer(classOf[serialization.StringFieldSerializer])
-case class StringField[T](
-    override val id: String)(implicit override val ord: Ordering[T],
-                             override val mf: Option[Manifest[T]])
+case class StringField[T](override val id: String)(
+    implicit override val ord: Ordering[T],
+    override val mf: Option[Manifest[T]])
     extends Field[T]
 
 object Field {

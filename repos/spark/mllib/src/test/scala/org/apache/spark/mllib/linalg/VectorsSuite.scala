@@ -315,8 +315,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
 
   test("vector p-norm") {
     val dv = Vectors.dense(0.0, -1.2, 3.1, 0.0, -4.5, 1.9)
-    val sv = Vectors.sparse(
-        6, Seq((1, -1.2), (2, 3.1), (3, 0.0), (4, -4.5), (5, 1.9)))
+    val sv = Vectors
+      .sparse(6, Seq((1, -1.2), (2, 3.1), (3, 0.0), (4, -4.5), (5, 1.9)))
 
     assert(Vectors.norm(dv, 1.0) ~== dv.toArray.foldLeft(0.0)((a, v) =>
               a + math.abs(v)) relTol 1E-8)
@@ -333,12 +333,10 @@ class VectorsSuite extends SparkFunSuite with Logging {
     assert(Vectors.norm(sv, Double.PositiveInfinity) ~==
           sv.toArray.map(math.abs).max relTol 1E-8)
 
-    assert(
-        Vectors.norm(dv, 3.7) ~== math.pow(
+    assert(Vectors.norm(dv, 3.7) ~== math.pow(
             dv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
             1.0 / 3.7) relTol 1E-8)
-    assert(
-        Vectors.norm(sv, 3.7) ~== math.pow(
+    assert(Vectors.norm(sv, 3.7) ~== math.pow(
             sv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
             1.0 / 3.7) relTol 1E-8)
   }
@@ -391,8 +389,10 @@ class VectorsSuite extends SparkFunSuite with Logging {
     val v = new SparseVector(5, Array(1, 2, 4), Array(1.1, 2.2, 4.4))
     assert(v.slice(Array(0, 2)) === new SparseVector(2, Array(1), Array(2.2)))
     assert(v.slice(Array(2, 0)) === new SparseVector(2, Array(0), Array(2.2)))
-    assert(v.slice(Array(2, 0, 3, 4)) === new SparseVector(
-            4, Array(0, 3), Array(2.2, 4.4)))
+    assert(
+        v.slice(Array(2, 0, 3, 4)) === new SparseVector(4,
+                                                        Array(0, 3),
+                                                        Array(2.2, 4.4)))
   }
 
   test("toJson/fromJson") {

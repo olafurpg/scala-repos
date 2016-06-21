@@ -44,8 +44,7 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   }
 
   def annotationNames: Seq[String] =
-    annotations.map(
-        (x: ScAnnotation) => {
+    annotations.map((x: ScAnnotation) => {
       val text: String = x.annotationExpr.constr.typeElement.getText
       text.substring(text.lastIndexOf(".", 0) + 1, text.length)
     })
@@ -75,8 +74,8 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
       case _ =>
         tp.isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, _, _)) =>
-            acceptType(
-                ta.aliasedType(TypingContext.empty).getOrAny, qualifiedName)
+            acceptType(ta.aliasedType(TypingContext.empty).getOrAny,
+                       qualifiedName)
           case _ => false
         }
     }

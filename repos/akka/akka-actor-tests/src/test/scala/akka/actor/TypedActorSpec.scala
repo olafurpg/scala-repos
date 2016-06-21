@@ -207,8 +207,7 @@ object TypedActorSpec {
       ensureContextAvailable(for (i ← 1 to 7) latch.countDown())
 
     override def onReceive(msg: Any, sender: ActorRef): Unit = {
-      ensureContextAvailable(
-          msg match {
+      ensureContextAvailable(msg match {
         case "pigdog" ⇒ sender ! "dogpig"
       })
     }
@@ -242,8 +241,9 @@ class TypedActorSpec
           .withDispatcher(dispatcher))
 
   def newStacked(): Stacked =
-    TypedActor(system).typedActorOf(TypedProps[StackedImpl](
-            classOf[Stacked], classOf[StackedImpl]).withTimeout(timeout))
+    TypedActor(system).typedActorOf(
+        TypedProps[StackedImpl](classOf[Stacked], classOf[StackedImpl])
+          .withTimeout(timeout))
 
   def mustStop(typedActor: AnyRef) =
     TypedActor(system).stop(typedActor) should ===(true)
@@ -453,15 +453,15 @@ class TypedActorSpec
     }
 
     "be able to use balancing dispatcher" in within(timeout.duration) {
-      val thais = for (i ← 1 to 60) yield
-        newFooBar("pooled-dispatcher", 6 seconds)
+      val thais = for (i ← 1 to 60)
+        yield newFooBar("pooled-dispatcher", 6 seconds)
       val iterator = new CyclicIterator(thais)
 
-      val results = for (i ← 1 to 120) yield
-        (i, iterator.next.futurePigdog(200 millis, i))
+      val results = for (i ← 1 to 120)
+        yield (i, iterator.next.futurePigdog(200 millis, i))
 
-      for ((i, r) ← results) Await.result(r, remaining) should ===(
-          "Pigdog" + i)
+      for ((i, r) ← results)
+        Await.result(r, remaining) should ===("Pigdog" + i)
 
       for (t ← thais) mustStop(t)
     }

@@ -151,8 +151,11 @@ private[graphx] class EdgePartition[@specialized(Char,
     * @return a new edge partition with all edges reversed.
     */
   def reverse: EdgePartition[ED, VD] = {
-    val builder = new ExistingEdgePartitionBuilder[ED, VD](
-        global2local, local2global, vertexAttrs, activeSet, size)
+    val builder = new ExistingEdgePartitionBuilder[ED, VD](global2local,
+                                                           local2global,
+                                                           vertexAttrs,
+                                                           activeSet,
+                                                           size)
     var i = 0
     while (i < size) {
       val localSrcId = localSrcIds(i)
@@ -223,8 +226,10 @@ private[graphx] class EdgePartition[@specialized(Char,
     */
   def filter(epred: EdgeTriplet[VD, ED] => Boolean,
              vpred: (VertexId, VD) => Boolean): EdgePartition[ED, VD] = {
-    val builder = new ExistingEdgePartitionBuilder[ED, VD](
-        global2local, local2global, vertexAttrs, activeSet)
+    val builder = new ExistingEdgePartitionBuilder[ED, VD](global2local,
+                                                           local2global,
+                                                           vertexAttrs,
+                                                           activeSet)
     var i = 0
     while (i < size) {
       // The user sees the EdgeTriplet, so we can't reuse it and must create one per edge.
@@ -262,8 +267,10 @@ private[graphx] class EdgePartition[@specialized(Char,
     * @return a new edge partition without duplicate edges
     */
   def groupEdges(merge: (ED, ED) => ED): EdgePartition[ED, VD] = {
-    val builder = new ExistingEdgePartitionBuilder[ED, VD](
-        global2local, local2global, vertexAttrs, activeSet)
+    val builder = new ExistingEdgePartitionBuilder[ED, VD](global2local,
+                                                           local2global,
+                                                           vertexAttrs,
+                                                           activeSet)
     var currSrcId: VertexId = null.asInstanceOf[VertexId]
     var currDstId: VertexId = null.asInstanceOf[VertexId]
     var currLocalSrcId = -1
@@ -280,8 +287,11 @@ private[graphx] class EdgePartition[@specialized(Char,
         // This edge starts a new run of edges
         if (i > 0) {
           // First release the existing run to the builder
-          builder.add(
-              currSrcId, currDstId, currLocalSrcId, currLocalDstId, currAttr)
+          builder.add(currSrcId,
+                      currDstId,
+                      currLocalSrcId,
+                      currLocalDstId,
+                      currAttr)
         }
         // Then start accumulating for a new run
         currSrcId = srcIds(i)
@@ -294,8 +304,8 @@ private[graphx] class EdgePartition[@specialized(Char,
     }
     // Finally, release the last accumulated run
     if (size > 0) {
-      builder.add(
-          currSrcId, currDstId, currLocalSrcId, currLocalDstId, currAttr)
+      builder
+        .add(currSrcId, currDstId, currLocalSrcId, currLocalDstId, currAttr)
     }
     builder.toEdgePartition
   }
@@ -312,8 +322,10 @@ private[graphx] class EdgePartition[@specialized(Char,
     */
   def innerJoin[ED2: ClassTag, ED3: ClassTag](other: EdgePartition[ED2, _])(
       f: (VertexId, VertexId, ED, ED2) => ED3): EdgePartition[ED3, VD] = {
-    val builder = new ExistingEdgePartitionBuilder[ED3, VD](
-        global2local, local2global, vertexAttrs, activeSet)
+    val builder = new ExistingEdgePartitionBuilder[ED3, VD](global2local,
+                                                            local2global,
+                                                            vertexAttrs,
+                                                            activeSet)
     var i = 0
     var j = 0
     // For i = index of each edge in `this`...
@@ -447,8 +459,8 @@ private[graphx] class EdgePartition[@specialized(Char,
         val dstAttr =
           if (tripletFields.useDst) vertexAttrs(localDstId)
           else null.asInstanceOf[VD]
-        ctx.set(
-            srcId, dstId, localSrcId, localDstId, srcAttr, dstAttr, data(i))
+        ctx
+          .set(srcId, dstId, localSrcId, localDstId, srcAttr, dstAttr, data(i))
         sendMsg(ctx)
       }
       i += 1
@@ -528,8 +540,9 @@ private[graphx] class EdgePartition[@specialized(Char,
   }
 }
 
-private class AggregatingEdgeContext[VD, ED, A](
-    mergeMsg: (A, A) => A, aggregates: Array[A], bitset: BitSet)
+private class AggregatingEdgeContext[VD, ED, A](mergeMsg: (A, A) => A,
+                                                aggregates: Array[A],
+                                                bitset: BitSet)
     extends EdgeContext[VD, ED, A] {
 
   private[this] var _srcId: VertexId = _

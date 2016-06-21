@@ -155,23 +155,22 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
     // creates the pyspark archive. Instead, let's use PYSPARK_ARCHIVES_PATH to point at the
     // needed locations.
     val sparkHome = sys.props("spark.test.home")
-    val pythonPath = Seq(
-        s"$sparkHome/python/lib/py4j-0.9.2-src.zip", s"$sparkHome/python")
+    val pythonPath =
+      Seq(s"$sparkHome/python/lib/py4j-0.9.2-src.zip", s"$sparkHome/python")
     val extraEnv = Map("PYSPARK_ARCHIVES_PATH" -> pythonPath
                          .map("local:" + _)
                          .mkString(File.pathSeparator),
                        "PYTHONPATH" -> pythonPath.mkString(File.pathSeparator))
 
-    val moduleDir =
-      if (clientMode) {
-        // In client-mode, .py files added with --py-files are not visible in the driver.
-        // This is something that the launcher library would have to handle.
-        tempDir
-      } else {
-        val subdir = new File(tempDir, "pyModules")
-        subdir.mkdir()
-        subdir
-      }
+    val moduleDir = if (clientMode) {
+      // In client-mode, .py files added with --py-files are not visible in the driver.
+      // This is something that the launcher library would have to handle.
+      tempDir
+    } else {
+      val subdir = new File(tempDir, "pyModules")
+      subdir.mkdir()
+      subdir
+    }
     val pyModule = new File(moduleDir, "mod1.py")
     Files.write(TEST_PYMODULE, pyModule, StandardCharsets.UTF_8)
 
@@ -193,8 +192,8 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
     // Create a jar file that contains a different version of "test.resource".
     val originalJar =
       TestUtils.createJarWithFiles(Map("test.resource" -> "ORIGINAL"), tempDir)
-    val userJar = TestUtils.createJarWithFiles(
-        Map("test.resource" -> "OVERRIDDEN"), tempDir)
+    val userJar = TestUtils
+      .createJarWithFiles(Map("test.resource" -> "OVERRIDDEN"), tempDir)
     val driverResult = File.createTempFile("driver", null, tempDir)
     val executorResult = File.createTempFile("executor", null, tempDir)
     val finalState = runSpark(

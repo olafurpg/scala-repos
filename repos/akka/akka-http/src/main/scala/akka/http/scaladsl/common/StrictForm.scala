@@ -54,8 +54,7 @@ object StrictForm {
 
     implicit def unmarshaller[T](implicit um: FieldUnmarshaller[T])
       : FromStrictFormFieldUnmarshaller[T] =
-      Unmarshaller.withMaterializer(
-          implicit ec ⇒
+      Unmarshaller.withMaterializer(implicit ec ⇒
             implicit mat ⇒ {
           case FromString(value) ⇒ um.unmarshalString(value)
           case FromPart(value) ⇒ um.unmarshalPart(value)
@@ -77,22 +76,24 @@ object StrictForm {
 
     @implicitNotFound(
         "In order to unmarshal a `StrictForm.Field` to type `${T}` you need to supply a " +
-        "`FromStringUnmarshaller[${T}]` and/or a `FromEntityUnmarshaller[${T}]`")
+          "`FromStringUnmarshaller[${T}]` and/or a `FromEntityUnmarshaller[${T}]`")
     sealed trait FieldUnmarshaller[T] {
-      def unmarshalString(value: String)(
-          implicit ec: ExecutionContext, mat: Materializer): Future[T]
+      def unmarshalString(value: String)(implicit ec: ExecutionContext,
+                                         mat: Materializer): Future[T]
       def unmarshalPart(value: Multipart.FormData.BodyPart.Strict)(
-          implicit ec: ExecutionContext, mat: Materializer): Future[T]
+          implicit ec: ExecutionContext,
+          mat: Materializer): Future[T]
     }
     object FieldUnmarshaller extends LowPrioImplicits {
       implicit def fromBoth[T](
           implicit fsu: FromStringUnmarshaller[T],
           feu: FromEntityUnmarshaller[T]): FieldUnmarshaller[T] =
         new FieldUnmarshaller[T] {
-          def unmarshalString(value: String)(
-              implicit ec: ExecutionContext, mat: Materializer) = fsu(value)
+          def unmarshalString(value: String)(implicit ec: ExecutionContext,
+                                             mat: Materializer) = fsu(value)
           def unmarshalPart(value: Multipart.FormData.BodyPart.Strict)(
-              implicit ec: ExecutionContext, mat: Materializer) =
+              implicit ec: ExecutionContext,
+              mat: Materializer) =
             feu(value.entity)
         }
     }
@@ -100,10 +101,11 @@ object StrictForm {
       implicit def fromFSU[T](
           implicit fsu: FromStringUnmarshaller[T]): FieldUnmarshaller[T] =
         new FieldUnmarshaller[T] {
-          def unmarshalString(value: String)(
-              implicit ec: ExecutionContext, mat: Materializer) = fsu(value)
+          def unmarshalString(value: String)(implicit ec: ExecutionContext,
+                                             mat: Materializer) = fsu(value)
           def unmarshalPart(value: Multipart.FormData.BodyPart.Strict)(
-              implicit ec: ExecutionContext, mat: Materializer) = {
+              implicit ec: ExecutionContext,
+              mat: Materializer) = {
             val charsetName = value.entity.contentType
               .asInstanceOf[ContentType.NonBinary]
               .charset
@@ -115,11 +117,12 @@ object StrictForm {
       implicit def fromFEU[T](
           implicit feu: FromEntityUnmarshaller[T]): FieldUnmarshaller[T] =
         new FieldUnmarshaller[T] {
-          def unmarshalString(value: String)(
-              implicit ec: ExecutionContext, mat: Materializer) =
+          def unmarshalString(value: String)(implicit ec: ExecutionContext,
+                                             mat: Materializer) =
             feu(HttpEntity(value))
           def unmarshalPart(value: Multipart.FormData.BodyPart.Strict)(
-              implicit ec: ExecutionContext, mat: Materializer) =
+              implicit ec: ExecutionContext,
+              mat: Materializer) =
             feu(value.entity)
         }
     }
@@ -165,8 +168,8 @@ object StrictForm {
   /**
     * Simple model for strict file content in a multipart form data part.
     */
-  final case class FileData(
-      filename: Option[String], entity: HttpEntity.Strict)
+  final case class FileData(filename: Option[String],
+                            entity: HttpEntity.Strict)
 
   object FileData {
     implicit val unmarshaller: FromStrictFormFieldUnmarshaller[FileData] =

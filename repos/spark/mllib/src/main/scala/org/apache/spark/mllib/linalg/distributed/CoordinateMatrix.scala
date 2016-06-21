@@ -73,8 +73,9 @@ class CoordinateMatrix @Since("1.0.0")(
   /** Transposes this CoordinateMatrix. */
   @Since("1.3.0")
   def transpose(): CoordinateMatrix = {
-    new CoordinateMatrix(
-        entries.map(x => MatrixEntry(x.j, x.i, x.value)), numCols(), numRows())
+    new CoordinateMatrix(entries.map(x => MatrixEntry(x.j, x.i, x.value)),
+                         numCols(),
+                         numRows())
   }
 
   /** Converts to IndexedRowMatrix. The number of columns must be within the integer range. */
@@ -84,7 +85,7 @@ class CoordinateMatrix @Since("1.0.0")(
     if (nl > Int.MaxValue) {
       sys.error(
           s"Cannot convert to a row-oriented format because the number of columns $nl is " +
-          "too large.")
+            "too large.")
     }
     val n = nl.toInt
     val indexedRows = entries
@@ -132,8 +133,8 @@ class CoordinateMatrix @Since("1.0.0")(
     val n = numCols()
     val numRowBlocks = math.ceil(m.toDouble / rowsPerBlock).toInt
     val numColBlocks = math.ceil(n.toDouble / colsPerBlock).toInt
-    val partitioner = GridPartitioner(
-        numRowBlocks, numColBlocks, entries.partitions.length)
+    val partitioner =
+      GridPartitioner(numRowBlocks, numColBlocks, entries.partitions.length)
 
     val blocks: RDD[((Int, Int), Matrix)] = entries.map { entry =>
       val blockRowIndex = (entry.i / rowsPerBlock).toInt

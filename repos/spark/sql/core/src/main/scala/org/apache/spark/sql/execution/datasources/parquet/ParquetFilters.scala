@@ -42,8 +42,8 @@ private[sql] object ParquetFilters {
     override def inverseCanDrop(statistics: Statistics[T]): Boolean = false
   }
 
-  private val makeEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+  private val makeEq: PartialFunction[DataType,
+                                      (String, Any) => FilterPredicate] = {
     case BooleanType =>
       (n: String, v: Any) =>
         FilterApi.eq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
@@ -74,8 +74,8 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeNotEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+  private val makeNotEq: PartialFunction[DataType,
+                                         (String, Any) => FilterPredicate] = {
     case BooleanType =>
       (n: String, v: Any) =>
         FilterApi.notEq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
@@ -105,8 +105,8 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeLt: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+  private val makeLt: PartialFunction[DataType,
+                                      (String, Any) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.lt(intColumn(n), v.asInstanceOf[Integer])
@@ -132,8 +132,8 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeLtEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+  private val makeLtEq: PartialFunction[DataType,
+                                        (String, Any) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.ltEq(intColumn(n), v.asInstanceOf[java.lang.Integer])
@@ -159,8 +159,8 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeGt: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+  private val makeGt: PartialFunction[DataType,
+                                      (String, Any) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.gt(intColumn(n), v.asInstanceOf[java.lang.Integer])
@@ -186,8 +186,8 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeGtEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+  private val makeGtEq: PartialFunction[DataType,
+                                        (String, Any) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.gtEq(intColumn(n), v.asInstanceOf[java.lang.Integer])
@@ -213,20 +213,23 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeInSet: PartialFunction[
-      DataType, (String, Set[Any]) => FilterPredicate] = {
+  private val makeInSet: PartialFunction[DataType,
+                                         (String,
+                                          Set[Any]) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
-            intColumn(n), SetInFilter(v.asInstanceOf[Set[java.lang.Integer]]))
+            intColumn(n),
+            SetInFilter(v.asInstanceOf[Set[java.lang.Integer]]))
       case LongType =>
       (n: String, v: Set[Any]) =>
-        FilterApi.userDefined(
-            longColumn(n), SetInFilter(v.asInstanceOf[Set[java.lang.Long]]))
+        FilterApi.userDefined(longColumn(n),
+                              SetInFilter(v.asInstanceOf[Set[java.lang.Long]]))
       case FloatType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
-            floatColumn(n), SetInFilter(v.asInstanceOf[Set[java.lang.Float]]))
+            floatColumn(n),
+            SetInFilter(v.asInstanceOf[Set[java.lang.Float]]))
       case DoubleType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
@@ -365,8 +368,8 @@ private[sql] object ParquetFilters {
   private lazy val relaxParquetValidTypeMap: Unit = {
     val constructor = Class
       .forName(classOf[ValidTypeMap].getCanonicalName + "$FullTypeDescriptor")
-      .getDeclaredConstructor(
-          classOf[PrimitiveTypeName], classOf[OriginalType])
+      .getDeclaredConstructor(classOf[PrimitiveTypeName],
+                              classOf[OriginalType])
 
     constructor.setAccessible(true)
     val enumTypeDescriptor = constructor

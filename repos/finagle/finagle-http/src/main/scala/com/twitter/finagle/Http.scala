@@ -77,8 +77,8 @@ object Http
       val default = CompressionLevel(-1)
     }
 
-    private[Http] def applyToCodec(
-        params: Stack.Params, codec: http.Http): http.Http =
+    private[Http] def applyToCodec(params: Stack.Params,
+                                   codec: http.Http): http.Http =
       codec
         .maxRequestSize(params[MaxRequestSize].size)
         .maxResponseSize(params[MaxResponseSize].size)
@@ -89,23 +89,26 @@ object Http
 
   // Only record payload sizes when streaming is disabled.
   private[this] val nonChunkedPayloadSize: Stackable[
-      ServiceFactory[Request, Response]] = new Stack.Module2[
-      param.Streaming, Stats, ServiceFactory[Request, Response]] {
-    override def role: Stack.Role = PayloadSizeFilter.Role
-    override def description: String = PayloadSizeFilter.Description
+      ServiceFactory[Request, Response]] =
+    new Stack.Module2[param.Streaming,
+                      Stats,
+                      ServiceFactory[Request, Response]] {
+      override def role: Stack.Role = PayloadSizeFilter.Role
+      override def description: String = PayloadSizeFilter.Description
 
-    override def make(
-        streaming: param.Streaming,
-        stats: Stats,
-        next: ServiceFactory[Request, Response]
-    ): ServiceFactory[Request, Response] = {
-      if (!streaming.enabled)
-        new PayloadSizeFilter[Request, Response](
-            stats.statsReceiver, _.content.length, _.content.length)
-          .andThen(next)
-      else next
+      override def make(
+          streaming: param.Streaming,
+          stats: Stats,
+          next: ServiceFactory[Request, Response]
+      ): ServiceFactory[Request, Response] = {
+        if (!streaming.enabled)
+          new PayloadSizeFilter[Request, Response](
+              stats.statsReceiver,
+              _.content.length,
+              _.content.length).andThen(next)
+        else next
+      }
     }
-  }
 
   object Client {
     val stack: Stack[ServiceFactory[Request, Response]] = StackClient.newStack
@@ -253,16 +256,17 @@ object Http
       Netty3Listener(httpPipeline, params)
     }
 
-    protected def newDispatcher(
-        transport: Transport[In, Out], service: Service[Request, Response]) = {
+    protected def newDispatcher(transport: Transport[In, Out],
+                                service: Service[Request, Response]) = {
       val dtab = new DtabFilter.Finagle[Request]
       val context = new ServerContextFilter[Request, Response]
       val Stats(stats) = params[Stats]
 
       val endpoint = dtab.andThen(context).andThen(service)
 
-      new HttpServerDispatcher(
-          new HttpTransport(transport), endpoint, stats.scope("dispatch"))
+      new HttpServerDispatcher(new HttpTransport(transport),
+                               endpoint,
+                               stats.scope("dispatch"))
     }
 
     protected def copy1(

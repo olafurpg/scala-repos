@@ -77,7 +77,7 @@ class TaskFailureRepositoryTest
     )
     lazy val metricRegistry = new MetricRegistry
     lazy val metrics = new Metrics(metricRegistry)
-    lazy val taskFailureRepo = new TaskFailureRepository(
-        entityStore, maxVersions = Some(1), metrics)
+    lazy val taskFailureRepo =
+      new TaskFailureRepository(entityStore, maxVersions = Some(1), metrics)
   }
 }

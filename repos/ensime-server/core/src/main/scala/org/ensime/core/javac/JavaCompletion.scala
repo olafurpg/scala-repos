@@ -23,10 +23,10 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
 
   import CompletionUtil._
 
-  protected def scopeForPoint(
-      file: SourceFileInfo, offset: Int): Option[(CompilationInfo, Scope)]
-  protected def pathToPoint(
-      file: SourceFileInfo, offset: Int): Option[(CompilationInfo, TreePath)]
+  protected def scopeForPoint(file: SourceFileInfo,
+                              offset: Int): Option[(CompilationInfo, Scope)]
+  protected def pathToPoint(file: SourceFileInfo,
+                            offset: Int): Option[(CompilationInfo, TreePath)]
   protected def indexer: ActorRef
 
   def completionsAt(info: SourceFileInfo,
@@ -62,54 +62,61 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
          // Erase the trailing partial subtype (it breaks type resolution).
          val patched =
            s.substring(0, indexAfterTarget) + " " +
-           s.substring(indexAfterTarget + defaultPrefix.length + 1);
+             s.substring(indexAfterTarget + defaultPrefix.length + 1);
          (pathToPoint(SourceFileInfo(info.file, Some(patched), None),
                       indexAfterTarget - 1) map {
                case (info: CompilationInfo, path: TreePath) => {
-                   memberCandidates(
-                       info, path.getLeaf, defaultPrefix, true, caseSens)
-                 }
+                 memberCandidates(info,
+                                  path.getLeaf,
+                                  defaultPrefix,
+                                  true,
+                                  caseSens)
+               }
              })
        } else if (ImportRegexp.findFirstMatchIn(preceding).isDefined) {
          (pathToPoint(info, indexAfterTarget) flatMap {
                case (info: CompilationInfo, path: TreePath) => {
-                   getEnclosingMemberSelectTree(path).map { m =>
-                     packageMemberCandidates(info, m, defaultPrefix, caseSens)
-                   }
+                 getEnclosingMemberSelectTree(path).map { m =>
+                   packageMemberCandidates(info, m, defaultPrefix, caseSens)
                  }
+               }
              })
        } else if (isMemberAccess) {
          // TODO how to avoid allocating a new string? buffer of immutable string slices?
          // Erase the trailing partial member (it breaks type resolution).
          val patched =
            s.substring(0, indexAfterTarget) + ".wait()" +
-           s.substring(indexAfterTarget + defaultPrefix.length + 1);
+             s.substring(indexAfterTarget + defaultPrefix.length + 1);
          (pathToPoint(SourceFileInfo(info.file, Some(patched), None),
                       indexAfterTarget + 1) flatMap {
                case (info: CompilationInfo, path: TreePath) => {
-                   getEnclosingMemberSelectTree(path).map { m =>
-                     memberCandidates(info,
-                                      m.getExpression(),
-                                      defaultPrefix,
-                                      false,
-                                      caseSens)
-                   }
+                 getEnclosingMemberSelectTree(path).map { m =>
+                   memberCandidates(info,
+                                    m.getExpression(),
+                                    defaultPrefix,
+                                    false,
+                                    caseSens)
                  }
+               }
              })
        } else {
 
          // Kick off an index search if the name looks like a type.
          val typeSearch =
            if (TypeNameRegex.findFirstMatchIn(defaultPrefix).isDefined) {
-             Some(fetchTypeSearchCompletions(
-                     defaultPrefix, maxResults, indexer))
+             Some(fetchTypeSearchCompletions(defaultPrefix,
+                                             maxResults,
+                                             indexer))
            } else None
 
          (scopeForPoint(info, indexAfterTarget) map {
                case (info: CompilationInfo, s: Scope) => {
-                   scopeMemberCandidates(
-                       info, s, defaultPrefix, caseSens, constructing)
-                 }
+                 scopeMemberCandidates(info,
+                                       s,
+                                       defaultPrefix,
+                                       caseSens,
+                                       constructing)
+               }
              }) map { scopeCandidates =>
            val typeSearchResult = typeSearch
              .flatMap(Await.result(_, Duration.Inf))
@@ -263,28 +270,27 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
     val candidates = typeElement(info, target).map { el =>
       el match {
         case tel: TypeElement => {
-            val elements: Elements = info.getElements()
-            elements.getAllMembers(tel).flatMap { e =>
-              filterElement(info, e, prefix, caseSense, importing, false)
-            }
+          val elements: Elements = info.getElements()
+          elements.getAllMembers(tel).flatMap { e =>
+            filterElement(info, e, prefix, caseSense, importing, false)
           }
+        }
         case e => {
-            log.warn("Unrecognized type element " + e)
-            List()
-          }
+          log.warn("Unrecognized type element " + e)
+          List()
+        }
       }
     }.getOrElse(List())
     candidates.toList
   }
 
-  private def methodInfo(
-      e: ExecutableElement, relavence: Int): CompletionInfo = {
+  private def methodInfo(e: ExecutableElement,
+                         relavence: Int): CompletionInfo = {
     val s = e.getSimpleName.toString
     CompletionInfo(
         s,
         CompletionSignature(
-            List(
-                e.getParameters()
+            List(e.getParameters()
                   .map { p =>
                 (p.getSimpleName.toString, p.asType.toString)
               }

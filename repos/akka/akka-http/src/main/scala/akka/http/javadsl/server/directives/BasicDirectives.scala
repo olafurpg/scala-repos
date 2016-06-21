@@ -79,8 +79,8 @@ abstract class BasicDirectives extends BasicDirectivesBase {
   /**
     * A route that extracts a value and completes the request with it.
     */
-  def extractAndComplete[T](
-      marshaller: Marshaller[T], extraction: RequestVal[T]): Route =
+  def extractAndComplete[T](marshaller: Marshaller[T],
+                            extraction: RequestVal[T]): Route =
     handle(extraction)(ctx ⇒ ctx.completeAs(marshaller, extraction.get(ctx)))
 
   /**
@@ -116,8 +116,10 @@ abstract class BasicDirectives extends BasicDirectivesBase {
   def handleReflectively(instance: AnyRef,
                          methodName: String,
                          extractions: RequestVal[_]*): Route =
-    handleReflectively(
-        instance.getClass, instance, methodName, extractions: _*)
+    handleReflectively(instance.getClass,
+                       instance,
+                       methodName,
+                       extractions: _*)
 
   /**
     * Handles the route by reflectively calling the static method specified by `clazz`, and `methodName`.
@@ -167,27 +169,27 @@ abstract class BasicDirectives extends BasicDirectivesBase {
       def paramsMatch(params: Seq[Class[_]]): Boolean = {
         val res =
           params.size == extractionTypes.size &&
-          (params, extractionTypes).zipped.forall(paramMatches)
+            (params, extractionTypes).zipped.forall(paramMatches)
 
         res
       }
       def returnTypeMatches(method: Method): Boolean =
         method.getReturnType == classOf[RouteResult] ||
-        returnsFuture(method) || returnsCompletionStage(method)
+          returnsFuture(method) || returnsCompletionStage(method)
 
       def returnsFuture(method: Method): Boolean =
         method.getReturnType == classOf[Future[_]] &&
-        method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
-        method.getGenericReturnType
-          .asInstanceOf[ParameterizedType]
-          .getActualTypeArguments()(0) == classOf[RouteResult]
+          method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
+          method.getGenericReturnType
+            .asInstanceOf[ParameterizedType]
+            .getActualTypeArguments()(0) == classOf[RouteResult]
 
       def returnsCompletionStage(method: Method): Boolean =
         method.getReturnType == classOf[CompletionStage[_]] &&
-        method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
-        method.getGenericReturnType
-          .asInstanceOf[ParameterizedType]
-          .getActualTypeArguments()(0) == classOf[RouteResult]
+          method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
+          method.getGenericReturnType
+            .asInstanceOf[ParameterizedType]
+            .getActualTypeArguments()(0) == classOf[RouteResult]
 
       /** Makes sure both RouteResult and Future[RouteResult] are acceptable result types. */
       def adaptResult(method: Method): (RequestContext, AnyRef) ⇒ RouteResult =
@@ -209,8 +211,8 @@ abstract class BasicDirectives extends BasicDirectivesBase {
           (ctx, params) ⇒
             resultAdaptor(
                 ctx,
-                method.invoke(
-                    instance, params.toArray.asInstanceOf[Array[AnyRef]]: _*))
+                method.invoke(instance,
+                              params.toArray.asInstanceOf[Array[AnyRef]]: _*))
         else
           (ctx, params) ⇒
             resultAdaptor(ctx,

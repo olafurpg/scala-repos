@@ -24,8 +24,8 @@ import com.sun.tools.javac.tree.JCTree._
   */
 trait UnsafeHelpers extends SLF4JLogging {
 
-  protected def unsafeGetElement(
-      info: CompilationInfo, t: Tree): Option[Element] = {
+  protected def unsafeGetElement(info: CompilationInfo,
+                                 t: Tree): Option[Element] = {
     t match {
       case t: JCCompilationUnit => Some(t.packge)
       case t: JCClassDecl => Some(t.sym)

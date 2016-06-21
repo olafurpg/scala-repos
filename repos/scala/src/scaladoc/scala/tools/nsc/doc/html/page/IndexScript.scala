@@ -29,25 +29,25 @@ class IndexScript(universe: doc.Universe) extends Page {
     val pairs = allPackagesWithTemplates.toIterable
       .map(_ match {
         case (pack, templates) => {
-            val merged = mergeByQualifiedName(templates)
+          val merged = mergeByQualifiedName(templates)
 
-            val ary = merged.keys.toList
-              .sortBy(_.toLowerCase)
-              .map(key => {
-                val pairs = merged(key).flatMap {
-                  t: DocTemplateEntity =>
-                    Seq(kindToString(t) -> relativeLinkTo(t),
-                        "kind" -> kindToString(t),
-                        "members" -> membersToJSON(t.members.filter(
-                                !_.isShadowedOrAmbiguousImplicit)),
-                        "shortDescription" -> shortDesc(t))
-                }
+          val ary = merged.keys.toList
+            .sortBy(_.toLowerCase)
+            .map(key => {
+              val pairs = merged(key).flatMap {
+                t: DocTemplateEntity =>
+                  Seq(kindToString(t) -> relativeLinkTo(t),
+                      "kind" -> kindToString(t),
+                      "members" -> membersToJSON(
+                          t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
+                      "shortDescription" -> shortDesc(t))
+              }
 
-                JSONObject(Map(pairs: _*) + ("name" -> key))
-              })
+              JSONObject(Map(pairs: _*) + ("name" -> key))
+            })
 
-            pack.qualifiedName -> JSONArray(ary)
-          }
+          pack.qualifiedName -> JSONArray(ary)
+        }
       })
       .toSeq
 
@@ -75,12 +75,11 @@ class IndexScript(universe: doc.Universe) extends Page {
   }
 
   def allPackagesWithTemplates = {
-    Map(
-        allPackages.map((key) => {
+    Map(allPackages.map((key) => {
       key -> key.templates.collect {
         case t: DocTemplateEntity
             if !t.isPackage &&
-            !universe.settings.hardcoded.isExcluded(t.qualifiedName) =>
+              !universe.settings.hardcoded.isExcluded(t.qualifiedName) =>
           t
       }
     }): _*)

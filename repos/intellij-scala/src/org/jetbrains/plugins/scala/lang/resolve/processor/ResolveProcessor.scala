@@ -41,7 +41,7 @@ object ResolveProcessor {
               case Some(c: ScObject) => defaultForTypeAlias(t)
               case Some(td: ScTypeDefinition)
                   if td.typeParameters.length == 0 &&
-                  ScalaPsiUtil.hasStablePath(td) =>
+                    ScalaPsiUtil.hasStablePath(td) =>
                 "Class:" + td.qualifiedName
               case Some(c: PsiClass) if c.getTypeParameters.length == 0 =>
                 "Class:" + c.qualifiedName
@@ -162,7 +162,7 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
           addResult(resolveResult)
         case clazz: PsiClass
             if !isThisOrSuperResolve ||
-            PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
+              PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
           addResult(
               new ScalaResolveResult(named,
                                      getSubst(state),
@@ -187,16 +187,15 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     true
   }
 
-  protected def nameAndKindMatch(
-      named: PsiNamedElement, state: ResolveState): Boolean = {
+  protected def nameAndKindMatch(named: PsiNamedElement,
+                                 state: ResolveState): Boolean = {
     val nameSet = state.get(ResolverEnv.nameKey)
-    val elName =
-      if (nameSet == null) {
-        val name = named.name
-        if (name == null) return false
-        if (name == "") return false
-        name
-      } else nameSet
+    val elName = if (nameSet == null) {
+      val name = named.name
+      if (name == null) return false
+      if (name == "") return false
+      name
+    } else nameSet
     val nameMatches = ScalaPsiUtil.memberNamesEquals(elName, name)
     nameMatches && kindMatches(named)
   }
@@ -238,13 +237,14 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     }
      */
     res.filter {
-      case r @ ScalaResolveResult(
-          _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
+      case r @ ScalaResolveResult(_: ScTypeAlias | _: ScClass | _: ScTrait,
+                                  _) =>
         res.foldLeft(true) {
           case (false, _) => false
           case (true,
-                rr @ ScalaResolveResult(
-                _: ScTypeAlias | _: ScClass | _: ScTrait, _)) =>
+                rr @ ScalaResolveResult(_: ScTypeAlias | _: ScClass |
+                                        _: ScTrait,
+                                        _)) =>
             rr.element.name != r.element.name || ScalaPsiUtil
               .superTypeMembers(rr.element)
               .find(_ == r.element) == None

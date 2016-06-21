@@ -19,8 +19,8 @@ object CofreeTest extends SpecLite {
   type OneAndList[A] = OneAnd[List, A]
   type CofreeOption[A] = Cofree[Option, A]
 
-  implicit def cofreeEqual[F[_], A](
-      implicit F: Eq1[F], A: Equal[A]): Equal[Cofree[F, A]] =
+  implicit def cofreeEqual[F[_], A](implicit F: Eq1[F],
+                                    A: Equal[A]): Equal[Cofree[F, A]] =
     Equal.equal { (a, b) =>
       A.equal(a.head, b.head) && F.eq1(cofreeEqual[F, A]).equal(a.tail, b.tail)
     }
@@ -129,8 +129,10 @@ object CofreeTest extends SpecLite {
       }
 
     checkAll("CofreeZipLazyOption",
-             applicative.laws[CofreeZipLazyOption](
-                 implicitly, implicitly, implicitly, CofreeZipLazyOptionEqual))
+             applicative.laws[CofreeZipLazyOption](implicitly,
+                                                   implicitly,
+                                                   implicitly,
+                                                   CofreeZipLazyOptionEqual))
   }
 
   {
@@ -148,7 +150,7 @@ object CofreeTest extends SpecLite {
     val b = Applicative[CofreeZip[IList, ?]].point(a)
     val size = 10
     Foldable[Cofree[IList, ?]].toStream(Tag.unwrap(b)).take(size) must_===
-      Stream.fill(size)(a)
+    Stream.fill(size)(a)
   }
 
   "Applicative[λ[α => CofreeZip[LazyOption, α]]] is Applicative[λ[α => Stream[α] @@ Zip]]" ! forAll {

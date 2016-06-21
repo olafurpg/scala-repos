@@ -8,8 +8,9 @@ import ir._
 
 import internal._
 
-class RuntimeTypeInfo(
-    classLoader: ClassLoader, clazz: Class[_], share: refs.Share) {
+class RuntimeTypeInfo(classLoader: ClassLoader,
+                      clazz: Class[_],
+                      share: refs.Share) {
   import ru._
   import definitions._
 
@@ -25,8 +26,8 @@ class RuntimeTypeInfo(
       if (clazz != null) clazz.getComponentType() else null
 
     if (elemClass != null) // assume it's an array
-      appliedType(
-          ArrayClass.toType, List(mirror.classSymbol(elemClass).asType.toType))
+      appliedType(ArrayClass.toType,
+                  List(mirror.classSymbol(elemClass).asType.toType))
     else sym.asType.toType
   }
   // debug(s"tpe: ${tpe.key}")
@@ -49,9 +50,9 @@ class RuntimeTypeInfo(
 }
 
 // Note: This entire class must be constructed inside of a GRL-locked method.
-class RuntimePickler(
-    classLoader: ClassLoader, clazz: Class[_], fastTag: FastTypeTag[_])(
-    implicit share: refs.Share)
+class RuntimePickler(classLoader: ClassLoader,
+                     clazz: Class[_],
+                     fastTag: FastTypeTag[_])(implicit share: refs.Share)
     extends RuntimeTypeInfo(classLoader, clazz, share) {
   import ru._
 
@@ -61,14 +62,13 @@ class RuntimePickler(
   sealed abstract class Logic(fir: irs.FieldIR, isEffFinal: Boolean) {
     // debug(s"creating Logic for ${fir.name}")
     def run(builder: PBuilder, picklee: Any, im: ru.InstanceMirror): Unit = {
-      val fldValue: Any =
-        if (fir.accessor.nonEmpty) {
-          val getterMirror = im.reflectMethod(fir.accessor.get)
-          getterMirror()
-        } else {
-          val fldMirror = im.reflectField(fir.field.get)
-          fldMirror.get
-        }
+      val fldValue: Any = if (fir.accessor.nonEmpty) {
+        val getterMirror = im.reflectMethod(fir.accessor.get)
+        getterMirror()
+      } else {
+        val fldMirror = im.reflectField(fir.field.get)
+        fldMirror.get
+      }
       val fldClass = if (fldValue != null) fldValue.getClass else null
 
       //debug(s"pickling field of type: ${fir.tpe.toString}")
@@ -144,8 +144,9 @@ class RuntimePickler(
   sealed class PrivateJavaFieldLogic(fir: irs.FieldIR, field: Field)
       extends Logic(fir, false) {
     // debug(s"creating PrivateJavaFieldLogic for ${fir.name}")
-    override def run(
-        builder: PBuilder, picklee: Any, im: ru.InstanceMirror): Unit = {
+    override def run(builder: PBuilder,
+                     picklee: Any,
+                     im: ru.InstanceMirror): Unit = {
       field.setAccessible(true)
       val fldValue = field.get(picklee)
       val fldClass = if (fldValue != null) fldValue.getClass else null
@@ -180,8 +181,8 @@ class RuntimePickler(
     }
   }
 
-  final class PrivateEffectivelyFinalJavaFieldLogic(
-      fir: irs.FieldIR, field: Field)
+  final class PrivateEffectivelyFinalJavaFieldLogic(fir: irs.FieldIR,
+                                                    field: Field)
       extends PrivateJavaFieldLogic(fir, field) {
     // debug(s"creating PrivateEffectivelyFinalJavaFieldLogic for ${fir.name}")
     override def pickleLogic(fldClass: Class[_],

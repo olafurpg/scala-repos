@@ -59,8 +59,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
 
   private object curSession
       extends RequestVar[LiftSession](
-          S.session openOr LiftRules.statelessSession.vend
-            .apply(curRequest.is)) {
+          S.session openOr LiftRules.statelessSession.vend.apply(curRequest.is)) {
     override def __nameSalt = Helpers.nextFuncName
   }
 
@@ -189,8 +188,8 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * messages from Failure() and return codes and messages
     * from ParamFailure[Int[(msg, _, _, code) 
     */
-  protected implicit def boxToResp[T](
-      in: Box[T])(implicit c: T => MVCResponse): Box[LiftResponse] =
+  protected implicit def boxToResp[T](in: Box[T])(
+      implicit c: T => MVCResponse): Box[LiftResponse] =
     in match {
       case Full(v) => c(v).toResponse
       case e: EmptyBox => emptyToResp(e)

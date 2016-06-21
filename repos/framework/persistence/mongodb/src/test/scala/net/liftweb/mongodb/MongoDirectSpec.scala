@@ -70,8 +70,7 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       doc.put("count", 2)
       val q = new BasicDBObject("name", "MongoDB") // the query to select the document(s) to update
       val o = doc // the new object to update with, replaces the entire document, except possibly _id
-      val upsert =
-        false // if the database should create the element if it does not exist
+      val upsert = false // if the database should create the element if it does not exist
       val apply = false // if an _id field should be added to the new object
       coll.update(q, o, upsert, apply)
 
@@ -143,8 +142,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       cur3.count must_== 50
 
       // range - 20 < i <= 30
-      val cur4 = coll.find(new BasicDBObject(
-              "i", new BasicDBObject("$gt", 20).append("$lte", 30)))
+      val cur4 = coll.find(
+          new BasicDBObject("i",
+                            new BasicDBObject("$gt", 20).append("$lte", 30)))
 
       cur4.count must_== 10
 

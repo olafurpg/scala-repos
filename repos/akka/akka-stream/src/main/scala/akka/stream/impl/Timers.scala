@@ -171,8 +171,8 @@ private[stream] object Timers {
                     s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
-          schedulePeriodically(
-              "IdleTimeoutCheckTimer", idleTimeoutCheckInterval(timeout))
+          schedulePeriodically("IdleTimeoutCheckTimer",
+                               idleTimeoutCheckInterval(timeout))
       }
   }
 
@@ -210,8 +210,8 @@ private[stream] object Timers {
       }
   }
 
-  final class IdleInject[I, O >: I](
-      val timeout: FiniteDuration, inject: () ⇒ O)
+  final class IdleInject[I, O >: I](val timeout: FiniteDuration,
+                                    inject: () ⇒ O)
       extends GraphStage[FlowShape[I, O]] {
     val in: Inlet[I] = Inlet("IdleInject.in")
     val out: Outlet[O] = Outlet("IdleInject.out")

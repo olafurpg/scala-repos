@@ -78,16 +78,16 @@ object Tournament extends LilaController {
           repo byId id flatMap {
             case None => NotFound(jsonError("No such tournament")).fuccess
             case Some(tour) => {
-                get("playerInfo").?? { env.api.playerInfo(tour.id, _) } zip getBool(
-                    "socketVersion").??(env version tour.id map some) flatMap {
-                  case (playerInfoExt, socketVersion) =>
-                    env.jsonView(tour,
-                                 page,
-                                 ctx.userId,
-                                 playerInfoExt,
-                                 socketVersion)
-                } map { Ok(_) }
-              }.mon(_.http.response.tournament.show.mobile)
+              get("playerInfo").?? { env.api.playerInfo(tour.id, _) } zip getBool(
+                  "socketVersion").??(env version tour.id map some) flatMap {
+                case (playerInfoExt, socketVersion) =>
+                  env.jsonView(tour,
+                               page,
+                               ctx.userId,
+                               playerInfoExt,
+                               socketVersion)
+              } map { Ok(_) }
+            }.mon(_.http.response.tournament.show.mobile)
           } map (_ as JSON)
     ) map NoCache
   }
@@ -185,12 +185,11 @@ object Tournament extends LilaController {
   def create = AuthBody { implicit ctx => implicit me =>
     NoLame {
       implicit val req = ctx.body
-      env.forms.create.bindFromRequest.fold(
-          err => BadRequest(html.tournament.form(err, env.forms)).fuccess,
-          setup =>
+      env.forms.create.bindFromRequest.fold(err =>
+            BadRequest(html.tournament.form(err, env.forms)).fuccess, setup =>
             env.api.createTournament(setup, me) map { tour =>
-              Redirect(routes.Tournament.show(tour.id))
-          })
+          Redirect(routes.Tournament.show(tour.id))
+      })
     }
   }
 

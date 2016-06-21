@@ -147,12 +147,11 @@ object LDAPUtil {
       }
     }
 
-    val conn: LDAPConnection =
-      if (ssl) {
-        new LDAPConnection(new LDAPJSSESecureSocketFactory())
-      } else {
-        new LDAPConnection(new LDAPJSSEStartTLSFactory())
-      }
+    val conn: LDAPConnection = if (ssl) {
+      new LDAPConnection(new LDAPJSSESecureSocketFactory())
+    } else {
+      new LDAPConnection(new LDAPJSSEStartTLSFactory())
+    }
 
     try {
       // Connect to the server
@@ -170,15 +169,15 @@ object LDAPUtil {
       f(conn)
     } catch {
       case e: Exception => {
-          // Provide more information if something goes wrong
-          logger.info("" + e)
+        // Provide more information if something goes wrong
+        logger.info("" + e)
 
-          if (conn.isConnected) {
-            conn.disconnect()
-          }
-          // Returns an error message
-          Left(error)
+        if (conn.isConnected) {
+          conn.disconnect()
         }
+        // Returns an error message
+        Left(error)
+      }
     }
   }
 
@@ -198,12 +197,12 @@ object LDAPUtil {
         getEntries(
             results,
             entries :+
-            (try {
-                  Option(results.next)
-                } catch {
-                  case ex: LDAPReferralException =>
-                    None // NOTE(tanacasino): Referral follow is off. so ignores it.(for AD)
-                }))
+              (try {
+                    Option(results.next)
+                  } catch {
+                    case ex: LDAPReferralException =>
+                      None // NOTE(tanacasino): Referral follow is off. so ignores it.(for AD)
+                  }))
       } else {
         entries.flatten
       }
@@ -256,6 +255,7 @@ object LDAPUtil {
       } else None
     }
 
-  case class LDAPUserInfo(
-      userName: String, fullName: String, mailAddress: String)
+  case class LDAPUserInfo(userName: String,
+                          fullName: String,
+                          mailAddress: String)
 }

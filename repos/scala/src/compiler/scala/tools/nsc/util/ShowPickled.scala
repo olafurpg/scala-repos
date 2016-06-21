@@ -18,8 +18,10 @@ import scala.reflect.internal.pickling.{PickleBuffer, PickleFormat}
 object ShowPickled extends Names {
   import PickleFormat._
 
-  case class PickleBufferEntry(
-      num: Int, startIndex: Int, tag: Int, bytes: Array[Byte]) {
+  case class PickleBufferEntry(num: Int,
+                               startIndex: Int,
+                               tag: Int,
+                               bytes: Array[Byte]) {
     def isName = tag == TERMname || tag == TYPEname
     def hasName = tag match {
       case TYPEsym | ALIASsym | CLASSsym | MODULEsym | VALsym |

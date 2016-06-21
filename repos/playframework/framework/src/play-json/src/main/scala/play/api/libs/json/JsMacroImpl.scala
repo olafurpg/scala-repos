@@ -13,15 +13,21 @@ import language.experimental.macros
 object JsMacroImpl {
 
   def formatImpl[A: c.WeakTypeTag](c: Context): c.Expr[OFormat[A]] =
-    macroImpl[A, OFormat, Format](
-        c, "format", "inmap", reads = true, writes = true)
+    macroImpl[A, OFormat, Format](c,
+                                  "format",
+                                  "inmap",
+                                  reads = true,
+                                  writes = true)
 
   def readsImpl[A: c.WeakTypeTag](c: Context): c.Expr[Reads[A]] =
     macroImpl[A, Reads, Reads](c, "read", "map", reads = true, writes = false)
 
   def writesImpl[A: c.WeakTypeTag](c: Context): c.Expr[OWrites[A]] =
-    macroImpl[A, OWrites, Writes](
-        c, "write", "contramap", reads = false, writes = true)
+    macroImpl[A, OWrites, Writes](c,
+                                  "write",
+                                  "contramap",
+                                  reads = false,
+                                  writes = true)
 
   /**
     * Generic implementation of the macro
@@ -54,7 +60,7 @@ object JsMacroImpl {
     // writes or both.
     def conditionalList[T](ifReads: T, ifWrites: T): List[T] =
       (if (reads) List(ifReads) else Nil) :::
-      (if (writes) List(ifWrites) else Nil)
+        (if (writes) List(ifWrites) else Nil)
 
     import c.universe._
 
@@ -174,8 +180,8 @@ object JsMacroImpl {
       }
 
       // builds M implicit from expected type
-      val neededImplicitType = appliedType(
-          natag.tpe.typeConstructor, tpe :: Nil)
+      val neededImplicitType =
+        appliedType(natag.tpe.typeConstructor, tpe :: Nil)
       // infers implicit
       val neededImplicit = c.inferImplicitValue(neededImplicitType)
       Implicit(name, implType, neededImplicit, isRecursive, tpe)
@@ -184,12 +190,11 @@ object JsMacroImpl {
     val applyParamImplicits = params.map { param =>
       createImplicit(param.name, param.typeSignature)
     }
-    val effectiveInferredImplicits =
-      if (hasVarArgs) {
-        val varArgsImplicit = createImplicit(
-            applyParamImplicits.last.paramName, unapplyReturnTypes.get.last)
-        applyParamImplicits.init :+ varArgsImplicit
-      } else applyParamImplicits
+    val effectiveInferredImplicits = if (hasVarArgs) {
+      val varArgsImplicit = createImplicit(applyParamImplicits.last.paramName,
+                                           unapplyReturnTypes.get.last)
+      applyParamImplicits.init :+ varArgsImplicit
+    } else applyParamImplicits
 
     // if any implicit is missing, abort
     val missingImplicits = effectiveInferredImplicits.collect {
@@ -272,18 +277,17 @@ object JsMacroImpl {
       $canBuild.$applyOrMap(..${conditionalList(applyFunction, unapplyFunction)})
     """
 
-    val lazyFinalTree =
-      if (!hasRec) {
-        finalTree
-      } else {
-        // If we're recursive, we need to wrap the whole thing in a class that breaks the recursion using a
-        // lazy val
-        q"""
+    val lazyFinalTree = if (!hasRec) {
+      finalTree
+    } else {
+      // If we're recursive, we need to wrap the whole thing in a class that breaks the recursion using a
+      // lazy val
+      q"""
         new $LazyHelper[${matag.tpe.typeSymbol}, ${atag.tpe.typeSymbol}] {
           override lazy val lazyStuff: ${matag.tpe.typeSymbol}[${atag.tpe}] = $finalTree
         }.lazyStuff
        """
-      }
+    }
     c.Expr[M[A]](lazyFinalTree)
   }
 }

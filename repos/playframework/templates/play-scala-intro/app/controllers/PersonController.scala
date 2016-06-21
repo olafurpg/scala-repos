@@ -15,8 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject._
 
 class PersonController @Inject()(
-    repo: PersonRepository, val messagesApi: MessagesApi)(
-    implicit ec: ExecutionContext)
+    repo: PersonRepository,
+    val messagesApi: MessagesApi)(implicit ec: ExecutionContext)
     extends Controller
     with I18nSupport {
 

@@ -38,11 +38,11 @@ object DequeueTest extends SpecLite {
 
   "snoc works" ! forAll { (l: List[Int]) ⇒
     (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q, a) ⇒ q snoc a)).toStream must_===
-      l.toStream
+    l.toStream
   }
 
   "cons works" ! forAll { (l: List[Int]) ⇒
     (l.foldRight[Dequeue[Int]](Dequeue.empty)((a, q) ⇒ q cons a)).toStream must_===
-      l.toStream
+    l.toStream
   }
 }

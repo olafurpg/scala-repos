@@ -40,7 +40,7 @@ object Tag {
   def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = fa.asInstanceOf[F[A]]
 
   /** @see `Tag.of` */
-  final class TagOf[T] private[Tag]() extends (Id.Id ~> (? @@ T)) {
+  final class TagOf[T] private[Tag] () extends (Id.Id ~> (? @@ T)) {
 
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)

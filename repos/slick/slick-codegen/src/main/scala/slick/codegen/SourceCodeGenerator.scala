@@ -137,7 +137,8 @@ object SourceCodeGenerator {
             Some(password),
             ignoreInvalidDefaults.toBoolean)
       case _ => {
-          println("""
+        println(
+            """
             |Usage:
             |  SourceCodeGenerator configURI [outputDir]
             |  SourceCodeGenerator profile jdbcDriver url outputDir pkg [user password]
@@ -158,8 +159,8 @@ object SourceCodeGenerator {
             |slick.basic.DatabaseConfig you can set "codegen.package" and
             |"codegen.outputDir". The latter can be overridden on the command line.
           """.stripMargin.trim)
-          System.exit(1)
-        }
+        System.exit(1)
+      }
     }
   }
 }

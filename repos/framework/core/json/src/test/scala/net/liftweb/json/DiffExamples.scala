@@ -63,8 +63,9 @@ object DiffExamples extends Specification {
     val expectedAdditions = read("/diff-example-expected-additions.json")
     val expectedDeletions = read("/diff-example-expected-deletions.json")
 
-    json1 diff json2 mustEqual Diff(
-        expectedChanges, expectedAdditions, expectedDeletions)
+    json1 diff json2 mustEqual Diff(expectedChanges,
+                                    expectedAdditions,
+                                    expectedDeletions)
   }
 
   private def read(resource: String) =

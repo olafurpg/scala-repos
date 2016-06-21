@@ -17,8 +17,8 @@ class OneAndTests extends CatsSuite {
   checkAll("Traverse[OneAnd[List, A]]",
            SerializableTests.serializable(Traverse[OneAnd[List, ?]]))
 
-  checkAll(
-      "OneAnd[List, Int]", ReducibleTests[OneAnd[List, ?]].reducible[Int, Int])
+  checkAll("OneAnd[List, Int]",
+           ReducibleTests[OneAnd[List, ?]].reducible[Int, Int])
   checkAll("Reducible[OneAnd[List, ?]]",
            SerializableTests.serializable(Reducible[OneAnd[List, ?]]))
 
@@ -76,8 +76,8 @@ class OneAndTests extends CatsSuite {
   checkAll("Monad[NonEmptyList[A]]",
            SerializableTests.serializable(Monad[NonEmptyList]))
 
-  checkAll(
-      "NonEmptyList[Int]", ComonadTests[NonEmptyList].comonad[Int, Int, Int])
+  checkAll("NonEmptyList[Int]",
+           ComonadTests[NonEmptyList].comonad[Int, Int, Int])
   checkAll("Comonad[NonEmptyList[A]]",
            SerializableTests.serializable(Comonad[NonEmptyList]))
 

@@ -13,11 +13,11 @@ object SocksConnectHandler {
   // Throwables used as `cause` fields for ConnectionFailedExceptions.
   private[socks] val InvalidInit = new Throwable(
       "unexpected SOCKS version or authentication " +
-      "level specified in connect response from proxy")
+        "level specified in connect response from proxy")
 
   private[socks] val InvalidResponse = new Throwable(
       "unexpected SOCKS version or response " +
-      "status specified in connect response from proxy")
+        "status specified in connect response from proxy")
 
   // Socks Version constants
   private val Version1: Byte = 0x01
@@ -39,14 +39,15 @@ object SocksConnectHandler {
       authenticationSettings: Seq[AuthenticationSetting],
       pipeline: ChannelPipeline
   ): SocksConnectHandler = {
-    val handler = new SocksConnectHandler(
-        proxyAddr, addr, authenticationSettings)
+    val handler =
+      new SocksConnectHandler(proxyAddr, addr, authenticationSettings)
     pipeline.addFirst("socksConnect", handler)
     proxyAddr match {
       case proxyInetAddr: InetSocketAddress if proxyInetAddr.isUnresolved =>
-        pipeline.addFirst("socketAddressResolver",
-                          new SocketAddressResolveHandler(
-                              SocketAddressResolver.random, addr))
+        pipeline.addFirst(
+            "socketAddressResolver",
+            new SocketAddressResolveHandler(SocketAddressResolver.random,
+                                            addr))
       case _ =>
     }
     handler
@@ -63,10 +64,10 @@ object SocksConnectHandler {
   *
   * We assume the proxy is provided by ssh -D.
   */
-class SocksConnectHandler(
-    proxyAddr: SocketAddress,
-    addr: InetSocketAddress,
-    authenticationSettings: Seq[AuthenticationSetting] = Seq(Unauthenticated))
+class SocksConnectHandler(proxyAddr: SocketAddress,
+                          addr: InetSocketAddress,
+                          authenticationSettings: Seq[AuthenticationSetting] =
+                            Seq(Unauthenticated))
     extends SimpleChannelHandler {
 
   import SocksConnectHandler._
@@ -138,8 +139,9 @@ class SocksConnectHandler(
     write(ctx, buf)
   }
 
-  private[this] def writeUserNameAndPass(
-      ctx: ChannelHandlerContext, username: String, pass: String) {
+  private[this] def writeUserNameAndPass(ctx: ChannelHandlerContext,
+                                         username: String,
+                                         pass: String) {
     val buf = ChannelBuffers.buffer(1024)
     buf.writeByte(Version1)
 
@@ -194,8 +196,8 @@ class SocksConnectHandler(
     if (buf.readableBytes < numBytes) throw ReplayError
   }
 
-  override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def connectRequested(ctx: ChannelHandlerContext,
+                                e: ChannelStateEvent) {
     e match {
       case de: DownstreamChannelStateEvent =>
         if (!connectFuture.compareAndSet(null, e.getFuture)) {
@@ -205,16 +207,14 @@ class SocksConnectHandler(
 
         // proxy cancellation
         val wrappedConnectFuture = Channels.future(de.getChannel, true)
-        de.getFuture.addListener(
-            new ChannelFutureListener {
+        de.getFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isCancelled) wrappedConnectFuture.cancel()
           }
         })
         // Proxy failures here so that if the connect fails, it is
         // propagated to the listener, not just on the channel.
-        wrappedConnectFuture.addListener(
-            new ChannelFutureListener {
+        wrappedConnectFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isSuccess || f.isCancelled) return
 
@@ -223,7 +223,10 @@ class SocksConnectHandler(
         })
 
         val wrappedEvent = new DownstreamChannelStateEvent(
-            de.getChannel, wrappedConnectFuture, de.getState, proxyAddr)
+            de.getChannel,
+            wrappedConnectFuture,
+            de.getState,
+            proxyAddr)
 
         super.connectRequested(ctx, wrappedEvent)
 
@@ -233,16 +236,15 @@ class SocksConnectHandler(
   }
 
   // we delay propagating connection upstream until we've completed the proxy connection.
-  override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def channelConnected(ctx: ChannelHandlerContext,
+                                e: ChannelStateEvent) {
     if (connectFuture.get eq null) {
       fail(ctx.getChannel, new InconsistentStateException(addr))
       return
     }
 
     // proxy cancellations again.
-    connectFuture.get.addListener(
-        new ChannelFutureListener {
+    connectFuture.get.addListener(new ChannelFutureListener {
       def operationComplete(f: ChannelFuture) {
         if (f.isSuccess) SocksConnectHandler. super.channelConnected(ctx, e)
         else if (f.isCancelled)

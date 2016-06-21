@@ -91,7 +91,7 @@ class DelayedFactoryTest extends FunSuite {
 
       test(
           ("%s: an incomplete buffered factory should satisfy closures with exceptions if they're " +
-              "interrupted").format(name)
+                "interrupted").format(name)
       ) {
         val ctx = helpFn()
         import ctx._

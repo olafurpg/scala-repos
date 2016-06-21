@@ -78,7 +78,7 @@ private[deploy] class ClientArguments(args: Array[String]) {
         // scalastyle:off println
         println(s"Jar url '${_jarUrl}' is not in valid format.")
         println(s"Must be a jar file path in URL format " +
-            "(e.g. hdfs://host:port/XX.jar, file:///XX.jar)")
+              "(e.g. hdfs://host:port/XX.jar, file:///XX.jar)")
         // scalastyle:on println
         printUsageAndExit(-1)
       }

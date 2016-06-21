@@ -1,5 +1,5 @@
 class C[A] {
-  type CC [B] <: C[B]
+  type CC[B] <: C[B]
   def aio[T]: T = aio[T]
 }
 class D[A] extends C[A] {

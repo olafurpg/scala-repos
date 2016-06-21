@@ -41,8 +41,8 @@ import scalafx.testutil.{DimensionDelegateSpec, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ShadowSpec
-    extends SimpleSFXDelegateSpec[jfxse.Shadow, Shadow](
-        classOf[jfxse.Shadow], classOf[Shadow])
+    extends SimpleSFXDelegateSpec[jfxse.Shadow, Shadow](classOf[jfxse.Shadow],
+                                                        classOf[Shadow])
     with ColorDelegateSpec[Shadow]
     with DimensionDelegateSpec[Shadow]
     with InputDelegateSpec[Shadow] {

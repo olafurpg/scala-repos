@@ -60,11 +60,13 @@ object TableColumn {
     /**
       * Instantiates a CellDataFeatures instance with the given properties set as read-only values of this instance.
       */
-    def this(
-        tableView: TableView[S], tableColumn: TableColumn[S, T], value: S) =
+    def this(tableView: TableView[S],
+             tableColumn: TableColumn[S, T],
+             value: S) =
       this(
-          new jfxsc.TableColumn.CellDataFeatures(
-              tableView, tableColumn, value))
+          new jfxsc.TableColumn.CellDataFeatures(tableView,
+                                                 tableColumn,
+                                                 value))
 
     /**
       * Returns the TableColumn passed in to the constructor.
@@ -225,8 +227,8 @@ class TableColumn[S, T](
       }
     })
   }
-  def cellFactory_=(callback: jfxu.Callback[
-          jfxsc.TableColumn[S, T], jfxsc.TableCell[S, T]]) {
+  def cellFactory_=(callback: jfxu.Callback[jfxsc.TableColumn[S, T],
+                                            jfxsc.TableCell[S, T]]) {
     delegate.cellFactoryProperty.setValue(callback)
   }
 

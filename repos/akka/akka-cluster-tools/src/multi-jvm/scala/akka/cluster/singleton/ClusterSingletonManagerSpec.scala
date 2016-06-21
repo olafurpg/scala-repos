@@ -38,7 +38,8 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
   val fifth = role("fifth")
   val sixth = role("sixth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -236,10 +237,9 @@ class ClusterSingletonManagerSpec
   def createSingletonProxy(): ActorRef = {
     //#create-singleton-proxy
     system.actorOf(
-        ClusterSingletonProxy.props(
-            singletonManagerPath = "/user/consumer",
-            settings =
-              ClusterSingletonProxySettings(system).withRole("worker")),
+        ClusterSingletonProxy.props(singletonManagerPath = "/user/consumer",
+                                    settings = ClusterSingletonProxySettings(
+                                        system).withRole("worker")),
         name = "consumerProxy")
     //#create-singleton-proxy
   }
@@ -358,8 +358,14 @@ class ClusterSingletonManagerSpec
       verifyProxyMsg(first, fifth, msg = msg())
 
       join(sixth, first)
-      awaitMemberUp(
-          memberProbe, sixth, fifth, fourth, third, second, observer, first)
+      awaitMemberUp(memberProbe,
+                    sixth,
+                    fifth,
+                    fourth,
+                    third,
+                    second,
+                    observer,
+                    first)
       verifyMsg(first, msg = msg())
       verifyProxyMsg(first, sixth, msg = msg())
 

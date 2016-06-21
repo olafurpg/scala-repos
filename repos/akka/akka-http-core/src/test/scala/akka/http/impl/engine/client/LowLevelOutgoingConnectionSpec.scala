@@ -441,7 +441,8 @@ class LowLevelOutgoingConnectionSpec
             }
 
           def expectSizeErrorInEntityOfType[T <: HttpEntity: ClassTag](
-              limit: Int, actualSize: Option[Long] = None) =
+              limit: Int,
+              actualSize: Option[Long] = None) =
             inside(response) {
               case HttpResponse(_, _, entity: T, _) ⇒
                 def gatherBytes =
@@ -449,7 +450,8 @@ class LowLevelOutgoingConnectionSpec
                     .runFold(ByteString.empty)(_ ++ _)
                     .awaitResult(100.millis)
                 (the[Exception] thrownBy gatherBytes).getCause shouldEqual EntityStreamSizeException(
-                    limit, actualSize)
+                    limit,
+                    actualSize)
             }
         }
       }
@@ -818,8 +820,10 @@ class LowLevelOutgoingConnectionSpec
       val netIn = TestPublisher.manualProbe[ByteString]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create(OutgoingConnectionBlueprint(
-                    Host("example.com"), settings, NoLogging)) {
+        .fromGraph(
+            GraphDSL.create(OutgoingConnectionBlueprint(Host("example.com"),
+                                                        settings,
+                                                        NoLogging)) {
           implicit b ⇒ client ⇒
             import GraphDSL.Implicits._
             Source.fromPublisher(netIn) ~> Flow[ByteString].map(

@@ -32,8 +32,7 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
     val file: ScalaFile = element.asInstanceOf[ScalaFile]
     val project: Project = file.getProject
     val result = new java.util.ArrayList[FoldingDescriptor]
-    file.accept(
-        new ScalaRecursiveElementVisitor {
+    file.accept(new ScalaRecursiveElementVisitor {
       override def visitLiteral(expression: ScLiteral) {
         checkLiteral(project, expression, result)
       }
@@ -47,8 +46,8 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
       case literal: ScLiteral =>
         return ScalaI18nUtil.getI18nMessage(element.getProject, literal)
       case methodCall: ScMethodCall =>
-        return ScalaI18nUtil.formatMethodCallExpression(
-            element.getProject, methodCall)
+        return ScalaI18nUtil
+          .formatMethodCallExpression(element.getProject, methodCall)
       case _ =>
     }
     element.getText
@@ -82,7 +81,8 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
               while (i < count + 1 && ok) {
                 val evaluator = new ScalaConstantExpressionEvaluator
                 val value: AnyRef = evaluator.computeConstantExpression(
-                    args(i), throwExceptionOnOverflow = false)
+                    args(i),
+                    throwExceptionOnOverflow = false)
                 if (value == null) {
                   if (!args(i).isInstanceOf[ScReferenceExpression]) {
                     ok = false

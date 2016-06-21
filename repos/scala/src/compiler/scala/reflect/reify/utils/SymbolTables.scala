@@ -8,7 +8,7 @@ trait SymbolTables { self: Utils =>
 
   import global._
 
-  class SymbolTable private[SymbolTable](
+  class SymbolTable private[SymbolTable] (
       private[SymbolTable] val symtab: immutable.ListMap[Symbol, Tree] =
         immutable.ListMap[Symbol, Tree](),
       private[SymbolTable] val aliases: List[(Symbol, TermName)] =
@@ -92,8 +92,9 @@ trait SymbolTables { self: Utils =>
       new SymbolTable(newSymtab, newAliases)
     }
 
-    private def add(
-        sym: Symbol, name0: TermName, reification: Tree): SymbolTable = {
+    private def add(sym: Symbol,
+                    name0: TermName,
+                    reification: Tree): SymbolTable = {
       def freshName(name0: TermName): TermName = {
         var name = name0.toString
         name = name.replace(".type", "$type")
@@ -123,11 +124,10 @@ trait SymbolTables { self: Utils =>
         newSymtab map {
           case ((sym, tree)) =>
             val ValDef(mods, primaryName, tpt, rhs) = tree
-            val tree1 =
-              if (!(newAliases contains ((sym, primaryName)))) {
-                val primaryName1 = newAliases.find(_._1 == sym).get._2
-                ValDef(mods, primaryName1, tpt, rhs).copyAttrs(tree)
-              } else tree
+            val tree1 = if (!(newAliases contains ((sym, primaryName)))) {
+              val primaryName1 = newAliases.find(_._1 == sym).get._2
+              ValDef(mods, primaryName1, tpt, rhs).copyAttrs(tree)
+            } else tree
             (sym, tree1)
         }
       new SymbolTable(newSymtab, newAliases)
@@ -172,8 +172,8 @@ trait SymbolTables { self: Utils =>
              entry.attachments.get[ReifyAliasAttachment]) match {
               case (Some(ReifyBindingAttachment(_)), _) => result += entry
               case (_, Some(ReifyAliasAttachment(sym, alias))) =>
-                result = new SymbolTable(
-                    result.symtab, result.aliases :+ ((sym, alias)))
+                result = new SymbolTable(result.symtab,
+                                         result.aliases :+ ((sym, alias)))
               case _ =>
               // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
           })
@@ -201,24 +201,25 @@ trait SymbolTables { self: Utils =>
             println("Filling in: %s (%s)".format(sym, sym.accurateKindString))
           val isFreeTerm = FreeTermDef.unapply(currtab.symDef(sym)).isDefined
           // SI-6204 don't reify signatures for incomplete symbols, because this might lead to cyclic reference errors
-          val signature =
-            if (sym.isInitialized) {
-              if (sym.isCapturedVariable) capturedVariableType(sym)
-              else if (isFreeTerm) sym.tpe
-              else sym.info
-            } else NoType
-          val rset = reifier.mirrorBuildCall(
-              nme.setInfo, currtab.symRef(sym), reifier.reify(signature))
+          val signature = if (sym.isInitialized) {
+            if (sym.isCapturedVariable) capturedVariableType(sym)
+            else if (isFreeTerm) sym.tpe
+            else sym.info
+          } else NoType
+          val rset = reifier.mirrorBuildCall(nme.setInfo,
+                                             currtab.symRef(sym),
+                                             reifier.reify(signature))
           // `Symbol.annotations` doesn't initialize the symbol, so we don't need to do anything special here
           // also since we call `sym.info` a few lines above, by now the symbol will be initialized (if possible)
           // so the annotations will be filled in and will be waiting to be reified (unless symbol initialization is prohibited as described above)
           if (sym.annotations.isEmpty) rset
           else
-            reifier.mirrorBuildCall(
-                nme.setAnnotations,
-                rset,
-                reifier.mkList(
-                    sym.annotations map reifier.reifyAnnotationInfo))
+            reifier
+              .mirrorBuildCall(
+                  nme.setAnnotations,
+                  rset,
+                  reifier.mkList(
+                      sym.annotations map reifier.reifyAnnotationInfo))
         }
 
         // `fillInSymbol` might add symbols to `symtab`, that's why this is done iteratively
@@ -238,26 +239,27 @@ trait SymbolTables { self: Utils =>
 
         val withAliases =
           cumulativeSymtab flatMap
-          (entry => {
-                val result = mutable.ListBuffer[Tree]()
-                result += entry
-                val sym = reifyBinding(entry).symbol
-                if (sym != NoSymbol)
-                  result ++= cumulativeAliases.distinct filter
-                  (alias =>
-                        alias._1 == sym &&
-                        alias._2 != currtab.symName(sym)) map
-                  (alias => {
-                        val canonicalName = currtab.symName(sym)
-                        val aliasName = alias._2
-                        ValDef(NoMods,
-                               aliasName,
-                               TypeTree(),
-                               Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
-                            sym, aliasName)
-                      })
-                result.toList
-              })
+            (entry => {
+                  val result = mutable.ListBuffer[Tree]()
+                  result += entry
+                  val sym = reifyBinding(entry).symbol
+                  if (sym != NoSymbol)
+                    result ++= cumulativeAliases.distinct filter
+                    (alias =>
+                          alias._1 == sym &&
+                            alias._2 != currtab.symName(sym)) map
+                    (alias => {
+                          val canonicalName = currtab.symName(sym)
+                          val aliasName = alias._2
+                          ValDef(NoMods,
+                                 aliasName,
+                                 TypeTree(),
+                                 Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
+                              sym,
+                              aliasName)
+                        })
+                  result.toList
+                })
 
         withAliases.toList
       } finally {

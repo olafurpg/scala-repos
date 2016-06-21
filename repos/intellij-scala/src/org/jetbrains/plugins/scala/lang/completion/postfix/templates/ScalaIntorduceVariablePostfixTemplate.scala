@@ -16,11 +16,11 @@ class ScalaIntorduceVariablePostfixTemplate
         "var",
         "val name = expr",
         new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
-  override def expandForChooseExpression(
-      expression: PsiElement, editor: Editor): Unit = {
+  override def expandForChooseExpression(expression: PsiElement,
+                                         editor: Editor): Unit = {
     val range = expression.getTextRange
-    editor.getSelectionModel.setSelection(
-        range.getStartOffset, range.getEndOffset)
+    editor.getSelectionModel
+      .setSelection(range.getStartOffset, range.getEndOffset)
     new ScalaIntroduceVariableHandler().invokeExpression(
         expression.getProject,
         editor,

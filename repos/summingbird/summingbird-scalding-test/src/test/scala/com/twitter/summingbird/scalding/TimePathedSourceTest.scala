@@ -26,14 +26,14 @@ import org.scalacheck.Prop._
 import scala.math._
 import com.twitter.scalding.{DateRange, RichDate}
 
-case class TestData(
-    requestedRange: DateRange, availableRange: DateRange, embiggen: Long)
+case class TestData(requestedRange: DateRange,
+                    availableRange: DateRange,
+                    embiggen: Long)
 
 object TimePathSourceLaws extends Properties("Time path source") {
 
   implicit def arbRateRange: Arbitrary[DateRange] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       startTs <- Gen.choose(-137878042589500L, 137878042589500L)
       startDate <- RichDate(startTs)
       endTsDelta <- Gen.choose(10L, 137878042589500L)
@@ -41,8 +41,7 @@ object TimePathSourceLaws extends Properties("Time path source") {
     } yield DateRange(startDate, endDate))
 
   implicit def arbData =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       reqRange <- arbitrary[DateRange]
       availableRange <- arbitrary[DateRange]
       embiggenVal <- Gen.choose(1L, 100000L)
@@ -65,8 +64,9 @@ object TimePathSourceLaws extends Properties("Time path source") {
     }
   }
 
-  def rangeWithEmbgginContained(
-      smaller: DateRange, embiggen: Long, bigger: DateRange) = {
+  def rangeWithEmbgginContained(smaller: DateRange,
+                                embiggen: Long,
+                                bigger: DateRange) = {
     bigger.contains(genEmbiggen(embiggen)(smaller))
   }
 
@@ -79,8 +79,9 @@ object TimePathSourceLaws extends Properties("Time path source") {
       val retData = BTimePathedSource.minify(
           genEmbiggen(data.embiggen),
           genVertractor(data.availableRange))(data.requestedRange)
-      if (rangeWithEmbgginContained(
-              data.requestedRange, data.embiggen, data.availableRange)) {
+      if (rangeWithEmbgginContained(data.requestedRange,
+                                    data.embiggen,
+                                    data.availableRange)) {
         retData == Some(data.requestedRange)
       } else true // not tested here
     }
@@ -95,7 +96,7 @@ object TimePathSourceLaws extends Properties("Time path source") {
         case None => true
         case Some(range) =>
           (data.availableRange.contains(range) &&
-              data.requestedRange.contains(range) && rangeLength(range) > 0)
+                data.requestedRange.contains(range) && rangeLength(range) > 0)
       }
     }
 
@@ -108,9 +109,9 @@ object TimePathSourceLaws extends Properties("Time path source") {
       retData match {
         case None =>
           (rangeLength(data.requestedRange) == 0 ||
-              rangeLength(data.availableRange) == 0 ||
-              data.requestedRange.isBefore(data.availableRange.start) ||
-              data.requestedRange.isAfter(data.availableRange.end) // Disjoint
+                rangeLength(data.availableRange) == 0 ||
+                data.requestedRange.isBefore(data.availableRange.start) ||
+                data.requestedRange.isAfter(data.availableRange.end) // Disjoint
               )
         case Some(_) => true // Not in this test
       }

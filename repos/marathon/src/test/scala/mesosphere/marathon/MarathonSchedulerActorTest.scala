@@ -53,8 +53,9 @@ class MarathonSchedulerActorTest
     val schedulerActor = createActor()
     try {
       schedulerActor ! LocalLeadershipEvent.ElectedAsLeader
-      awaitAssert(
-          verify(hcManager).reconcileWith(app.id), 5.seconds, 10.millis)
+      awaitAssert(verify(hcManager).reconcileWith(app.id),
+                  5.seconds,
+                  10.millis)
       verify(deploymentRepo, times(1)).all()
     } finally {
       stopActor(schedulerActor)
@@ -163,13 +164,13 @@ class MarathonSchedulerActorTest
         version = app.version.toString
     )
 
-    when(driver.killTask(taskA.taskId.mesosTaskId)).thenAnswer(
-        new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
-        system.eventStream.publish(statusUpdateEvent)
-        Status.DRIVER_RUNNING
-      }
-    })
+    when(driver.killTask(taskA.taskId.mesosTaskId))
+      .thenAnswer(new Answer[Status] {
+        def answer(invocation: InvocationOnMock): Status = {
+          system.eventStream.publish(statusUpdateEvent)
+          Status.DRIVER_RUNNING
+        }
+      })
 
     val schedulerActor = createActor()
     try {
@@ -223,13 +224,13 @@ class MarathonSchedulerActorTest
         timestamp = app.version.toString
     )
 
-    when(driver.killTask(taskA.taskId.mesosTaskId)).thenAnswer(
-        new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
-        system.eventStream.publish(statusUpdateEvent)
-        Status.DRIVER_RUNNING
-      }
-    })
+    when(driver.killTask(taskA.taskId.mesosTaskId))
+      .thenAnswer(new Answer[Status] {
+        def answer(invocation: InvocationOnMock): Status = {
+          system.eventStream.publish(statusUpdateEvent)
+          Status.DRIVER_RUNNING
+        }
+      })
 
     val schedulerActor = createActor()
     try {
@@ -308,23 +309,23 @@ class MarathonSchedulerActorTest
 
     when(driver.killTask(taskA.taskId.mesosTaskId))
       .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
-        system.eventStream.publish(
-            MesosStatusUpdateEvent(
-                slaveId = "",
-                taskId = taskA.taskId,
-                taskStatus = "TASK_KILLED",
-                message = "",
-                appId = app.id,
-                host = "",
-                ipAddresses = Nil,
-                ports = Nil,
-                version = app.version.toString
-            )
-        )
-        Status.DRIVER_RUNNING
-      }
-    })
+        def answer(invocation: InvocationOnMock): Status = {
+          system.eventStream.publish(
+              MesosStatusUpdateEvent(
+                  slaveId = "",
+                  taskId = taskA.taskId,
+                  taskStatus = "TASK_KILLED",
+                  message = "",
+                  appId = app.id,
+                  host = "",
+                  ipAddresses = Nil,
+                  ports = Nil,
+                  version = app.version.toString
+              )
+          )
+          Status.DRIVER_RUNNING
+        }
+      })
 
     system.eventStream.subscribe(probe.ref, classOf[UpgradeEvent])
 
@@ -609,12 +610,12 @@ class MarathonSchedulerActorTest
                            ref,
                            mock[MarathonConf])(system.dispatcher)
 
-    when(deploymentRepo.store(any)).thenAnswer(
-        new Answer[Future[DeploymentPlan]] {
-      override def answer(p1: InvocationOnMock): Future[DeploymentPlan] = {
-        Future.successful(p1.getArguments()(0).asInstanceOf[DeploymentPlan])
-      }
-    })
+    when(deploymentRepo.store(any))
+      .thenAnswer(new Answer[Future[DeploymentPlan]] {
+        override def answer(p1: InvocationOnMock): Future[DeploymentPlan] = {
+          Future.successful(p1.getArguments()(0).asInstanceOf[DeploymentPlan])
+        }
+      })
 
     when(deploymentRepo.expunge(any)).thenReturn(Future.successful(Seq(true)))
     when(deploymentRepo.all()).thenReturn(Future.successful(Nil))

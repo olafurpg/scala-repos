@@ -73,8 +73,9 @@ private[hive] object HiveShim {
   /*
    * Cannot use ColumnProjectionUtils.appendReadColumns directly, if ids is null or empty
    */
-  def appendReadColumns(
-      conf: Configuration, ids: Seq[Integer], names: Seq[String]) {
+  def appendReadColumns(conf: Configuration,
+                        ids: Seq[Integer],
+                        names: Seq[String]) {
     if (ids != null && ids.nonEmpty) {
       ColumnProjectionUtils.appendReadColumns(conf, ids.asJava)
     }
@@ -87,8 +88,8 @@ private[hive] object HiveShim {
    * Bug introduced in hive-0.13. AvroGenericRecordWritable has a member recordReaderID that
    * is needed to initialize before serialization.
    */
-  def prepareWritable(
-      w: Writable, serDeProps: Seq[(String, String)]): Writable = {
+  def prepareWritable(w: Writable,
+                      serDeProps: Seq[(String, String)]): Writable = {
     w match {
       case w: AvroGenericRecordWritable =>
         w.setRecordReaderID(new UID())
@@ -131,8 +132,9 @@ private[hive] object HiveShim {
     * @param functionClassName UDF class name
     * @param instance optional UDF instance which contains additional information (for macro)
     */
-  private[hive] case class HiveFunctionWrapper(
-      var functionClassName: String, private var instance: AnyRef = null)
+  private[hive] case class HiveFunctionWrapper(var functionClassName: String,
+                                               private var instance: AnyRef =
+                                                 null)
       extends java.io.Externalizable {
 
     // for Serialization
@@ -162,8 +164,9 @@ private[hive] object HiveShim {
     }
 
     @transient
-    def deserializeObjectByKryo[T: ClassTag](
-        kryo: Kryo, in: InputStream, clazz: Class[_]): T = {
+    def deserializeObjectByKryo[T: ClassTag](kryo: Kryo,
+                                             in: InputStream,
+                                             clazz: Class[_]): T = {
       val inp = new Input(in)
       val t: T = kryo.readObject(inp, clazz).asInstanceOf[T]
       inp.close()
@@ -177,16 +180,17 @@ private[hive] object HiveShim {
       output.close()
     }
 
-    def deserializePlan[UDFType](
-        is: java.io.InputStream, clazz: Class[_]): UDFType = {
-      deserializeObjectByKryo(
-          Utilities.runtimeSerializationKryo.get(), is, clazz)
-        .asInstanceOf[UDFType]
+    def deserializePlan[UDFType](is: java.io.InputStream,
+                                 clazz: Class[_]): UDFType = {
+      deserializeObjectByKryo(Utilities.runtimeSerializationKryo.get(),
+                              is,
+                              clazz).asInstanceOf[UDFType]
     }
 
     def serializePlan(function: AnyRef, out: java.io.OutputStream): Unit = {
-      serializeObjectByKryo(
-          Utilities.runtimeSerializationKryo.get(), function, out)
+      serializeObjectByKryo(Utilities.runtimeSerializationKryo.get(),
+                            function,
+                            out)
     }
 
     def writeExternal(out: java.io.ObjectOutput) {

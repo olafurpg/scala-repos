@@ -73,8 +73,8 @@ class LoadGenerator[Req, Rep](
 }
 
 object LoadGenerator {
-  def mkHistory[Req, Rep](
-      event: () => Event[Req, Rep], num: Int): Iterator[Event[Req, Rep]] =
+  def mkHistory[Req, Rep](event: () => Event[Req, Rep],
+                          num: Int): Iterator[Event[Req, Rep]] =
     new Iterator[Event[Req, Rep]] {
       def hasNext: Boolean = true
       def next(): Event[Req, Rep] = event()

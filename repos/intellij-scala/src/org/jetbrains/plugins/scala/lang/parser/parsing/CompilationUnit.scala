@@ -68,25 +68,25 @@ object CompilationUnit {
               builder.advanceLexer //package
               askType match {
                 case ScalaTokenTypes.tIDENTIFIER => {
-                    Qual_Id parse builder
-                    // Detect explicit packaging with curly braces
-                    if (ParserUtils.lookAhead(builder, ScalaTokenTypes.tLBRACE) &&
-                        !builder.getTokenText.matches(".*\n.*\n.*")) {
-                      newMarker.rollbackTo
-                      parsePackagingBody(true)
+                  Qual_Id parse builder
+                  // Detect explicit packaging with curly braces
+                  if (ParserUtils.lookAhead(builder, ScalaTokenTypes.tLBRACE) &&
+                      !builder.getTokenText.matches(".*\n.*\n.*")) {
+                    newMarker.rollbackTo
+                    parsePackagingBody(true)
+                    k
+                  } else {
+                    parsePackageSequence(false, {
+                      newMarker.done(ScalaElementTypes.PACKAGING);
                       k
-                    } else {
-                      parsePackageSequence(false, {
-                        newMarker.done(ScalaElementTypes.PACKAGING);
-                        k
-                      })
-                    }
+                    })
                   }
+                }
                 case _ => {
-                    builder error ErrMsg("package.qualID.expected")
-                    newMarker.drop
-                    parsePackageSequence(completed = true, k)
-                  }
+                  builder error ErrMsg("package.qualID.expected")
+                  newMarker.drop
+                  parsePackageSequence(completed = true, k)
+                }
               }
             } else {
               // Parse the remainder of a file

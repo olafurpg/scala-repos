@@ -37,7 +37,7 @@ private[appinfo] object TaskForStatistics {
             // To make this a bit more robust, we also allow it to be set explicitly.
             staging =
               maybeTaskState.isEmpty ||
-              maybeTaskState.contains(TaskState.TASK_STAGING),
+                maybeTaskState.contains(TaskState.TASK_STAGING),
             healthy = healths.nonEmpty && healths.forall(_.alive),
             unhealthy = healths.exists(!_.alive),
             maybeLifeTime = maybeTaskLifeTime

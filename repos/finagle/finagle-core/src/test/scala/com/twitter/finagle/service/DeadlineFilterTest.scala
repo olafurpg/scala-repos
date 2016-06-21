@@ -23,7 +23,11 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
     }
     val statsReceiver = new InMemoryStatsReceiver
     val deadlineFilter = new DeadlineFilter[String, String](
-        10.seconds, 10.seconds, 0.2, statsReceiver, Stopwatch.timeMillis)
+        10.seconds,
+        10.seconds,
+        0.2,
+        statsReceiver,
+        Stopwatch.timeMillis)
     val deadlineService = deadlineFilter.andThen(service)
   }
 
@@ -65,7 +69,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
 
   test(
       "When the request has a deadline filter and is serviced, DeadlineFilter " +
-      "should record budget remaining for the request") {
+        "should record budget remaining for the request") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -84,7 +88,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
 
   test(
       "When the request has a deadline filter and is serviced, DeadlineFilter " +
-      "should record transit time for the request") {
+        "should record transit time for the request") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -102,7 +106,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
   }
 
   test("When the request is rejected, DeadlineFilter should record " +
-      "budget remaining for the request") {
+        "budget remaining for the request") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -119,7 +123,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
   }
 
   test("When the request is rejected, DeadlineFilter should record " +
-      "transit time for the request") {
+        "transit time for the request") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -136,8 +140,8 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
   }
 
   test("When the deadline is exceeded but beyond the tolerance threshold, " +
-      "DeadlineFilter should service the request and increment the " +
-      "exceeded_beyond_tolerance stat") {
+        "DeadlineFilter should service the request and increment the " +
+        "exceeded_beyond_tolerance stat") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -158,8 +162,8 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
   }
 
   test("When the deadline is exceeded and within the tolerance threshold, " +
-      "but the reject token bucket contains too few tokens, DeadlineFilter " +
-      "should service the request and increment the exceeded stat") {
+        "but the reject token bucket contains too few tokens, DeadlineFilter " +
+        "should service the request and increment the exceeded stat") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -181,8 +185,8 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
 
   test(
       "When the deadline is exceeded and within the tolerance threshold, and " +
-      "the reject token bucket contains sufficient tokens, DeadlineFilter " +
-      "should service the request and increment the exceeded and rejected stats") {
+        "the reject token bucket contains sufficient tokens, DeadlineFilter " +
+        "should service the request and increment the exceeded and rejected stats") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -221,7 +225,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
   }
 
   test("tokens added to reject bucket on request with expired deadline " +
-      "greater than tolerance") {
+        "greater than tolerance") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -243,7 +247,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
   }
 
   test("tokens are added to bucket on request with expired deadline greater " +
-      "than tolerance when there are too few tokens to reject it") {
+        "than tolerance when there are too few tokens to reject it") {
     val h = new DeadlineFilterHelper
     import h._
 

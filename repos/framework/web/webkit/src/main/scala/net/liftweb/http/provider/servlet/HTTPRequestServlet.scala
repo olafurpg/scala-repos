@@ -28,8 +28,8 @@ import net.liftweb.common._
 import net.liftweb.util._
 import Helpers._
 
-class HTTPRequestServlet(
-    val req: HttpServletRequest, val provider: HTTPProvider)
+class HTTPRequestServlet(val req: HttpServletRequest,
+                         val provider: HTTPProvider)
     extends HTTPRequest {
   private lazy val ctx = {
     new HTTPServletContext(req.getSession.getServletContext)
@@ -100,7 +100,7 @@ class HTTPRequestServlet(
     */
   lazy val userAgent: Box[String] =
     headers find (_.name equalsIgnoreCase "user-agent") flatMap
-    (_.values.headOption)
+      (_.values.headOption)
 
   def remotePort: Int = req.getRemotePort
 
@@ -142,8 +142,7 @@ class HTTPRequestServlet(
   def extractFiles: List[ParamHolder] =
     (new Iterator[ParamHolder] {
       val mimeUpload = (new ServletFileUpload)
-      mimeUpload.setProgressListener(
-          new ProgressListener {
+      mimeUpload.setProgressListener(new ProgressListener {
         lazy val progList: (Long, Long, Int) => Unit =
           S.session.flatMap(_.progressListener) openOr LiftRules.progressListener
 
@@ -163,25 +162,27 @@ class HTTPRequestServlet(
           NormalParamHolder(f.getFieldName,
                             new String(readWholeStream(f.openStream), "UTF-8"))
         case f => {
-            val headers = f.getHeaders()
-            val names: List[String] =
-              if (headers eq null) Nil
-              else
-                headers
-                  .getHeaderNames()
-                  .asInstanceOf[java.util.Iterator[String]]
-                  .toList
-            val map: Map[String, List[String]] = Map(
-                names.map(n =>
-                      n -> headers
-                        .getHeaders(n)
-                        .asInstanceOf[java.util.Iterator[String]]
-                        .toList): _*)
-            LiftRules.withMimeHeaders(map) {
-              LiftRules.handleMimeFile(
-                  f.getFieldName, f.getContentType, f.getName, f.openStream)
-            }
+          val headers = f.getHeaders()
+          val names: List[String] =
+            if (headers eq null) Nil
+            else
+              headers
+                .getHeaderNames()
+                .asInstanceOf[java.util.Iterator[String]]
+                .toList
+          val map: Map[String, List[String]] = Map(
+              names.map(n =>
+                    n -> headers
+                      .getHeaders(n)
+                      .asInstanceOf[java.util.Iterator[String]]
+                      .toList): _*)
+          LiftRules.withMimeHeaders(map) {
+            LiftRules.handleMimeFile(f.getFieldName,
+                                     f.getContentType,
+                                     f.getName,
+                                     f.openStream)
           }
+        }
       }
     }).toList
 
@@ -214,8 +215,8 @@ class HTTPRequestServlet(
   }
 }
 
-private class OfflineRequestSnapshot(
-    req: HTTPRequest, val provider: HTTPProvider)
+private class OfflineRequestSnapshot(req: HTTPRequest,
+                                     val provider: HTTPProvider)
     extends HTTPRequest {
 
   private val _cookies = List(req.cookies: _*)
@@ -316,5 +317,5 @@ private class OfflineRequestSnapshot(
     */
   lazy val userAgent: Box[String] =
     headers find (_.name equalsIgnoreCase "user-agent") flatMap
-    (_.values.headOption)
+      (_.values.headOption)
 }

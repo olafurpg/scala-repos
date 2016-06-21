@@ -164,7 +164,8 @@ class MigrationTo0_13Test
         store = state,
         metrics = metrics,
         newState = () =>
-          MarathonTaskState(MarathonTask
+          MarathonTaskState(
+              MarathonTask
                 .newBuilder()
                 .setId(UUID.randomUUID().toString)
                 .build()),
@@ -177,8 +178,7 @@ class MigrationTo0_13Test
         store = state,
         metrics = metrics,
         newState = () => new FrameworkId(UUID.randomUUID().toString),
-        prefix =
-          "" // don't set the prefix so we don't have to use PersistentStore for testing
+        prefix = "" // don't set the prefix so we don't have to use PersistentStore for testing
     )
 
     lazy val migration = new MigrationTo0_13(taskRepo, state)
@@ -208,8 +208,8 @@ private[state] class LegacyTaskStore(store: PersistentStore) {
     PREFIX + appId.safePath + ID_DELIMITER + taskId
   }
 
-  private[this] def serialize(
-      task: MarathonTask, sink: ObjectOutputStream): Unit = {
+  private[this] def serialize(task: MarathonTask,
+                              sink: ObjectOutputStream): Unit = {
     val size = task.getSerializedSize
     sink.writeInt(size)
     sink.write(task.toByteArray)

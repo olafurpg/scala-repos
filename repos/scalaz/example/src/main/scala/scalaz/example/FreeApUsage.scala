@@ -73,8 +73,8 @@ object FreeApUsage extends App {
         (_, _, _))
 
   // Test input for programs
-  val testInput: Map[String, Any] = Map(
-      "string" -> "foobar", "bool" -> true, "int" -> 4, "list" -> List(1, 2))
+  val testInput: Map[String, Any] =
+    Map("string" -> "foobar", "bool" -> true, "int" -> 4, "list" -> List(1, 2))
 
   // Run that baby
   println(successfulProg.foldMap(toOption(testInput)))

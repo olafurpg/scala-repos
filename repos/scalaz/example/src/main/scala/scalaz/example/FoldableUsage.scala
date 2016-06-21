@@ -50,8 +50,8 @@ object FoldableUsage extends App {
   // Foldables can be composed:
   val FoldListOfOptions = Foldable[List] compose Foldable[Option]
 
-  val listOfOptions: List[Option[Int]] = List(
-      1.some, 2.some, none[Int], 3.some, 4.some)
+  val listOfOptions: List[Option[Int]] =
+    List(1.some, 2.some, none[Int], 3.some, 4.some)
   assert(FoldListOfOptions.fold(listOfOptions) === 10)
 
   // with this you get a collapse function which is perhaps like the

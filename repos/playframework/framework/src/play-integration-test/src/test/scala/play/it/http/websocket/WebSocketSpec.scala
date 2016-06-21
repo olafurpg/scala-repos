@@ -53,8 +53,7 @@ trait WebSocketSpec
       handler: (Flow[ExtendedMessage, ExtendedMessage, _]) => Future[A]): A = {
     WebSocketClient { client =>
       val innerResult = Promise[A]()
-      await(
-          client.connect(
+      await(client.connect(
               URI.create("ws://localhost:" + testServerPort + "/stream")) {
         flow =>
           innerResult.completeWith(handler(flow))
@@ -333,12 +332,9 @@ trait WebSocketSpec
 
       "allow consuming messages" in allowConsumingMessages { _ => consumed =>
         WebSocket.using[String] { req =>
-          (Iteratee
-             .getChunks[String]
-             .map { result =>
-               consumed.success(result)
-             },
-           Enumerator.empty)
+          (Iteratee.getChunks[String].map { result =>
+            consumed.success(result)
+          }, Enumerator.empty)
         }
       }
 

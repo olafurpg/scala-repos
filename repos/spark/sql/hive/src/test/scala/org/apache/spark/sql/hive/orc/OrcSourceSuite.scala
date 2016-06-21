@@ -141,8 +141,8 @@ abstract class OrcSuite
 
     df.write.format("orc").saveAsTable("orcNullValues")
 
-    checkAnswer(
-        sql("SELECT * FROM orcNullValues"), Row.fromSeq(Seq.fill(11)(null)))
+    checkAnswer(sql("SELECT * FROM orcNullValues"),
+                Row.fromSeq(Seq.fill(11)(null)))
 
     sql("DROP TABLE IF EXISTS orcNullValues")
   }

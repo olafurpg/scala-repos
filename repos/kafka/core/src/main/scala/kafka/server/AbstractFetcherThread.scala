@@ -53,8 +53,8 @@ abstract class AbstractFetcherThread(name: String,
   private val partitionMapLock = new ReentrantLock
   private val partitionMapCond = partitionMapLock.newCondition()
 
-  private val metricId = new ClientIdAndBroker(
-      clientId, sourceBroker.host, sourceBroker.port)
+  private val metricId =
+    new ClientIdAndBroker(clientId, sourceBroker.host, sourceBroker.port)
   val fetcherStats = new FetcherStats(metricId)
   val fetcherLagStats = new FetcherLagStats(metricId)
 
@@ -106,8 +106,8 @@ abstract class AbstractFetcherThread(name: String,
 
     try {
       trace(
-          "Issuing to broker %d of fetch request %s".format(
-              sourceBroker.id, fetchRequest))
+          "Issuing to broker %d of fetch request %s".format(sourceBroker.id,
+                                                            fetchRequest))
       responseData = fetch(fetchRequest)
     } catch {
       case t: Throwable =>
@@ -163,9 +163,9 @@ abstract class AbstractFetcherThread(name: String,
                           // should get fixed in the subsequent fetches
                           logger.error(
                               "Found invalid messages during fetch for partition [" +
-                              topic + "," + partitionId + "] offset " +
-                              currentPartitionFetchState.offset +
-                              " error " + ime.getMessage)
+                                topic + "," + partitionId + "] offset " +
+                                currentPartitionFetchState.offset +
+                                " error " + ime.getMessage)
                         case e: Throwable =>
                           throw new KafkaException(
                               "error processing data for partition [%s,%d] offset %d"
@@ -180,7 +180,8 @@ abstract class AbstractFetcherThread(name: String,
                           handleOffsetOutOfRange(topicAndPartition)
                         partitionMap.put(topicAndPartition,
                                          new PartitionFetchState(newOffset))
-                        error("Current offset %d for partition [%s,%d] out of range; reset offset to %d"
+                        error(
+                            "Current offset %d for partition [%s,%d] out of range; reset offset to %d"
                               .format(currentPartitionFetchState.offset,
                                       topic,
                                       partitionId,
@@ -311,14 +312,15 @@ class FetcherStats(metricId: ClientIdAndBroker) extends KafkaMetricsGroup {
                  "brokerHost" -> metricId.brokerHost,
                  "brokerPort" -> metricId.brokerPort.toString)
 
-  val requestRate = newMeter(
-      "RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val requestRate =
+    newMeter("RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
 
   val byteRate = newMeter("BytesPerSec", "bytes", TimeUnit.SECONDS, tags)
 }
 
-case class ClientIdTopicPartition(
-    clientId: String, topic: String, partitionId: Int) {
+case class ClientIdTopicPartition(clientId: String,
+                                  topic: String,
+                                  partitionId: Int) {
   override def toString = "%s-%s-%d".format(clientId, topic, partitionId)
 }
 

@@ -85,8 +85,8 @@ object WebSocketFlowHandler {
             }
           }
 
-          def toMessage(
-              messageType: MessageType.Type, data: ByteString): Message = {
+          def toMessage(messageType: MessageType.Type,
+                        data: ByteString): Message = {
             messageType match {
               case MessageType.Text => TextMessage(data.utf8String)
               case MessageType.Binary => BinaryMessage(data)
@@ -107,7 +107,7 @@ object WebSocketFlowHandler {
                 null
               case MessageType.Continuation
                   if currentPartialMessage.data.size +
-                  read.data.size > bufferLimit =>
+                    read.data.size > bufferLimit =>
                 serverInitiatedClose(
                     CloseMessage(CloseCodes.TooBig, "Message was too big"))
                 null
@@ -305,8 +305,9 @@ object WebSocketFlowHandler {
   private val logger = Logger("play.core.server.common.WebSocketFlowHandler")
 
   // Low level API for raw, possibly fragmented messages
-  case class RawMessage(
-      messageType: MessageType.Type, data: ByteString, isFinal: Boolean)
+  case class RawMessage(messageType: MessageType.Type,
+                        data: ByteString,
+                        isFinal: Boolean)
   object MessageType extends Enumeration {
     type Type = Value
     val Ping, Pong, Text, Binary, Continuation, Close = Value

@@ -11,8 +11,11 @@ import akka.http.scaladsl.unmarshalling.FromEntityUnmarshaller
 import akka.http.impl.util._
 import org.scalatest.{Matchers, WordSpec}
 
-case class Employee(
-    fname: String, name: String, age: Int, id: Long, boardMember: Boolean) {
+case class Employee(fname: String,
+                    name: String,
+                    age: Int,
+                    id: Long,
+                    boardMember: Boolean) {
   require(!boardMember || age > 40, "Board members must be older than 40")
 }
 

@@ -459,8 +459,10 @@ class MatrixTest extends WordSpec with Matchers {
                 List((1, 1, 1.0), (2, 2, 3.0), (1, 2, 4.0)))
         .sink[(Int, Int, Double)](Tsv("product")) { ob =>
           "correctly compute products" in {
-            toSparseMat(ob) shouldBe Map(
-                (1, 1) -> 17.0, (1, 2) -> 12.0, (2, 1) -> 12.0, (2, 2) -> 9.0)
+            toSparseMat(ob) shouldBe Map((1, 1) -> 17.0,
+                                         (1, 2) -> 12.0,
+                                         (2, 1) -> 12.0,
+                                         (2, 2) -> 9.0)
           }
         }
         .run
@@ -829,8 +831,10 @@ class MatrixTest extends WordSpec with Matchers {
                 List((1, 1, 1.0), (2, 2, 3.0), (1, 2, 4.0)))
         .sink[(Int, Int, Double)](Tsv("outerProd")) { ob =>
           "correctly compute the outer product of a column and row vector" in {
-            toSparseMat(ob) shouldBe Map(
-                (1, 1) -> 1.0, (1, 2) -> 4.0, (2, 1) -> 4.0, (2, 2) -> 16.0)
+            toSparseMat(ob) shouldBe Map((1, 1) -> 1.0,
+                                         (1, 2) -> 4.0,
+                                         (2, 1) -> 4.0,
+                                         (2, 2) -> 16.0)
           }
         }
         .run

@@ -102,7 +102,8 @@ object ResourceServer {
       lastModified = calcLastModified(url)
     } yield
       request.testFor304(
-          lastModified, "Expires" -> toInternetDate(millis + 30.days)) openOr {
+          lastModified,
+          "Expires" -> toInternetDate(millis + 30.days)) openOr {
         val stream = url.openStream
         val uc = url.openConnection
         StreamingResponse(

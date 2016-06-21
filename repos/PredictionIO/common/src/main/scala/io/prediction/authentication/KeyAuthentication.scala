@@ -41,13 +41,15 @@ trait KeyAuthentication {
 
       val passedKey = accessKeyParamOpt.getOrElse {
         Left(AuthenticationFailedRejection(
-                AuthenticationFailedRejection.CredentialsRejected, List()))
+                AuthenticationFailedRejection.CredentialsRejected,
+                List()))
       }
 
       if (passedKey.equals(ServerKey.get)) Right(ctx.request)
       else
         Left(AuthenticationFailedRejection(
-                AuthenticationFailedRejection.CredentialsRejected, List()))
+                AuthenticationFailedRejection.CredentialsRejected,
+                List()))
     }
   }
 }

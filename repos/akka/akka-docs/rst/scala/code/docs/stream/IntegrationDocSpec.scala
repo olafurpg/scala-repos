@@ -28,8 +28,8 @@ import akka.stream.scaladsl.Flow
 object IntegrationDocSpec {
   import TwitterStreamQuickstartDocSpec._
 
-  val config =
-    ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+      """
     #//#blocking-dispatcher-config
     blocking-dispatcher {
       executor = "thread-pool-executor"

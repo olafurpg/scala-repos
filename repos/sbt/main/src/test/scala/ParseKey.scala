@@ -28,8 +28,10 @@ object ParseKey extends Properties("Key parser test") {
       val expected = resolve(structure, key, mask)
       val string = displayMasked(key, mask)
 
-      ("Key: " + displayFull(key)) |: parseExpected(
-          structure, string, expected, mask)
+      ("Key: " + displayFull(key)) |: parseExpected(structure,
+                                                    string,
+                                                    expected,
+                                                    mask)
     }
 
   property("An unspecified project axis resolves to the current project") =
@@ -83,13 +85,15 @@ object ParseKey extends Properties("Key parser test") {
   def structureKeyMask(genKey: Structure => Gen[ScopedKey[_]])(
       implicit maskGen: Gen[ScopeMask],
       structureGen: Gen[Structure]): Gen[StructureKeyMask] =
-    for (mask <- maskGen; structure <- structureGen; key <- genKey(structure)) yield
-      new StructureKeyMask(structure, key, mask)
-  final class StructureKeyMask(
-      val structure: Structure, val key: ScopedKey[_], val mask: ScopeMask)
+    for (mask <- maskGen; structure <- structureGen; key <- genKey(structure))
+      yield new StructureKeyMask(structure, key, mask)
+  final class StructureKeyMask(val structure: Structure,
+                               val key: ScopedKey[_],
+                               val mask: ScopeMask)
 
-  def resolve(
-      structure: Structure, key: ScopedKey[_], mask: ScopeMask): ScopedKey[_] =
+  def resolve(structure: Structure,
+              key: ScopedKey[_],
+              mask: ScopeMask): ScopedKey[_] =
     ScopedKey(Resolve(structure.extra,
                       Select(structure.current),
                       key.key,
@@ -101,7 +105,8 @@ object ParseKey extends Properties("Key parser test") {
                     expected: ScopedKey[_],
                     mask: ScopeMask): Prop =
     ("Expected: " + displayFull(expected)) |: ("Mask: " + mask) |: parse(
-        structure, s) {
+        structure,
+        s) {
       case Left(err) => false
       case Right(sk) => Project.equal(sk, expected, mask)
     }

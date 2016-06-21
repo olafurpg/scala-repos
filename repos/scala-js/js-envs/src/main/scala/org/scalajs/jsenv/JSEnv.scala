@@ -44,8 +44,8 @@ trait JSEnv {
 
     def name: String = JSEnv.this.name
 
-    def jsRunner(
-        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner =
+    def jsRunner(libs: Seq[ResolvedJSDependency],
+                 code: VirtualJSFile): JSRunner =
       JSEnv.this.jsRunner(loadedLibs ++ libs, code)
   }
 }

@@ -46,12 +46,12 @@ class CaseFilter extends ElementFilter {
           if (node.isInstanceOf[PsiWhiteSpace]) node = node.getPrevSibling
           node match {
             case x: PsiErrorElement => {
-                val s = ErrMsg("wrong.top.statment.declaration")
-                x.getErrorDescription match {
-                  case `s` => return true
-                  case _ => return false
-                }
+              val s = ErrMsg("wrong.top.statment.declaration")
+              x.getErrorDescription match {
+                case `s` => return true
+                case _ => return false
               }
+            }
             case _ => return true
           }
         case _ =>

@@ -22,8 +22,9 @@ case class JavaFqn(pack: Option[String],
 }
 
 object JavaFqn {
-  def apply(
-      pack: String, tpe: String, fieldOrMethod: Option[String]): JavaFqn = {
+  def apply(pack: String,
+            tpe: String,
+            fieldOrMethod: Option[String]): JavaFqn = {
     JavaFqn(
         if (pack.isEmpty) None else Some(pack),
         if (tpe.isEmpty) None else Some(tpe),
@@ -106,14 +107,14 @@ trait Helpers extends UnsafeHelpers with SLF4JLogging {
     // TypeMirror docs
     tm match {
       case tm: DeclaredType if tm.getKind == TypeKind.DECLARED => {
-          tm.asElement match {
-            case te: TypeElement =>
-              parseFqnAsClass(te.getQualifiedName.toString)
-            case _ => {
-                None
-              }
+        tm.asElement match {
+          case te: TypeElement =>
+            parseFqnAsClass(te.getQualifiedName.toString)
+          case _ => {
+            None
           }
         }
+      }
       case tm: PrimitiveType if tm.getKind.isPrimitive =>
         Some(JavaFqn(None, Some(tm.toString), None))
       case _ => None

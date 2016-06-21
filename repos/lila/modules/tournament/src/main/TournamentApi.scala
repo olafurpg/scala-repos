@@ -41,18 +41,20 @@ private[tournament] final class TournamentApi(
 
   def createTournament(setup: TournamentSetup, me: User): Fu[Tournament] = {
     var variant = chess.variant.Variant orDefault setup.variant
-    val tour = Tournament.make(
-        createdBy = me,
-        clock =
-          TournamentClock((setup.clockTime * 60).toInt, setup.clockIncrement),
-        minutes = setup.minutes,
-        waitMinutes = setup.waitMinutes,
-        mode = setup.mode.fold(Mode.default)(Mode.orDefault),
-        `private` = setup.`private`.isDefined,
-        system = System.Arena,
-        variant = variant,
-        position =
-          StartingPosition.byEco(setup.position).ifTrue(variant.standard) | StartingPosition.initial)
+    val tour =
+      Tournament.make(createdBy = me,
+                      clock = TournamentClock((setup.clockTime * 60).toInt,
+                                              setup.clockIncrement),
+                      minutes = setup.minutes,
+                      waitMinutes = setup.waitMinutes,
+                      mode = setup.mode.fold(Mode.default)(Mode.orDefault),
+                      `private` = setup.`private`.isDefined,
+                      system = System.Arena,
+                      variant = variant,
+                      position =
+                        StartingPosition
+                          .byEco(setup.position)
+                          .ifTrue(variant.standard) | StartingPosition.initial)
     TournamentRepo.insert(tour) >>- join(tour.id, me) inject tour
   }
 
@@ -93,8 +95,9 @@ private[tournament] final class TournamentApi(
     }
   }
 
-  private def featureOneOf(
-      tour: Tournament, pairings: Pairings, ranking: Ranking): Funit =
+  private def featureOneOf(tour: Tournament,
+                           pairings: Pairings,
+                           ranking: Ranking): Funit =
     tour.featuredId.ifTrue(pairings.nonEmpty) ?? PairingRepo.byId map2 RankedPairing(
         ranking) map (_.flatten) flatMap { curOption =>
       pairings.flatMap(RankedPairing(ranking)).sortBy(_.bestRank).headOption ?? {
@@ -132,7 +135,8 @@ private[tournament] final class TournamentApi(
   def start(oldTour: Tournament) {
     Sequencing(oldTour.id)(TournamentRepo.createdById) { tour =>
       TournamentRepo.setStatus(tour.id, Status.Started) >>- sendTo(
-          tour.id, Reload) >>- publish()
+          tour.id,
+          Reload) >>- publish()
     }
   }
 
@@ -198,8 +202,8 @@ private[tournament] final class TournamentApi(
   private def updateNbPlayers(tourId: String) =
     PlayerRepo count tourId flatMap { TournamentRepo.setNbPlayers(tourId, _) }
 
-  private def withdrawAllNonMarathonOrUniqueBut(
-      tourId: String, userId: String) {
+  private def withdrawAllNonMarathonOrUniqueBut(tourId: String,
+                                                userId: String) {
     TournamentRepo toursToWithdrawWhenEntering tourId foreach {
       _ foreach { other =>
         PlayerRepo.exists(other.id, userId) foreach {
@@ -310,8 +314,8 @@ private[tournament] final class TournamentApi(
         (id: String) => PlayerRepo.bestByTourWithRank(id, 30),
         timeToLive = 3 second)
 
-  def miniStanding(
-      tourId: String, withStanding: Boolean): Fu[Option[MiniStanding]] =
+  def miniStanding(tourId: String,
+                   withStanding: Boolean): Fu[Option[MiniStanding]] =
     TournamentRepo byId tourId flatMap {
       _ ?? { tour =>
         if (withStanding)
@@ -354,8 +358,9 @@ private[tournament] final class TournamentApi(
       }
     }
 
-  private def playerPovs(
-      tourId: String, userId: String, nb: Int): Fu[List[Pov]] =
+  private def playerPovs(tourId: String,
+                         userId: String,
+                         nb: Int): Fu[List[Pov]] =
     PairingRepo.recentIdsByTourAndUserId(tourId, userId, nb) flatMap { ids =>
       GameRepo games ids map {
         _.flatMap { Pov.ofUserId(_, userId) }
@@ -383,31 +388,31 @@ private[tournament] final class TournamentApi(
   }
 
   private object publish {
-    private val debouncer = system.actorOf(
-        Props(new Debouncer(10 seconds, { (_: Debouncer.Nothing) =>
-      fetchVisibleTournaments foreach { vis =>
-        site ! SendToFlag("tournament",
-                          Json.obj(
-                              "t" -> "reload",
-                              "d" -> scheduleJsonView(vis)
-                          ))
-      }
-      TournamentRepo.promotable foreach { tours =>
-        renderer ? TournamentTable(tours) map {
-          case view: play.twirl.api.Html => ReloadTournaments(view.body)
-        } pipeToSelection lobby
-      }
+    private val debouncer = system.actorOf(Props(new Debouncer(10 seconds, {
+      (_: Debouncer.Nothing) =>
+        fetchVisibleTournaments foreach { vis =>
+          site ! SendToFlag("tournament",
+                            Json.obj(
+                                "t" -> "reload",
+                                "d" -> scheduleJsonView(vis)
+                            ))
+        }
+        TournamentRepo.promotable foreach { tours =>
+          renderer ? TournamentTable(tours) map {
+            case view: play.twirl.api.Html => ReloadTournaments(view.body)
+          } pipeToSelection lobby
+        }
     })))
     def apply() { debouncer ! Debouncer.Nothing }
   }
 
   private object updateTournamentStanding {
-    private val debouncer = system.actorOf(
-        Props(new Debouncer(10 seconds, { (tourId: String) =>
-      PairingRepo playingGameIds tourId foreach { ids =>
-        roundSocketHub ! TellIds(ids, TournamentStanding(tourId))
-      }
-    })))
+    private val debouncer =
+      system.actorOf(Props(new Debouncer(10 seconds, { (tourId: String) =>
+        PairingRepo playingGameIds tourId foreach { ids =>
+          roundSocketHub ! TellIds(ids, TournamentStanding(tourId))
+        }
+      })))
     def apply(tour: Tournament) {
       debouncer ! tour.id
     }

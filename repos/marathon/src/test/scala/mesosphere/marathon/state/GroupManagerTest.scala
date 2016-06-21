@@ -43,8 +43,8 @@ class GroupManagerTest
 
     lazy val metricRegistry = new MetricRegistry()
     lazy val metrics = new Metrics(metricRegistry)
-    lazy val capMetrics = new CapConcurrentExecutionsMetrics(
-        metrics, classOf[GroupManager])
+    lazy val capMetrics =
+      new CapConcurrentExecutionsMetrics(metrics, classOf[GroupManager])
 
     def serializeExecutions() = CapConcurrentExecutions(
         capMetrics,
@@ -77,8 +77,8 @@ class GroupManagerTest
             ))
     val update = manager(10, 20).assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
-    update.transitiveApps.flatMap(_.portNumbers.filter(x =>
-              x >= 10 && x <= 20)) should have size 5
+    update.transitiveApps.flatMap(
+        _.portNumbers.filter(x => x >= 10 && x <= 20)) should have size 5
   }
 
   test("Assign dynamic service ports specified in the container") {
@@ -90,7 +90,8 @@ class GroupManagerTest
             Docker(
                 image = "busybox",
                 network = Some(Network.BRIDGE),
-                portMappings = Some(Seq(
+                portMappings = Some(
+                    Seq(
                         PortMapping(containerPort = 8080,
                                     hostPort = 0,
                                     servicePort = 0,
@@ -115,8 +116,8 @@ class GroupManagerTest
     val update = manager(minServicePort = 10, maxServicePort = 20)
       .assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
-    update.transitiveApps.flatMap(_.portNumbers.filter(x =>
-              x >= 10 && x <= 20)) should have size 2
+    update.transitiveApps.flatMap(
+        _.portNumbers.filter(x => x >= 10 && x <= 20)) should have size 2
   }
 
   //regression for #2743
@@ -179,8 +180,8 @@ class GroupManagerTest
             ))
     val update = manager(10, 20).assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
-    update.transitiveApps.flatMap(_.portNumbers.filter(x =>
-              x >= 10 && x <= 20)) should have size 5
+    update.transitiveApps.flatMap(
+        _.portNumbers.filter(x => x >= 10 && x <= 20)) should have size 5
   }
 
   // Regression test for #2868
@@ -279,8 +280,9 @@ class GroupManagerTest
   test("Store new apps with correct version infos in groupRepo and appRepo") {
     val f = new Fixture
 
-    val app: AppDefinition = AppDefinition(
-        "/app1".toPath, cmd = Some("sleep 3"), portDefinitions = Seq.empty)
+    val app: AppDefinition = AppDefinition("/app1".toPath,
+                                           cmd = Some("sleep 3"),
+                                           portDefinitions = Seq.empty)
     val group = Group(PathId.empty, Set(app)).copy(version = Timestamp(1))
     when(f.groupRepo.zkRootName).thenReturn(GroupRepository.zkRootName)
     when(f.groupRepo.group(GroupRepository.zkRootName))
@@ -306,8 +308,9 @@ class GroupManagerTest
   test("Expunge removed apps from appRepo") {
     val f = new Fixture
 
-    val app: AppDefinition = AppDefinition(
-        "/app1".toPath, cmd = Some("sleep 3"), portDefinitions = Seq.empty)
+    val app: AppDefinition = AppDefinition("/app1".toPath,
+                                           cmd = Some("sleep 3"),
+                                           portDefinitions = Seq.empty)
     val group = Group(PathId.empty, Set(app)).copy(version = Timestamp(1))
     val groupEmpty = group.copy(apps = Set(), version = Timestamp(2))
     when(f.groupRepo.zkRootName).thenReturn(GroupRepository.zkRootName)

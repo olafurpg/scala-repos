@@ -107,8 +107,7 @@ object PromiseMock {
         tryBody
       } catch {
         case th: Throwable =>
-          catchBody(
-              th match {
+          catchBody(th match {
             case js.JavaScriptException(e) => e
             case _ => th
           })
@@ -117,8 +116,10 @@ object PromiseMock {
   }
 
   @ScalaJSDefined
-  private class MockPromise[+A](executor: js.Function2[
-          js.Function1[A | Thenable[A], _], js.Function1[scala.Any, _], _])
+  private class MockPromise[+A](
+      executor: js.Function2[js.Function1[A | Thenable[A], _],
+                             js.Function1[scala.Any, _],
+                             _])
       extends js.Object
       with js.Thenable[A] {
 
@@ -150,7 +151,8 @@ object PromiseMock {
     }
 
     private[this] def clearAndTriggerReactions[A](
-        reactions: js.Array[js.Function1[A, Any]], argument: A): Unit = {
+        reactions: js.Array[js.Function1[A, Any]],
+        argument: A): Unit = {
 
       assert(state != Pending)
 
@@ -186,7 +188,8 @@ object PromiseMock {
 
     // 25.4.2.2 PromiseResolveThenableJob
     private[this] def promiseResolveThenableJob(
-        thenable: Thenable[A], thenAction: js.Function): Unit = {
+        thenable: Thenable[A],
+        thenAction: js.Function): Unit = {
       thenAction.call(thenable, resolve _, reject _)
     }
 

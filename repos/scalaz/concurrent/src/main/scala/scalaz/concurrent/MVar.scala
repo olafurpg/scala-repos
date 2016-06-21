@@ -42,8 +42,9 @@ trait MVarFunctions {
     } yield new MVarImpl[A](value, readLatch, writeLatch)
 }
 
-private[this] class MVarImpl[A](
-    value: Atomic[Option[A]], readLatch: PhasedLatch, writeLatch: PhasedLatch)
+private[this] class MVarImpl[A](value: Atomic[Option[A]],
+                                readLatch: PhasedLatch,
+                                writeLatch: PhasedLatch)
     extends MVar[A] {
   def take = read(
       for {

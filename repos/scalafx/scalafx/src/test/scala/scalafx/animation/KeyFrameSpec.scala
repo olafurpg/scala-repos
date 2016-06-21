@@ -47,7 +47,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class KeyFrameSpec
     extends SimpleSFXDelegateSpec[jfxa.KeyFrame, KeyFrame](
-        classOf[jfxa.KeyFrame], classOf[KeyFrame]) {
+        classOf[jfxa.KeyFrame],
+        classOf[KeyFrame]) {
 
   override protected def getScalaClassInstance = KeyFrame(5 s)
 

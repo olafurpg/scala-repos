@@ -202,7 +202,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode MGET") {
-    assert(codec(wrap("MGET foo bar\r\n")) == List(
+    assert(
+        codec(wrap("MGET foo bar\r\n")) == List(
             MGet(List(StringToChannelBuffer("foo"),
                       StringToChannelBuffer("bar")))))
   }
@@ -449,7 +450,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode unified MGET requests", CodecTest) {
-    assert(codec(wrap("bar\r\n")) == List(
+    assert(
+        codec(wrap("bar\r\n")) == List(
             MGet(List(StringToChannelBuffer("foo"),
                       StringToChannelBuffer("bar")))))
   }

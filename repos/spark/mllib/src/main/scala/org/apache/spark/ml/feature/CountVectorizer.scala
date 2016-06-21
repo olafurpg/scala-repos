@@ -47,8 +47,10 @@ private[feature] trait CountVectorizerParams
     * Default: 2^18^
     * @group param
     */
-  val vocabSize: IntParam = new IntParam(
-      this, "vocabSize", "max size of the vocabulary", ParamValidators.gt(0))
+  val vocabSize: IntParam = new IntParam(this,
+                                         "vocabSize",
+                                         "max size of the vocabulary",
+                                         ParamValidators.gt(0))
 
   /** @group getParam */
   def getVocabSize: Int = $(vocabSize)
@@ -66,9 +68,9 @@ private[feature] trait CountVectorizerParams
       this,
       "minDF",
       "Specifies the minimum number of" +
-      " different documents a term must appear in to be included in the vocabulary." +
-      " If this is an integer >= 1, this specifies the number of documents the term must" +
-      " appear in; if this is a double in [0,1), then this specifies the fraction of documents.",
+        " different documents a term must appear in to be included in the vocabulary." +
+        " If this is an integer >= 1, this specifies the number of documents the term must" +
+        " appear in; if this is a double in [0,1), then this specifies the fraction of documents.",
       ParamValidators.gtEq(0.0))
 
   /** @group getParam */
@@ -76,8 +78,8 @@ private[feature] trait CountVectorizerParams
 
   /** Validates and transforms the input schema. */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
-    val typeCandidates = List(
-        new ArrayType(StringType, true), new ArrayType(StringType, false))
+    val typeCandidates =
+      List(new ArrayType(StringType, true), new ArrayType(StringType, false))
     SchemaUtils.checkColumnTypes(schema, $(inputCol), typeCandidates)
     SchemaUtils.appendColumn(schema, $(outputCol), new VectorUDT)
   }
@@ -100,11 +102,11 @@ private[feature] trait CountVectorizerParams
       this,
       "minTF",
       "Filter to ignore rare words in" +
-      " a document. For each document, terms with frequency/count less than the given threshold are" +
-      " ignored. If this is an integer >= 1, then this specifies a count (of times the term must" +
-      " appear in the document); if this is a double in [0,1), then this specifies a fraction (out" +
-      " of the document's token count). Note that the parameter is only used in transform of" +
-      " CountVectorizerModel and does not affect fitting.",
+        " a document. For each document, terms with frequency/count less than the given threshold are" +
+        " ignored. If this is an integer >= 1, then this specifies a count (of times the term must" +
+        " appear in the document); if this is a double in [0,1), then this specifies a fraction (out" +
+        " of the document's token count). Note that the parameter is only used in transform of" +
+        " CountVectorizerModel and does not affect fitting.",
       ParamValidators.gtEq(0.0))
 
   setDefault(minTF -> 1)
@@ -146,12 +148,11 @@ class CountVectorizer(override val uid: String)
     transformSchema(dataset.schema, logging = true)
     val vocSize = $(vocabSize)
     val input = dataset.select($(inputCol)).rdd.map(_.getAs[Seq[String]](0))
-    val minDf =
-      if ($(minDF) >= 1.0) {
-        $(minDF)
-      } else {
-        $(minDF) * input.cache().count()
-      }
+    val minDf = if ($(minDF) >= 1.0) {
+      $(minDF)
+    } else {
+      $(minDF) * input.cache().count()
+    }
     val wordCounts: RDD[(String, Long)] = input.flatMap {
       case (tokens) =>
         val wc = new OpenHashMap[String, Long]
@@ -171,14 +172,13 @@ class CountVectorizer(override val uid: String)
     }.cache()
     val fullVocabSize = wordCounts.count()
     val vocab: Array[String] = {
-      val tmpSortedWC: Array[(String, Long)] =
-        if (fullVocabSize <= vocSize) {
-          // Use all terms
-          wordCounts.collect().sortBy(-_._2)
-        } else {
-          // Sort terms to select vocab
-          wordCounts.sortBy(_._2, ascending = false).take(vocSize)
-        }
+      val tmpSortedWC: Array[(String, Long)] = if (fullVocabSize <= vocSize) {
+        // Use all terms
+        wordCounts.collect().sortBy(-_._2)
+      } else {
+        // Sort terms to select vocab
+        wordCounts.sortBy(_._2, ascending = false).take(vocSize)
+      }
       tmpSortedWC.map(_._1)
     }
 
@@ -207,8 +207,8 @@ object CountVectorizer extends DefaultParamsReadable[CountVectorizer] {
   * @param vocabulary An Array over terms. Only the terms in the vocabulary will be counted.
   */
 @Experimental
-class CountVectorizerModel(
-    override val uid: String, val vocabulary: Array[String])
+class CountVectorizerModel(override val uid: String,
+                           val vocabulary: Array[String])
     extends Model[CountVectorizerModel]
     with CountVectorizerParams
     with MLWritable {
@@ -240,8 +240,8 @@ class CountVectorizerModel(
       this,
       "binary",
       "If True, all non zero counts are set to 1. " +
-      "This is useful for discrete probabilistic models that model binary events rather " +
-      "than integer counts")
+        "This is useful for discrete probabilistic models that model binary events rather " +
+        "than integer counts")
 
   /** @group getParam */
   def getBinary: Boolean = $(binary)
@@ -273,12 +273,11 @@ class CountVectorizerModel(
         tokenCount += 1
       }
       val effectiveMinTF = if (minTf >= 1.0) minTf else tokenCount * minTf
-      val effectiveCounts =
-        if ($(binary)) {
-          termCounts.filter(_._2 >= effectiveMinTF).map(p => (p._1, 1.0)).toSeq
-        } else {
-          termCounts.filter(_._2 >= effectiveMinTF).toSeq
-        }
+      val effectiveCounts = if ($(binary)) {
+        termCounts.filter(_._2 >= effectiveMinTF).map(p => (p._1, 1.0)).toSeq
+      } else {
+        termCounts.filter(_._2 >= effectiveMinTF).toSeq
+      }
 
       Vectors.sparse(dictBr.value.size, effectiveCounts)
     }

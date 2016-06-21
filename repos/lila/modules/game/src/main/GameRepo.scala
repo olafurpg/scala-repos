@@ -85,7 +85,7 @@ object GameRepo {
   def gamesForAssessment(userId: String, nb: Int): Fu[List[Game]] = $find(
       $query(Query.finished ++ Query.rated ++ Query.user(userId) ++ Query
             .analysed(true) ++ Query.turnsMoreThan(20) ++ Query.clock(true)) sort
-      ($sort asc F.createdAt),
+        ($sort asc F.createdAt),
       nb
   )
 
@@ -114,7 +114,8 @@ object GameRepo {
           .update(
               $select(progress.origin.id),
               nonEmptyMod("$set", BSONDocument(sets)) ++ nonEmptyMod(
-                  "$unset", BSONDocument(unsets))
+                  "$unset",
+                  BSONDocument(unsets))
           )
           .void
     }
@@ -187,8 +188,8 @@ object GameRepo {
   }
 
   def onTv(nb: Int): Fu[List[Game]] =
-    $find(
-        $query(Json.obj(F.tvAt -> $exists(true))) sort $sort.desc(F.tvAt), nb)
+    $find($query(Json.obj(F.tvAt -> $exists(true))) sort $sort.desc(F.tvAt),
+          nb)
 
   def setAnalysed(id: ID) {
     $update.fieldUnchecked(id, F.analysed, true)
@@ -292,8 +293,8 @@ object GameRepo {
           .createdSince(DateTime.now minusHours 1))
 
   def setCheckAt(g: Game, at: DateTime) =
-    $update(
-        $select(g.id), BSONDocument("$set" -> BSONDocument(F.checkAt -> at)))
+    $update($select(g.id),
+            BSONDocument("$set" -> BSONDocument(F.checkAt -> at)))
 
   def unsetCheckAt(g: Game) =
     $update($select(g.id),
@@ -427,8 +428,9 @@ object GameRepo {
       )
       .one[BSONDocument] map { _ flatMap extractPgnMoves }
 
-  def lastGameBetween(
-      u1: String, u2: String, since: DateTime): Fu[Option[Game]] = {
+  def lastGameBetween(u1: String,
+                      u2: String,
+                      since: DateTime): Fu[Option[Game]] = {
     $find.one(
         Json.obj(
             F.playerUids -> Json.obj("$all" -> List(u1, u2)),
@@ -450,8 +452,8 @@ object GameRepo {
     }
 
   // #TODO this breaks it all since reactivemongo > 0.11.9
-  def activePlayersSinceNOPENOPENOPE(
-      since: DateTime, max: Int): Fu[List[UidNb]] = {
+  def activePlayersSinceNOPENOPENOPE(since: DateTime,
+                                     max: Int): Fu[List[UidNb]] = {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework,
     AggregationFramework.{Descending, GroupField, Limit, Match, Sort, SumValue, Unwind}
 

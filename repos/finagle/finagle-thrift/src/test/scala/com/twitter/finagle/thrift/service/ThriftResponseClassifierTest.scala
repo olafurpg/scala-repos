@@ -46,7 +46,8 @@ class ThriftResponseClassifierTest extends FunSuite {
         val rep = in.getBytes(Charsets.Utf8)
         assert(!classifier.isDefinedAt(ReqRep(in, Return(rep))))
         assert(expectedClass == classifier.applyOrElse(
-                ReqRep(in, Return(rep)), ResponseClassifier.Default))
+                ReqRep(in, Return(rep)),
+                ResponseClassifier.Default))
       }
     }
     testApplyOrElse("yep", Success)
@@ -104,7 +105,8 @@ class ThriftResponseClassifierTest extends FunSuite {
         val rep = in.getBytes(Charsets.Utf8)
         assert(!classifier.isDefinedAt(ReqRep(in, Return(rep))))
         assert(expectedClass == classifier.applyOrElse(
-                ReqRep(in, Return(rep)), ResponseClassifier.Default))
+                ReqRep(in, Return(rep)),
+                ResponseClassifier.Default))
       }
     }
 

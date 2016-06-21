@@ -32,8 +32,8 @@ import org.saddle.buffer.BufferInt
   * @param times A Vec[Long], where each element is a millisecond timestamp
   * @param tzone Optional time zone containing localization info
   */
-class VecTime(
-    val times: Vec[Long], val tzone: DateTimeZone = ISO_CHRONO.getZone)
+class VecTime(val times: Vec[Long],
+              val tzone: DateTimeZone = ISO_CHRONO.getZone)
     extends Vec[DateTime] {
 
   @transient lazy val scalarTag = ScalarTagTime
@@ -61,8 +61,8 @@ class VecTime(
     vl2vt(Vec(util.Concat.append(times.toArray, x.times.toArray)))
 
   // general concatenation
-  def concat[B, C](v: Vec[B])(
-      implicit wd: Promoter[DateTime, B, C], mc: ST[C]) =
+  def concat[B, C](v: Vec[B])(implicit wd: Promoter[DateTime, B, C],
+                              mc: ST[C]) =
     Vec(util.Concat.append[DateTime, B, C](toArray, v.toArray))
 
   def unary_-() = sys.error("Cannot negate VecTime")
@@ -104,7 +104,8 @@ class VecTime(
   def hasNA = times.hasNA
 
   def rolling[@spec(Boolean, Int, Long, Double) B: ST](
-      winSz: Int, f: (Vec[DateTime]) => B) =
+      winSz: Int,
+      f: (Vec[DateTime]) => B) =
     times.rolling(winSz, vl2vt _ andThen f)
 
   def slice(from: Int, until: Int, stride: Int) =

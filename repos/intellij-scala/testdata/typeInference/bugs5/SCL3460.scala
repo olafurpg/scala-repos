@@ -3,7 +3,7 @@ object SCL3460 {
     type A
   }
   trait G extends Z {
-    implicit def foo(a: G. super [Z].A): String = "text"
+    implicit def foo(a: G. super[Z].A): String = "text"
   }
 
   object U extends G {

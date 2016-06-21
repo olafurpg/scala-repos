@@ -22,8 +22,8 @@ object ActorPublisherSpec {
       my-dispatcher2 = $${akka.test.stream-dispatcher}
     """
 
-  def testPublisherProps(
-      probe: ActorRef, useTestDispatcher: Boolean = true): Props = {
+  def testPublisherProps(probe: ActorRef,
+                         useTestDispatcher: Boolean = true): Props = {
     val p = Props(new TestPublisher(probe))
     if (useTestDispatcher) p.withDispatcher("akka.test.stream-dispatcher")
     else p

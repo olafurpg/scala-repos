@@ -50,12 +50,11 @@ final case class HttpsRules(
     requiredTime.toList.map { duration =>
       val age = s"max-age=${duration.toSeconds}"
 
-      val header =
-        if (includeSubDomains) {
-          s"$age ; includeSubDomains"
-        } else {
-          age
-        }
+      val header = if (includeSubDomains) {
+        s"$age ; includeSubDomains"
+      } else {
+        age
+      }
 
       ("Strict-Transport-Security" -> header)
     }
@@ -275,7 +274,7 @@ final case class ContentSecurityPolicy(
     val restrictionString = allRestrictions.collect {
       case (category, restrictions) if restrictions.nonEmpty =>
         category + " " +
-        restrictions.map(_.sourceRestrictionString).mkString(" ")
+          restrictions.map(_.sourceRestrictionString).mkString(" ")
     }.mkString("; ")
 
     reportUri.map { uri =>

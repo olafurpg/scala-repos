@@ -85,15 +85,17 @@ object MongoQueryExecutor {
             jobActorSystem: ActorSystem)(
       implicit ec: ExecutionContext,
       M: Monad[Future]): Platform[Future, StreamT[Future, Slice]] = {
-    new MongoQueryExecutor(
-        new MongoQueryExecutorConfig(config), jobManager, jobActorSystem)
+    new MongoQueryExecutor(new MongoQueryExecutorConfig(config),
+                           jobManager,
+                           jobActorSystem)
   }
 }
 
 class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                          val jobManager: JobManager[Future],
                          val jobActorSystem: ActorSystem)(
-    implicit val executionContext: ExecutionContext, val M: Monad[Future])
+    implicit val executionContext: ExecutionContext,
+    val M: Monad[Future])
     extends StandaloneQueryExecutor
     with MongoColumnarTableModule
     with Logging {
@@ -137,8 +139,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         case t => logger.error("Failure during size", t)
       }
 
-    def browse(
-        userUID: String, path: Path): Future[Validation[String, JArray]] =
+    def browse(userUID: String,
+               path: Path): Future[Validation[String, JArray]] =
       Future {
         path.elements.toList match {
           case Nil =>

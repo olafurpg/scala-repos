@@ -131,12 +131,13 @@ class MesosSchedulerUtilsSuite
   }
 
   test("contains match is performed for range attributes") {
-    val offerAttribs = Map(
-        "ports" -> Value.Range
-          .newBuilder()
-          .setBegin(7000)
-          .setEnd(8000)
-          .build())
+    val offerAttribs =
+      Map(
+          "ports" -> Value.Range
+            .newBuilder()
+            .setBegin(7000)
+            .setEnd(8000)
+            .build())
     val ltConstraint = utils.parseConstraintString("ports:6000")
     val eqConstraint = utils.parseConstraintString("ports:7500")
     val gtConstraint = utils.parseConstraintString("ports:8002")

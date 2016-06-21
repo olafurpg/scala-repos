@@ -45,8 +45,8 @@ class RPackageUtilsSuite
   private val dep2 = MavenCoordinate("a", "dep2", "d")
 
   private def getJarPath(coord: MavenCoordinate, repo: File): File = {
-    new File(IvyTestUtils.pathFromCoordinate(
-                 coord, repo, "jar", useIvyLayout = false),
+    new File(IvyTestUtils
+               .pathFromCoordinate(coord, repo, "jar", useIvyLayout = false),
              IvyTestUtils.artifactName(coord, useIvyLayout = false, ".jar"))
   }
 
@@ -91,8 +91,9 @@ class RPackageUtilsSuite
       val jars = Seq(main, dep1, dep2).map { c =>
         getJarPath(c, new File(new URI(repo)))
       }.mkString(",")
-      RPackageUtils.checkAndBuildRPackage(
-          jars, new BufferPrintStream, verbose = true)
+      RPackageUtils.checkAndBuildRPackage(jars,
+                                          new BufferPrintStream,
+                                          verbose = true)
       val firstJar = jars.substring(0, jars.indexOf(","))
       val output = lineBuffer.mkString("\n")
       assert(output.contains("Building R package"))
@@ -110,8 +111,9 @@ class RPackageUtilsSuite
       val jars = Seq(main, dep1, dep2).map { c =>
         getJarPath(c, new File(new URI(repo))) + "dummy"
       }.mkString(",")
-      RPackageUtils.checkAndBuildRPackage(
-          jars, new BufferPrintStream, verbose = true)
+      RPackageUtils.checkAndBuildRPackage(jars,
+                                          new BufferPrintStream,
+                                          verbose = true)
       val individualJars = jars.split(",")
       val output = lineBuffer.mkString("\n")
       individualJars.foreach { jarFile =>
@@ -133,8 +135,9 @@ class RPackageUtilsSuite
                                      useIvyLayout = false,
                                      withR = false,
                                      Some(manifest))
-      RPackageUtils.checkAndBuildRPackage(
-          jar.getAbsolutePath, new BufferPrintStream, verbose = true)
+      RPackageUtils.checkAndBuildRPackage(jar.getAbsolutePath,
+                                          new BufferPrintStream,
+                                          verbose = true)
       val output = lineBuffer.mkString("\n")
       assert(output.contains(RPackageUtils.RJarDoc))
     }

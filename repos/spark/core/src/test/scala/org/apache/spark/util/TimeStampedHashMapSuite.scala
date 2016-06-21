@@ -151,28 +151,29 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
       }
     }
 
-    val threads = (1 to 25).map(i =>
-          new Thread() {
-        override def run() {
-          try {
-            for (j <- 1 to 1000) {
-              Random.nextInt(3) match {
-                case 0 =>
-                  testMap(Random.nextString(10)) =
-                    Random.nextDouble().toString // put
-                case 1 =>
-                  getRandomKey(testMap).map(testMap.get) // get
-                case 2 =>
-                  getRandomKey(testMap).map(testMap.remove) // remove
+    val threads =
+      (1 to 25).map(i =>
+            new Thread() {
+          override def run() {
+            try {
+              for (j <- 1 to 1000) {
+                Random.nextInt(3) match {
+                  case 0 =>
+                    testMap(Random.nextString(10)) =
+                      Random.nextDouble().toString // put
+                  case 1 =>
+                    getRandomKey(testMap).map(testMap.get) // get
+                  case 2 =>
+                    getRandomKey(testMap).map(testMap.remove) // remove
+                }
               }
+            } catch {
+              case t: Throwable =>
+                error = true
+                throw t
             }
-          } catch {
-            case t: Throwable =>
-              error = true
-              throw t
           }
-        }
-    })
+      })
 
     test(name + " - threading safety test") {
       threads.map(_.start)

@@ -46,8 +46,12 @@ object NumberTag {
     def isNaN(a: A): Boolean = false
   }
 
-  abstract class BuiltinFloatTag[A](
-      zero: A, min: A, max: A, nan: A, posInf: A, negInf: A)
+  abstract class BuiltinFloatTag[A](zero: A,
+                                    min: A,
+                                    max: A,
+                                    nan: A,
+                                    posInf: A,
+                                    negInf: A)
       extends NumberTag[A] {
     def resolution: Resolution = Approximate
 

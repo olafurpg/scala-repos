@@ -24,8 +24,8 @@ abstract class TestAllResolveTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil
+          .loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     scalaFile.accept(new ScalaRecursiveElementVisitor {
@@ -33,8 +33,8 @@ abstract class TestAllResolveTestBase
         val resolve = ref.resolve()
         assertNotNull(
             "Failed on reference: " + ref.getText +
-            ". Reference Range: (" + ref.getTextRange.getStartOffset + ", " +
-            ref.getTextRange.getEndOffset + ")",
+              ". Reference Range: (" + ref.getTextRange.getStartOffset + ", " +
+              ref.getTextRange.getEndOffset + ")",
             resolve)
         super.visitReference(ref)
       }

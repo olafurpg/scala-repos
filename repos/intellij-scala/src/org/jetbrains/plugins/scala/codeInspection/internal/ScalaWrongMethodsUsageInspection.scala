@@ -29,8 +29,8 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
 
   override def getDisplayName: String = "Wrong method usage"
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     if (!holder.getFile.isInstanceOf[ScalaFile])
       return new PsiElementVisitor {}
     new ScalaElementVisitor {
@@ -81,7 +81,7 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
                     holder.registerProblem(
                         ref.nameId,
                         "Don't use this method, use appropriate method implemented for Scala, or use " +
-                        "\"for Java only\" text in bounded doc comment owner ScalaDoc",
+                          "\"for Java only\" text in bounded doc comment owner ScalaDoc",
                         ProblemHighlightType.LIKE_DEPRECATED)
                   case _ =>
                 }

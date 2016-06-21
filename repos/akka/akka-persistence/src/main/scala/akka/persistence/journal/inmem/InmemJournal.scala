@@ -25,15 +25,16 @@ private[persistence] class InmemJournal
   }
 
   override def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] = {
+      persistenceId: String,
+      fromSequenceNr: Long): Future[Long] = {
     Future.successful(highestSequenceNr(persistenceId))
   }
 
-  override def asyncReplayMessages(persistenceId: String,
-                                   fromSequenceNr: Long,
-                                   toSequenceNr: Long,
-                                   max: Long)(
-      recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
+  override def asyncReplayMessages(
+      persistenceId: String,
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long)(recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
     val highest = highestSequenceNr(persistenceId)
     if (highest != 0L && max != 0L)
       read(persistenceId, fromSequenceNr, math.min(toSequenceNr, highest), max)
@@ -41,8 +42,8 @@ private[persistence] class InmemJournal
     Future.successful(())
   }
 
-  def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] = {
+  def asyncDeleteMessagesTo(persistenceId: String,
+                            toSequenceNr: Long): Future[Unit] = {
     val toSeqNr = math.min(toSequenceNr, highestSequenceNr(persistenceId))
     var snr = 1L
     while (snr <= toSeqNr) {
@@ -72,7 +73,7 @@ private[persistence] trait InmemMessages {
     messages = messages.get(pid) match {
       case Some(ms) ⇒
         messages +
-        (pid -> ms.map(sp ⇒ if (sp.sequenceNr == snr) f(sp) else sp))
+          (pid -> ms.map(sp ⇒ if (sp.sequenceNr == snr) f(sp) else sp))
       case None ⇒ messages
     }
 

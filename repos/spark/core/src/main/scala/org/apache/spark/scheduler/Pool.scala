@@ -81,8 +81,9 @@ private[spark] class Pool(val poolName: String,
     null
   }
 
-  override def executorLost(
-      executorId: String, host: String, reason: ExecutorLossReason) {
+  override def executorLost(executorId: String,
+                            host: String,
+                            reason: ExecutorLossReason) {
     schedulableQueue.asScala.foreach(_.executorLost(executorId, host, reason))
   }
 

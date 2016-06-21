@@ -56,14 +56,11 @@ private[ml] object TreeTests extends SparkFunSuite {
     }.toArray
     val featuresMetadata =
       new AttributeGroup("features", featuresAttributes).toMetadata()
-    val labelAttribute =
-      if (numClasses == 0) {
-        NumericAttribute.defaultAttr.withName("label")
-      } else {
-        NominalAttribute.defaultAttr
-          .withName("label")
-          .withNumValues(numClasses)
-      }
+    val labelAttribute = if (numClasses == 0) {
+      NumericAttribute.defaultAttr.withName("label")
+    } else {
+      NominalAttribute.defaultAttr.withName("label").withNumValues(numClasses)
+    }
     val labelMetadata = labelAttribute.toMetadata()
     df.select(df("features").as("features", featuresMetadata),
               df("label").as("label", labelMetadata))
@@ -95,8 +92,8 @@ private[ml] object TreeTests extends SparkFunSuite {
       case ex: Exception =>
         throw new AssertionError(
             "checkEqual failed since the two trees were not identical.\n" +
-            "TREE A:\n" + a.toDebugString +
-            "\n" + "TREE B:\n" + b.toDebugString + "\n",
+              "TREE A:\n" + a.toDebugString +
+              "\n" + "TREE B:\n" + b.toDebugString + "\n",
             ex)
     }
   }
@@ -152,10 +149,15 @@ private[ml] object TreeTests extends SparkFunSuite {
     val rightWeight = rightImp.count / parentImp.count.toDouble
     val gain =
       parentImp.calculate() -
-      (leftWeight * leftImp.calculate() + rightWeight * rightImp.calculate())
+        (leftWeight * leftImp.calculate() + rightWeight * rightImp.calculate())
     val pred = parentImp.predict
-    new InternalNode(
-        pred, parentImp.calculate(), gain, left, right, split, parentImp)
+    new InternalNode(pred,
+                     parentImp.calculate(),
+                     gain,
+                     left,
+                     right,
+                     split,
+                     parentImp)
   }
 
   /**

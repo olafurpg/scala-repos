@@ -127,8 +127,7 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     paramTokens.foldLeft(false) {
       case (true, _) => false
       case (_, param: String)
-          if ScaladocCommandLineState.generatedParamsWithArgs.contains(
-              param) =>
+          if ScaladocCommandLineState.generatedParamsWithArgs.contains(param) =>
         true
       case (_, param: String) =>
         if (!ScaladocCommandLineState.generatedParamsWithoutArgs.contains(
@@ -168,8 +167,9 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     val jp = new JavaParameters
     val jdk: Sdk = PathUtilEx.getAnyJdk(project)
     assert(jdk != null, "JDK IS NULL")
-    jp.configureByProject(
-        project, JavaParameters.JDK_AND_CLASSES_AND_TESTS, jdk)
+    jp.configureByProject(project,
+                          JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+                          jdk)
     jp.setWorkingDirectory(project.getBaseDir.getPath)
 
     val scalaModule = project.anyScalaModule.getOrElse {
@@ -203,7 +203,7 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
     def filterModulesList(files: VirtualFile*) {
       modulesNeeded ++=
-        allModules.filter(m => files.exists(f => m.getModuleScope.contains(f)))
+      allModules.filter(m => files.exists(f => m.getModuleScope.contains(f)))
       allModules --= modulesNeeded
     }
 
@@ -215,9 +215,10 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
           sourcesCollector -> target.sources()).foreach { entry =>
         entry._1 ++= entry._2.withoutSelfModuleOutput().getRoots.map {
           virtualFile =>
-            virtualFile.getPath.replaceAll(Pattern.quote(".") +
-                                           "(\\S{2,6})" + Pattern.quote("!/"),
-                                           ".$1/")
+            virtualFile.getPath.replaceAll(
+                Pattern.quote(".") +
+                  "(\\S{2,6})" + Pattern.quote("!/"),
+                ".$1/")
         }
       }
     }

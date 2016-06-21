@@ -24,8 +24,8 @@ import akka.http.scaladsl.{HttpsConnectionContext, Http}
 import PoolFlow._
 
 private object PoolInterfaceActor {
-  final case class PoolRequest(
-      request: HttpRequest, responsePromise: Promise[HttpResponse])
+  final case class PoolRequest(request: HttpRequest,
+                               responsePromise: Promise[HttpResponse])
       extends NoSerializationVerificationNeeded
 
   case object Shutdown extends DeadLetterSuppression
@@ -47,10 +47,10 @@ private object PoolInterfaceActor {
   *   To the inside (i.e. the running connection pool flow) the gateway actor acts as request source
   *   (ActorPublisher) and response sink (ActorSubscriber).
   */
-private class PoolInterfaceActor(hcps: HostConnectionPoolSetup,
-                                 shutdownCompletedPromise: Promise[Done],
-                                 gateway: PoolGateway)(
-    implicit fm: Materializer)
+private class PoolInterfaceActor(
+    hcps: HostConnectionPoolSetup,
+    shutdownCompletedPromise: Promise[Done],
+    gateway: PoolGateway)(implicit fm: Materializer)
     extends ActorSubscriber
     with ActorPublisher[RequestContext]
     with ActorLogging {
@@ -60,8 +60,8 @@ private class PoolInterfaceActor(hcps: HostConnectionPoolSetup,
     Buffer[PoolRequest](hcps.setup.settings.maxOpenRequests, fm)
   private[this] var activeIdleTimeout: Option[Cancellable] = None
 
-  log.debug(
-      "(Re-)starting host connection pool to {}:{}", hcps.host, hcps.port)
+  log
+    .debug("(Re-)starting host connection pool to {}:{}", hcps.host, hcps.port)
 
   initConnectionFlow()
 
@@ -80,8 +80,11 @@ private class PoolInterfaceActor(hcps: HostConnectionPoolSetup,
                                        settings.connectionSettings,
                                        setup.log)
       case _ ⇒
-        Http().outgoingConnection(
-            host, port, None, settings.connectionSettings, setup.log)
+        Http().outgoingConnection(host,
+                                  port,
+                                  None,
+                                  settings.connectionSettings,
+                                  setup.log)
     }
 
     val poolFlow =
@@ -158,8 +161,9 @@ private class PoolInterfaceActor(hcps: HostConnectionPoolSetup,
       responsePromise.completeWith(gateway(request))
 
     case Shutdown ⇒ // signal coming in from gateway
-      log.debug(
-          "Shutting down host connection pool to {}:{}", hcps.host, hcps.port)
+      log.debug("Shutting down host connection pool to {}:{}",
+                hcps.host,
+                hcps.port)
       onComplete()
       while (!inputBuffer.isEmpty) {
         val PoolRequest(request, responsePromise) = inputBuffer.dequeue()

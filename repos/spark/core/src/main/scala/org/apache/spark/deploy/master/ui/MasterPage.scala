@@ -54,8 +54,8 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
     })
   }
 
-  private def handleKillRequest(
-      request: HttpServletRequest, action: String => Unit): Unit = {
+  private def handleKillRequest(request: HttpServletRequest,
+                                action: String => Unit): Unit = {
     if (parent.killEnabled && parent.master.securityMgr.checkModifyPermissions(
             request.getRemoteUser)) {
       val killFlag =
@@ -210,7 +210,7 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
               app.state == ApplicationState.WAITING)) {
         val confirm =
           s"if (window.confirm('Are you sure you want to kill application ${app.id} ?')) " +
-          "{ this.parentNode.submit(); return true; } else { return false; }"
+            "{ this.parentNode.submit(); return true; } else { return false; }"
         <form action="app/kill/" method="POST" style="display:inline">
         <input type="hidden" name="id" value={app.id.toString}/>
         <input type="hidden" name="terminate" value="true"/>
@@ -245,7 +245,7 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
               driver.state == DriverState.RELAUNCHING)) {
         val confirm =
           s"if (window.confirm('Are you sure you want to kill driver ${driver.id} ?')) " +
-          "{ this.parentNode.submit(); return true; } else { return false; }"
+            "{ this.parentNode.submit(); return true; } else { return false; }"
         <form action="driver/kill/" method="POST" style="display:inline">
         <input type="hidden" name="id" value={driver.id.toString}/>
         <input type="hidden" name="terminate" value="true"/>

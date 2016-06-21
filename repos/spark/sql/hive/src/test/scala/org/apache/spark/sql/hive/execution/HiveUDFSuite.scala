@@ -177,7 +177,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     }
     assert(
         errMsg.getMessage contains "List type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch a component type in List<>;")
+          "JVM type erasure makes spark fail to catch a component type in List<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToListString")
     hiveContext.reset()
@@ -194,7 +194,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     }
     assert(
         errMsg.getMessage contains "List type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch a component type in List<>;")
+          "JVM type erasure makes spark fail to catch a component type in List<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToListInt")
     hiveContext.reset()
@@ -206,13 +206,13 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     testData.registerTempTable("inputTable")
 
     sql(s"CREATE TEMPORARY FUNCTION testUDFToStringIntMap " +
-        s"AS '${classOf[UDFToStringIntMap].getName}'")
+          s"AS '${classOf[UDFToStringIntMap].getName}'")
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToStringIntMap(s) FROM inputTable")
     }
     assert(
         errMsg.getMessage contains "Map type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch key and value types in Map<>;")
+          "JVM type erasure makes spark fail to catch key and value types in Map<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToStringIntMap")
     hiveContext.reset()
@@ -224,13 +224,13 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     testData.registerTempTable("inputTable")
 
     sql(s"CREATE TEMPORARY FUNCTION testUDFToIntIntMap " +
-        s"AS '${classOf[UDFToIntIntMap].getName}'")
+          s"AS '${classOf[UDFToIntIntMap].getName}'")
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToIntIntMap(s) FROM inputTable")
     }
     assert(
         errMsg.getMessage contains "Map type in java is unsupported because " +
-        "JVM type erasure makes spark fail to catch key and value types in Map<>;")
+          "JVM type erasure makes spark fail to catch key and value types in Map<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToIntIntMap")
     hiveContext.reset()
@@ -367,7 +367,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
       Seq(Tuple1(1451400761)).toDF("test_date").registerTempTable("tab1")
       sql(s"CREATE TEMPORARY FUNCTION testUDFToDate AS '${classOf[GenericUDFToDate].getName}'")
       val count = sql("select testUDFToDate(cast(test_date as timestamp))" +
-          " from tab1 group by testUDFToDate(cast(test_date as timestamp))")
+            " from tab1 group by testUDFToDate(cast(test_date as timestamp))")
         .count()
       sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToDate")
       assert(count == 1)
@@ -454,7 +454,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     // Non-External parquet pointing to /tmp/...
 
     sql("CREATE TABLE parquet_tmp(c1 int, c2 int) " + " STORED AS parquet " +
-        " AS SELECT 1, 2")
+          " AS SELECT 1, 2")
 
     val answer4 = sql("SELECT input_file_name() as file FROM parquet_tmp")
       .head()

@@ -10,8 +10,7 @@ object DeadlineFilter {
 
   val role = new Stack.Role("DeadlineAdmissionControl")
 
-  private[this] val DefaultTolerance =
-    170.milliseconds // max empirically measured clock skew
+  private[this] val DefaultTolerance = 170.milliseconds // max empirically measured clock skew
   private[this] val DefaultRejectPeriod = 10.seconds
 
   // In the case of large delays, don't want to reject too many requests
@@ -52,8 +51,9 @@ object DeadlineFilter {
     * [[com.twitter.finagle.service.DeadlineFilter]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[
-        param.Stats, DeadlineFilter.Param, ServiceFactory[Req, Rep]] {
+    new Stack.Module2[param.Stats,
+                      DeadlineFilter.Param,
+                      ServiceFactory[Req, Rep]] {
       val role = DeadlineFilter.role
       val description = "Reject requests when their deadline has passed"
 
@@ -133,7 +133,7 @@ private[finagle] class DeadlineFilter[Req, Rep](tolerance: Duration,
       now: Time
   ) =
     s"exceeded request deadline of ${deadline.deadline - deadline.timestamp} " +
-    s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."
+      s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."
 
   // The request is rejected if the set deadline has expired, the elapsed time
   // since expiry is less than `tolerance`, and there are at least

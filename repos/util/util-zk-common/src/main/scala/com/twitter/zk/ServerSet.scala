@@ -16,8 +16,9 @@ import com.twitter.util.{Future, FuturePool}
 /**
   * Wraps a common.zookeeper.ServerSetImpl to be asynchronous using a FuturePool.
   */
-class ServerSet(
-    val underlying: ServerSetImpl, val path: String, pool: FuturePool) {
+class ServerSet(val underlying: ServerSetImpl,
+                val path: String,
+                pool: FuturePool) {
   import ServerSet._
 
   /** Join a ServerSet */
@@ -41,13 +42,15 @@ class ServerSet(
 }
 
 object ServerSet {
-  def apply(
-      underlying: ServerSetImpl, path: String, pool: FuturePool): ServerSet = {
+  def apply(underlying: ServerSetImpl,
+            path: String,
+            pool: FuturePool): ServerSet = {
     new ServerSet(underlying, path, pool)
   }
 
-  def apply(
-      client: ZooKeeperClient, path: String, pool: FuturePool): ServerSet = {
+  def apply(client: ZooKeeperClient,
+            path: String,
+            pool: FuturePool): ServerSet = {
     apply(new ServerSetImpl(client, path), path, pool)
   }
 
@@ -68,8 +71,8 @@ object ServerSet {
   }
 
   /** Asynchronous wrapper for a common EndpointStatus.  A FuturePool must be provided. */
-  class EndpointStatus(
-      val underlying: CommonServerSet.EndpointStatus, pool: FuturePool) {
+  class EndpointStatus(val underlying: CommonServerSet.EndpointStatus,
+                       pool: FuturePool) {
     def update(status: Status): Future[Unit] = pool {
       underlying.update(status())
     }

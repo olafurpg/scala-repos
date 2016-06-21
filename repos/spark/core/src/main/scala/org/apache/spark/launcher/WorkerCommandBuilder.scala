@@ -29,8 +29,9 @@ import org.apache.spark.deploy.Command
   * Java doesn't have a feature similar to `private[spark]`, and we don't want that class to be
   * public, needs to live in the same package as the rest of the library.
   */
-private[spark] class WorkerCommandBuilder(
-    sparkHome: String, memoryMb: Int, command: Command)
+private[spark] class WorkerCommandBuilder(sparkHome: String,
+                                          memoryMb: Int,
+                                          command: Command)
     extends AbstractCommandBuilder {
 
   childEnv.putAll(command.environment.asJava)

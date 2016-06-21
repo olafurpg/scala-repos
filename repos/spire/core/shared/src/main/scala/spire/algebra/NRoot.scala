@@ -117,8 +117,10 @@ object NRoot {
       // it is `+ 2`.
       val maxSize = (ctxt.getPrecision + 8) / 9 + 2
 
-      def findRoot(
-          digits: Stream[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
+      def findRoot(digits: Stream[Int],
+                   y: BigInt,
+                   r: BigInt,
+                   i: Int): (Int, BigInt) = {
         val y_ = y * radix
         val a = undigitize(digits take k, radix)
         // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).

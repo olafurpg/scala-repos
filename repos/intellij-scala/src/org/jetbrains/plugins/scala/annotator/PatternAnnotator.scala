@@ -25,8 +25,9 @@ import scala.collection.mutable.ArrayBuffer
   */
 trait PatternAnnotator {
 
-  def annotatePattern(
-      pattern: ScPattern, holder: AnnotationHolder, highlightErrors: Boolean) {
+  def annotatePattern(pattern: ScPattern,
+                      holder: AnnotationHolder,
+                      highlightErrors: Boolean) {
     if (highlightErrors) {
       PatternAnnotator.checkPattern(pattern, holder)
     }
@@ -61,7 +62,7 @@ object PatternAnnotator {
 
     val neverMatches =
       !PatternAnnotatorUtil.matchesPattern(exTp, patType) &&
-      isNeverSubType(exTp, patType)
+        isNeverSubType(exTp, patType)
 
     def isEliminatedByErasure =
       (ScType.extractClass(exprType), ScType.extractClass(patType)) match {
@@ -87,14 +88,17 @@ object PatternAnnotator {
     pattern match {
       case _: ScTypedPattern if Seq(Nothing, Null, AnyVal) contains patType =>
         val message = ScalaBundle.message(
-            "type.cannot.be.used.in.type.pattern", patType.presentableText)
+            "type.cannot.be.used.in.type.pattern",
+            patType.presentableText)
         holder.createErrorAnnotation(pattern, message)
       case _: ScTypedPattern
           if exTp.isFinalType && freeTypeParams.isEmpty && !exTpMatchesPattp =>
         val (exprTypeText, patTypeText) =
           ScTypePresentation.different(exprType, patType)
         val message = ScalaBundle.message(
-            "scrutinee.incompatible.pattern.type", patTypeText, exprTypeText)
+            "scrutinee.incompatible.pattern.type",
+            patTypeText,
+            exprTypeText)
         holder.createErrorAnnotation(pattern, message)
       case ScTypedPattern(
           typeElem @ ScCompoundTypeElement(_, Some(refinement))) =>
@@ -108,7 +112,9 @@ object PatternAnnotator {
         holder.createErrorAnnotation(pattern, message)
       case (_: ScTuplePattern | _: ScInfixPattern) if neverMatches =>
         val message = ScalaBundle.message(
-            "pattern.type.incompatible.with.expected", patType, exprType)
+            "pattern.type.incompatible.with.expected",
+            patType,
+            exprType)
         holder.createErrorAnnotation(pattern, message)
       case _ if patType.isFinalType && neverMatches =>
         val (exprTypeText, patTypeText) =
@@ -126,7 +132,7 @@ object PatternAnnotator {
           ScTypePresentation.different(exprType, patType)
         val message =
           ScalaBundle.message("fruitless.type.test", exprTypeText, patTypeText) +
-          erasureWarn
+            erasureWarn
         holder.createWarningAnnotation(pattern, message)
       case StableIdResolvesToVar() =>
         val message =
@@ -160,7 +166,9 @@ object PatternAnnotator {
                   case Success(rt, _) =>
                     val expected =
                       ScPattern.expectedNumberOfExtractorArguments(
-                          rt, pattern, ScPattern.isOneArgCaseClassMethod(fun))
+                          rt,
+                          pattern,
+                          ScPattern.isOneArgCaseClassMethod(fun))
                     val tupleCrushingIsPresent =
                       expected > 0 && numPatterns == 1 && !fun.isSynthetic
                     if (expected != numPatterns && !tupleCrushingIsPresent) {
@@ -226,8 +234,8 @@ object PatternAnnotator {
 object PatternAnnotatorUtil {
   @tailrec
   def matchesPattern(matching: ScType, matched: ScType): Boolean = {
-    def abstraction(
-        scType: ScType, visited: HashSet[ScType] = HashSet.empty): ScType = {
+    def abstraction(scType: ScType,
+                    visited: HashSet[ScType] = HashSet.empty): ScType = {
       if (visited.contains(scType)) {
         return scType
       }
@@ -284,8 +292,9 @@ object PatternAnnotatorUtil {
         val subPat = tuple.subpatterns
         val subTypes = subPat.flatMap(patternType)
         if (subTypes.size == subPat.size)
-          Some(ScTupleType(subTypes)(
-                  project, GlobalSearchScope.allScope(project)))
+          Some(
+              ScTupleType(subTypes)(project,
+                                    GlobalSearchScope.allScope(project)))
         else None
       case typed: ScTypedPattern =>
         typed.typePattern.map(_.typeElement.calcType)

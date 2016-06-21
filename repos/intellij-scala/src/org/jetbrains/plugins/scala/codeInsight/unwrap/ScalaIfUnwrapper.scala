@@ -28,7 +28,8 @@ class ScalaIfUnwrapper extends ScalaUnwrapper {
     }
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e.getParent match {
+      e: PsiElement,
+      toExtract: util.List[PsiElement]) = e.getParent match {
     case ifSt @ ScIfStmt(_, Some(`e`), _) =>
       super.collectAffectedElements(e, toExtract)
       ifSt

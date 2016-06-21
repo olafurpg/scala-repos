@@ -33,11 +33,11 @@ object DataMapper {
   implicit val mapResponse: DataMapper[HttpResponse] =
     mapMessage(mapResponseEntity)((m, f) ⇒ m.withEntity(f(m.entity)))
 
-  def mapMessage[T, E](
-      entityMapper: DataMapper[E])(mapEntity: (T, E ⇒ E) ⇒ T): DataMapper[T] =
+  def mapMessage[T, E](entityMapper: DataMapper[E])(
+      mapEntity: (T, E ⇒ E) ⇒ T): DataMapper[T] =
     new DataMapper[T] {
-      def transformDataBytes(
-          t: T, transformer: Flow[ByteString, ByteString, _]): T =
+      def transformDataBytes(t: T,
+                             transformer: Flow[ByteString, ByteString, _]): T =
         mapEntity(t, entityMapper.transformDataBytes(_, transformer))
     }
 }

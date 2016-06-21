@@ -70,9 +70,9 @@ case class NativeConnector(connectString: String,
       connection match {
         case None => Future.Unit
         case Some(c) => {
-            connection = None
-            c.release()
-          }
+          connection = None
+          c.release()
+        }
       }
     }.flatten
 }
@@ -174,8 +174,9 @@ object NativeConnector {
     }
 
     protected[this] def mkZooKeeper = {
-      new ZooKeeper(
-          connectString, sessionTimeout.inMillis.toInt, sessionBroker)
+      new ZooKeeper(connectString,
+                    sessionTimeout.inMillis.toInt,
+                    sessionBroker)
     }
 
     def release(): Future[Unit] = Future {

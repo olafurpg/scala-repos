@@ -12,7 +12,8 @@ object DevErrorPageSpec extends PlaySpecification {
   "devError.scala.html" should {
 
     val testExceptionSource = new play.api.PlayException.ExceptionSource(
-        "test", "making sure the link shows up") {
+        "test",
+        "making sure the link shows up") {
       def line = 100.asInstanceOf[Integer]
       def position = 20.asInstanceOf[Integer]
       def input = "test"
@@ -29,8 +30,9 @@ object DevErrorPageSpec extends PlaySpecification {
     }
 
     "show prod error page in prod mode" in {
-      val errorHandler = new DefaultHttpErrorHandler(
-          Environment.simple(mode = Mode.Prod), Configuration.empty)
+      val errorHandler =
+        new DefaultHttpErrorHandler(Environment.simple(mode = Mode.Prod),
+                                    Configuration.empty)
       val result =
         errorHandler.onServerError(FakeRequest(), testExceptionSource)
       Helpers.contentAsString(result) must contain("Oops, an error occurred")

@@ -83,8 +83,8 @@ trait SexpPrinter extends (Sexp => String) {
     sb.append('"').append(escaped).append('"')
   }
 
-  protected def printSeq[A](iterable: Iterable[A], printSeparator: => Unit)(
-      f: A => Unit): Unit = {
+  protected def printSeq[A](iterable: Iterable[A],
+                            printSeparator: => Unit)(f: A => Unit): Unit = {
     var first = true
     iterable.foreach { a =>
       if (first) first = false else printSeparator

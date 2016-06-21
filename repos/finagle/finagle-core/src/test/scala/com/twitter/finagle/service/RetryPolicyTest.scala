@@ -117,8 +117,9 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("returns underlying result if filterEach accepts") {
-      val actual = getBackoffs(
-          policy, Stream(IException(2), IException(2), IException(0)))
+      val actual =
+        getBackoffs(policy,
+                    Stream(IException(2), IException(2), IException(0)))
       assert(actual == backoffs.take(2))
     }
   }

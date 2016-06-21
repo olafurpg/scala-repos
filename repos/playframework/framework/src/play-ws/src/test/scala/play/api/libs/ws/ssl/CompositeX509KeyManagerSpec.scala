@@ -19,8 +19,8 @@ import java.security.cert.X509Certificate
 
 object CompositeX509KeyManagerSpec extends Specification with Mockito {
 
-  def mockExtendedX509KeyManager(
-      clientResponse: String = null, serverResponse: String = null) =
+  def mockExtendedX509KeyManager(clientResponse: String = null,
+                                 serverResponse: String = null) =
     new X509ExtendedKeyManager() {
 
       override def chooseEngineClientAlias(keyType: Array[String],
@@ -33,18 +33,19 @@ object CompositeX509KeyManagerSpec extends Specification with Mockito {
                                            engine: SSLEngine): String =
         serverResponse
 
-      def getClientAliases(
-          keyType: String, issuers: Array[Principal]): Array[String] = ???
+      def getClientAliases(keyType: String,
+                           issuers: Array[Principal]): Array[String] = ???
 
       def chooseClientAlias(keyType: Array[String],
                             issuers: Array[Principal],
                             socket: Socket): String = ???
 
-      def getServerAliases(
-          keyType: String, issuers: Array[Principal]): Array[String] = ???
+      def getServerAliases(keyType: String,
+                           issuers: Array[Principal]): Array[String] = ???
 
-      def chooseServerAlias(
-          keyType: String, issuers: Array[Principal], socket: Socket): String =
+      def chooseServerAlias(keyType: String,
+                            issuers: Array[Principal],
+                            socket: Socket): String =
         ???
 
       def getCertificateChain(alias: String): Array[X509Certificate] = ???

@@ -40,8 +40,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ProgressBarTableCellSpec[S]
-    extends SimpleSFXDelegateSpec[
-        jfxscc.ProgressBarTableCell[S], ProgressBarTableCell[S]](
+    extends SimpleSFXDelegateSpec[jfxscc.ProgressBarTableCell[S],
+                                  ProgressBarTableCell[S]](
         classOf[jfxscc.ProgressBarTableCell[S]],
         classOf[ProgressBarTableCell[S]])
     with RunOnApplicationThread

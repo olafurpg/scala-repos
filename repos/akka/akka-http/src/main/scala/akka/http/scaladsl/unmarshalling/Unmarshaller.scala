@@ -13,8 +13,8 @@ import akka.http.scaladsl.model._
 
 trait Unmarshaller[-A, B] {
 
-  def apply(value: A)(
-      implicit ec: ExecutionContext, materializer: Materializer): Future[B]
+  def apply(value: A)(implicit ec: ExecutionContext,
+                      materializer: Materializer): Future[B]
 
   def transform[C](f: ExecutionContext ⇒ Materializer ⇒ Future[B] ⇒ Future[C])
     : Unmarshaller[A, C] =
@@ -118,9 +118,9 @@ object Unmarshaller
       Unmarshaller.withMaterializer { implicit ec ⇒ implicit mat ⇒ entity ⇒
         if (entity.contentType == ContentTypes.NoContentType ||
             ranges.exists(_ matches entity.contentType)) {
-          underlying(entity).fast
-            .recover[A](barkAtUnsupportedContentTypeException(
-                  ranges, entity.contentType))
+          underlying(entity).fast.recover[A](
+              barkAtUnsupportedContentTypeException(ranges,
+                                                    entity.contentType))
         } else FastFuture.failed(UnsupportedContentTypeException(ranges: _*))
       }
 
@@ -159,9 +159,8 @@ object Unmarshaller
     */
   final case class UnsupportedContentTypeException(
       supported: Set[ContentTypeRange])
-      extends RuntimeException(
-          supported.mkString(
-              "Unsupported Content-Type, supported: ", ", ", ""))
+      extends RuntimeException(supported
+            .mkString("Unsupported Content-Type, supported: ", ", ", ""))
 
   object UnsupportedContentTypeException {
     def apply(supported: ContentTypeRange*): UnsupportedContentTypeException =

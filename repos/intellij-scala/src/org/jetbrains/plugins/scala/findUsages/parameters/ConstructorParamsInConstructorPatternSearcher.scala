@@ -46,9 +46,10 @@ class ConstructorParamsInConstructorPatternSearcher
                     inReadAction {
                       val descriptor =
                         new UsageInfoToUsageConverter.TargetElementsDescriptor(
-                            Array(), Array(only))
-                      val usage = UsageInfoToUsageConverter.convert(
-                          descriptor, new UsageInfo(t))
+                            Array(),
+                            Array(only))
+                      val usage = UsageInfoToUsageConverter
+                        .convert(descriptor, new UsageInfo(t))
                       processor0.process(usage)
                     }
                   }

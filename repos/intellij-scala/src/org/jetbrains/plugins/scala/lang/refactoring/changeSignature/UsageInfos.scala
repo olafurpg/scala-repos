@@ -94,7 +94,8 @@ private[changeSignature] trait MethodUsageInfo {
 }
 
 private[changeSignature] case class MethodCallUsageInfo(
-    ref: ScReferenceExpression, call: ScMethodCall)
+    ref: ScReferenceExpression,
+    call: ScMethodCall)
     extends UsageInfo(call)
     with MethodUsageInfo {
 
@@ -138,7 +139,8 @@ private[changeSignature] case class PostfixExprUsageInfo(
 }
 
 private[changeSignature] case class ConstructorUsageInfo(
-    ref: ScReferenceElement, constr: ScConstructor)
+    ref: ScReferenceElement,
+    constr: ScConstructor)
     extends UsageInfo(constr)
     with MethodUsageInfo {
 
@@ -152,7 +154,8 @@ private[changeSignature] case class ConstructorUsageInfo(
 }
 
 private[changeSignature] case class AnonFunUsageInfo(
-    expr: ScExpression, ref: ScReferenceExpression)
+    expr: ScExpression,
+    ref: ScReferenceExpression)
     extends UsageInfo(expr)
 
 private[changeSignature] object isAnonFunUsage {
@@ -166,15 +169,16 @@ private[changeSignature] object isAnonFunUsage {
         Some(AnonFunUsageInfo(und, ref))
       case Both(ResolvesTo(m: PsiMethod), ChildOf(elem))
           if m.getParameterList.getParametersCount > 0 &&
-          !elem.isInstanceOf[MethodInvocation] =>
+            !elem.isInstanceOf[MethodInvocation] =>
         Some(AnonFunUsageInfo(ref, ref))
       case _ => None
     }
   }
 }
 
-private[changeSignature] case class ParameterUsageInfo(
-    oldIndex: Int, newName: String, ref: ScReferenceElement)
+private[changeSignature] case class ParameterUsageInfo(oldIndex: Int,
+                                                       newName: String,
+                                                       ref: ScReferenceElement)
     extends UsageInfo(ref: PsiElement)
 
 private[changeSignature] case class ImportUsageInfo(imp: ScReferenceElement)
@@ -223,8 +227,8 @@ private[changeSignature] object UsageUtil {
       case sc: ScalaChangeInfo => sc.newType
       case jc: JavaChangeInfo =>
         val method = jc.getMethod
-        val javaType = jc.getNewReturnType.getType(
-            method.getParameterList, method.getManager)
+        val javaType = jc.getNewReturnType
+          .getType(method.getParameterList, method.getManager)
         ScType.create(javaType, method.getProject)
       case _ => return None
     }
@@ -235,7 +239,8 @@ private[changeSignature] object UsageUtil {
 }
 
 private[changeSignature] case class OldArgsInfo(
-    args: Seq[ScExpression], namedElement: PsiNamedElement) {
+    args: Seq[ScExpression],
+    namedElement: PsiNamedElement) {
 
   val byOldParameterIndex = {
     args

@@ -3,8 +3,8 @@ package org.scalajs.core.tools.jsdep
 import org.scalajs.core.tools.sem.Semantics
 
 /** Expresses a requirement for a given semantic to be compliant */
-final class ComplianceRequirement(
-    val semantics: String, val origins: List[Origin])
+final class ComplianceRequirement(val semantics: String,
+                                  val origins: List[Origin])
 
 object ComplianceRequirement {
 

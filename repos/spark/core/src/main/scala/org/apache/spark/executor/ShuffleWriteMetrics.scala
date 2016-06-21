@@ -33,11 +33,14 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
     this(TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleWrite.BYTES_WRITTEN),
+             accumMap,
+             InternalAccumulator.shuffleWrite.BYTES_WRITTEN),
          TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleWrite.RECORDS_WRITTEN),
+             accumMap,
+             InternalAccumulator.shuffleWrite.RECORDS_WRITTEN),
          TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleWrite.WRITE_TIME))
+             accumMap,
+             InternalAccumulator.shuffleWrite.WRITE_TIME))
   }
 
   /**

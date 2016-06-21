@@ -34,8 +34,9 @@ private[spark] trait BlockDataManager {
     * Returns true if the block was stored and false if the put operation failed or the block
     * already existed.
     */
-  def putBlockData(
-      blockId: BlockId, data: ManagedBuffer, level: StorageLevel): Boolean
+  def putBlockData(blockId: BlockId,
+                   data: ManagedBuffer,
+                   level: StorageLevel): Boolean
 
   /**
     * Release locks acquired by [[putBlockData()]] and [[getBlockData()]].

@@ -60,16 +60,15 @@ trait TestResult[DF] {
   override def toString: String = {
 
     // String explaining what the p-value indicates.
-    val pValueExplain =
-      if (pValue <= 0.01) {
-        s"Very strong presumption against null hypothesis: $nullHypothesis."
-      } else if (0.01 < pValue && pValue <= 0.05) {
-        s"Strong presumption against null hypothesis: $nullHypothesis."
-      } else if (0.05 < pValue && pValue <= 0.1) {
-        s"Low presumption against null hypothesis: $nullHypothesis."
-      } else {
-        s"No presumption against null hypothesis: $nullHypothesis."
-      }
+    val pValueExplain = if (pValue <= 0.01) {
+      s"Very strong presumption against null hypothesis: $nullHypothesis."
+    } else if (0.01 < pValue && pValue <= 0.05) {
+      s"Strong presumption against null hypothesis: $nullHypothesis."
+    } else if (0.05 < pValue && pValue <= 0.1) {
+      s"Low presumption against null hypothesis: $nullHypothesis."
+    } else {
+      s"No presumption against null hypothesis: $nullHypothesis."
+    }
 
     s"degrees of freedom = ${degreesOfFreedom.toString} \n" +
     s"statistic = $statistic \n" + s"pValue = $pValue \n" + pValueExplain
@@ -80,7 +79,7 @@ trait TestResult[DF] {
   * Object containing the test results for the chi-squared hypothesis test.
   */
 @Since("1.1.0")
-class ChiSqTestResult private[stat](
+class ChiSqTestResult private[stat] (
     override val pValue: Double,
     @Since("1.1.0") override val degreesOfFreedom: Int,
     @Since("1.1.0") override val statistic: Double,
@@ -99,7 +98,7 @@ class ChiSqTestResult private[stat](
   */
 @Experimental
 @Since("1.5.0")
-class KolmogorovSmirnovTestResult private[stat](
+class KolmogorovSmirnovTestResult private[stat] (
     @Since("1.5.0") override val pValue: Double,
     @Since("1.5.0") override val statistic: Double,
     @Since("1.5.0") override val nullHypothesis: String)

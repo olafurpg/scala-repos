@@ -18,8 +18,12 @@ private[flow] object ReviveOffersActor {
             marathonEventStream: EventStream,
             offersWanted: Observable[Boolean],
             driverHolder: MarathonSchedulerDriverHolder): Props = {
-    Props(new ReviveOffersActor(
-            clock, conf, marathonEventStream, offersWanted, driverHolder))
+    Props(
+        new ReviveOffersActor(clock,
+                              conf,
+                              marathonEventStream,
+                              offersWanted,
+                              driverHolder))
   }
 
   private[impl] case object TimedCheck

@@ -188,7 +188,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     sparkConf.getBoolean(SecurityManager.SPARK_AUTH_CONF, false)
   // keep spark.ui.acls.enable for backwards compatibility with 1.0
   private var aclsOn = sparkConf.getBoolean(
-      "spark.acls.enable", sparkConf.getBoolean("spark.ui.acls.enable", false))
+      "spark.acls.enable",
+      sparkConf.getBoolean("spark.ui.acls.enable", false))
 
   // admin acls should be set before view or modify acls
   private var adminAcls: Set[String] = stringToSet(
@@ -202,7 +203,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
 
   // always add the current user and SPARK_USER to the viewAcls
   private val defaultAclUsers = Set[String](
-      System.getProperty("user.name", ""), Utils.getCurrentUserName())
+      System.getProperty("user.name", ""),
+      Utils.getCurrentUserName())
 
   setViewAcls(defaultAclUsers, sparkConf.get("spark.ui.view.acls", ""))
   setModifyAcls(defaultAclUsers, sparkConf.get("spark.modify.acls", ""))
@@ -210,10 +212,10 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
   private val secretKey = generateSecretKey()
   logInfo(
       "SecurityManager: authentication " +
-      (if (authOn) "enabled" else "disabled") +
-      "; ui acls " + (if (aclsOn) "enabled" else "disabled") +
-      "; users with view permissions: " + viewAcls.toString() +
-      "; users with modify permissions: " + modifyAcls.toString())
+        (if (authOn) "enabled" else "disabled") +
+        "; ui acls " + (if (aclsOn) "enabled" else "disabled") +
+        "; users with view permissions: " + viewAcls.toString() +
+        "; users with modify permissions: " + modifyAcls.toString())
 
   // Set our own authenticator to properly negotiate user/password for HTTP connections.
   // This is needed by the HTTP client fetching from the HttpServer. Put here so its
@@ -251,8 +253,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
 
           try {
             val ks = KeyStore.getInstance(KeyStore.getDefaultType)
-            ks.load(
-                input, fileServerSSLOptions.trustStorePassword.get.toCharArray)
+            ks.load(input,
+                    fileServerSSLOptions.trustStorePassword.get.toCharArray)
 
             val tmf = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm)
@@ -269,10 +271,12 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
           override def getAcceptedIssuers: Array[X509Certificate] = null
 
           override def checkClientTrusted(
-              x509Certificates: Array[X509Certificate], s: String) {}
+              x509Certificates: Array[X509Certificate],
+              s: String) {}
 
           override def checkServerTrusted(
-              x509Certificates: Array[X509Certificate], s: String) {}
+              x509Certificates: Array[X509Certificate],
+              s: String) {}
         }: TrustManager
       })
 
@@ -293,8 +297,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     }
 
   def getSSLOptions(module: String): SSLOptions = {
-    val opts = SSLOptions.parse(
-        sparkConf, s"spark.ssl.$module", Some(defaultSSLOptions))
+    val opts = SSLOptions
+      .parse(sparkConf, s"spark.ssl.$module", Some(defaultSSLOptions))
     logDebug(s"Created SSL options for $module: $opts")
     opts
   }
@@ -392,8 +396,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
         rnd.nextBytes(secret)
 
         val cookie = HashCodes.fromBytes(secret).toString()
-        SparkHadoopUtil.get.addSecretKeyToUserCredentials(
-            SECRET_LOOKUP_KEY, cookie)
+        SparkHadoopUtil.get
+          .addSecretKeyToUserCredentials(SECRET_LOOKUP_KEY, cookie)
         cookie
       } else {
         new Text(secretKey).toString
@@ -407,7 +411,7 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
         case None =>
           throw new IllegalArgumentException(
               "Error: a secret key must be specified via the " +
-              SecurityManager.SPARK_AUTH_SECRET_CONF + " config")
+                SecurityManager.SPARK_AUTH_SECRET_CONF + " config")
       }
     }
   }
@@ -429,7 +433,7 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     */
   def checkUIViewPermissions(user: String): Boolean = {
     logDebug("user=" + user + " aclsEnabled=" + aclsEnabled() + " viewAcls=" +
-        viewAcls.mkString(","))
+          viewAcls.mkString(","))
     !aclsEnabled || user == null || viewAcls.contains(user) ||
     viewAcls.contains("*")
   }
@@ -446,7 +450,7 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
   def checkModifyPermissions(user: String): Boolean = {
     logDebug(
         "user=" + user + " aclsEnabled=" + aclsEnabled() + " modifyAcls=" +
-        modifyAcls.mkString(","))
+          modifyAcls.mkString(","))
     !aclsEnabled || user == null || modifyAcls.contains(user) ||
     modifyAcls.contains("*")
   }

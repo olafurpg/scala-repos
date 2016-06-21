@@ -35,7 +35,8 @@ object SurviveNetworkInstabilityMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+                """
       akka.remote.system-message-buffer-size=100
       akka.remote.netty.tcp.connection-timeout = 10s
       """))
@@ -294,9 +295,8 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("targets-registered")
 
       runOn(first) {
-        for (role ← others) testConductor
-          .blackhole(role, second, Direction.Both)
-          .await
+        for (role ← others)
+          testConductor.blackhole(role, second, Direction.Both).await
       }
       enterBarrier("blackhole-6")
 
@@ -314,7 +314,7 @@ abstract class SurviveNetworkInstabilitySpec
       runOn(others: _*) {
         // second should be removed because of quarantine
         awaitAssert(clusterView.members.map(_.address) should not contain
-            (address(second)))
+              (address(second)))
       }
 
       enterBarrier("after-6")

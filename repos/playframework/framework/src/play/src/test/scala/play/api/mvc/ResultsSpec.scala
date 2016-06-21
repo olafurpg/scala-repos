@@ -258,12 +258,12 @@ object ResultsSpec extends Specification {
 
     "support redirects for reverse routed calls" in {
       Results.Redirect(Call("GET", "/path")).header must_==
-        Status(303).withHeaders(LOCATION -> "/path").header
+      Status(303).withHeaders(LOCATION -> "/path").header
     }
 
     "support redirects for reverse routed calls with custom statuses" in {
       Results.Redirect(Call("GET", "/path"), TEMPORARY_REDIRECT).header must_==
-        Status(TEMPORARY_REDIRECT).withHeaders(LOCATION -> "/path").header
+      Status(TEMPORARY_REDIRECT).withHeaders(LOCATION -> "/path").header
     }
   }
 }

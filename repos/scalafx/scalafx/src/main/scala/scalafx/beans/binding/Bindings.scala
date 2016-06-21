@@ -48,8 +48,8 @@ trait Bindings {
     * @param values Collection of values
     * @return The highest Value
     */
-  def min(
-      v1: jfxbv.ObservableNumberValue, values: jfxbv.ObservableNumberValue*) =
+  def min(v1: jfxbv.ObservableNumberValue,
+          values: jfxbv.ObservableNumberValue*) =
     (v1 /: values)(jfxbb.Bindings.min)
 
   /**
@@ -60,8 +60,8 @@ trait Bindings {
     * @param values Collection of values
     * @return The Lowest Value
     */
-  def max(
-      v1: jfxbv.ObservableNumberValue, values: jfxbv.ObservableNumberValue*) =
+  def max(v1: jfxbv.ObservableNumberValue,
+          values: jfxbv.ObservableNumberValue*) =
     (v1 /: values)(jfxbb.Bindings.max)
 
   /**
@@ -72,8 +72,8 @@ trait Bindings {
     * @param values Collection of values
     * @return The Value sum.
     */
-  def add(
-      v1: jfxbv.ObservableNumberValue, values: jfxbv.ObservableNumberValue*) =
+  def add(v1: jfxbv.ObservableNumberValue,
+          values: jfxbv.ObservableNumberValue*) =
     (v1 /: values)(jfxbb.Bindings.add)
 
   /**

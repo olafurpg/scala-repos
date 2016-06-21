@@ -110,18 +110,16 @@ class Node @Since("1.2.0")(
     * Returns a deep copy of the subtree rooted at this node.
     */
   private[tree] def deepCopy(): Node = {
-    val leftNodeCopy =
-      if (leftNode.isEmpty) {
-        None
-      } else {
-        Some(leftNode.get.deepCopy())
-      }
-    val rightNodeCopy =
-      if (rightNode.isEmpty) {
-        None
-      } else {
-        Some(rightNode.get.deepCopy())
-      }
+    val leftNodeCopy = if (leftNode.isEmpty) {
+      None
+    } else {
+      Some(leftNode.get.deepCopy())
+    }
+    val rightNodeCopy = if (rightNode.isEmpty) {
+      None
+    } else {
+      Some(rightNode.get.deepCopy())
+    }
     new Node(id,
              predict,
              impurity,

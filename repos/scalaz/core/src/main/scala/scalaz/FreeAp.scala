@@ -19,8 +19,8 @@ sealed abstract class FreeAp[F[_], A] {
     }
 
   /** Provides access to the first instruction of this program, if present */
-  def para[B](
-      pure: A => B, ap: λ[α => (F[α], FreeAp[F, α => A])] ~> λ[α => B]): B =
+  def para[B](pure: A => B,
+              ap: λ[α => (F[α], FreeAp[F, α => A])] ~> λ[α => B]): B =
     this match {
       case Pure(x) => pure(x)
       case x @ Ap() => ap(x.v() -> x.k())
@@ -114,8 +114,8 @@ object FreeAp {
   /**
     * Add an effect to the front of a program that produces a continuation for it.
     */
-  def apply[F[_], A, B](
-      value: => F[A], function: => FreeAp[F, A => B]): FreeAp[F, B] =
+  def apply[F[_], A, B](value: => F[A],
+                        function: => FreeAp[F, A => B]): FreeAp[F, B] =
     new Ap[F, B] {
       type I = A
       val v = () => value

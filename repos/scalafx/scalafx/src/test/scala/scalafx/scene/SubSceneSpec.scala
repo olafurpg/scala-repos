@@ -43,7 +43,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class SubSceneSpec
     extends SimpleSFXDelegateSpec[jfxs.SubScene, SubScene](
-        classOf[jfxs.SubScene], classOf[SubScene])
+        classOf[jfxs.SubScene],
+        classOf[SubScene])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance =

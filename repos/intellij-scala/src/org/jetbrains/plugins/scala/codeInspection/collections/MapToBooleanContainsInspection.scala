@@ -18,8 +18,8 @@ object MapContainsFalse extends SimplificationType {
     expr match {
       case qual `.map` (pred @ returnsBoolean()) `.contains`(literal(
           "false")) =>
-        val notForallText = invocationText(
-            negation = true, qual, "forall", pred)
+        val notForallText =
+          invocationText(negation = true, qual, "forall", pred)
         Some(replace(expr).withText(notForallText).highlightFrom(qual))
       case _ => None
     }

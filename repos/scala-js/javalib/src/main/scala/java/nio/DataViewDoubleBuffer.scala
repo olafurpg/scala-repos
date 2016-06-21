@@ -49,13 +49,15 @@ private[nio] final class DataViewDoubleBuffer private (
     GenBuffer(this).generic_put(index, d)
 
   @noinline
-  override def get(
-      dst: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def get(dst: Array[Double],
+                   offset: Int,
+                   length: Int): DoubleBuffer =
     GenBuffer(this).generic_get(dst, offset, length)
 
   @noinline
-  override def put(
-      src: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def put(src: Array[Double],
+                   offset: Int,
+                   length: Int): DoubleBuffer =
     GenBuffer(this).generic_put(src, offset, length)
 
   @noinline
@@ -84,13 +86,17 @@ private[nio] final class DataViewDoubleBuffer private (
     _dataView.setFloat64(8 * index, elem, !isBigEndian)
 
   @inline
-  override private[nio] def load(
-      startIndex: Int, dst: Array[Double], offset: Int, length: Int): Unit =
+  override private[nio] def load(startIndex: Int,
+                                 dst: Array[Double],
+                                 offset: Int,
+                                 length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  override private[nio] def store(
-      startIndex: Int, src: Array[Double], offset: Int, length: Int): Unit =
+  override private[nio] def store(startIndex: Int,
+                                  src: Array[Double],
+                                  offset: Int,
+                                  length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -104,8 +110,11 @@ private[nio] object DataViewDoubleBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): DoubleBuffer = {
-      new DataViewDoubleBuffer(
-          dataView, initialPosition, initialLimit, readOnly, isBigEndian)
+      new DataViewDoubleBuffer(dataView,
+                               initialPosition,
+                               initialLimit,
+                               readOnly,
+                               isBigEndian)
     }
   }
 

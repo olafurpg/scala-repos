@@ -168,8 +168,8 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
     *
     * @see [[com.twitter.finagle.dispatch.GenSerialServerDispatcher]]
     */
-  protected def newDispatcher(
-      transport: Transport[In, Out], service: Service[Req, Rep]): Closable
+  protected def newDispatcher(transport: Transport[In, Out],
+                              service: Service[Req, Rep]): Closable
 
   /**
     * Creates a new StackServer with parameter `p`.
@@ -266,7 +266,8 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
             val d = server.newDispatcher(
                 transport,
                 Service.const(Future.exception(Failure.rejected(
-                            "Terminating session and ignoring request", exc)))
+                            "Terminating session and ignoring request",
+                            exc)))
             )
             connections.add(d)
             transport.onClose ensure connections.remove(d)
@@ -276,8 +277,9 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
         }
       }
 
-      ServerRegistry.register(
-          underlying.boundAddress.toString, server.stack, server.params)
+      ServerRegistry.register(underlying.boundAddress.toString,
+                              server.stack,
+                              server.params)
 
       protected def closeServer(deadline: Time) = closeAwaitably {
         // Here be dragons

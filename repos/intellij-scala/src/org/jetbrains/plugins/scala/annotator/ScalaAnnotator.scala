@@ -97,8 +97,9 @@ class ScalaAnnotator
 
         if (isAdvancedHighlightingEnabled(element)) {
           expr.getTypeExt(TypingContext.empty) match {
-            case ExpressionTypeResult(
-                Success(t, _), _, Some(implicitFunction)) =>
+            case ExpressionTypeResult(Success(t, _),
+                                      _,
+                                      Some(implicitFunction)) =>
               highlightImplicitView(expr, implicitFunction, t, expr, holder)
             case _ =>
           }
@@ -118,7 +119,7 @@ class ScalaAnnotator
                 if (typeParametersLength != argsLength) {
                   val error =
                     "Wrong number of type parameters. Expected: " +
-                    typeParametersLength + ", actual: " + argsLength
+                      typeParametersLength + ", actual: " + argsLength
                   val leftBracket = parameterized.typeArgList.getNode
                     .findChildByType(ScalaTokenTypes.tLSQBRACKET)
                   if (leftBracket != null) {
@@ -226,8 +227,9 @@ class ScalaAnnotator
       }
 
       override def visitVariableDeclaration(varr: ScVariableDeclaration) {
-        checkAbstractMemberPrivateModifier(
-            varr, varr.declaredElements.map(_.nameId), holder)
+        checkAbstractMemberPrivateModifier(varr,
+                                           varr.declaredElements.map(_.nameId),
+                                           holder)
         super.visitVariableDeclaration(varr)
       }
 
@@ -383,22 +385,30 @@ class ScalaAnnotator
         }
         varr.typeElement match {
           case Some(typ) =>
-            checkBoundsVariance(
-                varr, holder, typ, varr, checkTypeDeclaredSameBracket = false)
+            checkBoundsVariance(varr,
+                                holder,
+                                typ,
+                                varr,
+                                checkTypeDeclaredSameBracket = false)
           case _ =>
         }
         if (!childHasAnnotation(varr.typeElement, "uncheckedVariance")) {
-          checkValueAndVariableVariance(
-              varr, ScTypeParam.Covariant, varr.declaredElements, holder)
-          checkValueAndVariableVariance(
-              varr, ScTypeParam.Contravariant, varr.declaredElements, holder)
+          checkValueAndVariableVariance(varr,
+                                        ScTypeParam.Covariant,
+                                        varr.declaredElements,
+                                        holder)
+          checkValueAndVariableVariance(varr,
+                                        ScTypeParam.Contravariant,
+                                        varr.declaredElements,
+                                        holder)
         }
         super.visitVariable(varr)
       }
 
       override def visitValueDeclaration(v: ScValueDeclaration) {
-        checkAbstractMemberPrivateModifier(
-            v, v.declaredElements.map(_.nameId), holder)
+        checkAbstractMemberPrivateModifier(v,
+                                           v.declaredElements.map(_.nameId),
+                                           holder)
         super.visitValueDeclaration(v)
       }
 
@@ -410,13 +420,18 @@ class ScalaAnnotator
         }
         v.typeElement match {
           case Some(typ) =>
-            checkBoundsVariance(
-                v, holder, typ, v, checkTypeDeclaredSameBracket = false)
+            checkBoundsVariance(v,
+                                holder,
+                                typ,
+                                v,
+                                checkTypeDeclaredSameBracket = false)
           case _ =>
         }
         if (!childHasAnnotation(v.typeElement, "uncheckedVariance")) {
-          checkValueAndVariableVariance(
-              v, ScTypeParam.Covariant, v.declaredElements, holder)
+          checkValueAndVariableVariance(v,
+                                        ScTypeParam.Covariant,
+                                        v.declaredElements,
+                                        holder)
         }
         super.visitValue(v)
       }
@@ -517,8 +532,9 @@ class ScalaAnnotator
     data._2.forall(!_.contains(offset))
   }
 
-  def checkCatchBlockGeneralizedRule(
-      block: ScCatchBlock, holder: AnnotationHolder, typeAware: Boolean) {
+  def checkCatchBlockGeneralizedRule(block: ScCatchBlock,
+                                     holder: AnnotationHolder,
+                                     typeAware: Boolean) {
     block.expression match {
       case Some(expr) =>
         val tp = expr.getType(TypingContext.empty).getOrAny
@@ -528,8 +544,8 @@ class ScalaAnnotator
           .orNull
         if (throwable == null) return
         val throwableType = ScDesignatorType(throwable)
-        def checkMember(
-            memberName: String, checkReturnTypeIsBoolean: Boolean) {
+        def checkMember(memberName: String,
+                        checkReturnTypeIsBoolean: Boolean) {
           val processor = new MethodResolveProcessor(
               expr,
               memberName,
@@ -539,8 +555,9 @@ class ScalaAnnotator
           processor.processType(tp, expr)
           val candidates = processor.candidates
           if (candidates.length != 1) {
-            val error = ScalaBundle.message(
-                "method.is.not.member", memberName, ScType.presentableText(tp))
+            val error = ScalaBundle.message("method.is.not.member",
+                                            memberName,
+                                            ScType.presentableText(tp))
             val annotation = holder.createErrorAnnotation(expr, error)
             annotation.setHighlightType(ProblemHighlightType.GENERIC_ERROR)
           } else if (checkReturnTypeIsBoolean) {
@@ -553,7 +570,8 @@ class ScalaAnnotator
             candidates(0) match {
               case ScalaResolveResult(fun: ScFunction, subst) =>
                 if (fun.returnType.isEmpty || !Equivalence.equiv(
-                        subst.subst(fun.returnType.get), psi.types.Boolean)) {
+                        subst.subst(fun.returnType.get),
+                        psi.types.Boolean)) {
                   error()
                 }
               case _ => error()
@@ -572,13 +590,13 @@ class ScalaAnnotator
                       case _ => return
                     }
                     val expectedType = Success(tp, None)
-                    val conformance = ScalaAnnotator.smartCheckConformance(
-                        expectedType, returnType)
+                    val conformance = ScalaAnnotator
+                      .smartCheckConformance(expectedType, returnType)
                     if (!conformance) {
                       if (typeAware) {
                         val (retTypeText, expectedTypeText) =
-                          ScTypePresentation.different(
-                              returnType.getOrNothing, expectedType.get)
+                          ScTypePresentation.different(returnType.getOrNothing,
+                                                       expectedType.get)
                         val error = ScalaBundle.message(
                             "expr.type.does.not.conform.expected.type",
                             retTypeText,
@@ -591,11 +609,11 @@ class ScalaAnnotator
                           //Don't highlight te if it's outside of original file.
                           case Some(te)
                               if te.containingFile == t.containingFile =>
-                            val fix = new ChangeTypeFix(
-                                te, returnType.getOrNothing)
+                            val fix =
+                              new ChangeTypeFix(te, returnType.getOrNothing)
                             annotation.registerFix(fix)
-                            val teAnnotation = annotationWithoutHighlighting(
-                                holder, te)
+                            val teAnnotation =
+                              annotationWithoutHighlighting(holder, te)
                             teAnnotation.registerFix(fix)
                           case _ =>
                         }
@@ -613,8 +631,8 @@ class ScalaAnnotator
     }
   }
 
-  private def annotationWithoutHighlighting(
-      holder: AnnotationHolder, te: PsiElement): Annotation = {
+  private def annotationWithoutHighlighting(holder: AnnotationHolder,
+                                            te: PsiElement): Annotation = {
     val teAnnotation = holder.createErrorAnnotation(te, null)
     teAnnotation.setHighlightType(ProblemHighlightType.INFORMATION)
     val emptyAttr = new TextAttributes()
@@ -622,8 +640,8 @@ class ScalaAnnotator
     teAnnotation
   }
 
-  private def checkTypeParamBounds(
-      sTypeParam: ScTypeBoundsOwner, holder: AnnotationHolder) {
+  private def checkTypeParamBounds(sTypeParam: ScTypeBoundsOwner,
+                                   holder: AnnotationHolder) {
     for {
       lower <- sTypeParam.lowerBound
       upper <- sTypeParam.upperBound if !Conformance.conforms(upper, lower)
@@ -647,7 +665,7 @@ class ScalaAnnotator
       val value: ValueUsed = element match {
         case ref: ScReferenceExpression
             if checkWrite &&
-            ScalaPsiUtil.isPossiblyAssignment(ref.asInstanceOf[PsiElement]) =>
+              ScalaPsiUtil.isPossiblyAssignment(ref.asInstanceOf[PsiElement]) =>
           WriteValueUsed(named)
         case _ => ReadValueUsed(named)
       }
@@ -669,8 +687,8 @@ class ScalaAnnotator
     toCheck match {
       case boundOwner: ScTypeBoundsOwner =>
         checkAndHighlightBounds(boundOwner.upperTypeElement, varianceOfUpper)
-        checkAndHighlightBounds(
-            boundOwner.lowerTypeElement, varianceOfUpper * -1)
+        checkAndHighlightBounds(boundOwner.lowerTypeElement,
+                                varianceOfUpper * -1)
       case _ =>
     }
     toCheck match {
@@ -688,8 +706,8 @@ class ScalaAnnotator
       case _ =>
     }
 
-    def checkAndHighlightBounds(
-        boundOption: Option[ScTypeElement], expectedVariance: Int) {
+    def checkAndHighlightBounds(boundOption: Option[ScTypeElement],
+                                expectedVariance: Int) {
       boundOption match {
         case Some(bound)
             if !childHasAnnotation(Some(bound), "uncheckedVariance") =>
@@ -705,8 +723,8 @@ class ScalaAnnotator
     }
   }
 
-  private def checkNotQualifiedReferenceElement(
-      refElement: ScReferenceElement, holder: AnnotationHolder) {
+  private def checkNotQualifiedReferenceElement(refElement: ScReferenceElement,
+                                                holder: AnnotationHolder) {
     refElement match {
       case _: ScInterpolatedStringPartReference =>
         return //do not inspect interpolated literal, it will be highlighted in other place
@@ -740,7 +758,7 @@ class ScalaAnnotator
 
     val goodDoc =
       refElement.isInstanceOf[ScDocResolvableCodeReference] &&
-      resolve.length > 1
+        resolve.length > 1
     if (resolve.length != 1 && !goodDoc) {
       if (resolve.length == 0) {
         //Let's try to hide dynamic named parameter usage
@@ -758,17 +776,17 @@ class ScalaAnnotator
       refElement match {
         case e: ScReferenceExpression
             if e.getParent.isInstanceOf[ScPrefixExpr] &&
-            e.getParent.asInstanceOf[ScPrefixExpr].operation == e =>
+              e.getParent.asInstanceOf[ScPrefixExpr].operation == e =>
         //todo: this is hide !(Not Boolean)
         case e: ScReferenceExpression
             if e.getParent.isInstanceOf[ScInfixExpr] &&
-            e.getParent.asInstanceOf[ScInfixExpr].operation == e =>
+              e.getParent.asInstanceOf[ScInfixExpr].operation == e =>
         //todo: this is hide A op B
         case e: ScReferenceExpression =>
           processError(countError = false, fixes = getFix)
         case e: ScStableCodeReferenceElement
             if e.getParent.isInstanceOf[ScInfixPattern] &&
-            e.getParent.asInstanceOf[ScInfixPattern].reference == e =>
+              e.getParent.asInstanceOf[ScInfixPattern].reference == e =>
         //todo: this is hide A op B in patterns
         case _ =>
           refElement.getParent match {
@@ -811,24 +829,30 @@ class ScalaAnnotator
       refElement match {
         case e: ScReferenceExpression
             if e.getParent.isInstanceOf[ScPrefixExpr] &&
-            e.getParent.asInstanceOf[ScPrefixExpr].operation == e =>
+              e.getParent.asInstanceOf[ScPrefixExpr].operation == e =>
           resolveResult.implicitFunction match {
             case Some(fun) =>
               val pref = e.getParent.asInstanceOf[ScPrefixExpr]
               val expr = pref.operand
-              highlightImplicitMethod(
-                  expr, resolveResult, refElement, fun, holder)
+              highlightImplicitMethod(expr,
+                                      resolveResult,
+                                      refElement,
+                                      fun,
+                                      holder)
             case _ =>
           }
         case e: ScReferenceExpression
             if e.getParent.isInstanceOf[ScInfixExpr] &&
-            e.getParent.asInstanceOf[ScInfixExpr].operation == e =>
+              e.getParent.asInstanceOf[ScInfixExpr].operation == e =>
           resolveResult.implicitFunction match {
             case Some(fun) =>
               val inf = e.getParent.asInstanceOf[ScInfixExpr]
               val expr = if (inf.isLeftAssoc) inf.rOp else inf.lOp
-              highlightImplicitMethod(
-                  expr, resolveResult, refElement, fun, holder)
+              highlightImplicitMethod(expr,
+                                      resolveResult,
+                                      refElement,
+                                      fun,
+                                      holder)
             case _ =>
           }
         case _ =>
@@ -842,7 +866,9 @@ class ScalaAnnotator
           messageKey: String,
           fix: ScTypeDefinition => IntentionAction): Boolean = {
         val refWithoutArgs = ScalaPsiElementFactory.createReferenceFromText(
-            refElement.getText, parent.getContext, parent)
+            refElement.getText,
+            parent.getContext,
+            parent)
         if (refWithoutArgs != null && refWithoutArgs
               .multiResolve(false)
               .exists(!_.getElement.isInstanceOf[PsiPackage])) {
@@ -866,13 +892,13 @@ class ScalaAnnotator
         case s: ScImportSelector if resolve.length > 0 => return
         case mc: ScMethodCall =>
           val messageKey = "cannot.resolve.apply.method"
-          if (addCreateApplyOrUnapplyFix(
-                  messageKey, td => new CreateApplyQuickFix(td, mc))) return
-        case Both(
-            p: ScPattern, (_: ScConstructorPattern | _: ScInfixPattern)) =>
+          if (addCreateApplyOrUnapplyFix(messageKey, td =>
+                    new CreateApplyQuickFix(td, mc))) return
+        case Both(p: ScPattern,
+                  (_: ScConstructorPattern | _: ScInfixPattern)) =>
           val messageKey = "cannot.resolve.unapply.method"
-          if (addCreateApplyOrUnapplyFix(
-                  messageKey, td => new CreateUnapplyQuickFix(td, p))) return
+          if (addCreateApplyOrUnapplyFix(messageKey, td =>
+                    new CreateUnapplyQuickFix(td, p))) return
         case scalaDocTag: ScDocTag
             if scalaDocTag.getName == MyScaladocParsing.THROWS_TAG =>
           return //see SCL-9490
@@ -910,21 +936,22 @@ class ScalaAnnotator
     annotation.setAfterEndOfLine(false)
   }
 
-  private def checkSelfInvocation(
-      self: ScSelfInvocation, holder: AnnotationHolder) {
+  private def checkSelfInvocation(self: ScSelfInvocation,
+                                  holder: AnnotationHolder) {
     self.bind match {
       case Some(elem) =>
       case None =>
         if (isAdvancedHighlightingEnabled(self)) {
           val annotation: Annotation = holder.createErrorAnnotation(
-              self.thisElement, "Cannot find constructor for this call")
+              self.thisElement,
+              "Cannot find constructor for this call")
           annotation.setHighlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
         }
     }
   }
 
-  private def checkQualifiedReferenceElement(
-      refElement: ScReferenceElement, holder: AnnotationHolder) {
+  private def checkQualifiedReferenceElement(refElement: ScReferenceElement,
+                                             holder: AnnotationHolder) {
     AnnotatorHighlighter.highlightReferenceElement(refElement, holder)
     var resolve: Array[ResolveResult] = null
     resolve = refElement.multiResolve(false)
@@ -984,8 +1011,8 @@ class ScalaAnnotator
     }
   }
 
-  private def highlightWrongInterpolatedString(
-      l: ScInterpolatedStringLiteral, holder: AnnotationHolder) {
+  private def highlightWrongInterpolatedString(l: ScInterpolatedStringLiteral,
+                                               holder: AnnotationHolder) {
     val ref = l.findReferenceAt(0)
     val prefix = l.getFirstChild
     val injections = l.getInjections
@@ -997,7 +1024,8 @@ class ScalaAnnotator
 
     def annotateBadPrefix(key: String) {
       val annotation = holder.createErrorAnnotation(
-          prefix.getTextRange, ScalaBundle.message(key, prefix.getText))
+          prefix.getTextRange,
+          ScalaBundle.message(key, prefix.getText))
       annotation.setHighlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
     }
 
@@ -1021,12 +1049,12 @@ class ScalaAnnotator
         val fakeAnnotator = new AnnotationHolderImpl(
             Option(holder.getCurrentAnnotationSession)
               .getOrElse(new AnnotationSession(l.getContainingFile))) {
-          override def createErrorAnnotation(
-              elt: PsiElement, message: String): Annotation =
+          override def createErrorAnnotation(elt: PsiElement,
+                                             message: String): Annotation =
             createErrorAnnotation(elt.getTextRange, message)
 
-          override def createErrorAnnotation(
-              range: TextRange, message: String): Annotation = {
+          override def createErrorAnnotation(range: TextRange,
+                                             message: String): Annotation = {
             holder.createErrorAnnotation(
                 elementsMap.getOrElse(range.getStartOffset - shift, prefix),
                 message)
@@ -1050,25 +1078,26 @@ class ScalaAnnotator
     }
   }
 
-  private def registerUsedImports(
-      element: PsiElement, result: ScalaResolveResult) {
+  private def registerUsedImports(element: PsiElement,
+                                  result: ScalaResolveResult) {
     ImportTracker
       .getInstance(element.getProject)
       .registerUsedImports(element.getContainingFile.asInstanceOf[ScalaFile],
                            result.importsUsed)
   }
 
-  private def checkMethodCallImplicitConversion(
-      call: ScMethodCall, holder: AnnotationHolder) {
+  private def checkMethodCallImplicitConversion(call: ScMethodCall,
+                                                holder: AnnotationHolder) {
     val importUsed = call.getImportsUsed
     ImportTracker
       .getInstance(call.getProject)
-      .registerUsedImports(
-          call.getContainingFile.asInstanceOf[ScalaFile], importUsed)
+      .registerUsedImports(call.getContainingFile.asInstanceOf[ScalaFile],
+                           importUsed)
   }
 
-  private def checkExpressionType(
-      expr: ScExpression, holder: AnnotationHolder, typeAware: Boolean) {
+  private def checkExpressionType(expr: ScExpression,
+                                  holder: AnnotationHolder,
+                                  typeAware: Boolean) {
     def checkExpressionTypeInner(fromUnderscore: Boolean) {
       val ExpressionTypeResult(exprType, importUsed, implicitFunction) =
         expr.getTypeAfterImplicitConversion(
@@ -1076,8 +1105,8 @@ class ScalaAnnotator
             fromUnderscore = fromUnderscore)
       ImportTracker
         .getInstance(expr.getProject)
-        .registerUsedImports(
-            expr.getContainingFile.asInstanceOf[ScalaFile], importUsed)
+        .registerUsedImports(expr.getContainingFile.asInstanceOf[ScalaFile],
+                             importUsed)
 
       expr match {
         case m: ScMatchStmt =>
@@ -1089,17 +1118,17 @@ class ScalaAnnotator
           expr.getParent match {
             case a: ScAssignStmt
                 if a.getRExpression.contains(expr) &&
-                a.isDynamicNamedAssignment =>
+                  a.isDynamicNamedAssignment =>
               return
             case args: ScArgumentExprList => return
             case inf: ScInfixExpr if inf.getArgExpr == expr => return
             case tuple: ScTuple
                 if tuple.getContext.isInstanceOf[ScInfixExpr] &&
-                tuple.getContext.asInstanceOf[ScInfixExpr].getArgExpr == tuple =>
+                  tuple.getContext.asInstanceOf[ScInfixExpr].getArgExpr == tuple =>
               return
             case e: ScParenthesisedExpr
                 if e.getContext.isInstanceOf[ScInfixExpr] &&
-                e.getContext.asInstanceOf[ScInfixExpr].getArgExpr == e =>
+                  e.getContext.asInstanceOf[ScInfixExpr].getArgExpr == e =>
               return
             case t: ScTypedStmt if t.isSequenceArg => return
             case parent @ (_: ScTuple | _: ScParenthesisedExpr) =>
@@ -1149,9 +1178,8 @@ class ScalaAnnotator
                     case _ => expr
                   }
 
-                  val (exprTypeText, expectedTypeText) =
-                    ScTypePresentation.different(
-                        exprType.getOrNothing, expectedType.get)
+                  val (exprTypeText, expectedTypeText) = ScTypePresentation
+                    .different(exprType.getOrNothing, expectedType.get)
                   val error = ScalaBundle.message(
                       "expr.type.does.not.conform.expected.type",
                       exprTypeText,
@@ -1160,10 +1188,10 @@ class ScalaAnnotator
                     holder.createErrorAnnotation(markedPsi, error)
                   annotation.setHighlightType(
                       ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
-                  if (WrapInOptionQuickFix.isAvailable(
-                          expr, expectedType, exprType)) {
-                    val wrapInOptionFix = new WrapInOptionQuickFix(
-                        expr, expectedType, exprType)
+                  if (WrapInOptionQuickFix
+                        .isAvailable(expr, expectedType, exprType)) {
+                    val wrapInOptionFix =
+                      new WrapInOptionQuickFix(expr, expectedType, exprType)
                     annotation.registerFix(wrapInOptionFix)
                   }
                   if (AddBreakoutQuickFix.isAvailable(expr)) {
@@ -1174,8 +1202,8 @@ class ScalaAnnotator
                         if te.getContainingFile == expr.getContainingFile =>
                       val fix = new ChangeTypeFix(te, exprType.getOrNothing)
                       annotation.registerFix(fix)
-                      val teAnnotation = annotationWithoutHighlighting(
-                          holder, te)
+                      val teAnnotation =
+                        annotationWithoutHighlighting(holder, te)
                       teAnnotation.registerFix(fix)
                     case _ =>
                   }
@@ -1191,8 +1219,8 @@ class ScalaAnnotator
     checkExpressionTypeInner(fromUnderscore = false)
   }
 
-  private def checkExpressionImplicitParameters(
-      expr: ScExpression, holder: AnnotationHolder) {
+  private def checkExpressionImplicitParameters(expr: ScExpression,
+                                                holder: AnnotationHolder) {
     expr.findImplicitParameters match {
       case Some(seq) =>
         for (resolveResult <- seq) {
@@ -1209,8 +1237,8 @@ class ScalaAnnotator
     }
   }
 
-  private def checkUnboundUnderscore(
-      under: ScUnderscoreSection, holder: AnnotationHolder) {
+  private def checkUnboundUnderscore(under: ScUnderscoreSection,
+                                     holder: AnnotationHolder) {
     if (under.getText == "_") {
       ScalaPsiUtil.getParentOfType(under, classOf[ScVariableDefinition]) match {
         case varDef @ ScVariableDefinition.expr(expr)
@@ -1238,8 +1266,8 @@ class ScalaAnnotator
     }
   }
 
-  private def checkExplicitTypeForReturnStatement(
-      ret: ScReturnStmt, holder: AnnotationHolder) {
+  private def checkExplicitTypeForReturnStatement(ret: ScReturnStmt,
+                                                  holder: AnnotationHolder) {
     val fun: ScFunction = PsiTreeUtil.getParentOfType(ret, classOf[ScFunction])
     fun match {
       case null =>
@@ -1261,28 +1289,30 @@ class ScalaAnnotator
             val ExpressionTypeResult(_, importUsed, _) = ret.expr match {
               case Some(e: ScExpression) => e.getTypeAfterImplicitConversion()
               case None =>
-                ExpressionTypeResult(
-                    Success(psi.types.Unit, None), Set.empty, None)
+                ExpressionTypeResult(Success(psi.types.Unit, None),
+                                     Set.empty,
+                                     None)
             }
             ImportTracker
               .getInstance(ret.getProject)
               .registerUsedImports(
-                  ret.getContainingFile.asInstanceOf[ScalaFile], importUsed)
+                  ret.getContainingFile.asInstanceOf[ScalaFile],
+                  importUsed)
           case _ =>
         }
     }
   }
 
-  private def checkForStmtUsedTypes(
-      f: ScForStatement, holder: AnnotationHolder) {
+  private def checkForStmtUsedTypes(f: ScForStatement,
+                                    holder: AnnotationHolder) {
     ImportTracker
       .getInstance(f.getProject)
       .registerUsedImports(f.getContainingFile.asInstanceOf[ScalaFile],
                            ScalaPsiUtil.getExprImports(f))
   }
 
-  private def checkImportExpr(
-      impExpr: ScImportExpr, holder: AnnotationHolder) {
+  private def checkImportExpr(impExpr: ScImportExpr,
+                              holder: AnnotationHolder) {
     if (impExpr.qualifier == null) {
       val annotation: Annotation = holder.createErrorAnnotation(
           impExpr.getTextRange,
@@ -1291,8 +1321,8 @@ class ScalaAnnotator
     }
   }
 
-  private def checkTypeElementForm(
-      typeElement: ScTypeElement, holder: AnnotationHolder) {
+  private def checkTypeElementForm(typeElement: ScTypeElement,
+                                   holder: AnnotationHolder) {
     //todo: check bounds conformance for parameterized type
     typeElement match {
       case simpleTypeElement: ScSimpleTypeElement =>
@@ -1309,13 +1339,13 @@ class ScalaAnnotator
     }
   }
 
-  private def checkAnnotationType(
-      annotation: ScAnnotation, holder: AnnotationHolder) {
+  private def checkAnnotationType(annotation: ScAnnotation,
+                                  holder: AnnotationHolder) {
     //todo: check annotation is inheritor for class scala.Annotation
   }
 
-  def childHasAnnotation(
-      teOption: Option[ScTypeElement], annotation: String): Boolean =
+  def childHasAnnotation(teOption: Option[ScTypeElement],
+                         annotation: String): Boolean =
     teOption match {
       case Some(te) =>
         te.breadthFirst.exists {
@@ -1333,8 +1363,8 @@ class ScalaAnnotator
       case _ => false
     }
 
-  private def checkFunctionForVariance(
-      fun: ScFunction, holder: AnnotationHolder) {
+  private def checkFunctionForVariance(fun: ScFunction,
+                                       holder: AnnotationHolder) {
     if (!modifierIsThis(fun) && !compoundType(fun)) {
       //if modifier contains [this] or if it is a compound type we do not highlight it
       checkBoundsVariance(fun, holder, fun.nameId, fun.getParent)
@@ -1414,8 +1444,9 @@ class ScalaAnnotator
                             checkIfTypeIsInSameBrackets: Boolean = false,
                             insideParameterized: Boolean = false) = {
 
-    def highlightVarianceError(
-        varianceOfElement: Int, varianceOfPosition: Int, name: String) = {
+    def highlightVarianceError(varianceOfElement: Int,
+                               varianceOfPosition: Int,
+                               name: String) = {
       if (varianceOfPosition != varianceOfElement &&
           varianceOfElement != ScTypeParam.Invariant) {
         val pos =
@@ -1454,8 +1485,9 @@ class ScalaAnnotator
                 case _ =>
                   def findVariance: Int = {
                     if (!checkIfTypeIsInSameBrackets) return i
-                    if (PsiTreeUtil.isAncestor(
-                            scTypeParam.getParent, toHighlight, false))
+                    if (PsiTreeUtil.isAncestor(scTypeParam.getParent,
+                                               toHighlight,
+                                               false))
                       //we do not highlight element if it was declared inside parameterized type.
                       if (!scTypeParam.getParent.getParent
                             .isInstanceOf[ScTemplateDefinition])
@@ -1465,8 +1497,9 @@ class ScalaAnnotator
                       return i * -1
                     i
                   }
-                  highlightVarianceError(
-                      scTypeParam.variance, findVariance, paramType.name)
+                  highlightVarianceError(scTypeParam.variance,
+                                         findVariance,
+                                         paramType.name)
               }
             case _ =>
           }
@@ -1498,8 +1531,8 @@ class ScalaAnnotator
     }
   }
 
-  private def checkIntegerLiteral(
-      literal: ScLiteral, holder: AnnotationHolder) {
+  private def checkIntegerLiteral(literal: ScLiteral,
+                                  holder: AnnotationHolder) {
     val child = literal.getFirstChild.getNode
     val text = literal.getText
     val endsWithL = child.getText.endsWith('l') || child.getText.endsWith('L')
@@ -1511,7 +1544,7 @@ class ScalaAnnotator
       // only "-1234" is negative, "- 1234" should be considered as positive 1234
       case prefixExpr: ScPrefixExpr
           if prefixExpr.getChildren.size == 2 &&
-          prefixExpr.getFirstChild.getText == "-" =>
+            prefixExpr.getFirstChild.getText == "-" =>
         true
       case _ => false
     }
@@ -1528,8 +1561,8 @@ class ScalaAnnotator
     // 0 -> the literal can fit in Int
     // 1 -> the literal can fit in Long
     // 2 -> the literal cannot fit in Long
-    def parseIntegerNumber(
-        text: String, isNegative: Boolean): (Option[Long], Byte) = {
+    def parseIntegerNumber(text: String,
+                           isNegative: Boolean): (Option[Long], Byte) = {
       var value = 0l
       val divider = if (base == 10) 1 else 2
       var statusCode: Byte = 0
@@ -1593,7 +1626,9 @@ class ScalaAnnotator
         annotation.setHighlightType(
             ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
         val bigIntType = ScalaPsiElementFactory.createTypeFromText(
-            "_root_.scala.math.BigInt", literal.getContext, literal)
+            "_root_.scala.math.BigInt",
+            literal.getContext,
+            literal)
         val conformsToTypeList = List(Long, bigIntType)
         val shouldRegisterFix =
           if (isNegative)
@@ -1630,8 +1665,8 @@ object ScalaAnnotator {
     * In other way it will return true to avoid red code.
     * Check conformance in case l = r.
     */
-  def smartCheckConformance(
-      l: TypeResult[ScType], r: TypeResult[ScType]): Boolean = {
+  def smartCheckConformance(l: TypeResult[ScType],
+                            r: TypeResult[ScType]): Boolean = {
     val leftType = l match {
       case Success(res, _) => res
       case _ => return true

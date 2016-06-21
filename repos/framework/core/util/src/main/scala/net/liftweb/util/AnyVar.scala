@@ -56,10 +56,10 @@ trait MemoizeVar[K, V] {
     coreVar.is.get(key) match {
       case Full(x) => x
       case _ => {
-          val ret = defaultFunction(key)
-          coreVar.is.update(key, ret)
-          ret
-        }
+        val ret = defaultFunction(key)
+        coreVar.is.update(key, ret)
+        ret
+      }
     }
   }
 

@@ -50,8 +50,9 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
       }
   }
 
-  private def paginator(
-      user: User, page: Int, sort: BSONDocument): Fu[Paginator[TourEntry]] =
+  private def paginator(user: User,
+                        page: Int,
+                        sort: BSONDocument): Fu[Paginator[TourEntry]] =
     Paginator(adapter =
                 new BSONAdapter[Entry](
                     collection = coll,
@@ -121,7 +122,9 @@ object LeaderboardApi {
       def rankPercentMedian = rank.median map rankPercent
     }
 
-    case class AggregationResult(
-        _id: Int, nb: Int, points: List[Int], ratios: List[Int])
+    case class AggregationResult(_id: Int,
+                                 nb: Int,
+                                 points: List[Int],
+                                 ratios: List[Int])
   }
 }

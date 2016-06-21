@@ -75,8 +75,8 @@ object ChoiceBoxTableCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(
-      message = "Use forTableColumn[S, T](ObservableBuffer[T])", since = "1.0")
+  @deprecated(message = "Use forTableColumn[S, T](ObservableBuffer[T])",
+              since = "1.0")
   def forTableColumn[S, T](items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxTableCell.forTableColumn[S, T](items)
 
@@ -103,8 +103,8 @@ object ChoiceBoxTableCell {
       message =
         "Use forTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
       since = "1.0")
-  def forTableColumn[S, T](
-      converter: jfxu.StringConverter[T], items: jfxc.ObservableList[T]) =
+  def forTableColumn[S, T](converter: jfxu.StringConverter[T],
+                           items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxTableCell.forTableColumn[S, T](converter, items)
 
   /**

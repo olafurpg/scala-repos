@@ -40,14 +40,16 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
     val userNameByIDRangeAndProduct = for {
       (min, (max, product)) <- Parameters[(Int, (Int, String))]
       u <- users if u.id >= min && u.id <= max &&
-      orders.filter(o => (u.id === o.userID) && (o.product === product)).exists
+        orders
+          .filter(o => (u.id === o.userID) && (o.product === product))
+          .exists
     } yield u.first
     val q4 = userNameByIDRangeAndProduct(2, (5, "Product A"))
 
     def userNameByIDOrAll(id: Option[Int]) =
       for (u <- users
-           if id.map(u.id === _.bind).getOrElse(LiteralColumn(true))) yield
-        u.first
+           if id.map(u.id === _.bind).getOrElse(LiteralColumn(true)))
+        yield u.first
     val q5a = userNameByIDOrAll(Some(3))
     val q5b = userNameByIDOrAll(None)
 
@@ -100,9 +102,11 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
     val impShaped = (ts.length, ts.length)
     val impShapedC = Compiled(impShaped)
     implicitly[slick.lifted.Executable[
-            slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)], _]]
+            slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)],
+            _]]
     implicitly[slick.lifted.Compilable[
-            slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)], _]]
+            slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)],
+            _]]
     val expShaped = impShaped.shaped
     val expShapedC = Compiled(expShaped)
 

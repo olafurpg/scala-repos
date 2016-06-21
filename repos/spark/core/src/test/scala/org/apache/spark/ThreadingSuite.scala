@@ -71,8 +71,7 @@ class ThreadingSuite
             printf("In thread %d: answer1 was %d\n", i, answer1)
             ok = false
           }
-          val answer2 =
-            nums.first() // This will run "locally" in the current thread
+          val answer2 = nums.first() // This will run "locally" in the current thread
           if (answer2 != 1) {
             printf("In thread %d: answer2 was %d\n", i, answer2)
             ok = false
@@ -100,8 +99,7 @@ class ThreadingSuite
             printf("In thread %d: answer1 was %d\n", i, answer1)
             ok = false
           }
-          val answer2 =
-            nums.first() // This will run "locally" in the current thread
+          val answer2 = nums.first() // This will run "locally" in the current thread
           if (answer2 != 1) {
             printf("In thread %d: answer2 was %d\n", i, answer2)
             ok = false
@@ -159,7 +157,7 @@ class ThreadingSuite
     }
     if (ThreadingSuiteState.failed.get()) {
       logError("Waited 1 second without seeing runningThreads = 4 (it was " +
-          ThreadingSuiteState.runningThreads.get() + "); failing test")
+            ThreadingSuiteState.runningThreads.get() + "); failing test")
       fail("One or more threads didn't see runningThreads = 4")
     }
   }

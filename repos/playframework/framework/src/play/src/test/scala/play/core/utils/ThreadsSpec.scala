@@ -23,9 +23,9 @@ object ThreadsSpec extends Specification {
         val currentCl = Thread.currentThread.getContextClassLoader
         (catching(classOf[RuntimeException]) opt Threads
               .withContextClassLoader(testClassLoader) {
-              Thread.currentThread.getContextClassLoader must be equalTo testClassLoader
-              throw new RuntimeException("Uh oh")
-            }) must beNone
+                Thread.currentThread.getContextClassLoader must be equalTo testClassLoader
+                throw new RuntimeException("Uh oh")
+              }) must beNone
         Thread.currentThread.getContextClassLoader must be equalTo currentCl
       }
     }

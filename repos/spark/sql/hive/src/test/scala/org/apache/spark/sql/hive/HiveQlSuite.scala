@@ -66,7 +66,8 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
         desc.schema == CatalogColumn("viewtime", "int") :: CatalogColumn(
             "userid",
             "bigint") :: CatalogColumn("page_url", "string") :: CatalogColumn(
-            "referrer_url", "string") :: CatalogColumn(
+            "referrer_url",
+            "string") :: CatalogColumn(
             "ip",
             "string",
             comment = Some("IP Address of the User")) :: CatalogColumn(
@@ -75,9 +76,14 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
             comment = Some("country of origination")) :: Nil)
     // TODO will be SQLText
     assert(desc.viewText == Option("This is the staging page view table"))
-    assert(desc.partitionColumns == CatalogColumn(
-            "dt", "string", comment = Some("date type")) :: CatalogColumn(
-            "hour", "string", comment = Some("hour of the day")) :: Nil)
+    assert(
+        desc.partitionColumns == CatalogColumn(
+            "dt",
+            "string",
+            comment = Some("date type")) :: CatalogColumn(
+            "hour",
+            "string",
+            comment = Some("hour of the day")) :: Nil)
     assert(desc.storage.serdeProperties == Map(
             (serdeConstants.SERIALIZATION_FORMAT, "\u002C"),
             (serdeConstants.FIELD_DELIM, "\u002C")))
@@ -119,7 +125,8 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
         desc.schema == CatalogColumn("viewtime", "int") :: CatalogColumn(
             "userid",
             "bigint") :: CatalogColumn("page_url", "string") :: CatalogColumn(
-            "referrer_url", "string") :: CatalogColumn(
+            "referrer_url",
+            "string") :: CatalogColumn(
             "ip",
             "string",
             comment = Some("IP Address of the User")) :: CatalogColumn(
@@ -128,9 +135,14 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
             comment = Some("country of origination")) :: Nil)
     // TODO will be SQLText
     assert(desc.viewText == Option("This is the staging page view table"))
-    assert(desc.partitionColumns == CatalogColumn(
-            "dt", "string", comment = Some("date type")) :: CatalogColumn(
-            "hour", "string", comment = Some("hour of the day")) :: Nil)
+    assert(
+        desc.partitionColumns == CatalogColumn(
+            "dt",
+            "string",
+            comment = Some("date type")) :: CatalogColumn(
+            "hour",
+            "string",
+            comment = Some("hour of the day")) :: Nil)
     assert(desc.storage.serdeProperties == Map())
     assert(desc.storage.inputFormat == Some(
             "parquet.hive.DeprecatedParquetInputFormat"))
@@ -228,16 +240,16 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
   }
 
   test("use backticks in output of Script Transform") {
-    val plan =
-      parser.parsePlan("""SELECT `t`.`thing1`
+    val plan = parser.parsePlan(
+        """SELECT `t`.`thing1`
         |FROM (SELECT TRANSFORM (`parquet_t1`.`key`, `parquet_t1`.`value`)
         |USING 'cat' AS (`thing1` int, `thing2` string) FROM `default`.`parquet_t1`) AS t
       """.stripMargin)
   }
 
   test("use backticks in output of Generator") {
-    val plan =
-      parser.parsePlan("""
+    val plan = parser.parsePlan(
+        """
         |SELECT `gentab2`.`gencol2`
         |FROM `default`.`src`
         |LATERAL VIEW explode(array(array(1, 2, 3))) `gentab1` AS `gencol1`
@@ -246,8 +258,8 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
   }
 
   test("use escaped backticks in output of Generator") {
-    val plan =
-      parser.parsePlan("""
+    val plan = parser.parsePlan(
+        """
         |SELECT `gen``tab2`.`gen``col2`
         |FROM `default`.`src`
         |LATERAL VIEW explode(array(array(1, 2,  3))) `gen``tab1` AS `gen``col1`

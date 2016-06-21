@@ -87,10 +87,10 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                            batchSize: Int,
                            maxFields: Int,
                            ingestTmpDir: File,
-                           postMode: WriteMode)(
-    implicit val M: Monad[Future], executor: ExecutionContext)
-    extends CustomHttpService[
-        ByteChunk, (APIKey, Path) => Future[HttpResponse[JValue]]]
+                           postMode: WriteMode)(implicit val M: Monad[Future],
+                                                executor: ExecutionContext)
+    extends CustomHttpService[ByteChunk,
+                              (APIKey, Path) => Future[HttpResponse[JValue]]]
     with IngestSupport
     with Logging {
 
@@ -114,7 +114,10 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
   }
 
   private[this] val processingSelectors = new DefaultIngestProcessingSelectors(
-      maxFields, batchSize, ingestTmpDir, ingestStore)
+      maxFields,
+      batchSize,
+      ingestTmpDir,
+      ingestStore)
 
   def chooseProcessing(
       apiKey: APIKey,
@@ -178,14 +181,15 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
   private def jobErrorResponse(message: String) = {
     logger.error(
         "Internal error during ingest; got bad response from the jobs server: " +
-        message)
+          message)
     HttpResponse(
         InternalServerError,
         content = Some(JString("Internal error from job service: " + message)))
   }
 
   val service: HttpRequest[ByteChunk] => Validation[
-      NotServed, (APIKey, Path) => Future[HttpResponse[JValue]]] =
+      NotServed,
+      (APIKey, Path) => Future[HttpResponse[JValue]]] =
     (request: HttpRequest[ByteChunk]) => {
       logger.debug("Got request in ingest handler: " + request)
       Success { (apiKey: APIKey, path: Path) =>
@@ -193,15 +197,20 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
           val timestamp = clock.now()
           def createJob: EitherT[Future, String, JobId] =
             jobManager
-              .createJob(
-                  apiKey, "ingest-" + path, "ingest", None, Some(timestamp))
+              .createJob(apiKey,
+                         "ingest-" + path,
+                         "ingest",
+                         None,
+                         Some(timestamp))
               .map(_.id)
 
-          findRequestWriteAuthorities(
-              request, apiKey, path, Some(timestamp.toInstant)) {
+          findRequestWriteAuthorities(request,
+                                      apiKey,
+                                      path,
+                                      Some(timestamp.toInstant)) {
             authorities =>
               logger.debug("Write permission granted for " + authorities +
-                  " to " + path)
+                    " to " + path)
               request.content map { content =>
                 import MimeTypes._
                 import Validation._
@@ -228,7 +237,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                   case _ =>
                     left[Future, String, (Durability, WriteMode)](
                         Promise.successful("HTTP method " + request.method +
-                            " not supported for data ingest."))
+                              " not supported for data ingest."))
                 }
 
                 durabilityM flatMap {
@@ -242,8 +251,8 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                                 storeMode) flatMap {
                       case NotIngested(reason) =>
                         val message =
-                          "Ingest to %s by %s failed with reason: %s ".format(
-                              path, apiKey, reason)
+                          "Ingest to %s by %s failed with reason: %s "
+                            .format(path, apiKey, reason)
                         logger.warn(message)
                         notifyJob(durability,
                                   JobManager.channels.Warning,
@@ -256,8 +265,8 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
 
                       case StreamingResult(ingested, None) =>
                         val message =
-                          "Ingest to %s by %s succeeded (%d records)".format(
-                              path, apiKey, ingested)
+                          "Ingest to %s by %s succeeded (%d records)"
+                            .format(path, apiKey, ingested)
                         logger.info(message)
                         notifyJob(durability,
                                   JobManager.channels.Info,
@@ -321,7 +330,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                       BadRequest,
                       content = Some(JString(
                               "Errors were encountered processing your ingest request: " +
-                              errors)))
+                                errors)))
                 }
               } getOrElse {
                 logger.warn(

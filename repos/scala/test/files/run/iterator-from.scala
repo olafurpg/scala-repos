@@ -13,8 +13,9 @@ object Test extends App {
 
   def testSet[A <% Ordered[A]](set: SortedSet[A], list: List[A]) {
     val distinctSorted = list.distinct.sorted
-    assertEquals(
-        "Set size wasn't the same as list sze", set.size, distinctSorted.size)
+    assertEquals("Set size wasn't the same as list sze",
+                 set.size,
+                 distinctSorted.size)
 
     for (key <- distinctSorted) {
       val clazz = set.getClass
@@ -42,8 +43,9 @@ object Test extends App {
 
   def testMap[A <% Ordered[A], B](map: SortedMap[A, B], list: List[(A, B)]) {
     val distinctSorted = distinctByKey(list).sortBy(_._1)
-    assertEquals(
-        "Map size wasn't the same as list sze", map.size, distinctSorted.size)
+    assertEquals("Map size wasn't the same as list sze",
+                 map.size,
+                 distinctSorted.size)
 
     for (keyValue <- distinctSorted) {
       val key = keyValue._1

@@ -74,7 +74,7 @@ class ScalaIsCommentComplete extends CommentCompleteHandler {
           return false
         } else {
           return lexer.getTokenEnd -
-          lexer.getTokenStart == 2 //difference from EnterHandler
+            lexer.getTokenStart == 2 //difference from EnterHandler
         }
       }
       if (!continue &&

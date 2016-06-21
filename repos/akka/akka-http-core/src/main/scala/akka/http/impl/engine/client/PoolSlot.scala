@@ -193,8 +193,8 @@ private object PoolSlot {
         val (entity, whenCompleted) =
           HttpEntity.captureTermination(response.entity)
         val delivery = ResponseDelivery(
-            ResponseContext(
-                requestContext, Success(response withEntity entity)))
+            ResponseContext(requestContext,
+                            Success(response withEntity entity)))
         import fm.executionContext
         val requestCompleted = SlotEvent.RequestCompletedFuture(
             whenCompleted.map(_ ⇒ SlotEvent.RequestCompleted(slotIx)))
@@ -216,10 +216,10 @@ private object PoolSlot {
           (error match {
             case Some(err) ⇒
               ResponseDelivery(
-                  ResponseContext(
-                      firstContext.get,
-                      Failure(new UnexpectedDisconnectException(
-                              "Unexpected (early) disconnect", err))))
+                  ResponseContext(firstContext.get,
+                                  Failure(new UnexpectedDisconnectException(
+                                          "Unexpected (early) disconnect",
+                                          err))))
             case _ ⇒
               ResponseDelivery(
                   ResponseContext(firstContext.get,

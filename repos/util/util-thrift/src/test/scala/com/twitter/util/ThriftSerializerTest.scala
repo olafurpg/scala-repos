@@ -31,8 +31,8 @@ class ThriftSerializerTest extends WordSpec {
   val encodedCompact = Some(
       "GCJtZSBndXN0YW4gbG9zIHRhY29zIHkgbG9zIGJ1cnJpdG9zFVQA")
 
-  def testSerializer(
-      serializer: ThriftSerializer, stringVersion: Option[String] = None) = {
+  def testSerializer(serializer: ThriftSerializer,
+                     stringVersion: Option[String] = None) = {
     val bytes = serializer.toBytes(original)
     var obj = new TestThriftStructure()
     serializer.fromBytes(obj, bytes)

@@ -61,8 +61,10 @@ object ListView {
              newValue: T,
              editIndex: Int) =
       this(
-          new jfxsc.ListView.EditEvent[T](
-              source, eventType, newValue, editIndex))
+          new jfxsc.ListView.EditEvent[T](source,
+                                          eventType,
+                                          newValue,
+                                          editIndex))
 
     /**
       * Returns the ListView upon which the edit took place.
@@ -245,7 +247,8 @@ class ListView[T](
   def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]](
-        onScrollTo, v)
+          onScrollTo,
+          v)
   }
 
   /**

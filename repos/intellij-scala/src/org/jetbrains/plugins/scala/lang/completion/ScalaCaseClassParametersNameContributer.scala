@@ -31,8 +31,8 @@ class ScalaCaseClassParametersNameContributer
             PsiTreeUtil.getContextOfType(position, classOf[ScCaseClause])
           if (scope == null) return
 
-          val constructorPattern = PsiTreeUtil.getContextOfType(
-              position, classOf[ScConstructorPattern])
+          val constructorPattern = PsiTreeUtil
+            .getContextOfType(position, classOf[ScConstructorPattern])
           if (constructorPattern == null) return
 
           val classRef =
@@ -43,7 +43,7 @@ class ScalaCaseClassParametersNameContributer
               funcDef.syntheticCaseClass.get.parameters
             case fundef: ScFunctionDefinition
                 if fundef.getName == "unapply" ||
-                fundef.getName == "unapplySeq" =>
+                  fundef.getName == "unapplySeq" =>
               fundef.getParameterList.params
             case _ => return
           }
@@ -77,8 +77,8 @@ class ScalaCaseClassParametersNameContributer
           }
         }
 
-        def byClassParamCompletionsItems(
-            params: Seq[ScParameter], result: CompletionResultSet): Unit = {
+        def byClassParamCompletionsItems(params: Seq[ScParameter],
+                                         result: CompletionResultSet): Unit = {
           params
             .map(p => new ScalaLookupItem(p, p.name))
             .foreach(l => addLocalScalaLookUpItem(result, l))
@@ -129,8 +129,10 @@ class ScalaCaseClassParametersNameContributer
           val me = PsiTreeUtil.getContextOfType(position, classOf[ScPattern])
           if (me == null) return ParameterWithPosition(None, -1)
 
-          val patterns = Option(PsiTreeUtil.getContextOfType(
-                  position, classOf[ScPatternArgumentList])).map(_.patterns)
+          val patterns = Option(
+              PsiTreeUtil.getContextOfType(position,
+                                           classOf[ScPatternArgumentList]))
+            .map(_.patterns)
 
           if (patterns.isEmpty ||
               (patterns.isDefined && patterns.get.length > classParams.length))
@@ -145,7 +147,7 @@ class ScalaCaseClassParametersNameContributer
           ParameterWithPosition(coresponedParameter, myPosition)
         }
 
-        case class ParameterWithPosition(
-            parameter: Option[ScParameter], position: Int)
+        case class ParameterWithPosition(parameter: Option[ScParameter],
+                                         position: Int)
       })
 }

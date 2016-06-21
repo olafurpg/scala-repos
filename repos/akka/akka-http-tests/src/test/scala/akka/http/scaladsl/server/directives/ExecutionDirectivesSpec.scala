@@ -62,7 +62,8 @@ class ExecutionDirectivesSpec extends RoutingSpec {
       }
     }
     "not handle other exceptions" in EventFilter[RuntimeException](
-        occurrences = 1, message = "buh").intercept {
+        occurrences = 1,
+        message = "buh").intercept {
       Get("/abc") ~> get {
         handleExceptions(handler) {
           throw new RuntimeException("buh")

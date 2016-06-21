@@ -50,9 +50,10 @@ trait AuthService[M[+ _]] { self =>
   }
 }
 
-case class WebAuthService(
-    protocol: String, host: String, port: Int, path: String)(
-    implicit executor: ExecutionContext)
+case class WebAuthService(protocol: String,
+                          host: String,
+                          port: Int,
+                          path: String)(implicit executor: ExecutionContext)
     extends WebClient(protocol, host, port, path)
     with AuthService[Response] {
   import scalaz.syntax.monad._

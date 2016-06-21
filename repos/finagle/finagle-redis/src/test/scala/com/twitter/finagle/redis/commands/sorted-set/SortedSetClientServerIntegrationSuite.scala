@@ -98,15 +98,17 @@ final class SortedSetClientServerIntegrationSuite
            ZMember(2, "two"),
            ZMember(3, "three"))
 
-      assert(Await.result(client(ZInterStore(
-                      "out", List(key, key2), Weights(2, 3)))) == IntegerReply(
-              2))
+      assert(
+          Await.result(client(ZInterStore("out",
+                                          List(key, key2),
+                                          Weights(2, 3)))) == IntegerReply(2))
       assertMBulkReply(client(ZRange("out", 0, -1, WithScores)),
                        List("one", "5", "two", "10"))
 
-      assert(Await.result(client(ZUnionStore(
-                      "out", List(key, key2), Weights(2, 3)))) == IntegerReply(
-              3))
+      assert(
+          Await.result(client(ZUnionStore("out",
+                                          List(key, key2),
+                                          Weights(2, 3)))) == IntegerReply(3))
       assertMBulkReply(client(ZRange("out", 0, -1, WithScores)),
                        List("one", "5", "three", "9", "two", "10"))
     }
@@ -160,10 +162,10 @@ final class SortedSetClientServerIntegrationSuite
       assertMBulkReply(
           client(ZRangeByScore(key, ZInterval.exclusive(1f), ZInterval(2f))),
           List("two"))
-      assertMBulkReply(
-          client(ZRangeByScore(
-                  key, ZInterval.exclusive(1f), ZInterval.exclusive(2f))),
-          List())
+      assertMBulkReply(client(ZRangeByScore(key,
+                                            ZInterval.exclusive(1f),
+                                            ZInterval.exclusive(2f))),
+                       List())
       assertMBulkReply(
           client(
               ZRangeByScore(key, ZInterval.MIN, ZInterval.MAX, Limit(1, 5))),
@@ -179,10 +181,10 @@ final class SortedSetClientServerIntegrationSuite
           client(
               ZRevRangeByScore(key, ZInterval(2f), ZInterval.exclusive(1f))),
           List("two"))
-      assertMBulkReply(
-          client(ZRevRangeByScore(
-                  key, ZInterval.exclusive(2f), ZInterval.exclusive(1f))),
-          List())
+      assertMBulkReply(client(ZRevRangeByScore(key,
+                                               ZInterval.exclusive(2f),
+                                               ZInterval.exclusive(1f))),
+                       List())
     }
   }
 

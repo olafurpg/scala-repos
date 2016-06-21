@@ -177,8 +177,8 @@ object JavaTypeInference {
     constructorFor(TypeToken.of(beanClass), None)
   }
 
-  private def constructorFor(
-      typeToken: TypeToken[_], path: Option[Expression]): Expression = {
+  private def constructorFor(typeToken: TypeToken[_],
+                             path: Option[Expression]): Expression = {
 
     /** Returns the current path with a sub-field extracted. */
     def addToPath(part: String): Expression =
@@ -262,8 +262,10 @@ object JavaTypeInference {
                            "array",
                            ObjectType(classOf[Array[Any]]))
 
-        StaticInvoke(
-            classOf[java.util.Arrays], ObjectType(c), "asList", array :: Nil)
+        StaticInvoke(classOf[java.util.Arrays],
+                     ObjectType(c),
+                     "asList",
+                     array :: Nil)
 
       case _ if mapType.isAssignableFrom(typeToken) =>
         val (keyType, valueType) = mapKeyValueType(typeToken)
@@ -299,18 +301,17 @@ object JavaTypeInference {
           val (_, nullable) = inferDataType(fieldType)
           val constructor =
             constructorFor(fieldType, Some(addToPath(fieldName)))
-          val setter =
-            if (nullable) {
-              constructor
-            } else {
-              AssertNotNull(
-                  constructor, Seq("currently no type path record in java"))
-            }
+          val setter = if (nullable) {
+            constructor
+          } else {
+            AssertNotNull(constructor,
+                          Seq("currently no type path record in java"))
+          }
           p.getWriteMethod.getName -> setter
         }.toMap
 
-        val newInstance = NewInstance(
-            other, Nil, ObjectType(other), propagateNull = false)
+        val newInstance =
+          NewInstance(other, Nil, ObjectType(other), propagateNull = false)
         val result = InitializeJavaBean(newInstance, setters)
 
         if (path.nonEmpty) {
@@ -334,11 +335,11 @@ object JavaTypeInference {
       .asInstanceOf[CreateNamedStruct]
   }
 
-  private def extractorFor(
-      inputObject: Expression, typeToken: TypeToken[_]): Expression = {
+  private def extractorFor(inputObject: Expression,
+                           typeToken: TypeToken[_]): Expression = {
 
-    def toCatalystArray(
-        input: Expression, elementType: TypeToken[_]): Expression = {
+    def toCatalystArray(input: Expression,
+                        elementType: TypeToken[_]): Expression = {
       val (dataType, nullable) = inferDataType(elementType)
       if (ScalaReflection.isNativeType(dataType)) {
         NewInstance(classOf[GenericArrayData],
@@ -410,8 +411,7 @@ object JavaTypeInference {
         case other =>
           val properties = getJavaBeanProperties(other)
           if (properties.length > 0) {
-            CreateNamedStruct(
-                properties.flatMap { p =>
+            CreateNamedStruct(properties.flatMap { p =>
               val fieldName = p.getName
               val fieldType = typeToken.method(p.getReadMethod).getReturnType
               val fieldValue = Invoke(inputObject,

@@ -145,7 +145,8 @@ case class ThreadPoolConfigDispatcherBuilder(
                                    flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithArrayBlockingQueueWithCapacityAndFairness(
-      capacity: Int, fair: Boolean): ThreadPoolConfigDispatcherBuilder =
+      capacity: Int,
+      fair: Boolean): ThreadPoolConfigDispatcherBuilder =
     this.copy(
         config = config.copy(queueFactory = arrayBlockingQueue(capacity, fair),
                              flowHandler = defaultFlowHandler))
@@ -216,11 +217,10 @@ object MonitorableThread {
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
 class MonitorableThread(runnable: Runnable, name: String)
-    extends Thread(
-        runnable, name + "-" + MonitorableThread.created.incrementAndGet) {
+    extends Thread(runnable,
+                   name + "-" + MonitorableThread.created.incrementAndGet) {
 
-  setUncaughtExceptionHandler(
-      new Thread.UncaughtExceptionHandler() {
+  setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
     def uncaughtException(thread: Thread, cause: Throwable) = {}
   })
 
@@ -244,8 +244,7 @@ class BoundedExecutorDecorator(val executor: ExecutorService, bound: Int)
   override def execute(command: Runnable) = {
     semaphore.acquire
     try {
-      executor.execute(
-          new Runnable() {
+      executor.execute(new Runnable() {
         def run = {
           try {
             command.run
@@ -291,15 +290,17 @@ trait ExecutorServiceDelegate extends ExecutorService {
   def invokeAll[T](callables: Collection[_ <: Callable[T]]) =
     executor.invokeAll(callables)
 
-  def invokeAll[T](
-      callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
+  def invokeAll[T](callables: Collection[_ <: Callable[T]],
+                   l: Long,
+                   timeUnit: TimeUnit) =
     executor.invokeAll(callables, l, timeUnit)
 
   def invokeAny[T](callables: Collection[_ <: Callable[T]]) =
     executor.invokeAny(callables)
 
-  def invokeAny[T](
-      callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
+  def invokeAny[T](callables: Collection[_ <: Callable[T]],
+                   l: Long,
+                   timeUnit: TimeUnit) =
     executor.invokeAny(callables, l, timeUnit)
 }
 

@@ -143,8 +143,7 @@ class RenamePlainJson {
     override def fromJournal(event: Any, manifest: String): EventSeq =
       event match {
         case json: JsObject =>
-          EventSeq(
-              marshaller.fromJson(manifest match {
+          EventSeq(marshaller.fromJson(manifest match {
             case V1 => rename(json, "code", "seatNr")
             case V2 => json // pass-through
             case unknown =>
@@ -208,7 +207,7 @@ object SimplestCustomSerializer {
         case _ =>
           throw new IllegalArgumentException(
               s"Unable to deserialize from bytes, manifest was: $manifest! Bytes length: " +
-              bytes.length)
+                bytes.length)
       }
   }
 
@@ -312,8 +311,7 @@ class RenamedEventAwareSerializer extends SerializerWithStringManifest {
   val Utf8 = Charset.forName("UTF-8")
   override def identifier: Int = 8337
 
-  val OldPayloadClassName =
-    "docs.persistence.OldPayload" // class NOT available anymore
+  val OldPayloadClassName = "docs.persistence.OldPayload" // class NOT available anymore
   val MyPayloadClassName = classOf[SamplePayload].getName
 
   override def manifest(o: AnyRef): String = o.getClass.getName

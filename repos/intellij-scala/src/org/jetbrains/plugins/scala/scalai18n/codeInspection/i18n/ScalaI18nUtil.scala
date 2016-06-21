@@ -30,7 +30,8 @@ import scala.collection.mutable
   */
 object ScalaI18nUtil {
   final val NULL: IProperty = new PropertyImpl(
-      new PropertyStubImpl(null, null), PropertiesElementTypes.PROPERTY)
+      new PropertyStubImpl(null, null),
+      PropertiesElementTypes.PROPERTY)
   private final val FOLD_MAX_LENGTH: Int = 50
   private final val CACHE: Key[IProperty] = Key.create("i18n.property.cache")
   private final val TOP_LEVEL_EXPRESSION: Key[
@@ -39,14 +40,15 @@ object ScalaI18nUtil {
   private final val TOP_LEVEL_PROVIDER: ParameterizedCachedValueProvider[
       ScExpression,
       (Project, ScExpression)] = new ParameterizedCachedValueProvider[
-      ScExpression, (Project, ScExpression)] {
+      ScExpression,
+      (Project, ScExpression)] {
     def compute(pair: (Project, ScExpression))
       : CachedValueProvider.Result[ScExpression] = {
       val param: ScExpression = pair._2
       val project: Project = pair._1
       val topLevel: ScExpression = getTopLevel(project, param)
-      val cachedValue: ParameterizedCachedValue[
-          ScExpression, (Project, ScExpression)] =
+      val cachedValue: ParameterizedCachedValue[ScExpression,
+                                                (Project, ScExpression)] =
         param.getUserData(TOP_LEVEL_EXPRESSION)
       assert(cachedValue != null)
       var i: Int = 0
@@ -60,7 +62,8 @@ object ScalaI18nUtil {
         i
       }
       CachedValueProvider.Result.create(
-          topLevel, PsiManager.getInstance(project).getModificationTracker)
+          topLevel,
+          PsiManager.getInstance(project).getModificationTracker)
     }
   }
 
@@ -68,15 +71,15 @@ object ScalaI18nUtil {
     ScalaCodeFoldingSettings.getInstance.isCollapseI18nMessages
   }
 
-  def isI18nProperty(
-      @NotNull project: Project, @NotNull expr: ScLiteral): Boolean = {
+  def isI18nProperty(@NotNull project: Project,
+                     @NotNull expr: ScLiteral): Boolean = {
     if (!isStringLiteral(expr)) return false
     val property: IProperty = expr.getUserData(CACHE)
     if (property == NULL) return false
     if (property != null) return true
     val annotationParams = new mutable.HashMap[String, AnyRef]
-    annotationParams.put(
-        AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
+    annotationParams
+      .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
     val isI18n: Boolean = mustBePropertyKey(project, expr, annotationParams)
     if (!isI18n) {
       expr.putUserData(CACHE, NULL)
@@ -171,7 +174,8 @@ object ScalaI18nUtil {
   }
 
   @NotNull private def getTopLevel(
-      project: Project, @NotNull myExpression: ScExpression): ScExpression = {
+      project: Project,
+      @NotNull myExpression: ScExpression): ScExpression = {
     var expression = myExpression
     var i: Int = 0
     var flag = true
@@ -188,8 +192,8 @@ object ScalaI18nUtil {
       expression = parent
       if (expression.isInstanceOf[PsiAssignmentExpression]) flag = false
       if (i > 10 && expression.isInstanceOf[PsiBinaryExpression]) {
-        val value: ParameterizedCachedValue[
-            ScExpression, (Project, ScExpression)] =
+        val value: ParameterizedCachedValue[ScExpression,
+                                            (Project, ScExpression)] =
           expression.getUserData(TOP_LEVEL_EXPRESSION)
         if (value != null && value.hasUpToDateValue) {
           return getToplevelExpression(project, expression)
@@ -268,13 +272,13 @@ object ScalaI18nUtil {
         .findPropertiesByKey(expression.getProject, key)
         .isEmpty
     } else {
-      val propertiesFiles = propertiesFilesByBundleName(
-          resourceBundleName, expression)
+      val propertiesFiles =
+        propertiesFilesByBundleName(resourceBundleName, expression)
       var containedInPropertiesFile: Boolean = false
       import scala.collection.JavaConversions._
       for (propertiesFile <- propertiesFiles) {
         containedInPropertiesFile |=
-          propertiesFile.findPropertyByKey(key) != null
+        propertiesFile.findPropertyByKey(key) != null
       }
       containedInPropertiesFile
     }
@@ -380,8 +384,8 @@ object ScalaI18nUtil {
                 format = new MessageFormat(value)
               } catch {
                 case e: Exception => {
-                    flag = false
-                  }
+                  flag = false
+                }
               }
               if (flag) {
                 try {
@@ -400,7 +404,8 @@ object ScalaI18nUtil {
   }
 
   def formatMethodCallExpression(
-      project: Project, methodCallExpression: ScMethodCall): String = {
+      project: Project,
+      methodCallExpression: ScMethodCall): String = {
     val args: Array[ScExpression] = methodCallExpression.args.exprsArray
     if (args.length > 0 && args(0).isInstanceOf[ScLiteral] &&
         args(0).isValid &&
@@ -408,14 +413,15 @@ object ScalaI18nUtil {
       val count: Int = getPropertyValueParamsMaxCount(
           args(0).asInstanceOf[ScLiteral])
       if (args.length == 1 + count) {
-        var text: String = getI18nMessage(
-            project, args(0).asInstanceOf[ScLiteral])
+        var text: String =
+          getI18nMessage(project, args(0).asInstanceOf[ScLiteral])
         var i: Int = 1
         var flag = true
         while (i < count + 1 && flag) {
           val evaluator = new ScalaConstantExpressionEvaluator
           var value: AnyRef = evaluator.computeConstantExpression(
-              args(i), throwExceptionOnOverflow = false)
+              args(i),
+              throwExceptionOnOverflow = false)
           if (value == null) {
             if (args(i).isInstanceOf[ScReferenceExpression]) {
               value = "{" + args(i).getText + "}"
@@ -447,8 +453,8 @@ object ScalaI18nUtil {
       @NotNull key: String,
       @NotNull outResourceBundle: Ref[String]): Boolean = {
     val annotationAttributeValues = new mutable.HashMap[String, AnyRef]
-    annotationAttributeValues.put(
-        AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
+    annotationAttributeValues
+      .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
     if (mustBePropertyKey(project, expression, annotationAttributeValues)) {
       annotationAttributeValues get AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER exists {
         case bundleName: PsiElement =>
@@ -484,7 +490,8 @@ object ScalaI18nUtil {
     }
   }
 
-  @Nullable def getSelectedRange(editor: Editor, psiFile: PsiFile): TextRange = {
+  @Nullable
+  def getSelectedRange(editor: Editor, psiFile: PsiFile): TextRange = {
     if (editor == null) return null
     val selectedText: String = editor.getSelectionModel.getSelectedText
     if (selectedText != null) {

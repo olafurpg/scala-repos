@@ -103,8 +103,10 @@ class ConfigSSLContextBuilder(info: SSLConfig,
   protected val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
   def build: SSLContext = {
-    buildSSLContext(
-        info.protocol, keyManagers, trustManagers, info.secureRandom)
+    buildSSLContext(info.protocol,
+                    keyManagers,
+                    trustManagers,
+                    info.secureRandom)
   }
 
   lazy val revocationLists = certificateRevocationList(info)
@@ -116,8 +118,8 @@ class ConfigSSLContextBuilder(info: SSLConfig,
   lazy val keySizeConstraints =
     info.disabledKeyAlgorithms.map(AlgorithmConstraintsParser.apply).toSet
 
-  lazy val algorithmChecker = new AlgorithmChecker(
-      signatureConstraints, keySizeConstraints)
+  lazy val algorithmChecker =
+    new AlgorithmChecker(signatureConstraints, keySizeConstraints)
 
   lazy val keyManagers: Seq[KeyManager] =
     if (info.keyManagerConfig.keyStoreConfigs.nonEmpty) {
@@ -137,8 +139,10 @@ class ConfigSSLContextBuilder(info: SSLConfig,
                       keyManagers: Seq[KeyManager],
                       trustManagers: Seq[TrustManager],
                       secureRandom: Option[SecureRandom]) = {
-    val builder = new SimpleSSLContextBuilder(
-        protocol, keyManagers, trustManagers, secureRandom)
+    val builder = new SimpleSSLContextBuilder(protocol,
+                                              keyManagers,
+                                              trustManagers,
+                                              secureRandom)
     builder.build()
   }
 
@@ -156,8 +160,10 @@ class ConfigSSLContextBuilder(info: SSLConfig,
                                  algorithmChecker: AlgorithmChecker) = {
 
     val trustManagers = trustManagerInfo.trustStoreConfigs.map { tsc =>
-      buildTrustManager(
-          tsc, revocationEnabled, revocationLists, algorithmChecker)
+      buildTrustManager(tsc,
+                        revocationEnabled,
+                        revocationLists,
+                        algorithmChecker)
     }
     new CompositeX509TrustManager(trustManagers, algorithmChecker)
   }
@@ -213,7 +219,8 @@ class ConfigSSLContextBuilder(info: SSLConfig,
       case e: java.lang.ArithmeticException =>
         // This bug only exists in 1.6: we'll only check on 1.6 and explain after the exception.
         val willExplodeOnEmptyPassword = foldVersion(
-            run16 = warnOnPKCS12EmptyPasswordBug(ksc), runHigher = false)
+            run16 = warnOnPKCS12EmptyPasswordBug(ksc),
+            runHigher = false)
         if (willExplodeOnEmptyPassword) {
           val msg =
             """You are running JDK 1.6, have a PKCS12 keystore with a null or empty password, and have run into a JSSE bug.
@@ -355,8 +362,8 @@ class ConfigSSLContextBuilder(info: SSLConfig,
   /**
     * Validates that a key store (as opposed to a trust store) contains private keys for client authentication.
     */
-  def validateStoreContainsPrivateKeys(
-      ksc: KeyStoreConfig, keyStore: KeyStore): Boolean = {
+  def validateStoreContainsPrivateKeys(ksc: KeyStoreConfig,
+                                       keyStore: KeyStore): Boolean = {
     import scala.collection.JavaConverters._
 
     // Is there actually a private key being stored in this key store?
@@ -397,11 +404,11 @@ class ConfigSSLContextBuilder(info: SSLConfig,
           case e: CertPathValidatorException =>
             logger.warn(
                 s"validateStore: Skipping certificate with weak key size in $alias: " +
-                e.getMessage)
+                  e.getMessage)
             store.deleteEntry(alias)
           case e: Exception =>
             logger.warn(s"validateStore: Skipping unknown exception $alias: " +
-                e.getMessage)
+                  e.getMessage)
             store.deleteEntry(alias)
         }
       }

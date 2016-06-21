@@ -198,8 +198,8 @@ object FakeRequest {
   /**
     * Constructs a new request.
     */
-  def apply(
-      method: String, path: String): FakeRequest[AnyContentAsEmpty.type] = {
+  def apply(method: String,
+            path: String): FakeRequest[AnyContentAsEmpty.type] = {
     FakeRequest(method, path, FakeHeaders(), AnyContentAsEmpty)
   }
 

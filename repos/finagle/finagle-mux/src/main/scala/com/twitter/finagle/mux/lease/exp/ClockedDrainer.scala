@@ -39,8 +39,7 @@ private[finagle] class ClockedDrainer(
     lr: LogsReceiver = NullLogsReceiver,
     statsReceiver: StatsReceiver = NullStatsReceiver,
     verbose: Boolean = false
-)
-    extends Thread("GcDrainer")
+) extends Thread("GcDrainer")
     with Lessor {
 
   private[this] val lessees =
@@ -148,7 +147,7 @@ private[finagle] class ClockedDrainer(
     coord.sleepUntilDiscountRemaining(space, { () =>
       if (verbose) {
         log.info("AWAIT-DISCOUNT: discount=" + space.discount() + "; clock=" +
-            coord.counter + "; space=" + space)
+              coord.counter + "; space=" + space)
       }
 
       // discount (bytes) / rate (bytes / second) == expiry (seconds)
@@ -186,8 +185,8 @@ private[finagle] class ClockedDrainer(
     if (verbose) {
       log.info(
           "AWAIT-DRAIN: n=" + npending() + "; clock=" + coord.counter +
-          "; space=" + space + "; maxWaitMs=" + maxWait.inMilliseconds +
-          "; minDiscount=" + space.minDiscount)
+            "; space=" + space + "; maxWaitMs=" + maxWait.inMilliseconds +
+            "; minDiscount=" + space.minDiscount)
     }
 
     coord.sleepUntilFinishedDraining(space, maxWait, npending, log)
@@ -204,7 +203,7 @@ private[finagle] class ClockedDrainer(
       val n = npending()
       if (verbose)
         log.info("FORCE-GC: n=" + n + "; clock=" + coord.counter + "; space=" +
-            space)
+              space)
 
       lr.record("byteLeft", coord.counter.info.remaining().inBytes.toString)
 
@@ -285,43 +284,42 @@ private[finagle] object ClockedDrainer {
   private[this] val lr =
     if (drainerDebug()) new DedupingLogsReceiver(log) else NullLogsReceiver
 
-  lazy val flagged: Lessor =
-    if (drainerEnabled()) {
-      Coordinator.create() match {
-        case None =>
-          log.warning("Failed to acquire a ParNew+CMS Coordinator; cannot " +
+  lazy val flagged: Lessor = if (drainerEnabled()) {
+    Coordinator.create() match {
+      case None =>
+        log.warning("Failed to acquire a ParNew+CMS Coordinator; cannot " +
               "construct drainer")
-          Lessor.nil
-        case Some(coord) =>
-          val rSnooper = new RequestSnooper(
-              coord.counter,
-              drainerPercentile().toDouble / 100.0,
-              lr
-          )
+        Lessor.nil
+      case Some(coord) =>
+        val rSnooper = new RequestSnooper(
+            coord.counter,
+            drainerPercentile().toDouble / 100.0,
+            lr
+        )
 
-          val (min, max) = drainerDiscountRange()
-          assert(min < max)
+        val (min, max) = drainerDiscountRange()
+        assert(min < max)
 
-          val space = new MemorySpace(
-              coord.counter.info,
-              min,
-              max,
-              rSnooper,
-              lr
-          )
+        val space = new MemorySpace(
+            coord.counter.info,
+            min,
+            max,
+            rSnooper,
+            lr
+        )
 
-          new ClockedDrainer(
-              coord,
-              GarbageCollector.forceNewGc,
-              space,
-              rSnooper,
-              log,
-              lr,
-              DefaultStatsReceiver.scope("gcdrainer")
-          )
-      }
-    } else {
-      log.info("Drainer is disabled; bypassing")
-      Lessor.nil
+        new ClockedDrainer(
+            coord,
+            GarbageCollector.forceNewGc,
+            space,
+            rSnooper,
+            log,
+            lr,
+            DefaultStatsReceiver.scope("gcdrainer")
+        )
     }
+  } else {
+    log.info("Drainer is disabled; bypassing")
+    Lessor.nil
+  }
 }

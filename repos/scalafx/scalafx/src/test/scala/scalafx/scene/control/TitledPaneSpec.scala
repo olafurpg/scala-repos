@@ -41,5 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class TitledPaneSpec
     extends SimpleSFXDelegateSpec[jfxsc.TitledPane, TitledPane](
-        classOf[jfxsc.TitledPane], classOf[TitledPane])
+        classOf[jfxsc.TitledPane],
+        classOf[TitledPane])
     with RunOnApplicationThread

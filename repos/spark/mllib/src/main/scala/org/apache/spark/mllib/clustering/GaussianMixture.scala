@@ -180,13 +180,13 @@ class GaussianMixture private (private var k: Int,
       case Some(gmm) => (gmm.weights, gmm.gaussians)
 
       case None => {
-          val samples =
-            breezeData.takeSample(withReplacement = true, k * nSamples, seed)
-          (Array.fill(k)(1.0 / k), Array.tabulate(k) { i =>
-            val slice = samples.view(i * nSamples, (i + 1) * nSamples)
-            new MultivariateGaussian(vectorMean(slice), initCovariance(slice))
-          })
-        }
+        val samples =
+          breezeData.takeSample(withReplacement = true, k * nSamples, seed)
+        (Array.fill(k)(1.0 / k), Array.tabulate(k) { i =>
+          val slice = samples.view(i * nSamples, (i + 1) * nSamples)
+          new MultivariateGaussian(vectorMean(slice), initCovariance(slice))
+        })
+      }
     }
 
     var llh = Double.MinValue // current log-likelihood
@@ -222,8 +222,10 @@ class GaussianMixture private (private var k: Int,
       } else {
         var i = 0
         while (i < k) {
-          val (weight, gaussian) = updateWeightsAndGaussians(
-              sums.means(i), sums.sigmas(i), sums.weights(i), sumWeights)
+          val (weight, gaussian) = updateWeightsAndGaussians(sums.means(i),
+                                                             sums.sigmas(i),
+                                                             sums.weights(i),
+                                                             sumWeights)
           weights(i) = weight
           gaussians(i) = gaussian
           i = i + 1
@@ -301,7 +303,8 @@ private object ExpectationSum {
   // compute cluster contributions for each input point
   // (U, T) => U for aggregation
   def add(weights: Array[Double], dists: Array[MultivariateGaussian])(
-      sums: ExpectationSum, x: BV[Double]): ExpectationSum = {
+      sums: ExpectationSum,
+      x: BV[Double]): ExpectationSum = {
     val p = weights.zip(dists).map {
       case (weight, dist) => MLUtils.EPSILON + weight * dist.pdf(x)
     }

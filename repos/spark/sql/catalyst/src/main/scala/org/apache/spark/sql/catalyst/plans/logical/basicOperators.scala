@@ -42,8 +42,7 @@ case class Project(projectList: Seq[NamedExpression], child: LogicalPlan)
   override def maxRows: Option[Long] = child.maxRows
 
   override lazy val resolved: Boolean = {
-    val hasSpecialExpressions = projectList.exists(
-        _.collect {
+    val hasSpecialExpressions = projectList.exists(_.collect {
       case agg: AggregateExpression => agg
       case generator: Generator => generator
       case window: WindowExpression => window
@@ -151,9 +150,9 @@ case class Intersect(left: LogicalPlan, right: LogicalPlan)
   // since the Optimizer will convert Intersect to Join.
   override lazy val resolved: Boolean =
     childrenResolved && left.output.length == right.output.length &&
-    left.output.zip(right.output).forall {
-      case (l, r) => l.dataType == r.dataType
-    } && duplicateResolved
+      left.output.zip(right.output).forall {
+        case (l, r) => l.dataType == r.dataType
+      } && duplicateResolved
 
   override def maxRows: Option[Long] = {
     if (children.exists(_.maxRows.isEmpty)) {
@@ -181,9 +180,9 @@ case class Except(left: LogicalPlan, right: LogicalPlan)
 
   override lazy val resolved: Boolean =
     childrenResolved && left.output.length == right.output.length &&
-    left.output.zip(right.output).forall {
-      case (l, r) => l.dataType == r.dataType
-    }
+      left.output.zip(right.output).forall {
+        case (l, r) => l.dataType == r.dataType
+      }
 
   override def statistics: Statistics = {
     Statistics(sizeInBytes = left.statistics.sizeInBytes)
@@ -220,10 +219,8 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
           child =>
             // compare the attribute number with the first child
             child.output.length == children.head.output.length &&
-            // compare the data types with the first child
-            child.output
-              .zip(children.head.output)
-              .forall {
+              // compare the data types with the first child
+              child.output.zip(children.head.output).forall {
             case (l, r) => l.dataType == r.dataType
         })
 
@@ -246,8 +243,7 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
       constraints: Set[Expression]): Set[Expression] = {
     require(reference.size == original.size)
     val attributeRewrites = AttributeMap(original.zip(reference))
-    constraints.map(
-        _ transform {
+    constraints.map(_ transform {
       case a: Attribute => attributeRewrites(a)
     })
   }
@@ -255,8 +251,9 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
   override protected def validConstraints: Set[Expression] = {
     children
       .map(child =>
-            rewriteConstraints(
-                children.head.output, child.output, child.constraints))
+            rewriteConstraints(children.head.output,
+                               child.output,
+                               child.constraints))
       .reduce(_ intersect _)
   }
 }
@@ -369,7 +366,8 @@ case class With(child: LogicalPlan, cteRelations: Map[String, SubqueryAlias])
 }
 
 case class WithWindowDefinition(
-    windowDefinitions: Map[String, WindowSpecDefinition], child: LogicalPlan)
+    windowDefinitions: Map[String, WindowSpecDefinition],
+    child: LogicalPlan)
     extends UnaryNode {
   override def output: Seq[Attribute] = child.output
 }
@@ -475,8 +473,8 @@ private[sql] object Expand {
     * @param attrs the attributes in sequence
     * @return the attributes of non selected specified via bitmask (with the bit set to 1)
     */
-  private def buildNonSelectAttrSet(
-      bitmask: Int, attrs: Seq[Attribute]): AttributeSet = {
+  private def buildNonSelectAttrSet(bitmask: Int,
+                                    attrs: Seq[Attribute]): AttributeSet = {
     val nonSelect = new ArrayBuffer[Attribute]()
 
     var bit = attrs.length - 1
@@ -698,8 +696,9 @@ case class Distinct(child: LogicalPlan) extends UnaryNode {
   * asked for `coalesce` or `repartition`. [[RepartitionByExpression]] is used when the consumer
   * of the output requires some specific ordering or distribution of the data.
   */
-case class Repartition(
-    numPartitions: Int, shuffle: Boolean, child: LogicalPlan)
+case class Repartition(numPartitions: Int,
+                       shuffle: Boolean,
+                       child: LogicalPlan)
     extends UnaryNode {
   override def output: Seq[Attribute] = child.output
 }

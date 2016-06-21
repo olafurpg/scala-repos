@@ -515,8 +515,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
       ask: Int): RuntimeLong | js.Tuple4[Int, Int, Int, Int] = {
 
     var shift =
-      inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(
-          alo, ahi)
+      inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(alo,
+                                                                        ahi)
     val initialBShift = inline_<<(blo, bhi, shift)
     var bShiftLo = initialBShift._1
     var bShiftHi = initialBShift._2

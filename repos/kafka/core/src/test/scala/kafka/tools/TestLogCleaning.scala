@@ -104,16 +104,19 @@ object TestLogCleaning {
     val options = parser.parse(args: _*)
 
     if (args.length == 0)
-      CommandLineUtils.printUsageAndDie(
-          parser, "An integration test for log cleaning.")
+      CommandLineUtils
+        .printUsageAndDie(parser, "An integration test for log cleaning.")
 
     if (options.has(dumpOpt)) {
       dumpLog(new File(options.valueOf(dumpOpt)))
       System.exit(0)
     }
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, brokerOpt, zkConnectOpt, numMessagesOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       brokerOpt,
+                                       zkConnectOpt,
+                                       numMessagesOpt)
 
     // parse options
     val messages = options.valueOf(numMessagesOpt).longValue
@@ -130,8 +133,12 @@ object TestLogCleaning {
       (0 until topicCount).map("log-cleaner-test-" + testId + "-" + _).toArray
 
     println("Producing %d messages...".format(messages))
-    val producedDataFile = produceMessages(
-        brokerUrl, topics, messages, compressionType, dups, percentDeletes)
+    val producedDataFile = produceMessages(brokerUrl,
+                                           topics,
+                                           messages,
+                                           compressionType,
+                                           dups,
+                                           percentDeletes)
     println("Sleeping for %d seconds...".format(sleepSecs))
     Thread.sleep(sleepSecs * 1000)
     println("Consuming messages...")
@@ -159,9 +166,8 @@ object TestLogCleaning {
         val content =
           if (entry.message.isNull) null
           else TestUtils.readString(entry.message.payload)
-        println(
-            "offset = %s, key = %s, content = %s".format(
-                entry.offset, key, content))
+        println("offset = %s, key = %s, content = %s"
+              .format(entry.offset, key, content))
       }
     }
   }
@@ -175,12 +181,12 @@ object TestLogCleaning {
     val consumed = valuesIterator(consumedReader)
     val producedDedupedFile = new File(
         producedDataFile.getAbsolutePath + ".deduped")
-    val producedDeduped = new BufferedWriter(
-        new FileWriter(producedDedupedFile), 1024 * 1024)
+    val producedDeduped =
+      new BufferedWriter(new FileWriter(producedDedupedFile), 1024 * 1024)
     val consumedDedupedFile = new File(
         consumedDataFile.getAbsolutePath + ".deduped")
-    val consumedDeduped = new BufferedWriter(
-        new FileWriter(consumedDedupedFile), 1024 * 1024)
+    val consumedDeduped =
+      new BufferedWriter(new FileWriter(consumedDedupedFile), 1024 * 1024)
     var total = 0
     var mismatched = 0
     while (produced.hasNext && consumed.hasNext) {
@@ -259,8 +265,8 @@ object TestLogCleaning {
         }
       }
     }.start()
-    new BufferedReader(
-        new InputStreamReader(process.getInputStream()), 10 * 1024 * 1024)
+    new BufferedReader(new InputStreamReader(process.getInputStream()),
+                       10 * 1024 * 1024)
   }
 
   def produceMessages(brokerUrl: String,
@@ -270,37 +276,39 @@ object TestLogCleaning {
                       dups: Int,
                       percentDeletes: Int): File = {
     val producerProps = new Properties
-    producerProps.setProperty(
-        ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
-    producerProps.setProperty(
-        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl)
+    producerProps
+      .setProperty(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
+    producerProps
+      .setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl)
     producerProps.put(
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.ByteArraySerializer")
     producerProps.put(
         ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.ByteArraySerializer")
-    producerProps.setProperty(
-        ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType)
+    producerProps
+      .setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType)
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
     val rand = new Random(1)
     val keyCount = (messages / dups).toInt
     val producedFile =
       File.createTempFile("kafka-log-cleaner-produced-", ".txt")
     println("Logging produce requests to " + producedFile.getAbsolutePath)
-    val producedWriter = new BufferedWriter(
-        new FileWriter(producedFile), 1024 * 1024)
+    val producedWriter =
+      new BufferedWriter(new FileWriter(producedFile), 1024 * 1024)
     for (i <- 0L until (messages * topics.length)) {
       val topic = topics((i % topics.length).toInt)
       val key = rand.nextInt(keyCount)
       val delete = i % 100 < percentDeletes
       val msg =
         if (delete)
-          new ProducerRecord[Array[Byte], Array[Byte]](
-              topic, key.toString.getBytes(), null)
+          new ProducerRecord[Array[Byte], Array[Byte]](topic,
+                                                       key.toString.getBytes(),
+                                                       null)
         else
-          new ProducerRecord[Array[Byte], Array[Byte]](
-              topic, key.toString.getBytes(), i.toString.getBytes())
+          new ProducerRecord[Array[Byte], Array[Byte]](topic,
+                                                       key.toString.getBytes(),
+                                                       i.toString.getBytes())
       producer.send(msg)
       producedWriter.write(TestRecord(topic, key, i, delete).toString)
       producedWriter.newLine()
@@ -310,11 +318,12 @@ object TestLogCleaning {
     producedFile
   }
 
-  def makeConsumer(
-      zkUrl: String, topics: Array[String]): ZookeeperConsumerConnector = {
+  def makeConsumer(zkUrl: String,
+                   topics: Array[String]): ZookeeperConsumerConnector = {
     val consumerProps = new Properties
     consumerProps.setProperty(
-        "group.id", "log-cleaner-test-" + new Random().nextInt(Int.MaxValue))
+        "group.id",
+        "log-cleaner-test-" + new Random().nextInt(Int.MaxValue))
     consumerProps.setProperty("zookeeper.connect", zkUrl)
     consumerProps.setProperty("consumer.timeout.ms", (20 * 1000).toString)
     consumerProps.setProperty("auto.offset.reset", "smallest")
@@ -351,8 +360,10 @@ object TestLogCleaning {
   }
 }
 
-case class TestRecord(
-    val topic: String, val key: Int, val value: Long, val delete: Boolean) {
+case class TestRecord(val topic: String,
+                      val key: Int,
+                      val value: Long,
+                      val delete: Boolean) {
   def this(pieces: Array[String]) =
     this(pieces(0), pieces(1).toInt, pieces(2).toLong, pieces(3) == "d")
   def this(line: String) = this(line.split("\t"))

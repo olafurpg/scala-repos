@@ -59,7 +59,7 @@ abstract class AbstractActor extends Actor {
     else
       throw IllegalActorStateException(
           "Actor behavior has already been set with receive(...), " +
-          "use context().become(...) to change it later")
+            "use context().become(...) to change it later")
 
   /**
     * Returns this AbstractActor's AbstractActorContext

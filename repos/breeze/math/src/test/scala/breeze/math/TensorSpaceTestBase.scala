@@ -43,8 +43,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
   }
 
   test("norm(v) == 0 iff v == 0") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       val z = zeroLike(a)
       norm(z) == 0.0 && ((z == a) || norm(a) != 0.0)
@@ -53,8 +52,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
 
   // dot product distributes
   test("dot product distributes") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       val res =
         scalars.close(scalars.+(a dot b, a dot c), (a dot (b + c)), 1E-3)
@@ -62,8 +60,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
       res
     })
 
-    check(
-        Prop.forAll { (trip: (V, V, V), s: S) =>
+    check(Prop.forAll { (trip: (V, V, V), s: S) =>
       val (a, b, c) = trip
       scalars.close(scalars.*(a dot b, s), (a dot (b :* s)))
       scalars.close(scalars.*(s, a dot b), ((a :* s) dot (b)))
@@ -79,8 +76,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
   }
 
   test("Elementwise mult of vectors distributes over vector addition") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       val ab = copy(a)
       ab += b
@@ -102,8 +98,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
 //      s == 0 || close( (a + b)/ s, (b / s +a / s), TOL)
 //    })
 
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       val ab = copy(a)
       ab += b
@@ -121,8 +116,7 @@ trait DoubleValuedTensorSpaceTestBase[V, I]
   import space._
 
   test("normalization sets appropriate norm to 1") {
-    check(
-        Prop.forAll { (trip: (V, V, V), n: Double) =>
+    check(Prop.forAll { (trip: (V, V, V), n: Double) =>
       val (a, b, c) = trip
       val nn = n.abs % 100 + 1.0
       val normalized = breeze.linalg.normalize(a, nn)

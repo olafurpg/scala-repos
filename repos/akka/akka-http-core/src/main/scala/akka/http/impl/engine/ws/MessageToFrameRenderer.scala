@@ -35,8 +35,8 @@ private[http] object MessageToFrameRenderer {
       case TextMessage.Strict(text) ⇒
         strictFrames(Opcode.Text, ByteString(text, "UTF-8"))
       case tm: TextMessage ⇒
-        streamedFrames(
-            Opcode.Text, tm.textStream.transform(() ⇒ new Utf8Encoder))
+        streamedFrames(Opcode.Text,
+                       tm.textStream.transform(() ⇒ new Utf8Encoder))
     }
   }
 }

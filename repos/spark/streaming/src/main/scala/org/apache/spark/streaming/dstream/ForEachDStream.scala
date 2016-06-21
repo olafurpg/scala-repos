@@ -35,8 +35,7 @@ private[streaming] class ForEachDStream[T: ClassTag](
     parent: DStream[T],
     foreachFunc: (RDD[T], Time) => Unit,
     displayInnerRDDOps: Boolean
-)
-    extends DStream[Unit](parent.ssc) {
+) extends DStream[Unit](parent.ssc) {
 
   override def dependencies: List[DStream[_]] = List(parent)
 

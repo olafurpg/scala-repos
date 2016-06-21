@@ -26,9 +26,11 @@ import scala.collection.JavaConverters._
     storages = Array(new Storage("sbt.xml"))
 )
 class SbtSystemSettings(project: Project)
-    extends AbstractExternalSystemSettings[
-        SbtSystemSettings, SbtProjectSettings, SbtProjectSettingsListener](
-        SbtTopic, project)
+    extends AbstractExternalSystemSettings[SbtSystemSettings,
+                                           SbtProjectSettings,
+                                           SbtProjectSettingsListener](
+        SbtTopic,
+        project)
     with PersistentStateComponent[SbtSystemSettingsState] {
 
   @BeanProperty
@@ -57,12 +59,13 @@ class SbtSystemSettings(project: Project)
       getPublisher.onJdkChanged(old.jdk, current.jdk)
     }
     if (old.resolveClassifiers != current.resolveClassifiers) {
-      getPublisher.onResolveClassifiersChanged(
-          old.resolveClassifiers, current.resolveClassifiers)
+      getPublisher.onResolveClassifiersChanged(old.resolveClassifiers,
+                                               current.resolveClassifiers)
     }
     if (old.resolveSbtClassifiers != current.resolveSbtClassifiers) {
       getPublisher.onResolveSbtClassifiersChanged(
-          old.resolveSbtClassifiers, current.resolveSbtClassifiers)
+          old.resolveSbtClassifiers,
+          current.resolveSbtClassifiers)
     }
     if (old.sbtVersion != current.sbtVersion) {
       getPublisher.onSbtVersionChanged(old.sbtVersion, current.sbtVersion)
@@ -83,7 +86,7 @@ class SbtSystemSettings(project: Project)
   }
 
   def loadState(state: SbtSystemSettingsState) {
-    super [AbstractExternalSystemSettings].loadState(state)
+    super[AbstractExternalSystemSettings].loadState(state)
     customLauncherEnabled = state.customLauncherEnabled
     customLauncherPath = state.customLauncherPath
     maximumHeapSize = state.maximumHeapSize
@@ -121,7 +124,7 @@ class SbtSystemSettings(project: Project)
       linkedProjectPath: String): SbtProjectSettings =
     Option(super.getLinkedProjectSettings(linkedProjectPath))
       .getOrElse(super.getLinkedProjectSettings(
-            ExternalSystemApiUtil.normalizePath(linkedProjectPath)))
+              ExternalSystemApiUtil.normalizePath(linkedProjectPath)))
 }
 
 object SbtSystemSettings {

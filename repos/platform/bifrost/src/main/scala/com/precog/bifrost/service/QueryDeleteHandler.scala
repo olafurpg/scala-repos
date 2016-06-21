@@ -38,7 +38,8 @@ import java.nio.ByteBuffer
 import scalaz._
 
 class QueryDeleteHandler[A](jobManager: JobManager[Future], clock: Clock)(
-    implicit executor: ExecutionContext, M: Monad[Future])
+    implicit executor: ExecutionContext,
+    M: Monad[Future])
     extends CustomHttpService[A, APIKey => Future[HttpResponse[A]]] {
   import JobState._
   import scalaz.syntax.monad._

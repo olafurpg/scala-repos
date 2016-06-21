@@ -65,8 +65,8 @@ trait StdNames { self: SymbolTable =>
     val MaxNameLength = math.min(
         settings.maxClassfileName.value - maxSuffixLength,
         2 *
-        (settings.maxClassfileName.value - maxSuffixLength -
-            2 * marker.length - 32)
+          (settings.maxClassfileName.value - maxSuffixLength -
+                2 * marker.length - 32)
     )
     def toMD5(s: String, edge: Int): String = {
       val prefix = s take edge
@@ -297,8 +297,7 @@ trait StdNames { self: SymbolTable =>
     final val ExceptionsATTR: NameType = "Exceptions"
     final val InnerClassesATTR: NameType = "InnerClasses"
     final val MethodParametersATTR: NameType = "MethodParameters"
-    final val RuntimeAnnotationATTR: NameType =
-      "RuntimeVisibleAnnotations" // RetentionPolicy.RUNTIME
+    final val RuntimeAnnotationATTR: NameType = "RuntimeVisibleAnnotations" // RetentionPolicy.RUNTIME
     final val ScalaATTR: NameType = "Scala"
     final val ScalaSignatureATTR: NameType = "ScalaSig"
     final val SignatureATTR: NameType = "Signature"
@@ -337,8 +336,7 @@ trait StdNames { self: SymbolTable =>
     val SUPER_PREFIX_STRING = "super$"
     val WHILE_PREFIX = "while$"
     val FRESH_PREFIX = "fresh"
-    val FRESH_SUFFIX =
-      "macro$" // uses a keyword to avoid collisions with mangled names
+    val FRESH_SUFFIX = "macro$" // uses a keyword to avoid collisions with mangled names
     val QUAL_PREFIX = "qual$"
     val NAMEDARG_PREFIX = "x$"
 
@@ -373,12 +371,10 @@ trait StdNames { self: SymbolTable =>
     val QUASIQUOTE_TUPLE: NameType = "$quasiquote$tuple$"
     val QUASIQUOTE_UNLIFT_HELPER: String = "$quasiquote$unlift$helper$"
     val MIXIN_CONSTRUCTOR: NameType = "$init$"
-    val MODULE_INSTANCE_FIELD: NameType =
-      NameTransformer.MODULE_INSTANCE_NAME // "MODULE$"
+    val MODULE_INSTANCE_FIELD: NameType = NameTransformer.MODULE_INSTANCE_NAME // "MODULE$"
     val OUTER: NameType = "$outer"
     val OUTER_LOCAL: NameType = OUTER.localName
-    val OUTER_SYNTH: NameType =
-      "<outer>" // emitted by virtual pattern matcher, replaced by outer accessor in explicitouter
+    val OUTER_SYNTH: NameType = "<outer>" // emitted by virtual pattern matcher, replaced by outer accessor in explicitouter
     val ROOTPKG: NameType = "_root_"
     val SELECTOR_DUMMY: NameType = "<unapply-selector>"
     val SELF: NameType = "$this"
@@ -415,11 +411,12 @@ trait StdNames { self: SymbolTable =>
       case raw.NE | raw.LE | raw.GE | EMPTY => false
       case _ =>
         name.endChar == '=' && name.startChar != '=' &&
-        isOperatorPart(name.startChar)
+          isOperatorPart(name.startChar)
     }
 
-    private def expandedNameInternal(
-        name: TermName, base: Symbol, separator: String): TermName =
+    private def expandedNameInternal(name: TermName,
+                                     base: Symbol,
+                                     separator: String): TermName =
       newTermNameCached(base.fullName('$') + separator + name)
 
     /** The expanded name of `name` relative to this class `base`
@@ -688,8 +685,7 @@ trait StdNames { self: SymbolTable =>
     val classOf: NameType = "classOf"
     val clone_ : NameType = "clone"
     val collection: NameType = "collection"
-    val conforms: NameType =
-      "$conforms" // dollar prefix to avoid accidental shadowing
+    val conforms: NameType = "$conforms" // dollar prefix to avoid accidental shadowing
     val copy: NameType = "copy"
     val create: NameType = "create"
     val currentMirror: NameType = "currentMirror"
@@ -1066,14 +1062,14 @@ trait StdNames { self: SymbolTable =>
 
     val BITMAP_NORMAL: NameType =
       BITMAP_PREFIX +
-      "" // initialization bitmap for public/protected lazy vals
+        "" // initialization bitmap for public/protected lazy vals
     val BITMAP_TRANSIENT: NameType =
       BITMAP_PREFIX + "trans$" // initialization bitmap for transient lazy vals
     val BITMAP_CHECKINIT: NameType =
       BITMAP_PREFIX + "init$" // initialization bitmap for checkinit values
     val BITMAP_CHECKINIT_TRANSIENT: NameType =
       BITMAP_PREFIX +
-      "inittrans$" // initialization bitmap for transient checkinit values
+        "inittrans$" // initialization bitmap for transient checkinit values
   }
 
   lazy val typeNames: tpnme.type = tpnme

@@ -5,8 +5,7 @@ import com.twitter.ostrich.stats.{Stats, StatsCollection}
 class OstrichStatsReceiver(
     val repr: StatsCollection = Stats,
     val delimiter: String = "/"
-)
-    extends StatsReceiverWithCumulativeGauges {
+) extends StatsReceiverWithCumulativeGauges {
 
   def this() = this(Stats, "/")
   // To avoid breaking the Java API:

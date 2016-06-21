@@ -83,8 +83,8 @@ class Company private ()
   val country = new CountryField(this)
   val postCode = new PostalCodeField(this, country)
   val created = new DateTimeField(this)
-  val employeeSatisfaction = new OptionalDecimalField(
-      this, new MathContext(10), 5)
+  val employeeSatisfaction =
+    new OptionalDecimalField(this, new MathContext(10), 5)
 
   lazy val employees = MySchema.companyToEmployees.left(this)
 }
@@ -197,8 +197,8 @@ object MySchema extends Schema {
 
   val roomAssignments = manyToManyRelation(employees, rooms)
     .via[RoomAssignment]((employee, room, roomAssignment) =>
-        (roomAssignment.employeeId === employee.idField,
-         roomAssignment.roomId === room.idField))
+          (roomAssignment.employeeId === employee.idField,
+           roomAssignment.roomId === room.idField))
 
   on(employees)(e =>
         declare(e.companyId defineAs (indexed("idx_employee_companyId")),

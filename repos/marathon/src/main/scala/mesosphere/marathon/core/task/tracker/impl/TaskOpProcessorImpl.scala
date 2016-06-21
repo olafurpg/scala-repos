@@ -23,8 +23,8 @@ private[tracker] object TaskOpProcessorImpl {
     * @param directTaskTracker a TaskTracker instance that goes directly to the correct taskTracker
     *                          without going through the WhenLeaderActor indirection.
     */
-  class StatusUpdateActionResolver(
-      clock: Clock, directTaskTracker: TaskTracker) {
+  class StatusUpdateActionResolver(clock: Clock,
+                                   directTaskTracker: TaskTracker) {
     private[this] val log = LoggerFactory.getLogger(getClass)
 
     /**
@@ -47,9 +47,10 @@ private[tracker] object TaskOpProcessorImpl {
     }
 
     private[this] def actionForTaskAndStatus(
-        task: Task, statusUpdate: TaskStatus): Action = {
-      val change = task.update(TaskStateOp.MesosUpdate(
-              MarathonTaskStatus(statusUpdate), clock.now()))
+        task: Task,
+        statusUpdate: TaskStatus): Action = {
+      val change = task.update(TaskStateOp
+            .MesosUpdate(MarathonTaskStatus(statusUpdate), clock.now()))
       change match {
         case TaskStateChange.Update(updatedTask) => Action.Update(updatedTask)
         case TaskStateChange.Expunge => Action.Expunge
@@ -86,8 +87,8 @@ private[tracker] class TaskOpProcessorImpl(
         repo
           .store(marathonTask)
           .map { _ =>
-            taskTrackerRef ! TaskTrackerActor.TaskUpdated(
-                task, TaskTrackerActor.Ack(op.sender))
+            taskTrackerRef ! TaskTrackerActor
+              .TaskUpdated(task, TaskTrackerActor.Ack(op.sender))
           }
           .recoverWith(tryToRecover(op)(expectedTaskState = Some(task)))
 
@@ -97,8 +98,8 @@ private[tracker] class TaskOpProcessorImpl(
         repo
           .expunge(op.taskId.idString)
           .map { _ =>
-            taskTrackerRef ! TaskTrackerActor.TaskRemoved(
-                op.taskId, TaskTrackerActor.Ack(op.sender))
+            taskTrackerRef ! TaskTrackerActor
+              .TaskRemoved(op.taskId, TaskTrackerActor.Ack(op.sender))
           }
           .recoverWith(tryToRecover(op)(expectedTaskState = None))
 

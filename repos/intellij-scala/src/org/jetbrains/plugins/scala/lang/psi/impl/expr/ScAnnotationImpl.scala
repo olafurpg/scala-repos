@@ -24,8 +24,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-class ScAnnotationImpl private (
-    stub: StubElement[ScAnnotation], nodeType: IElementType, node: ASTNode)
+class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
+                                nodeType: IElementType,
+                                node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScAnnotation
     with PsiAnnotationParameterList {
@@ -115,7 +116,8 @@ class ScAnnotationImpl private (
   def getOwner: PsiAnnotationOwner = null
 
   def setDeclaredAttributeValue[T <: PsiAnnotationMemberValue](
-      attributeName: String, value: T): T = {
+      attributeName: String,
+      value: T): T = {
     val existing: PsiAnnotationMemberValue = findDeclaredAttributeValue(
         attributeName)
     if (value == null) {
@@ -164,9 +166,10 @@ class ScAnnotationImpl private (
         }
         val params: Seq[ScExpression] = args.flatMap(arg => arg.exprs)
         if (params.length == 1 && !params(0).isInstanceOf[ScAssignStmt]) {
-          params(0).replace(ScalaPsiElementFactory.createExpressionFromText(
+          params(0).replace(
+              ScalaPsiElementFactory.createExpressionFromText(
                   PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME +
-                  " = " + params(0).getText,
+                    " = " + params(0).getText,
                   params(0).getManager))
         }
         var allowNoName: Boolean =
@@ -180,7 +183,8 @@ class ScAnnotationImpl private (
         }
 
         args(0).addBefore(ScalaPsiElementFactory.createExpressionFromText(
-                              namePrefix + value.getText, value.getManager),
+                              namePrefix + value.getText,
+                              value.getManager),
                           null)
       }
     }

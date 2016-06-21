@@ -62,11 +62,11 @@ trait ScalatraFilter extends Filter with ServletBase {
     request.get("org.scalatra.ScalatraFilter.requestPath") match {
       case Some(uri) => uri.toString
       case _ => {
-          val requestPath = getRequestPath
-          request.setAttribute(
-              "org.scalatra.ScalatraFilter.requestPath", requestPath)
-          requestPath.toString
-        }
+        val requestPath = getRequestPath
+        request
+          .setAttribute("org.scalatra.ScalatraFilter.requestPath", requestPath)
+        requestPath.toString
+      }
     }
   }
 

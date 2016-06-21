@@ -39,15 +39,14 @@ class CodecSpec extends Specification with ScalaCheck {
 
   implicit lazy val arbBigDecimal: Arbitrary[BigDecimal] = Arbitrary(
       Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2) map
-      (BigDecimal(_)))
+        (BigDecimal(_)))
 
   //implicit def arbBitSet = Arbitrary(Gen.listOf(Gen.choose(0, 500)) map (BitSet(_: _*)))
   implicit def arbBitSet =
     Arbitrary(Gen.listOf(Gen.choose(0, 500)) map BitSetUtil.create)
 
   implicit def arbSparseBitSet: Arbitrary[(Codec[BitSet], BitSet)] = {
-    Arbitrary(
-        Gen.chooseNum(0, 500) flatMap { size =>
+    Arbitrary(Gen.chooseNum(0, 500) flatMap { size =>
       val codec = Codec.SparseBitSetCodec(size)
       if (size > 0) {
         Gen.listOf(Gen.choose(0, size - 1)) map { bits =>
@@ -61,8 +60,7 @@ class CodecSpec extends Specification with ScalaCheck {
   }
 
   implicit def arbSparseRawBitSet: Arbitrary[(Codec[RawBitSet], RawBitSet)] = {
-    Arbitrary(
-        Gen.chooseNum(0, 500) flatMap { size =>
+    Arbitrary(Gen.chooseNum(0, 500) flatMap { size =>
       val codec = Codec.SparseRawBitSetCodec(size)
       if (size > 0) {
         Gen.listOf(Gen.choose(0, size - 1)) map { bits =>
@@ -82,8 +80,7 @@ class CodecSpec extends Specification with ScalaCheck {
     Arbitrary(Gen.listOf(a.arbitrary) map (Vector(_: _*)))
 
   implicit def arbArray[A: Manifest: Gen]: Arbitrary[Array[A]] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       values <- Gen.listOf(implicitly[Gen[A]])
     } yield {
       val array: Array[A] = values.toArray
@@ -101,8 +98,7 @@ class CodecSpec extends Specification with ScalaCheck {
   }
 
   def surviveHardRoundTrip[A](a: A)(implicit codec: Codec[A]) = {
-    val bytes = smallPool.run(
-        for {
+    val bytes = smallPool.run(for {
       _ <- codec.write(a)
       bytes <- flipBytes
       _ <- release
@@ -121,7 +117,8 @@ class CodecSpec extends Specification with ScalaCheck {
   }
 
   def surviveRoundTrip[A](codec: Codec[A])(
-      implicit a: Arbitrary[A], s: Shrink[A]) = "survive round-trip" in {
+      implicit a: Arbitrary[A],
+      s: Shrink[A]) = "survive round-trip" in {
     "with large buffers" in {
       check { (a: A) =>
         surviveEasyRoundTrip(a)(codec)
@@ -140,7 +137,8 @@ class CodecSpec extends Specification with ScalaCheck {
   "DoubleCodec" should surviveRoundTrip(Codec.DoubleCodec)
   "Utf8Codec" should surviveRoundTrip(Codec.Utf8Codec)
   "BigDecimalCodec" should surviveRoundTrip(Codec.BigDecimalCodec)(
-      arbBigDecimal, implicitly)
+      arbBigDecimal,
+      implicitly)
   "BitSetCodec" should surviveRoundTrip(Codec.BitSetCodec)
   "SparseBitSet" should {
     "survive round-trip" in {

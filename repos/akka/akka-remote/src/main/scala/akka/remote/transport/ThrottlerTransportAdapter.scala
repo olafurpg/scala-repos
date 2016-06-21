@@ -27,8 +27,8 @@ import akka.remote.RARP
 
 class ThrottlerProvider extends TransportAdapterProvider {
 
-  override def create(
-      wrappedTransport: Transport, system: ExtendedActorSystem): Transport =
+  override def create(wrappedTransport: Transport,
+                      system: ExtendedActorSystem): Transport =
     new ThrottlerTransportAdapter(wrappedTransport, system)
 }
 
@@ -80,8 +80,9 @@ object ThrottlerTransportAdapter {
   }
 
   @SerialVersionUID(1L)
-  final case class SetThrottle(
-      address: Address, direction: Direction, mode: ThrottleMode)
+  final case class SetThrottle(address: Address,
+                               direction: Direction,
+                               mode: ThrottleMode)
 
   @SerialVersionUID(1L)
   case object SetThrottleAck {
@@ -93,8 +94,8 @@ object ThrottlerTransportAdapter {
   }
 
   sealed trait ThrottleMode extends NoSerializationVerificationNeeded {
-    def tryConsumeTokens(
-        nanoTimeOfSend: Long, tokens: Int): (ThrottleMode, Boolean)
+    def tryConsumeTokens(nanoTimeOfSend: Long,
+                         tokens: Int): (ThrottleMode, Boolean)
     def timeToAvailable(currentNanoTime: Long, tokens: Int): FiniteDuration
   }
 
@@ -111,8 +112,8 @@ object ThrottlerTransportAdapter {
       } else
         min((availableTokens + tokensGenerated(nanoTimeOfSend)), capacity) >= tokens
 
-    override def tryConsumeTokens(
-        nanoTimeOfSend: Long, tokens: Int): (ThrottleMode, Boolean) = {
+    override def tryConsumeTokens(nanoTimeOfSend: Long,
+                                  tokens: Int): (ThrottleMode, Boolean) = {
       if (isAvailable(nanoTimeOfSend, tokens))
         (this.copy(
              nanoTimeOfLastSend = nanoTimeOfSend,
@@ -123,8 +124,8 @@ object ThrottlerTransportAdapter {
       else (this, false)
     }
 
-    override def timeToAvailable(
-        currentNanoTime: Long, tokens: Int): FiniteDuration = {
+    override def timeToAvailable(currentNanoTime: Long,
+                                 tokens: Int): FiniteDuration = {
       val needed =
         (if (tokens > capacity) 1 else tokens) - tokensGenerated(
             currentNanoTime)
@@ -137,11 +138,11 @@ object ThrottlerTransportAdapter {
 
   @SerialVersionUID(1L)
   case object Unthrottled extends ThrottleMode {
-    override def tryConsumeTokens(
-        nanoTimeOfSend: Long, tokens: Int): (ThrottleMode, Boolean) =
+    override def tryConsumeTokens(nanoTimeOfSend: Long,
+                                  tokens: Int): (ThrottleMode, Boolean) =
       (this, true)
-    override def timeToAvailable(
-        currentNanoTime: Long, tokens: Int): FiniteDuration = Duration.Zero
+    override def timeToAvailable(currentNanoTime: Long,
+                                 tokens: Int): FiniteDuration = Duration.Zero
 
     /**
       * Java API: get the singleton instance
@@ -151,11 +152,11 @@ object ThrottlerTransportAdapter {
 
   @SerialVersionUID(1L)
   case object Blackhole extends ThrottleMode {
-    override def tryConsumeTokens(
-        nanoTimeOfSend: Long, tokens: Int): (ThrottleMode, Boolean) =
+    override def tryConsumeTokens(nanoTimeOfSend: Long,
+                                  tokens: Int): (ThrottleMode, Boolean) =
       (this, false)
-    override def timeToAvailable(
-        currentNanoTime: Long, tokens: Int): FiniteDuration = Duration.Zero
+    override def timeToAvailable(currentNanoTime: Long,
+                                 tokens: Int): FiniteDuration = Duration.Zero
 
     /**
       * Java API: get the singleton instance
@@ -173,8 +174,8 @@ object ThrottlerTransportAdapter {
     * Management Command to force disassociation of an address with an explicit error.
     */
   @SerialVersionUID(1L)
-  final case class ForceDisassociateExplicitly(
-      address: Address, reason: DisassociateInfo)
+  final case class ForceDisassociateExplicitly(address: Address,
+                                               reason: DisassociateInfo)
 
   @SerialVersionUID(1L)
   case object ForceDisassociateAck {
@@ -186,8 +187,8 @@ object ThrottlerTransportAdapter {
   }
 }
 
-class ThrottlerTransportAdapter(
-    _wrappedTransport: Transport, _system: ExtendedActorSystem)
+class ThrottlerTransportAdapter(_wrappedTransport: Transport,
+                                _system: ExtendedActorSystem)
     extends ActorTransportAdapter(_wrappedTransport, _system) {
 
   override protected def addedSchemeIdentifier = SchemeIdentifier
@@ -219,12 +220,12 @@ private[transport] object ThrottlerManager {
   final case class Checkin(origin: Address, handle: ThrottlerHandle)
       extends NoSerializationVerificationNeeded
 
-  final case class AssociateResult(
-      handle: AssociationHandle, statusPromise: Promise[AssociationHandle])
+  final case class AssociateResult(handle: AssociationHandle,
+                                   statusPromise: Promise[AssociationHandle])
       extends NoSerializationVerificationNeeded
 
-  final case class ListenerAndMode(
-      listener: HandleEventListener, mode: ThrottleMode)
+  final case class ListenerAndMode(listener: HandleEventListener,
+                                   mode: ThrottleMode)
       extends NoSerializationVerificationNeeded
 
   final case class Handle(handle: ThrottlerHandle)
@@ -251,8 +252,8 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
 
   override def ready: Receive = {
     case InboundAssociation(handle) ⇒
-      val wrappedHandle = wrapHandle(
-          handle, associationListener, inbound = true)
+      val wrappedHandle =
+        wrapHandle(handle, associationListener, inbound = true)
       wrappedHandle.throttlerActor ! Handle(wrappedHandle)
     case AssociateUnderlying(remoteAddress, statusPromise) ⇒
       wrappedTransport.associate(remoteAddress) onComplete {
@@ -262,8 +263,8 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
       }
     // Finished outbound association and got back the handle
     case AssociateResult(handle, statusPromise) ⇒
-      val wrappedHandle = wrapHandle(
-          handle, associationListener, inbound = false)
+      val wrappedHandle =
+        wrapHandle(handle, associationListener, inbound = false)
       val naked = nakedAddress(handle.remoteAddress)
       val inMode = getInboundMode(naked)
       wrappedHandle.outboundThrottleMode.set(getOutboundMode(naked))
@@ -342,15 +343,18 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
     if (target.isTerminated) Future successful SetThrottleAck
     else {
       val internalTarget = target.asInstanceOf[InternalActorRef]
-      val ref = PromiseActorRef(
-          internalTarget.provider, timeout, target, mode.getClass.getName)
+      val ref = PromiseActorRef(internalTarget.provider,
+                                timeout,
+                                target,
+                                mode.getClass.getName)
       internalTarget.sendSystemMessage(Watch(internalTarget, ref))
       target.tell(mode, ref)
       ref.result.future.transform({
         case Terminated(t) if t.path == target.path ⇒ SetThrottleAck
         case SetThrottleAck ⇒ {
-            internalTarget.sendSystemMessage(Unwatch(target, ref)); SetThrottleAck
-          }
+          internalTarget.sendSystemMessage(Unwatch(target, ref));
+          SetThrottleAck
+        }
       }, t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t })(
           ref.internalCallingThreadExecutionContext)
     }
@@ -484,9 +488,9 @@ private[transport] class ThrottledAssociation(
   }
 
   when(WaitModeAndUpstreamListener) {
-    case Event(ListenerAndMode(
-               listener: HandleEventListener, mode: ThrottleMode),
-               _) ⇒
+    case Event(
+        ListenerAndMode(listener: HandleEventListener, mode: ThrottleMode),
+        _) ⇒
       upstreamListener = listener
       inboundThrottleMode = mode
       self ! Dequeue
@@ -502,8 +506,9 @@ private[transport] class ThrottledAssociation(
       if (mode == Blackhole) throttledMessages = Queue.empty[ByteString]
       cancelTimer(DequeueTimerName)
       if (throttledMessages.nonEmpty)
-        scheduleDequeue(inboundThrottleMode.timeToAvailable(
-                System.nanoTime(), throttledMessages.head.length))
+        scheduleDequeue(
+            inboundThrottleMode.timeToAvailable(System.nanoTime(),
+                                                throttledMessages.head.length))
       sender() ! SetThrottleAck
       stay()
     case Event(InboundPayload(p), _) ⇒
@@ -520,7 +525,8 @@ private[transport] class ThrottledAssociation(
           ._1
         if (throttledMessages.nonEmpty)
           scheduleDequeue(inboundThrottleMode.timeToAvailable(
-                  System.nanoTime(), throttledMessages.head.length))
+                  System.nanoTime(),
+                  throttledMessages.head.length))
       }
       stay()
   }
@@ -587,7 +593,8 @@ private[transport] class ThrottledAssociation(
   * INTERNAL API
   */
 private[transport] final case class ThrottlerHandle(
-    _wrappedHandle: AssociationHandle, throttlerActor: ActorRef)
+    _wrappedHandle: AssociationHandle,
+    throttlerActor: ActorRef)
     extends AbstractTransportAdapterHandle(_wrappedHandle, SchemeIdentifier) {
 
   private[transport] val outboundThrottleMode =

@@ -121,11 +121,15 @@ class FsHistoryProviderSuite
                       lastMod: Long,
                       user: String,
                       completed: Boolean): ApplicationHistoryInfo = {
-        ApplicationHistoryInfo(
-            id,
-            name,
-            List(ApplicationAttemptInfo(
-                    None, start, end, lastMod, user, completed)))
+        ApplicationHistoryInfo(id,
+                               name,
+                               List(
+                                   ApplicationAttemptInfo(None,
+                                                          start,
+                                                          end,
+                                                          lastMod,
+                                                          user,
+                                                          completed)))
       }
 
       list(0) should be(
@@ -168,15 +172,21 @@ class FsHistoryProviderSuite
     writeFile(logFile1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1-1", Some("app1-1"), 1L, "test", None),
+              SparkListenerApplicationStart("app1-1",
+                                            Some("app1-1"),
+                                            1L,
+                                            "test",
+                                            None),
               SparkListenerApplicationEnd(2L))
     val logFile2 = newLogFile("new2", None, inProgress = false)
     writeFile(logFile2,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1-2", Some("app1-2"), 1L, "test", None),
+              SparkListenerApplicationStart("app1-2",
+                                            Some("app1-2"),
+                                            1L,
+                                            "test",
+                                            None),
               SparkListenerApplicationEnd(2L))
     logFile2.setReadable(false, false)
 
@@ -246,8 +256,11 @@ class FsHistoryProviderSuite
     writeFile(attempt1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 1L, "test", Some("attempt1")))
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            1L,
+                                            "test",
+                                            Some("attempt1")))
 
     updateAndCheck(provider) { list =>
       list.size should be(1)
@@ -258,8 +271,11 @@ class FsHistoryProviderSuite
     writeFile(attempt2,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 2L, "test", Some("attempt2")))
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            2L,
+                                            "test",
+                                            Some("attempt2")))
 
     updateAndCheck(provider) { list =>
       list.size should be(1)
@@ -271,8 +287,11 @@ class FsHistoryProviderSuite
     writeFile(attempt3,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 3L, "test", Some("attempt3")),
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            3L,
+                                            "test",
+                                            Some("attempt3")),
               SparkListenerApplicationEnd(4L))
 
     updateAndCheck(provider) { list =>
@@ -286,8 +305,11 @@ class FsHistoryProviderSuite
     writeFile(attempt1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app2", Some("app2"), 5L, "test", Some("attempt1")),
+              SparkListenerApplicationStart("app2",
+                                            Some("app2"),
+                                            5L,
+                                            "test",
+                                            Some("attempt1")),
               SparkListenerApplicationEnd(6L))
 
     updateAndCheck(provider) { list =>
@@ -309,17 +331,21 @@ class FsHistoryProviderSuite
   test("log cleaner") {
     val maxAge = TimeUnit.SECONDS.toMillis(10)
     val clock = new ManualClock(maxAge / 2)
-    val provider = new FsHistoryProvider(
-        createTestConf().set("spark.history.fs.cleaner.maxAge",
-                             s"${maxAge}ms"),
-        clock)
+    val provider =
+      new FsHistoryProvider(
+          createTestConf().set("spark.history.fs.cleaner.maxAge",
+                               s"${maxAge}ms"),
+          clock)
 
     val log1 = newLogFile("app1", Some("attempt1"), inProgress = false)
     writeFile(log1,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 1L, "test", Some("attempt1")),
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            1L,
+                                            "test",
+                                            Some("attempt1")),
               SparkListenerApplicationEnd(2L))
     log1.setLastModified(0L)
 
@@ -327,8 +353,11 @@ class FsHistoryProviderSuite
     writeFile(log2,
               true,
               None,
-              SparkListenerApplicationStart(
-                  "app1", Some("app1"), 3L, "test", Some("attempt2")),
+              SparkListenerApplicationStart("app1",
+                                            Some("app1"),
+                                            3L,
+                                            "test",
+                                            Some("attempt2")),
               SparkListenerApplicationEnd(4L))
     log2.setLastModified(clock.getTimeMillis())
 
@@ -387,8 +416,9 @@ class FsHistoryProviderSuite
       while (entry != null) {
         val actual = new String(ByteStreams.toByteArray(inputStream),
                                 StandardCharsets.UTF_8)
-        val expected = Files.toString(
-            logs.find(_.getName == entry.getName).get, StandardCharsets.UTF_8)
+        val expected =
+          Files.toString(logs.find(_.getName == entry.getName).get,
+                         StandardCharsets.UTF_8)
         actual should be(expected)
         totalEntries += 1
         entry = inputStream.getNextEntry

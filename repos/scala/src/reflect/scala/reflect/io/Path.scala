@@ -89,7 +89,7 @@ import Path._
   *
   *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-class Path private[io](val jfile: JFile) {
+class Path private[io] (val jfile: JFile) {
   val separator = java.io.File.separatorChar
   val separatorStr = java.io.File.separator
 
@@ -143,8 +143,8 @@ class Path private[io](val jfile: JFile) {
     assert(isAbsolute == other.isAbsolute,
            "Paths not of same type: " + this + ", " + other)
 
-    def createRelativePath(
-        baseSegs: List[String], otherSegs: List[String]): String = {
+    def createRelativePath(baseSegs: List[String],
+                           otherSegs: List[String]): String = {
       (baseSegs, otherSegs) match {
         case (b :: bs, o :: os) if b == o => createRelativePath(bs, os)
         case (bs, os) =>
@@ -241,8 +241,8 @@ class Path private[io](val jfile: JFile) {
   def isFresher(other: Path) = lastModified > other.lastModified
 
   // creations
-  def createDirectory(
-      force: Boolean = true, failIfExists: Boolean = false): Directory = {
+  def createDirectory(force: Boolean = true,
+                      failIfExists: Boolean = false): Directory = {
     val res = if (force) jfile.mkdirs() else jfile.mkdir()
     if (!res && failIfExists && exists)
       fail("Directory '%s' already exists." format name)

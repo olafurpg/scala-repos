@@ -17,12 +17,12 @@ class ScalaRunLineMarkerContributor extends RunLineMarkerContributor {
     if (element.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER)
       element.getParent match {
         case fun: ScFunctionDefinition
-            if ScalaApplicationConfigurationProducer.findMain(
-                fun, firstContMethodOnly = true) != null =>
+            if ScalaApplicationConfigurationProducer
+              .findMain(fun, firstContMethodOnly = true) != null =>
           createInfo(1)
         case obj: ScObject
-            if ScalaApplicationConfigurationProducer.getMainClass(
-                element, firstTemplateDefOnly = true) != null =>
+            if ScalaApplicationConfigurationProducer
+              .getMainClass(element, firstTemplateDefOnly = true) != null =>
           createInfo(0)
         case _ => null
       } else null

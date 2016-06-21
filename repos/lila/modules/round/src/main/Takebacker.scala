@@ -3,8 +3,9 @@ package lila.round
 import lila.game.{GameRepo, Game, UciMemo, Pov, Rewind, Event, Progress}
 import lila.pref.{Pref, PrefApi}
 
-private[round] final class Takebacker(
-    messenger: Messenger, uciMemo: UciMemo, prefApi: PrefApi) {
+private[round] final class Takebacker(messenger: Messenger,
+                                      uciMemo: UciMemo,
+                                      prefApi: PrefApi) {
 
   def yes(pov: Pov): Fu[Events] = IfAllowed(pov.game) {
     pov match {

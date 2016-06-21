@@ -641,8 +641,7 @@ class ShardRegion(typeName: String,
 
   def askAllShards[T: ClassTag](msg: Any): Future[Seq[(ShardId, T)]] = {
     implicit val timeout: Timeout = 3.seconds
-    Future.sequence(
-        shards.toSeq.map {
+    Future.sequence(shards.toSeq.map {
       case (shardId, ref) ⇒ (ref ? msg).mapTo[T].map(t ⇒ (shardId, t))
     })
   }
@@ -705,7 +704,7 @@ class ShardRegion(typeName: String,
         if (tot <= bufferSize / 2) log.info(logMsg)
         else
           log.warning(logMsg +
-              " The coordinator might not be available. You might want to check cluster membership status.")
+                " The coordinator might not be available. You might want to check cluster membership status.")
       }
     }
   }
@@ -713,8 +712,9 @@ class ShardRegion(typeName: String,
   def deliverBufferedMessages(shardId: ShardId, receiver: ActorRef): Unit = {
     shardBuffers.get(shardId) match {
       case Some(buf) ⇒
-        log.debug(
-            "Deliver [{}] buffered messages for shard [{}]", buf.size, shardId)
+        log.debug("Deliver [{}] buffered messages for shard [{}]",
+                  buf.size,
+                  shardId)
         buf.foreach { case (msg, snd) ⇒ receiver.tell(msg, snd) }
         shardBuffers -= shardId
       case None ⇒
@@ -759,8 +759,8 @@ class ShardRegion(typeName: String,
               case None ⇒ bufferMessage(shardId, msg, snd)
             }
           case Some(ref) ⇒
-            log.debug(
-                "Forwarding request for shard [{}] to [{}]", shardId, ref)
+            log
+              .debug("Forwarding request for shard [{}] to [{}]", shardId, ref)
             ref.tell(msg, snd)
           case None if (shardId == null || shardId == "") ⇒
             log.warning("Shard must not be empty, dropping message [{}]",

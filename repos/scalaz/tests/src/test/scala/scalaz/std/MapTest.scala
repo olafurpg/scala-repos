@@ -8,9 +8,8 @@ import scala.collection.immutable.{Map => SMap, MapLike}
 import scala.math.{Ordering => SOrdering}
 import org.scalacheck.Prop.forAll
 
-abstract class XMapTest[
-    Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], BKC[_]](
-    dict: MapSubInstances with MapSubFunctions {
+abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]],
+                        BKC[_]](dict: MapSubInstances with MapSubFunctions {
   type XMap[A, B] = Map[A, B]
   type BuildKeyConstraint[A] = BKC[A]
 })(implicit BKCF: Contravariant[BKC], OI: BKC[Int], OS: BKC[String])
@@ -70,7 +69,7 @@ abstract class XMapTest[
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
     ==>>.fromList(x.toList) must_===
-      Align[Int ==>> ?].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
+    Align[Int ==>> ?].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
     x.keySet must_=== (keysA ++ keysB)
 
     x.filter(_._2.isThis).keySet must_=== (keysA -- keysB)
@@ -78,9 +77,9 @@ abstract class XMapTest[
     x.filter(_._2.isBoth).keySet must_=== (keysA & keysB)
 
     x.filter(_._2.isThis) must_===
-      F.map(a.filter { case (k, _) => !keysB(k) })(This(_))
+    F.map(a.filter { case (k, _) => !keysB(k) })(This(_))
     x.filter(_._2.isThat) must_===
-      F.map(b.filter { case (k, _) => !keysA(k) })(That(_))
+    F.map(b.filter { case (k, _) => !keysA(k) })(That(_))
   }
 
   "getOrAdd" ! forAll { (m0: Map[Int, Long], k: Int, vOld: Long, vNew: Long) =>
@@ -99,7 +98,7 @@ abstract class XMapTest[
     // lazy
     var evaluated = false
     getOrAdd[Id.Id, Int, Long](mWithOld, k)({ evaluated = true; vNew }) must_===
-      (mWithOld, vOld)
+    (mWithOld, vOld)
     evaluated must_=== false
   }
 }
@@ -109,5 +108,6 @@ private object DIContravariant extends Contravariant[λ[α => DummyImplicit]] {
 }
 
 object MapTest
-    extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(
-        DIContravariant, implicitly, implicitly)
+    extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(DIContravariant,
+                                                           implicitly,
+                                                           implicitly)

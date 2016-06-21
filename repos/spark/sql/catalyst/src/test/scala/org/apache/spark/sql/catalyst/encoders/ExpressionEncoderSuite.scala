@@ -121,8 +121,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
   encodeDecodeTest(Array.empty[Int], "empty array of int")
   encodeDecodeTest(Array.empty[String], "empty array of string")
 
-  encodeDecodeTest(
-      Array(Array(31, -123), null, Array(4, 67)), "array of array of int")
+  encodeDecodeTest(Array(Array(31, -123), null, Array(4, 67)),
+                   "array of array of int")
   encodeDecodeTest(Array(Array("abc", "xyz"),
                          Array[String](null),
                          null,
@@ -156,8 +156,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
   productTest(InnerClass(1))
   encodeDecodeTest(Array(InnerClass(1)), "array of inner class")
 
-  encodeDecodeTest(
-      Array(Option(InnerClass(1))), "array of optional inner class")
+  encodeDecodeTest(Array(Option(InnerClass(1))),
+                   "array of optional inner class")
 
   productTest(PrimitiveData(1, 1, 1, 1, 1, 1, true))
 
@@ -174,8 +174,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
   productTest(OptionalData(None, None, None, None, None, None, None, None))
 
   encodeDecodeTest(Seq(Some(1), None), "Option in array")
-  encodeDecodeTest(
-      Map(1 -> Some(10L), 2 -> Some(20L), 3 -> None), "Option in map")
+  encodeDecodeTest(Map(1 -> Some(10L), 2 -> Some(20L), 3 -> None),
+                   "Option in map")
 
   productTest(BoxedData(1, 1L, 1.0, 1.0f, 1.toShort, 1.toByte, true))
 
@@ -222,18 +222,19 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       ExpressionEncoder.tuple(ExpressionEncoder[Int], ExpressionEncoder[Long]))
 
   encodeDecodeTest((PrimitiveData(1, 1, 1, 1, 1, 1, true), (3, 30L)),
-                   "tuple with 2 product encoders")(ExpressionEncoder.tuple(
-          ExpressionEncoder[PrimitiveData], ExpressionEncoder[(Int, Long)]))
+                   "tuple with 2 product encoders")(
+      ExpressionEncoder.tuple(ExpressionEncoder[PrimitiveData],
+                              ExpressionEncoder[(Int, Long)]))
 
   encodeDecodeTest(
       (PrimitiveData(1, 1, 1, 1, 1, 1, true), 3),
-      "tuple with flat encoder and product encoder")(ExpressionEncoder.tuple(
-          ExpressionEncoder[PrimitiveData], ExpressionEncoder[Int]))
+      "tuple with flat encoder and product encoder")(ExpressionEncoder
+        .tuple(ExpressionEncoder[PrimitiveData], ExpressionEncoder[Int]))
 
   encodeDecodeTest(
       (3, PrimitiveData(1, 1, 1, 1, 1, 1, true)),
-      "tuple with product encoder and flat encoder")(ExpressionEncoder.tuple(
-          ExpressionEncoder[Int], ExpressionEncoder[PrimitiveData]))
+      "tuple with product encoder and flat encoder")(ExpressionEncoder
+        .tuple(ExpressionEncoder[Int], ExpressionEncoder[PrimitiveData]))
 
   encodeDecodeTest((1, (10, 100L)), "nested tuple encoder") {
     val intEnc = ExpressionEncoder[Int]
@@ -281,7 +282,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
   }
 
   private def encodeDecodeTest[T: ExpressionEncoder](
-      input: T, testName: String): Unit = {
+      input: T,
+      testName: String): Unit = {
     test(s"encode/decode for $testName: $input") {
       val encoder = implicitly[ExpressionEncoder[T]]
       val row = encoder.toRow(input)
@@ -312,11 +314,11 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
         case (b1: Array[Byte], b2: Array[Byte]) => Arrays.equals(b1, b2)
         case (b1: Array[Int], b2: Array[Int]) => Arrays.equals(b1, b2)
         case (b1: Array[Array[_]], b2: Array[Array[_]]) =>
-          Arrays.deepEquals(
-              b1.asInstanceOf[Array[AnyRef]], b2.asInstanceOf[Array[AnyRef]])
+          Arrays.deepEquals(b1.asInstanceOf[Array[AnyRef]],
+                            b2.asInstanceOf[Array[AnyRef]])
         case (b1: Array[_], b2: Array[_]) =>
-          Arrays.equals(
-              b1.asInstanceOf[Array[AnyRef]], b2.asInstanceOf[Array[AnyRef]])
+          Arrays.equals(b1.asInstanceOf[Array[AnyRef]],
+                        b2.asInstanceOf[Array[AnyRef]])
         case _ => input == convertedBack
       }
 

@@ -118,8 +118,9 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     def columns = Seq.empty
   }
 
-  case class SingleDBColumn(
-      cref: ColumnRef, column: Column, extractor: (ResultSet, Int) => Unit)
+  case class SingleDBColumn(cref: ColumnRef,
+                            column: Column,
+                            extractor: (ResultSet, Int) => Unit)
       extends DBColumns {
     def extract(rs: ResultSet, rowId: Int) = extractor(rs, rowId)
     def columns = Seq(cref -> column)
@@ -292,7 +293,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
       case other =>
         logger.warn(
-            "Unsupported JDBC column type %d for %s".format(other, selector)); EmptyDBColumn
+            "Unsupported JDBC column type %d for %s".format(other, selector));
+        EmptyDBColumn
     }
   }
 
@@ -312,7 +314,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     def databaseMap: Map[String, String]
 
     private def jTypeToProperties(
-        tpe: JType, current: Set[String]): Set[String] = tpe match {
+        tpe: JType,
+        current: Set[String]): Set[String] = tpe match {
       case JArrayFixedT(elements) if current.nonEmpty =>
         elements.map {
           case (index, childType) =>
@@ -325,14 +328,13 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
       case JObjectFixedT(fields) =>
         fields.map {
           case (name, childType) =>
-            val newPaths =
-              if (current.nonEmpty) {
-                current.map { s =>
-                  s + "." + name
-                }
-              } else {
-                Set(name)
+            val newPaths = if (current.nonEmpty) {
+              current.map { s =>
+                s + "." + name
               }
+            } else {
+              Set(name)
+            }
             jTypeToProperties(childType, newPaths)
         }.toSet.flatten
 
@@ -423,7 +425,7 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                   case err =>
                     sys.error("JDBC path " + path.path +
-                        " does not have the form /dbName/tableName; rollups not yet supported.")
+                          " does not have the form /dbName/tableName; rollups not yet supported.")
                 }
 
               case InitialLoad(Nil) =>
@@ -464,12 +466,11 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
             val columns = valColumns.flatMap(_.columns).toMap
           }
 
-          val nextSkip =
-            if (rowIndex == yggConfig.maxSliceSize) {
-              Some(skip + yggConfig.maxSliceSize)
-            } else {
-              None
-            }
+          val nextSkip = if (rowIndex == yggConfig.maxSliceSize) {
+            Some(skip + yggConfig.maxSliceSize)
+          } else {
+            None
+          }
 
           (slice, nextSkip)
         } finally {

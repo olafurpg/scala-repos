@@ -71,8 +71,10 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
 
   def testFreeSpecIgnored(): Unit = {
     addFreeSpecViewTest()
-    runFileStructureViewTest(
-        className, ignoredStatusId, "\"level2\"", "\"level2_2\"")
+    runFileStructureViewTest(className,
+                             ignoredStatusId,
+                             "\"level2\"",
+                             "\"level2_2\"")
   }
 
   def testFreeSpecIgnoredAndPending(): Unit = {
@@ -82,7 +84,9 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
 
   def testFreeSpecPending(): Unit = {
     addFreeSpecViewTest()
-    runFileStructureViewTest(
-        className, pendingStatusId, "\"level1_2\"", "\"level1_3\"")
+    runFileStructureViewTest(className,
+                             pendingStatusId,
+                             "\"level1_2\"",
+                             "\"level1_3\"")
   }
 }

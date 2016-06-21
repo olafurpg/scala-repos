@@ -76,7 +76,7 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
             def viaUniversalExtensionMethod = m match {
               case t: TypeMember
                   if t.implicitlyAdded &&
-                  t.viaView.info.params.head.info.bounds.isEmptyBounds =>
+                    t.viaView.info.params.head.info.bounds.isEmptyBounds =>
                 true
               case _ => false
             }
@@ -88,7 +88,7 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
           val matching = r.matchingResults().filterNot(shouldHide)
           val tabAfterCommonPrefixCompletion =
             lastCommonPrefixCompletion.contains(buf.substring(0, cursor)) &&
-            matching.exists(_.symNameDropLocal == r.name)
+              matching.exists(_.symNameDropLocal == r.name)
           val doubleTab =
             tabCount > 0 && matching.forall(_.symNameDropLocal == r.name)
           if (tabAfterCommonPrefixCompletion || doubleTab)
@@ -102,8 +102,8 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
               camelMatches.map(_.symNameDropLocal.decoded).distinct.sorted
             def allowCompletion =
               ((memberCompletions.size == 1) ||
-                  CompletionResult.camelMatch(r.name)(r.name.newName(
-                          StringOps.longestCommonPrefix(memberCompletions))))
+                    CompletionResult.camelMatch(r.name)(r.name.newName(
+                            StringOps.longestCommonPrefix(memberCompletions))))
             if (memberCompletions.isEmpty) Completion.NoCandidates
             else if (allowCompletion)
               Candidates(cursor - r.positionDelta, memberCompletions)
@@ -121,7 +121,7 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
       lastCommonPrefixCompletion =
         if (found != Completion.NoCandidates && buf.length >= found.cursor)
           Some(buf.substring(0, found.cursor) +
-              StringOps.longestCommonPrefix(found.candidates))
+                StringOps.longestCommonPrefix(found.candidates))
         else None
       found
     }

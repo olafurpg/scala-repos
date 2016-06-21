@@ -58,8 +58,8 @@ private[stream] class ConnectionSourceStage(
 
       override def preStart(): Unit = {
         getStageActor(receive)
-        tcpManager ! Tcp.Bind(
-            self, endpoint, backlog, options, pullMode = true)
+        tcpManager ! Tcp
+          .Bind(self, endpoint, backlog, options, pullMode = true)
       }
 
       private def receive(evt: (ActorRef, Any)): Unit = {
@@ -71,8 +71,9 @@ private[stream] class ConnectionSourceStage(
             stageActor.watch(listener)
             if (isAvailable(out)) listener ! ResumeAccepting(1)
             val target = self
-            bindingPromise.success(ServerBinding(localAddress)(
-                    () ⇒ { target ! Unbind; unbindPromise.future }))
+            bindingPromise.success(ServerBinding(localAddress)(() ⇒ {
+              target ! Unbind; unbindPromise.future
+            }))
           case f: CommandFailed ⇒
             val ex = BindFailedException
             bindingPromise.failure(ex)
@@ -107,8 +108,9 @@ private[stream] class ConnectionSourceStage(
         connectionFlowsAwaitingInitialization.incrementAndGet()
 
         val tcpFlow = Flow
-          .fromGraph(new IncomingConnectionStage(
-                  connection, connected.remoteAddress, halfClose))
+          .fromGraph(new IncomingConnectionStage(connection,
+                                                 connected.remoteAddress,
+                                                 halfClose))
           .via(detacher[ByteString]) // must read ahead for proper completions
           .mapMaterializedValue { m ⇒
             connectionFlowsAwaitingInitialization.decrementAndGet()
@@ -180,8 +182,8 @@ private[stream] object TcpConnectionStage {
    * to attach an extra, fused buffer to the end of this flow. Keeping this stage non-detached makes it much simpler and
    * easier to maintain and understand.
    */
-  class TcpStreamLogic(
-      val shape: FlowShape[ByteString, ByteString], val role: TcpRole)
+  class TcpStreamLogic(val shape: FlowShape[ByteString, ByteString],
+                       val role: TcpRole)
       extends GraphStageLogic(shape) {
     implicit def self: ActorRef = stageActor.ref
 
@@ -201,8 +203,9 @@ private[stream] object TcpConnectionStage {
           setHandler(bytesOut, readHandler)
           connection = conn
           getStageActor(connected).watch(connection)
-          connection ! Register(
-              self, keepOpenOnPeerClosed = true, useResumeWriting = false)
+          connection ! Register(self,
+                                keepOpenOnPeerClosed = true,
+                                useResumeWriting = false)
           pull(bytesIn)
         case ob @ Outbound(manager, cmd, _, _) ⇒
           getStageActor(connecting(ob)).watch(manager)
@@ -229,8 +232,9 @@ private[stream] object TcpConnectionStage {
           stageActor.unwatch(ob.manager)
           stageActor.become(connected)
           stageActor.watch(connection)
-          connection ! Register(
-              self, keepOpenOnPeerClosed = true, useResumeWriting = false)
+          connection ! Register(self,
+                                keepOpenOnPeerClosed = true,
+                                useResumeWriting = false)
           if (isAvailable(bytesOut)) connection ! ResumeReading
           pull(bytesIn)
       }
@@ -320,8 +324,9 @@ private[stream] object TcpConnectionStage {
 /**
   * INTERNAL API
   */
-private[stream] class IncomingConnectionStage(
-    connection: ActorRef, remoteAddress: InetSocketAddress, halfClose: Boolean)
+private[stream] class IncomingConnectionStage(connection: ActorRef,
+                                              remoteAddress: InetSocketAddress,
+                                              halfClose: Boolean)
     extends GraphStage[FlowShape[ByteString, ByteString]] {
   import TcpConnectionStage._
 

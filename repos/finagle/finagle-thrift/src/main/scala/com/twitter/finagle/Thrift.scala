@@ -118,7 +118,8 @@ object Thrift
 
   object Client {
     private val preparer: Stackable[ServiceFactory[
-            ThriftClientRequest, Array[Byte]]] = new Stack.ModuleParams[
+            ThriftClientRequest,
+            Array[Byte]]] = new Stack.ModuleParams[
         ServiceFactory[ThriftClientRequest, Array[Byte]]] {
       override def parameters: Seq[Stack.Param[_]] = Nil
       override val role = StackClient.Role.prepConn
@@ -145,8 +146,7 @@ object Thrift
         Client.stack,
       params: Stack.Params =
         StackClient.defaultParams + ProtocolLibrary("thrift")
-  )
-      extends StdStackClient[ThriftClientRequest, Array[Byte], Client]
+  ) extends StdStackClient[ThriftClientRequest, Array[Byte], Client]
       with WithSessionPool[Client]
       with WithDefaultLoadBalancer[Client]
       with ThriftRichClient {
@@ -313,8 +313,7 @@ object Thrift
       stack: Stack[ServiceFactory[Array[Byte], Array[Byte]]] = Server.stack,
       params: Stack.Params =
         StackServer.defaultParams + ProtocolLibrary("thrift")
-  )
-      extends StdStackServer[Array[Byte], Array[Byte], Server]
+  ) extends StdStackServer[Array[Byte], Array[Byte], Server]
       with ThriftRichServer {
     protected def copy1(
         stack: Stack[ServiceFactory[Array[Byte], Array[Byte]]] = this.stack,

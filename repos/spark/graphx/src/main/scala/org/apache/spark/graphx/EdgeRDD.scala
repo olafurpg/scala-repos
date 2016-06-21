@@ -48,8 +48,8 @@ abstract class EdgeRDD[ED](sc: SparkContext, deps: Seq[Dependency[_]])
   override protected def getPartitions: Array[Partition] =
     partitionsRDD.partitions
 
-  override def compute(
-      part: Partition, context: TaskContext): Iterator[Edge[ED]] = {
+  override def compute(part: Partition,
+                       context: TaskContext): Iterator[Edge[ED]] = {
     val p =
       firstParent[(PartitionID, EdgePartition[ED, _])].iterator(part, context)
     if (p.hasNext) {

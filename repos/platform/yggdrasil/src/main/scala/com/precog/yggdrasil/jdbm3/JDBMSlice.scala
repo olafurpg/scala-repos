@@ -96,8 +96,8 @@ object JDBMSlice {
     (firstKey, lastKey, rows)
   }
 
-  def columnFor(prefix: CPath, sliceSize: Int)(
-      ref: ColumnRef): (ColumnRef, ArrayColumn[_]) =
+  def columnFor(prefix: CPath,
+                sliceSize: Int)(ref: ColumnRef): (ColumnRef, ArrayColumn[_]) =
     (ref.copy(selector = (prefix \ ref.selector)), (ref.ctype match {
       case CString => ArrayStrColumn.empty(sliceSize)
       case CBoolean => ArrayBoolColumn.empty()

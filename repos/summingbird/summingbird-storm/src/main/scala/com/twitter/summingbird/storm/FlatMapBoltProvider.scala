@@ -70,13 +70,15 @@ object FlatMapBoltProvider {
 }
 
 case class FlatMapBoltProvider(
-    storm: Storm, jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-    implicit topologyBuilder: TopologyBuilder) {
+    storm: Storm,
+    jobID: JobId,
+    stormDag: Dag[Storm],
+    node: StormNode)(implicit topologyBuilder: TopologyBuilder) {
   import FlatMapBoltProvider._
   import Producer2FlatMapOperation._
 
-  def getOrElse[T <: AnyRef: Manifest](
-      default: T, queryNode: StormNode = node) =
+  def getOrElse[T <: AnyRef: Manifest](default: T,
+                                       queryNode: StormNode = node) =
     storm.getOrElse(stormDag, queryNode, default)
 
   // Boilerplate extracting of the options from the DAG
@@ -114,8 +116,8 @@ case class FlatMapBoltProvider(
     // Query to get the summer paralellism of the summer down stream of us we are emitting to
     // to ensure no edge case between what we might see for its parallelism and what it would see/pass to storm.
     val summerParalellism = getOrElse(DEFAULT_SUMMER_PARALLELISM, summer)
-    val summerBatchMultiplier = getOrElse(
-        DEFAULT_SUMMER_BATCH_MULTIPLIER, summer)
+    val summerBatchMultiplier =
+      getOrElse(DEFAULT_SUMMER_BATCH_MULTIPLIER, summer)
 
     // This option we report its value here, but its not user settable.
     val keyValueShards = executor.KeyValueShards(

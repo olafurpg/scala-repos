@@ -105,7 +105,8 @@ class NetUtilTest extends WordSpec {
       assert(NetUtil.isInetAddressInBlock(InetAddress.getByName("192.168.0.1"),
                                           block) == true)
       assert(NetUtil.isInetAddressInBlock(
-              InetAddress.getByName("192.168.255.254"), block) == true)
+              InetAddress.getByName("192.168.255.254"),
+              block) == true)
       assert(NetUtil.isInetAddressInBlock(InetAddress.getByName("192.169.0.1"),
                                           block) == false)
     }

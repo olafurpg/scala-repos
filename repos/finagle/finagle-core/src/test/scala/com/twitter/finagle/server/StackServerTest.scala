@@ -22,7 +22,7 @@ class StackServerTest extends FunSuite {
       StackServer.newStack[Unit, Deadline] ++ Stack.Leaf(Endpoint, echo)
     val statsReceiver = new InMemoryStatsReceiver
     val factory = stack.make(StackServer.defaultParams +
-        TimeoutFilter.Param(1.second) + Stats(statsReceiver))
+          TimeoutFilter.Param(1.second) + Stats(statsReceiver))
     val svc = Await.result(factory(), 5.seconds)
     Time.withCurrentTimeFrozen { ctl =>
       Contexts.broadcast.let(Deadline, Deadline.ofTimeout(5.seconds)) {
@@ -31,8 +31,9 @@ class StackServerTest extends FunSuite {
 
         // we should be one second ahead
         assert(statsReceiver
-              .stats(Seq("admission_control", "deadline", "transit_latency_ms"))(
-                0) == 1.second.inMilliseconds.toFloat)
+              .stats(
+                  Seq("admission_control", "deadline", "transit_latency_ms"))(
+                  0) == 1.second.inMilliseconds.toFloat)
 
         // but the deadline inside the service's closure should be updated
         assert(Await.result(result) == Deadline.ofTimeout(1.second))

@@ -7,8 +7,8 @@ package generator
   * This ONLY handles case-class types, it will not handle ADTS, but can generate code for non-final case classes.
   *
   */
-class CaseClassPickling(
-    val allowReflection: Boolean, val careAboutSubclasses: Boolean)
+class CaseClassPickling(val allowReflection: Boolean,
+                        val careAboutSubclasses: Boolean)
     extends PicklingAlgorithm {
   case class FieldInfo(name: String, sym: IrMethod)
   case class CaseClassInfo(constructor: IrConstructor, fields: Seq[FieldInfo])
@@ -24,7 +24,8 @@ class CaseClassPickling(
       .filterNot(_.isMarkedTransient)
   }
   private def checkConstructorImpl(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+      tpe: IrClass,
+      logger: AlgorithmLogger): AlgorithmResult = {
     if (tpe.isCaseClass) {
       tpe.primaryConstructor match {
         case Some(c) if c.isPublic =>
@@ -47,21 +48,20 @@ class CaseClassPickling(
             m <- vars.find(_.methodName == name)
           } yield FieldInfo(name, m)
           if (fields.length == c.parameterNames.flatten.length) {
-            val pickle = PickleBehavior(
-                Seq(PickleEntry(fields.map { field =>
+            val pickle = PickleBehavior(Seq(PickleEntry(fields.map { field =>
               GetField(field.name, field.sym)
             }.toSeq ++ standAloneVars.map { field =>
               GetField(field.methodName, field)
             })))
             val unpickle = UnpickleBehavior(Seq(CallConstructor(
-                        fields.map(_.name), c)) ++ standAloneVars.map {
-              field =>
-                field.setter match {
-                  case Some(mth) => SetField(field.methodName, mth)
-                  case _ =>
-                    sys.error(
-                        s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
-                }
+                        fields.map(_.name),
+                        c)) ++ standAloneVars.map { field =>
+              field.setter match {
+                case Some(mth) => SetField(field.methodName, mth)
+                case _ =>
+                  sys.error(
+                      s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
+              }
             })
             if (!allowReflection &&
                 (pickle.requiresReflection || unpickle.requiresReflection)) {
@@ -105,8 +105,8 @@ class CaseClassPickling(
     } else AlgorithmFailure("class is not a case class")
   }
 
-  def checkFactoryImpl(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+  def checkFactoryImpl(tpe: IrClass,
+                       logger: AlgorithmLogger): AlgorithmResult = {
     // THis should be accurate, because all case calsses have companions
     (for {
       companion <- tpe.companion
@@ -131,8 +131,7 @@ class CaseClassPickling(
         m <- vars.find(_.methodName == name)
       } yield FieldInfo(name, m)
       if (fields.length == factoryMethod.parameterNames.flatten.length) {
-        val pickle = PickleBehavior(
-            Seq(PickleEntry(fields.map { field =>
+        val pickle = PickleBehavior(Seq(PickleEntry(fields.map { field =>
           GetField(field.name, field.sym)
         }.toSeq)))
         val unpickle = UnpickleBehavior(
@@ -155,8 +154,8 @@ class CaseClassPickling(
     * @param tpe
     * @return
     */
-  override def generate(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+  override def generate(tpe: IrClass,
+                        logger: AlgorithmLogger): AlgorithmResult = {
     // Scala modules are pickled differently, so we have to explicitly ignore `case object`
     if (tpe.isCaseClass && !tpe.isScalaModule) {
       val behavior =
@@ -179,7 +178,10 @@ class CaseClassPickling(
                     )
                   case x: UnpickleBehavior =>
                     UnpickleBehavior(Seq(SubclassUnpicklerDelegation(
-                                Nil, tpe, Some(x), allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
+                                Nil,
+                                tpe,
+                                Some(x),
+                                allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
                   case x => x
                 }
                 .asInstanceOf[PickleUnpickleImplementation]
@@ -197,7 +199,10 @@ class CaseClassPickling(
                     SubclassDispatch(Nil, tpe, Some(x), allowReflection) // TODO - This should be `allow runtime pickler lookup`.
                   case x: UnpickleBehavior =>
                     UnpickleBehavior(Seq(SubclassUnpicklerDelegation(
-                                Nil, tpe, Some(x), allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
+                                Nil,
+                                tpe,
+                                Some(x),
+                                allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
                   case x => x
                 }
                 .asInstanceOf[PickleUnpickleImplementation]

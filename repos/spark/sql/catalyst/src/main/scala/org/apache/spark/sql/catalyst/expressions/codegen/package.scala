@@ -57,7 +57,8 @@ package object codegen {
       if (!packageDir.exists()) { packageDir.mkdir() }
 
       val classFile = new java.io.File(
-          packageDir, generatedClass.getName.split("\\.").last + ".class")
+          packageDir,
+          generatedClass.getName.split("\\.").last + ".class")
 
       val outfile = new java.io.FileOutputStream(classFile)
       outfile.write(generatedBytes)

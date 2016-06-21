@@ -30,7 +30,10 @@ abstract class StochasticGradientDescent[T](val defaultStepSize: Double,
                                             fvalMemory: Int = 100)(
     implicit protected val vspace: NormedModule[T, Double])
     extends FirstOrderMinimizer[T, StochasticDiffFunction[T]](
-        maxIter, tolerance, fvalMemory, relativeTolerance = true)
+        maxIter,
+        tolerance,
+        fvalMemory,
+        relativeTolerance = true)
     with SerializableLogging {
 
   import vspace._
@@ -44,8 +47,9 @@ abstract class StochasticGradientDescent[T](val defaultStepSize: Double,
     */
   protected def takeStep(state: State, dir: T, stepSize: Double) =
     state.x + dir * stepSize
-  protected def chooseDescentDirection(
-      state: State, fn: StochasticDiffFunction[T]) = state.grad * -1.0
+  protected def chooseDescentDirection(state: State,
+                                       fn: StochasticDiffFunction[T]) =
+    state.grad * -1.0
 
   /**
     * Choose a step size scale for this iteration.

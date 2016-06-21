@@ -83,8 +83,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
     Option(statusDisplayN)
   }
 
-  private def createSelectClassPathList(
-      defaultModule: Option[String], file: VirtualFile) = {
+  private def createSelectClassPathList(defaultModule: Option[String],
+                                        file: VirtualFile) = {
     val modulesBox = new ModulesComboBox()
 
     modulesBox fillModules project
@@ -104,7 +104,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
         if (m == null) return
 
         WorksheetCompiler.setModuleForCpName(
-            PsiManager getInstance project findFile file, m.getName)
+            PsiManager getInstance project findFile file,
+            m.getName)
       }
     })
 
@@ -122,7 +123,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
           new ChangeListener {
             override def stateChanged(e: ChangeEvent) {
               WorksheetCompiler.setMakeBeforeRun(
-                  PsiManager getInstance project findFile file, box.isSelected)
+                  PsiManager getInstance project findFile file,
+                  box.isSelected)
             }
         }
     )
@@ -179,11 +181,10 @@ object WorksheetUiConstructor {
   def fixUnboundMaxSize(comp: JComponent, isSquare: Boolean = true) {
     val preferredSize = comp.getPreferredSize
 
-    val size =
-      if (isSquare) {
-        val sqSize = Math.max(preferredSize.width, preferredSize.height)
-        new Dimension(sqSize, sqSize)
-      } else new Dimension(preferredSize.width, preferredSize.height)
+    val size = if (isSquare) {
+      val sqSize = Math.max(preferredSize.width, preferredSize.height)
+      new Dimension(sqSize, sqSize)
+    } else new Dimension(preferredSize.width, preferredSize.height)
 
     comp setMaximumSize size
   }
@@ -194,8 +195,8 @@ object WorksheetUiConstructor {
 
   def createSplitter() = {
     val separator = new JSeparator(SwingConstants.VERTICAL)
-    val size = new Dimension(
-        separator.getPreferredSize.width, separator.getMaximumSize.height)
+    val size = new Dimension(separator.getPreferredSize.width,
+                             separator.getMaximumSize.height)
     separator setMaximumSize size
 
     separator

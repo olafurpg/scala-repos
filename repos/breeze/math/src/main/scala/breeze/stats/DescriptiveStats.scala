@@ -42,7 +42,7 @@ case class MeanAndVariance(mean: Double, variance: Double, count: Long) {
 
     val m2x =
       m2a + m2b + d * d * (other.count * this.count) /
-      (other.count + this.count)
+        (other.count + this.count)
 
     val newVariance = m2x / (other.count + this.count - 1)
 
@@ -210,14 +210,14 @@ trait DescriptiveStats {
   }
 
   object covmat extends UFunc {
-    implicit val matrixCovariance: Impl[
-        DenseMatrix[Double], DenseMatrix[Double]] =
+    implicit val matrixCovariance: Impl[DenseMatrix[Double],
+                                        DenseMatrix[Double]] =
       new Impl[DenseMatrix[Double], DenseMatrix[Double]] {
         def apply(data: DenseMatrix[Double]) = cov(data)
       }
 
-    implicit val sequenceCovariance: Impl[
-        Seq[DenseVector[Double]], DenseMatrix[Double]] =
+    implicit val sequenceCovariance: Impl[Seq[DenseVector[Double]],
+                                          DenseMatrix[Double]] =
       new Impl[Seq[DenseVector[Double]], DenseMatrix[Double]] {
         /*
          * We roughly follow the two_pass_covariance algorithm from here: http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance
@@ -352,8 +352,8 @@ trait DescriptiveStats {
     implicit def vecVersion[@expand.args(Int, Long, Double, Float) T]
       : Impl2[DenseVector[T], DenseVector[Double], DenseVector[Int]] =
       new Impl2[DenseVector[T], DenseVector[Double], DenseVector[Int]] {
-        def apply(
-            x: DenseVector[T], bins: DenseVector[Double]): DenseVector[Int] = {
+        def apply(x: DenseVector[T],
+                  bins: DenseVector[Double]): DenseVector[Int] = {
           errorCheckBins(bins)
           val result = new DenseVector[Int](x.length)
           cfor(0)(i => i < x.length, i => i + 1)(i => {
@@ -400,8 +400,8 @@ trait DescriptiveStats {
     implicit def vecVersion[@expand.args(Double, Complex, Float) T]
       : Impl2[DenseVector[Int], DenseVector[T], DenseVector[T]] =
       new Impl2[DenseVector[Int], DenseVector[T], DenseVector[T]] {
-        def apply(
-            x: DenseVector[Int], weights: DenseVector[T]): DenseVector[T] = {
+        def apply(x: DenseVector[Int],
+                  weights: DenseVector[T]): DenseVector[T] = {
           require(min(x) >= 0)
           require(x.length == weights.length)
           val result = new DenseVector[T](max(x) + 1)
@@ -513,23 +513,23 @@ object DescriptiveStats {
     * by truncating the longer vector.
     * </p>
     */
-  def meanAndCov[T](it1: TraversableOnce[T], it2: TraversableOnce[T])(
-      implicit frac: Fractional[T]) = {
+  def meanAndCov[T](it1: TraversableOnce[T],
+                    it2: TraversableOnce[T])(implicit frac: Fractional[T]) = {
     implicit def t(it: TraversableOnce[T]) =
       it.toIterable //convert to an iterable for zip operation
     import frac.mkNumericOps
     //mu1(n-1), mu2(n-1), Cov(n-1), n-1
     val (mu1, mu2, c, n) = (it1, it2).zipped
       .foldLeft((frac.zero, frac.zero, frac.zero, frac.zero)) { (acc, y) =>
-      val (oldMu1, oldMu2, oldC, oldN) = acc
-      val newN = oldN + frac.fromInt(1)
-      val newMu1 = oldMu1 + ((y._1 - oldMu1) / newN)
-      val newMu2 = oldMu2 + ((y._2 - oldMu2) / newN)
-      val newC =
-        oldC +
-        ((y._1 - oldMu1) * (y._2 - newMu2)) //compute covariance in single pass
-      (newMu1, newMu2, newC, newN)
-    }
+        val (oldMu1, oldMu2, oldC, oldN) = acc
+        val newN = oldN + frac.fromInt(1)
+        val newMu1 = oldMu1 + ((y._1 - oldMu1) / newN)
+        val newMu2 = oldMu2 + ((y._2 - oldMu2) / newN)
+        val newC =
+          oldC +
+            ((y._1 - oldMu1) * (y._2 - newMu2)) //compute covariance in single pass
+        (newMu1, newMu2, newC, newN)
+      }
     if (n == 1) (mu1, mu2, 0) else (mu1, mu2, c / (n - frac.fromInt(1)))
   }
 

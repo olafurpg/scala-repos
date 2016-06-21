@@ -218,8 +218,8 @@ class HeartbeatReceiverSuite
   }
 
   /** Manually send a heartbeat and return the response. */
-  private def triggerHeartbeat(
-      executorId: String, executorShouldReregister: Boolean): Unit = {
+  private def triggerHeartbeat(executorId: String,
+                               executorShouldReregister: Boolean): Unit = {
     val metrics = new TaskMetrics
     val blockManagerId = BlockManagerId(executorId, "localhost", 12345)
     val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
@@ -277,8 +277,10 @@ private class FakeSchedulerBackend(scheduler: TaskSchedulerImpl,
 
   protected override def doRequestTotalExecutors(
       requestedTotal: Int): Boolean = {
-    clusterManagerEndpoint.askWithRetry[Boolean](RequestExecutors(
-            requestedTotal, localityAwareTasks, hostToLocalTaskCount))
+    clusterManagerEndpoint.askWithRetry[Boolean](
+        RequestExecutors(requestedTotal,
+                         localityAwareTasks,
+                         hostToLocalTaskCount))
   }
 
   protected override def doKillExecutors(executorIds: Seq[String]): Boolean = {

@@ -72,10 +72,11 @@ private class EnableFullQualifiedImports extends LocalQuickFix {
   }
 }
 
-private class MakeFullQualifiedImportFix(
-    q: ScStableCodeReferenceElement, fqn: String)
+private class MakeFullQualifiedImportFix(q: ScStableCodeReferenceElement,
+                                         fqn: String)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("make.import.fully.qualified"), q) {
+        ScalaBundle.message("make.import.fully.qualified"),
+        q) {
 
   def doApplyFix(project: Project) {
     val ref = getElement

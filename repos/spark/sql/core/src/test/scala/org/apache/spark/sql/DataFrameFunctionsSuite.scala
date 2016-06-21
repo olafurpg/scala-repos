@@ -200,11 +200,11 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
 
   test("misc crc32 function") {
     val df = Seq(("ABC", Array[Byte](1, 2, 3, 4, 5, 6))).toDF("a", "b")
-    checkAnswer(
-        df.select(crc32($"a"), crc32($"b")), Row(2743272264L, 2180413220L))
+    checkAnswer(df.select(crc32($"a"), crc32($"b")),
+                Row(2743272264L, 2180413220L))
 
-    checkAnswer(
-        df.selectExpr("crc32(a)", "crc32(b)"), Row(2743272264L, 2180413220L))
+    checkAnswer(df.selectExpr("crc32(a)", "crc32(b)"),
+                Row(2743272264L, 2180413220L))
   }
 
   test("string function find_in_set") {
@@ -227,9 +227,7 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
 
   test("conditional function: greatest") {
     checkAnswer(
-        testData2
-          .select(greatest(lit(2), lit(3), col("a"), col("b")))
-          .limit(1),
+        testData2.select(greatest(lit(2), lit(3), col("a"), col("b"))).limit(1),
         Row(3)
     )
     checkAnswer(

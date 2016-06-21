@@ -22,7 +22,8 @@ import scala.concurrent.duration._
 class FlowMapBenchmark {
 
   val config = ConfigFactory
-    .parseString("""
+    .parseString(
+        """
       akka {
         log-config-on-start = off
         log-dead-letters-during-shutdown = off
@@ -70,8 +71,8 @@ class FlowMapBenchmark {
 
   @Setup
   def setup(): Unit = {
-    val settings = ActorMaterializerSettings(system).withInputBuffer(
-        initialInputBufferSize, initialInputBufferSize)
+    val settings = ActorMaterializerSettings(system)
+      .withInputBuffer(initialInputBufferSize, initialInputBufferSize)
 
     materializer = ActorMaterializer(settings)
 
@@ -116,8 +117,7 @@ class FlowMapBenchmark {
   @Benchmark
   @OperationsPerInvocation(100000)
   def flow_map_100k_elements(): Unit = {
-    val lock =
-      new Lock() // todo rethink what is the most lightweight way to await for a streams completion
+    val lock = new Lock() // todo rethink what is the most lightweight way to await for a streams completion
     lock.acquire()
 
     flow.runWith(Sink.onComplete(_ ⇒ lock.release()))(materializer)

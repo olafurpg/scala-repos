@@ -44,7 +44,8 @@ trait ObjectOperator extends LogicalPlan {
     * is the same whether or not the operator is output serialized data.
     */
   def outputObject: NamedExpression =
-    Alias(serializer.head.collect { case b: BoundReference => b }.head, "obj")()
+    Alias(serializer.head.collect { case b: BoundReference => b }.head,
+          "obj")()
 
   /**
     * Returns a copy of this operator that will produce an object instead of an encoded row.
@@ -68,8 +69,8 @@ trait ObjectOperator extends LogicalPlan {
 }
 
 object MapPartitions {
-  def apply[T: Encoder, U: Encoder](
-      func: Iterator[T] => Iterator[U], child: LogicalPlan): MapPartitions = {
+  def apply[T: Encoder, U: Encoder](func: Iterator[T] => Iterator[U],
+                                    child: LogicalPlan): MapPartitions = {
     MapPartitions(func.asInstanceOf[Iterator[Any] => Iterator[Any]],
                   encoderFor[T].fromRowExpression,
                   encoderFor[U].namedExpressions,
@@ -95,8 +96,8 @@ case class MapPartitions(func: Iterator[Any] => Iterator[Any],
 
 /** Factory for constructing new `AppendColumn` nodes. */
 object AppendColumns {
-  def apply[T: Encoder, U: Encoder](
-      func: T => U, child: LogicalPlan): AppendColumns = {
+  def apply[T: Encoder, U: Encoder](func: T => U,
+                                    child: LogicalPlan): AppendColumns = {
     new AppendColumns(func.asInstanceOf[Any => Any],
                       encoderFor[T].fromRowExpression,
                       encoderFor[U].namedExpressions,

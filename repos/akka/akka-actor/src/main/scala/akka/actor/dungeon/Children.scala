@@ -43,14 +43,21 @@ private[akka] trait Children {
   def actorOf(props: Props): ActorRef =
     makeChild(this, props, randomName(), async = false, systemService = false)
   def actorOf(props: Props, name: String): ActorRef =
-    makeChild(
-        this, props, checkName(name), async = false, systemService = false)
-  private[akka] def attachChild(
-      props: Props, systemService: Boolean): ActorRef =
-    makeChild(
-        this, props, randomName(), async = true, systemService = systemService)
-  private[akka] def attachChild(
-      props: Props, name: String, systemService: Boolean): ActorRef =
+    makeChild(this,
+              props,
+              checkName(name),
+              async = false,
+              systemService = false)
+  private[akka] def attachChild(props: Props,
+                                systemService: Boolean): ActorRef =
+    makeChild(this,
+              props,
+              randomName(),
+              async = true,
+              systemService = systemService)
+  private[akka] def attachChild(props: Props,
+                                name: String,
+                                systemService: Boolean): ActorRef =
     makeChild(this,
               props,
               checkName(name),
@@ -65,7 +72,8 @@ private[akka] trait Children {
       .asInstanceOf[Map[String, FunctionRef]]
 
   private[akka] def getFunctionRefOrNobody(
-      name: String, uid: Int = ActorCell.undefinedUid): InternalActorRef =
+      name: String,
+      uid: Int = ActorCell.undefinedUid): InternalActorRef =
     functionRefs.getOrElse(name, Children.GetNobody()) match {
       case f: FunctionRef ⇒
         if (uid == ActorCell.undefinedUid || f.path.uid == uid) f else Nobody
@@ -84,7 +92,10 @@ private[akka] trait Children {
       val old = functionRefs
       val added = old.updated(childPath.name, ref)
       if (!Unsafe.instance.compareAndSwapObject(
-              this, AbstractActorCell.functionRefsOffset, old, added)) rec()
+              this,
+              AbstractActorCell.functionRefsOffset,
+              old,
+              added)) rec()
     }
     rec()
 
@@ -101,7 +112,10 @@ private[akka] trait Children {
       else {
         val removed = old - name
         if (!Unsafe.instance.compareAndSwapObject(
-                this, AbstractActorCell.functionRefsOffset, old, removed))
+                this,
+                AbstractActorCell.functionRefsOffset,
+                old,
+                removed))
           rec()
         else {
           ref.stop()
@@ -152,8 +166,10 @@ private[akka] trait Children {
   @inline private final def swapChildrenRefs(
       oldChildren: ChildrenContainer,
       newChildren: ChildrenContainer): Boolean =
-    Unsafe.instance.compareAndSwapObject(
-        this, AbstractActorCell.childrenOffset, oldChildren, newChildren)
+    Unsafe.instance.compareAndSwapObject(this,
+                                         AbstractActorCell.childrenOffset,
+                                         oldChildren,
+                                         newChildren)
 
   @tailrec final def reserveChild(name: String): Boolean = {
     val c = childrenRefs
@@ -184,14 +200,15 @@ private[akka] trait Children {
     childrenRefs match {
       case c: ChildrenContainer.TerminatingChildrenContainer ⇒
         swapChildrenRefs(c, c.copy(reason = reason)) ||
-        setChildrenTerminationReason(reason)
+          setChildrenTerminationReason(reason)
       case _ ⇒ false
     }
   }
 
   final protected def setTerminated(): Unit =
-    Unsafe.instance.putObjectVolatile(
-        this, AbstractActorCell.childrenOffset, TerminatedChildrenContainer)
+    Unsafe.instance.putObjectVolatile(this,
+                                      AbstractActorCell.childrenOffset,
+                                      TerminatedChildrenContainer)
 
   /*
    * ActorCell-internal API
@@ -213,8 +230,8 @@ private[akka] trait Children {
       case _ ⇒
     }
 
-  protected def resumeChildren(
-      causedByFailure: Throwable, perp: ActorRef): Unit =
+  protected def resumeChildren(causedByFailure: Throwable,
+                               perp: ActorRef): Unit =
     childrenRefs.stats foreach {
       case ChildRestartStats(child: InternalActorRef, _, _) ⇒
         child.resume(if (perp == child) causedByFailure else null)
@@ -296,7 +313,7 @@ private[akka] trait Children {
         props.args forall
         (arg ⇒
               arg == null ||
-              arg.isInstanceOf[NoSerializationVerificationNeeded] || {
+                arg.isInstanceOf[NoSerializationVerificationNeeded] || {
                 val o = arg.asInstanceOf[AnyRef]
                 val serializer = ser.findSerializerFor(o)
                 val bytes = serializer.toBinary(o)
@@ -325,8 +342,8 @@ private[akka] trait Children {
       reserveChild(name)
       // this name will either be unreserved or overwritten with a real child below
       val actor = try {
-        val childPath = new ChildActorPath(
-            cell.self.path, name, ActorCell.newUid())
+        val childPath =
+          new ChildActorPath(cell.self.path, name, ActorCell.newUid())
         cell.provider.actorOf(cell.systemImpl,
                               props,
                               cell.self,

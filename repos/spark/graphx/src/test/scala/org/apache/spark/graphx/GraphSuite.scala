@@ -28,7 +28,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
 
   def starGraph(sc: SparkContext, n: Int): Graph[String, Int] = {
     Graph.fromEdgeTuples(
-        sc.parallelize((1 to n).map(x => (0: VertexId, x: VertexId)), 3), "v")
+        sc.parallelize((1 to n).map(x => (0: VertexId, x: VertexId)), 3),
+        "v")
   }
 
   test("Graph.fromEdgeTuples") {
@@ -40,8 +41,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(graph.edges.collect().forall(e => e.attr == 1))
 
       // uniqueEdges option should uniquify edges and store duplicate count in edge attributes
-      val uniqueGraph = Graph.fromEdgeTuples(
-          sc.parallelize(doubleRing), 1, Some(RandomVertexCut))
+      val uniqueGraph = Graph.fromEdgeTuples(sc.parallelize(doubleRing),
+                                             1,
+                                             Some(RandomVertexCut))
       assert(uniqueGraph.edges.count() === ring.size)
       assert(uniqueGraph.edges.collect().forall(e => e.attr == 2))
     }
@@ -110,8 +112,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         assert(nonemptyParts(mkGraph(edges)).count === 2)
       }
       // partitionBy(RandomVertexCut) puts identical edges in the same partition
-      assert(nonemptyParts(mkGraph(identicalEdges).partitionBy(
-                  RandomVertexCut)).count === 1)
+      assert(nonemptyParts(
+              mkGraph(identicalEdges).partitionBy(RandomVertexCut)).count === 1)
       // partitionBy(EdgePartition1D) puts same-source edges in the same partition
       assert(
           nonemptyParts(mkGraph(sameSrcEdges).partitionBy(EdgePartition1D)).count === 1)
@@ -120,8 +122,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(nonemptyParts(mkGraph(canonicalEdges).partitionBy(
                   CanonicalRandomVertexCut)).count === 1)
       // partitionBy(EdgePartition2D) puts identical edges in the same partition
-      assert(nonemptyParts(mkGraph(identicalEdges).partitionBy(
-                  EdgePartition2D)).count === 1)
+      assert(nonemptyParts(
+              mkGraph(identicalEdges).partitionBy(EdgePartition2D)).count === 1)
 
       // partitionBy(EdgePartition2D) ensures that vertices need only be replicated to 2 * sqrt(p)
       // partitions
@@ -152,7 +154,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         val failure = verts.maxBy(id => partitionSets.count(_.contains(id)))
         fail(
             ("Replication bound test failed for %d/%d vertices. " +
-                "Example: vertex %d replicated to %d (> %f) partitions.")
+                  "Example: vertex %d replicated to %d (> %f) partitions.")
               .format(numFailures,
                       n,
                       failure,
@@ -173,10 +175,12 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val g = Graph(sc.parallelize(List((0L, "a"), (1L, "b"), (2L, "c"))),
                     sc.parallelize(List(Edge(0L, 1L, 1), Edge(0L, 2L, 1)), 2))
       assert(g.triplets.collect().map(_.toTuple).toSet === Set(
-              ((0L, "a"), (1L, "b"), 1), ((0L, "a"), (2L, "c"), 1)))
+              ((0L, "a"), (1L, "b"), 1),
+              ((0L, "a"), (2L, "c"), 1)))
       val gPart = g.partitionBy(EdgePartition2D)
       assert(gPart.triplets.collect().map(_.toTuple).toSet === Set(
-              ((0L, "a"), (1L, "b"), 1), ((0L, "a"), (2L, "c"), 1)))
+              ((0L, "a"), (1L, "b"), 1),
+              ((0L, "a"), (2L, "c"), 1)))
     }
   }
 
@@ -199,13 +203,13 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
 
   test("mapVertices changing type with same erased type") {
     withSpark { sc =>
-      val vertices = sc.parallelize(
-          Array[(Long, Option[java.lang.Integer])](
+      val vertices = sc.parallelize(Array[(Long, Option[java.lang.Integer])](
               (1L, Some(1)),
               (2L, Some(2)),
               (3L, Some(3))
           ))
-      val edges = sc.parallelize(Array(
+      val edges = sc.parallelize(
+          Array(
               Edge(1L, 2L, 0),
               Edge(2L, 3L, 0),
               Edge(3L, 1L, 0)
@@ -223,7 +227,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val graph2 = graph1.mapTriplets(t => t.srcAttr.get)
       assert(
           graph2.edges.map(_.attr).collect().toSet === Set[java.lang.Double](
-              1.0, 2.0, 3.0))
+              1.0,
+              2.0,
+              3.0))
     }
   }
 
@@ -267,8 +273,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         sc.parallelize(Array((1L, 1), (2L, 2)))
       val edges: RDD[Edge[Int]] = sc.parallelize(Array(Edge(1L, 2L, 0)))
       val graph = Graph(vertices, edges).reverse
-      val result = GraphXUtils.mapReduceTriplets[Int, Int, Int](
-          graph, et => Iterator((et.dstId, et.srcAttr)), _ + _)
+      val result = GraphXUtils.mapReduceTriplets[Int, Int, Int](graph, et =>
+            Iterator((et.dstId, et.srcAttr)), _ + _)
       assert(result.collect().toSet === Set((1L, 2)))
     }
   }
@@ -353,7 +359,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         if (ctx.dstAttr != null) {
           throw new Exception(
               "expected ctx.dstAttr to be null due to TripletFields, but it was " +
-              ctx.dstAttr)
+                ctx.dstAttr)
         }
         ctx.sendToDst(ctx.srcAttr)
       }, _ + _, TripletFields.Src)
@@ -440,8 +446,11 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val verts =
         sc.parallelize(List((1: VertexId, "a"), (2: VertexId, "b")), 1)
       val edges = sc.parallelize(List(Edge(1, 2, 0), Edge(2, 1, 0)), 2)
-      val graph = Graph(
-          verts, edges, "", StorageLevel.MEMORY_ONLY, StorageLevel.MEMORY_ONLY)
+      val graph = Graph(verts,
+                        edges,
+                        "",
+                        StorageLevel.MEMORY_ONLY,
+                        StorageLevel.MEMORY_ONLY)
       // Note: Before caching, graph.vertices is cached, but graph.edges is not (but graph.edges'
       //       parent RDD is cached).
       graph.cache()
@@ -459,11 +468,12 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       .set("spark.default.parallelism", defaultParallelism.toString)
     val sc = new SparkContext("local", "test", conf)
     try {
-      val edges = sc.parallelize(
-          (1 to n).map(x => (x: VertexId, 0: VertexId)), numEdgePartitions)
+      val edges = sc.parallelize((1 to n).map(x => (x: VertexId, 0: VertexId)),
+                                 numEdgePartitions)
       val graph = Graph.fromEdgeTuples(edges, 1)
-      val neighborAttrSums = GraphXUtils.mapReduceTriplets[Int, Int, Int](
-          graph, et => Iterator((et.dstId, et.srcAttr)), _ + _)
+      val neighborAttrSums =
+        GraphXUtils.mapReduceTriplets[Int, Int, Int](graph, et =>
+              Iterator((et.dstId, et.srcAttr)), _ + _)
       assert(neighborAttrSums.collect().toSet === Set((0: VertexId, n)))
     } finally {
       sc.stop()

@@ -214,12 +214,18 @@ class UnreachableCodeTest extends ClearAfterClass {
         List(VarOp(ILOAD, 1), VarOp(ISTORE, 2)) === List(VarOp(ILOAD, 2),
                                                          VarOp(ISTORE, 1)))
 
-    assertTrue(List(Label(1), Label(2), Label(1)) === List(
-            Label(2), Label(4), Label(2)))
-    assertTrue(List(LineNumber(1, Label(1)), Label(1)) === List(
-            LineNumber(1, Label(3)), Label(3)))
-    assertFalse(List(LineNumber(1, Label(1)), Label(1)) === List(
-            LineNumber(1, Label(3)), Label(1)))
+    assertTrue(
+        List(Label(1), Label(2), Label(1)) === List(Label(2),
+                                                    Label(4),
+                                                    Label(2)))
+    assertTrue(
+        List(LineNumber(1, Label(1)), Label(1)) === List(
+            LineNumber(1, Label(3)),
+            Label(3)))
+    assertFalse(
+        List(LineNumber(1, Label(1)), Label(1)) === List(
+            LineNumber(1, Label(3)),
+            Label(1)))
 
     assertTrue(
         List(
@@ -261,11 +267,11 @@ class UnreachableCodeTest extends ClearAfterClass {
 
     assertSameSummary(getSingleMethod(c, "nl"), List(ACONST_NULL, ARETURN))
 
-    assertSameSummary(
-        getSingleMethod(c, "nt"), List(NEW, DUP, LDC, "<init>", ATHROW))
+    assertSameSummary(getSingleMethod(c, "nt"),
+                      List(NEW, DUP, LDC, "<init>", ATHROW))
 
-    assertSameSummary(
-        getSingleMethod(c, "t1"), List(ALOAD, ACONST_NULL, "cons", RETURN))
+    assertSameSummary(getSingleMethod(c, "t1"),
+                      List(ALOAD, ACONST_NULL, "cons", RETURN))
 
     // GenBCode introduces POP; ACONST_NULL after loading an expression of type scala.runtime.Null$,
     // see comment in BCodeBodyBuilder.adapt
@@ -289,7 +295,7 @@ class UnreachableCodeTest extends ClearAfterClass {
     val List(cDCE) = compileClasses(dceCompiler)(code)
     assertSameSummary(getSingleMethod(cDCE, "t3"),
                       List(ALOAD, NEW, DUP, LDC, "<init>", ATHROW))
-    assertSameSummary(
-        getSingleMethod(cDCE, "t4"), List(ALOAD, ALOAD, "nt", ATHROW))
+    assertSameSummary(getSingleMethod(cDCE, "t4"),
+                      List(ALOAD, ALOAD, "nt", ATHROW))
   }
 }

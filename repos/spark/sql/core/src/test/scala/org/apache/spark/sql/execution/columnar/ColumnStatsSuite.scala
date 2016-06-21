@@ -22,16 +22,18 @@ import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.types._
 
 class ColumnStatsSuite extends SparkFunSuite {
-  testColumnStats(
-      classOf[BooleanColumnStats], BOOLEAN, createRow(true, false, 0))
+  testColumnStats(classOf[BooleanColumnStats],
+                  BOOLEAN,
+                  createRow(true, false, 0))
   testColumnStats(classOf[ByteColumnStats],
                   BYTE,
                   createRow(Byte.MaxValue, Byte.MinValue, 0))
   testColumnStats(classOf[ShortColumnStats],
                   SHORT,
                   createRow(Short.MaxValue, Short.MinValue, 0))
-  testColumnStats(
-      classOf[IntColumnStats], INT, createRow(Int.MaxValue, Int.MinValue, 0))
+  testColumnStats(classOf[IntColumnStats],
+                  INT,
+                  createRow(Int.MaxValue, Int.MinValue, 0))
   testColumnStats(classOf[LongColumnStats],
                   LONG,
                   createRow(Long.MaxValue, Long.MinValue, 0))

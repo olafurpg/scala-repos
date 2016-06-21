@@ -54,8 +54,9 @@ object JavaSerialization {
 import JavaSerialization._
 
 sealed trait Event {
-  def fold[A](
-      ingest: Ingest => A, archive: Archive => A, storeFile: StoreFile => A): A
+  def fold[A](ingest: Ingest => A,
+              archive: Archive => A,
+              storeFile: StoreFile => A): A
   def split(n: Int): List[Event]
   def length: Int
 }
@@ -146,8 +147,10 @@ object Ingest {
     extractorV1 <+> extractorV1a <+> extractorV0
 }
 
-case class Archive(
-    apiKey: APIKey, path: Path, jobId: Option[JobId], timestamp: Instant)
+case class Archive(apiKey: APIKey,
+                   path: Path,
+                   jobId: Option[JobId],
+                   timestamp: Instant)
     extends Event {
   def fold[A](ingest: Ingest => A,
               archive: Archive => A,
@@ -161,10 +164,10 @@ object Archive {
 
   val schemaV1 =
     "apiKey" :: "path" :: "jobId" ::
-    ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
+      ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
   val schemaV0 =
     "tokenId" :: "path" :: Omit ::
-    ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
+      ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
 
   val decomposerV1: Decomposer[Archive] =
     decomposerV[Archive](schemaV1, Some("1.0".v))
@@ -249,9 +252,9 @@ object StreamRef {
         ((other \? "create") map { jv =>
               (jv, Create.apply _)
             }) orElse
-        ((other \? "replace") map { jv =>
-              (jv, Replace.apply _)
-            }) map {
+          ((other \? "replace") map { jv =>
+                (jv, Replace.apply _)
+              }) map {
           case (jv, f) =>
             (jv.validated[UUID]("uuid") |@| jv.validated[Boolean]("terminal")) {
               f

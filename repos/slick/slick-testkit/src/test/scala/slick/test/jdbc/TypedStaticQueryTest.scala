@@ -22,10 +22,10 @@ class TypedStaticQueryTest {
       val id2 = 1
       val s1 = tsql"select * from SUPPLIERS where SUP_ID = ${id1}"
       val s2 = tsql"select * from COFFEES where SUP_ID = ${id2}"
-      assertEquals(
-          "select * from SUPPLIERS where SUP_ID = ?", s1.statements.head)
-      assertEquals(
-          "select * from COFFEES where SUP_ID = ?", s2.statements.head)
+      assertEquals("select * from SUPPLIERS where SUP_ID = ?",
+                   s1.statements.head)
+      assertEquals("select * from COFFEES where SUP_ID = ?",
+                   s2.statements.head)
 
       val (total1, sales1) = (5, 4)
       val s3 =
@@ -127,9 +127,10 @@ class TypedStaticQueryTest {
               },
                   s4.map { o4 =>
                 val t4: Vector[Bar] = o4.map(Bar(_))
-                assertEquals(
-                    Set(Bar("Groundsville"), Bar("Meadows"), Bar("Mendocino")),
-                    t4.toSet)
+                assertEquals(Set(Bar("Groundsville"),
+                                 Bar("Meadows"),
+                                 Bar("Mendocino")),
+                             t4.toSet)
               }
               )),
           Duration.Inf)

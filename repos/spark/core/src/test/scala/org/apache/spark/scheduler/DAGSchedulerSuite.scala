@@ -70,8 +70,8 @@ class MyRDD(sc: SparkContext,
     extends RDD[(Int, Int)](sc, dependencies)
     with Serializable {
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[(Int, Int)] =
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[(Int, Int)] =
     throw new RuntimeException("should not be reached")
 
   override def getPartitions: Array[Partition] =
@@ -132,8 +132,8 @@ class DAGSchedulerSuite
     }
     override def setDAGScheduler(dagScheduler: DAGScheduler) = {}
     override def defaultParallelism() = 2
-    override def executorLost(
-        executorId: String, reason: ExecutorLossReason): Unit = {}
+    override def executorLost(executorId: String,
+                              reason: ExecutorLossReason): Unit = {}
     override def applicationAttemptId(): Option[String] = None
   }
 
@@ -535,8 +535,8 @@ class DAGSchedulerSuite
           execId: String,
           accumUpdates: Array[(Long, Seq[AccumulableInfo])],
           blockManagerId: BlockManagerId): Boolean = true
-      override def executorLost(
-          executorId: String, reason: ExecutorLossReason): Unit = {}
+      override def executorLost(executorId: String,
+                                reason: ExecutorLossReason): Unit = {}
       override def applicationAttemptId(): Option[String] = None
     }
     val noKillScheduler = new DAGScheduler(sc,
@@ -598,8 +598,11 @@ class DAGSchedulerSuite
     // the 2nd ResultTask failed
     complete(taskSets(1),
              Seq((Success, 42),
-                 (FetchFailed(
-                      makeBlockManagerId("hostA"), shuffleId, 0, 0, "ignored"),
+                 (FetchFailed(makeBlockManagerId("hostA"),
+                              shuffleId,
+                              0,
+                              0,
+                              "ignored"),
                   null)))
     // this will get called
     // blockManagerMaster.removeExecutor("exec-hostA")
@@ -655,7 +658,9 @@ class DAGSchedulerSuite
     * @param numShufflePartitions - The number of partitions in the next stage
     */
   private def completeShuffleMapStageSuccessfully(
-      stageId: Int, attemptIdx: Int, numShufflePartitions: Int): Unit = {
+      stageId: Int,
+      attemptIdx: Int,
+      numShufflePartitions: Int): Unit = {
     val stageAttempt = taskSets.last
     checkStageId(stageId, attemptIdx, stageAttempt)
     complete(stageAttempt, stageAttempt.tasks.zipWithIndex.map {
@@ -826,8 +831,9 @@ class DAGSchedulerSuite
         // Fail all these tasks with FetchFailure
         completeNextStageWithFetchFailure(1, attempt, shuffleDepOne)
       } else {
-        completeShuffleMapStageSuccessfully(
-            1, attempt, numShufflePartitions = 1)
+        completeShuffleMapStageSuccessfully(1,
+                                            attempt,
+                                            numShufflePartitions = 1)
 
         // Fail stage 2
         completeNextStageWithFetchFailure(
@@ -846,7 +852,8 @@ class DAGSchedulerSuite
 
     // Succeed stage2 with a "42"
     completeNextResultStageWithSuccess(
-        2, Stage.MAX_CONSECUTIVE_FETCH_FAILURES / 2)
+        2,
+        Stage.MAX_CONSECUTIVE_FETCH_FAILURES / 2)
 
     assert(results === Map(0 -> 42))
     assertDataStructuresEmpty()
@@ -945,21 +952,25 @@ class DAGSchedulerSuite
 
     // The first result task fails, with a fetch failure for the output from the first mapper.
     runEvent(
-        makeCompletionEvent(
-            taskSets(1).tasks(0),
-            FetchFailed(
-                makeBlockManagerId("hostA"), shuffleId, 0, 0, "ignored"),
-            null))
+        makeCompletionEvent(taskSets(1).tasks(0),
+                            FetchFailed(makeBlockManagerId("hostA"),
+                                        shuffleId,
+                                        0,
+                                        0,
+                                        "ignored"),
+                            null))
     sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
     assert(sparkListener.failedStages.contains(1))
 
     // The second ResultTask fails, with a fetch failure for the output from the second mapper.
     runEvent(
-        makeCompletionEvent(
-            taskSets(1).tasks(0),
-            FetchFailed(
-                makeBlockManagerId("hostA"), shuffleId, 1, 1, "ignored"),
-            null))
+        makeCompletionEvent(taskSets(1).tasks(0),
+                            FetchFailed(makeBlockManagerId("hostA"),
+                                        shuffleId,
+                                        1,
+                                        1,
+                                        "ignored"),
+                            null))
     // The SparkListener should not receive redundant failure events.
     sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
     assert(sparkListener.failedStages.size == 1)
@@ -1005,11 +1016,13 @@ class DAGSchedulerSuite
 
     // The first result task fails, with a fetch failure for the output from the first mapper.
     runEvent(
-        makeCompletionEvent(
-            taskSets(1).tasks(0),
-            FetchFailed(
-                makeBlockManagerId("hostA"), shuffleId, 0, 0, "ignored"),
-            null))
+        makeCompletionEvent(taskSets(1).tasks(0),
+                            FetchFailed(makeBlockManagerId("hostA"),
+                                        shuffleId,
+                                        0,
+                                        0,
+                                        "ignored"),
+                            null))
     sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
     assert(sparkListener.failedStages.contains(1))
 
@@ -1022,11 +1035,13 @@ class DAGSchedulerSuite
 
     // The second ResultTask fails, with a fetch failure for the output from the second mapper.
     runEvent(
-        makeCompletionEvent(
-            taskSets(1).tasks(1),
-            FetchFailed(
-                makeBlockManagerId("hostB"), shuffleId, 1, 1, "ignored"),
-            null))
+        makeCompletionEvent(taskSets(1).tasks(1),
+                            FetchFailed(makeBlockManagerId("hostB"),
+                                        shuffleId,
+                                        1,
+                                        1,
+                                        "ignored"),
+                            null))
 
     // Another ResubmitFailedStages event should not result in another attempt for the map
     // stage being run concurrently.
@@ -1044,7 +1059,7 @@ class DAGSchedulerSuite
     */
   test(
       "extremely late fetch failures don't cause multiple concurrent attempts for " +
-      "the same stage") {
+        "the same stage") {
     val shuffleMapRdd = new MyRDD(sc, 2, Nil)
     val shuffleDep =
       new ShuffleDependency(shuffleMapRdd, new HashPartitioner(2))
@@ -1075,11 +1090,13 @@ class DAGSchedulerSuite
 
     // The first result task fails, with a fetch failure for the output from the first mapper.
     runEvent(
-        makeCompletionEvent(
-            taskSets(1).tasks(0),
-            FetchFailed(
-                makeBlockManagerId("hostA"), shuffleId, 0, 0, "ignored"),
-            null))
+        makeCompletionEvent(taskSets(1).tasks(0),
+                            FetchFailed(makeBlockManagerId("hostA"),
+                                        shuffleId,
+                                        0,
+                                        0,
+                                        "ignored"),
+                            null))
 
     // Trigger resubmission of the failed map stage and finish the re-started map task.
     runEvent(ResubmitFailedStages)
@@ -1093,11 +1110,13 @@ class DAGSchedulerSuite
 
     // A late FetchFailed arrives from the second task in the original reduce stage.
     runEvent(
-        makeCompletionEvent(
-            taskSets(1).tasks(1),
-            FetchFailed(
-                makeBlockManagerId("hostB"), shuffleId, 1, 1, "ignored"),
-            null))
+        makeCompletionEvent(taskSets(1).tasks(1),
+                            FetchFailed(makeBlockManagerId("hostB"),
+                                        shuffleId,
+                                        1,
+                                        1,
+                                        "ignored"),
+                            null))
 
     // Running ResubmitFailedStages shouldn't result in any more attempts for the map stage, because
     // the FetchFailed should have been ignored
@@ -1493,8 +1512,10 @@ class DAGSchedulerSuite
 
     val reduceRdd1 =
       new MyRDD(sc, 2, List(shuffleDep1), tracker = mapOutputTracker)
-    val reduceRdd2 = new MyRDD(
-        sc, 2, List(shuffleDep1, shuffleDep2), tracker = mapOutputTracker)
+    val reduceRdd2 = new MyRDD(sc,
+                               2,
+                               List(shuffleDep1, shuffleDep2),
+                               tracker = mapOutputTracker)
 
     // We need to make our own listeners for this test, since by default submit uses the same
     // listener for all jobs, and here we want to capture the failure for each job separately.
@@ -1528,8 +1549,9 @@ class DAGSchedulerSuite
     assertDataStructuresEmpty()
   }
 
-  def checkJobPropertiesAndPriority(
-      taskSet: TaskSet, expected: String, priority: Int): Unit = {
+  def checkJobPropertiesAndPriority(taskSet: TaskSet,
+                                    expected: String,
+                                    priority: Int): Unit = {
     assert(taskSet.properties != null)
     assert(taskSet.properties.getProperty("testProperty") === expected)
     assert(taskSet.priority === priority)
@@ -1540,8 +1562,8 @@ class DAGSchedulerSuite
     val baseRdd = new MyRDD(sc, 1, Nil)
     val shuffleDep1 = new ShuffleDependency(baseRdd, new HashPartitioner(1))
     val intermediateRdd = new MyRDD(sc, 1, List(shuffleDep1))
-    val shuffleDep2 = new ShuffleDependency(
-        intermediateRdd, new HashPartitioner(1))
+    val shuffleDep2 =
+      new ShuffleDependency(intermediateRdd, new HashPartitioner(1))
     val finalRdd1 = new MyRDD(sc, 1, List(shuffleDep2))
     val finalRdd2 = new MyRDD(sc, 1, List(shuffleDep2))
     val job1Properties = new Properties()
@@ -1572,8 +1594,7 @@ class DAGSchedulerSuite
     // even though we have cancelled that job and are now running it because of job2, we haven't
     // updated the TaskSet's properties.  Changing the properties to "job2" is likely the more
     // correct behavior.
-    val job1Id =
-      0 // TaskSet priority for Stages run with "job1" as the ActiveJob
+    val job1Id = 0 // TaskSet priority for Stages run with "job1" as the ActiveJob
     checkJobPropertiesAndPriority(taskSets(0), "job1", job1Id)
     complete(taskSets(0), Seq((Success, makeMapStatus("hostA", 1))))
 
@@ -1608,10 +1629,9 @@ class DAGSchedulerSuite
     */
   test(
       "stage used by two jobs, some fetch failures, and the first job no longer active " +
-      "(SPARK-6880)") {
+        "(SPARK-6880)") {
     val shuffleDep1 = launchJobsThatShareStageAndCancelFirst()
-    val job2Id =
-      1 // TaskSet priority for Stages run with "job2" as the ActiveJob
+    val job2Id = 1 // TaskSet priority for Stages run with "job2" as the ActiveJob
 
     // lets say there is a fetch failure in this task set, which makes us go back and
     // run stage 0, attempt 1
@@ -1857,8 +1877,10 @@ class DAGSchedulerSuite
     val exceptionFailure =
       new ExceptionFailure(new SparkException("fondue?"), accumUpdates)
     submit(new MyRDD(sc, 1, Nil), Array(0))
-    runEvent(makeCompletionEvent(
-            taskSets.head.tasks.head, exceptionFailure, "result"))
+    runEvent(
+        makeCompletionEvent(taskSets.head.tasks.head,
+                            exceptionFailure,
+                            "result"))
     assert(Accumulators.get(acc1.id).get.value === 15L)
     assert(Accumulators.get(acc2.id).get.value === 13L)
     assert(Accumulators.get(acc3.id).get.value === 18L)
@@ -2052,8 +2074,11 @@ class DAGSchedulerSuite
     submit(reduceRdd, Array(0, 1))
     complete(taskSets(1),
              Seq((Success, 42),
-                 (FetchFailed(
-                      makeBlockManagerId("hostA"), shuffleId, 0, 0, "ignored"),
+                 (FetchFailed(makeBlockManagerId("hostA"),
+                              shuffleId,
+                              0,
+                              0,
+                              "ignored"),
                   null)))
     // Ask the scheduler to try it again; TaskSet 2 will rerun the map task that we couldn't fetch
     // from, then TaskSet 3 will run the reduce stage
@@ -2115,12 +2140,14 @@ class DAGSchedulerSuite
 
     // When attempting the second stage, show a fetch failure
     assert(taskSets(1).stageId === 1)
-    complete(
-        taskSets(1),
-        Seq((Success, makeMapStatus("hostA", rdd2.partitions.length)),
-            (FetchFailed(
-                 makeBlockManagerId("hostA"), dep1.shuffleId, 0, 0, "ignored"),
-             null)))
+    complete(taskSets(1),
+             Seq((Success, makeMapStatus("hostA", rdd2.partitions.length)),
+                 (FetchFailed(makeBlockManagerId("hostA"),
+                              dep1.shuffleId,
+                              0,
+                              0,
+                              "ignored"),
+                  null)))
     scheduler.resubmitFailedStages()
     assert(listener2.results.size === 0) // Second stage listener should not have a result yet
 
@@ -2152,12 +2179,14 @@ class DAGSchedulerSuite
     // Finally, the reduce job should be running as task set 4; make it see a fetch failure,
     // then make it run again and succeed
     assert(taskSets(4).stageId === 2)
-    complete(
-        taskSets(4),
-        Seq((Success, 52),
-            (FetchFailed(
-                 makeBlockManagerId("hostD"), dep2.shuffleId, 0, 0, "ignored"),
-             null)))
+    complete(taskSets(4),
+             Seq((Success, 52),
+                 (FetchFailed(makeBlockManagerId("hostD"),
+                              dep2.shuffleId,
+                              0,
+                              0,
+                              "ignored"),
+                  null)))
     scheduler.resubmitFailedStages()
 
     // TaskSet 5 will rerun stage 1's lost task, then TaskSet 6 will rerun stage 2
@@ -2182,8 +2211,10 @@ class DAGSchedulerSuite
     submitMapStage(shuffleDep)
 
     val oldTaskSet = taskSets(0)
-    runEvent(makeCompletionEvent(
-            oldTaskSet.tasks(0), Success, makeMapStatus("hostA", 2)))
+    runEvent(
+        makeCompletionEvent(oldTaskSet.tasks(0),
+                            Success,
+                            makeMapStatus("hostA", 2)))
     assert(results.size === 0) // Map stage job should not be complete yet
 
     // Pretend host A was lost
@@ -2193,23 +2224,31 @@ class DAGSchedulerSuite
     assert(newEpoch > oldEpoch)
 
     // Suppose we also get a completed event from task 1 on the same host; this should be ignored
-    runEvent(makeCompletionEvent(
-            oldTaskSet.tasks(1), Success, makeMapStatus("hostA", 2)))
+    runEvent(
+        makeCompletionEvent(oldTaskSet.tasks(1),
+                            Success,
+                            makeMapStatus("hostA", 2)))
     assert(results.size === 0) // Map stage job should not be complete yet
 
     // A completion from another task should work because it's a non-failed host
-    runEvent(makeCompletionEvent(
-            oldTaskSet.tasks(2), Success, makeMapStatus("hostB", 2)))
+    runEvent(
+        makeCompletionEvent(oldTaskSet.tasks(2),
+                            Success,
+                            makeMapStatus("hostB", 2)))
     assert(results.size === 0) // Map stage job should not be complete yet
 
     // Now complete tasks in the second task set
     val newTaskSet = taskSets(1)
     assert(newTaskSet.tasks.size === 2) // Both tasks 0 and 1 were on on hostA
-    runEvent(makeCompletionEvent(
-            newTaskSet.tasks(0), Success, makeMapStatus("hostB", 2)))
+    runEvent(
+        makeCompletionEvent(newTaskSet.tasks(0),
+                            Success,
+                            makeMapStatus("hostB", 2)))
     assert(results.size === 0) // Map stage job should not be complete yet
-    runEvent(makeCompletionEvent(
-            newTaskSet.tasks(1), Success, makeMapStatus("hostB", 2)))
+    runEvent(
+        makeCompletionEvent(newTaskSet.tasks(1),
+                            Success,
+                            makeMapStatus("hostB", 2)))
     assert(results.size === 1) // Map stage job should now finally be complete
     assertDataStructuresEmpty()
 
@@ -2237,8 +2276,9 @@ class DAGSchedulerSuite
     }
   }
 
-  private def makeMapStatus(
-      host: String, reduces: Int, sizes: Byte = 2): MapStatus =
+  private def makeMapStatus(host: String,
+                            reduces: Int,
+                            sizes: Byte = 2): MapStatus =
     MapStatus(makeBlockManagerId(host), Array.fill[Long](reduces)(sizes))
 
   private def makeBlockManagerId(host: String): BlockManagerId =
@@ -2284,7 +2324,10 @@ class DAGSchedulerSuite
       case ef: ExceptionFailure => ef.accumUpdates
       case _ => Seq.empty[AccumulableInfo]
     }
-    CompletionEvent(
-        task, reason, result, accumUpdates ++ extraAccumUpdates, taskInfo)
+    CompletionEvent(task,
+                    reason,
+                    result,
+                    accumUpdates ++ extraAccumUpdates,
+                    taskInfo)
   }
 }

@@ -51,8 +51,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort from client side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       clientHandler.send(clientConnection, Abort)
       clientHandler.expectMsg(Aborted)
@@ -74,8 +76,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort from server side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       serverHandler.send(serverConnection, Abort)
       serverHandler.expectMsg(Aborted)
@@ -97,8 +101,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort via PoisonPill from client side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       clientHandler.send(clientConnection, PoisonPill)
       verifyActorTermination(clientConnection)
@@ -120,8 +126,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort via PoisonPill from server side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       serverHandler.send(serverConnection, PoisonPill)
       verifyActorTermination(serverConnection)

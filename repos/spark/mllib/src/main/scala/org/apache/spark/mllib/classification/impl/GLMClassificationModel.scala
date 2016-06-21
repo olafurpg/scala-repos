@@ -35,8 +35,9 @@ private[classification] object GLMClassificationModel {
     def thisFormatVersion: String = "1.0"
 
     /** Model data for import/export */
-    case class Data(
-        weights: Vector, intercept: Double, threshold: Option[Double])
+    case class Data(weights: Vector,
+                    intercept: Double,
+                    threshold: Option[Double])
 
     /**
       * Helper method for saving GLM classification model metadata and data.
@@ -57,7 +58,7 @@ private[classification] object GLMClassificationModel {
       // Create JSON metadata.
       val metadata = compact(
           render(("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
-              ("numFeatures" -> numFeatures) ~ ("numClasses" -> numClasses)))
+                ("numFeatures" -> numFeatures) ~ ("numClasses" -> numClasses)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -82,18 +83,17 @@ private[classification] object GLMClassificationModel {
       assert(dataArray.length == 1,
              s"Unable to load $modelClass data from: $datapath")
       val data = dataArray(0)
-      assert(
-          data.size == 3, s"Unable to load $modelClass data from: $datapath")
+      assert(data.size == 3,
+             s"Unable to load $modelClass data from: $datapath")
       val (weights, intercept) = data match {
         case Row(weights: Vector, intercept: Double, _) =>
           (weights, intercept)
       }
-      val threshold =
-        if (data.isNullAt(2)) {
-          None
-        } else {
-          Some(data.getDouble(2))
-        }
+      val threshold = if (data.isNullAt(2)) {
+        None
+      } else {
+        Some(data.getDouble(2))
+      }
       Data(weights, intercept, threshold)
     }
   }

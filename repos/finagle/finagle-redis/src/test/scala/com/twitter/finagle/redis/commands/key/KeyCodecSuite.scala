@@ -63,8 +63,8 @@ final class KeyCodecSuite extends RedisRequestTest {
     val time = Time.now + 10.seconds
     unwrap(codec(wrap("EXPIREAT foo %d\r\n".format(time.inSeconds)))) {
       case ExpireAt(foo, timestamp) => {
-          assert(timestamp.inSeconds == time.inSeconds)
-        }
+        assert(timestamp.inSeconds == time.inSeconds)
+      }
     }
   }
 
@@ -122,8 +122,8 @@ final class KeyCodecSuite extends RedisRequestTest {
     val time = Time.now + 10.seconds
     unwrap(codec(wrap("PEXPIREAT foo %d\r\n".format(time.inMilliseconds)))) {
       case PExpireAt(foo, timestamp) => {
-          assert(timestamp.inMilliseconds == time.inMilliseconds)
-        }
+        assert(timestamp.inMilliseconds == time.inMilliseconds)
+      }
     }
   }
 

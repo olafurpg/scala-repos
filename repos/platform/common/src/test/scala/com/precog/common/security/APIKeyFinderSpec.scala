@@ -59,7 +59,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
       } yield (key0.apiKey -> mgr)).copoint
       withAPIKeyFinder(mgr) { keyFinder =>
         keyFinder.findAPIKey(key, None).copoint map (_.apiKey) must_==
-          Some(key)
+        Some(key)
       }
     }
 
@@ -90,8 +90,12 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         mgr <- M.point(emptyAPIKeyManager)
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
         key1 <- mgr.newStandardAPIKeyRecord("user2", None, None)
-        grant <- mgr.createGrant(
-                    None, None, key0.apiKey, Set.empty, permissions, None)
+        grant <- mgr.createGrant(None,
+                                 None,
+                                 key0.apiKey,
+                                 Set.empty,
+                                 permissions,
+                                 None)
       } yield (key0.apiKey, key1.apiKey, grant.grantId, mgr)).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
@@ -175,7 +179,8 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         keyFinder.findAPIKey(key0, Some(rootKey)).copoint.get.issuerChain mustEqual List(
             rootKey)
         keyFinder.findAPIKey(key1, Some(rootKey)).copoint.get.issuerChain mustEqual List(
-            key0, rootKey)
+            key0,
+            rootKey)
       }
     }
 
@@ -196,11 +201,10 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
 }
 
 class DirectAPIKeyFinderSpec extends Specification {
-  include(
-      new APIKeyFinderSpec[Need] {
+  include(new APIKeyFinderSpec[Need] {
     val M = Need.need
-    def withAPIKeyFinder[A](
-        mgr: APIKeyManager[Need])(f: APIKeyFinder[Need] => A): A = {
+    def withAPIKeyFinder[A](mgr: APIKeyManager[Need])(
+        f: APIKeyFinder[Need] => A): A = {
       f(new DirectAPIKeyFinder(mgr))
     }
   })

@@ -133,8 +133,8 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
         self ++= xs; this
       }
       override def sizeHint(size: Int) = self.sizeHint(size)
-      override def sizeHintBounded(
-          size: Int, boundColl: TraversableLike[_, _]) =
+      override def sizeHintBounded(size: Int,
+                                   boundColl: TraversableLike[_, _]) =
         self.sizeHintBounded(size, boundColl)
       def result: NewTo = f(self.result())
     }

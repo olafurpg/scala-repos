@@ -50,7 +50,7 @@ object RecordSpec extends Specification {
 
     "introspect only the expected fields" in {
       rec.fields().map(_.name).sortWith(_ < _) must_==
-        allExpectedFieldNames.sortWith(_ < _)
+      allExpectedFieldNames.sortWith(_ < _)
     }
 
     "correctly look up fields by name" in {
@@ -200,18 +200,18 @@ object RecordSpec extends Specification {
 
       val fttrJValue: JValue =
         ("mandatoryBooleanField" -> false) ~ ("mandatoryCountryField" -> 1) ~
-        ("mandatoryDateTimeField" -> Helpers.toInternetDate(cal.getTime)) ~
-        ("mandatoryDecimalField" -> "3.14") ~
-        ("mandatoryDoubleField" -> 1999.0) ~
-        ("mandatoryEmailField" -> "test@liftweb.net") ~
-        ("mandatoryEnumField" -> 0) ~ ("mandatoryIntField" -> 99) ~
-        ("mandatoryLocaleField" -> "en_US") ~ ("mandatoryLongField" -> 100) ~
-        ("mandatoryPostalCodeField" -> "55401") ~
-        ("mandatoryStringField" -> "foobar") ~
-        ("mandatoryTextareaField" -> "foobar") ~
-        ("mandatoryTimeZoneField" -> "America/Chicago") ~
-        ("mandatoryBinaryField" -> "EhMU") ~
-        ("mandatoryJodaTimeField" -> dt.getMillis)
+          ("mandatoryDateTimeField" -> Helpers.toInternetDate(cal.getTime)) ~
+          ("mandatoryDecimalField" -> "3.14") ~
+          ("mandatoryDoubleField" -> 1999.0) ~
+          ("mandatoryEmailField" -> "test@liftweb.net") ~
+          ("mandatoryEnumField" -> 0) ~ ("mandatoryIntField" -> 99) ~
+          ("mandatoryLocaleField" -> "en_US") ~ ("mandatoryLongField" -> 100) ~
+          ("mandatoryPostalCodeField" -> "55401") ~
+          ("mandatoryStringField" -> "foobar") ~
+          ("mandatoryTextareaField" -> "foobar") ~
+          ("mandatoryTimeZoneField" -> "America/Chicago") ~
+          ("mandatoryBinaryField" -> "EhMU") ~
+          ("mandatoryJodaTimeField" -> dt.getMillis)
 
       val fttrJson: String = compactRender(fttrJValue)
 

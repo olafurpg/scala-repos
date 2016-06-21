@@ -34,8 +34,8 @@ object PresentationUtil {
         buffer.append(")")
         buffer.toString()
       case param: ScParameter =>
-        ScalaDocumentationProvider.parseParameter(
-            param, presentationString(_, substitutor))
+        ScalaDocumentationProvider
+          .parseParameter(param, presentationString(_, substitutor))
       case param: Parameter =>
         val builder = new StringBuilder
         builder.append(param.name)
@@ -47,8 +47,8 @@ object PresentationUtil {
       case tp: PsiEllipsisType =>
         presentationString(tp.getComponentType, substitutor) + "*"
       case tp: PsiType =>
-        presentationString(
-            ScType.create(tp, DecompilerUtil.obtainProject), substitutor)
+        presentationString(ScType.create(tp, DecompilerUtil.obtainProject),
+                           substitutor)
       case tp: ScTypeParamClause =>
         tp.typeParameters
           .map(t => presentationString(t, substitutor))
@@ -75,7 +75,8 @@ object PresentationUtil {
         param.contextBound foreach { (tp: ScType) =>
           paramText =
             paramText + " : " + presentationString(
-                ScTypeUtil.stripTypeArgs(substitutor.subst(tp)), substitutor)
+                ScTypeUtil.stripTypeArgs(substitutor.subst(tp)),
+                substitutor)
         }
         paramText
       case param: PsiTypeParameter =>

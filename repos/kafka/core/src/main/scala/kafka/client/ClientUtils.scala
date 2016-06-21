@@ -88,9 +88,8 @@ object ClientUtils extends Logging {
             .format(topics, shuffledBrokers),
           t)
     } else {
-      debug(
-          "Successfully fetched metadata for %d topic(s) %s".format(
-              topics.size, topics))
+      debug("Successfully fetched metadata for %d topic(s) %s"
+            .format(topics.size, topics))
     }
     topicMetadataResponse
   }
@@ -108,8 +107,8 @@ object ClientUtils extends Logging {
                          timeoutMs: Int,
                          correlationId: Int = 0): TopicMetadataResponse = {
     val props = new Properties()
-    props.put(
-        "metadata.broker.list", brokers.map(_.connectionString).mkString(","))
+    props.put("metadata.broker.list",
+              brokers.map(_.connectionString).mkString(","))
     props.put("client.id", clientId)
     props.put("request.timeout.ms", timeoutMs.toString)
     val producerConfig = new ProducerConfig(props)
@@ -131,8 +130,8 @@ object ClientUtils extends Logging {
   /**
     * Creates a blocking channel to a random broker
     */
-  def channelToAnyBroker(
-      zkUtils: ZkUtils, socketTimeoutMs: Int = 3000): BlockingChannel = {
+  def channelToAnyBroker(zkUtils: ZkUtils,
+                         socketTimeoutMs: Int = 3000): BlockingChannel = {
     var channel: BlockingChannel = null
     var connected = false
     while (!connected) {
@@ -184,15 +183,14 @@ object ClientUtils extends Logging {
         try {
           if (!queryChannel.isConnected)
             queryChannel = channelToAnyBroker(zkUtils)
-          debug("Querying %s:%d to locate offset manager for %s.".format(
-                  queryChannel.host, queryChannel.port, group))
+          debug("Querying %s:%d to locate offset manager for %s."
+                .format(queryChannel.host, queryChannel.port, group))
           queryChannel.send(GroupCoordinatorRequest(group))
           val response = queryChannel.receive()
           val consumerMetadataResponse =
             GroupCoordinatorResponse.readFrom(response.payload())
-          debug(
-              "Consumer metadata response: " +
-              consumerMetadataResponse.toString)
+          debug("Consumer metadata response: " +
+                consumerMetadataResponse.toString)
           if (consumerMetadataResponse.errorCode == Errors.NONE.code)
             coordinatorOpt = consumerMetadataResponse.coordinatorOpt
           else {
@@ -206,8 +204,8 @@ object ClientUtils extends Logging {
           }
         } catch {
           case ioe: IOException =>
-            info("Failed to fetch consumer metadata from %s:%d.".format(
-                    queryChannel.host, queryChannel.port))
+            info("Failed to fetch consumer metadata from %s:%d."
+                  .format(queryChannel.host, queryChannel.port))
             queryChannel.disconnect()
         }
       }
@@ -235,8 +233,7 @@ object ClientUtils extends Logging {
             info("Error while connecting to %s.".format(connectString))
             if (offsetManagerChannel != null) offsetManagerChannel.disconnect()
             Thread.sleep(retryBackOffMs)
-            offsetManagerChannelOpt =
-              None // just in case someone decides to change shutdownChannel to not swallow exceptions
+            offsetManagerChannelOpt = None // just in case someone decides to change shutdownChannel to not swallow exceptions
         }
       }
     }

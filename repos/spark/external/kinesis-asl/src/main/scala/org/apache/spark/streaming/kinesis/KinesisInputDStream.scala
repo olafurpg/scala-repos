@@ -40,11 +40,11 @@ private[kinesis] class KinesisInputDStream[T: ClassTag](
     storageLevel: StorageLevel,
     messageHandler: Record => T,
     awsCredentialsOption: Option[SerializableAWSCredentials]
-)
-    extends ReceiverInputDStream[T](_ssc) {
+) extends ReceiverInputDStream[T](_ssc) {
 
   private[streaming] override def createBlockRDD(
-      time: Time, blockInfos: Seq[ReceivedBlockInfo]): RDD[T] = {
+      time: Time,
+      blockInfos: Seq[ReceivedBlockInfo]): RDD[T] = {
 
     // This returns true even for when blockInfos is empty
     val allBlocksHaveRanges = blockInfos.map { _.metadataOption }
@@ -59,7 +59,7 @@ private[kinesis] class KinesisInputDStream[T: ClassTag](
       val isBlockIdValid = blockInfos.map { _.isBlockIdValid() }.toArray
       logDebug(
           s"Creating KinesisBackedBlockRDD for $time with ${seqNumRanges.length} " +
-          s"seq number ranges: ${seqNumRanges.mkString(", ")} ")
+            s"seq number ranges: ${seqNumRanges.mkString(", ")} ")
       new KinesisBackedBlockRDD(
           context.sc,
           regionName,
@@ -73,7 +73,7 @@ private[kinesis] class KinesisInputDStream[T: ClassTag](
     } else {
       logWarning(
           "Kinesis sequence number information was not present with some block metadata," +
-          " it may not be possible to recover from failures")
+            " it may not be possible to recover from failures")
       super.createBlockRDD(time, blockInfos)
     }
   }

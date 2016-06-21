@@ -16,7 +16,7 @@ class ScalaParameterNameAdjuster extends NodeDescriptorNameAdjuster {
       case vd: LocalVariableDescriptorImpl if vd.getName == "$this" => false
       case vd: LocalVariableDescriptorImpl =>
         ScalaParameterNameAdjuster.isScalaArgument(vd.getLocalVariable) &&
-        vd.getName.contains("$")
+          vd.getName.contains("$")
       case _ => false
     }
   }

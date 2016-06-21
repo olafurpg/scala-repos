@@ -61,8 +61,9 @@ class MigrationClientTest
 
     // set-up old pool
     val oldPoolCluster = new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, oldPoolPath))
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.OPEN_ACL_UNSAFE,
+                          oldPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -74,8 +75,9 @@ class MigrationClientTest
 
     // set-up new pool
     val newPoolCluster = new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, newPoolPath))
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.OPEN_ACL_UNSAFE,
+                          newPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -117,8 +119,8 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient.loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
@@ -145,8 +147,8 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient.loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
@@ -178,8 +180,8 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient.loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
@@ -214,8 +216,8 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient.loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
@@ -246,8 +248,8 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
       migrationClient.loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }

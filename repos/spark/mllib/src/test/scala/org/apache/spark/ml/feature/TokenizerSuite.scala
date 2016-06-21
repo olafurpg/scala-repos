@@ -95,8 +95,7 @@ class RegexTokenizerSuite
       .setInputCol("rawText")
       .setOutputCol("tokens")
       .setToLowercase(false)
-    val dataset = sqlContext.createDataFrame(
-        Seq(
+    val dataset = sqlContext.createDataFrame(Seq(
             TokenizerTestData("JAVA SCALA", Array("JAVA", "SCALA")),
             TokenizerTestData("java scala", Array("java", "scala"))
         ))

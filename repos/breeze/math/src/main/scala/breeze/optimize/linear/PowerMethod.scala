@@ -17,11 +17,11 @@ class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
   import PowerMethod.BDM
   import PowerMethod.BDV
 
-  case class State private[PowerMethod](eigenValue: Double,
-                                        eigenVector: BDV,
-                                        ay: BDV,
-                                        iter: Int,
-                                        converged: Boolean)
+  case class State private[PowerMethod] (eigenValue: Double,
+                                         eigenVector: BDV,
+                                         ay: BDV,
+                                         iter: Int,
+                                         converged: Boolean)
 
   //memory allocation for the eigen vector result
   def normalize(ynorm: BDV, y: BDV) = {
@@ -101,8 +101,9 @@ object PowerMethod {
         State(lambda, eigenVector, ay, 0, false)
       }
 
-      override def iterations(
-          A: BDM, y: BDV, initialState: State): Iterator[State] =
+      override def iterations(A: BDM,
+                              y: BDV,
+                              initialState: State): Iterator[State] =
         Iterator
           .iterate(reset(A, y, initialState)) { state =>
             import state._

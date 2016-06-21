@@ -12,7 +12,8 @@ import scala.concurrent.duration._
 trait IsolatedSearchServiceFixture extends IsolatedSourceResolverFixture {
 
   def withSearchService(testCode: (EnsimeConfig, SearchService) => Any)(
-      implicit actorSystem: ActorSystem, vfs: EnsimeVFS): Any =
+      implicit actorSystem: ActorSystem,
+      vfs: EnsimeVFS): Any =
     withSourceResolver { (config, resolver) =>
       val searchService = new SearchService(config, resolver)
       try {

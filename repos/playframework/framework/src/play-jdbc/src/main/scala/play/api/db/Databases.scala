@@ -65,11 +65,11 @@ object Databases {
     * @param block The block of code to run
     * @return The result of the block
     */
-  def withDatabase[T](driver: String,
-                      url: String,
-                      name: String = "default",
-                      config: Map[String, _ <: Any] = Map.empty)(
-      block: Database => T): T = {
+  def withDatabase[T](
+      driver: String,
+      url: String,
+      name: String = "default",
+      config: Map[String, _ <: Any] = Map.empty)(block: Database => T): T = {
     val database = Databases(driver, url, name, config)
     try {
       block(database)
@@ -104,8 +104,9 @@ object Databases {
   * Default implementation of the database API.
   * Provides driver registration and connection methods.
   */
-abstract class DefaultDatabase(
-    val name: String, configuration: Config, environment: Environment)
+abstract class DefaultDatabase(val name: String,
+                               configuration: Config,
+                               environment: Environment)
     extends Database {
 
   private val config = PlayConfig(configuration)
@@ -122,14 +123,16 @@ abstract class DefaultDatabase(
   lazy val driver: Option[Driver] = {
     databaseConfig.driver.map { driverClassName =>
       try {
-        val proxyDriver = new ProxyDriver(Reflect.createInstance[Driver](
-                driverClassName, environment.classLoader))
+        val proxyDriver = new ProxyDriver(
+            Reflect.createInstance[Driver](driverClassName,
+                                           environment.classLoader))
         DriverManager.registerDriver(proxyDriver)
         proxyDriver
       } catch {
         case NonFatal(e) =>
-          throw config.reportError(
-              "driver", s"Driver not found: [$driverClassName}]", Some(e))
+          throw config.reportError("driver",
+                                   s"Driver not found: [$driverClassName}]",
+                                   Some(e))
       }
     }
   }

@@ -64,8 +64,11 @@ class ChildrenCallbackPromise(znode: ZNode)
 class DataCallbackPromise(znode: ZNode)
     extends AsyncCallbackPromise[ZNode.Data]
     with AsyncCallback.DataCallback {
-  def processResult(
-      rc: Int, path: String, ctx: AnyRef, bytes: Array[Byte], stat: Stat) {
+  def processResult(rc: Int,
+                    path: String,
+                    ctx: AnyRef,
+                    bytes: Array[Byte],
+                    stat: Stat) {
     process(rc, path) {
       znode(stat, bytes)
     }

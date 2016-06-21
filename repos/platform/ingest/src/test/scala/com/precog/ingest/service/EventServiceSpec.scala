@@ -225,7 +225,8 @@ class EventServiceSpec
           events flatMap {
             _.data.map(v => JParser.parseUnsafe(v.renderCompact))
           } must contain(
-              JParser.parseUnsafe("""{
+              JParser.parseUnsafe(
+                  """{
               "URL": "http://alexk2009.hubpages.com/hub/Big-Birds-that-carry-off-children",
               "Title": "Eagles carrying off children and babies", "Status": "Published",
               "24 Hours": [ 11, 0 ], "Total": [ 10856, 252 ],

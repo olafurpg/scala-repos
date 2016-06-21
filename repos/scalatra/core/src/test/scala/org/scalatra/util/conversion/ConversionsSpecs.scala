@@ -89,7 +89,8 @@ class ConversionsSpecs extends Specification {
       import Impl._
 
       def testConversion[T](args: (String, Seq[T]))(
-          implicit mf: Manifest[T], t: TypeConverter[String, T]) = {
+          implicit mf: Manifest[T],
+          t: TypeConverter[String, T]) = {
         val (source, expected) = args
         Impl.stringToSeq(t).apply(source).get must containAllOf(expected).inOrder
       }

@@ -37,8 +37,8 @@ object ScalaErrorHandling extends PlaySpecification with WsTestClient {
           new Provider[Router] { def get = Router.empty }
       )
       def errorContent(mode: Mode.Mode) =
-        contentAsString(errorHandler(mode).onServerError(
-                FakeRequest(), new RuntimeException("foo")))
+        contentAsString(errorHandler(mode)
+              .onServerError(FakeRequest(), new RuntimeException("foo")))
 
       errorContent(Mode.Prod) must startWith("A server error occurred: ")
       errorContent(Mode.Dev) must not startWith ("A server error occurred: ")
@@ -55,8 +55,9 @@ package root {
 
   class ErrorHandler extends HttpErrorHandler {
 
-    def onClientError(
-        request: RequestHeader, statusCode: Int, message: String) = {
+    def onClientError(request: RequestHeader,
+                      statusCode: Int,
+                      message: String) = {
       Future.successful(
           Status(statusCode)("A client error occurred: " + message)
       )
@@ -88,11 +89,10 @@ package default {
       config: Configuration,
       sourceMapper: OptionalSourceMapper,
       router: Provider[Router]
-  )
-      extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
+  ) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
 
-    override def onProdServerError(
-        request: RequestHeader, exception: UsefulException) = {
+    override def onProdServerError(request: RequestHeader,
+                                   exception: UsefulException) = {
       Future.successful(
           InternalServerError(
               "A server error occurred: " + exception.getMessage)

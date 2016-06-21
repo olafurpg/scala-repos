@@ -23,14 +23,15 @@ object JavaConversionUtil {
                                "scala.volatile" -> "volatile",
                                "scala.transient" -> "transient")
 
-  def typeText(
-      tp: ScType, project: Project, scope: GlobalSearchScope): String = {
+  def typeText(tp: ScType,
+               project: Project,
+               scope: GlobalSearchScope): String = {
     val psiType = ScType.toPsi(tp, project, scope)
     psiType.getCanonicalText
   }
 
-  def annotationsAndModifiers(
-      s: ScModifierListOwner, isStatic: Boolean): String = {
+  def annotationsAndModifiers(s: ScModifierListOwner,
+                              isStatic: Boolean): String = {
     val builder = new StringBuilder
 
     s match {

@@ -39,7 +39,7 @@ class RangeDirectivesExamplesSpec extends RoutingSpec {
       headers.collectFirst { case `Content-Range`(_, _) => true } shouldBe None
       val responseF = responseAs[Multipart.ByteRanges].parts
         .runFold[List[Multipart.ByteRanges.BodyPart]](Nil)((acc, curr) =>
-            curr :: acc)
+              curr :: acc)
 
       val response = Await.result(responseF, 3.seconds).reverse
 

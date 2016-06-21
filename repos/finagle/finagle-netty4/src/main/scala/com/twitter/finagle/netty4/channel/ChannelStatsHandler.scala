@@ -11,8 +11,8 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.{Level, Logger}
 
-private[channel] case class ChannelStats(
-    bytesRead: AtomicLong, bytesWritten: AtomicLong)
+private[channel] case class ChannelStats(bytesRead: AtomicLong,
+                                         bytesWritten: AtomicLong)
 
 private[netty4] object ChannelStatsHandler {
   private[channel] val ConnectionStatsKey =
@@ -70,8 +70,9 @@ private[netty4] class ChannelStatsHandler(statsReceiver: StatsReceiver)
     super.channelActive(ctx)
   }
 
-  override def write(
-      ctx: ChannelHandlerContext, msg: Object, p: ChannelPromise) {
+  override def write(ctx: ChannelHandlerContext,
+                     msg: Object,
+                     p: ChannelPromise) {
     val channelWriteCount = ctx.attr(ConnectionStatsKey).get.bytesWritten
 
     msg match {

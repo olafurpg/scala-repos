@@ -89,8 +89,8 @@ sealed abstract class Future[+A] {
     * while stepping through the trampoline, so this should provide a fairly
     * robust means of cancellation.
     */
-  def unsafePerformListenInterruptibly(
-      cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+  def unsafePerformListenInterruptibly(cb: A => Trampoline[Unit],
+                                       cancel: AtomicBoolean): Unit =
     this.stepInterruptibly(cancel) match {
       case Now(a) if !cancel.get => cb(a).run
       case Async(onFinish) if !cancel.get =>
@@ -108,8 +108,8 @@ sealed abstract class Future[+A] {
     }
 
   @deprecated("use unsafePerformListenInterruptibly", "7.2")
-  def listenInterruptibly(
-      cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+  def listenInterruptibly(cb: A => Trampoline[Unit],
+                          cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(cb, cancel)
 
   /**
@@ -175,8 +175,8 @@ sealed abstract class Future[+A] {
     * while stepping through the trampoline, this should provide a fairly
     * robust means of cancellation.
     */
-  def unsafePerformAsyncInterruptibly(
-      cb: A => Unit, cancel: AtomicBoolean): Unit =
+  def unsafePerformAsyncInterruptibly(cb: A => Unit,
+                                      cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(a => Trampoline.done(cb(a)), cancel)
 
   @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
@@ -187,14 +187,14 @@ sealed abstract class Future[+A] {
   def unsafePerformSync: A = this match {
     case Now(a) => a
     case _ => {
-        val latch = new java.util.concurrent.CountDownLatch(1)
-        @volatile var result: Option[A] = None
-        unsafePerformAsync { a =>
-          result = Some(a); latch.countDown
-        }
-        latch.await
-        result.get
+      val latch = new java.util.concurrent.CountDownLatch(1)
+      @volatile var result: Option[A] = None
+      unsafePerformAsync { a =>
+        result = Some(a); latch.countDown
       }
+      latch.await
+      result.get
+    }
   }
 
   @deprecated("use unsafePerformSync", "7.2")
@@ -269,8 +269,8 @@ sealed abstract class Future[+A] {
         }
       }, timeoutInMillis, TimeUnit.MILLISECONDS)
 
-      unsafePerformAsyncInterruptibly(
-          a => if (done.compareAndSet(false, true)) cb(\/-(a)), cancel)
+      unsafePerformAsyncInterruptibly(a =>
+            if (done.compareAndSet(false, true)) cb(\/-(a)), cancel)
     }
 
   def unsafePerformTimed(timeout: Duration)(
@@ -319,8 +319,8 @@ object Future {
         fa flatMap f
       def point[A](a: => A): Future[A] = delay(a)
 
-      def chooseAny[A](
-          h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+      def chooseAny[A](h: Future[A],
+                       t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
         Async { cb =>
           // The details of this implementation are a bit tricky, but the general
           // idea is to run all futures in parallel, returning whichever result

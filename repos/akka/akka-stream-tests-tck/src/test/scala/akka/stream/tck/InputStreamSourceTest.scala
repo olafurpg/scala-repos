@@ -22,8 +22,8 @@ class InputStreamSourceTest extends AkkaPublisherVerification[ByteString] {
             num
           }
       })
-      .withAttributes(ActorAttributes.dispatcher(
-              "akka.test.stream-dispatcher"))
+      .withAttributes(
+          ActorAttributes.dispatcher("akka.test.stream-dispatcher"))
       .take(elements)
       .runWith(Sink.asPublisher(false))
   }

@@ -94,7 +94,7 @@ object OpenSSL {
         // This is a warning rather than a Throwable because we fall back to JSSE
         log.log(Level.FINEST,
                 "APR/OpenSSL could not be loaded: " + e.getClass().getName() +
-                ": " + e.getMessage())
+                  ": " + e.getMessage())
         return None
     }
 

@@ -299,17 +299,18 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
     def message(q: String): String = {
       val actual = doEval(q)
 
-      "evaluates to [%s], not [%s]".format(
-          actual map { _.renderCompact } mkString ",", expect map {
-        _.renderCompact
-      } mkString ",")
+      "evaluates to [%s], not [%s]"
+        .format(actual map { _.renderCompact } mkString ",", expect map {
+          _.renderCompact
+        } mkString ",")
     }
 
     (inner _, message _)
   }
 
   private def evalAndThrow[E <: Throwable](
-      implicit fs: FS, evidence: ClassManifest[E]): Matcher[String] = {
+      implicit fs: FS,
+      evidence: ClassManifest[E]): Matcher[String] = {
     def inner(q: String): Boolean =
       eval(compileSingle(q))(fs.map) must throwA[E]
     (inner _, "unused error message")

@@ -61,7 +61,8 @@ object product {
     type Aux[P, Out0 <: HList] = ToHList[P] { type Out = Out0 }
 
     implicit def toHList[P, Out0 <: HList, L <: HList](
-        implicit gen: Generic.Aux[P, L], ev: L <:< Out0): Aux[P, Out0] =
+        implicit gen: Generic.Aux[P, L],
+        ev: L <:< Out0): Aux[P, Out0] =
       new ToHList[P] {
         type Out = Out0
         def apply(p: P) = ev(gen.to(p))

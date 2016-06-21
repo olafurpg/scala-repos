@@ -30,9 +30,9 @@ private[setup] object AnonConfigRepo {
   def config(sid: String): Fu[UserConfig] =
     $find byId sid recover {
       case e: LilaException => {
-          logger.warn("Can't load config", e)
-          none[UserConfig]
-        }
+        logger.warn("Can't load config", e)
+        none[UserConfig]
+      }
     } map (_ | UserConfig.default(sid))
 
   private def configOption(req: RequestHeader): Fu[Option[UserConfig]] =

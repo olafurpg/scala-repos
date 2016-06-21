@@ -66,7 +66,7 @@ object JsonParserSpec extends Specification with JValueGen with ScalaCheck {
 
   "All valid string escape characters can be parsed" in {
     parse("[\"abc\\\"\\\\\\/\\b\\f\\n\\r\\t\\u00a0\"]") must_==
-      JArray(JString("abc\"\\/\b\f\n\r\t\u00a0") :: Nil)
+    JArray(JString("abc\"\\/\b\f\n\r\t\u00a0") :: Nil)
   }
 
   "Parser does not bleed prior results" in {

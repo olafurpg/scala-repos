@@ -139,8 +139,8 @@ object FileVirtualJSFile extends (File => FileVirtualJSFile) {
   def apply(f: File): FileVirtualJSFile =
     new FileVirtualJSFile(f)
 
-  def relative(
-      f: File, relPath: String): FileVirtualJSFile with RelativeVirtualFile = {
+  def relative(f: File,
+               relPath: String): FileVirtualJSFile with RelativeVirtualFile = {
     new FileVirtualJSFile(f) with RelativeVirtualFile {
       def relativePath: String = relPath
     }

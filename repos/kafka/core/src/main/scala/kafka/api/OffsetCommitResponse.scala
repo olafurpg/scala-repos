@@ -69,8 +69,7 @@ case class OffsetCommitResponse(commitStatus: Map[TopicAndPartition, Short],
   override def sizeInBytes =
     4 + /* correlationId */
     4 + /* topic count */
-    commitStatusGroupedByTopic.foldLeft(0)(
-        (count, partitionStatusMap) => {
+    commitStatusGroupedByTopic.foldLeft(0)((count, partitionStatusMap) => {
       val (topic, partitionStatus) = partitionStatusMap
       count + ApiUtils.shortStringLength(topic) + 4 + /* partition count */
       partitionStatus.size * (4 /* partition */ + 2 /* error code */ )

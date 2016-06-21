@@ -52,8 +52,7 @@ object FilesystemFileOps extends FileOps {
 
     if (!dest.getParentFile.isDirectory) {
       throw new IOException(
-          "Destination parent for moveDir (%s) is not a directory".format(
-              dest))
+          "Destination parent for moveDir (%s) is not a directory".format(dest))
     }
 
     Files.move(src, dest)

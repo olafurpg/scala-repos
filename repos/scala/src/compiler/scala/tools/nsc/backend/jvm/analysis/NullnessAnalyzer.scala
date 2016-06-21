@@ -89,8 +89,9 @@ final class NullnessInterpreter(bTypes: BTypes)
     else NullnessValue.unknown(isSize2 = tp != null /*(2)*/ && tp.getSize == 2)
   }
 
-  override def newParameterValue(
-      isInstanceMethod: Boolean, local: Int, tp: Type): NullnessValue = {
+  override def newParameterValue(isInstanceMethod: Boolean,
+                                 local: Int,
+                                 tp: Type): NullnessValue = {
     // For instance methods, the `this` parameter is known to be not null.
     if (isInstanceMethod && local == 0) NotNullValue
     else super.newParameterValue(isInstanceMethod, local, tp)
@@ -110,11 +111,11 @@ final class NullnessInterpreter(bTypes: BTypes)
       case _ => NullnessValue.unknown(insn)
     }
 
-  def copyOperation(
-      insn: AbstractInsnNode, value: NullnessValue): NullnessValue = value
+  def copyOperation(insn: AbstractInsnNode,
+                    value: NullnessValue): NullnessValue = value
 
-  def unaryOperation(
-      insn: AbstractInsnNode, value: NullnessValue): NullnessValue =
+  def unaryOperation(insn: AbstractInsnNode,
+                     value: NullnessValue): NullnessValue =
     (insn.getOpcode: @switch) match {
       case Opcodes.CHECKCAST => value
 

@@ -57,7 +57,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
 
   this.logIdent =
     "[Replica state machine on controller " + controller.config.brokerId +
-    "]: "
+      "]: "
 
   /**
     * Invoked on successful controller election. First registers a broker change listener since that triggers all
@@ -72,9 +72,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     // move all Online replicas to Online
     handleStateChanges(controllerContext.allLiveReplicas(), OnlineReplica)
 
-    info(
-        "Started replica state machine with initial state -> " +
-        replicaState.toString())
+    info("Started replica state machine with initial state -> " +
+          replicaState.toString())
   }
 
   // register ZK listeners of the replica state machine
@@ -113,9 +112,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                          targetState: ReplicaState,
                          callbacks: Callbacks = (new CallbackBuilder).build) {
     if (replicas.size > 0) {
-      info(
-          "Invoking state change to %s for replicas %s".format(
-              targetState, replicas.mkString(",")))
+      info("Invoking state change to %s for replicas %s"
+            .format(targetState, replicas.mkString(",")))
       try {
         brokerRequestBatch.newBatch()
         replicas.foreach(r => handleStateChange(r, targetState, callbacks))
@@ -174,7 +172,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     if (!hasStarted.get)
       throw new StateChangeFailedException(
           ("Controller %d epoch %d initiated state change of replica %d for partition %s " +
-              "to %s failed because replica state machine has not started")
+                "to %s failed because replica state machine has not started")
             .format(controllerId,
                     controller.epoch,
                     replicaId,
@@ -187,19 +185,19 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
         controllerContext.partitionReplicaAssignment(topicAndPartition)
       targetState match {
         case NewReplica =>
-          assertValidPreviousStates(
-              partitionAndReplica, List(NonExistentReplica), targetState)
+          assertValidPreviousStates(partitionAndReplica,
+                                    List(NonExistentReplica),
+                                    targetState)
           // start replica as a follower to the current leader for its partition
-          val leaderIsrAndControllerEpochOpt =
-            ReplicationUtils.getLeaderIsrAndEpochForPartition(
-                zkUtils, topic, partition)
+          val leaderIsrAndControllerEpochOpt = ReplicationUtils
+            .getLeaderIsrAndEpochForPartition(zkUtils, topic, partition)
           leaderIsrAndControllerEpochOpt match {
             case Some(leaderIsrAndControllerEpoch) =>
               if (leaderIsrAndControllerEpoch.leaderAndIsr.leader == replicaId)
                 throw new StateChangeFailedException(
                     "Replica %d for partition %s cannot be moved to NewReplica"
                       .format(replicaId, topicAndPartition) +
-                    "state as it is being requested to become leader")
+                      "state as it is being requested to become leader")
               brokerRequestBatch.addLeaderAndIsrRequestForBrokers(
                   List(replicaId),
                   topic,
@@ -219,8 +217,9 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                         currState,
                         targetState))
         case ReplicaDeletionStarted =>
-          assertValidPreviousStates(
-              partitionAndReplica, List(OfflineReplica), targetState)
+          assertValidPreviousStates(partitionAndReplica,
+                                    List(OfflineReplica),
+                                    targetState)
           replicaState.put(partitionAndReplica, ReplicaDeletionStarted)
           // send stop replica command
           brokerRequestBatch.addStopReplicaRequestForBrokers(
@@ -238,8 +237,9 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                         currState,
                         targetState))
         case ReplicaDeletionIneligible =>
-          assertValidPreviousStates(
-              partitionAndReplica, List(ReplicaDeletionStarted), targetState)
+          assertValidPreviousStates(partitionAndReplica,
+                                    List(ReplicaDeletionStarted),
+                                    targetState)
           replicaState.put(partitionAndReplica, ReplicaDeletionIneligible)
           stateChangeLogger.trace(
               "Controller %d epoch %d changed state of replica %d for partition %s from %s to %s"
@@ -250,8 +250,9 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                         currState,
                         targetState))
         case ReplicaDeletionSuccessful =>
-          assertValidPreviousStates(
-              partitionAndReplica, List(ReplicaDeletionStarted), targetState)
+          assertValidPreviousStates(partitionAndReplica,
+                                    List(ReplicaDeletionStarted),
+                                    targetState)
           replicaState.put(partitionAndReplica, ReplicaDeletionSuccessful)
           stateChangeLogger.trace(
               "Controller %d epoch %d changed state of replica %d for partition %s from %s to %s"
@@ -293,8 +294,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
               val currentAssignedReplicas =
                 controllerContext.partitionReplicaAssignment(topicAndPartition)
               if (!currentAssignedReplicas.contains(replicaId))
-                controllerContext.partitionReplicaAssignment.put(
-                    topicAndPartition, currentAssignedReplicas :+ replicaId)
+                controllerContext.partitionReplicaAssignment
+                  .put(topicAndPartition, currentAssignedReplicas :+ replicaId)
               stateChangeLogger.trace(
                   "Controller %d epoch %d changed state of replica %d for partition %s from %s to %s"
                     .format(controllerId,
@@ -336,8 +337,11 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                                          ReplicaDeletionIneligible),
                                     targetState)
           // send stop replica command to the replica so that it stops fetching from the leader
-          brokerRequestBatch.addStopReplicaRequestForBrokers(
-              List(replicaId), topic, partition, deletePartition = false)
+          brokerRequestBatch.addStopReplicaRequestForBrokers(List(replicaId),
+                                                             topic,
+                                                             partition,
+                                                             deletePartition =
+                                                               false)
           // As an optimization, the controller removes dead replicas from the ISR
           val leaderAndIsrIsEmpty: Boolean = controllerContext.partitionLeadershipInfo
             .get(topicAndPartition) match {
@@ -398,9 +402,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     val replicasForTopic = controller.controllerContext.replicasForTopic(topic)
     val replicaStatesForTopic =
       replicasForTopic.map(r => (r, replicaState(r))).toMap
-    debug(
-        "Are all replicas for topic %s deleted %s".format(
-            topic, replicaStatesForTopic))
+    debug("Are all replicas for topic %s deleted %s"
+          .format(topic, replicaStatesForTopic))
     replicaStatesForTopic.forall(_._2 == ReplicaDeletionSuccessful)
   }
 
@@ -412,8 +415,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
           deletionState || r._2 == ReplicaDeletionStarted)
   }
 
-  def replicasInState(
-      topic: String, state: ReplicaState): Set[PartitionAndReplica] = {
+  def replicasInState(topic: String,
+                      state: ReplicaState): Set[PartitionAndReplica] = {
     replicaState.filter(r => r._1.topic.equals(topic) && r._2 == state).keySet
   }
 
@@ -438,18 +441,18 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
         fromStates.contains(replicaState(partitionAndReplica)),
         "Replica %s should be in the %s states before moving to %s state"
           .format(partitionAndReplica, fromStates.mkString(","), targetState) +
-        ". Instead it is in %s state".format(
-            replicaState(partitionAndReplica)))
+          ". Instead it is in %s state".format(
+              replicaState(partitionAndReplica)))
   }
 
   private def registerBrokerChangeListener() = {
-    zkUtils.zkClient.subscribeChildChanges(
-        ZkUtils.BrokerIdsPath, brokerChangeListener)
+    zkUtils.zkClient
+      .subscribeChildChanges(ZkUtils.BrokerIdsPath, brokerChangeListener)
   }
 
   private def deregisterBrokerChangeListener() = {
-    zkUtils.zkClient.unsubscribeChildChanges(
-        ZkUtils.BrokerIdsPath, brokerChangeListener)
+    zkUtils.zkClient
+      .unsubscribeChildChanges(ZkUtils.BrokerIdsPath, brokerChangeListener)
   }
 
   /**
@@ -475,8 +478,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     }
   }
 
-  def partitionsAssignedToBroker(
-      topics: Seq[String], brokerId: Int): Seq[TopicAndPartition] = {
+  def partitionsAssignedToBroker(topics: Seq[String],
+                                 brokerId: Int): Seq[TopicAndPartition] = {
     controllerContext.partitionReplicaAssignment
       .filter(_._2.contains(brokerId))
       .keySet
@@ -489,11 +492,11 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
   class BrokerChangeListener() extends IZkChildListener with Logging {
     this.logIdent =
       "[BrokerChangeListener on Controller " + controller.config.brokerId +
-      "]: "
-    def handleChildChange(
-        parentPath: String, currentBrokerList: java.util.List[String]) {
-      info("Broker change listener fired for path %s with children %s".format(
-              parentPath, currentBrokerList.sorted.mkString(",")))
+        "]: "
+    def handleChildChange(parentPath: String,
+                          currentBrokerList: java.util.List[String]) {
+      info("Broker change listener fired for path %s with children %s"
+            .format(parentPath, currentBrokerList.sorted.mkString(",")))
       inLock(controllerContext.controllerLock) {
         if (hasStarted.get) {
           ControllerStats.leaderElectionTimer.time {

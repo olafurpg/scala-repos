@@ -26,8 +26,8 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
   private[this] val logger = Logger("REQUEST")
   import org.scalatra.slf4j.ScalatraSlf4jRequestLogging._
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse) {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse) {
     val realMultiParams =
       req.getParameterMap.asScala.toMap transform { (k, v) ⇒
         v: Seq[String]

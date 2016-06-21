@@ -42,7 +42,7 @@ class SparkPlanInfo(val nodeName: String,
   override def equals(other: Any): Boolean = other match {
     case o: SparkPlanInfo =>
       nodeName == o.nodeName && simpleString == o.simpleString &&
-      children == o.children
+        children == o.children
     case _ => false
   }
 }

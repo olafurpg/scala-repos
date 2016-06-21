@@ -220,12 +220,13 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           formXml.isDefined must_== true
           formXml foreach { fprime =>
             val f = ("* [name]" #> ".*" & "select *" #>
-                (((ns: NodeSeq) =>
-                    ns.filter {
-                      case e: Elem =>
-                        e.attribute("selected").map(_.text) == Some("selected")
-                      case _ => false
-                    }) andThen "* [value]" #> ".*"))(fprime)
+                  (((ns: NodeSeq) =>
+                      ns.filter {
+                        case e: Elem =>
+                          e.attribute("selected").map(_.text) == Some(
+                              "selected")
+                        case _ => false
+                      }) andThen "* [value]" #> ".*"))(fprime)
             val ret: Boolean = Helpers.compareXml(f, fp)
 
             ret must_== true
@@ -262,7 +263,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     val ttjo2 = TypeTestJsonObject(2, "jsonobj2", Map("x" -> "b"))
     val json =
       ("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~
-      ("mapField" -> (("x" -> "a")))
+        ("mapField" -> (("x" -> "a")))
     passBasicTests(ttjo,
                    ttjo2,
                    rec.mandatoryJsonObjectField,
@@ -345,14 +346,14 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("")
       rec.validate must_==
-        (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
+      (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
     }
 
     "require at least 3 character password" in {
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("ab")
       rec.validate must_==
-        (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
+      (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
     }
   }
 
@@ -479,8 +480,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       passConversionTests(
           lst,
           rec.uuidListField,
-          JsArray(
-              Str(uuid1.toString), Str(uuid2.toString), Str(uuid3.toString)),
+          JsArray(Str(uuid1.toString),
+                  Str(uuid2.toString),
+                  Str(uuid3.toString)),
           JArray(
               List(
                   JsonUUID(uuid1),
@@ -527,9 +529,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
                       TypeTestJsonObject(4, "jsonobj4", Map("x" -> "4")))
       val json = List(
           ("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~
-          ("mapField" -> (("x" -> "1"))),
+            ("mapField" -> (("x" -> "1"))),
           ("intField" -> 2) ~ ("stringField" -> "jsonobj2") ~
-          ("mapField" -> (("x" -> "2")))
+            ("mapField" -> (("x" -> "2")))
       )
       passBasicTests(lst, lst2, rec.mandatoryMongoJsonObjectListField, Empty)
       passConversionTests(
@@ -602,14 +604,14 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
 
       val srJson =
         ("name" -> "subrecord") ~ ("subsub" -> ("name" -> "subsub")) ~
-        ("subsublist" -> JArray(Nil)) ~
-        ("when" ->
-            ("$dt" -> rec.meta.formats.dateFormat.format(subRec.when.value))) ~
-        ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
-        ("oid" -> ("$oid" -> subRec.oid.value.toString)) ~
-        ("pattern" -> ("$regex" -> subRec.pattern.value.pattern) ~
-            ("$flags" -> subRec.pattern.value.flags)) ~
-        ("uuid" -> ("$uuid" -> subRec.uuid.value.toString))
+          ("subsublist" -> JArray(Nil)) ~
+          ("when" ->
+                ("$dt" -> rec.meta.formats.dateFormat.format(subRec.when.value))) ~
+          ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
+          ("oid" -> ("$oid" -> subRec.oid.value.toString)) ~
+          ("pattern" -> ("$regex" -> subRec.pattern.value.pattern) ~
+                ("$flags" -> subRec.pattern.value.flags)) ~
+          ("uuid" -> ("$uuid" -> subRec.uuid.value.toString))
 
       val srJsExp = new JsExp {
         def toJsCmd = compactRender(srJson)
@@ -640,25 +642,25 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
                       SubRecord.createRecord.name("subrec4"))
       val sr1Json =
         ("name" -> "subrec1") ~ ("subsub" -> ("name" -> "subsub")) ~
-        ("subsublist" -> JArray(Nil)) ~
-        ("when" ->
-            ("$dt" -> rec.meta.formats.dateFormat.format(lst(0).when.value))) ~
-        ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
-        ("oid" -> ("$oid" -> lst(0).oid.value.toString)) ~
-        ("pattern" -> ("$regex" -> lst(0).pattern.value.pattern) ~
-            ("$flags" -> lst(0).pattern.value.flags)) ~
-        ("uuid" -> ("$uuid" -> lst(0).uuid.value.toString))
+          ("subsublist" -> JArray(Nil)) ~
+          ("when" ->
+                ("$dt" -> rec.meta.formats.dateFormat.format(lst(0).when.value))) ~
+          ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
+          ("oid" -> ("$oid" -> lst(0).oid.value.toString)) ~
+          ("pattern" -> ("$regex" -> lst(0).pattern.value.pattern) ~
+                ("$flags" -> lst(0).pattern.value.flags)) ~
+          ("uuid" -> ("$uuid" -> lst(0).uuid.value.toString))
 
       val sr2Json =
         ("name" -> "subrec2") ~ ("subsub" -> ("name" -> "subsub")) ~
-        ("subsublist" -> JArray(Nil)) ~
-        ("when" ->
-            ("$dt" -> rec.meta.formats.dateFormat.format(lst(1).when.value))) ~
-        ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
-        ("oid" -> ("$oid" -> lst(1).oid.value.toString)) ~
-        ("pattern" -> ("$regex" -> lst(1).pattern.value.pattern) ~
-            ("$flags" -> lst(1).pattern.value.flags)) ~
-        ("uuid" -> ("$uuid" -> lst(1).uuid.value.toString))
+          ("subsublist" -> JArray(Nil)) ~
+          ("when" ->
+                ("$dt" -> rec.meta.formats.dateFormat.format(lst(1).when.value))) ~
+          ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
+          ("oid" -> ("$oid" -> lst(1).oid.value.toString)) ~
+          ("pattern" -> ("$regex" -> lst(1).pattern.value.pattern) ~
+                ("$flags" -> lst(1).pattern.value.flags)) ~
+          ("uuid" -> ("$uuid" -> lst(1).uuid.value.toString))
 
       val sr1JsExp = new JsExp {
         def toJsCmd = compactRender(sr1Json)
@@ -703,7 +705,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     "get set from JValue after BSON roundtrip" in {
       val joftrJson: JObject =
         ("_id" -> ("$oid" -> ObjectId.get.toString)) ~
-        ("mandatoryJObjectField" -> ("minutes" -> 59))
+          ("mandatoryJObjectField" -> ("minutes" -> 59))
       val fromJsonBox = JObjectFieldTestRecord.fromJValue(joftrJson)
 
       fromJsonBox.isDefined must_== true

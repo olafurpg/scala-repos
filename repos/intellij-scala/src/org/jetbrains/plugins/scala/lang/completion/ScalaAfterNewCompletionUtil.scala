@@ -40,16 +40,15 @@ object ScalaAfterNewCompletionUtil {
       position: PsiElement,
       context: ProcessingContext): (Array[ScType], Boolean) = {
     val isAfter = isAfterNew(position, context)
-    val data =
-      if (isAfter) {
-        val element = position
-        val newExpr: ScNewTemplateDefinition = PsiTreeUtil.getContextOfType(
-            element, classOf[ScNewTemplateDefinition])
-        newExpr.expectedTypes().map {
-          case ScAbstractType(_, lower, upper) => upper
-          case tp => tp
-        }
-      } else Array[ScType]()
+    val data = if (isAfter) {
+      val element = position
+      val newExpr: ScNewTemplateDefinition =
+        PsiTreeUtil.getContextOfType(element, classOf[ScNewTemplateDefinition])
+      newExpr.expectedTypes().map {
+        case ScAbstractType(_, lower, upper) => upper
+        case tp => tp
+      }
+    } else Array[ScType]()
 
     (data, isAfter)
   }
@@ -65,17 +64,15 @@ object ScalaAfterNewCompletionUtil {
     val undefines: Seq[ScUndefinedType] = clazz.getTypeParameters.map(ptp =>
           new ScUndefinedType(
               new ScTypeParameterType(ptp, ScSubstitutor.empty)))
-    val predefinedType =
-      if (clazz.getTypeParameters.length == 1) {
-        ScParameterizedType(ScDesignatorType(clazz), undefines)
-      } else ScDesignatorType(clazz)
-    val noUndefType =
-      if (clazz.getTypeParameters.length == 1) {
-        ScParameterizedType(
-            ScDesignatorType(clazz),
-            clazz.getTypeParameters.map(ptp =>
-                  new ScTypeParameterType(ptp, ScSubstitutor.empty)))
-      } else ScDesignatorType(clazz)
+    val predefinedType = if (clazz.getTypeParameters.length == 1) {
+      ScParameterizedType(ScDesignatorType(clazz), undefines)
+    } else ScDesignatorType(clazz)
+    val noUndefType = if (clazz.getTypeParameters.length == 1) {
+      ScParameterizedType(
+          ScDesignatorType(clazz),
+          clazz.getTypeParameters.map(ptp =>
+                new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+    } else ScDesignatorType(clazz)
 
     val iterator = expectedTypes.iterator
     while (iterator.hasNext) {
@@ -120,8 +117,8 @@ object ScalaAfterNewCompletionUtil {
                                       psiClass: PsiClass,
                                       subst: ScSubstitutor)
       extends LookupElementRenderer[LookupElement] {
-    def renderElement(
-        ignore: LookupElement, presentation: LookupElementPresentation) {
+    def renderElement(ignore: LookupElement,
+                      presentation: LookupElementPresentation) {
       var isDeprecated = false
       psiClass match {
         case doc: PsiDocCommentOwner if doc.isDeprecated => isDeprecated = true
@@ -165,17 +162,17 @@ object ScalaAfterNewCompletionUtil {
     val isRenamed = renamesMap.filter {
       case (aName, (renamed, aClazz)) => aName == name && aClazz == psiClass
     }.map(_._2._1).headOption
-    val lookupElement: ScalaLookupItem = new ScalaLookupItem(
-        psiClass, isRenamed.getOrElse(name)) {
-      override def renderElement(presentation: LookupElementPresentation) {
-        renderer(tp, psiClass, subst).renderElement(this, presentation)
-        isRenamed match {
-          case Some(nme) =>
-            presentation.setItemText(nme + " <= " + presentation.getItemText)
-          case _ =>
+    val lookupElement: ScalaLookupItem =
+      new ScalaLookupItem(psiClass, isRenamed.getOrElse(name)) {
+        override def renderElement(presentation: LookupElementPresentation) {
+          renderer(tp, psiClass, subst).renderElement(this, presentation)
+          isRenamed match {
+            case Some(nme) =>
+              presentation.setItemText(nme + " <= " + presentation.getItemText)
+            case _ =>
+          }
         }
       }
-    }
     lookupElement.isRenamed = isRenamed
     if (ApplicationManager.getApplication.isUnitTestMode ||
         psiClass.isInterface || psiClass.isInstanceOf[ScTrait] ||
@@ -225,8 +222,12 @@ object ScalaAfterNewCompletionUtil {
           return null
         if (addedClasses.contains(clazz.qualifiedName)) return null
         addedClasses += clazz.qualifiedName
-        getLookupElementFromTypeAndClass(
-            tp, clazz, subst, renderer, insertHandler, renamesMap)
+        getLookupElementFromTypeAndClass(tp,
+                                         clazz,
+                                         subst,
+                                         renderer,
+                                         insertHandler,
+                                         renamesMap)
       case _ => null
     }
   }
@@ -256,17 +257,15 @@ object ScalaAfterNewCompletionUtil {
                 clazz.getTypeParameters.map(ptp =>
                       new ScUndefinedType(
                           new ScTypeParameterType(ptp, ScSubstitutor.empty)))
-              val predefinedType =
-                if (clazz.getTypeParameters.nonEmpty) {
-                  ScParameterizedType(ScDesignatorType(clazz), undefines)
-                } else ScDesignatorType(clazz)
-              val noUndefType =
-                if (clazz.getTypeParameters.nonEmpty) {
-                  ScParameterizedType(
-                      ScDesignatorType(clazz),
-                      clazz.getTypeParameters.map(ptp =>
-                            new ScTypeParameterType(ptp, ScSubstitutor.empty)))
-                } else ScDesignatorType(clazz)
+              val predefinedType = if (clazz.getTypeParameters.nonEmpty) {
+                ScParameterizedType(ScDesignatorType(clazz), undefines)
+              } else ScDesignatorType(clazz)
+              val noUndefType = if (clazz.getTypeParameters.nonEmpty) {
+                ScParameterizedType(
+                    ScDesignatorType(clazz),
+                    clazz.getTypeParameters.map(ptp =>
+                          new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+              } else ScDesignatorType(clazz)
               if (!predefinedType.conforms(typez)) return true
               val undef = Conformance.undefinedSubst(typez, predefinedType)
               undef.getSubstitutor match {

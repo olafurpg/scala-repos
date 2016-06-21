@@ -86,14 +86,13 @@ trait Helpers { self: Global =>
       }
     }
 
-    val name =
-      if (sym.isType) {
-        typeIndexerName(sym)
-      } else if (sym.isModule) {
-        typeIndexerName(sym) + "$"
-      } else {
-        symbolIndexerName(sym.owner) + "." + sym.encodedName
-      }
+    val name = if (sym.isType) {
+      typeIndexerName(sym)
+    } else if (sym.isModule) {
+      typeIndexerName(sym) + "$"
+    } else {
+      symbolIndexerName(sym.owner) + "." + sym.encodedName
+    }
     name
       .replaceAll("\\.package\\$\\$", ".")
       .replaceAll("\\.package\\$\\.", ".")
@@ -119,12 +118,11 @@ trait Helpers { self: Global =>
       if (typeSym.enclosingPackage == NoSymbol) ""
       else typeSym.enclosingPackage.fullName + "."
 
-    val withoutArgs =
-      if (typeSym.isNestedClass) {
-        prefix + nestedClassName(typeSym)
-      } else {
-        prefix + typeShortName(typeSym)
-      }
+    val withoutArgs = if (typeSym.isNestedClass) {
+      prefix + nestedClassName(typeSym)
+    } else {
+      prefix + typeShortName(typeSym)
+    }
     if (withTpeArgs) {
       withoutArgs + (if (tpe.typeArgs.size > 0) {
                        "[" +
@@ -148,7 +146,8 @@ trait Helpers { self: Global =>
     * Returns the type, object, or package symbol uniquely identified by name.
     */
   protected def symbolByName(
-      name: String, rootSymbol: Symbol = RootClass): Option[Symbol] = {
+      name: String,
+      rootSymbol: Symbol = RootClass): Option[Symbol] = {
     def segments(name: String): List[Name] = {
       val len = name.length
       if (len == 0) {

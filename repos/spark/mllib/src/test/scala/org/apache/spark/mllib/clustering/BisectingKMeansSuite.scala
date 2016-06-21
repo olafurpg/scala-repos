@@ -30,8 +30,8 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(bkm0.getMaxIterations === 20)
     assert(bkm0.getMinDivisibleClusterSize === 1.0)
     val bkm1 = new BisectingKMeans()
-    assert(
-        bkm0.getSeed === bkm1.getSeed, "The default seed should be constant.")
+    assert(bkm0.getSeed === bkm1.getSeed,
+           "The default seed should be constant.")
   }
 
   test("setter/getter") {

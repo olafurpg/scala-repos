@@ -32,13 +32,13 @@ class MarathonHealthCheckManager @Inject()(
     zkConf: ZookeeperConf)
     extends HealthCheckManager {
 
-  protected[this] case class ActiveHealthCheck(
-      healthCheck: HealthCheck, actor: ActorRef)
+  protected[this] case class ActiveHealthCheck(healthCheck: HealthCheck,
+                                               actor: ActorRef)
 
   protected[this] var appHealthChecks: RWLock[
-      mutable.Map[PathId, Map[Timestamp, Set[ActiveHealthCheck]]]] = RWLock(
-      mutable.Map.empty
-        .withDefaultValue(Map.empty.withDefaultValue(Set.empty)))
+      mutable.Map[PathId, Map[Timestamp, Set[ActiveHealthCheck]]]] =
+    RWLock(mutable.Map.empty
+          .withDefaultValue(Map.empty.withDefaultValue(Set.empty)))
 
   override def list(appId: PathId): Set[HealthCheck] =
     listActive(appId).map(_.healthCheck)
@@ -49,13 +49,15 @@ class MarathonHealthCheckManager @Inject()(
     }
 
   protected[this] def listActive(
-      appId: PathId, appVersion: Timestamp): Set[ActiveHealthCheck] =
+      appId: PathId,
+      appVersion: Timestamp): Set[ActiveHealthCheck] =
     appHealthChecks.readLock { ahcs =>
       ahcs(appId)(appVersion)
     }
 
-  override def add(
-      appId: PathId, appVersion: Timestamp, healthCheck: HealthCheck): Unit =
+  override def add(appId: PathId,
+                   appVersion: Timestamp,
+                   healthCheck: HealthCheck): Unit =
     appHealthChecks.writeLock { ahcs =>
       val healthChecksForApp = listActive(appId, appVersion)
 
@@ -96,8 +98,9 @@ class MarathonHealthCheckManager @Inject()(
       app.healthChecks.foreach(add(app.id, app.version, _))
     }
 
-  override def remove(
-      appId: PathId, appVersion: Timestamp, healthCheck: HealthCheck): Unit =
+  override def remove(appId: PathId,
+                      appVersion: Timestamp,
+                      healthCheck: HealthCheck): Unit =
     appHealthChecks.writeLock { ahcs =>
       val healthChecksForVersion: Set[ActiveHealthCheck] =
         listActive(appId, appVersion)
@@ -111,12 +114,11 @@ class MarathonHealthCheckManager @Inject()(
       }
       val newHealthChecksForVersion = healthChecksForVersion -- toRemove
       val currentHealthChecksForApp = ahcs(appId)
-      val newHealthChecksForApp =
-        if (newHealthChecksForVersion.isEmpty) {
-          currentHealthChecksForApp - appVersion
-        } else {
-          currentHealthChecksForApp + (appVersion -> newHealthChecksForVersion)
-        }
+      val newHealthChecksForApp = if (newHealthChecksForVersion.isEmpty) {
+        currentHealthChecksForApp - appVersion
+      } else {
+        currentHealthChecksForApp + (appVersion -> newHealthChecksForVersion)
+      }
 
       if (newHealthChecksForApp.isEmpty) ahcs -= appId
       else ahcs += (appId -> newHealthChecksForApp)
@@ -144,7 +146,7 @@ class MarathonHealthCheckManager @Inject()(
         val tasks: Iterable[Task] = taskTracker.appTasksSync(app.id)
         val activeAppVersions: Set[Timestamp] =
           tasks.iterator.flatMap(_.launched.map(_.appVersion)).toSet +
-          app.version
+            app.version
 
         val healthCheckAppVersions: Set[Timestamp] =
           appHealthChecks.writeLock { ahcs =>
@@ -172,7 +174,7 @@ class MarathonHealthCheckManager @Inject()(
                 // throw away old versions such that we may not have the app configuration of all tasks available anymore.
                 log.warn(
                     s"Cannot find health check configuration for [$appId] and version [$version], " +
-                    "using most recent one.")
+                      "using most recent one.")
 
               case Some(appVersion) =>
                 log.info(s"addAllFor [$appId] version [$version]")
@@ -188,17 +190,16 @@ class MarathonHealthCheckManager @Inject()(
     appHealthChecks.readLock { ahcs =>
       // construct a health result from the incoming task status
       val taskId = Task.Id(taskStatus.getTaskId.getValue)
-      val maybeResult: Option[HealthResult] =
-        if (taskStatus.hasHealthy) {
-          val healthy = taskStatus.getHealthy
-          log.info(
-              s"Received status for $taskId with version [$version] and healthy [$healthy]")
-          Some(if (healthy) Healthy(taskId, version)
-              else Unhealthy(taskId, version, ""))
-        } else {
-          log.debug(s"Ignoring status for $taskId with no health information")
-          None
-        }
+      val maybeResult: Option[HealthResult] = if (taskStatus.hasHealthy) {
+        val healthy = taskStatus.getHealthy
+        log.info(
+            s"Received status for $taskId with version [$version] and healthy [$healthy]")
+        Some(if (healthy) Healthy(taskId, version)
+            else Unhealthy(taskId, version, ""))
+      } else {
+        log.debug(s"Ignoring status for $taskId with no health information")
+        None
+      }
 
       // compute the app ID for the incoming task status
       val appId = Task.Id(taskStatus.getTaskId).appId

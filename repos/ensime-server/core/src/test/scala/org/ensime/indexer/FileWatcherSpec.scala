@@ -31,12 +31,12 @@ abstract class FileWatcherSpec
     with IsolatedEnsimeVFSFixture {
 
   // variant that watches a jar file
-  def createJarWatcher(jar: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher
+  def createJarWatcher(jar: File)(implicit vfs: EnsimeVFS,
+                                  tk: TestKit): Watcher
 
   // variant that recursively watches a directory of classes
-  def createClassWatcher(base: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher
+  def createClassWatcher(base: File)(implicit vfs: EnsimeVFS,
+                                     tk: TestKit): Watcher
 
   /**
     * The Linux ext2+ filesystems have a timestamp precision of 1
@@ -197,7 +197,7 @@ abstract class FileWatcherSpec
   }
 
   it should "be able to start up from a non-existent directory" taggedAs
-  (Retryable) in withVFS { implicit vfs =>
+    (Retryable) in withVFS { implicit vfs =>
     withTestKit { implicit tk =>
       val dir = Files.createTempDir().canon
       dir.delete()
@@ -219,7 +219,7 @@ abstract class FileWatcherSpec
   }
 
   it should "survive removed parent base directory and recreated base" taggedAs
-  (Retryable) in withVFS { implicit vfs =>
+    (Retryable) in withVFS { implicit vfs =>
     withTestKit { implicit tk =>
       val parent = Files.createTempDir().canon
       val dir = parent / "base"
@@ -299,7 +299,7 @@ abstract class FileWatcherSpec
   }
 
   it should "be able to start up from a non-existent base file" taggedAs
-  (Retryable) in withVFS { implicit vfs =>
+    (Retryable) in withVFS { implicit vfs =>
     withTestKit { implicit tk =>
       withTempDir { dir =>
         val jar = (dir / "jar.jar")
@@ -339,14 +339,14 @@ abstract class FileWatcherSpec
   type -->[A, B] = PartialFunction[A, B]
   type Fish = PartialFunction[Any, Boolean]
 
-  def withClassWatcher[T](base: File)(code: Watcher => T)(
-      implicit vfs: EnsimeVFS, tk: TestKit) = {
+  def withClassWatcher[T](base: File)(
+      code: Watcher => T)(implicit vfs: EnsimeVFS, tk: TestKit) = {
     val w = createClassWatcher(base)
     try code(w) finally w.shutdown()
   }
 
-  def withJarWatcher[T](jar: File)(code: Watcher => T)(
-      implicit vfs: EnsimeVFS, tk: TestKit) = {
+  def withJarWatcher[T](jar: File)(code: Watcher => T)(implicit vfs: EnsimeVFS,
+                                                       tk: TestKit) = {
     val w = createJarWatcher(jar)
     try code(w) finally w.shutdown()
   }
@@ -367,12 +367,14 @@ abstract class FileWatcherSpec
 }
 
 class ApacheFileWatcherSpec extends FileWatcherSpec {
-  override def createClassWatcher(base: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
+  override def createClassWatcher(base: File)(implicit vfs: EnsimeVFS,
+                                              tk: TestKit): Watcher =
     new ApachePollingFileWatcher(base, ClassfileSelector, true, listeners)
 
-  override def createJarWatcher(jar: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
-    new ApachePollingFileWatcher(
-        jar.getParentFile, JarSelector, false, listeners)
+  override def createJarWatcher(
+      jar: File)(implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
+    new ApachePollingFileWatcher(jar.getParentFile,
+                                 JarSelector,
+                                 false,
+                                 listeners)
 }

@@ -19,8 +19,8 @@ class ArraySAMTest {
   import js.JSArrayOps._
 
   @Test def should_provide_jsMap(): Unit = {
-    assertJSArrayEquals(
-        js.Array(2, 3, 1, 2), js.Array("Sc", "ala", ".", "js").jsMap(_.length))
+    assertJSArrayEquals(js.Array(2, 3, 1, 2),
+                        js.Array("Sc", "ala", ".", "js").jsMap(_.length))
   }
 
   @Test def should_provide_jsFilter(): Unit = {

@@ -158,8 +158,9 @@ class TreeMap[A, +B] private (
     *  @param elems the remaining elements to add.
     *  @return      a new $coll with the updated bindings
     */
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): TreeMap[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): TreeMap[A, B1] =
     this + elem1 + elem2 ++ elems
 
   /** Adds a number of elements provided by a traversable object

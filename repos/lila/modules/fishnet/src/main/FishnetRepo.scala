@@ -25,8 +25,8 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
   def updateClient(client: Client): Funit =
     clientColl.update(selectClient(client.key), client, upsert = true).void >> clientCache
       .remove(client.key)
-  def updateClientInstance(
-      client: Client, instance: Client.Instance): Fu[Client] =
+  def updateClientInstance(client: Client,
+                           instance: Client.Instance): Fu[Client] =
     client.updateInstance(instance).fold(fuccess(client)) { updated =>
       updateClient(updated) inject updated
     }

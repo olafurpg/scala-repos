@@ -119,9 +119,8 @@ trait ScTypeDefinition
                     })
                     .mkString("(", ", ", ")")
                 }.mkString("(", " => ", s" => $name)")
-              val typeElement =
-                ScalaPsiElementFactory.createTypeElementFromText(
-                    typeElementText, getManager)
+              val typeElement = ScalaPsiElementFactory
+                .createTypeElementFromText(typeElementText, getManager)
               s" extends ${typeElement.getText}"
             } else {
               ""
@@ -142,7 +141,9 @@ trait ScTypeDefinition
 
     val next = ScalaPsiUtil.getNextStubOrPsiElement(this)
     val obj: ScObject = ScalaPsiElementFactory.createObjectWithContext(
-        objText, getContext, if (next != null) next else this)
+        objText,
+        getContext,
+        if (next != null) next else this)
     import org.jetbrains.plugins.scala.extensions._
     val objOption: Option[ScObject] = obj.toOption
     objOption.foreach { (obj: ScObject) =>

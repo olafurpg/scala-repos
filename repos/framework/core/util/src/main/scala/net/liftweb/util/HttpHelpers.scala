@@ -539,14 +539,14 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     in match {
       case null => true
       case n => {
-          n.get("Content-Type") match {
-            case Some(s) => {
-                (s.toLowerCase == "text/html") ||
-                (s.toLowerCase == "application/xhtml+xml")
-              }
-            case None => true
+        n.get("Content-Type") match {
+          case Some(s) => {
+            (s.toLowerCase == "text/html") ||
+            (s.toLowerCase == "application/xhtml+xml")
           }
+          case None => true
         }
+      }
     }
 
   /**
@@ -614,9 +614,9 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     */
   def findOrAddId(in: Elem): (Elem, String) = (in \ "@id").toList match {
     case Nil => {
-        val id = nextFuncName
-        (in % ("id" -> id), id)
-      }
+      val id = nextFuncName
+      (in % ("id" -> id), id)
+    }
     case x :: xs => (in, x.text)
   }
 
@@ -628,10 +628,10 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     var found = false
     ns.flatMap {
       case e: Elem if !found => {
-          found = true
-          val (ne, id) = findOrAddId(e)
-          f(id, ne)
-        }
+        found = true
+        val (ne, id) = findOrAddId(e)
+        f(id, ne)
+      }
       case x => x
     }
   }
@@ -660,8 +660,8 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     * URL taking into account # and if there are any other query
     * parameters
     */
-  def appendQueryParameters(
-      url: String, params: List[(String, String)]): String =
+  def appendQueryParameters(url: String,
+                            params: List[(String, String)]): String =
     params match {
       case Nil => url
       case ps =>

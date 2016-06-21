@@ -34,8 +34,8 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
   //   (nb: Int) => GameRepo.activePlayersSince(DateTime.now minusDays 1, nb),
   //   timeToLive = 1 hour)
 
-  private val countShortTtl = AsyncCache[JsObject, Int](
-      f = (o: JsObject) => $count(o), timeToLive = 5.seconds)
+  private val countShortTtl = AsyncCache[JsObject, Int](f = (o: JsObject) =>
+        $count(o), timeToLive = 5.seconds)
 
   private val count = mongoCache(prefix = "game:count",
                                  f = (o: JsObject) => $count(o),

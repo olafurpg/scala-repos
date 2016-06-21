@@ -41,10 +41,10 @@ class SimpleFetchTest {
   val replicaLagMaxMessages = 10L
 
   val overridingProps = new Properties()
-  overridingProps.put(
-      KafkaConfig.ReplicaLagTimeMaxMsProp, replicaLagTimeMaxMs.toString)
-  overridingProps.put(
-      KafkaConfig.ReplicaFetchWaitMaxMsProp, replicaFetchWaitMaxMs.toString)
+  overridingProps
+    .put(KafkaConfig.ReplicaLagTimeMaxMsProp, replicaLagTimeMaxMs.toString)
+  overridingProps
+    .put(KafkaConfig.ReplicaFetchWaitMaxMsProp, replicaFetchWaitMaxMs.toString)
 
   val configs = TestUtils
     .createBrokerConfigs(2, TestUtils.MockZkConnect)
@@ -127,8 +127,8 @@ class SimpleFetchTest {
     val partition = replicaManager.getOrCreatePartition(topic, partitionId)
 
     // create the leader replica with the local log
-    val leaderReplica = new Replica(
-        configs(0).brokerId, partition, time, 0, Some(log))
+    val leaderReplica =
+      new Replica(configs(0).brokerId, partition, time, 0, Some(log))
     leaderReplica.highWatermark = new LogOffsetMetadata(partitionHW)
     partition.leaderReplicaIdOpt = Some(leaderReplica.brokerId)
 

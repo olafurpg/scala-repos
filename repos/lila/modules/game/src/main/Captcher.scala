@@ -71,8 +71,8 @@ private final class Captcher extends Actor {
     private def fromGame(game: Game): OptionT[Fu, Captcha] =
       optionT(GameRepo getOptionPgn game.id) flatMap { makeCaptcha(game, _) }
 
-    private def makeCaptcha(
-        game: Game, moves: List[String]): OptionT[Fu, Captcha] =
+    private def makeCaptcha(game: Game,
+                            moves: List[String]): OptionT[Fu, Captcha] =
       optionT(Future {
         for {
           rewinded ← rewind(game, moves)

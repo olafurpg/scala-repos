@@ -71,15 +71,15 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
         ORSetKeyManifest -> (bytes ⇒ ORSetKey(keyIdFromBinary(bytes))),
         FlagKeyManifest -> (bytes ⇒ FlagKey(keyIdFromBinary(bytes))),
         LWWRegisterKeyManifest ->
-        (bytes ⇒ LWWRegisterKey(keyIdFromBinary(bytes))),
+          (bytes ⇒ LWWRegisterKey(keyIdFromBinary(bytes))),
         GCounterKeyManifest -> (bytes ⇒ GCounterKey(keyIdFromBinary(bytes))),
         PNCounterKeyManifest -> (bytes ⇒ PNCounterKey(keyIdFromBinary(bytes))),
         ORMapKeyManifest -> (bytes ⇒ ORMapKey(keyIdFromBinary(bytes))),
         LWWMapKeyManifest -> (bytes ⇒ LWWMapKey(keyIdFromBinary(bytes))),
         PNCounterMapKeyManifest ->
-        (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
+          (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
         ORMultiMapKeyManifest ->
-        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
+          (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: ORSet[_] ⇒ ORSetManifest

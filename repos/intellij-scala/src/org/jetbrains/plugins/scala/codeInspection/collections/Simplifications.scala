@@ -16,7 +16,7 @@ case class Simplification(exprToReplace: SmartPsiElementPointer[ScExpression],
                           hint: String,
                           rangeInParent: TextRange)
 
-class SimplificationBuilder private[collections](
+class SimplificationBuilder private[collections] (
     val exprToReplace: ScExpression) {
   private var rangeInParent: TextRange = {
     val exprToHighlightFrom: ScExpression = exprToReplace match {

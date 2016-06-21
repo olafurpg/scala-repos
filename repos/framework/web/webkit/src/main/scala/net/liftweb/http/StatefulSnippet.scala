@@ -109,8 +109,9 @@ trait StatefulSnippet extends DispatchSnippet {
   /**
     * Merge the SHtml into the form
     */
-  private[http] def mergeIntoForm(
-      isForm: Boolean, res: NodeSeq, toMerge: => NodeSeq): NodeSeq = {
+  private[http] def mergeIntoForm(isForm: Boolean,
+                                  res: NodeSeq,
+                                  toMerge: => NodeSeq): NodeSeq = {
     val formElem = Helpers.findOption(res) {
       case e: Elem if e.label == "form" && null == e.prefix => Some(e)
       case _ => None

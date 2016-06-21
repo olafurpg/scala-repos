@@ -8,8 +8,8 @@ class MacroExpansionCollector(private val project: Project)
     extends ProjectComponent {
 
   private val compilationStatusListener = new CompilationStatusListener {
-    override def fileGenerated(
-        outputRoot: String, relativePath: String): Unit = ???
+    override def fileGenerated(outputRoot: String,
+                               relativePath: String): Unit = ???
 
     override def compilationFinished(aborted: Boolean,
                                      errors: Int,

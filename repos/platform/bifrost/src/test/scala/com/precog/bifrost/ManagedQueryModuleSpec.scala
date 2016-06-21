@@ -77,8 +77,8 @@ class ManagedQueryModuleSpec
   implicit val executionContext =
     ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executionContext, Duration(30, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
+                                          Duration(30, "seconds"))
 
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
@@ -96,8 +96,8 @@ class ManagedQueryModuleSpec
   def dropStreamToFuture =
     implicitly[Hoist[StreamT]]
       .hoist[TestFuture, Future](new (TestFuture ~> Future) {
-      def apply[A](fa: TestFuture[A]): Future[A] = fa.value
-    })
+        def apply[A](fa: TestFuture[A]): Future[A] = fa.value
+      })
 
   def waitForJobCompletion(jobId: JobId): Future[Job] = {
     import JobState._
@@ -115,15 +115,14 @@ class ManagedQueryModuleSpec
   }
 
   // Performs an incredibly intense compuation that requires numTicks ticks.
-  def execute(numTicks: Int,
-              ticksToTimeout: Option[Int] =
-                None): Future[(JobId, AtomicInteger, Future[Int])] = {
+  def execute(numTicks: Int, ticksToTimeout: Option[Int] = None)
+    : Future[(JobId, AtomicInteger, Future[Int])] = {
     val timeout =
       ticksToTimeout map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
       }
-    val ctx = EvaluationContext(
-        apiKey, account, Path.Root, Path.Root, clock.now())
+    val ctx =
+      EvaluationContext(apiKey, account, Path.Root, Path.Root, clock.now())
 
     val result = for {
       // TODO: No idea how to work with EitherT[TestFuture, so sys.error it is]
@@ -131,8 +130,9 @@ class ManagedQueryModuleSpec
                    sys.error(err.toString)
                  }
       result0 <- executor
-                  .execute(
-                      numTicks.toString, ctx, QueryOptions(timeout = timeout))
+                  .execute(numTicks.toString,
+                           ctx,
+                           QueryOptions(timeout = timeout))
                   .valueOr(err => sys.error(err.toString)) mapValue {
                   case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
                 }
@@ -300,8 +300,9 @@ trait TestManagedQueryModule
         new QueryExecutor[TestFuture, StreamT[TestFuture, CharBuffer]] {
           import UserQuery.Serialization._
 
-          def execute(
-              query: String, ctx: EvaluationContext, opts: QueryOptions) = {
+          def execute(query: String,
+                      ctx: EvaluationContext,
+                      opts: QueryOptions) = {
             val userQuery =
               UserQuery(query, ctx.basePath, opts.sortOn, opts.sortOrder)
             val numTicks = query.toInt

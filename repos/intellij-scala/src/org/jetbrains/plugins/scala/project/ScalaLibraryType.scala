@@ -34,8 +34,7 @@ class ScalaLibraryType
 
 object ScalaLibraryType {
   def instance: ScalaLibraryType =
-    Option(
-        LibraryType
+    Option(LibraryType
           .findByKind(ScalaLibraryKind)
           .asInstanceOf[ScalaLibraryType]).getOrElse(
         throw new NoSuchElementException("Scala library type not found"))

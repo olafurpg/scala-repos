@@ -85,5 +85,5 @@ case class LogOffsetMetadata(
 
   override def toString =
     messageOffset.toString + " [" + segmentBaseOffset + " : " +
-    relativePositionInSegment + "]"
+      relativePositionInSegment + "]"
 }

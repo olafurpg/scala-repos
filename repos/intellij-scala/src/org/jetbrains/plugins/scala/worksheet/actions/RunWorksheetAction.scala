@@ -101,8 +101,8 @@ object RunWorksheetAction {
               scala.extensions.inWriteAction {
                 CleanWorksheetAction.resetScrollModel(viewer)
                 if (!auto)
-                  CleanWorksheetAction.cleanWorksheet(
-                      file.getNode, editor, viewer, project)
+                  CleanWorksheetAction
+                    .cleanWorksheet(file.getNode, editor, viewer, project)
               }
             }
           }, ModalityState.any())
@@ -110,17 +110,21 @@ object RunWorksheetAction {
 
         def runnable() = {
           new WorksheetCompiler().compileAndRun(
-              editor, file, (className: String, addToCp: String) => {
-            ApplicationManager.getApplication invokeLater new Runnable {
-              override def run() {
-                executeWorksheet(file.getName,
-                                 project,
-                                 file.getContainingFile,
-                                 className,
-                                 addToCp)
-              }
-            }
-          }, Option(editor), auto)
+              editor,
+              file,
+              (className: String, addToCp: String) => {
+                ApplicationManager.getApplication invokeLater new Runnable {
+                  override def run() {
+                    executeWorksheet(file.getName,
+                                     project,
+                                     file.getContainingFile,
+                                     className,
+                                     addToCp)
+                  }
+                }
+              },
+              Option(editor),
+              auto)
         }
 
         if (WorksheetCompiler isMakeBeforeRun psiFile) {
@@ -227,8 +231,8 @@ object RunWorksheetAction {
     handler.startNotify()
   }
 
-  def isScratchWorksheet(
-      vFileOpt: Option[VirtualFile], project: Project): Boolean =
+  def isScratchWorksheet(vFileOpt: Option[VirtualFile],
+                         project: Project): Boolean =
     vFileOpt.exists {
       case vFile =>
         ScratchFileService

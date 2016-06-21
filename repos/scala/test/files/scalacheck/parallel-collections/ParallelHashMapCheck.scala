@@ -57,15 +57,14 @@ class IntIntParallelHashMapCheck(val tasksupport: TaskSupport)
 
   override def printDataStructureDebugInfo(ds: AnyRef) = ds match {
     case pm: ParHashMap[k, v] =>
-      println(
-          "Mutable parallel hash map\n" +
-          pm.hashTableContents.debugInformation)
+      println("Mutable parallel hash map\n" +
+            pm.hashTableContents.debugInformation)
     case _ =>
       println("could not match data structure type: " + ds.getClass)
   }
 
-  override def checkDataStructureInvariants(
-      orig: Traversable[(Int, Int)], ds: AnyRef) = ds match {
+  override def checkDataStructureInvariants(orig: Traversable[(Int, Int)],
+                                            ds: AnyRef) = ds match {
     // case pm: ParHashMap[k, v] if 1 == 0 => // disabled this to make tests faster
     //   val invs = pm.brokenInvariants
 

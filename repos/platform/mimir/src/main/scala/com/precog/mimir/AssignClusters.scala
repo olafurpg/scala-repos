@@ -48,8 +48,8 @@ trait AssignClusterModule[M[+ _]]
 
   trait AssignClusterSupport extends ColumnarTableLib with ModelSupport {
     trait AssignClusterBase extends ModelBase { self: Morphism2 =>
-      case class ModelCluster(
-          name: ClusterId, featureValues: Map[CPath, Double])
+      case class ModelCluster(name: ClusterId,
+                              featureValues: Map[CPath, Double])
       case class Model(name: ModelId, clusters: Array[ModelCluster])
       object Model extends ModelCompanion
 
@@ -66,7 +66,8 @@ trait AssignClusterModule[M[+ _]]
 
           val rowModels: Int => Set[Model] = {
             val modelTuples: Map[
-                ModelId, Set[(ModelId, ClusterId, CPath, DoubleColumn)]] = {
+                ModelId,
+                Set[(ModelId, ClusterId, CPath, DoubleColumn)]] = {
               schema.columnRefs.flatMap {
                 case ref @ ColumnRef(CPath(TableModule.paths.Value,
                                            CPathField(modelName),
@@ -293,7 +294,8 @@ trait AssignClusterModule[M[+ _]]
                                          CPathField("clusterId"))
                       val centerId = Map(
                           ColumnRef(idPath, CString) -> ArrayStrColumn(
-                              definedModel, resultArray))
+                              definedModel,
+                              resultArray))
 
                       centers ++ centerId
                   }

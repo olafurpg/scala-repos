@@ -25,8 +25,8 @@ trait ExecutionDirectives {
         handler andThen (_ (ctx.withAcceptAll))
       try innerRouteBuilder(())(ctx).fast.recoverWith(handleException) catch {
         case NonFatal(e) ⇒
-          handleException.applyOrElse[Throwable, Future[RouteResult]](
-              e, throw _)
+          handleException
+            .applyOrElse[Throwable, Future[RouteResult]](e, throw _)
       }
     }
 
@@ -52,7 +52,7 @@ trait ExecutionDirectives {
         } else
           sys.error(
               s"Rejection handler still produced new rejections after $maxIterations iterations. " +
-              s"Is there an infinite handler cycle? Initial rejections: $originalRejections final rejections: $rejections")
+                s"Is there an infinite handler cycle? Initial rejections: $originalRejections final rejections: $rejections")
 
       recoverRejectionsWith { rejections ⇒
         val transformed = RejectionHandler.applyTransformations(rejections)

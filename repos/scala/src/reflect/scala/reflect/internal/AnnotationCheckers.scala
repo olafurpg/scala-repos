@@ -51,8 +51,8 @@ trait AnnotationCheckers { self: SymbolTable =>
       * Decide whether this analyzer plugin can adapt a tree that has an annotated type to the
       * given type tp, taking into account the given mode (see method adapt in trait Typers).
       */
-    @deprecated(
-        "Create an AnalyzerPlugin and use canAdaptAnnotations", "2.10.1")
+    @deprecated("Create an AnalyzerPlugin and use canAdaptAnnotations",
+                "2.10.1")
     def canAdaptAnnotations(tree: Tree, mode: Mode, pt: Type): Boolean = false
 
     /**
@@ -74,7 +74,7 @@ trait AnnotationCheckers { self: SymbolTable =>
       */
     @deprecated(
         "Create an AnalyzerPlugin and use pluginsTypedReturn. Note: the 'tree' argument here is\n" +
-        "the 'expr' of a Return tree; 'pluginsTypedReturn' takes the Return tree itself as argument",
+          "the 'expr' of a Return tree; 'pluginsTypedReturn' takes the Return tree itself as argument",
         "2.10.1")
     def adaptTypeOfReturn(tree: Tree, pt: Type, default: => Type): Type =
       default
@@ -141,8 +141,7 @@ trait AnnotationCheckers { self: SymbolTable =>
   def canAdaptAnnotations(tree: Tree, mode: Mode, pt: Type): Boolean =
     if (annotationCheckers.isEmpty) false
     else
-      annotationCheckers.exists(
-          checker => {
+      annotationCheckers.exists(checker => {
         checker.isActive() && checker.canAdaptAnnotations(tree, mode, pt)
       })
 

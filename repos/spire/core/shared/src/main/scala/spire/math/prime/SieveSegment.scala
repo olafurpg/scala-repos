@@ -138,16 +138,15 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
       val p = factor.p
       val len = primes.length
       var i = (m - start).toInt
-      val m2 =
-        if (p < len) {
-          val k = p.toInt
-          val kk = k + k
-          while (i < len) { primes -= i; i += kk }
-          start + i
-        } else {
-          primes -= i
-          m + p
-        }
+      val m2 = if (p < len) {
+        val k = p.toInt
+        val kk = k + k
+        while (i < len) { primes -= i; i += kk }
+        start + i
+      } else {
+        primes -= i
+        m + p
+      }
       factor.next = m2
       q += factor
       initFromQueue(limit, q)

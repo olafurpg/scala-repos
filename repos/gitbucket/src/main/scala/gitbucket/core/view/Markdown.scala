@@ -56,15 +56,15 @@ object Markdown {
   /**
     * Extends markedj Renderer for GitBucket
     */
-  class GitBucketMarkedRenderer(options: Options,
-                                repository: RepositoryService.RepositoryInfo,
-                                enableWikiLink: Boolean,
-                                enableRefsLink: Boolean,
-                                enableAnchor: Boolean,
-                                enableTaskList: Boolean,
-                                hasWritePermission: Boolean,
-                                pages: List[String])(
-      implicit val context: Context)
+  class GitBucketMarkedRenderer(
+      options: Options,
+      repository: RepositoryService.RepositoryInfo,
+      enableWikiLink: Boolean,
+      enableRefsLink: Boolean,
+      enableAnchor: Boolean,
+      enableTaskList: Boolean,
+      hasWritePermission: Boolean,
+      pages: List[String])(implicit val context: Context)
       extends Renderer(options)
       with LinkConverter
       with RequestCache {
@@ -78,7 +78,7 @@ object Markdown {
       if (enableAnchor) {
         out.append(" class=\"markdown-head\">")
         out.append("<a class=\"markdown-anchor-link\" href=\"#" + id +
-            "\"><span class=\"octicon octicon-link\"></span></a>")
+              "\"><span class=\"octicon octicon-link\"></span></a>")
         out.append("<a class=\"markdown-anchor\" name=\"" + id + "\"></a>")
       } else {
         out.append(">")
@@ -146,17 +146,16 @@ object Markdown {
       if (enableWikiLink && text.startsWith("[[") && text.endsWith("]]")) {
         val link = text.replaceAll("(^\\[\\[|\\]\\]$)", "")
 
-        val (label, page) =
-          if (link.contains('|')) {
-            val i = link.indexOf('|')
-            (link.substring(0, i), link.substring(i + 1))
-          } else {
-            (link, link)
-          }
+        val (label, page) = if (link.contains('|')) {
+          val i = link.indexOf('|')
+          (link.substring(0, i), link.substring(i + 1))
+        } else {
+          (link, link)
+        }
 
         val url =
           repository.httpUrl.replaceFirst("/git/", "/").stripSuffix(".git") +
-          "/wiki/" + StringUtil.urlEncode(page)
+            "/wiki/" + StringUtil.urlEncode(page)
         if (pages.contains(page)) {
           "<a href=\"" + url + "\">" + escape(label) + "</a>"
         } else {
@@ -219,10 +218,10 @@ object Markdown {
       .replaceAll(
           "task:x:",
           """<input type="checkbox" class="task-list-item-checkbox" checked="checked" """ +
-          disabled + "/>")
+            disabled + "/>")
       .replaceAll(
           "task: :",
           """<input type="checkbox" class="task-list-item-checkbox" """ +
-          disabled + "/>")
+            disabled + "/>")
   }
 }

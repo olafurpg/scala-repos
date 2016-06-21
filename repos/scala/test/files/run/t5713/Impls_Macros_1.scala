@@ -18,8 +18,8 @@ private object LoggerMacros {
   def error(c: LoggerContext)(message: c.Expr[String]): c.Expr[Unit] =
     log(c)(c.universe.reify(Level.Error), message)
 
-  private def log(c: LoggerContext)(
-      level: c.Expr[Level.Value], message: c.Expr[String]): c.Expr[Unit] =
+  private def log(c: LoggerContext)(level: c.Expr[Level.Value],
+                                    message: c.Expr[String]): c.Expr[Unit] =
 // was:    if (level.splice.id < 4) // TODO Remove hack!
     if (c.eval(level).id < 4) // TODO Remove hack!
       c.universe.reify(())

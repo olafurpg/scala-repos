@@ -59,8 +59,8 @@ package record {
   class SelectorMacros(val c: whitebox.Context) extends CaseClassMacros {
     import c.universe._
 
-    def applyImpl[L <: HList, K](
-        implicit lTag: WeakTypeTag[L], kTag: WeakTypeTag[K]): Tree = {
+    def applyImpl[L <: HList, K](implicit lTag: WeakTypeTag[L],
+                                 kTag: WeakTypeTag[K]): Tree = {
       val lTpe = lTag.tpe.dealias
       val kTpe = kTag.tpe.dealias
       if (!(lTpe <:< hlistTpe)) abort(s"$lTpe is not a record type")
@@ -143,8 +143,8 @@ package record {
   class UpdaterMacros(val c: whitebox.Context) extends CaseClassMacros {
     import c.universe._
 
-    def applyImpl[L <: HList, F](
-        implicit lTag: WeakTypeTag[L], fTag: WeakTypeTag[F]): Tree = {
+    def applyImpl[L <: HList, F](implicit lTag: WeakTypeTag[L],
+                                 fTag: WeakTypeTag[F]): Tree = {
       val lTpe = lTag.tpe.dealias
       val fTpe = fTag.tpe.dealias
       if (!(lTpe <:< hlistTpe)) abort(s"$lTpe is not a record type")
@@ -196,7 +196,8 @@ package record {
       }
 
     implicit def hlistMerger2[K, V, T <: HList, M <: HList, MT <: HList](
-        implicit rm: Remover.Aux[M, K, (V, MT)], mt: Merger[T, MT])
+        implicit rm: Remover.Aux[M, K, (V, MT)],
+        mt: Merger[T, MT])
       : Aux[FieldType[K, V] :: T, M, FieldType[K, V] :: mt.Out] =
       new Merger[FieldType[K, V] :: T, M] {
         type Out = FieldType[K, V] :: mt.Out
@@ -496,8 +497,8 @@ package record {
         def apply(): Out = HNil
       }
 
-    implicit def hlistSwapRecord[K, V, T <: HList](
-        implicit wk: Witness.Aux[K], kt: SwapRecord[T])
+    implicit def hlistSwapRecord[K, V, T <: HList](implicit wk: Witness.Aux[K],
+                                                   kt: SwapRecord[T])
       : Aux[FieldType[K, V] :: T, FieldType[V, K] :: kt.Out] =
       new SwapRecord[FieldType[K, V] :: T] {
         type Out = FieldType[V, K] :: kt.Out
@@ -526,8 +527,8 @@ package record {
         def apply(l: L) = l
       }
 
-    implicit def hconsFields[K, V, T <: HList](
-        implicit key: Witness.Aux[K], tailFields: Fields[T])
+    implicit def hconsFields[K, V, T <: HList](implicit key: Witness.Aux[K],
+                                               tailFields: Fields[T])
       : Aux[FieldType[K, V] :: T, (K, V) :: tailFields.Out] =
       new Fields[FieldType[K, V] :: T] {
         type Out = (K, V) :: tailFields.Out
@@ -614,7 +615,8 @@ package record {
       }
 
     implicit def hconsMapValues[HF, K, V, T <: HList](
-        implicit hc: Case1[HF, V], mapValuesTail: MapValues[HF, T])
+        implicit hc: Case1[HF, V],
+        mapValuesTail: MapValues[HF, T])
       : Aux[HF,
             FieldType[K, V] :: T,
             FieldType[K, hc.Result] :: mapValuesTail.Out] =

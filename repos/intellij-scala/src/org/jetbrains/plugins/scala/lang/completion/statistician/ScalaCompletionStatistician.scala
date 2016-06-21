@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
   * @since 06.07.12
   */
 class ScalaCompletionStatistician extends CompletionStatistician {
-  def serialize(
-      element: LookupElement, location: CompletionLocation): StatisticsInfo = {
+  def serialize(element: LookupElement,
+                location: CompletionLocation): StatisticsInfo = {
     val currentElement =
       Option(element.as(LookupItem.CLASS_CONDITION_KEY)).getOrElse(return null)
 

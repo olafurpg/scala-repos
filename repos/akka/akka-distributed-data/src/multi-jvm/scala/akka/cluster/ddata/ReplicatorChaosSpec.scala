@@ -20,7 +20,8 @@ object ReplicatorChaosSpec extends MultiNodeConfig {
   val fourth = role("fourth")
   val fifth = role("fifth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.cluster.roles = ["backend"]
@@ -168,9 +169,8 @@ class ReplicatorChaosSpec
       val side1 = Seq(first, second)
       val side2 = Seq(third, fourth, fifth)
       runOn(first) {
-        for (a ← side1; b ← side2) testConductor
-          .blackhole(a, b, Direction.Both)
-          .await
+        for (a ← side1; b ← side2)
+          testConductor.blackhole(a, b, Direction.Both).await
       }
       enterBarrier("split")
 
@@ -222,9 +222,8 @@ class ReplicatorChaosSpec
       val side1 = Seq(first, second)
       val side2 = Seq(third, fifth) // fourth was shutdown
       runOn(first) {
-        for (a ← side1; b ← side2) testConductor
-          .passThrough(a, b, Direction.Both)
-          .await
+        for (a ← side1; b ← side2)
+          testConductor.passThrough(a, b, Direction.Both).await
       }
       enterBarrier("split-repaired")
 

@@ -28,7 +28,7 @@ trait MethodSynthesis { self: Analyzer =>
 
     private def isOverride(name: TermName) =
       clazzMember(name).alternatives exists
-      (sym => !sym.isDeferred && (sym.owner != clazz))
+        (sym => !sym.isDeferred && (sym.owner != clazz))
 
     def newMethodFlags(name: TermName) = {
       val overrideFlag = if (isOverride(name)) OVERRIDE else 0L
@@ -42,23 +42,26 @@ trait MethodSynthesis { self: Analyzer =>
 
     private def finishMethod(method: Symbol, f: Symbol => Tree): Tree =
       localTyper typed
-      (if (method.isLazy) ValDef(method, f(method))
-       else DefDef(method, f(method)))
+        (if (method.isLazy) ValDef(method, f(method))
+         else DefDef(method, f(method)))
 
-    private def createInternal(
-        name: Name, f: Symbol => Tree, info: Type): Tree = {
+    private def createInternal(name: Name,
+                               f: Symbol => Tree,
+                               info: Type): Tree = {
       val name1 = name.toTermName
       val m = clazz.newMethod(name1, clazz.pos.focus, newMethodFlags(name1))
       finishMethod(m setInfoAndEnter info, f)
     }
-    private def createInternal(
-        name: Name, f: Symbol => Tree, infoFn: Symbol => Type): Tree = {
+    private def createInternal(name: Name,
+                               f: Symbol => Tree,
+                               infoFn: Symbol => Type): Tree = {
       val name1 = name.toTermName
       val m = clazz.newMethod(name1, clazz.pos.focus, newMethodFlags(name1))
       finishMethod(m setInfoAndEnter infoFn(m), f)
     }
-    private def cloneInternal(
-        original: Symbol, f: Symbol => Tree, name: Name): Tree = {
+    private def cloneInternal(original: Symbol,
+                              f: Symbol => Tree,
+                              name: Name): Tree = {
       val m =
         original.cloneSymbol(clazz, newMethodFlags(original), name) setPos clazz.pos.focus
       finishMethod(clazz.info.decls enter m, f)
@@ -88,8 +91,8 @@ trait MethodSynthesis { self: Analyzer =>
     def forwardMethod(original: Symbol, newMethod: Symbol)(
         transformArgs: List[Tree] => List[Tree]): Tree =
       createMethod(original)(m =>
-            gen.mkMethodCall(
-                newMethod, transformArgs(m.paramss.head map Ident)))
+            gen.mkMethodCall(newMethod,
+                             transformArgs(m.paramss.head map Ident)))
 
     def createSwitchMethod(name: Name, range: Seq[Int], returnType: Type)(
         f: Int => Tree) = {
@@ -139,25 +142,24 @@ trait MethodSynthesis { self: Analyzer =>
 
     // TODO: see if we can link symbol creation & tree derivation by sharing the Field/Getter/Setter factories
     def enterGetterSetter(tree: ValDef): Unit = {
-      tree.symbol =
-        if (tree.mods.isLazy) {
-          val lazyValGetter = LazyValGetter(tree).createAndEnterSymbol()
-          enterLazyVal(tree, lazyValGetter)
-        } else {
-          val getter = Getter(tree)
-          val getterSym = getter.createAndEnterSymbol()
+      tree.symbol = if (tree.mods.isLazy) {
+        val lazyValGetter = LazyValGetter(tree).createAndEnterSymbol()
+        enterLazyVal(tree, lazyValGetter)
+      } else {
+        val getter = Getter(tree)
+        val getterSym = getter.createAndEnterSymbol()
 
-          // Create the setter if necessary.
-          if (getter.needsSetter) Setter(tree).createAndEnterSymbol()
+        // Create the setter if necessary.
+        if (getter.needsSetter) Setter(tree).createAndEnterSymbol()
 
-          // If the getter's abstract the tree gets the getter's symbol,
-          // otherwise, create a field (assume the getter requires storage).
-          // NOTE: we cannot look at symbol info, since we're in the process of deriving them
-          // (luckily, they only matter for lazy vals, which we've ruled out in this else branch,
-          // and `doNotDeriveField` will skip them if `!mods.isLazy`)
-          if (Field.noFieldFor(tree)) getterSym setPos tree.pos
-          else enterStrictVal(tree)
-        }
+        // If the getter's abstract the tree gets the getter's symbol,
+        // otherwise, create a field (assume the getter requires storage).
+        // NOTE: we cannot look at symbol info, since we're in the process of deriving them
+        // (luckily, they only matter for lazy vals, which we've ruled out in this else branch,
+        // and `doNotDeriveField` will skip them if `!mods.isLazy`)
+        if (Field.noFieldFor(tree)) getterSym setPos tree.pos
+        else enterStrictVal(tree)
+      }
 
       enterBeans(tree)
     }
@@ -171,18 +173,19 @@ trait MethodSynthesis { self: Analyzer =>
       val annotations = tree.symbol.initialize.annotations
       val targetClass = defaultAnnotationTarget(tree)
       val retained =
-        annotations filter annotationFilter(
-            targetClass, defaultRetention = true)
+        annotations filter annotationFilter(targetClass,
+                                            defaultRetention = true)
 
       annotations filterNot (retained contains _) foreach
       (ann => issueAnnotationWarning(tree, ann, targetClass))
     }
-    private def issueAnnotationWarning(
-        tree: Tree, ann: AnnotationInfo, defaultTarget: Symbol) {
+    private def issueAnnotationWarning(tree: Tree,
+                                       ann: AnnotationInfo,
+                                       defaultTarget: Symbol) {
       global.reporter.warning(
           ann.pos,
           s"no valid targets for annotation on ${tree.symbol} - it is discarded unused. " +
-          s"You may specify targets with meta-annotations, e.g. @($ann @${defaultTarget.name})")
+            s"You may specify targets with meta-annotations, e.g. @($ann @${defaultTarget.name})")
     }
 
     def addDerivedTrees(typer: Typer, stat: Tree): List[Tree] = stat match {
@@ -192,8 +195,8 @@ trait MethodSynthesis { self: Analyzer =>
         val annotations = stat.symbol.initialize.annotations
         val trees =
           ((field(vd) ::: standardAccessors(vd) ::: beanAccessors(vd)) map
-              (acc => atPos(vd.pos.focus)(acc derive annotations)) filterNot
-              (_ eq EmptyTree))
+                (acc => atPos(vd.pos.focus)(acc derive annotations)) filterNot
+                (_ eq EmptyTree))
         // Verify each annotation landed safely somewhere, else warn.
         // Filtering when isParamAccessor is a necessary simplification
         // because there's a bunch of unwritten annotation code involving
@@ -332,7 +335,7 @@ trait MethodSynthesis { self: Analyzer =>
             "[+derived] " + ojoin(mods.flagString,
                                   basisSym.accurateKindString,
                                   basisSym.getterName.decode) + " (" +
-            derivedSym + ")\n        " + result)
+              derivedSym + ")\n        " + result)
 
         result
       }
@@ -352,8 +355,8 @@ trait MethodSynthesis { self: Analyzer =>
             annotationFilter(ParamTargetClass, defaultRetention = true)
           // By default annotations go to the field, except if the field is generated for a class parameter (PARAMACCESSOR).
           case _: Field =>
-            annotationFilter(
-                FieldTargetClass, defaultRetention = !mods.isParamAccessor)
+            annotationFilter(FieldTargetClass,
+                             defaultRetention = !mods.isParamAccessor)
           case _: BaseGetter =>
             annotationFilter(GetterTargetClass, defaultRetention = false)
           case _: Setter =>
@@ -453,7 +456,7 @@ trait MethodSynthesis { self: Analyzer =>
           // circumstances (at least: concrete vals with existential types.)
           case _: ExistentialType =>
             TypeTree() setOriginal
-            (tree.tpt.duplicate setPos tree.tpt.pos.focus)
+              (tree.tpt.duplicate setPos tree.tpt.pos.focus)
           case _ if isDeferred =>
             TypeTree() setOriginal tree.tpt // keep type tree of original abstract field
           case _ => TypeTree(getterTp)
@@ -472,8 +475,8 @@ trait MethodSynthesis { self: Analyzer =>
       *      { z = <rhs>; z } where z can be an identifier or a field.
       */
     case class LazyValGetter(tree: ValDef) extends BaseGetter(tree) {
-      class ChangeOwnerAndModuleClassTraverser(
-          oldowner: Symbol, newowner: Symbol)
+      class ChangeOwnerAndModuleClassTraverser(oldowner: Symbol,
+                                               newowner: Symbol)
           extends ChangeOwnerTraverser(oldowner, newowner) {
 
         override def traverse(tree: Tree) {

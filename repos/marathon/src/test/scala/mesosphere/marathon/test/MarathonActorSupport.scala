@@ -22,8 +22,8 @@ trait MarathonActorSupport
   private[this] lazy val stoppingConfig =
     ConfigFactory.parseString(stoppingConfigStr)
 
-  implicit lazy val system: ActorSystem = ActorSystem(
-      getClass.getSimpleName, stoppingConfig)
+  implicit lazy val system: ActorSystem =
+    ActorSystem(getClass.getSimpleName, stoppingConfig)
   log.info("actor system {}: starting", system.name)
 
   override protected def afterAll(): Unit = {

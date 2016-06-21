@@ -155,8 +155,7 @@ final class PrefixAndTail[T](n: Int)
         setKeepGoing(false)
         cancelTimer(SubscriptionTimer)
         pull(in)
-        tailSource.setHandler(
-            new OutHandler {
+        tailSource.setHandler(new OutHandler {
           override def onPull(): Unit = pull(in)
         })
       }
@@ -243,8 +242,8 @@ object Split {
     : Graph[FlowShape[T, Source[T, NotUsed]], NotUsed] =
     new Split(Split.SplitBefore, p, substreamCancelStrategy)
 
-  def after[T](
-      p: T ⇒ Boolean, substreamCancelStrategy: SubstreamCancelStrategy)
+  def after[T](p: T ⇒ Boolean,
+               substreamCancelStrategy: SubstreamCancelStrategy)
     : Graph[FlowShape[T, Source[T, NotUsed]], NotUsed] =
     new Split(Split.SplitAfter, p, substreamCancelStrategy)
 }
@@ -347,8 +346,8 @@ final class Split[T](decision: Split.SplitDecision,
         private var willCompleteAfterInitialElement = false
 
         // Substreams are always assumed to be pushable position when we enter this method
-        private def closeThis(
-            handler: SubstreamHandler, currentElem: T): Unit = {
+        private def closeThis(handler: SubstreamHandler,
+                              currentElem: T): Unit = {
           decision match {
             case SplitAfter ⇒
               if (!substreamCancelled) {
@@ -427,8 +426,8 @@ object SubSink {
 /**
   * INTERNAL API
   */
-final class SubSink[T](
-    name: String, externalCallback: ActorSubscriberMessage ⇒ Unit)
+final class SubSink[T](name: String,
+                       externalCallback: ActorSubscriberMessage ⇒ Unit)
     extends GraphStage[SinkShape[T]] {
   import SubSink._
 

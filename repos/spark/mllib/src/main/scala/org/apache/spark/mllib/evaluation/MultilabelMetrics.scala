@@ -65,8 +65,8 @@ class MultilabelMetrics @Since("1.2.0")(
     predictionAndLabels.map {
       case (predictions, labels) =>
         labels.intersect(predictions).length.toDouble /
-        (labels.length + predictions.length -
-            labels.intersect(predictions).length)
+          (labels.length + predictions.length -
+                labels.intersect(predictions).length)
     }.sum / numDocs
 
   /**
@@ -77,7 +77,7 @@ class MultilabelMetrics @Since("1.2.0")(
     predictionAndLabels.map {
       case (predictions, labels) =>
         labels.length + predictions.length -
-        2 * labels.intersect(predictions).length
+          2 * labels.intersect(predictions).length
     }.sum / (numDocs * numLabels)
 
   /**
@@ -112,7 +112,7 @@ class MultilabelMetrics @Since("1.2.0")(
     predictionAndLabels.map {
       case (predictions, labels) =>
         2.0 * predictions.intersect(labels).length /
-        (predictions.length + labels.length)
+          (predictions.length + labels.length)
     }.sum / numDocs
 
   private lazy val tpPerClass = predictionAndLabels.flatMap {

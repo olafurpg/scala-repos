@@ -63,8 +63,7 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
 
     // Hanging onto lower bound in case anything interesting
     // happens with it.
-    mapFrom(hidden)(
-        s =>
+    mapFrom(hidden)(s =>
           s.existentialBound match {
         case TypeBounds(lo, hi) => TypeBounds(lo, hiBound(s))
         case _ => hiBound(s)
@@ -88,8 +87,9 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
     *  only the type of the Ident is changed.
     */
   final def existentialTransform[T](
-      rawSyms: List[Symbol], tp: Type, rawOwner: Symbol = NoSymbol)(
-      creator: (List[Symbol], Type) => T): T = {
+      rawSyms: List[Symbol],
+      tp: Type,
+      rawOwner: Symbol = NoSymbol)(creator: (List[Symbol], Type) => T): T = {
     val allBounds = existentialBoundsExcludingHidden(rawSyms)
     val typeParams: List[Symbol] =
       rawSyms map { sym =>
@@ -121,8 +121,9 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
     * @param tp       The original type
     * @param rawOwner The owner for Java raw types.
     */
-  final def packSymbols(
-      hidden: List[Symbol], tp: Type, rawOwner: Symbol = NoSymbol): Type =
+  final def packSymbols(hidden: List[Symbol],
+                        tp: Type,
+                        rawOwner: Symbol = NoSymbol): Type =
     if (hidden.isEmpty) tp
     else existentialTransform(hidden, tp, rawOwner)(existentialAbstraction)
 }

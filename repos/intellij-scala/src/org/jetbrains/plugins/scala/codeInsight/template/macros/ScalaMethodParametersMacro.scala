@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
   * @since 22.09.2015.
   */
 class ScalaMethodParametersMacro extends Macro {
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     import scala.collection.JavaConversions._
     Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
                                        classOf[ScFunction]))

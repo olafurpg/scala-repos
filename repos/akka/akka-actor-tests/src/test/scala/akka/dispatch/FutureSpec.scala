@@ -455,8 +455,9 @@ class FutureSpec
         for (i ← 1 to 1000) {
           Await.result(
               Future { q.add(1); 3 } andThen { case _ ⇒ q.add(2) } andThen {
-            case Success(0) ⇒ q.add(Int.MaxValue)
-          } andThen { case _ ⇒ q.add(3); }, timeout.duration) should ===(3)
+                case Success(0) ⇒ q.add(Int.MaxValue)
+              } andThen { case _ ⇒ q.add(3); },
+              timeout.duration) should ===(3)
           q.poll() should ===(1)
           q.poll() should ===(2)
           q.poll() should ===(3)
@@ -607,8 +608,7 @@ class FutureSpec
       }
 
       "traverse Futures" in {
-        val oddActor = system.actorOf(
-            Props(new Actor {
+        val oddActor = system.actorOf(Props(new Actor {
           var counter = 1
           def receive = {
             case 'GetNext ⇒
@@ -675,7 +675,8 @@ class FutureSpec
         val latch = Vector.fill(10)(new TestLatch)
 
         val f1 = Future {
-          latch(0).open(); FutureSpec.ready(latch(1), TestLatch.DefaultTimeout); "Hello"
+          latch(0).open(); FutureSpec.ready(latch(1), TestLatch.DefaultTimeout);
+          "Hello"
         }
         val f2 =
           f1 map { s ⇒
@@ -739,7 +740,7 @@ class FutureSpec
       "not deadlock with nested await (ticket 1313)" in {
         val simple =
           Future(()) map
-          (_ ⇒ Await.result((Future(()) map (_ ⇒ ())), timeout.duration))
+            (_ ⇒ Await.result((Future(()) map (_ ⇒ ())), timeout.duration))
         FutureSpec.ready(simple, timeout.duration) should be('completed)
 
         val l1, l2 = new TestLatch
@@ -760,16 +761,17 @@ class FutureSpec
           Future(()) flatMap { _ ⇒
             val originalThread = Thread.currentThread
             // run some nested futures
-            val nested = for (i ← 1 to 100) yield
-              Future.successful("abc") flatMap { _ ⇒
-                if (Thread.currentThread ne originalThread)
-                  failCount.incrementAndGet
-                // another level of nesting
-                Future.successful("xyz") map { _ ⇒
+            val nested = for (i ← 1 to 100)
+              yield
+                Future.successful("abc") flatMap { _ ⇒
                   if (Thread.currentThread ne originalThread)
                     failCount.incrementAndGet
+                  // another level of nesting
+                  Future.successful("xyz") map { _ ⇒
+                    if (Thread.currentThread ne originalThread)
+                      failCount.incrementAndGet
+                  }
                 }
-              }
             Future.sequence(nested)
           }
         Await.ready(f, timeout.duration)
@@ -814,8 +816,8 @@ class FutureSpec
     }
     "compose result with flatMap" in {
       f { (future, result) ⇒
-        val r = for (r ← future; p ← Promise.successful("foo").future) yield
-          r.toString + p
+        val r = for (r ← future; p ← Promise.successful("foo").future)
+          yield r.toString + p
         Await.result(r, timeout.duration) should ===(result.toString + "foo")
       }
     }
@@ -850,8 +852,7 @@ class FutureSpec
       }
     }
     "not project a failure" in {
-      f(
-          (future, result) ⇒
+      f((future, result) ⇒
             (intercept[NoSuchElementException] {
           Await.result(future.failed, timeout.duration)
         }).getMessage should ===(
@@ -872,8 +873,7 @@ class FutureSpec
       f: ((Future[Any], String) ⇒ Unit) ⇒ Unit) {
     "be completed" in { f((future, _) ⇒ future should be('completed)) }
     "contain a value" in {
-      f(
-          (future, message) ⇒ {
+      f((future, message) ⇒ {
         future.value should be('defined)
         future.value.get should be('failure)
         val Failure(f) = future.value.get
@@ -881,15 +881,13 @@ class FutureSpec
       })
     }
     "throw exception with 'get'" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             (intercept[java.lang.Exception] {
           Await.result(future, timeout.duration)
         }).getMessage should ===(message))
     }
     "throw exception with 'Await.result'" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             (intercept[java.lang.Exception] {
           Await.result(future, timeout.duration)
         }).getMessage should ===(message))
@@ -905,18 +903,16 @@ class FutureSpec
       }
     }
     "retain exception with map" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             (intercept[java.lang.Exception] {
           Await.result(future map (_.toString.length), timeout.duration)
         }).getMessage should ===(message))
     }
     "retain exception with flatMap" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             (intercept[java.lang.Exception] {
           Await.result(future flatMap
-                       (_ ⇒ Promise.successful[Any]("foo").future),
+                         (_ ⇒ Promise.successful[Any]("foo").future),
                        timeout.duration)
         }).getMessage should ===(message))
     }
@@ -931,8 +927,7 @@ class FutureSpec
       }
     }
     "recover from exception" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             Await.result(future.recover({
           case e if e.getMessage == message ⇒ "pigdog"
         }), timeout.duration) should ===("pigdog"))
@@ -951,8 +946,7 @@ class FutureSpec
       }
     }
     "always cast successfully using mapTo" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             (evaluating {
               Await.result(future.mapTo[java.lang.Thread], timeout.duration)
             } should produce[java.lang.Exception]).getMessage should ===(

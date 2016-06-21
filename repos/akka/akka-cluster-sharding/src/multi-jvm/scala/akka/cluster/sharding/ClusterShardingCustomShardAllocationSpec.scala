@@ -74,15 +74,15 @@ object ClusterShardingCustomShardAllocationSpec {
         requester: ActorRef,
         shardId: ShardRegion.ShardId,
         currentShardAllocations: Map[
-            ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]])
-      : Future[ActorRef] = {
+            ActorRef,
+            immutable.IndexedSeq[ShardRegion.ShardId]]): Future[ActorRef] = {
       (ref ? AllocateReq).mapTo[ActorRef]
     }
 
-    override def rebalance(
-        currentShardAllocations: Map[
-            ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]],
-        rebalanceInProgress: Set[ShardRegion.ShardId])
+    override def rebalance(currentShardAllocations: Map[
+                               ActorRef,
+                               immutable.IndexedSeq[ShardRegion.ShardId]],
+                           rebalanceInProgress: Set[ShardRegion.ShardId])
       : Future[Set[ShardRegion.ShardId]] = {
       (ref ? RebalanceReq).mapTo[Set[String]]
     }

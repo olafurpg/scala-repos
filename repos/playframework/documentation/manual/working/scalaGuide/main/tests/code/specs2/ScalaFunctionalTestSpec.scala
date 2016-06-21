@@ -110,8 +110,9 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
         })
         .build()
 
-    "run in a browser" in new WithBrowser(
-        webDriver = WebDriverFactory(HTMLUNIT), app = applicationWithBrowser) {
+    "run in a browser" in new WithBrowser(webDriver =
+                                            WebDriverFactory(HTMLUNIT),
+                                          app = applicationWithBrowser) {
       browser.goTo("/")
 
       // Check the page

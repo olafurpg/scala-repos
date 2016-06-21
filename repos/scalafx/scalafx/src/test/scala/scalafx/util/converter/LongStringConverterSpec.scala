@@ -40,8 +40,10 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class LongStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[
-        java.lang.Long, jfxuc.LongStringConverter, Long, LongStringConverter](
+    extends AbstractStringConverterDelegateSpec[java.lang.Long,
+                                                jfxuc.LongStringConverter,
+                                                Long,
+                                                LongStringConverter](
         classOf[jfxuc.LongStringConverter],
         classOf[LongStringConverter],
         classOf[Long]) {

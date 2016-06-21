@@ -90,8 +90,8 @@ class TestService[K, V](
       implicit ts: TupleSetter[T]): Buffer[Tuple] =
     it.map { ts(_) }.toBuffer
 
-  override def readStream(
-      batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
+  override def readStream(batchID: BatchID,
+                          mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
     streams.get(batchID).map { iter =>
       val mappable = streamMappable(batchID)
       Reader { (fd: (FlowDef, Mode)) =>

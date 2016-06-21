@@ -59,7 +59,8 @@ import scala.math.Ordered._
 
 trait VFSMetadata[M[+ _]] {
   def findDirectChildren(
-      apiKey: APIKey, path: Path): EitherT[M, ResourceError, Set[PathMetadata]]
+      apiKey: APIKey,
+      path: Path): EitherT[M, ResourceError, Set[PathMetadata]]
   def pathStructure(apiKey: APIKey,
                     path: Path,
                     property: CPath,
@@ -82,11 +83,12 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
       with Logging {
     final val unsecured = vfs
 
-    private def verifyResourceAccess(
-        apiKey: APIKey, path: Path, readMode: ReadMode)
+    private def verifyResourceAccess(apiKey: APIKey,
+                                     path: Path,
+                                     readMode: ReadMode)
       : Resource => EitherT[M, ResourceError, Resource] = { resource =>
-      logger.debug("Verifying access to %s as %s on %s (mode %s)".format(
-              resource, apiKey, path, readMode))
+      logger.debug("Verifying access to %s as %s on %s (mode %s)"
+            .format(resource, apiKey, path, readMode))
       import AccessMode._
       val permissions: Set[Permission] =
         resource.authorities.accountIds map { accountId =>
@@ -99,8 +101,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         }
 
       EitherT {
-        permissionsFinder.apiKeyFinder.hasCapability(
-            apiKey, permissions, Some(clock.now())) map {
+        permissionsFinder.apiKeyFinder
+          .hasCapability(apiKey, permissions, Some(clock.now())) map {
           case true => \/.right(resource)
           case false =>
             \/.left(permissionsError(
@@ -116,7 +118,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         version: Version,
         readMode: ReadMode): EitherT[M, ResourceError, Resource] = {
       vfs.readResource(path, version) >>=
-        verifyResourceAccess(apiKey, path, readMode)
+      verifyResourceAccess(apiKey, path, readMode)
     }
 
     final def readQuery(
@@ -125,7 +127,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         version: Version,
         readMode: ReadMode): EitherT[M, ResourceError, String] = {
       readResource(apiKey, path, version, readMode) >>=
-        Resource.asQuery(path, version)
+      Resource.asQuery(path, version)
     }
 
     final def readProjection(
@@ -134,7 +136,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         version: Version,
         readMode: ReadMode): EitherT[M, ResourceError, Projection] = {
       readResource(apiKey, path, version, readMode) >>=
-        Resource.asProjection(path, version)
+      Resource.asProjection(path, version)
     }
 
     final def size(apiKey: APIKey,
@@ -153,7 +155,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         selector: CPath,
         version: Version): EitherT[M, ResourceError, PathStructure] = {
       readProjection(apiKey, path, version, AccessMode.ReadMetadata) >>=
-        VFS.pathStructure(selector)
+      VFS.pathStructure(selector)
     }
 
     final def findDirectChildren(
@@ -165,8 +167,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         case Path.Root =>
           logger.debug("Defaulting on root-level child browse to account path")
           for {
-            children <- EitherT.right(permissionsFinder.findBrowsableChildren(
-                               apiKey, path))
+            children <- EitherT.right(permissionsFinder
+                             .findBrowsableChildren(apiKey, path))
             nonRoot = children.filterNot(_ == Path.Root)
             childMetadata <- nonRoot.toList.traverseU(vfs.findPathMetadata)
           } yield {
@@ -176,8 +178,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         case other =>
           for {
             children <- vfs.findDirectChildren(path)
-            permitted <- EitherT.right(permissionsFinder.findBrowsableChildren(
-                                apiKey, path))
+            permitted <- EitherT.right(permissionsFinder
+                              .findBrowsableChildren(apiKey, path))
           } yield {
             children filter {
               case PathMetadata(child, _) =>
@@ -196,10 +198,11 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
       import queryOptions.cacheControl._
       import EvaluationError._
 
-      val pathPrefix = EitherT(
-          (path.prefix \/> invalidState(
-                  "Path %s cannot be relativized.".format(path.path)))
-            .point[M])
+      val pathPrefix =
+        EitherT(
+            (path.prefix \/> invalidState(
+                    "Path %s cannot be relativized.".format(path.path)))
+              .point[M])
 
       val cachePath = path / Path(".cached")
       def fallBack =
@@ -225,8 +228,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
       EitherT.right(vfs.currentVersion(cachePath)) flatMap {
         case Some(VersionEntry(id, _, timestamp))
             if maxAge.forall(ms => timestamp.plus(ms) >= clock.instant()) =>
-          logger.debug("Found fresh cache entry (%s) for query on %s".format(
-                  timestamp, path))
+          logger.debug("Found fresh cache entry (%s) for query on %s"
+                .format(timestamp, path))
           val recacheAction = (recacheAfter
             .exists(ms => timestamp.plus(ms) < clock.instant()))
             .whenM[({ type l[a] = EitherT[M, EvaluationError, a] })#l, UUID] {
@@ -247,8 +250,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                                             cachePath,
                                             None) leftMap invalidState
                 _ = logger.debug(
-                    "Cache refresh scheduled for query %s, as id %s.".format(
-                        path.path, taskId))
+                    "Cache refresh scheduled for query %s, as id %s."
+                      .format(path.path, taskId))
               } yield taskId
             }
 
@@ -259,8 +262,9 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                                          Version.Current,
                                          AccessMode.Read) leftMap storageError
           } yield {
-            StoredQueryResult(
-                projection.getBlockStream(None), Some(timestamp), None)
+            StoredQueryResult(projection.getBlockStream(None),
+                              Some(timestamp),
+                              None)
           }
 
         case Some(VersionEntry(_, _, timestamp)) =>
@@ -358,13 +362,13 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
 
     // No permissions checks are being done here because the underlying routing layer, which serves both
     // VFS persistence and the KafkaShardManagerActor, must perform those checks.
-    def persistingStream(apiKey: APIKey,
-                         path: Path,
-                         writeAs: Authorities,
-                         jobId: Option[JobId],
-                         stream: StreamT[M, Block],
-                         clock: Clock)(
-        blockf: Block => Block): StreamT[M, Block] = {
+    def persistingStream(
+        apiKey: APIKey,
+        path: Path,
+        writeAs: Authorities,
+        jobId: Option[JobId],
+        stream: StreamT[M, Block],
+        clock: Clock)(blockf: Block => Block): StreamT[M, Block] = {
       val streamId = java.util.UUID.randomUUID()
 
       StreamT.unfoldM((0, stream)) {

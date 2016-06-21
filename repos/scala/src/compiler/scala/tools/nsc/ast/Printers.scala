@@ -67,8 +67,10 @@ trait Printers extends scala.reflect.internal.Printers {
     *  punctuation than the standard one.
     */
   class CompactTreePrinter(out: PrintWriter) extends TreePrinter(out) {
-    override def printRow(
-        ts: List[Tree], start: String, sep: String, end: String) {
+    override def printRow(ts: List[Tree],
+                          start: String,
+                          sep: String,
+                          end: String) {
       print(start)
       printSeq(ts)(print(_))(print(sep))
       print(end)

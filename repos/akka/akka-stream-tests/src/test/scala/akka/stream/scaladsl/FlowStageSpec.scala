@@ -23,8 +23,8 @@ class FlowStageSpec
     extends AkkaSpec(ConfigFactory.parseString(
             "akka.actor.debug.receive=off\nakka.loglevel=INFO")) {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -387,8 +387,7 @@ class FlowStageSpec
     }
 
     "be safe to reuse" in {
-      val flow = Source(1 to 3).transform(
-          () ⇒
+      val flow = Source(1 to 3).transform(() ⇒
             new PushStage[Int, Int] {
           var count = 0
 

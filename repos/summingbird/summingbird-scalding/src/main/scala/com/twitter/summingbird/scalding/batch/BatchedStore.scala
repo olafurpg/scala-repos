@@ -90,7 +90,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
 
   /** Record a computed batch of code */
   def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit
+      implicit flowDef: FlowDef,
+      mode: Mode): Unit
 
   @transient private val logger =
     LoggerFactory.getLogger(classOf[BatchedStore[_, _]])
@@ -173,8 +174,7 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
     val batchIntr = batcher.batchesCoveredBy(readTimespan)
 
     val batches = BatchID.toIterable(batchIntr).toList
-    val finalBatch =
-      batches.last // batches won't be empty, ensured by atLeastOneBatch method
+    val finalBatch = batches.last // batches won't be empty, ensured by atLeastOneBatch method
     val filteredBatches = select(batches).sorted
 
     assert(filteredBatches.contains(finalBatch),
@@ -291,8 +291,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
 
       (batchOps.coverIt(timeSpan).toList match {
         case Nil =>
-          Left(List("Timespan is covered by Nil: %s batcher: %s".format(
-                      timeSpan, batcher)))
+          Left(List("Timespan is covered by Nil: %s batcher: %s"
+                    .format(timeSpan, batcher)))
         case list => Right((in, list))
       })
     })
@@ -354,7 +354,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       // Get the total time we want to cover. If the lower bound of the requested timeSpan
       // is not the firstDeltaTimestamp, adjust it to that.
       deltaTimes: Interval[Timestamp] = setLower(
-          InclusiveLower(firstDeltaTimestamp), timeSpan)
+          InclusiveLower(firstDeltaTimestamp),
+          timeSpan)
 
       // Try to read the range covering the time we want; get the time we can completely
       // cover and the data from input in that range.
@@ -369,9 +370,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
               if (readDeltaTimestamps.contains(firstDeltaTimestamp)) Right(())
               else
                 Left(List("Cannot load initial timestamp " +
-                        firstDeltaTimestamp.toString +
-                        " of deltas " + " at " + this.toString + " only " +
-                        readDeltaTimestamps.toString)))
+                          firstDeltaTimestamp.toString +
+                          " of deltas " + " at " + this.toString + " only " +
+                          readDeltaTimestamps.toString)))
 
       // Record the timespan we actually read.
       _ <- putState((readDeltaTimestamps, mode))
@@ -405,7 +406,7 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
     fromEither[FactoryInput] {
       if (batcher.batchesCoveredBy(readTimespan) == Empty()) {
         Left(List("readTimespan is not convering at least one batch: " +
-                readTimespan.toString))
+                  readTimespan.toString))
       } else {
         Right(())
       }

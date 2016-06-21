@@ -15,8 +15,9 @@ object Test {
       val rest = res.toTraversable
       val failed = (rest take 100).size == 100
 
-      "%-45s %-30s %s".format(
-          toString, resString, if (failed) "<failed>" else rest.mkString(" "))
+      "%-45s %-30s %s".format(toString,
+                              resString,
+                              if (failed) "<failed>" else rest.mkString(" "))
     }
     def and(g: Perturber): Perturber =
       new Perturber(this.labels ++ g.labels, f andThen g.f)

@@ -43,7 +43,7 @@ import scalaz.syntax.monad._
   * A Projection wrapping a raw JDBM TreeMap index used for sorting. It's assumed that
   * the index has been created and filled prior to creating this wrapper.
   */
-class JDBMRawSortProjection[M[+ _]] private[yggdrasil](
+class JDBMRawSortProjection[M[+ _]] private[yggdrasil] (
     dbFile: File,
     indexName: String,
     sortKeyRefs: Seq[ColumnRef],
@@ -73,8 +73,8 @@ class JDBMRawSortProjection[M[+ _]] private[yggdrasil](
   val keyFormat = RowFormat.forSortingKey(sortKeyRefs)
 
   override def getBlockAfter(
-      id: Option[Array[Byte]], columns: Option[Set[ColumnRef]])(
-      implicit M: Monad[M])
+      id: Option[Array[Byte]],
+      columns: Option[Set[ColumnRef]])(implicit M: Monad[M])
     : M[Option[BlockProjectionData[Array[Byte], Slice]]] = M.point {
     // TODO: Make this far, far less ugly
     if (columns.nonEmpty) {
@@ -143,8 +143,8 @@ class JDBMRawSortProjection[M[+ _]] private[yggdrasil](
         val valColumnDecoder =
           rowFormat.ColumnDecoder(valColumns.map(_._2)(collection.breakOut))
 
-        val (firstKey, lastKey, rows) = JDBMSlice.load(
-            sliceSize, iteratorSetup, keyColumnDecoder, valColumnDecoder)
+        val (firstKey, lastKey, rows) = JDBMSlice
+          .load(sliceSize, iteratorSetup, keyColumnDecoder, valColumnDecoder)
 
         val slice = new Slice {
           val size = rows

@@ -15,7 +15,7 @@ final class DataForm {
 
   val clockIncrements =
     (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10) ++
-    (90 to 180 by 30)
+      (90 to 180 by 30)
   val clockIncrementDefault = 60
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
 
@@ -24,8 +24,8 @@ final class DataForm {
   val clockExtraDefault = 0
 
   val colors = List("white", "random", "black")
-  val colorChoices = List(
-      "white" -> "White", "random" -> "Random", "black" -> "Black")
+  val colorChoices =
+    List("white" -> "White", "random" -> "Random", "black" -> "Black")
   val colorDefault = "white"
 
   def create =

@@ -143,8 +143,9 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
             ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
           }
       q1 = ts.sortBy(_.a).map(_.a).take(1)
-      result <- db.run(q1.result.head
-                     .zipWith(q1.result.head)({ case (a, b) => a + b }))
+      result <- db.run(q1.result.head.zipWith(q1.result.head)({
+                 case (a, b) => a + b
+               }))
       _ = result shouldBe 2
     } yield ()
   }
@@ -161,8 +162,7 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
             ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
           }
       q1 = ts.sortBy(_.a).map(_.a).take(1)
-      result <- db.run(
-                   q1.result.headOption.collect {
+      result <- db.run(q1.result.headOption.collect {
                  case Some(a) => a
                })
       _ = result shouldBe 1

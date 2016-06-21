@@ -8,7 +8,8 @@ import scala.reflect.ClassTag
 object HashArrayEqualsWrapperLaws {
 
   def check2[T](ordToTest: Ordering[HashEqualsArrayWrapper[T]])(
-      implicit ord: Ordering[T], arb: Arbitrary[Array[T]]): Prop =
+      implicit ord: Ordering[T],
+      arb: Arbitrary[Array[T]]): Prop =
     Prop.forAll { (left: Array[T], right: Array[T]) =>
       val leftWrapped = HashEqualsArrayWrapper.wrap(left)
       val rightWrapped = HashEqualsArrayWrapper.wrap(right)
@@ -30,8 +31,8 @@ object HashArrayEqualsWrapperLaws {
       }
     }
 
-  def check[T](ordToTest: Ordering[Array[T]])(
-      implicit ord: Ordering[T], arb: Arbitrary[Array[T]]): Prop =
+  def check[T](ordToTest: Ordering[Array[T]])(implicit ord: Ordering[T],
+                                              arb: Arbitrary[Array[T]]): Prop =
     Prop.forAll { (left: Array[T], right: Array[T]) =>
       import scala.Ordering.Implicits.seqDerivedOrdering
 
@@ -105,13 +106,13 @@ class HashArrayEqualsWrapperTest extends FunSuite {
     testWrap[Short](Array[Short](1), classOf[HashEqualsShortArrayWrapper])
     testWrap[Char](Array[Char]('a'), classOf[HashEqualsCharArrayWrapper])
     testWrap[Byte](Array[Byte](1), classOf[HashEqualsByteArrayWrapper])
-    testWrap[Boolean](
-        Array[Boolean](true), classOf[HashEqualsBooleanArrayWrapper])
+    testWrap[Boolean](Array[Boolean](true),
+                      classOf[HashEqualsBooleanArrayWrapper])
     testWrap[Float](Array[Float](1), classOf[HashEqualsFloatArrayWrapper])
     testWrap[Double](Array[Double](1), classOf[HashEqualsDoubleArrayWrapper])
 
-    testWrap[String](
-        Array[String]("hi"), classOf[HashEqualsObjectArrayWrapper[String]])
+    testWrap[String](Array[String]("hi"),
+                     classOf[HashEqualsObjectArrayWrapper[String]])
   }
 
   test("classForTag works correctly") {

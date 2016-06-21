@@ -64,8 +64,11 @@ trait MelterLowPriority extends MelterLowerPriority {
     makeMelter { (a: A, b: (B, C, D)) =>
       (a, b._1, b._2, b._3)
     }
-  implicit def melt1_4[
-      A: ST: ORD, B: ST: ORD, C: ST: ORD, D: ST: ORD, E: ST: ORD] =
+  implicit def melt1_4[A: ST: ORD,
+                       B: ST: ORD,
+                       C: ST: ORD,
+                       D: ST: ORD,
+                       E: ST: ORD] =
     makeMelter { (a: A, b: (B, C, D, E)) =>
       (a, b._1, b._2, b._3, b._4)
     }
@@ -119,8 +122,11 @@ trait MelterLowPriority extends MelterLowerPriority {
     makeMelter { (a: (A, B, C), b: D) =>
       (a._1, a._2, a._3, b)
     }
-  implicit def melt4_1[
-      A: ST: ORD, B: ST: ORD, C: ST: ORD, D: ST: ORD, E: ST: ORD] =
+  implicit def melt4_1[A: ST: ORD,
+                       B: ST: ORD,
+                       C: ST: ORD,
+                       D: ST: ORD,
+                       E: ST: ORD] =
     makeMelter { (a: (A, B, C, D), b: E) =>
       (a._1, a._2, a._3, a._4, b)
     }
@@ -176,13 +182,19 @@ object Melter extends MelterLowPriority {
       (a._1, a._2, b._1, b._2)
     }
 
-  implicit def melt2_3[
-      A: ST: ORD, B: ST: ORD, C: ST: ORD, D: ST: ORD, E: ST: ORD] =
+  implicit def melt2_3[A: ST: ORD,
+                       B: ST: ORD,
+                       C: ST: ORD,
+                       D: ST: ORD,
+                       E: ST: ORD] =
     makeMelter { (a: (A, B), b: (C, D, E)) =>
       (a._1, a._2, b._1, b._2, b._3)
     }
-  implicit def melt3_2[
-      A: ST: ORD, B: ST: ORD, C: ST: ORD, D: ST: ORD, E: ST: ORD] =
+  implicit def melt3_2[A: ST: ORD,
+                       B: ST: ORD,
+                       C: ST: ORD,
+                       D: ST: ORD,
+                       E: ST: ORD] =
     makeMelter { (a: (A, B, C), b: (C, D)) =>
       (a._1, a._2, a._3, b._1, b._2)
     }

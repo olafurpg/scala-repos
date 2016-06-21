@@ -93,8 +93,8 @@ class TaskStatsByVersionFormatTest
             fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 200))),
         maybeWithOutdatedConfig = Some(
             fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 300))),
-        maybeTotalSummary =
-          Some(fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 500)))
+        maybeTotalSummary = Some(
+            fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 500)))
     )
 
     When("serializing to JSON")

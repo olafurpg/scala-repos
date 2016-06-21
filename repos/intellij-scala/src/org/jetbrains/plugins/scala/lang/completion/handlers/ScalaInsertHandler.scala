@@ -63,41 +63,38 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
     val document = editor.getDocument
 
     val contextStartOffset = context.getStartOffset
-    var (startOffset, lookupStringLength) =
-      if (item.isInSimpleString) {
-        val literal =
-          context.getFile.findElementAt(contextStartOffset).getParent
-        val startOffset = contextStartOffset
-        val tailOffset = context.getTailOffset
-        val literalOffset = literal.getTextRange.getStartOffset
-        document.insertString(tailOffset, "}")
-        document.insertString(startOffset, "{")
-        document.insertString(literalOffset, "s")
-        context.commitDocument()
-        (startOffset + 2, tailOffset - startOffset)
-      } else if (item.isInInterpolatedString) {
-        val literal =
-          context.getFile.findElementAt(contextStartOffset).getParent
-        if (!literal.isInstanceOf[ScInterpolated]) return
-        val index =
-          literal.asInstanceOf[ScInterpolated].getInjections.lastIndexWhere {
-            expr =>
-              expr.getTextRange.getEndOffset <= contextStartOffset
-          }
-        val res = ScalaBasicCompletionContributor
-          .getStartEndPointForInterpolatedString(
+    var (startOffset, lookupStringLength) = if (item.isInSimpleString) {
+      val literal = context.getFile.findElementAt(contextStartOffset).getParent
+      val startOffset = contextStartOffset
+      val tailOffset = context.getTailOffset
+      val literalOffset = literal.getTextRange.getStartOffset
+      document.insertString(tailOffset, "}")
+      document.insertString(startOffset, "{")
+      document.insertString(literalOffset, "s")
+      context.commitDocument()
+      (startOffset + 2, tailOffset - startOffset)
+    } else if (item.isInInterpolatedString) {
+      val literal = context.getFile.findElementAt(contextStartOffset).getParent
+      if (!literal.isInstanceOf[ScInterpolated]) return
+      val index =
+        literal.asInstanceOf[ScInterpolated].getInjections.lastIndexWhere {
+          expr =>
+            expr.getTextRange.getEndOffset <= contextStartOffset
+        }
+      val res =
+        ScalaBasicCompletionContributor.getStartEndPointForInterpolatedString(
             literal.asInstanceOf[ScInterpolated],
             index,
             contextStartOffset - literal.getTextRange.getStartOffset)
-        if (res.isEmpty) return
-        val (startOffset, _) = res.get
-        val tailOffset = context.getTailOffset
-        document.insertString(tailOffset, "}")
-        document.insertString(
-            startOffset + literal.getTextRange.getStartOffset, "{")
-        context.commitDocument()
-        (startOffset + 1, tailOffset - startOffset)
-      } else (contextStartOffset, context.getTailOffset - contextStartOffset)
+      if (res.isEmpty) return
+      val (startOffset, _) = res.get
+      val tailOffset = context.getTailOffset
+      document.insertString(tailOffset, "}")
+      document
+        .insertString(startOffset + literal.getTextRange.getStartOffset, "{")
+      context.commitDocument()
+      (startOffset + 1, tailOffset - startOffset)
+    } else (contextStartOffset, context.getTailOffset - contextStartOffset)
     var endOffset = startOffset + lookupStringLength
 
     val completionChar: Char = context.getCompletionChar
@@ -112,22 +109,21 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
     //val file = context.getFile //returns wrong file in evaluate expression in debugger (runtime type completion)
     val file =
       PsiDocumentManager.getInstance(context.getProject).getPsiFile(document)
-    val element =
-      if (completionChar == '\t') {
-        file.findElementAt(startOffset) match {
-          case elem
-              if elem.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER &&
+    val element = if (completionChar == '\t') {
+      file.findElementAt(startOffset) match {
+        case elem
+            if elem.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER &&
               elem.getParent.isInstanceOf[ScReferenceExpression] &&
               elem.getParent.getParent.isInstanceOf[ScReferenceExpression] &&
               item.getAllLookupStrings.size() > 1 =>
-            val ref = elem.getParent.asInstanceOf[ScReferenceExpression]
-            val newRefText = ref.getText
-            val newRef = ScalaPsiElementFactory.createExpressionFromText(
-                newRefText, ref.getManager)
-            ref.getParent.replace(newRef).getFirstChild
-          case elem => elem
-        }
-      } else file.findElementAt(startOffset)
+          val ref = elem.getParent.asInstanceOf[ScReferenceExpression]
+          val newRefText = ref.getText
+          val newRef = ScalaPsiElementFactory
+            .createExpressionFromText(newRefText, ref.getManager)
+          ref.getParent.replace(newRef).getFirstChild
+        case elem => elem
+      }
+    } else file.findElementAt(startOffset)
     if (some) {
       var elem = element
       var parent = elem.getParent
@@ -261,7 +257,7 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
       case _: ScFun if item.isInImport => moveCaretIfNeeded()
       case fun: ScFunction
           if fun.name == "classOf" && fun.containingClass != null &&
-          fun.containingClass.qualifiedName == "scala.Predef" =>
+            fun.containingClass.qualifiedName == "scala.Predef" =>
         context.setAddCompletionChar(false)
         insertIfNeeded(placeInto = true,
                        openChar = '[',
@@ -400,8 +396,8 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
               val blockEndOffset = block.getTextRange.getEndOffset
               val blockStartOffset = block.getTextRange.getStartOffset
               document.replaceString(blockEndOffset - 1, blockEndOffset, "")
-              document.replaceString(
-                  blockStartOffset, blockStartOffset + 1, "")
+              document
+                .replaceString(blockStartOffset, blockStartOffset + 1, "")
               item.isInSimpleStringNoBraces = true
             case _ =>
           }

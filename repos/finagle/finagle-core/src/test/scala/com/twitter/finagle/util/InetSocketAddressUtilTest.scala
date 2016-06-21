@@ -81,12 +81,12 @@ class InetSocketAddressUtilTest extends FunSuite {
             new InetSocketAddress("127.0.0.1", port1)))
     assert(
         InetSocketAddressUtil.parseHosts("127.0.0.1:" + port1 + ",127.0.0.1:" +
-            port2) == Seq(new InetSocketAddress("127.0.0.1", port1),
-                          new InetSocketAddress("127.0.0.1", port2)))
+              port2) == Seq(new InetSocketAddress("127.0.0.1", port1),
+                            new InetSocketAddress("127.0.0.1", port2)))
     assert(
         InetSocketAddressUtil.parseHosts("127.0.0.1:" + port1 + " 127.0.0.1:" +
-            port2) == Seq(new InetSocketAddress("127.0.0.1", port1),
-                          new InetSocketAddress("127.0.0.1", port2)))
+              port2) == Seq(new InetSocketAddress("127.0.0.1", port1),
+                            new InetSocketAddress("127.0.0.1", port2)))
 
     assert(InetSocketAddressUtil.parseHosts(":" + port1) == Seq(
             new InetSocketAddress("0.0.0.0", port1)))

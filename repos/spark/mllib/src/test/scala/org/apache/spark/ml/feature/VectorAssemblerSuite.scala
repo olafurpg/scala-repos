@@ -40,11 +40,11 @@ class VectorAssemblerSuite
     assert(assemble(0.0) === Vectors.sparse(1, Array.empty, Array.empty))
     assert(assemble(0.0, 1.0) === Vectors.sparse(2, Array(1), Array(1.0)))
     val dv = Vectors.dense(2.0, 0.0)
-    assert(assemble(0.0, dv, 1.0) === Vectors.sparse(
-            4, Array(1, 3), Array(2.0, 1.0)))
+    assert(assemble(0.0, dv, 1.0) === Vectors
+          .sparse(4, Array(1, 3), Array(2.0, 1.0)))
     val sv = Vectors.sparse(2, Array(0, 1), Array(3.0, 4.0))
-    assert(assemble(0.0, dv, 1.0, sv) === Vectors.sparse(
-            6, Array(1, 3, 4, 5), Array(2.0, 1.0, 3.0, 4.0)))
+    assert(assemble(0.0, dv, 1.0, sv) === Vectors
+          .sparse(6, Array(1, 3, 4, 5), Array(2.0, 1.0, 3.0, 4.0)))
     for (v <- Seq(1, "a", null)) {
       intercept[SparkException](assemble(v))
       intercept[SparkException](assemble(1.0, v))
@@ -76,8 +76,8 @@ class VectorAssemblerSuite
       .setOutputCol("features")
     assembler.transform(df).select("features").collect().foreach {
       case Row(v: Vector) =>
-        assert(v === Vectors.sparse(
-                6, Array(1, 2, 4, 5), Array(1.0, 2.0, 3.0, 10.0)))
+        assert(v === Vectors
+              .sparse(6, Array(1, 2, 4, 5), Array(1.0, 2.0, 3.0, 10.0)))
     }
   }
 

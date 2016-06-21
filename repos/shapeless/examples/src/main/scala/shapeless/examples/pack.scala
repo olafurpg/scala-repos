@@ -34,10 +34,11 @@ object PackExamples extends App {
     implicit def packHNil[F[_]]: PNil[F] = PNil[F]()
 
     implicit def packHList[F[_], H, T <: HList](
-        implicit fh: F[H], pt: Pack[F, T]): Pack[F, H :: T] = PCons(fh, pt)
+        implicit fh: F[H],
+        pt: Pack[F, T]): Pack[F, H :: T] = PCons(fh, pt)
 
-    implicit def unpack[F[_], E, L <: HList](
-        implicit pack: Pack[F, L], unpack: Unpack[F, L, E]): F[E] =
+    implicit def unpack[F[_], E, L <: HList](implicit pack: Pack[F, L],
+                                             unpack: Unpack[F, L, E]): F[E] =
       unpack(pack)
 
     trait Unpack[F[_], L <: HList, E] {

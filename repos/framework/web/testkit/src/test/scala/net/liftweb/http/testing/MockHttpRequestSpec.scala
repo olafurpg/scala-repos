@@ -77,7 +77,7 @@ object MockHttpRequestSpec extends Specification {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
 
       testRequest.headers +=
-        IF_MODIFIED_HEADER -> List("this is not a valid date")
+      IF_MODIFIED_HEADER -> List("this is not a valid date")
 
       testRequest.getDateHeader(IF_MODIFIED_HEADER) must throwA[
           IllegalArgumentException]
@@ -93,8 +93,8 @@ object MockHttpRequestSpec extends Specification {
     "throw an IllegalArgumentException for an invalid query string" in {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
 
-      (testRequest.queryString =
-        "this=a&&that=b") must throwA[IllegalArgumentException]
+      (testRequest.queryString = "this=a&&that=b") must throwA[
+          IllegalArgumentException]
     }
 
     "properly set a default content type for JSON" in {

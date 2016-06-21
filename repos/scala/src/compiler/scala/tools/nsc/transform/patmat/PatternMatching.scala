@@ -74,7 +74,7 @@ trait PatternMatching
             reporter.error(
                 tree.pos,
                 "error during expansion of this match (this is a scalac bug).\nThe underlying error was: " +
-                x.msg)
+                  x.msg)
             translated
         }
       case Try(block, catches, finalizer) =>
@@ -99,8 +99,9 @@ trait PatternMatching
   class PureMatchTranslator(val typer: analyzer.Typer, val matchStrategy: Tree)
       extends MatchTranslator
       with PureCodegen {
-    def optimizeCases(
-        prevBinder: Symbol, cases: List[List[TreeMaker]], pt: Type) =
+    def optimizeCases(prevBinder: Symbol,
+                      cases: List[List[TreeMaker]],
+                      pt: Type) =
       (cases, Nil)
     def analyzeCases(prevBinder: Symbol,
                      cases: List[List[TreeMaker]],
@@ -151,8 +152,7 @@ trait Interface extends ast.TreeDSL {
     val outer = newTermName("<outer>")
     val runOrElse = newTermName("runOrElse")
     val zero = newTermName("zero")
-    val _match =
-      newTermName("__match") // don't call the val __match, since that will trigger virtual pattern matching...
+    val _match = newTermName("__match") // don't call the val __match, since that will trigger virtual pattern matching...
 
     def counted(str: String, i: Int) = newTermName(str + i)
   }
@@ -211,7 +211,7 @@ trait Interface extends ast.TreeDSL {
       reporter.warning(
           pos,
           "match may not be exhaustive.\nIt would fail on the following " +
-          ceString)
+            ceString)
     }
   }
 
@@ -260,16 +260,16 @@ trait Interface extends ast.TreeDSL {
             else typer.typed(to)
 
           def typedStable(t: Tree) =
-            typer.typed(
-                t.shallowDuplicate, Mode.MonoQualifierModes | Mode.TYPEPATmode)
+            typer.typed(t.shallowDuplicate,
+                        Mode.MonoQualifierModes | Mode.TYPEPATmode)
           lazy val toTypes: List[Type] = to map (tree => typedStable(tree).tpe)
 
           override def transform(tree: Tree): Tree = {
             def subst(from: List[Symbol], to: List[Tree]): Tree =
               if (from.isEmpty) tree
               else if (tree.symbol == from.head)
-                typedIfOrigTyped(
-                    typedStable(to.head).setPos(tree.pos), tree.tpe)
+                typedIfOrigTyped(typedStable(to.head).setPos(tree.pos),
+                                 tree.tpe)
               else subst(from.tail, to.tail)
 
             val tree1 = tree match {
@@ -319,7 +319,8 @@ object PatternMatchingStats {
   val patmatCNF =
     Statistics.newSubTimer("  of which in CNF conversion", patmatNanos)
   val patmatCNFSizes = Statistics.newQuantMap[Int, Statistics.Counter](
-      "  CNF size counts", "patmat")(Statistics.newCounter(""))
+      "  CNF size counts",
+      "patmat")(Statistics.newCounter(""))
   val patmatAnaVarEq =
     Statistics.newSubTimer("  of which variable equality", patmatNanos)
   val patmatAnaExhaust =

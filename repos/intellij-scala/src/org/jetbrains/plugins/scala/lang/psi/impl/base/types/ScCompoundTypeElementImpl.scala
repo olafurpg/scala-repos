@@ -28,8 +28,11 @@ class ScCompoundTypeElementImpl(node: ASTNode)
         collectFailures(comps, types.Any)(
             new ScCompoundType(_, Map.empty, Map.empty))
       case Some(r) =>
-        collectFailures(comps, types.Any)(ScCompoundType.fromPsi(
-                _, r.holders.toList, r.types.toList, ScSubstitutor.empty))
+        collectFailures(comps, types.Any)(
+            ScCompoundType.fromPsi(_,
+                                   r.holders.toList,
+                                   r.types.toList,
+                                   ScSubstitutor.empty))
     }
   }
 

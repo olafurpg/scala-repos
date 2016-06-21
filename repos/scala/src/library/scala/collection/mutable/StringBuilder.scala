@@ -313,8 +313,10 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     * @throws StringIndexOutOfBoundsException  if index < 0, index > length,
     *         offset < 0, len < 0, or (offset + len) > str.length.
     */
-  def insertAll(
-      index: Int, str: Array[Char], offset: Int, len: Int): StringBuilder = {
+  def insertAll(index: Int,
+                str: Array[Char],
+                offset: Int,
+                len: Int): StringBuilder = {
     underlying.insert(index, str, offset, len)
     this
   }

@@ -74,8 +74,10 @@ object WebJobManager {
 }
 
 case class RealWebJobManager(
-    protocol: String, host: String, port: Int, path: String)(
-    implicit val executionContext: ExecutionContext)
+    protocol: String,
+    host: String,
+    port: Int,
+    path: String)(implicit val executionContext: ExecutionContext)
     extends WebClient(protocol, host, port, path)
     with WebJobManager {
 
@@ -106,18 +108,18 @@ trait WebJobManager
                 started: Option[DateTime]): Response[Job] = {
     val content: JValue = JObject(
         jfield("name", name) :: jfield("type", jobType) ::
-        (data map (jfield("data", _) :: Nil) getOrElse Nil)
+          (data map (jfield("data", _) :: Nil) getOrElse Nil)
     )
 
     withJsonClient { client =>
-      val job0: Response[Job] = eitherT(
-          client.query("apiKey", apiKey).post("/jobs/")(content) map {
-        case HttpResponse(HttpStatus(Created, _), _, Some(obj), _) =>
-          obj.validated[Job] map (right(_)) getOrElse left(
-              "Invalid job returned by server:\n" + obj)
-        case res =>
-          left(unexpected(res))
-      })
+      val job0: Response[Job] =
+        eitherT(client.query("apiKey", apiKey).post("/jobs/")(content) map {
+          case HttpResponse(HttpStatus(Created, _), _, Some(obj), _) =>
+            obj.validated[Job] map (right(_)) getOrElse left(
+                "Invalid job returned by server:\n" + obj)
+          case res =>
+            left(unexpected(res))
+        })
 
       started map { timestamp =>
         for {
@@ -126,7 +128,7 @@ trait WebJobManager
           job <- result.fold({ error: String =>
                   BadResponse(
                       "Server failed to return job that had been created: " +
-                      error)
+                        error)
                 }, _.point[Response])
         } yield job
       } getOrElse job0
@@ -170,8 +172,9 @@ trait WebJobManager
       val update =
         JObject(
             JField("message", JString(msg)) :: JField(
-                "progress", JNum(progress)) :: JField("unit", JString(unit)) ::
-            (info map (JField("info", _) :: Nil) getOrElse Nil)
+                "progress",
+                JNum(progress)) :: JField("unit", JString(unit)) ::
+              (info map (JField("info", _) :: Nil) getOrElse Nil)
         )
 
       val client =
@@ -224,8 +227,9 @@ trait WebJobManager
       })
   }
 
-  def addMessage(
-      jobId: JobId, channel: String, value: JValue): Response[Message] =
+  def addMessage(jobId: JobId,
+                 channel: String,
+                 value: JValue): Response[Message] =
     withJsonClient { client =>
       eitherT(client.post[JValue]("/jobs/" + jobId + "/messages/" + channel)(
               value) map {
@@ -269,8 +273,10 @@ trait WebJobManager
                     case Some(job) => Right(job)
                     case None => Left("Could not find job with ID: " + jobId)
                   }
-                case HttpResponse(
-                    HttpStatus(BadRequest, _), _, Some(JString(msg)), _) =>
+                case HttpResponse(HttpStatus(BadRequest, _),
+                                  _,
+                                  Some(JString(msg)),
+                                  _) =>
                   BadResponse(msg)
                 case res =>
                   BadResponse(unexpected(res))
@@ -292,8 +298,7 @@ trait WebJobManager
       mimeType: Option[MimeType],
       data: StreamT[Response, Array[Byte]]): Response[Either[String, Unit]] = {
     withRawClient { client0 =>
-      eitherT(
-          mimeType
+      eitherT(mimeType
             .foldLeft(client0)(_ contentType _)
             .put[ByteChunk]("/jobs/" + jobId + "/result") {
           val t = ResponseStreamAsFutureStream
@@ -318,8 +323,10 @@ trait WebJobManager
           right(Right((contentType(headers),
                        bytes :: StreamT.empty[Response, Array[Byte]])))
 
-        case HttpResponse(
-            HttpStatus(OK, _), headers, Some(Right(chunks)), _) =>
+        case HttpResponse(HttpStatus(OK, _),
+                          headers,
+                          Some(Right(chunks)),
+                          _) =>
           val t = FutureStreamAsResponseStream
           right(Right((contentType(headers), t(chunks))))
 

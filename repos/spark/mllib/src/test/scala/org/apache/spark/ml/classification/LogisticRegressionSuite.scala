@@ -49,13 +49,17 @@ class LogisticRegressionSuite
 
     binaryDataset = {
       val nPoints = 10000
-      val coefficients = Array(
-          -0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
+      val coefficients =
+        Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
 
-      val testData = generateMultinomialLogisticInput(
-          coefficients, xMean, xVariance, addIntercept = true, nPoints, 42)
+      val testData = generateMultinomialLogisticInput(coefficients,
+                                                      xMean,
+                                                      xVariance,
+                                                      addIntercept = true,
+                                                      nPoints,
+                                                      42)
 
       sqlContext.createDataFrame(sc.parallelize(testData, 4))
     }
@@ -189,11 +193,12 @@ class LogisticRegressionSuite
       .map { case Row(pred: Double, prob: Vector) => pred }
     assert(predAllZero.forall(_ === 0),
            s"With threshold=1.0, expected predictions to be all 0, but only" +
-           s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
+             s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
     // Call transform with params, and check that the params worked.
     val predNotAllZero = model
-      .transform(
-          dataset, model.threshold -> 0.0, model.probabilityCol -> "myProb")
+      .transform(dataset,
+                 model.threshold -> 0.0,
+                 model.probabilityCol -> "myProb")
       .select("prediction", "myProb")
       .collect()
       .map { case Row(pred: Double, prob: Vector) => pred }
@@ -826,18 +831,16 @@ class LogisticRegressionSuite
 
     val histogram = binaryDataset.rdd.map {
       case Row(label: Double, features: Vector) => label
-    }.treeAggregate(new MultiClassSummarizer)(
-          seqOp = (c, v) =>
+    }.treeAggregate(new MultiClassSummarizer)(seqOp = (c, v) =>
             (c, v) match {
-              case (classSummarizer: MultiClassSummarizer, label: Double) =>
-                classSummarizer.add(label)
-          },
-          combOp = (c1, c2) =>
+          case (classSummarizer: MultiClassSummarizer, label: Double) =>
+            classSummarizer.add(label)
+      }, combOp = (c1, c2) =>
             (c1, c2) match {
-              case (classSummarizer1: MultiClassSummarizer,
-                    classSummarizer2: MultiClassSummarizer) =>
-                classSummarizer1.merge(classSummarizer2)
-          })
+          case (classSummarizer1: MultiClassSummarizer,
+                classSummarizer2: MultiClassSummarizer) =>
+            classSummarizer1.merge(classSummarizer2)
+      })
       .histogram
 
     /*
@@ -927,8 +930,12 @@ class LogisticRegressionSuite
         Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
-      val testData = generateMultinomialLogisticInput(
-          coefficients, xMean, xVariance, true, nPoints, 42)
+      val testData = generateMultinomialLogisticInput(coefficients,
+                                                      xMean,
+                                                      xVariance,
+                                                      true,
+                                                      nPoints,
+                                                      42)
 
       // Let's over-sample the positive samples twice.
       val data1 = testData.flatMap {
@@ -1032,8 +1039,10 @@ class LogisticRegressionSuite
       assert(model.numFeatures === model2.numFeatures)
     }
     val lr = new LogisticRegression()
-    testEstimatorAndModelReadWrite(
-        lr, dataset, LogisticRegressionSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(lr,
+                                   dataset,
+                                   LogisticRegressionSuite.allParamSettings,
+                                   checkModelData)
   }
 }
 

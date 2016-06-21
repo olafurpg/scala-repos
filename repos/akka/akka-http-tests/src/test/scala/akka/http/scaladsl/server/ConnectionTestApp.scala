@@ -58,8 +58,9 @@ object ConnectionTestApp {
   }
 
   def sendSingle(uri: Uri, id: Int): Unit = {
-    val connectionFlow: Flow[
-        HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] =
+    val connectionFlow: Flow[HttpRequest,
+                             HttpResponse,
+                             Future[Http.OutgoingConnection]] =
       Http().outgoingConnection(uri.authority.host.address, uri.authority.port)
     val responseFuture: Future[HttpResponse] =
       Source.single(buildRequest(uri)).via(connectionFlow).runWith(Sink.head)
@@ -93,8 +94,8 @@ object ConnectionTestApp {
     readLine()
     println(
         "===================== \n\n" +
-        system.asInstanceOf[ActorSystemImpl].printTree +
-        "\n\n========================")
+          system.asInstanceOf[ActorSystemImpl].printTree +
+          "\n\n========================")
     readLine()
     system.terminate()
   }

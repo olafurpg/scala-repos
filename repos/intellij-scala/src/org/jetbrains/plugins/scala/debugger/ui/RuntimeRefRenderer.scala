@@ -51,7 +51,8 @@ class RuntimeRefRenderer extends NodeRendererImpl {
   }
 
   override def getChildValueExpression(
-      node: DebuggerTreeNode, context: DebuggerContext): PsiElement = {
+      node: DebuggerTreeNode,
+      context: DebuggerContext): PsiElement = {
     val descr = unwrappedDescriptor(
         node.getParent.asInstanceOf[ValueDescriptor].getValue,
         context.getProject)
@@ -62,8 +63,8 @@ class RuntimeRefRenderer extends NodeRendererImpl {
   override def calcLabel(descriptor: ValueDescriptor,
                          evaluationContext: EvaluationContext,
                          listener: DescriptorLabelListener): String = {
-    val unwrapped = unwrappedDescriptor(
-        descriptor.getValue, evaluationContext.getProject)
+    val unwrapped =
+      unwrappedDescriptor(descriptor.getValue, evaluationContext.getProject)
     autoRenderer(evaluationContext.getDebugProcess, unwrapped) match {
       case toStr: ToStringRenderer =>
         calcToStringLabel(
@@ -81,8 +82,8 @@ class RuntimeRefRenderer extends NodeRendererImpl {
     autoRenderer(process, descr).getIdLabel(descr.getValue, process)
   }
 
-  private def autoRenderer(
-      debugProcess: DebugProcess, valueDescriptor: ValueDescriptor) = {
+  private def autoRenderer(debugProcess: DebugProcess,
+                           valueDescriptor: ValueDescriptor) = {
     debugProcess
       .asInstanceOf[DebugProcessImpl]
       .getAutoRenderer(valueDescriptor)

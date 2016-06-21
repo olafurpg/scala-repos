@@ -68,15 +68,17 @@ private[http] object CharacterClasses {
   val `cookie-octet-raw` =
     CharPredicate('\u0020' to '\u007e') ++ CharPredicate((x: Char) ⇒
           x > 0x7f && java.lang.Character.isDefined(x)) -- `cookie-separator`
-  val `av-octet` =
-    CharPredicate('\u0020' to '\u003a', '\u003c' to '\u007e') // http://www.rfc-editor.org/errata_search.php?rfc=6265
+  val `av-octet` = CharPredicate('\u0020' to '\u003a', '\u003c' to '\u007e') // http://www.rfc-editor.org/errata_search.php?rfc=6265
 
   // http://tools.ietf.org/html/rfc5988#section-5
   val `reg-rel-type-octet` = LOWER_ALPHA ++ DIGIT ++ '.' ++ '-'
 
   // helpers
-  val `qdtext-base` = CharPredicate(
-      HTAB, SP, '\u0021', '\u0023' to '\u005B', '\u005D' to '\u007E')
+  val `qdtext-base` = CharPredicate(HTAB,
+                                    SP,
+                                    '\u0021',
+                                    '\u0023' to '\u005B',
+                                    '\u005D' to '\u007E')
   val `ctext-base` = CharPredicate(HTAB,
                                    SP,
                                    '\u0021' to '\u0027',

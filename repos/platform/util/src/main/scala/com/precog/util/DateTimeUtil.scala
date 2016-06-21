@@ -37,12 +37,11 @@ object DateTimeUtil {
   def parseDateTime(value0: String, withOffset: Boolean): DateTime = {
     val value = value0.trim.replace(" ", "T")
 
-    val parser =
-      if (value.contains("-") || value.contains(":")) {
-        fullParser
-      } else {
-        basicParser
-      }
+    val parser = if (value.contains("-") || value.contains(":")) {
+      fullParser
+    } else {
+      basicParser
+    }
 
     val p = if (withOffset) parser.withOffsetParsed else parser
     p.parseDateTime(value)
@@ -88,7 +87,8 @@ object DateTimeUtil {
 
   def isValidFormat(time: String, fmt: String): Boolean =
     try {
-      DateTimeFormat.forPattern(fmt).withOffsetParsed().parseDateTime(time); true
+      DateTimeFormat.forPattern(fmt).withOffsetParsed().parseDateTime(time);
+      true
     } catch {
       case e: IllegalArgumentException => { false }
     }

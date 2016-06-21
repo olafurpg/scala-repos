@@ -16,7 +16,10 @@ class TickSourceSpec extends AkkaSpec {
   "A Flow based on tick publisher" must {
     "produce ticks" in assertAllStagesStopped {
       val c = TestSubscriber.manualProbe[String]()
-      Source.tick(1.second, 500.millis, "tick").to(Sink.fromSubscriber(c)).run()
+      Source
+        .tick(1.second, 500.millis, "tick")
+        .to(Sink.fromSubscriber(c))
+        .run()
       val sub = c.expectSubscription()
       sub.request(3)
       c.expectNoMsg(600.millis)

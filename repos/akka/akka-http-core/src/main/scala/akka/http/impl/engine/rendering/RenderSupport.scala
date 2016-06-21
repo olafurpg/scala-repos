@@ -30,10 +30,9 @@ private object RenderSupport {
 
   val defaultLastChunkBytes: ByteString = renderChunk(HttpEntity.LastChunk)
 
-  def CancelSecond[T, Mat](
-      first: Source[T, Mat], second: Source[T, Any]): Source[T, Mat] = {
-    Source.fromGraph(
-        GraphDSL.create(first) { implicit b ⇒ frst ⇒
+  def CancelSecond[T, Mat](first: Source[T, Mat],
+                           second: Source[T, Any]): Source[T, Mat] = {
+    Source.fromGraph(GraphDSL.create(first) { implicit b ⇒ frst ⇒
       import GraphDSL.Implicits._
       second ~> Sink.cancelled
       SourceShape(frst.out)
@@ -45,10 +44,10 @@ private object RenderSupport {
       r ~~ headers.`Content-Type` ~~ entity.contentType ~~ CrLf
     else r
 
-  def renderByteStrings(r: ByteStringRendering,
-                        entityBytes: ⇒ Source[ByteString, Any],
-                        skipEntity: Boolean =
-                          false): Source[ByteString, Any] = {
+  def renderByteStrings(
+      r: ByteStringRendering,
+      entityBytes: ⇒ Source[ByteString, Any],
+      skipEntity: Boolean = false): Source[ByteString, Any] = {
     val messageStart = Source.single(r.get)
     val messageBytes =
       if (!skipEntity)
@@ -89,8 +88,8 @@ private object RenderSupport {
       extends PushStage[ByteString, ByteString] {
     var sent = 0L
 
-    override def onPush(
-        elem: ByteString, ctx: Context[ByteString]): SyncDirective = {
+    override def onPush(elem: ByteString,
+                        ctx: Context[ByteString]): SyncDirective = {
       sent += elem.length
       if (sent > length)
         ctx fail InvalidContentLengthException(
@@ -112,7 +111,7 @@ private object RenderSupport {
     val renderedSize = // buffer space required for rendering (without trailer)
       CharUtils.numberOfHexDigits(data.length) + (if (extension.isEmpty) 0
                                                   else extension.length + 1) +
-      data.length + 2 + 2
+        data.length + 2 + 2
     val r = new ByteStringRendering(renderedSize)
     r ~~% data.length
     if (extension.nonEmpty) r ~~ ';' ~~ extension
@@ -129,7 +128,7 @@ private object RenderSupport {
   def suppressionWarning(
       log: LoggingAdapter,
       h: HttpHeader,
-      msg: String =
-        "the akka-http-core layer sets this header automatically!"): Unit =
+      msg: String = "the akka-http-core layer sets this header automatically!")
+    : Unit =
     log.warning("Explicitly set HTTP header '{}' is ignored, {}", h, msg)
 }

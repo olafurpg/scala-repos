@@ -45,18 +45,18 @@ import org.apache.spark.internal.Logging
   * @param protocol            SSL protocol (remember that SSLv3 was compromised) supported by Java
   * @param enabledAlgorithms   a set of encryption algorithms that may be used
   */
-private[spark] case class SSLOptions(enabled: Boolean = false,
-                                     keyStore: Option[File] = None,
-                                     keyStorePassword: Option[String] = None,
-                                     keyPassword: Option[String] = None,
-                                     keyStoreType: Option[String] = None,
-                                     needClientAuth: Boolean = false,
-                                     trustStore: Option[File] = None,
-                                     trustStorePassword: Option[String] = None,
-                                     trustStoreType: Option[String] = None,
-                                     protocol: Option[String] = None,
-                                     enabledAlgorithms: Set[String] =
-                                       Set.empty)
+private[spark] case class SSLOptions(
+    enabled: Boolean = false,
+    keyStore: Option[File] = None,
+    keyStorePassword: Option[String] = None,
+    keyPassword: Option[String] = None,
+    keyStoreType: Option[String] = None,
+    needClientAuth: Boolean = false,
+    trustStore: Option[File] = None,
+    trustStorePassword: Option[String] = None,
+    trustStoreType: Option[String] = None,
+    protocol: Option[String] = None,
+    enabledAlgorithms: Set[String] = Set.empty)
     extends Logging {
 
   /**
@@ -122,16 +122,16 @@ private[spark] case class SSLOptions(enabled: Boolean = false,
       val supported = enabledAlgorithms & providerAlgorithms
       require(supported.nonEmpty || sys.env.contains("SPARK_TESTING"),
               "SSLContext does not support any of the enabled algorithms: " +
-              enabledAlgorithms.mkString(","))
+                enabledAlgorithms.mkString(","))
       supported
     }
 
   /** Returns a string representation of this SSLOptions with all the passwords masked. */
   override def toString: String =
     s"SSLOptions{enabled=$enabled, " +
-    s"keyStore=$keyStore, keyStorePassword=${keyStorePassword.map(_ => "xxx")}, " +
-    s"trustStore=$trustStore, trustStorePassword=${trustStorePassword.map(_ => "xxx")}, " +
-    s"protocol=$protocol, enabledAlgorithms=$enabledAlgorithms}"
+      s"keyStore=$keyStore, keyStorePassword=${keyStorePassword.map(_ => "xxx")}, " +
+      s"trustStore=$trustStore, trustStorePassword=${trustStorePassword.map(_ => "xxx")}, " +
+      s"protocol=$protocol, enabledAlgorithms=$enabledAlgorithms}"
 }
 
 private[spark] object SSLOptions extends Logging {
@@ -167,8 +167,8 @@ private[spark] object SSLOptions extends Logging {
   def parse(conf: SparkConf,
             ns: String,
             defaults: Option[SSLOptions] = None): SSLOptions = {
-    val enabled = conf.getBoolean(
-        s"$ns.enabled", defaultValue = defaults.exists(_.enabled))
+    val enabled = conf
+      .getBoolean(s"$ns.enabled", defaultValue = defaults.exists(_.enabled))
 
     val keyStore = conf
       .getOption(s"$ns.keyStore")

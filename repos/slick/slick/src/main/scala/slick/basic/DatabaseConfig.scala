@@ -73,8 +73,8 @@ object DatabaseConfig {
   def forConfig[P <: BasicProfile: ClassTag](
       path: String,
       config: Config = ConfigFactory.load(),
-      classLoader: ClassLoader =
-        ClassLoaderUtil.defaultClassLoader): DatabaseConfig[P] = {
+      classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
+    : DatabaseConfig[P] = {
     val basePath = (if (path.isEmpty) "" else path + ".")
     val n = config.getStringOpt(basePath + "profile").getOrElse {
       val nOld = config.getStringOpt(basePath + "driver").map {
@@ -99,8 +99,8 @@ object DatabaseConfig {
       else classLoader.loadClass(n).newInstance()
     } catch {
       case NonFatal(ex) =>
-        throw new SlickException(
-            s"""Error getting instance of profile "$n"""", ex)
+        throw new SlickException(s"""Error getting instance of profile "$n"""",
+                                 ex)
     }
     val pClass = implicitly[ClassTag[P]].runtimeClass
     if (!pClass.isInstance(untypedP))
@@ -108,8 +108,8 @@ object DatabaseConfig {
           s"Configured profile $n does not conform to requested profile ${pClass.getName}")
     val root = config
     new DatabaseConfig[P] {
-      lazy val db: P#Backend#Database = profile.backend.createDatabase(
-          root, (if (path.isEmpty) "" else path + ".") + "db")
+      lazy val db: P#Backend#Database = profile.backend
+        .createDatabase(root, (if (path.isEmpty) "" else path + ".") + "db")
       val profile: P = untypedP.asInstanceOf[P]
       val driver: P = untypedP.asInstanceOf[P]
       lazy val config: Config =
@@ -127,8 +127,8 @@ object DatabaseConfig {
     * is used. */
   def forURI[P <: BasicProfile: ClassTag](
       uri: URI,
-      classLoader: ClassLoader =
-        ClassLoaderUtil.defaultClassLoader): DatabaseConfig[P] = {
+      classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
+    : DatabaseConfig[P] = {
     val (base, path) = {
       val f = uri.getRawFragment
       val s = uri.toString

@@ -115,16 +115,16 @@ private[spark] object StratifiedSamplingUtils extends Logging {
           val copiesWaitlisted = rng.nextPoisson(acceptResult.waitListBound)
           if (copiesWaitlisted > 0) {
             acceptResult.waitList ++=
-              ArrayBuffer.fill(copiesWaitlisted)(rng.nextUniform())
+            ArrayBuffer.fill(copiesWaitlisted)(rng.nextUniform())
           }
         } else {
           // We use the streaming version of the algorithm for sampling without replacement to avoid
           // using an extra pass over the RDD for computing the count.
           // Hence, acceptBound and waitListBound change on every iteration.
-          acceptResult.acceptBound = BinomialBounds.getLowerBound(
-              delta, acceptResult.numItems, fraction)
-          acceptResult.waitListBound = BinomialBounds.getUpperBound(
-              delta, acceptResult.numItems, fraction)
+          acceptResult.acceptBound = BinomialBounds
+            .getLowerBound(delta, acceptResult.numItems, fraction)
+          acceptResult.waitListBound = BinomialBounds
+            .getUpperBound(delta, acceptResult.numItems, fraction)
 
           val x = rng.nextUniform()
           if (x < acceptResult.acceptBound) {
@@ -143,7 +143,8 @@ private[spark] object StratifiedSamplingUtils extends Logging {
     */
   def getCombOp[K]: (mutable.Map[K, AcceptanceResult],
                      mutable.Map[K, AcceptanceResult]) => mutable.Map[
-      K, AcceptanceResult] = {
+      K,
+      AcceptanceResult] = {
     (result1: mutable.Map[K, AcceptanceResult],
      result2: mutable.Map[K, AcceptanceResult]) =>
       {
@@ -191,7 +192,7 @@ private[spark] object StratifiedSamplingUtils extends Logging {
           thresholdByKey += (key -> acceptResult.waitListBound)
         } else {
           thresholdByKey +=
-            (key -> acceptResult.waitList.sorted.apply(numWaitListAccepted))
+          (key -> acceptResult.waitList.sorted.apply(numWaitListAccepted))
         }
       }
     }
@@ -245,8 +246,8 @@ private[spark] object StratifiedSamplingUtils extends Logging {
     // TODO implement the streaming version of sampling w/ replacement that doesn't require counts
     if (exact) {
       val counts = Some(rdd.countByKey())
-      val finalResult = getAcceptanceResults(
-          rdd, true, fractions, counts, seed)
+      val finalResult =
+        getAcceptanceResults(rdd, true, fractions, counts, seed)
       val thresholdByKey = computeThresholdByKey(finalResult, fractions)
       (idx: Int, iter: Iterator[(K, V)]) =>
         {
@@ -322,15 +323,13 @@ private[spark] object StratifiedSamplingUtils extends Logging {
   *
   * `[random]` here is necessary since it's in the return type signature of seqOp defined above
   */
-private[random] class AcceptanceResult(
-    var numItems: Long = 0L, var numAccepted: Long = 0L)
+private[random] class AcceptanceResult(var numItems: Long = 0L,
+                                       var numAccepted: Long = 0L)
     extends Serializable {
 
   val waitList = new ArrayBuffer[Double]
-  var acceptBound: Double =
-    Double.NaN // upper bound for accepting item instantly
-  var waitListBound: Double =
-    Double.NaN // upper bound for adding item to waitlist
+  var acceptBound: Double = Double.NaN // upper bound for accepting item instantly
+  var waitListBound: Double = Double.NaN // upper bound for adding item to waitlist
 
   def areBoundsEmpty: Boolean = acceptBound.isNaN || waitListBound.isNaN
 

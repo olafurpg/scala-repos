@@ -89,8 +89,8 @@ object ScalaClassNameCompletionContributor {
     val expectedTypesAfterNew: Array[ScType] =
       if (afterNewPattern.accepts(dummyPosition, context)) {
         val element = dummyPosition
-        val newExpr = PsiTreeUtil.getContextOfType(
-            element, classOf[ScNewTemplateDefinition])
+        val newExpr = PsiTreeUtil
+          .getContextOfType(element, classOf[ScNewTemplateDefinition])
         //todo: probably we need to remove all abstracts here according to variance
         newExpr.expectedTypes().map {
           case ScAbstractType(_, lower, upper) => upper
@@ -103,9 +103,10 @@ object ScalaClassNameCompletionContributor {
         //It's ok here to use parameters.getPosition
         val offsetInString =
           parameters.getOffset -
-          parameters.getPosition.getTextRange.getStartOffset + 1
+            parameters.getPosition.getTextRange.getStartOffset + 1
         val interpolated = ScalaPsiElementFactory.createExpressionFromText(
-            "s" + position.getText, position.getContext.getContext)
+            "s" + position.getText,
+            position.getContext.getContext)
         (interpolated.findElementAt(offsetInString), true)
       case _ => (dummyPosition, false)
     }
@@ -117,13 +118,13 @@ object ScalaClassNameCompletionContributor {
       psiElement.afterLeaf("@").accepts(position)
     val isInImport =
       ScalaPsiUtil.getContextOfType(position, false, classOf[ScImportStmt]) != null
-    val stableRefElement = ScalaPsiUtil.getContextOfType(
-        position, false, classOf[ScStableCodeReferenceElement])
-    val refElement = ScalaPsiUtil.getContextOfType(
-        position, false, classOf[ScReferenceElement])
+    val stableRefElement = ScalaPsiUtil
+      .getContextOfType(position, false, classOf[ScStableCodeReferenceElement])
+    val refElement = ScalaPsiUtil
+      .getContextOfType(position, false, classOf[ScReferenceElement])
     val onlyClasses =
       stableRefElement != null &&
-      !stableRefElement.getContext.isInstanceOf[ScConstructorPattern]
+        !stableRefElement.getContext.isInstanceOf[ScConstructorPattern]
 
     val renamesMap = new mutable.HashMap[String, (String, PsiNamedElement)]()
     val reverseRenamesMap = new mutable.HashMap[String, PsiNamedElement]()
@@ -144,9 +145,8 @@ object ScalaClassNameCompletionContributor {
     }
 
     def addTypeForCompletion(typeToImport: TypeToImport) {
-      val isExcluded: Boolean =
-        ApplicationManager.getApplication.runReadAction(
-            new Computable[Boolean] {
+      val isExcluded: Boolean = ApplicationManager.getApplication
+        .runReadAction(new Computable[Boolean] {
           def compute: Boolean = {
             typeToImport match {
               case ClassTypeToImport(classToImport) =>
@@ -167,8 +167,8 @@ object ScalaClassNameCompletionContributor {
       val isAccessible =
         invocationCount >= 2 || (typeToImport.element match {
               case member: PsiMember =>
-                ResolveUtils.isAccessible(
-                    member, position, forCompletion = true)
+                ResolveUtils
+                  .isAccessible(member, position, forCompletion = true)
               case _ => true
             })
       if (!isAccessible) return
@@ -187,8 +187,8 @@ object ScalaClassNameCompletionContributor {
         .map(_._1)
       for {
         el <- LookupElementManager.getLookupElement(
-                 new ScalaResolveResult(
-                     typeToImport.element, nameShadow = renamed),
+                 new ScalaResolveResult(typeToImport.element,
+                                        nameShadow = renamed),
                  isClassName = true,
                  isInImport = isInImport,
                  isInStableCodeReference = stableRefElement != null,
@@ -199,8 +199,10 @@ object ScalaClassNameCompletionContributor {
         else {
           typeToImport match {
             case ClassTypeToImport(clazz) =>
-              result.addElement(getLookupElementFromClass(
-                      expectedTypesAfterNew, clazz, renamesMap))
+              result.addElement(
+                  getLookupElementFromClass(expectedTypesAfterNew,
+                                            clazz,
+                                            renamesMap))
             case _ =>
           }
         }
@@ -216,7 +218,7 @@ object ScalaClassNameCompletionContributor {
     for {
       clazz <- SyntheticClasses.get(project).all.valuesIterator
       if checkSynthetic ||
-      !ScType.baseTypesQualMap.contains(clazz.qualifiedName)
+        !ScType.baseTypesQualMap.contains(clazz.qualifiedName)
     } addTypeForCompletion(ClassTypeToImport(clazz))
 
     val prefixMatcher = result.getPrefixMatcher

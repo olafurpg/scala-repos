@@ -243,8 +243,25 @@ trait GeneratedTupleAdders {
     }
 
     def ++[B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-        other: Tuple19[
-            B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]) = {
+        other: Tuple19[B,
+                       C,
+                       D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
+                       T]) = {
       (tup._1,
        other._1,
        other._2,
@@ -268,8 +285,26 @@ trait GeneratedTupleAdders {
     }
 
     def ++[B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-        other: Tuple20[
-            B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]) = {
+        other: Tuple20[B,
+                       C,
+                       D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
+                       T,
+                       U]) = {
       (tup._1,
        other._1,
        other._2,
@@ -294,8 +329,27 @@ trait GeneratedTupleAdders {
     }
 
     def ++[B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-        other: Tuple21[
-            B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]) = {
+        other: Tuple21[B,
+                       C,
+                       D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
+                       T,
+                       U,
+                       V]) = {
       (tup._1,
        other._1,
        other._2,
@@ -583,8 +637,25 @@ trait GeneratedTupleAdders {
     }
 
     def ++[C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-        other: Tuple19[
-            C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]) = {
+        other: Tuple19[C,
+                       D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
+                       T,
+                       U]) = {
       (tup._1,
        tup._2,
        other._1,
@@ -609,8 +680,26 @@ trait GeneratedTupleAdders {
     }
 
     def ++[C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-        other: Tuple20[
-            C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]) = {
+        other: Tuple20[C,
+                       D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
+                       T,
+                       U,
+                       V]) = {
       (tup._1,
        tup._2,
        other._1,
@@ -918,8 +1007,25 @@ trait GeneratedTupleAdders {
     }
 
     def ++[D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-        other: Tuple19[
-            D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]) = {
+        other: Tuple19[D,
+                       E,
+                       F,
+                       G,
+                       H,
+                       I,
+                       J,
+                       K,
+                       L,
+                       M,
+                       N,
+                       O,
+                       P,
+                       Q,
+                       R,
+                       S,
+                       T,
+                       U,
+                       V]) = {
       (tup._1,
        tup._2,
        tup._3,
@@ -4566,8 +4672,24 @@ trait GeneratedTupleAdders {
     }
   }
 
-  implicit def tup18ToAdder[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
+  implicit def tup18ToAdder[A,
+                            B,
+                            C,
+                            D,
+                            E,
+                            F,
+                            G,
+                            H,
+                            I,
+                            J,
+                            K,
+                            L,
+                            M,
+                            N,
+                            O,
+                            P,
+                            Q,
+                            R](
       tup: Tuple18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]) =
     new Tuple18Adder(tup)
 
@@ -4691,14 +4813,50 @@ trait GeneratedTupleAdders {
     }
   }
 
-  implicit def tup19ToAdder[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
+  implicit def tup19ToAdder[A,
+                            B,
+                            C,
+                            D,
+                            E,
+                            F,
+                            G,
+                            H,
+                            I,
+                            J,
+                            K,
+                            L,
+                            M,
+                            N,
+                            O,
+                            P,
+                            Q,
+                            R,
+                            S](
       tup: Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]) =
     new Tuple19Adder(tup)
 
   class Tuple20Adder[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
-      T](tup: Tuple20[
-          A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]) {
+      T](
+      tup: Tuple20[A,
+                   B,
+                   C,
+                   D,
+                   E,
+                   F,
+                   G,
+                   H,
+                   I,
+                   J,
+                   K,
+                   L,
+                   M,
+                   N,
+                   O,
+                   P,
+                   Q,
+                   R,
+                   S,
+                   T]) {
     def :+[U](other: U) = {
       (tup._1,
        tup._2,
@@ -4796,15 +4954,71 @@ trait GeneratedTupleAdders {
     }
   }
 
-  implicit def tup20ToAdder[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](tup: Tuple20[
-          A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]) =
+  implicit def tup20ToAdder[A,
+                            B,
+                            C,
+                            D,
+                            E,
+                            F,
+                            G,
+                            H,
+                            I,
+                            J,
+                            K,
+                            L,
+                            M,
+                            N,
+                            O,
+                            P,
+                            Q,
+                            R,
+                            S,
+                            T](
+      tup: Tuple20[A,
+                   B,
+                   C,
+                   D,
+                   E,
+                   F,
+                   G,
+                   H,
+                   I,
+                   J,
+                   K,
+                   L,
+                   M,
+                   N,
+                   O,
+                   P,
+                   Q,
+                   R,
+                   S,
+                   T]) =
     new Tuple20Adder(tup)
 
   class Tuple21Adder[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       T, U](
-      tup: Tuple21[
-          A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]) {
+      tup: Tuple21[A,
+                   B,
+                   C,
+                   D,
+                   E,
+                   F,
+                   G,
+                   H,
+                   I,
+                   J,
+                   K,
+                   L,
+                   M,
+                   N,
+                   O,
+                   P,
+                   Q,
+                   R,
+                   S,
+                   T,
+                   U]) {
     def :+[V](other: V) = {
       (tup._1,
        tup._2,
@@ -4880,10 +5094,48 @@ trait GeneratedTupleAdders {
     }
   }
 
-  implicit def tup21ToAdder[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      tup: Tuple21[
-          A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]) =
+  implicit def tup21ToAdder[A,
+                            B,
+                            C,
+                            D,
+                            E,
+                            F,
+                            G,
+                            H,
+                            I,
+                            J,
+                            K,
+                            L,
+                            M,
+                            N,
+                            O,
+                            P,
+                            Q,
+                            R,
+                            S,
+                            T,
+                            U](
+      tup: Tuple21[A,
+                   B,
+                   C,
+                   D,
+                   E,
+                   F,
+                   G,
+                   H,
+                   I,
+                   J,
+                   K,
+                   L,
+                   M,
+                   N,
+                   O,
+                   P,
+                   Q,
+                   R,
+                   S,
+                   T,
+                   U]) =
     new Tuple21Adder(tup)
 }
 // end of autogenerated

@@ -104,8 +104,8 @@ case class Abs(child: Expression)
       case dt: DecimalType =>
         defineCodeGen(ctx, ev, c => s"$c.abs()")
       case dt: NumericType =>
-        defineCodeGen(
-            ctx, ev, c => s"(${ctx.javaType(dt)})(java.lang.Math.abs($c))")
+        defineCodeGen(ctx, ev, c =>
+              s"(${ctx.javaType(dt)})(java.lang.Math.abs($c))")
     }
 
   protected override def nullSafeEval(input: Any): Any = numeric.abs(input)
@@ -126,14 +126,12 @@ abstract class BinaryArithmetic extends BinaryOperator {
   override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     dataType match {
       case dt: DecimalType =>
-        defineCodeGen(
-            ctx, ev, (eval1, eval2) => s"$eval1.$decimalMethod($eval2)")
+        defineCodeGen(ctx, ev, (eval1, eval2) =>
+              s"$eval1.$decimalMethod($eval2)")
       // byte and short are casted into int when add, minus, times or divide
       case ByteType | ShortType =>
-        defineCodeGen(ctx,
-                      ev,
-                      (eval1, eval2) =>
-                        s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
+        defineCodeGen(ctx, ev, (eval1, eval2) =>
+              s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
       case _ =>
         defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
     }
@@ -167,10 +165,8 @@ case class Add(left: Expression, right: Expression) extends BinaryArithmetic {
       case dt: DecimalType =>
         defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$$plus($eval2)")
       case ByteType | ShortType =>
-        defineCodeGen(ctx,
-                      ev,
-                      (eval1, eval2) =>
-                        s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
+        defineCodeGen(ctx, ev, (eval1, eval2) =>
+              s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
       case CalendarIntervalType =>
         defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.add($eval2)")
       case _ =>
@@ -202,10 +198,8 @@ case class Subtract(left: Expression, right: Expression)
       case dt: DecimalType =>
         defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$$minus($eval2)")
       case ByteType | ShortType =>
-        defineCodeGen(ctx,
-                      ev,
-                      (eval1, eval2) =>
-                        s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
+        defineCodeGen(ctx, ev, (eval1, eval2) =>
+              s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
       case CalendarIntervalType =>
         defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.subtract($eval2)")
       case _ =>
@@ -261,19 +255,17 @@ case class Divide(left: Expression, right: Expression)
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val eval1 = left.gen(ctx)
     val eval2 = right.gen(ctx)
-    val isZero =
-      if (dataType.isInstanceOf[DecimalType]) {
-        s"${eval2.value}.isZero()"
-      } else {
-        s"${eval2.value} == 0"
-      }
+    val isZero = if (dataType.isInstanceOf[DecimalType]) {
+      s"${eval2.value}.isZero()"
+    } else {
+      s"${eval2.value} == 0"
+    }
     val javaType = ctx.javaType(dataType)
-    val divide =
-      if (dataType.isInstanceOf[DecimalType]) {
-        s"${eval1.value}.$decimalMethod(${eval2.value})"
-      } else {
-        s"($javaType)(${eval1.value} $symbol ${eval2.value})"
-      }
+    val divide = if (dataType.isInstanceOf[DecimalType]) {
+      s"${eval1.value}.$decimalMethod(${eval2.value})"
+    } else {
+      s"($javaType)(${eval1.value} $symbol ${eval2.value})"
+    }
     s"""
       ${eval2.code}
       boolean ${ev.isNull} = false;
@@ -326,19 +318,17 @@ case class Remainder(left: Expression, right: Expression)
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val eval1 = left.gen(ctx)
     val eval2 = right.gen(ctx)
-    val isZero =
-      if (dataType.isInstanceOf[DecimalType]) {
-        s"${eval2.value}.isZero()"
-      } else {
-        s"${eval2.value} == 0"
-      }
+    val isZero = if (dataType.isInstanceOf[DecimalType]) {
+      s"${eval2.value}.isZero()"
+    } else {
+      s"${eval2.value} == 0"
+    }
     val javaType = ctx.javaType(dataType)
-    val remainder =
-      if (dataType.isInstanceOf[DecimalType]) {
-        s"${eval1.value}.$decimalMethod(${eval2.value})"
-      } else {
-        s"($javaType)(${eval1.value} $symbol ${eval2.value})"
-      }
+    val remainder = if (dataType.isInstanceOf[DecimalType]) {
+      s"${eval1.value}.$decimalMethod(${eval2.value})"
+    } else {
+      s"($javaType)(${eval1.value} $symbol ${eval2.value})"
+    }
     s"""
       ${eval2.code}
       boolean ${ev.isNull} = false;

@@ -34,7 +34,7 @@ class SecurityTask(settings: Settings)
 
       val req =
         (security / "").addQueryParameter("apiKey", apiKey) <<
-        ("""
+          ("""
 {"name":"MH Test Write",
  "description":"Foo",
  "grants":[
@@ -206,8 +206,10 @@ class SecurityTask(settings: Settings)
       addToGrant(apiKey2, apiKey1, grantId).complete()
 
       val p2 = p + text(4) + "/"
-      val child = createChildGrant(
-          apiKey2, grantId, ("read", p2, accountId1 :: Nil) :: Nil).jvalue
+      val child =
+        createChildGrant(apiKey2,
+                         grantId,
+                         ("read", p2, accountId1 :: Nil) :: Nil).jvalue
       val childId = (child \ "grantId").deserialize[String]
 
       describeGrant(apiKey1, childId).jvalue must_== child

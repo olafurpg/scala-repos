@@ -113,8 +113,7 @@ class MongoMapField[OwnerType <: BsonRecord[OwnerType], MapValueType](
   def setFromDBObject(dbo: DBObject): Box[Map[String, MapValueType]] = {
     import scala.collection.JavaConversions._
 
-    setBox(
-        Full(
+    setBox(Full(
             Map() ++ dbo.keySet.map { k =>
           (k.toString, dbo.get(k).asInstanceOf[MapValueType])
         }

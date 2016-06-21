@@ -74,15 +74,15 @@ object ShardStateOptions {
   case object DisableAsyncQueries extends ShardStateOptions
 }
 
-case class ShardState(platform: ManagedPlatform,
-                      apiKeyFinder: APIKeyFinder[Future],
-                      accountFinder: AccountFinder[Future],
-                      scheduler: Scheduler[Future],
-                      jobManager: JobManager[Future],
-                      clock: Clock,
-                      stoppable: Stoppable,
-                      options: ShardStateOptions =
-                        ShardStateOptions.NoOptions) {}
+case class ShardState(
+    platform: ManagedPlatform,
+    apiKeyFinder: APIKeyFinder[Future],
+    accountFinder: AccountFinder[Future],
+    scheduler: Scheduler[Future],
+    jobManager: JobManager[Future],
+    clock: Clock,
+    stoppable: Stoppable,
+    options: ShardStateOptions = ShardStateOptions.NoOptions) {}
 
 trait ShardService
     extends BlueEyesServiceBuilder
@@ -151,8 +151,9 @@ trait ShardService
   }
 
   private def syncHandler(state: ShardState) = {
-    val queryService = new SyncQueryServiceHandler(
-        state.platform.synchronous, state.jobManager, SyncResultFormat.Simple)
+    val queryService = new SyncQueryServiceHandler(state.platform.synchronous,
+                                                   state.jobManager,
+                                                   SyncResultFormat.Simple)
     jsonp {
       jsonAPIKey(state.apiKeyFinder) {
         requireAccount(state.accountFinder) {

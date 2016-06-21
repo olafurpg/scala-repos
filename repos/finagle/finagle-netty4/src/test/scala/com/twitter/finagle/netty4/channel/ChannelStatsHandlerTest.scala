@@ -175,8 +175,9 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
     import tc._
 
     handler.channelActive(ctx)
-    handler.write(
-        ctx, wrappedBuffer(Array.fill(42)(0.toByte)), mock[ChannelPromise])
+    handler.write(ctx,
+                  wrappedBuffer(Array.fill(42)(0.toByte)),
+                  mock[ChannelPromise])
     handler.channelInactive(ctx)
 
     assert(sr.counter("sent_bytes")() == 42)

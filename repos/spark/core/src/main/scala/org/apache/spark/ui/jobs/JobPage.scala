@@ -178,8 +178,8 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
 
     listener.synchronized {
       val parameterId = request.getParameter("id")
-      require(
-          parameterId != null && parameterId.nonEmpty, "Missing id parameter")
+      require(parameterId != null && parameterId.nonEmpty,
+              "Missing id parameter")
 
       val jobId = parameterId.toInt
       val jobDataOption = listener.jobIdToData.get(jobId)
@@ -187,18 +187,22 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
         val content = <div id="no-info">
             <p>No information to display for job {jobId}</p>
           </div>
-        return UIUtils.headerSparkPage(
-            s"Details for Job $jobId", content, parent)
+        return UIUtils
+          .headerSparkPage(s"Details for Job $jobId", content, parent)
       }
       val jobData = jobDataOption.get
       val isComplete = jobData.status != JobExecutionStatus.RUNNING
       val stages = jobData.stageIds.map { stageId =>
         // This could be empty if the JobProgressListener hasn't received information about the
         // stage or if the stage information has been garbage collected
-        listener.stageIdToInfo.getOrElse(
-            stageId,
-            new StageInfo(
-                stageId, 0, "Unknown", 0, Seq.empty, Seq.empty, "Unknown"))
+        listener.stageIdToInfo.getOrElse(stageId,
+                                         new StageInfo(stageId,
+                                                       0,
+                                                       "Unknown",
+                                                       0,
+                                                       Seq.empty,
+                                                       Seq.empty,
+                                                       "Unknown"))
       }
 
       val activeStages = Buffer[StageInfo]()
@@ -320,30 +324,33 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
                                appStartTime)
 
       content ++= UIUtils.showDagVizForJob(
-          jobId, operationGraphListener.getOperationGraphForJob(jobId))
+          jobId,
+          operationGraphListener.getOperationGraphForJob(jobId))
 
       if (shouldShowActiveStages) {
         content ++=
-          <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
+        <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
       }
       if (shouldShowPendingStages) {
         content ++=
-          <h4 id="pending">Pending Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
+        <h4 id="pending">Pending Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
       }
       if (shouldShowCompletedStages) {
         content ++=
-          <h4 id="completed">Completed Stages ({completedStages.size})</h4> ++ completedStagesTable.toNodeSeq
+        <h4 id="completed">Completed Stages ({completedStages.size})</h4> ++ completedStagesTable.toNodeSeq
       }
       if (shouldShowSkippedStages) {
         content ++=
-          <h4 id="skipped">Skipped Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
+        <h4 id="skipped">Skipped Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
       }
       if (shouldShowFailedStages) {
         content ++=
-          <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
+        <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
       }
-      UIUtils.headerSparkPage(
-          s"Details for Job $jobId", content, parent, showVisualization = true)
+      UIUtils.headerSparkPage(s"Details for Job $jobId",
+                              content,
+                              parent,
+                              showVisualization = true)
     }
   }
 }

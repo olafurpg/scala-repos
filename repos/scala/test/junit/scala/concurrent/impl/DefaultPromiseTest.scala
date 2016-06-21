@@ -59,8 +59,8 @@ class DefaultPromiseTest {
     private def promiseChain(p: PromiseId): Option[(ChainId, Chain)] = {
       val found: Iterable[(ChainId, Chain)] = for ((cid, c) <- chains;
                                                    p0 <- c.promises;
-                                                   if (p0 == p)) yield
-        ((cid, c))
+                                                   if (p0 == p))
+        yield ((cid, c))
       found.toList match {
         case Nil => None
         case x :: Nil => Some(x)
@@ -184,13 +184,14 @@ class DefaultPromiseTest {
       val (newCidA, newCidB) = mergeOp match {
         case NoMerge => (cidA, cidB)
         case Merge(newState) => {
-            chains = chains - cidA
-            chains = chains - cidB
-            val newCid = freshId()
-            chains = chains.updated(
-                newCid, Chain(chainA.promises ++ chainB.promises, newState))
-            (newCid, newCid)
-          }
+          chains = chains - cidA
+          chains = chains - cidB
+          val newCid = freshId()
+          chains = chains.updated(
+              newCid,
+              Chain(chainA.promises ++ chainB.promises, newState))
+          (newCid, newCid)
+        }
       }
       assertPromiseValues()
       (newCidA, newCidB)
@@ -326,8 +327,7 @@ class DefaultPromiseTest {
       val doneLatch = new CountDownLatch(flatMapCount + 1)
       def execute(f: => Unit) {
         val ec = ExecutionContext.global
-        ec.execute(
-            new Runnable {
+        ec.execute(new Runnable {
           def run() {
             try {
               startLatch.await()

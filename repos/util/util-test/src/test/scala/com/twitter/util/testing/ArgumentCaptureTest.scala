@@ -58,8 +58,8 @@ class ArgumentCaptureTest
 
   test("captureOne should handle 4-ary functions") {
     val theMockSubject = mock[MockSubject]
-    when(theMockSubject.method4(
-            any[String], any[String], any[String], any[String]))
+    when(theMockSubject
+          .method4(any[String], any[String], any[String], any[String]))
       .thenReturn(149L)
 
     assert(theMockSubject.method4("north", "east", "south", "west") == 149L)
@@ -70,9 +70,12 @@ class ArgumentCaptureTest
 
   test("captureOne should handle 5-ary functions") {
     val theMockSubject = mock[MockSubject]
-    when(theMockSubject.method5(
-            any[String], any[String], any[String], any[String], any[String]))
-      .thenReturn(789L)
+    when(
+        theMockSubject.method5(any[String],
+                               any[String],
+                               any[String],
+                               any[String],
+                               any[String])).thenReturn(789L)
 
     assert(theMockSubject.method5("doh", "ray", "mi", "fa", "so") == 789L)
 
@@ -119,8 +122,8 @@ class ArgumentCaptureTest
   test("captureAll should handle 4-ary functions") {
     // This is really just a test of zip4
     val theMockSubject = mock[MockSubject]
-    when(theMockSubject.method4(
-            any[String], any[String], any[String], any[String]))
+    when(theMockSubject
+          .method4(any[String], any[String], any[String], any[String]))
       .thenReturn(149L)
     assert(theMockSubject.method4("foo", "bar", "baz", "spam") == 149L)
     assert(theMockSubject.method4("north", "east", "south", "west") == 149L)
@@ -136,9 +139,12 @@ class ArgumentCaptureTest
   test("captureAll should handle 5-ary functions") {
     // This is really just a test of zip5
     val theMockSubject = mock[MockSubject]
-    when(theMockSubject.method5(
-            any[String], any[String], any[String], any[String], any[String]))
-      .thenReturn(789L)
+    when(
+        theMockSubject.method5(any[String],
+                               any[String],
+                               any[String],
+                               any[String],
+                               any[String])).thenReturn(789L)
     assert(theMockSubject.method5("foo", "bar", "baz", "spam", "ham") == 789L)
     assert(theMockSubject.method5("doh", "ray", "mi", "fa", "so") == 789L)
 

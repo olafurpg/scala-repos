@@ -4,7 +4,7 @@ import scala.language.higherKinds
 
 trait EncoderCompanion {
 
-  type Enc [T, S] <: Encoder[T, S]
+  type Enc[T, S] <: Encoder[T, S]
 
   /**
     * Encode a value of type T into a serialized value of type S based on the implicit environment.
@@ -30,7 +30,7 @@ trait Encoder[T, S] extends (T => S) {
 
 trait DecoderCompanion {
 
-  type Dec [T, S] <: Decoder[T, S]
+  type Dec[T, S] <: Decoder[T, S]
 
   /**
     * Decode a value of type T from a serialized value of type S based on the implicit environment.

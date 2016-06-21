@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
-final class MonadPlusOps[F[_], A] private[syntax](val self: F[A])(
+final class MonadPlusOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: MonadPlus[F])
     extends Ops[F[A]] {
   ////
@@ -22,8 +22,8 @@ final class MonadPlusOps[F[_], A] private[syntax](val self: F[A])(
     F.unite[T, B](ftb)
   }
 
-  final def separate[G[_, _], B, C](
-      implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
+  final def separate[G[_, _], B, C](implicit ev: A === G[B, C],
+                                    G: Bifoldable[G]): (F[B], F[C]) =
     F.separate(ev.subst(self))
 
   ////

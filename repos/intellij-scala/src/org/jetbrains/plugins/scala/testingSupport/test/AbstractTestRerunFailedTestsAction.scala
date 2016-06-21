@@ -42,8 +42,8 @@ class AbstractTestRerunFailedTestsAction(
         }
       }
 
-      def getState(
-          executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      def getState(executor: Executor,
+                   env: ExecutionEnvironment): RunProfileState = {
         val extensionConfiguration =
           properties.asInstanceOf[PropertiesExtension].getRunConfigurationBase
         val state = configuration.getState(executor, env)

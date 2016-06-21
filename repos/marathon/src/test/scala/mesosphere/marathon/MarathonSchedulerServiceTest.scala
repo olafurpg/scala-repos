@@ -231,8 +231,9 @@ class MarathonSchedulerServiceTest
     val mockTimer = mock[Timer]
 
     val metrics = new Metrics(new MetricRegistry)
-    val store = new MarathonStore[FrameworkId](
-        new InMemoryStore, metrics, () => new FrameworkId(""), "frameworkId:")
+    val store =
+      new MarathonStore[FrameworkId](new InMemoryStore, metrics, () =>
+            new FrameworkId(""), "frameworkId:")
     frameworkIdUtil = new FrameworkIdUtil(store, Duration.Inf)
 
     val schedulerService = new MarathonSchedulerService(

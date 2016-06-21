@@ -108,16 +108,15 @@ object TraversablesOrderedBuf {
 
     // When dealing with a map we have 2 type args, and need to generate the tuple type
     // it would correspond to if we .toList the Map.
-    val innerType =
-      if (outerType.asInstanceOf[TypeRefApi].args.size == 2) {
-        val (tpe1, tpe2) = (outerType.asInstanceOf[TypeRefApi].args(0),
-                            outerType.asInstanceOf[TypeRefApi].args(1))
-        val containerType = typeOf[Tuple2[Any, Any]].asInstanceOf[TypeRef]
-        import compat._
-        TypeRef.apply(containerType.pre, containerType.sym, List(tpe1, tpe2))
-      } else {
-        outerType.asInstanceOf[TypeRefApi].args.head
-      }
+    val innerType = if (outerType.asInstanceOf[TypeRefApi].args.size == 2) {
+      val (tpe1, tpe2) = (outerType.asInstanceOf[TypeRefApi].args(0),
+                          outerType.asInstanceOf[TypeRefApi].args(1))
+      val containerType = typeOf[Tuple2[Any, Any]].asInstanceOf[TypeRef]
+      import compat._
+      TypeRef.apply(containerType.pre, containerType.sym, List(tpe1, tpe2))
+    } else {
+      outerType.asInstanceOf[TypeRefApi].args.head
+    }
 
     val innerTypes = outerType.asInstanceOf[TypeRefApi].args
 
@@ -139,8 +138,8 @@ object TraversablesOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) = {
         val innerCompareFn = freshT("innerCompareFn")
         val a = freshT("a")
         val b = freshT("b")
@@ -267,8 +266,8 @@ object TraversablesOrderedBuf {
       """
       }
 
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = {
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree = {
 
         val a = freshT("a")
         val b = freshT("b")

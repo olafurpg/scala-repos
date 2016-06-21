@@ -44,7 +44,8 @@ class SeqIdFilterTest
 
     test("SeqIdFilter(%s) maintain seqids passed in by the client".format(how)) {
       val f = filtered(new ThriftClientRequest(
-              mkmsg(new TMessage("proc", TMessageType.CALL, seqId)), false))
+              mkmsg(new TMessage("proc", TMessageType.CALL, seqId)),
+              false))
       assert(f.poll == None)
 
       val req = ArgumentCaptor.forClass(classOf[ThriftClientRequest])
@@ -65,7 +66,8 @@ class SeqIdFilterTest
         val expected =
           (new scala.util.Random(Time.now.inMilliseconds)).nextInt()
         val f = filtered(new ThriftClientRequest(
-                mkmsg(new TMessage("proc", TMessageType.CALL, seqId)), false))
+                mkmsg(new TMessage("proc", TMessageType.CALL, seqId)),
+                false))
         val req = ArgumentCaptor.forClass(classOf[ThriftClientRequest])
         verify(service).apply(req.capture)
         assert(getmsg(req.getValue.message).seqid == expected)
@@ -78,7 +80,8 @@ class SeqIdFilterTest
         val expected =
           (new scala.util.Random(Time.now.inMilliseconds)).nextInt()
         val f = filtered(new ThriftClientRequest(
-                mkmsg(new TMessage("proc", TMessageType.CALL, seqId)), false))
+                mkmsg(new TMessage("proc", TMessageType.CALL, seqId)),
+                false))
         p.setValue(mkmsg(new TMessage("proc", TMessageType.REPLY, 1111)))
         assert(f.poll match {
           case Some(Throw(SeqMismatchException(1111, expected))) => true

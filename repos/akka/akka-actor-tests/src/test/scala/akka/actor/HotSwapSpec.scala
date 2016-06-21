@@ -24,10 +24,10 @@ class HotSwapSpec extends AkkaSpec with ImplicitSender {
     }
 
     "be able to become multiple times in its constructor" in {
-      val a = system.actorOf(
-          Props(new Becomer {
-        for (i ← 1 to 4) context
-          .become({ case always ⇒ sender() ! i + ":" + always })
+      val a = system.actorOf(Props(new Becomer {
+        for (i ← 1 to 4) context.become({
+          case always ⇒ sender() ! i + ":" + always
+        })
         def receive = { case always ⇒ sender() ! "FAILURE" }
       }))
       a ! "pigdog"
@@ -35,8 +35,7 @@ class HotSwapSpec extends AkkaSpec with ImplicitSender {
     }
 
     "be able to become with stacking in its constructor" in {
-      val a = system.actorOf(
-          Props(new Becomer {
+      val a = system.actorOf(Props(new Becomer {
         context.become({
           case always ⇒ sender() ! "pigdog:" + always; context.unbecome()
         }, false)
@@ -49,8 +48,7 @@ class HotSwapSpec extends AkkaSpec with ImplicitSender {
     }
 
     "be able to become, with stacking, multiple times in its constructor" in {
-      val a = system.actorOf(
-          Props(new Becomer {
+      val a = system.actorOf(Props(new Becomer {
         for (i ← 1 to 4) context.become({
           case always ⇒ sender() ! i + ":" + always; context.unbecome()
         }, false)
@@ -67,8 +65,7 @@ class HotSwapSpec extends AkkaSpec with ImplicitSender {
     }
 
     "be able to hotswap its behavior with become(..)" in {
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case "init" ⇒ sender() ! "init"
           case "swap" ⇒

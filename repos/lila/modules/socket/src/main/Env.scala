@@ -7,8 +7,9 @@ import com.typesafe.config.Config
 import actorApi._
 import makeTimeout.short
 
-final class Env(
-    config: Config, system: ActorSystem, scheduler: lila.common.Scheduler) {
+final class Env(config: Config,
+                system: ActorSystem,
+                scheduler: lila.common.Scheduler) {
 
   import scala.concurrent.duration._
 

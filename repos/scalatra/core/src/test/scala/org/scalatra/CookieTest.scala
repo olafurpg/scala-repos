@@ -67,7 +67,7 @@ class CookieTest extends WordSpec with Matchers with BeforeAndAfterAll {
       val d = new Date(Cookie.currentTimeMillis + 15500 * 1000)
       cookie.toCookieString should equal(
           "cookiename=value3; Domain=.nowhere.com; Path=/path/to/page; Comment=the cookie thingy comment; " +
-          "Expires=" + Cookie.formatExpires(d) + "; Secure; HttpOnly")
+            "Expires=" + Cookie.formatExpires(d) + "; Secure; HttpOnly")
     }
   }
 

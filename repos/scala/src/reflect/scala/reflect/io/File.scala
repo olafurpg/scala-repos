@@ -54,7 +54,7 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
   override def toDirectory: Directory = new Directory(jfile)
   override def toFile: File = this
   override def normalize: File = super.normalize.toFile
-  override def length = super [Path].length
+  override def length = super[Path].length
   override def walkFilter(cond: Path => Boolean): Iterator[Path] =
     if (cond(this)) Iterator.single(this) else Iterator.empty
 
@@ -108,8 +108,8 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
     */
   def setExecutable(executable: Boolean, ownerOnly: Boolean = true): Boolean = {
     type JBoolean = java.lang.Boolean
-    val method = try classOf[JFile].getMethod(
-        "setExecutable", classOf[Boolean], classOf[Boolean]) catch {
+    val method = try classOf[JFile]
+      .getMethod("setExecutable", classOf[Boolean], classOf[Boolean]) catch {
       case _: NoSuchMethodException => return false
     }
 

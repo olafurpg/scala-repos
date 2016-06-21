@@ -22,13 +22,15 @@ class ParquetScroogeTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedColumns(
         new DailySuffixParquetScrooge[MockThriftStruct](path, dateRange) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new DailySuffixParquetScrooge[MockThriftStruct](path, dateRange) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "HourlySuffixParquetScrooge" should {
@@ -46,13 +48,15 @@ class ParquetScroogeTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedColumns(
         new HourlySuffixParquetScrooge[MockThriftStruct](path, dateRange) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new HourlySuffixParquetScrooge[MockThriftStruct](path, dateRange) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "FixedPathParquetScrooge" should {
@@ -70,13 +74,15 @@ class ParquetScroogeTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedColumns(
         new FixedPathParquetScrooge[MockThriftStruct](path, path, path) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new FixedPathParquetScrooge[MockThriftStruct](path, path, path) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 }
 

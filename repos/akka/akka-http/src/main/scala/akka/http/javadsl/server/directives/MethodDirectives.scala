@@ -49,7 +49,8 @@ abstract class MethodDirectives extends HostDirectives {
 
   /** Handles the inner routes if the incoming request is a request with the given method, rejects the request otherwise */
   @varargs
-  def method(
-      method: HttpMethod, innerRoute: Route, moreInnerRoutes: Route*): Route =
+  def method(method: HttpMethod,
+             innerRoute: Route,
+             moreInnerRoutes: Route*): Route =
     RouteStructure.MethodFilter(method)(innerRoute, moreInnerRoutes.toList)
 }

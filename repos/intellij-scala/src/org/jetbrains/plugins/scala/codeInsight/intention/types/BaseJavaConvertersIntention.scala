@@ -69,7 +69,8 @@ abstract class BaseJavaConvertersIntention(methodName: String)
     def appendAsMethod() {
       val expression: ScExpression = getTargetExpression(element)
       val replacement = ScalaPsiElementFactory.createExpressionFromText(
-          s"${expression.getText}.$methodName", expression.getManager)
+          s"${expression.getText}.$methodName",
+          expression.getManager)
       CodeEditUtil.replaceChild(expression.getParent.getNode,
                                 expression.getNode,
                                 replacement.getNode)

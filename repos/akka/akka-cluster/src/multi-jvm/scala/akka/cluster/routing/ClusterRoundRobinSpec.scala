@@ -49,7 +49,8 @@ object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+                """
       akka.actor.deployment {
         /router1 {
           router = round-robin-pool
@@ -120,10 +121,11 @@ abstract class ClusterRoundRobinSpec
     system.actorOf(FromConfig.props(Props[SomeActor]), "router3")
   lazy val router4 = system.actorOf(FromConfig.props(), "router4")
   lazy val router5 = system.actorOf(
-      RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]), "router5")
+      RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]),
+      "router5")
 
-  def receiveReplies(
-      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] = {
+  def receiveReplies(routeeType: RouteeType,
+                     expectedReplies: Int): Map[Address, Int] = {
     val zero = Map.empty[Address, Int] ++ roles.map(address(_) -> 0)
     (receiveWhile(5 seconds, messages = expectedReplies) {
       case Reply(`routeeType`, ref) ⇒ fullAddress(ref)

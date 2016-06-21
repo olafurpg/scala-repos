@@ -23,8 +23,7 @@ class ListenerSpec extends AkkaSpec {
       }))
 
       def newListener =
-        system.actorOf(
-            Props(new Actor {
+        system.actorOf(Props(new Actor {
           def receive = {
             case "bar" ⇒
               barCount.incrementAndGet

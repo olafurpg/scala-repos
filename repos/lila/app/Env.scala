@@ -103,7 +103,7 @@ object Env {
                        system = lila.common.PlayApp.system,
                        appPath =
                          lila.common.PlayApp withApp
-                         (_.path.getCanonicalPath))
+                           (_.path.getCanonicalPath))
 
   def api = lila.api.Env.current
   def db = lila.db.Env.current

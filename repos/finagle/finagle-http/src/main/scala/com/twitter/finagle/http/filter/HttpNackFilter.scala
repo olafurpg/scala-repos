@@ -34,7 +34,7 @@ private[finagle] object HttpNackFilter {
 
   def isNack(rep: HttpResponse): Boolean =
     rep.getStatus.getCode == ResponseStatus.code &&
-    rep.headers.contains(Header)
+      rep.headers.contains(Header)
 
   def module: Stackable[ServiceFactory[Request, Response]] =
     new Stack.Module1[param.Stats, ServiceFactory[Request, Response]] {

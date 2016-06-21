@@ -69,8 +69,8 @@ class SimplifyConditionalSuite extends PlanTest with PredicateHelper {
   }
 
   test("remove entire CaseWhen if the first branch is always true") {
-    assertEquivalent(
-        CaseWhen(trueBranch :: normalBranch :: Nil, None), Literal(5))
+    assertEquivalent(CaseWhen(trueBranch :: normalBranch :: Nil, None),
+                     Literal(5))
 
     // Test branch elimination and simplification in combination
     assertEquivalent(

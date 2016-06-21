@@ -136,8 +136,9 @@ class DocFindingSpec
             sig.java shouldBe DocSig(DocFqn("java.lang", "Class"),
                                      Some("isInstance(java.lang.Object)"))
           case "22" =>
-            sig.scala shouldBe DocSig(
-                DocFqn("scala", "Predef$$DummyImplicit$"), None)
+            sig.scala shouldBe DocSig(DocFqn("scala",
+                                             "Predef$$DummyImplicit$"),
+                                      None)
           case "23" =>
             sig.java shouldBe DocSig(DocFqn("java.util", "HashMap"), None)
           case "24" =>

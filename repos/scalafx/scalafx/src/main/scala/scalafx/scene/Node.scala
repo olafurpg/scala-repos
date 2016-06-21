@@ -1021,8 +1021,8 @@ abstract class Node protected (override val delegate: jfxs.Node)
   /**
     * Takes a snapshot of this node and returns the rendered image when it is ready.
     */
-  def snapshot(
-      params: SnapshotParameters, image: WritableImage): WritableImage =
+  def snapshot(params: SnapshotParameters,
+               image: WritableImage): WritableImage =
     delegate.snapshot(delegateOrNull(params), delegateOrNull(image))
 
   /**

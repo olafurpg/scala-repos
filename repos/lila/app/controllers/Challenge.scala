@@ -80,8 +80,9 @@ object Challenge extends LilaController {
   }
 
   private def withChallengeAnonCookie(
-      cond: Boolean, c: ChallengeModel, owner: Boolean)(res: Result)(
-      implicit ctx: Context): Fu[Result] =
+      cond: Boolean,
+      c: ChallengeModel,
+      owner: Boolean)(res: Result)(implicit ctx: Context): Fu[Result] =
     cond ?? {
       GameRepo.game(c.id).map {
         _ map { game =>

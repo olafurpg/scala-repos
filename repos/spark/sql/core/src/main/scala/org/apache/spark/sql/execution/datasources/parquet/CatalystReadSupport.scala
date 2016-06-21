@@ -66,8 +66,8 @@ private[parquet] class CatalystReadSupport
       StructType.fromString(schemaString)
     }
 
-    val parquetRequestedSchema = CatalystReadSupport.clipParquetSchema(
-        context.getFileSchema, catalystRequestedSchema)
+    val parquetRequestedSchema = CatalystReadSupport
+      .clipParquetSchema(context.getFileSchema, catalystRequestedSchema)
 
     new ReadContext(parquetRequestedSchema, Map.empty[String, String].asJava)
   }
@@ -112,18 +112,18 @@ private[parquet] object CatalystReadSupport {
     * Tailors `parquetSchema` according to `catalystSchema` by removing column paths don't exist
     * in `catalystSchema`, and adding those only exist in `catalystSchema`.
     */
-  def clipParquetSchema(
-      parquetSchema: MessageType, catalystSchema: StructType): MessageType = {
-    val clippedParquetFields = clipParquetGroupFields(
-        parquetSchema.asGroupType(), catalystSchema)
+  def clipParquetSchema(parquetSchema: MessageType,
+                        catalystSchema: StructType): MessageType = {
+    val clippedParquetFields =
+      clipParquetGroupFields(parquetSchema.asGroupType(), catalystSchema)
     Types
       .buildMessage()
       .addFields(clippedParquetFields: _*)
       .named(CatalystSchemaConverter.SPARK_PARQUET_SCHEMA_NAME)
   }
 
-  private def clipParquetType(
-      parquetType: Type, catalystType: DataType): Type = {
+  private def clipParquetType(parquetType: Type,
+                              catalystType: DataType): Type = {
     catalystType match {
       case t: ArrayType if !isPrimitiveCatalystType(t.elementType) =>
         // Only clips array types with nested type as element type.
@@ -131,7 +131,7 @@ private[parquet] object CatalystReadSupport {
 
       case t: MapType
           if !isPrimitiveCatalystType(t.keyType) ||
-          !isPrimitiveCatalystType(t.valueType) =>
+            !isPrimitiveCatalystType(t.valueType) =>
         // Only clips map types with nested key type or value type
         clipParquetMapType(parquetType.asGroupType(), t.keyType, t.valueType)
 
@@ -162,8 +162,8 @@ private[parquet] object CatalystReadSupport {
     * of the [[ArrayType]] should also be a nested type, namely an [[ArrayType]], a [[MapType]], or a
     * [[StructType]].
     */
-  private def clipParquetListType(
-      parquetList: GroupType, elementType: DataType): Type = {
+  private def clipParquetListType(parquetList: GroupType,
+                                  elementType: DataType): Type = {
     // Precondition of this method, should only be called for lists with nested element types.
     assert(!isPrimitiveCatalystType(elementType))
 
@@ -175,15 +175,15 @@ private[parquet] object CatalystReadSupport {
     } else {
       assert(parquetList.getOriginalType == OriginalType.LIST,
              "Invalid Parquet schema. " +
-             "Original type of annotated Parquet lists must be LIST: " +
-             parquetList.toString)
+               "Original type of annotated Parquet lists must be LIST: " +
+               parquetList.toString)
 
       assert(
           parquetList.getFieldCount == 1 &&
-          parquetList.getType(0).isRepetition(Repetition.REPEATED),
+            parquetList.getType(0).isRepetition(Repetition.REPEATED),
           "Invalid Parquet schema. " +
-          "LIST-annotated group should only have exactly one repeated field: " +
-          parquetList)
+            "LIST-annotated group should only have exactly one repeated field: " +
+            parquetList)
 
       // Precondition of this method, should only be called for lists with nested element types.
       assert(!parquetList.getType(0).isPrimitive)
@@ -228,9 +228,8 @@ private[parquet] object CatalystReadSupport {
                                  keyType: DataType,
                                  valueType: DataType): GroupType = {
     // Precondition of this method, only handles maps with nested key types or value types.
-    assert(
-        !isPrimitiveCatalystType(keyType) ||
-        !isPrimitiveCatalystType(valueType))
+    assert(!isPrimitiveCatalystType(keyType) ||
+          !isPrimitiveCatalystType(valueType))
 
     val repeatedGroup = parquetMap.getType(0).asGroupType()
     val parquetKeyType = repeatedGroup.getType(0)
@@ -258,10 +257,10 @@ private[parquet] object CatalystReadSupport {
     *       [[MessageType]].  Because it's legal to construct an empty requested schema for column
     *       pruning.
     */
-  private def clipParquetGroup(
-      parquetRecord: GroupType, structType: StructType): GroupType = {
-    val clippedParquetFields = clipParquetGroupFields(
-        parquetRecord, structType)
+  private def clipParquetGroup(parquetRecord: GroupType,
+                               structType: StructType): GroupType = {
+    val clippedParquetFields =
+      clipParquetGroupFields(parquetRecord, structType)
     Types
       .buildGroup(parquetRecord.getRepetition)
       .as(parquetRecord.getOriginalType)
@@ -274,8 +273,8 @@ private[parquet] object CatalystReadSupport {
     *
     * @return A list of clipped [[GroupType]] fields, which can be empty.
     */
-  private def clipParquetGroupFields(
-      parquetRecord: GroupType, structType: StructType): Seq[Type] = {
+  private def clipParquetGroupFields(parquetRecord: GroupType,
+                                     structType: StructType): Seq[Type] = {
     val parquetFieldMap =
       parquetRecord.getFields.asScala.map(f => f.getName -> f).toMap
     val toParquet = new CatalystSchemaConverter(

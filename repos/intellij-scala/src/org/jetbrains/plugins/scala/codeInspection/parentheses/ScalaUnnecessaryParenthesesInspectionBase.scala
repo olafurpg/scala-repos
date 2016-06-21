@@ -22,22 +22,23 @@ import scala.annotation.tailrec
   * 4/25/13
   */
 abstract class ScalaUnnecessaryParenthesesInspectionBase
-    extends AbstractInspection(
-        "UnnecessaryParenthesesU", "Remove unnecessary parentheses") {
+    extends AbstractInspection("UnnecessaryParenthesesU",
+                               "Remove unnecessary parentheses") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case parenthesized: ScParenthesisedExpr
         if !parenthesized.getParent.isInstanceOf[ScParenthesisedExpr] &&
-        IntentionAvailabilityChecker.checkInspection(this, parenthesized) &&
-        UnnecessaryParenthesesUtil.canBeStripped(
-            parenthesized, getIgnoreClarifying) =>
-      holder.registerProblem(parenthesized,
-                             "Unnecessary parentheses",
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             new UnnecessaryParenthesesQuickFix(
-                                 parenthesized,
-                                 UnnecessaryParenthesesUtil.getTextOfStripped(
-                                     parenthesized, getIgnoreClarifying)))
+          IntentionAvailabilityChecker.checkInspection(this, parenthesized) &&
+          UnnecessaryParenthesesUtil.canBeStripped(parenthesized,
+                                                   getIgnoreClarifying) =>
+      holder.registerProblem(
+          parenthesized,
+          "Unnecessary parentheses",
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+          new UnnecessaryParenthesesQuickFix(
+              parenthesized,
+              UnnecessaryParenthesesUtil
+                .getTextOfStripped(parenthesized, getIgnoreClarifying)))
   }
 
   override def createOptionsPanel(): JComponent = {
@@ -51,8 +52,8 @@ abstract class ScalaUnnecessaryParenthesesInspectionBase
   def setIgnoreClarifying(value: Boolean)
 }
 
-class UnnecessaryParenthesesQuickFix(
-    parenthesized: ScParenthesisedExpr, textOfStripped: String)
+class UnnecessaryParenthesesQuickFix(parenthesized: ScParenthesisedExpr,
+                                     textOfStripped: String)
     extends AbstractFixOnPsiElement(
         "Remove unnecessary parentheses " + getShortText(parenthesized),
         parenthesized) {
@@ -61,8 +62,8 @@ class UnnecessaryParenthesesQuickFix(
     val parenthExpr = getElement
     if (!parenthExpr.isValid) return
 
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        textOfStripped, parenthExpr.getManager)
+    val newExpr = ScalaPsiElementFactory
+      .createExpressionFromText(textOfStripped, parenthExpr.getManager)
     val replaced =
       parenthExpr.replaceExpression(newExpr, removeParenthesis = true)
 
@@ -93,8 +94,8 @@ object UnnecessaryParenthesesUtil {
   }
 
   @tailrec
-  def getTextOfStripped(
-      expr: ScExpression, ignoreClarifying: Boolean): String = expr match {
+  def getTextOfStripped(expr: ScExpression,
+                        ignoreClarifying: Boolean): String = expr match {
     case parenthesized @ ScParenthesisedExpr(inner)
         if canBeStripped(parenthesized, ignoreClarifying) =>
       getTextOfStripped(inner, ignoreClarifying)

@@ -67,8 +67,11 @@ abstract class DownloadingAndImportingTestCase
     val projectDir = new File(projectDirPath)
     if (!outputZipFile.exists() && !projectDir.exists()) {
       //don't download if zip file is already there
-      GithubDownloadUtil.downloadAtomically(
-          null, downloadURL, outputZipFile, githubUsername, githubRepoName)
+      GithubDownloadUtil.downloadAtomically(null,
+                                            downloadURL,
+                                            outputZipFile,
+                                            githubUsername,
+                                            githubRepoName)
     }
     if (!projectDir.exists()) {
       //don't unpack if the project is already unpacked

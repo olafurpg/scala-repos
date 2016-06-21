@@ -213,8 +213,9 @@ object UnitTests extends TestSuite {
             "from x import y"
         )
         'import4 - stmt(
-            Seq(ImportFrom(
-                    Some(identifier("x.y")), Seq(alias('y, Some('z))), None)),
+            Seq(ImportFrom(Some(identifier("x.y")),
+                           Seq(alias('y, Some('z))),
+                           None)),
             "from x.y import y as z"
         )
         'import5 - stmt(

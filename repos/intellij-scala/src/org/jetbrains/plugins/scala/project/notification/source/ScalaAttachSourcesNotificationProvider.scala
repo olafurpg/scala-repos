@@ -27,14 +27,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 //todo: possibly join with AttachSourcesNorificationProvider
 //todo: differences only in JavaEditorFileSwapper -> ScalaEditorFileSwapper
 class ScalaAttachSourcesNotificationProvider(
-    myProject: Project, notifications: EditorNotifications)
+    myProject: Project,
+    notifications: EditorNotifications)
     extends AttachSourcesNotificationProvider(myProject, notifications) {
   private val EXTENSION_POINT_NAME: ExtensionPointName[AttachSourcesProvider] =
     new ExtensionPointName[AttachSourcesProvider](
         "com.intellij.attachSourcesProvider")
 
   override def createNotificationPanel(
-      file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel = {
+      file: VirtualFile,
+      fileEditor: FileEditor): EditorNotificationPanel = {
     if (file.getFileType ne JavaClassFileType.INSTANCE) return null
     val libraries: util.List[LibraryOrderEntry] =
       findOrderEntriesContainingFile(file)
@@ -59,7 +61,9 @@ class ScalaAttachSourcesNotificationProvider(
     if (sourceFile != null) {
       panel.setText(ScalaBundle.message("library.sources.not.attached"))
       defaultAction = new AttachSourcesUtil.AttachJarAsSourcesAction(
-          file, sourceFile, myProject)
+          file,
+          sourceFile,
+          myProject)
     } else {
       panel.setText(ScalaBundle.message("library.sources.not.found"))
       defaultAction =
@@ -88,12 +92,13 @@ class ScalaAttachSourcesNotificationProvider(
       }
     }
     Collections.sort(
-        actions, new Comparator[AttachSourcesProvider.AttachSourcesAction] {
-      def compare(o1: AttachSourcesProvider.AttachSourcesAction,
-                  o2: AttachSourcesProvider.AttachSourcesAction): Int = {
-        o1.getName.compareToIgnoreCase(o2.getName)
-      }
-    })
+        actions,
+        new Comparator[AttachSourcesProvider.AttachSourcesAction] {
+          def compare(o1: AttachSourcesProvider.AttachSourcesAction,
+                      o2: AttachSourcesProvider.AttachSourcesAction): Int = {
+            o1.getName.compareToIgnoreCase(o2.getName)
+          }
+        })
 
     actions.add(defaultAction)
 
@@ -101,33 +106,34 @@ class ScalaAttachSourcesNotificationProvider(
     while (iterator.hasNext) {
       val each = iterator.next()
       panel.createActionLabel(
-          GuiUtils.getTextWithoutMnemonicEscaping(each.getName), new Runnable {
-        def run() {
-          if (!Comparing.equal(
-                  libraries, findOrderEntriesContainingFile(file))) {
-            Messages.showErrorDialog(
-                myProject,
-                "Cannot find library for " + StringUtil.getShortName(fqn),
-                "Error")
-            return
-          }
-          panel.setText(each.getBusyText)
-          val onFinish: Runnable = new Runnable {
+          GuiUtils.getTextWithoutMnemonicEscaping(each.getName),
+          new Runnable {
             def run() {
-              SwingUtilities.invokeLater(new Runnable {
+              if (!Comparing.equal(libraries,
+                                   findOrderEntriesContainingFile(file))) {
+                Messages.showErrorDialog(
+                    myProject,
+                    "Cannot find library for " + StringUtil.getShortName(fqn),
+                    "Error")
+                return
+              }
+              panel.setText(each.getBusyText)
+              val onFinish: Runnable = new Runnable {
                 def run() {
-                  panel.setText(
-                      ScalaBundle.message("library.sources.not.found"))
+                  SwingUtilities.invokeLater(new Runnable {
+                    def run() {
+                      panel.setText(
+                          ScalaBundle.message("library.sources.not.found"))
+                    }
+                  })
                 }
-              })
+              }
+              val callback: ActionCallback =
+                each.perform(findOrderEntriesContainingFile(file))
+              callback.doWhenRejected(onFinish)
+              callback.doWhenDone(onFinish)
             }
-          }
-          val callback: ActionCallback =
-            each.perform(findOrderEntriesContainingFile(file))
-          callback.doWhenRejected(onFinish)
-          callback.doWhenDone(onFinish)
-        }
-      })
+          })
     }
     panel
   }

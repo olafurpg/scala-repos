@@ -48,8 +48,8 @@ object RotateEvent {
     * This event occurs when user performs a rotating gesture such as dragging two fingers around each other.
     */
   val Rotate: EventType[jfxsi.RotateEvent] = jfxsi.RotateEvent.ROTATE
-  @deprecated(
-      "Use Rotate; ROTATE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Rotate; ROTATE will be removed in a future release",
+              "8.0.60-R10")
   val ROTATE = Rotate
 
   /**

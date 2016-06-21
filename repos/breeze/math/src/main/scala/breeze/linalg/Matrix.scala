@@ -35,8 +35,10 @@ trait MatrixLike[@spec(Double, Int, Float, Long) V, +Self <: Matrix[V]]
     extends Tensor[(Int, Int), V]
     with TensorLike[(Int, Int), V, Self] {
   def map[V2, That](fn: V => V2)(
-      implicit canMapValues: CanMapValues[
-          Self @uncheckedVariance, V, V2, That]): That =
+      implicit canMapValues: CanMapValues[Self @uncheckedVariance,
+                                          V,
+                                          V2,
+                                          That]): That =
     values map fn
 }
 
@@ -68,16 +70,16 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
   }
 
   def iterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols)) yield
-      (i -> j) -> apply(i, j)
+    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
+      yield (i -> j) -> apply(i, j)
 
   def valuesIterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols)) yield
-      apply(i, j)
+    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
+      yield apply(i, j)
 
   def keysIterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols)) yield
-      (i -> j)
+    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
+      yield (i -> j)
 
   def toString(maxLines: Int = Terminal.terminalHeight - 3,
                maxWidth: Int = Terminal.terminalWidth): String = {
@@ -157,7 +159,7 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
   override def equals(p1: Any): Boolean = p1 match {
     case x: Matrix[_] =>
       this.rows == x.rows && this.cols == x.cols &&
-      keysIterator.forall(k => this(k) == x(k))
+        keysIterator.forall(k => this(k) == x(k))
     case _ =>
       return false
   }
@@ -171,10 +173,13 @@ object Matrix
     with MatrixMultOps {
 
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
-      rows: Int, cols: Int): Matrix[V] = DenseMatrix.zeros(rows, cols)
+      rows: Int,
+      cols: Int): Matrix[V] = DenseMatrix.zeros(rows, cols)
 
   def create[@spec(Double, Int, Float, Long) V: Zero](
-      rows: Int, cols: Int, data: Array[V]): Matrix[V] =
+      rows: Int,
+      cols: Int,
+      data: Array[V]): Matrix[V] =
     DenseMatrix.create(rows, cols, data)
 
   private[linalg] def zeroRows[V: ClassTag](cols: Int): Matrix[V] =
@@ -183,7 +188,8 @@ object Matrix
     emptyMatrix(rows, 0)
 
   private[linalg] def emptyMatrix[V: ClassTag](
-      _rows: Int, _cols: Int): Matrix[V] = new Matrix[V] {
+      _rows: Int,
+      _cols: Int): Matrix[V] = new Matrix[V] {
     def activeIterator: Iterator[((Int, Int), V)] = Iterator.empty
 
     def activeValuesIterator: Iterator[V] = Iterator.empty
@@ -239,9 +245,11 @@ object Matrix
 
 trait MatrixConstructors[Mat[T] <: Matrix[T]] {
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
-      rows: Int, cols: Int): Mat[V]
-  def create[@spec(Double, Int, Float, Long) V: Zero](
-      rows: Int, cols: Int, data: Array[V]): Mat[V]
+      rows: Int,
+      cols: Int): Mat[V]
+  def create[@spec(Double, Int, Float, Long) V: Zero](rows: Int,
+                                                      cols: Int,
+                                                      data: Array[V]): Mat[V]
 
   /**
     * Creates a matrix of all ones.
@@ -251,15 +259,18 @@ trait MatrixConstructors[Mat[T] <: Matrix[T]] {
     * @return
     */
   def ones[@spec(Double, Int, Float, Long) V: ClassTag: Zero: Semiring](
-      rows: Int, cols: Int): Mat[V] = {
+      rows: Int,
+      cols: Int): Mat[V] = {
     fill(rows, cols)(implicitly[Semiring[V]].one)
   }
 
   def fill[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
-      rows: Int, cols: Int)(v: => V): Mat[V] =
+      rows: Int,
+      cols: Int)(v: => V): Mat[V] =
     create(rows, cols, Array.fill(rows * cols)(v))
   def tabulate[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
-      rows: Int, cols: Int)(f: (Int, Int) => V): Mat[V] = {
+      rows: Int,
+      cols: Int)(f: (Int, Int) => V): Mat[V] = {
     val z = zeros(rows, cols)
     for (c <- 0 until cols; r <- 0 until rows) {
       z(r, c) = f(r, c)
@@ -267,8 +278,9 @@ trait MatrixConstructors[Mat[T] <: Matrix[T]] {
     z
   }
 
-  def rand[T: ClassTag: Zero](
-      rows: Int, cols: Int, rand: Rand[T] = Rand.uniform): Mat[T] = {
+  def rand[T: ClassTag: Zero](rows: Int,
+                              cols: Int,
+                              rand: Rand[T] = Rand.uniform): Mat[T] = {
     fill(rows, cols)(rand.draw())
   }
 
@@ -276,7 +288,9 @@ trait MatrixConstructors[Mat[T] <: Matrix[T]] {
   /** Static constructor for a literal matrix. */
   def apply[@specialized( /* Don't remove until SI-8886 is closed*/ ) R,
             @spec(Double, Int, Float, Long) V](rows: R*)(
-      implicit rl: LiteralRow[R, V], man: ClassTag[V], zero: Zero[V]) = {
+      implicit rl: LiteralRow[R, V],
+      man: ClassTag[V],
+      zero: Zero[V]) = {
     val nRows = rows.length
     val ns = rl.length(rows(0))
     val rv = zeros(nRows, ns)
@@ -300,8 +314,9 @@ trait MatrixConstructors[Mat[T] <: Matrix[T]] {
 
   // This method only exists because of trouble in Scala-specialization land.
   // basically, we turn off specialization for this loop, since it's not going to be fast anyway.
-  private def finishLiteral[V, R](
-      rv: Matrix[V], rl: LiteralRow[R, V], rows: Seq[R]) {
+  private def finishLiteral[V, R](rv: Matrix[V],
+                                  rl: LiteralRow[R, V],
+                                  rows: Seq[R]) {
     for ((row, i) <- rows.zipWithIndex) {
       rl.foreach(row, { (j, v) =>
         rv(i, j) = v

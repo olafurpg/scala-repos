@@ -61,7 +61,7 @@ object GuavaCache {
     * Creates a function which caches the results of `fn` in a
     * [[com.google.common.cache.Cache]].
     */
-  def fromCache[K, V](
-      fn: K => Future[V], cache: GCache[K, Future[V]]): K => Future[V] =
+  def fromCache[K, V](fn: K => Future[V],
+                      cache: GCache[K, Future[V]]): K => Future[V] =
     FutureCache.default(fn, new GuavaCache(cache))
 }

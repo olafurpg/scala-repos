@@ -148,8 +148,9 @@ object Dependencies {
     ) ++ specsBuild.map(_ % Test) ++ logback.map(_ % Test) ++ scalaParserCombinators(
         scalaVersion)
 
-  private def sbtPluginDep(
-      sbtVersion: String, scalaVersion: String, moduleId: ModuleID) = {
+  private def sbtPluginDep(sbtVersion: String,
+                           scalaVersion: String,
+                           moduleId: ModuleID) = {
     moduleId.extra(
         "sbtVersion" -> CrossVersion.binarySbtVersion(sbtVersion),
         "scalaVersion" -> CrossVersion.binaryScalaVersion(scalaVersion)
@@ -278,7 +279,7 @@ object Dependencies {
 
   val playCacheDeps =
     "net.sf.ehcache" % "ehcache-core" % "2.6.11" +:
-    (specsBuild.map(_ % Test) ++ logback.map(_ % Test))
+      (specsBuild.map(_ % Test) ++ logback.map(_ % Test))
 
   val playWsDeps =
     Seq(
@@ -286,7 +287,7 @@ object Dependencies {
         "org.asynchttpclient" % "async-http-client" % "2.0.0-RC12"
     ) ++ Seq("signpost-core", "signpost-commonshttp4").map(
         "oauth.signpost" % _ % "1.2.1.2") ++ logback.map(_ % Test) ++
-    (specsBuild :+ specsMatcherExtra).map(_ % Test) :+ mockitoAll % Test
+      (specsBuild :+ specsMatcherExtra).map(_ % Test) :+ mockitoAll % Test
 
   val playDocsSbtPluginDependencies = Seq(
       "com.typesafe.play" %% "play-doc" % "1.3.0"

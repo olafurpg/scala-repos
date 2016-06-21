@@ -35,7 +35,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
 
     val validCredentials = BasicHttpCredentials("John", "p4ssw0rd")
@@ -50,7 +51,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The supplied authentication is invalid"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
   }
   "authenticateBasicPF-0" in {
@@ -74,7 +76,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
 
     val validCredentials = BasicHttpCredentials("John", "p4ssw0rd")
@@ -96,7 +99,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The supplied authentication is invalid"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
   }
   "authenticateBasicPFAsync-0" in {
@@ -125,7 +129,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
 
     val validCredentials = BasicHttpCredentials("John", "p4ssw0rd")
@@ -140,7 +145,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The supplied authentication is invalid"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
   }
   "authenticateBasicAsync-0" in {
@@ -170,7 +176,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
 
     val validCredentials = BasicHttpCredentials("John", "p4ssw0rd")
@@ -185,7 +192,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The supplied authentication is invalid"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "Basic", "secure site")
+          "Basic",
+          "secure site")
     }
   }
   "authenticateOrRejectWithChallenge-0" in {
@@ -217,7 +225,8 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
       status shouldEqual StatusCodes.Unauthorized
       responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
       header[`WWW-Authenticate`].get.challenges.head shouldEqual HttpChallenge(
-          "MyAuth", "MyRealm")
+          "MyAuth",
+          "MyRealm")
     }
 
     val validCredentials = BasicHttpCredentials("John", "p4ssw0rd")

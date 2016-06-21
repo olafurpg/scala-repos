@@ -70,10 +70,10 @@ class ActorSelectionSpec
     asked.correlationId should ===(selection)
 
     implicit val ec = system.dispatcher
-    val resolved = Await.result(
-        selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
-      case _ ⇒ null
-    }, timeout.duration)
+    val resolved = Await
+      .result(selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
+        case _ ⇒ null
+      }, timeout.duration)
     Option(resolved) should ===(result)
 
     result
@@ -347,13 +347,17 @@ class ActorSelectionSpec
       ActorSelection(c21, "../*/hello").## should ===(
           ActorSelection(c21, "../*/hello").##)
       ActorSelection(c2, "../*/hello") should not be ActorSelection(
-          c21, "../*/hello")
+          c21,
+          "../*/hello")
       ActorSelection(c2, "../*/hello").## should not be ActorSelection(
-          c21, "../*/hello").##
+          c21,
+          "../*/hello").##
       ActorSelection(c21, "../*/hell") should not be ActorSelection(
-          c21, "../*/hello")
+          c21,
+          "../*/hello")
       ActorSelection(c21, "../*/hell").## should not be ActorSelection(
-          c21, "../*/hello").##
+          c21,
+          "../*/hello").##
     }
 
     "print nicely" in {

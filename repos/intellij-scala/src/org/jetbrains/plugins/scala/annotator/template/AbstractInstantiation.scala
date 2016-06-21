@@ -33,8 +33,8 @@ object AbstractInstantiation extends AnnotatorPart[ScTemplateDefinition] {
       case (refElement, Some((psiClass, _))) if isAbstract(psiClass) =>
         holder.createErrorAnnotation(
             refElement,
-            "%s %s is abstract; cannot be instantiated".format(
-                kindOf(psiClass), psiClass.name))
+            "%s %s is abstract; cannot be instantiated"
+              .format(kindOf(psiClass), psiClass.name))
       case _ =>
     }
   }

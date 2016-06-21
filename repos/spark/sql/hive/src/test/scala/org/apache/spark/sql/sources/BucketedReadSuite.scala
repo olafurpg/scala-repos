@@ -63,8 +63,7 @@ class BucketedReadSuite
         assert(rdd.partitions.length == 8)
 
         val attrs = table.select("j", "k").queryExecution.analyzed.output
-        val checkBucketId = rdd.mapPartitionsWithIndex(
-            (index, rows) => {
+        val checkBucketId = rdd.mapPartitionsWithIndex((index, rows) => {
           val getBucketId = UnsafeProjection.create(
               HashPartitioning(attrs, 8).partitionIdExpression :: Nil,
               output)
@@ -289,8 +288,9 @@ class BucketedReadSuite
     }
   }
 
-  private def joinCondition(
-      left: DataFrame, right: DataFrame, joinCols: Seq[String]): Column = {
+  private def joinCondition(left: DataFrame,
+                            right: DataFrame,
+                            joinCols: Seq[String]): Column = {
     joinCols.map(col => left(col) === right(col)).reduce(_ && _)
   }
 

@@ -124,8 +124,8 @@ trait Batcher extends Serializable {
     * Return the largest interval of batches completely covered by
     * the interval of time.
     */
-  private def dateToBatch(interval: Interval[Timestamp])(
-      onIncLow: (Timestamp) => BatchID)(
+  private def dateToBatch(
+      interval: Interval[Timestamp])(onIncLow: (Timestamp) => BatchID)(
       onExcUp: (Timestamp) => BatchID): Interval[BatchID] = {
 
     interval match {
@@ -207,8 +207,8 @@ trait Batcher extends Serializable {
     )
   }
 
-  def enclosedBy(
-      extremities: (BatchID, BatchID), other: Batcher): Iterable[BatchID] = {
+  def enclosedBy(extremities: (BatchID, BatchID),
+                 other: Batcher): Iterable[BatchID] = {
     val (bottom, top) = extremities
     SortedSet(
         BatchID.range(bottom, top).toSeq.flatMap(enclosedBy(_, other)): _*

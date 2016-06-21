@@ -40,8 +40,8 @@ case class ScalaChangeInfo(newVisibility: String,
   //used in introduce parameter refactoring
   var introducedParameterData: Option[ScalaIntroduceParameterData] = None
 
-  override def getValue(
-      i: Int, callExpression: PsiCallExpression): PsiExpression =
+  override def getValue(i: Int,
+                        callExpression: PsiCallExpression): PsiExpression =
     getNewParameters()(i).getValue(callExpression)
 
   override def getNewReturnType: Type =

@@ -18,8 +18,8 @@ object Source {
   case object Simul extends Source(id = 10)
   case object Relay extends Source(id = 11)
 
-  val all = List(
-      Lobby, Friend, Ai, Api, Tournament, Position, Import, Simul, Relay)
+  val all =
+    List(Lobby, Friend, Ai, Api, Tournament, Position, Import, Simul, Relay)
   val byId = all map { v =>
     (v.id, v)
   } toMap

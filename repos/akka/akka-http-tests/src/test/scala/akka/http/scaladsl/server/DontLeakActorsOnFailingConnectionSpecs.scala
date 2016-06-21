@@ -37,16 +37,16 @@ class DontLeakActorsOnFailingConnectionSpecs
       stdout-loglevel = OFF
     }""")
     .withFallback(ConfigFactory.load())
-  implicit val system = ActorSystem(
-      "DontLeakActorsOnFailingConnectionSpecs", config)
+  implicit val system =
+    ActorSystem("DontLeakActorsOnFailingConnectionSpecs", config)
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
 
   val log = Logging(system, getClass)
 
   // TODO DUPLICATED
-  def assertAllStagesStopped[T](name: String)(block: ⇒ T)(
-      implicit materializer: Materializer): T =
+  def assertAllStagesStopped[T](
+      name: String)(block: ⇒ T)(implicit materializer: Materializer): T =
     materializer match {
       case impl: ActorMaterializerImpl ⇒
         val probe = TestProbe()(impl.system)

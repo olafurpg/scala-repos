@@ -34,8 +34,9 @@ class IngestStress(settings: Settings) extends Task(settings) {
 
   val accountSet = Vector.fill(clients)(createAccount)
 
-  def randomIngest(
-      account: Account, n: Int, generator: Arbitrary[SampleData]): Double = {
+  def randomIngest(account: Account,
+                   n: Int,
+                   generator: Arbitrary[SampleData]): Double = {
     def loop(n: Int, accumulated: Int = 0): Int = {
       val sd = generator.arbitrary.sample.get
       val actualSize = sd.data.length
@@ -63,23 +64,23 @@ class IngestStress(settings: Settings) extends Task(settings) {
   val threads =
     accountSet.zipWithIndex map {
       case (account, i) => {
-          new Thread(new Runnable {
-            def run() {
-              val generator = sample(schema)
-              while (true) {
-                val rate = randomIngest(account, eps / clients, generator)
-                rates.set(i, rate)
+        new Thread(new Runnable {
+          def run() {
+            val generator = sample(schema)
+            while (true) {
+              val rate = randomIngest(account, eps / clients, generator)
+              rates.set(i, rate)
 
-                // throttle to the target EPS
-                if (rate > eps) {
-                  val delay = 1000 / (rate - eps)
-                  throttles.set(i, delay)
-                  Thread.sleep(delay.toLong)
-                }
+              // throttle to the target EPS
+              if (rate > eps) {
+                val delay = 1000 / (rate - eps)
+                throttles.set(i, delay)
+                Thread.sleep(delay.toLong)
               }
             }
-          })
-        }
+          }
+        })
+      }
     }
 
   println("Starting ingestion; batton down the hatches! (Ctrl-C to abort)")
@@ -94,8 +95,8 @@ class IngestStress(settings: Settings) extends Task(settings) {
     val throttle = math.round(0 until clients map throttles.get sum)
 
     println(
-        ">>> burst rate = %s; current throttle = %s".format(
-            burstRate, throttle))
+        ">>> burst rate = %s; current throttle = %s".format(burstRate,
+                                                            throttle))
   }
 }
 

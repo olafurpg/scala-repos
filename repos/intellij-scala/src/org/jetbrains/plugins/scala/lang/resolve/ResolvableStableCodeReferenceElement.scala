@@ -58,22 +58,24 @@ trait ResolvableStableCodeReferenceElement
 
   def resolveTypesOnly(incomplete: Boolean) = {
 
-    @CachedMappedWithRecursionGuard(
-        this, Array.empty, ModCount.getBlockModificationCount)
+    @CachedMappedWithRecursionGuard(this,
+                                    Array.empty,
+                                    ModCount.getBlockModificationCount)
     def doResolve(incomplete: Boolean): Array[ResolveResult] =
-      ImportResolverNoMethods.resolve(
-          ResolvableStableCodeReferenceElement.this, incomplete)
+      ImportResolverNoMethods
+        .resolve(ResolvableStableCodeReferenceElement.this, incomplete)
 
     resolveWithCompiled(incomplete, ImportResolverNoMethods, doResolve)
   }
 
   def resolveMethodsOnly(incomplete: Boolean) = {
 
-    @CachedMappedWithRecursionGuard(
-        this, Array.empty, ModCount.getBlockModificationCount)
+    @CachedMappedWithRecursionGuard(this,
+                                    Array.empty,
+                                    ModCount.getBlockModificationCount)
     def doResolve(incomplete: Boolean): Array[ResolveResult] =
-      ImportResolverNoTypes.resolve(
-          ResolvableStableCodeReferenceElement.this, incomplete)
+      ImportResolverNoTypes
+        .resolve(ResolvableStableCodeReferenceElement.this, incomplete)
 
     resolveWithCompiled(incomplete, ImportResolverNoTypes, doResolve)
   }
@@ -101,8 +103,9 @@ trait ResolvableStableCodeReferenceElement
     }
   }
 
-  @CachedMappedWithRecursionGuard(
-      this, Array.empty, ModCount.getBlockModificationCount)
+  @CachedMappedWithRecursionGuard(this,
+                                  Array.empty,
+                                  ModCount.getBlockModificationCount)
   private def multiResolveCached(incomplete: Boolean): Array[ResolveResult] =
     Resolver.resolve(ResolvableStableCodeReferenceElement.this, incomplete)
 
@@ -153,7 +156,9 @@ trait ResolvableStableCodeReferenceElement
               //check implicit conversions
               val expr =
                 ScalaPsiElementFactory.createExpressionWithContextFromText(
-                    ref.getText, ref.getContext, ref)
+                    ref.getText,
+                    ref.getContext,
+                    ref)
               //todo: this is really hacky solution... Probably can be joint somehow with interpolated pattern.
               expr match {
                 case ref: ResolvableReferenceExpression =>
@@ -192,8 +197,8 @@ trait ResolvableStableCodeReferenceElement
       PsiTreeUtil.getContextOfType(ref, true, classOf[ScImportStmt])
 
     if (importStmt != null) {
-      val importHolder = PsiTreeUtil.getContextOfType(
-          importStmt, true, classOf[ScImportsHolder])
+      val importHolder = PsiTreeUtil
+        .getContextOfType(importStmt, true, classOf[ScImportsHolder])
       if (importHolder != null) {
         importHolder.getImportStatements.takeWhile(_ != importStmt).foreach {
           case stmt: ScImportStmt =>
@@ -244,8 +249,8 @@ trait ResolvableStableCodeReferenceElement
     filtered.toArray
   }
 
-  protected def processQualifier(
-      ref: ScStableCodeReferenceElement, processor: BaseProcessor) {
+  protected def processQualifier(ref: ScStableCodeReferenceElement,
+                                 processor: BaseProcessor) {
     _qualifier() match {
       case None =>
         def treeWalkUp(place: PsiElement, lastParent: PsiElement) {
@@ -257,8 +262,10 @@ trait ResolvableStableCodeReferenceElement
               // See ScalaPsiUtil.syntheticParamClause and StableCodeReferenceElementResolver#computeEffectiveParameterClauses
               treeWalkUp(p.analog.get, lastParent)
             case p =>
-              if (!p.processDeclarations(
-                      processor, ResolveState.initial, lastParent, ref)) return
+              if (!p.processDeclarations(processor,
+                                         ResolveState.initial,
+                                         lastParent,
+                                         ref)) return
               place match {
                 case (_: ScTemplateBody | _: ScExtendsBlock) =>
                 // template body and inherited members are at the same level.
@@ -270,7 +277,9 @@ trait ResolvableStableCodeReferenceElement
         treeWalkUp(ref, null)
       case Some(p: ScInterpolationPattern) =>
         val expr = ScalaPsiElementFactory.createExpressionWithContextFromText(
-            s"""_root_.scala.StringContext("").$refName""", p, ref)
+            s"""_root_.scala.StringContext("").$refName""",
+            p,
+            ref)
         expr match {
           case ref: ResolvableReferenceExpression =>
             ref.doResolve(ref, processor, accessibilityCheck = true)
@@ -285,8 +294,8 @@ trait ResolvableStableCodeReferenceElement
           case _ =>
         }
       case Some(thisQ: ScThisReference) =>
-        for (ttype <- thisQ.getType(TypingContext.empty)) processor
-          .processType(ttype, this)
+        for (ttype <- thisQ.getType(TypingContext.empty))
+          processor.processType(ttype, this)
       case Some(superQ: ScSuperReference) =>
         ResolveUtils.processSuperReference(superQ, processor, this)
       case Some(qual) =>
@@ -320,7 +329,9 @@ trait ResolvableStableCodeReferenceElement
   }
 
   @CachedWithRecursionGuard[ResolvableStableCodeReferenceElement](
-      this, EMPTY_ARRAY, ModCount.getBlockModificationCount)
+      this,
+      EMPTY_ARRAY,
+      ModCount.getBlockModificationCount)
   private def resolveNoConstructorImpl(): Array[ResolveResult] =
     NoConstructorResolver.resolve(this, incomplete = false)
 
@@ -330,7 +341,9 @@ trait ResolvableStableCodeReferenceElement
   }
 
   @CachedWithRecursionGuard[ResolvableStableCodeReferenceElement](
-      this, EMPTY_ARRAY, ModCount.getBlockModificationCount)
+      this,
+      EMPTY_ARRAY,
+      ModCount.getBlockModificationCount)
   private def resolveAllConstructorsImpl(): Array[ResolveResult] =
     ResolverAllConstructors.resolve(this, incomplete = false)
 
@@ -340,7 +353,9 @@ trait ResolvableStableCodeReferenceElement
   }
 
   @CachedWithRecursionGuard[ResolvableStableCodeReferenceElement](
-      this, EMPTY_ARRAY, ModCount.getBlockModificationCount)
+      this,
+      EMPTY_ARRAY,
+      ModCount.getBlockModificationCount)
   private def shapeResolveImpl(): Array[ResolveResult] =
     ShapesResolver.resolve(this, incomplete = false)
 
@@ -351,7 +366,9 @@ trait ResolvableStableCodeReferenceElement
   }
 
   @CachedWithRecursionGuard[ResolvableStableCodeReferenceElement](
-      this, EMPTY_ARRAY, ModCount.getBlockModificationCount)
+      this,
+      EMPTY_ARRAY,
+      ModCount.getBlockModificationCount)
   private def shapeResolveConstrImpl(): Array[ResolveResult] =
     ShapesResolverAllConstructors.resolve(this, incomplete = false)
 

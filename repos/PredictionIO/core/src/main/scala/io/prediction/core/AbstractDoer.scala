@@ -58,8 +58,8 @@ object Doer extends Logging {
           case e: NoSuchMethodException =>
             error(
                 s"${params.getClass.getName} was used as the constructor " +
-                s"argument to ${e.getMessage}, but no constructor can handle it. " +
-                "Aborting.")
+                  s"argument to ${e.getMessage}, but no constructor can handle it. " +
+                  "Aborting.")
             sys.exit(1)
         }
     }

@@ -61,16 +61,18 @@ object FTupleSpec extends Specification with ScalaCheck {
 
     implicit def arbTuple3[A: Arbitrary, B: Arbitrary, C: Arbitrary]
       : Arbitrary[F.Tuple3[A, B, C]] = Arbitrary {
-      for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C]) yield
-        F.Tuple3(a, b, c)
+      for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C])
+        yield F.Tuple3(a, b, c)
     }
 
-    implicit def arbTuple4[
-        A: Arbitrary, B: Arbitrary, C: Arbitrary, D: Arbitrary]
-      : Arbitrary[F.Tuple4[A, B, C, D]] = Arbitrary {
-      for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C];
-           d <- arbitrary[D]) yield F.Tuple4(a, b, c, d)
-    }
+    implicit def arbTuple4[A: Arbitrary,
+                           B: Arbitrary,
+                           C: Arbitrary,
+                           D: Arbitrary]: Arbitrary[F.Tuple4[A, B, C, D]] =
+      Arbitrary {
+        for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C];
+             d <- arbitrary[D]) yield F.Tuple4(a, b, c, d)
+      }
 
     implicit def arbTuple5[A: Arbitrary,
                            B: Arbitrary,
@@ -79,8 +81,8 @@ object FTupleSpec extends Specification with ScalaCheck {
                            E: Arbitrary]: Arbitrary[F.Tuple5[A, B, C, D, E]] =
       Arbitrary {
         for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C];
-             d <- arbitrary[D]; e <- arbitrary[E]) yield
-          F.Tuple5(a, b, c, d, e)
+             d <- arbitrary[D]; e <- arbitrary[E])
+          yield F.Tuple5(a, b, c, d, e)
       }
   }
 }

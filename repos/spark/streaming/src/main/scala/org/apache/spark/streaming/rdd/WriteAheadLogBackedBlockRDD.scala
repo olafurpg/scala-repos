@@ -47,8 +47,7 @@ private[streaming] class WriteAheadLogBackedBlockRDDPartition(
     val blockId: BlockId,
     val isBlockIdValid: Boolean,
     val walRecordHandle: WriteAheadLogRecordHandle
-)
-    extends Partition
+) extends Partition
 
 /**
   * This class represents a special case of the BlockRDD where the data blocks in
@@ -83,12 +82,12 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
   require(
       _blockIds.length == walRecordHandles.length,
       s"Number of block Ids (${_blockIds.length}) must be " +
-      s" same as number of WAL record handles (${walRecordHandles.length})")
+        s" same as number of WAL record handles (${walRecordHandles.length})")
 
   require(
       isBlockIdValid.isEmpty || isBlockIdValid.length == _blockIds.length,
       s"Number of elements in isBlockIdValid (${isBlockIdValid.length}) must be " +
-      s" same as number of block Ids (${_blockIds.length})")
+        s" same as number of block Ids (${_blockIds.length})")
 
   // Hadoop configuration is not serializable, so broadcast it as a serializable.
   @transient private val hadoopConfig = sc.hadoopConfiguration
@@ -101,8 +100,10 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
     assertValid()
     Array.tabulate(_blockIds.length) { i =>
       val isValid = if (isBlockIdValid.length == 0) true else isBlockIdValid(i)
-      new WriteAheadLogBackedBlockRDDPartition(
-          i, _blockIds(i), isValid, walRecordHandles(i))
+      new WriteAheadLogBackedBlockRDDPartition(i,
+                                               _blockIds(i),
+                                               isValid,
+                                               walRecordHandles(i))
     }
   }
 
@@ -138,7 +139,9 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
             System.getProperty("java.io.tmpdir"),
             UUID.randomUUID().toString).getAbsolutePath
         writeAheadLog = WriteAheadLogUtils.createLogForReceiver(
-            SparkEnv.get.conf, nonExistentDirectory, hadoopConf)
+            SparkEnv.get.conf,
+            nonExistentDirectory,
+            hadoopConf)
         dataRead = writeAheadLog.read(partition.walRecordHandle)
       } catch {
         case NonFatal(e) =>
@@ -154,14 +157,15 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
       if (dataRead == null) {
         throw new SparkException(
             s"Could not read data from write ahead log record ${partition.walRecordHandle}, " +
-            s"read returned null")
+              s"read returned null")
       }
       logInfo(
           s"Read partition data of $this from write ahead log, record handle " +
-          partition.walRecordHandle)
+            partition.walRecordHandle)
       if (storeInBlockManager) {
-        blockManager.putBytes(
-            blockId, new ChunkedByteBuffer(dataRead.duplicate()), storageLevel)
+        blockManager.putBytes(blockId,
+                              new ChunkedByteBuffer(dataRead.duplicate()),
+                              storageLevel)
         logDebug(
             s"Stored partition data of $this into block manager with level $storageLevel")
         dataRead.rewind()
@@ -183,12 +187,11 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
     */
   override def getPreferredLocations(split: Partition): Seq[String] = {
     val partition = split.asInstanceOf[WriteAheadLogBackedBlockRDDPartition]
-    val blockLocations =
-      if (partition.isBlockIdValid) {
-        getBlockIdLocations().get(partition.blockId)
-      } else {
-        None
-      }
+    val blockLocations = if (partition.isBlockIdValid) {
+      getBlockIdLocations().get(partition.blockId)
+    } else {
+      None
+    }
 
     blockLocations.getOrElse {
       partition.walRecordHandle match {

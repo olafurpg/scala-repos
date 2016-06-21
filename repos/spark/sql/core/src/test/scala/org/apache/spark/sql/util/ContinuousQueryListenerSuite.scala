@@ -172,8 +172,7 @@ class ContinuousQueryListenerSuite
 
   class QueryStatusCollector extends ContinuousQueryListener {
 
-    private val asyncTestWaiter =
-      new Waiter // to catch errors in the async listener events
+    private val asyncTestWaiter = new Waiter // to catch errors in the async listener events
 
     @volatile var startStatus: QueryStatus = null
     @volatile var terminationStatus: QueryStatus = null

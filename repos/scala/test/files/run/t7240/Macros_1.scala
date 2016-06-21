@@ -20,7 +20,7 @@ object Bakery {
       val names = dslName.split("\\.").toList.reverse
       assert(names.length >= 1,
              "DSL trait name must be in the valid format. DSL trait name is " +
-             dslName)
+               dslName)
 
       val tpeName = newTypeName(names.head)
       names.tail.reverse match {

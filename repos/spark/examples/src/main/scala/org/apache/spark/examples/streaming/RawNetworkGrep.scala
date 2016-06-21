@@ -46,16 +46,19 @@ object RawNetworkGrep {
 
     StreamingExamples.setStreamingLogLevels()
 
-    val Array(
-    IntParam(numStreams), host, IntParam(port), IntParam(batchMillis)) = args
+    val Array(IntParam(numStreams),
+              host,
+              IntParam(port),
+              IntParam(batchMillis)) = args
     val sparkConf = new SparkConf().setAppName("RawNetworkGrep")
     // Create the context
     val ssc = new StreamingContext(sparkConf, Duration(batchMillis))
 
     val rawStreams = (1 to numStreams)
       .map(_ =>
-            ssc.rawSocketStream[String](
-                host, port, StorageLevel.MEMORY_ONLY_SER_2))
+            ssc.rawSocketStream[String](host,
+                                        port,
+                                        StorageLevel.MEMORY_ONLY_SER_2))
       .toArray
     val union = ssc.union(rawStreams)
     union

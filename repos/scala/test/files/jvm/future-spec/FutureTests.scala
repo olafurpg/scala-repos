@@ -41,8 +41,8 @@ class FutureTests extends MinimalScalaTest {
       with mutable.SynchronizedSet[Throwable]
       implicit val ec = scala.concurrent.ExecutionContext
         .fromExecutor(new java.util.concurrent.ForkJoinPool(), { t =>
-        ms += t
-      })
+          ms += t
+        })
 
       class ThrowableTest(m: String) extends Throwable(m)
 
@@ -160,8 +160,7 @@ class FutureTests extends MinimalScalaTest {
       assert(ECNotUsed(ec =>
                 f.map(_ => fail("map should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.flatMap(_ => fail("flatMap should not have been called"))(
-                    ec)) eq f)
+                f.flatMap(_ => fail("flatMap should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
                 f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
@@ -593,10 +592,11 @@ class FutureTests extends MinimalScalaTest {
     }
 
     "find" in {
-      val futures = for (i <- 1 to 10) yield
-        Future {
-          i
-        }
+      val futures = for (i <- 1 to 10)
+        yield
+          Future {
+            i
+          }
 
       val result = Future.find[Int](futures)(_ == 3)
       Await.result(result, defaultTimeout) mustBe (Some(3))

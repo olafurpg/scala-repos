@@ -108,13 +108,13 @@ class ScForStatementImpl(node: ASTNode)
           var filterText = "withFilter"
           var filterFound = false
           val tp = gen.rvalue.getType(TypingContext.empty).getOrAny
-          val processor = new CompletionProcessor(StdKinds.methodRef,
-                                                  this,
-                                                  collectImplicits = true,
-                                                  forName =
-                                                    Some("withFilter")) {
-            override def execute(
-                _element: PsiElement, state: ResolveState): Boolean = {
+          val processor = new CompletionProcessor(
+              StdKinds.methodRef,
+              this,
+              collectImplicits = true,
+              forName = Some("withFilter")) {
+            override def execute(_element: PsiElement,
+                                 state: ResolveState): Boolean = {
               super.execute(_element, state)
               if (!levelSet.isEmpty) {
                 filterFound = true
@@ -193,12 +193,11 @@ class ScForStatementImpl(node: ASTNode)
           gen.pattern.desugarizedPatternIndex = exprText.length
           exprText.append(gen.pattern.getText)
 
-          val (freshName1, freshName2) =
-            if (forDisplay) {
-              ("x$1", "x$2")
-            } else {
-              ("freshNameForIntelliJIDEA1", "freshNameForIntelliJIDEA2")
-            }
+          val (freshName1, freshName2) = if (forDisplay) {
+            ("x$1", "x$2")
+          } else {
+            ("freshNameForIntelliJIDEA1", "freshNameForIntelliJIDEA2")
+          }
 
           exprText
             .append(") <- (for (")
@@ -250,7 +249,9 @@ class ScForStatementImpl(node: ASTNode)
           try {
             Option(
                 ScalaPsiElementFactory.createExpressionWithContextFromText(
-                    text, this.getContext, this))
+                    text,
+                    this.getContext,
+                    this))
           } catch {
             case e: Throwable => None
           }

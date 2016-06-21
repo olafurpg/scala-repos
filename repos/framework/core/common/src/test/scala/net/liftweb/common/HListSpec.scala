@@ -72,14 +72,14 @@ object HListSpec extends Specification {
       // result in a failure
       x match {
         case Right(a :+: one :+: lst :+: HNil) => {
-            // val a2: Int = a  fails... not type safe
+          // val a2: Int = a  fails... not type safe
 
-            val as: String = a
-            val onei: Int = one
-            val lstl: List[Int] = lst
+          val as: String = a
+          val onei: Int = one
+          val lstl: List[Int] = lst
 
-            success
-          }
+          success
+        }
         case Left(_) => failure
       }
     }

@@ -59,10 +59,11 @@ object RouterSpec extends PlaySpecification {
   "bind int parameters from the query string as a list" in {
 
     "from a list of numbers" in new WithApplication() {
-      val Some(result) = route(
-          implicitApp,
-          FakeRequest(
-              GET, controllers.routes.Application.takeList(List(1, 2, 3)).url))
+      val Some(result) =
+        route(implicitApp,
+              FakeRequest(
+                  GET,
+                  controllers.routes.Application.takeList(List(1, 2, 3)).url))
       contentAsString(result) must equalTo("1,2,3")
     }
     "from a list of numbers and letters" in new WithApplication() {

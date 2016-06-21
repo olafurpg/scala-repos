@@ -26,7 +26,8 @@ object RestartNode2SpecMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+                """
       akka.cluster.auto-down-unreachable-after = 2s
       akka.cluster.retry-unsuccessful-join-after = 3s
       akka.remote.retry-gate-closed-for = 45s
@@ -54,8 +55,8 @@ abstract class RestartNode2SpecSpec
     Vector(seedNode1Address, seed2)
 
   // this is the node that will attempt to re-join, keep gate times low so it can retry quickly
-  lazy val restartedSeed1System = ActorSystem(
-      system.name, ConfigFactory.parseString(s"""
+  lazy val restartedSeed1System =
+    ActorSystem(system.name, ConfigFactory.parseString(s"""
       akka.remote.netty.tcp.port= ${seedNodes.head.port.get}
       #akka.remote.retry-gate-closed-for = 1s
     """).withFallback(system.settings.config))

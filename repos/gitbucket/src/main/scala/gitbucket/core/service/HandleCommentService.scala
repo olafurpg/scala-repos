@@ -14,11 +14,11 @@ trait HandleCommentService {
   /**
     * @see [[https://github.com/takezoe/gitbucket/wiki/CommentAction]]
     */
-  def handleComment(issue: Issue,
-                    content: Option[String],
-                    repository: RepositoryService.RepositoryInfo,
-                    actionOpt: Option[String])(
-      implicit context: Context, s: Session) = {
+  def handleComment(
+      issue: Issue,
+      content: Option[String],
+      repository: RepositoryService.RepositoryInfo,
+      actionOpt: Option[String])(implicit context: Context, s: Session) = {
 
     defining(repository.owner, repository.name) {
       case (owner, name) =>
@@ -27,9 +27,9 @@ trait HandleCommentService {
         val (action, recordActivity) = actionOpt.collect {
           case "close" if (!issue.closed) =>
             true ->
-            (Some("close") -> Some(
-                    if (issue.isPullRequest) recordClosePullRequestActivity _
-                    else recordCloseIssueActivity _))
+              (Some("close") -> Some(
+                      if (issue.isPullRequest) recordClosePullRequestActivity _
+                      else recordCloseIssueActivity _))
           case "reopen" if (issue.closed) =>
             false -> (Some("reopen") -> Some(recordReopenIssueActivity _))
         }.map {
@@ -69,16 +69,21 @@ trait HandleCommentService {
 
         // extract references and create refer comment
         content.map { content =>
-          createReferComment(
-              owner, name, issue, content, context.loginAccount.get)
+          createReferComment(owner,
+                             name,
+                             issue,
+                             content,
+                             context.loginAccount.get)
         }
 
         // call web hooks
         action match {
           case None =>
             commentId.map { commentIdSome =>
-              callIssueCommentWebHook(
-                  repository, issue, commentIdSome, context.loginAccount.get)
+              callIssueCommentWebHook(repository,
+                                      issue,
+                                      commentIdSome,
+                                      context.loginAccount.get)
             }
           case Some(act) =>
             val webHookAction = act match {

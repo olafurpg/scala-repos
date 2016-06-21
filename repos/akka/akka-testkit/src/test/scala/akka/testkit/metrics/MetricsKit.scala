@@ -52,8 +52,8 @@ private[akka] trait MetricsKit extends MetricsKitOps {
 
     def configureConsoleReporter() {
       if (settings.Reporters.contains("console")) {
-        val akkaConsoleReporter = new AkkaConsoleReporter(
-            registry, settings.ConsoleReporter.Verbose)
+        val akkaConsoleReporter =
+          new AkkaConsoleReporter(registry, settings.ConsoleReporter.Verbose)
 
         if (settings.ConsoleReporter.ScheduledReportInterval > Duration.Zero)
           akkaConsoleReporter.start(
@@ -68,8 +68,8 @@ private[akka] trait MetricsKit extends MetricsKitOps {
       if (settings.Reporters.contains("graphite")) {
         note(
             s"MetricsKit: Graphite reporter enabled, sending metrics to: ${settings.GraphiteReporter.Host}:${settings.GraphiteReporter.Port}")
-        val address = new InetSocketAddress(
-            settings.GraphiteReporter.Host, settings.GraphiteReporter.Port)
+        val address = new InetSocketAddress(settings.GraphiteReporter.Host,
+                                            settings.GraphiteReporter.Port)
         val graphite = new GraphiteClient(address)
         val akkaGraphiteReporter = new AkkaGraphiteReporter(
             registry,

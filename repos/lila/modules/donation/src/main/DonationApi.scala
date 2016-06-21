@@ -15,8 +15,8 @@ final class DonationApi(coll: Coll,
 
   private val minAmount = 200
 
-  private val donorCache = lila.memo.AsyncCache[String, Boolean](
-      userId => donatedByUser(userId).map(_ >= minAmount), maxCapacity = 5000)
+  private val donorCache = lila.memo.AsyncCache[String, Boolean](userId =>
+        donatedByUser(userId).map(_ >= minAmount), maxCapacity = 5000)
 
   // in $ cents
   private def donatedByUser(userId: String): Fu[Int] =

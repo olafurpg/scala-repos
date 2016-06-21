@@ -115,7 +115,8 @@ class ClusterSpec extends AkkaSpec(ClusterSpec.config) with ImplicitSender {
     "allow join and leave with local address" in {
       val sys2 = ActorSystem(
           "ClusterSpec2",
-          ConfigFactory.parseString("""
+          ConfigFactory.parseString(
+              """
         akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
         akka.remote.netty.tcp.port = 0
         """))

@@ -43,8 +43,8 @@ object DriverWrapper {
                                    0,
                                    conf,
                                    new SecurityManager(conf))
-        rpcEnv.setupEndpoint(
-            "workerWatcher", new WorkerWatcher(rpcEnv, workerUrl))
+        rpcEnv
+          .setupEndpoint("workerWatcher", new WorkerWatcher(rpcEnv, workerUrl))
 
         val currentLoader = Thread.currentThread.getContextClassLoader
         val userJarUrl = new File(userJar).toURI().toURL()

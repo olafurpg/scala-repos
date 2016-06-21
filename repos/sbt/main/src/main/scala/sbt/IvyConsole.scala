@@ -46,8 +46,9 @@ object IvyConsole {
     Project.setProject(session, newStructure, newState)
   }
 
-  final case class Dependencies(
-      managed: Seq[ModuleID], resolvers: Seq[Resolver], unmanaged: Seq[File])
+  final case class Dependencies(managed: Seq[ModuleID],
+                                resolvers: Seq[Resolver],
+                                unmanaged: Seq[File])
   def parseDependencies(args: Seq[String], log: Logger): Dependencies =
     (Dependencies(Nil, Nil, Nil) /: args)(parseArgument(log))
   def parseArgument(

@@ -49,8 +49,8 @@ trait ExecutionContext {
     val conf = step.getConfig
     getIdentifierOpt(ExecutionContext.getDesc(step))
       .foreach(descriptionString => {
-      conf.set(Config.StepDescriptions, descriptionString)
-    })
+        conf.set(Config.StepDescriptions, descriptionString)
+      })
   }
 
   final def buildFlow: Try[Flow[_]] =
@@ -126,7 +126,8 @@ trait ExecutionContext {
             case Success(fn) => flow.addStepListener(fn(mode, configWithId))
             case Failure(e) =>
               new Exception(
-                  "Failed to decode flow step listener when submitting job", e)
+                  "Failed to decode flow step listener when submitting job",
+                  e)
           }
 
         case _ => ()

@@ -30,8 +30,8 @@ private[launchqueue] object AppTaskLauncherActor {
             taskOpFactory: TaskOpFactory,
             maybeOfferReviver: Option[OfferReviver],
             taskTracker: TaskTracker,
-            rateLimiterActor: ActorRef)(
-      app: AppDefinition, initialCount: Int): Props = {
+            rateLimiterActor: ActorRef)(app: AppDefinition,
+                                        initialCount: Int): Props = {
     Props(
         new AppTaskLauncherActor(config,
                                  offerMatcherManager,
@@ -68,7 +68,7 @@ private[launchqueue] object AppTaskLauncherActor {
 
   private val TASK_OP_REJECTED_TIMEOUT_REASON: String =
     "AppTaskLauncherActor: no accept received within timeout. " +
-    "You can reconfigure the timeout with --task_operation_notification_timeout."
+      "You can reconfigure the timeout with --task_operation_notification_timeout."
 }
 
 /**
@@ -126,8 +126,9 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
 
     super.postStop()
 
-    log.info(
-        "Stopped appTaskLaunchActor for {} version {}", app.id, app.version)
+    log.info("Stopped appTaskLaunchActor for {} version {}",
+             app.id,
+             app.version)
   }
 
   override def receive: Receive = waitForInitialDelay
@@ -197,7 +198,9 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
           import context.dispatcher
           recheckBackOff = Some(
               context.system.scheduler.scheduleOnce(
-                  now until delayUntil, self, RecheckIfBackOffUntilReached)
+                  now until delayUntil,
+                  self,
+                  RecheckIfBackOffUntilReached)
           )
         }
 
@@ -226,7 +229,8 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
       OfferMatcherRegistration.manageOfferMatcherStatus()
 
     case TaskOpSourceDelegate.TaskOpRejected(
-        op, AppTaskLauncherActor.TASK_OP_REJECTED_TIMEOUT_REASON) =>
+        op,
+        AppTaskLauncherActor.TASK_OP_REJECTED_TIMEOUT_REASON) =>
       // This is a message that we scheduled in this actor.
       // When we receive a launch confirmation or rejection, we cancel this timer but
       // there is still a race and we might send ourselves the message nevertheless, so we just
@@ -236,8 +240,8 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
           op.taskId)
 
     case TaskOpSourceDelegate.TaskOpRejected(op, reason) =>
-      log.warning(
-          "Unexpected task launch rejected for taskId '{}'.", op.taskId)
+      log
+        .warning("Unexpected task launch rejected for taskId '{}'.", op.taskId)
 
     case TaskOpSourceDelegate.TaskOpAccepted(op) =>
       inFlightTaskOperations -= op.taskId
@@ -348,7 +352,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
         // don't count tasks that are not launched in the tasksMap
         tasksLaunched =
           tasksMap.values.count(_.launched.isDefined) -
-          inFlightTaskOperations.size,
+            inFlightTaskOperations.size,
         backOffUntil.getOrElse(clock.now())
     )
   }
@@ -400,7 +404,8 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
 
     updateActorState()
     sender() ! MatchedTaskOps(
-        offer.getId, Seq(TaskOpWithSource(myselfAsLaunchSource, taskOp)))
+        offer.getId,
+        Seq(TaskOpWithSource(myselfAsLaunchSource, taskOp)))
   }
 
   private[this] def scheduleTaskOpTimeout(taskOp: TaskOp): Unit = {
@@ -420,7 +425,9 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
       message: TaskOpSourceDelegate.TaskOpRejected): Cancellable = {
     import context.dispatcher
     context.system.scheduler.scheduleOnce(
-        config.taskOpNotificationTimeout().milliseconds, self, message)
+        config.taskOpNotificationTimeout().milliseconds,
+        self,
+        message)
   }
 
   private[this] def backoffActive: Boolean =

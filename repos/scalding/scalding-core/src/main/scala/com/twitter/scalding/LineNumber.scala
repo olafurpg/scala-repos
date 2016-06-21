@@ -25,7 +25,8 @@ object LineNumber {
     getCurrent(depth, Thread.currentThread().getStackTrace)
 
   private[this] def getCurrent(
-      depth: Int, stack: Seq[StackTraceElement]): StackTraceElement =
+      depth: Int,
+      stack: Seq[StackTraceElement]): StackTraceElement =
     stack(depth + 2)
 
   def ignorePath(classPrefix: String): Option[StackTraceElement] =
@@ -75,8 +76,7 @@ object LineNumber {
       if (it.hasNext) Some(it.next)
       else None
 
-    val scaldingJobCaller = headOption(
-        stack.iterator.filter { se =>
+    val scaldingJobCaller = headOption(stack.iterator.filter { se =>
       se.getClassName.startsWith(scaldingPrefix)
     }.filter { se =>
       val cls = Class.forName(se.getClassName)

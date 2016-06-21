@@ -21,8 +21,8 @@ import kafka.utils.{ZkUtils, Logging}
 import org.I0Itec.zkclient.{IZkStateListener, IZkChildListener, ZkClient}
 import org.apache.zookeeper.Watcher.Event.KeeperState
 
-class ZookeeperTopicEventWatcher(
-    val zkUtils: ZkUtils, val eventHandler: TopicEventHandler[String])
+class ZookeeperTopicEventWatcher(val zkUtils: ZkUtils,
+                                 val eventHandler: TopicEventHandler[String])
     extends Logging {
 
   val lock = new Object()
@@ -88,8 +88,8 @@ class ZookeeperTopicEventWatcher(
       lock.synchronized {
         if (zkUtils != null) {
           info("ZK expired: resubscribing topic event listener to topic registry")
-          zkUtils.zkClient.subscribeChildChanges(
-              ZkUtils.BrokerTopicsPath, topicEventListener)
+          zkUtils.zkClient.subscribeChildChanges(ZkUtils.BrokerTopicsPath,
+                                                 topicEventListener)
         }
       }
     }

@@ -71,8 +71,8 @@ trait LogisticRegressionLibModule[M[+ _]]
     object LogisticRegression
         extends Morphism2(Stats2Namespace, "logisticRegression")
         with ReductionHelper {
-      val tpe = BinaryOperationType(
-          JNumberT, JType.JUniverseT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JNumberT, JType.JUniverseT, JObjectUnfixedT)
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
@@ -110,48 +110,49 @@ trait LogisticRegressionLibModule[M[+ _]]
         } else {
           val result = seq.foldLeft(0D) {
             case (sum, colVal) => {
-                val xs = java.util.Arrays.copyOf(colVal, colVal.length - 1)
-                val y = colVal.last
+              val xs = java.util.Arrays.copyOf(colVal, colVal.length - 1)
+              val y = colVal.last
 
-                assert(xs.length == theta.length)
+              assert(xs.length == theta.length)
 
-                if (y == 1) {
-                  val result = log(sigmoid(dotProduct(theta, xs)))
+              if (y == 1) {
+                val result = log(sigmoid(dotProduct(theta, xs)))
 
-                  sum + checkValue(result)
-                } else if (y == 0) {
-                  val result = log(1 - sigmoid(dotProduct(theta, xs)))
+                sum + checkValue(result)
+              } else if (y == 0) {
+                val result = log(1 - sigmoid(dotProduct(theta, xs)))
 
-                  sum + checkValue(result)
-                } else {
-                  sys.error("unreachable case")
-                }
+                sum + checkValue(result)
+              } else {
+                sys.error("unreachable case")
               }
+            }
           }
 
           -result
         }
       }
 
-      def gradient(
-          seq: Seq[ColumnValues], theta: Theta, alpha: Double): Theta = {
+      def gradient(seq: Seq[ColumnValues],
+                   theta: Theta,
+                   alpha: Double): Theta = {
         if (seq.isEmpty) {
           sys.error("empty sequence should never occur")
         } else {
           seq.foldLeft(theta) {
             case (theta, colVal) => {
-                val xs = colVal.take(colVal.length - 1)
-                val y = colVal.last
+              val xs = colVal.take(colVal.length - 1)
+              val y = colVal.last
 
-                assert(xs.length == theta.length)
+              assert(xs.length == theta.length)
 
-                val result = (0 until xs.length).map { i =>
-                  theta(i) -
-                  alpha * (y - sigmoid(dotProduct(theta, xs))) * xs(i)
-                }.map(checkValue)
+              val result = (0 until xs.length).map { i =>
+                theta(i) -
+                alpha * (y - sigmoid(dotProduct(theta, xs))) * xs(i)
+              }.map(checkValue)
 
-                result.toArray
-              }
+              result.toArray
+            }
           }
         }
       }
@@ -190,8 +191,9 @@ trait LogisticRegressionLibModule[M[+ _]]
       }
 
       @tailrec
-      def gradloop(
-          seq: Seq[ColumnValues], theta0: Theta, alpha: Double): Theta = {
+      def gradloop(seq: Seq[ColumnValues],
+                   theta0: Theta,
+                   alpha: Double): Theta = {
         val theta = gradient(seq, theta0, alpha)
 
         val diffs = theta0.zip(theta) map { case (t0, t) => math.abs(t0 - t) }
@@ -212,55 +214,55 @@ trait LogisticRegressionLibModule[M[+ _]]
 
         res map {
           case seq => {
-              val initialTheta: Theta = {
-                val thetaLength =
-                  seq.headOption map { _.length } getOrElse sys.error(
-                      "unreachable: `res` would have been None")
-                val thetas = Seq.fill(100)(
-                    Array.fill(thetaLength - 1)(Random.nextGaussian * 10))
+            val initialTheta: Theta = {
+              val thetaLength =
+                seq.headOption map { _.length } getOrElse sys.error(
+                    "unreachable: `res` would have been None")
+              val thetas = Seq.fill(100)(
+                  Array.fill(thetaLength - 1)(Random.nextGaussian * 10))
 
-                val (result, _) = (thetas.tail).foldLeft(
-                    (thetas.head, cost(seq, thetas.head))) {
+              val (result, _) =
+                (thetas.tail).foldLeft((thetas.head, cost(seq, thetas.head))) {
                   case ((theta0, cost0), theta) => {
-                      val costnew = cost(seq, theta)
+                    val costnew = cost(seq, theta)
 
-                      if (costnew < cost0) (theta, costnew)
-                      else (theta0, cost0)
-                    }
+                    if (costnew < cost0) (theta, costnew)
+                    else (theta0, cost0)
+                  }
                 }
 
-                result
+              result
+            }
+
+            val initialAlpha = 1.0
+
+            val finalTheta: Theta = gradloop(seq, initialTheta, initialAlpha)
+
+            val tree =
+              CPath.makeTree(cpaths, Range(1, finalTheta.length).toSeq :+ 0)
+
+            val spec = TransSpec.concatChildren(tree)
+
+            val res =
+              finalTheta map { v =>
+                RObject(Map("estimate" -> CNum(v)))
               }
 
-              val initialAlpha = 1.0
+            val theta = Table.fromRValues(Stream(RArray(res.toList)))
 
-              val finalTheta: Theta = gradloop(seq, initialTheta, initialAlpha)
+            val result = theta.transform(spec)
 
-              val tree =
-                CPath.makeTree(cpaths, Range(1, finalTheta.length).toSeq :+ 0)
+            val coeffsTable =
+              result.transform(trans.WrapObject(Leaf(Source), "coefficients"))
 
-              val spec = TransSpec.concatChildren(tree)
+            val valueTable = coeffsTable.transform(
+                trans.WrapObject(Leaf(Source), paths.Value.name))
+            val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-              val res =
-                finalTheta map { v =>
-                  RObject(Map("estimate" -> CNum(v)))
-                }
-
-              val theta = Table.fromRValues(Stream(RArray(res.toList)))
-
-              val result = theta.transform(spec)
-
-              val coeffsTable = result.transform(
-                  trans.WrapObject(Leaf(Source), "coefficients"))
-
-              val valueTable = coeffsTable.transform(
-                  trans.WrapObject(Leaf(Source), paths.Value.name))
-              val keyTable = Table.constEmptyArray.transform(
-                  trans.WrapObject(Leaf(Source), paths.Key.name))
-
-              valueTable.cross(keyTable)(
-                  InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
-            }
+            valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          }
         } getOrElse Table.empty
       }
 
@@ -273,8 +275,8 @@ trait LogisticRegressionLibModule[M[+ _]]
           val xsSpec = trans.DeepMap1(xsSpec0, cf.util.CoerceToDouble)
 
           // `arraySpec` generates the schema in which the Coefficients will be returned
-          val arraySpec = InnerArrayConcat(
-              trans.WrapArray(xsSpec), trans.WrapArray(ySpec))
+          val arraySpec =
+            InnerArrayConcat(trans.WrapArray(xsSpec), trans.WrapArray(ySpec))
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
           val table = table0.transform(valueSpec).transform(arraySpec)
 
@@ -339,8 +341,8 @@ trait LogisticRegressionLibModule[M[+ _]]
     object LogisticPrediction
         extends Morphism2(Stats2Namespace, "predictLogistic")
         with LogisticPredictionBase {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
 
       override val idPolicy = IdentityPolicy.Retain.Merge
 

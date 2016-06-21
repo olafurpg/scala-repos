@@ -65,8 +65,9 @@ class PluginsResource @Inject()(val config: MarathonConf,
              @Context req: HttpServletRequest): Response =
     handleRequest(pluginId, path, req)
 
-  private[this] def handleRequest(
-      pluginId: String, path: String, req: HttpServletRequest): Response = {
+  private[this] def handleRequest(pluginId: String,
+                                  path: String,
+                                  req: HttpServletRequest): Response = {
     pluginIdToHandler
       .get(pluginId)
       .map { handler =>

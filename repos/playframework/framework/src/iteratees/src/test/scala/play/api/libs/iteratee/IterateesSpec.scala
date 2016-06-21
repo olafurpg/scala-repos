@@ -190,7 +190,8 @@ object IterateesSpec
               .flatMapTraversable(_ =>
                     Done[List[Int], Int](4, Input.El(List(3, 4))))(
                   implicitly[List[Int] => scala.collection.TraversableLike[
-                          Int, List[Int]]],
+                          Int,
+                          List[Int]]],
                   implicitly[scala.collection.generic.CanBuildFrom[List[Int],
                                                                    Int,
                                                                    List[Int]]],
@@ -252,8 +253,8 @@ object IterateesSpec
       val unitDone: Iteratee[Unit, Unit] = Done(())
       val flatMapped: Iteratee[Unit, Unit] = (0 until overflowDepth)
         .foldLeft[Iteratee[Unit, Unit]](Cont(_ => unitDone)) {
-        case (it, _) => it.flatMap(_ => unitDone)
-      }
+          case (it, _) => it.flatMap(_ => unitDone)
+        }
       await(await(flatMapped.feed(Input.EOF)).unflatten) must equalTo(
           Step.Done((), Input.Empty))
     }
@@ -352,7 +353,7 @@ object IterateesSpec
       mustExecute(4) { foldEC =>
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee
               .fold1[Int, Int](Future.successful(0))((x, y) =>
-                  Future.successful(x + y))(foldEC)) must equalTo(10)
+                    Future.successful(x + y))(foldEC)) must equalTo(10)
       }
     }
   }
@@ -658,7 +659,8 @@ object IterateesSpec
     "skip Input.Empty when taking elements" in {
       val enum =
         Enumerator(1, 2) >>> Enumerator.enumInput(Input.Empty) >>> Enumerator(
-            3, 4)
+            3,
+            4)
       await(enum |>>> takenAndNotTaken(3)) must equalTo((Seq(1, 2, 3), Seq(4)))
     }
   }
@@ -734,7 +736,8 @@ object IterateesSpec
     "skip Input.Empty when taking elements" in {
       val enum =
         Enumerator(1, 2) >>> Enumerator.enumInput(Input.Empty) >>> Enumerator(
-            3, 4)
+            3,
+            4)
       await(enum |>>> process(3)) must equalTo((Seq(1, 2, 3), false, Seq(4)))
     }
   }
@@ -749,7 +752,7 @@ object IterateesSpec
         Iterator.range(0, tooManyArrays).map(_ => new Array[Byte](arraySize))
       import play.api.libs.iteratee.Execution.Implicits.defaultExecutionContext
       await(Enumerator.enumerate(iterator) |>>> Iteratee.ignore[Array[Byte]]) must_==
-        (())
+      (())
     }
   }
 }

@@ -551,8 +551,11 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
     )
 
     marshal(
-        new NamedTypeMemberInfo(
-            "typeX", typeInfo, None, None, DeclaredAs.Method): EntityInfo,
+        new NamedTypeMemberInfo("typeX",
+                                typeInfo,
+                                None,
+                                None,
+                                DeclaredAs.Method): EntityInfo,
         """(:name "typeX" :type (:arrow-type nil :name "type1" :decl-as method :full-name "FOO.type1") :decl-as method)"""
     )
 

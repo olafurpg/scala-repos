@@ -38,8 +38,8 @@ class ScDocTagValueImpl(node: ASTNode)
 
   def qualifier: Option[ScalaPsiElement] = None
 
-  def getKinds(
-      incomplete: Boolean, completion: Boolean): Set[ResolveTargets.Value] =
+  def getKinds(incomplete: Boolean,
+               completion: Boolean): Set[ResolveTargets.Value] =
     Set(ResolveTargets.VAL)
 
   def getSameNameVariants: Array[ResolveResult] = Array.empty
@@ -48,8 +48,8 @@ class ScDocTagValueImpl(node: ASTNode)
     getParametersVariants
       .filter(a =>
             a.name == refName ||
-            ScalaPsiUtil.convertMemberName(a.name) == ScalaPsiUtil
-              .convertMemberName(refName))
+              ScalaPsiUtil.convertMemberName(a.name) == ScalaPsiUtil
+                .convertMemberName(refName))
       .map(new ScalaResolveResult(_))
 
   override def toString = "ScalaDocTagValue: " + getText
@@ -124,8 +124,8 @@ class ScDocTagValueImpl(node: ASTNode)
         params: Seq[ScNamedElement]): Array[ScNamedElement] = {
       val paramsSet =
         (for (tag <- parent.asInstanceOf[ScDocComment].findTagsByName(tagName)
-              if tag.getValueElement != null && tag != getParent) yield
-          tag.getValueElement.getText).toSet
+              if tag.getValueElement != null && tag != getParent)
+          yield tag.getValueElement.getText).toSet
 
       val result = ArrayBuilder.make[ScNamedElement]()
       params

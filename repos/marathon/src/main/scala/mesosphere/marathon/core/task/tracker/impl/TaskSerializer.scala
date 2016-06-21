@@ -158,8 +158,9 @@ object TaskSerializer {
         setReservation(reserved.reservation)
 
       case launchedOnR: Task.LaunchedOnReservation =>
-        setLaunched(
-            launchedOnR.appVersion, launchedOnR.status, launchedOnR.networking)
+        setLaunched(launchedOnR.appVersion,
+                    launchedOnR.status,
+                    launchedOnR.networking)
         setReservation(launchedOnR.reservation)
     }
 

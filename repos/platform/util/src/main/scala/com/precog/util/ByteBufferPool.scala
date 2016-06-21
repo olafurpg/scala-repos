@@ -109,8 +109,7 @@ object ByteBufferPool {
 
     def bind[A, B](fa: ByteBufferPoolS[A])(
         f: A => ByteBufferPoolS[B]): ByteBufferPoolS[B] =
-      State(
-          s =>
+      State(s =>
             fa(s) match {
           case (s, a) => f(a)(s)
       })

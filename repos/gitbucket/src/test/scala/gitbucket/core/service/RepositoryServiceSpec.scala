@@ -24,8 +24,11 @@ class RepositoryServiceSpec
           creator = tester,
           now = new java.util.Date)
 
-      service.enableBranchProtection(
-          "root", "repo", "branch", true, Seq("must1", "must2"))
+      service.enableBranchProtection("root",
+                                     "repo",
+                                     "branch",
+                                     true,
+                                     Seq("must1", "must2"))
 
       val orgPbi = service.getProtectedBranchInfo("root", "repo", "branch")
       val org = service.getCommitStatus("root", "repo", id).get

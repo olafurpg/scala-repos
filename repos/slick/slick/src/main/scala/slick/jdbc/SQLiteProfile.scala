@@ -77,21 +77,21 @@ trait SQLiteProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
-        RelationalCapabilities.functionUser - RelationalCapabilities.joinFull -
-        RelationalCapabilities.joinRight - JdbcCapabilities.mutable -
-        SqlCapabilities.sequence - JdbcCapabilities.returnInsertOther -
-        RelationalCapabilities.typeBigDecimal -
-        RelationalCapabilities.typeBlob - RelationalCapabilities.zip -
-        JdbcCapabilities.insertOrUpdate -
-        JdbcCapabilities.defaultValueMetaData -
-        JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
-        JdbcCapabilities.distinguishesIntTypes)
+          RelationalCapabilities.functionUser - RelationalCapabilities.joinFull -
+          RelationalCapabilities.joinRight - JdbcCapabilities.mutable -
+          SqlCapabilities.sequence - JdbcCapabilities.returnInsertOther -
+          RelationalCapabilities.typeBigDecimal -
+          RelationalCapabilities.typeBlob - RelationalCapabilities.zip -
+          JdbcCapabilities.insertOrUpdate -
+          JdbcCapabilities.defaultValueMetaData -
+          JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
+          JdbcCapabilities.distinguishesIntTypes)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
       extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
-    override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+    override def createColumnBuilder(tableBuilder: TableBuilder,
+                                     meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
 
         /** Regex matcher to extract name and length out of a db type name with length ascription */
@@ -128,8 +128,8 @@ trait SQLiteProfile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
@@ -140,16 +140,17 @@ trait SQLiteProfile extends JdbcProfile {
       .map(_.filter(_.name.name.toLowerCase != "sqlite_sequence"))
 
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createUpsertBuilder(node: Insert): super.InsertBuilder =
     new UpsertBuilder(node)
   override def createInsertBuilder(node: Insert): super.InsertBuilder =
     new InsertBuilder(node)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createInsertActionExtensionMethods[T](
       compiled: CompiledInsert): InsertActionExtensionMethods[T] =
@@ -171,7 +172,8 @@ trait SQLiteProfile extends JdbcProfile {
     }
 
     override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
+        fetch: Option[Node],
+        offset: Option[Node]) = (fetch, offset) match {
       case (Some(t), Some(d)) => b"\nlimit $d,$t"
       case (Some(t), None) => b"\nlimit $t"
       case (None, Some(d)) => b"\nlimit $d,-1"
@@ -182,12 +184,12 @@ trait SQLiteProfile extends JdbcProfile {
       case Library.UCase(ch) => b"upper(!$ch)"
       case Library.LCase(ch) => b"lower(!$ch)"
       case Library.Substring(n, start, end) =>
-        b"substr($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())}, ${QueryParameter.constOp[Int](
-            "-")(_ - _)(end, start)})"
+        b"substr($n, ${QueryParameter
+          .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())}, ${QueryParameter
+          .constOp[Int]("-")(_ - _)(end, start)})"
       case Library.Substring(n, start) =>
-        b"substr($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())})\)"
+        b"substr($n, ${QueryParameter
+          .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())})\)"
       case Library.IndexOf(n, str) => b"\(charindex($str, $n) - 1\)"
       case Library.%(l, r) => b"\($l%$r\)"
       case Library.Ceiling(ch) => b"round($ch+0.5)"
@@ -215,10 +217,8 @@ trait SQLiteProfile extends JdbcProfile {
   }
 
   class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table) {
-    override protected val foreignKeys =
-      Nil // handled directly in addTableOptions
-    override protected val primaryKeys =
-      Nil // handled directly in addTableOptions
+    override protected val foreignKeys = Nil // handled directly in addTableOptions
+    override protected val primaryKeys = Nil // handled directly in addTableOptions
 
     override protected def addTableOptions(b: StringBuilder) {
       for (pk <- table.primaryKeys) {
@@ -253,7 +253,8 @@ trait SQLiteProfile extends JdbcProfile {
   }
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_],
+      sym: Option[FieldSymbol]): String = tmd.sqlType match {
     case java.sql.Types.TINYINT | java.sql.Types.SMALLINT |
         java.sql.Types.BIGINT =>
       "INTEGER"

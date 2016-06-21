@@ -26,10 +26,10 @@ private[stream] object QueueSource {
 /**
   * INTERNAL API
   */
-final private[stream] class QueueSource[T](
-    maxBuffer: Int, overflowStrategy: OverflowStrategy)
-    extends GraphStageWithMaterializedValue[
-        SourceShape[T], SourceQueueWithComplete[T]] {
+final private[stream] class QueueSource[T](maxBuffer: Int,
+                                           overflowStrategy: OverflowStrategy)
+    extends GraphStageWithMaterializedValue[SourceShape[T],
+                                            SourceQueueWithComplete[T]] {
   import QueueSource._
 
   val out = Outlet[T]("queueSource.out")

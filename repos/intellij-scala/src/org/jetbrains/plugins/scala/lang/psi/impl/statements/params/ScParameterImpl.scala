@@ -26,8 +26,9 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScParameterImpl protected (
-    stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
+class ScParameterImpl protected (stub: StubElement[ScParameter],
+                                 nodeType: IElementType,
+                                 node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScParameter {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -67,7 +68,7 @@ class ScParameterImpl protected (
               exprs(0) match {
                 case literal: ScLiteral
                     if literal.getNode.getFirstChildNode != null &&
-                    literal.getNode.getFirstChildNode.getElementType == ScalaTokenTypes.tSYMBOL =>
+                      literal.getNode.getFirstChildNode.getElementType == ScalaTokenTypes.tSYMBOL =>
                   val literalText = literal.getText
                   if (literalText.length < 2) None
                   else Some(literalText.substring(1))
@@ -105,9 +106,9 @@ class ScParameterImpl protected (
         stub.asInstanceOf[ScParameterStub].getTypeText match {
           case ""
               if stub.getParentStub != null &&
-              stub.getParentStub.getParentStub != null &&
-              stub.getParentStub.getParentStub.getParentStub
-                .isInstanceOf[ScFunctionStub] =>
+                stub.getParentStub.getParentStub != null &&
+                stub.getParentStub.getParentStub.getParentStub
+                  .isInstanceOf[ScFunctionStub] =>
             return Failure("Cannot infer type", Some(this))
           case "" =>
             return Failure("Wrong Stub problem", Some(this)) //shouldn't be

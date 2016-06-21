@@ -52,7 +52,7 @@ trait HostDirectives {
       case _ ⇒
         throw new IllegalArgumentException(
             "Path regex '" + regex.pattern.pattern +
-            "' must not contain more than one capturing group")
+              "' must not contain more than one capturing group")
     }
   }
 }

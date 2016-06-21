@@ -52,8 +52,9 @@ private class DeploymentActor(parent: ActorRef,
       val step = steps.next()
       currentStepNr += 1
       currentStep = Some(step)
-      parent ! DeploymentStepInfo(
-          plan, currentStep.getOrElse(DeploymentStep(Nil)), currentStepNr)
+      parent ! DeploymentStepInfo(plan,
+                                  currentStep.getOrElse(DeploymentStep(Nil)),
+                                  currentStepNr)
 
       performStep(step) onComplete {
         case Success(_) => self ! NextStep
@@ -121,13 +122,12 @@ private class DeploymentActor(parent: ActorRef,
                scaleTo: Int,
                toKill: Option[Iterable[Task]]): Future[Unit] = {
     val runningTasks = taskTracker.appTasksLaunchedSync(app.id)
-    def killToMeetConstraints(
-        notSentencedAndRunning: Iterable[Task], toKillCount: Int) =
+    def killToMeetConstraints(notSentencedAndRunning: Iterable[Task],
+                              toKillCount: Int) =
       Constraints.selectTasksToKill(app, notSentencedAndRunning, toKillCount)
 
-    val ScalingProposition(tasksToKill, tasksToStart) =
-      ScalingProposition.propose(
-          runningTasks, toKill, killToMeetConstraints, scaleTo)
+    val ScalingProposition(tasksToKill, tasksToStart) = ScalingProposition
+      .propose(runningTasks, toKill, killToMeetConstraints, scaleTo)
 
     def killTasksIfNeeded: Future[Unit] =
       tasksToKill.fold(Future.successful(())) {
@@ -198,8 +198,8 @@ private class DeploymentActor(parent: ActorRef,
     }
   }
 
-  def resolveArtifacts(
-      app: AppDefinition, urls: Map[URL, String]): Future[Unit] = {
+  def resolveArtifacts(app: AppDefinition,
+                       urls: Map[URL, String]): Future[Unit] = {
     val promise = Promise[Boolean]()
     context.actorOf(
         Props(classOf[ResolveArtifactsActor], app, urls, promise, storage))

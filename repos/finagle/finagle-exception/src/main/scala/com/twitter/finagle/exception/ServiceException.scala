@@ -26,7 +26,7 @@ private object JsonGenerator {
   *
   * TraceId is from Zipkin.
   */
-sealed private[exception] case class ServiceException private[ServiceException](
+sealed private[exception] case class ServiceException private[ServiceException] (
     private val jsonValue: Map[String, Any]) {
 
   /**
@@ -64,7 +64,7 @@ sealed private[exception] case class ServiceException private[ServiceException](
         jsonValue.updated(
             "cardinality",
             jsonValue.getOrElse("cardinality", 1).asInstanceOf[Int] +
-            cardinality))
+              cardinality))
 
   /**
     * Generate a json representation of this using jerkson

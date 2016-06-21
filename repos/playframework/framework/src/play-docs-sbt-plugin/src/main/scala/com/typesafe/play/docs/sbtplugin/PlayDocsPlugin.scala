@@ -22,8 +22,9 @@ import scala.util.control.NonFatal
 
 object Imports {
   object PlayDocsKeys {
-    val manualPath = SettingKey[File](
-        "playDocsManualPath", "The location of the manual", KeyRanks.CSetting)
+    val manualPath = SettingKey[File]("playDocsManualPath",
+                                      "The location of the manual",
+                                      KeyRanks.CSetting)
     val docsVersion = SettingKey[String](
         "playDocsVersion",
         "The version of the documentation to fallback to.",
@@ -31,8 +32,9 @@ object Imports {
     val docsName = SettingKey[String]("playDocsName",
                                       "The name of the documentation artifact",
                                       KeyRanks.BSetting)
-    val docsJarFile = TaskKey[Option[File]](
-        "playDocsJarFile", "Optional play docs jar file", KeyRanks.CTask)
+    val docsJarFile = TaskKey[Option[File]]("playDocsJarFile",
+                                            "Optional play docs jar file",
+                                            KeyRanks.CTask)
     val resources = TaskKey[Seq[PlayDocsResource]](
         "playDocsResources",
         "Resource files to add to the file repository for running docs and validation",
@@ -89,7 +91,8 @@ object Imports {
     val scalaTwirlSourceManaged = SettingKey[File]("scalaRoutesSourceManaged")
 
     val evaluateSbtFiles = TaskKey[Unit](
-        "evaluateSbtFiles", "Evaluate all the sbt files in the project")
+        "evaluateSbtFiles",
+        "Evaluate all the sbt files in the project")
   }
 
   sealed trait PlayDocsResource {
@@ -134,13 +137,13 @@ object PlayDocsPlugin extends AutoPlugin {
       docsJarFile <<= docsJarFileSetting,
       PlayDocsKeys.resources :=
         Seq(PlayDocsDirectoryResource(manualPath.value)) ++ docsJarFile.value
-        .map(jar => PlayDocsJarFileResource(jar, Some("play/docs/content")))
-        .toSeq,
+          .map(jar => PlayDocsJarFileResource(jar, Some("play/docs/content")))
+          .toSeq,
       docsJarScalaBinaryVersion <<= scalaBinaryVersion,
       libraryDependencies ++= Seq(
           "com.typesafe.play" %% docsName.value % PlayVersion.current,
           "com.typesafe.play" % s"${docsName.value}_${docsJarScalaBinaryVersion.value}" % docsVersion.value % "docs" notTransitive
-          ()
+            ()
       )
   )
 
@@ -218,7 +221,9 @@ object PlayDocsPlugin extends AutoPlugin {
                 .getOrElse(sbtFile.getAbsolutePath)
               try {
                 EvaluateConfigurations.evaluateConfiguration(
-                    eval(), sbtFile, unit.imports)(unit.loader)
+                    eval(),
+                    sbtFile,
+                    unit.imports)(unit.loader)
                 log.info(s"  ${Colors.green("+")} $relativeFile")
                 true
               } catch {
@@ -286,8 +291,10 @@ object PlayDocsPlugin extends AutoPlugin {
 
     val docHandlerFactoryClass =
       classloader.loadClass("play.docs.BuildDocHandlerFactory")
-    val fromResourcesMethod = docHandlerFactoryClass.getMethod(
-        "fromResources", classOf[Array[java.io.File]], classOf[Array[String]])
+    val fromResourcesMethod =
+      docHandlerFactoryClass.getMethod("fromResources",
+                                       classOf[Array[java.io.File]],
+                                       classOf[Array[String]])
 
     val files = allResources.map(_.file).toArray[File]
     val baseDirs = allResources.map {
@@ -337,10 +344,9 @@ object PlayDocsPlugin extends AutoPlugin {
       .asInstanceOf[ServerWithStop]
 
     println()
-    println(
-        Colors.green(
+    println(Colors.green(
             "Documentation server started, you can now view the docs by going to http://" +
-            server.mainAddress()))
+              server.mainAddress()))
     println()
 
     waitForKey()

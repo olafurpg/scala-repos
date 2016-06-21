@@ -55,7 +55,8 @@ object AreaChartDemo extends JFXApp {
   def xySeries(name: String, data: Seq[(Int, Int)]) =
     XYChart.Series[Number, Number](
         name,
-        ObservableBuffer(
-            data.map { case (x, y) => XYChart.Data[Number, Number](x, y) })
+        ObservableBuffer(data.map {
+          case (x, y) => XYChart.Data[Number, Number](x, y)
+        })
     )
 }

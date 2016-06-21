@@ -40,21 +40,22 @@ class PsiTypedDefinitionWrapper(
     if (result == null) {
       val message =
         "Containing class is null: " +
-        typedDefinition.getContainingFile.getText + "\n" +
-        "typed Definition: " + typedDefinition.getTextRange.getStartOffset
+          typedDefinition.getContainingFile.getText + "\n" +
+          "typed Definition: " + typedDefinition.getTextRange.getStartOffset
       throw new RuntimeException(message)
     }
     result
   }
-  val methodText = PsiTypedDefinitionWrapper.methodText(
-      typedDefinition, isStatic, isInterface, role)
+  val methodText = PsiTypedDefinitionWrapper
+    .methodText(typedDefinition, isStatic, isInterface, role)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)
     } catch {
       case e: Exception =>
         elementFactory.createMethodFromText(
-            "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
+            "public void FAILED_TO_DECOMPILE_METHOD() {}",
+            containingClass)
     }
   }
 } with LightMethodAdapter(typedDefinition.getManager, method, containingClass)
@@ -169,13 +170,17 @@ object PsiTypedDefinitionWrapper {
                          processName: String => Unit = _ => ()): Unit = {
     if (nodeName == t.name) {
       processMethod(
-          t.getTypedDefinitionWrapper(
-              isStatic, isInterface, role = SIMPLE_ROLE, cClass))
+          t.getTypedDefinitionWrapper(isStatic,
+                                      isInterface,
+                                      role = SIMPLE_ROLE,
+                                      cClass))
       processName(t.name)
       if (t.isVar) {
         processMethod(
-            t.getTypedDefinitionWrapper(
-                isStatic, isInterface, role = EQ, cClass))
+            t.getTypedDefinitionWrapper(isStatic,
+                                        isInterface,
+                                        role = EQ,
+                                        cClass))
         processName(t.name + "_eq")
       }
     }
@@ -186,27 +191,35 @@ object PsiTypedDefinitionWrapper {
         if (beanProperty) {
           if (nodeName == "get" + t.name.capitalize) {
             processMethod(
-                t.getTypedDefinitionWrapper(
-                    isStatic, isInterface, role = GETTER, cClass))
+                t.getTypedDefinitionWrapper(isStatic,
+                                            isInterface,
+                                            role = GETTER,
+                                            cClass))
             processName("get" + t.getName.capitalize)
           }
           if (t.isVar && nodeName == "set" + t.name.capitalize) {
             processMethod(
-                t.getTypedDefinitionWrapper(
-                    isStatic, isInterface, role = SETTER, cClass))
+                t.getTypedDefinitionWrapper(isStatic,
+                                            isInterface,
+                                            role = SETTER,
+                                            cClass))
             processName("set" + t.getName.capitalize)
           }
         } else if (booleanBeanProperty) {
           if (nodeName == "is" + t.name.capitalize) {
             processMethod(
-                t.getTypedDefinitionWrapper(
-                    isStatic, isInterface, role = IS_GETTER, cClass))
+                t.getTypedDefinitionWrapper(isStatic,
+                                            isInterface,
+                                            role = IS_GETTER,
+                                            cClass))
             processName("is" + t.getName.capitalize)
           }
           if (t.isVar && nodeName == "set" + t.name.capitalize) {
             processMethod(
-                t.getTypedDefinitionWrapper(
-                    isStatic, isInterface, role = SETTER, cClass))
+                t.getTypedDefinitionWrapper(isStatic,
+                                            isInterface,
+                                            role = SETTER,
+                                            cClass))
             processName("set" + t.getName.capitalize)
           }
         }

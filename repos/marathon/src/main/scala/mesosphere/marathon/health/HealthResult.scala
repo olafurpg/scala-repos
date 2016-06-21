@@ -9,8 +9,9 @@ sealed trait HealthResult {
   def time: Timestamp
 }
 
-case class Healthy(
-    taskId: Task.Id, version: Timestamp, time: Timestamp = Timestamp.now())
+case class Healthy(taskId: Task.Id,
+                   version: Timestamp,
+                   time: Timestamp = Timestamp.now())
     extends HealthResult
 
 case class Unhealthy(taskId: Task.Id,

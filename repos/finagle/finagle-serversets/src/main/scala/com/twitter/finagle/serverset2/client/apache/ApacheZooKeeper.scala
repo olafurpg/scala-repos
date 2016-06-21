@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
   *
   * @param zk Underlying Apache ZooKeeper client.
   */
-private[serverset2] class ApacheZooKeeper private[apache](
+private[serverset2] class ApacheZooKeeper private[apache] (
     zk: zookeeper.ZooKeeper)
     extends ZooKeeperRW {
   private def fromZKData(data: Array[Byte]): Option[Buf] = data match {
@@ -102,8 +102,10 @@ private[serverset2] class ApacheZooKeeper private[apache](
   def exists(path: String): Future[Option[Data.Stat]] = {
     val rv = new Promise[Option[Data.Stat]]
     val cb = new StatCallback {
-      def processResult(
-          ret: Int, path: String, ctx: Object, stat: zookeeper.data.Stat) =
+      def processResult(ret: Int,
+                        path: String,
+                        ctx: Object,
+                        stat: zookeeper.data.Stat) =
         ApacheKeeperException(ret, Option(path)) match {
           case None => rv.setValue(Some(ApacheData.Stat(stat)))
           case Some(KeeperException.NoNode(_)) => rv.setValue(None)
@@ -123,8 +125,10 @@ private[serverset2] class ApacheZooKeeper private[apache](
     val watcher = new ApacheWatcher
     val rv = new Promise[Watched[Option[Data.Stat]]]
     val cb = new StatCallback {
-      def processResult(
-          ret: Int, path: String, ctx: Object, stat: zookeeper.data.Stat) =
+      def processResult(ret: Int,
+                        path: String,
+                        ctx: Object,
+                        stat: zookeeper.data.Stat) =
         ApacheKeeperException(ret, Option(path)) match {
           case None =>
             rv.setValue(Watched(Some(ApacheData.Stat(stat)), watcher.state))
@@ -196,8 +200,10 @@ private[serverset2] class ApacheZooKeeper private[apache](
               version: Option[Int]): Future[Data.Stat] = {
     val rv = new Promise[Data.Stat]
     val cb = new StatCallback {
-      def processResult(
-          ret: Int, path: String, ctx: Object, stat: zookeeper.data.Stat) =
+      def processResult(ret: Int,
+                        path: String,
+                        ctx: Object,
+                        stat: zookeeper.data.Stat) =
         ApacheKeeperException(ret, Option(path)) match {
           case None => rv.setValue(ApacheData.Stat(stat))
           case Some(e) => rv.setException(e)
@@ -241,8 +247,10 @@ private[serverset2] class ApacheZooKeeper private[apache](
              version: Option[Int]): Future[Data.Stat] = {
     val rv = new Promise[Data.Stat]
     val cb = new StatCallback {
-      def processResult(
-          ret: Int, path: String, ctx: Object, stat: zookeeper.data.Stat) =
+      def processResult(ret: Int,
+                        path: String,
+                        ctx: Object,
+                        stat: zookeeper.data.Stat) =
         ApacheKeeperException(ret, Option(path)) match {
           case None => rv.setValue(ApacheData.Stat(stat))
           case Some(e) => rv.setException(e)
@@ -351,8 +359,12 @@ private[serverset2] object ApacheZooKeeper {
     )
     val zk = (config.sessionId, config.password) match {
       case (Some(id), Some(pw)) =>
-        new ApacheZooKeeper(new zookeeper.ZooKeeper(
-                config.hosts, timeoutInMs, watcher, id, toByteArray(pw)))
+        new ApacheZooKeeper(
+            new zookeeper.ZooKeeper(config.hosts,
+                                    timeoutInMs,
+                                    watcher,
+                                    id,
+                                    toByteArray(pw)))
       case _ =>
         new ApacheZooKeeper(
             new zookeeper.ZooKeeper(config.hosts, timeoutInMs, watcher))

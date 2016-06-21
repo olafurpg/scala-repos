@@ -257,8 +257,8 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
     @volatile var onAddDataCalled = false
     @volatile var onPushBlockCalled = false
 
-    override def onPushBlock(
-        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+    override def onPushBlock(blockId: StreamBlockId,
+                             arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
       pushedData.addAll(arrayBuffer.asJava)
       onPushBlockCalled = true
     }

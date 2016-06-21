@@ -45,7 +45,7 @@ object ToHeadSpec extends Specification with XmlMatchers {
           val actual = secureXML.load(sus._1)
           val expected = secureXML.load(sus._2)
           mergeToHtmlHead(actual).toString.replaceAll("\\s", "") must_==
-            (expected.toString.replaceAll("\\s", ""))
+          (expected.toString.replaceAll("\\s", ""))
       }
     }
 
@@ -78,7 +78,7 @@ object ToHeadSpec extends Specification with XmlMatchers {
           val actual = secureXML.load(sus._1)
           val expected = secureXML.load(sus._2)
           mergeToHtmlHead(actual).toString.replaceAll("\\s", "") must_==
-            (expected.toString.replaceAll("\\s", ""))
+          (expected.toString.replaceAll("\\s", ""))
       }
     }
   }

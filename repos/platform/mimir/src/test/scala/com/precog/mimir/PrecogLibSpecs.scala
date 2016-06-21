@@ -71,8 +71,9 @@ trait PrecogLibSpecs[M[+ _]]
                                Cross(None),
                                const("field"),
                                const("abc"))(line))(line))(line)
-  val misbehave = Join(
-      WrapObject, Cross(None), const("url"), const("http://misbehave"))(line)
+  val misbehave =
+    Join(WrapObject, Cross(None), const("url"), const("http://misbehave"))(
+        line)
   val empty =
     Join(WrapObject, Cross(None), const("url"), const("http://empty"))(line)
   val serverError =

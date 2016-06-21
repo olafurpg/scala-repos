@@ -217,8 +217,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
        * please notice `tmp` has type tree.tpe, while `earlyReturnVar` has the method return type.
        * Because those two types can be different, dedicated vars are needed.
        */
-      val tmp =
-        if (guardResult) locals.makeLocal(tpeTK(tree), "tmp") else null;
+      val tmp = if (guardResult) locals.makeLocal(tpeTK(tree), "tmp") else null;
 
       /*
        * upon early return from the try-body or one of its EHs (but not the EH-version of the finally-clause)
@@ -292,8 +291,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
       // "postHandlers" as in the source-code view. And from that perspective, both (3.A) and (3.B) are invisible implementation artifacts.
       if (hasFinally) {
         nopIfNeeded(startTryBody)
-        val finalHandler =
-          currProgramPoint() // version of the finally-clause reached via unhandled exception.
+        val finalHandler = currProgramPoint() // version of the finally-clause reached via unhandled exception.
         protect(startTryBody, finalHandler, finalHandler, null)
         val Local(eTK, _, eIdx, _) = locals(
             locals.makeLocal(jlThrowableRef, "exc"))

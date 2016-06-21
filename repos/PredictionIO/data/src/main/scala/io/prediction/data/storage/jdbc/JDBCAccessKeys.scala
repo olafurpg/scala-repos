@@ -23,8 +23,9 @@ import scalikejdbc._
 import scala.util.Random
 
 /** JDBC implementation of [[AccessKeys]] */
-class JDBCAccessKeys(
-    client: String, config: StorageClientConfig, prefix: String)
+class JDBCAccessKeys(client: String,
+                     config: StorageClientConfig,
+                     prefix: String)
     extends AccessKeys
     with Logging {
 

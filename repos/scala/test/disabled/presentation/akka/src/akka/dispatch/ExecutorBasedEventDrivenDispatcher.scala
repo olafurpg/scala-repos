@@ -243,18 +243,17 @@ trait ExecutableMailbox extends Runnable { self: MessageQueue =>
             else 0
           do {
             nextMessage.invoke
-            nextMessage =
-              if (self.suspended.locked) {
-                null // If we are suspended, abort
-              } else {
-                // If we aren't suspended, we need to make sure we're not overstepping our boundaries
-                processedMessages += 1
-                if ((processedMessages >= dispatcher.throughput) ||
-                    (isDeadlineEnabled &&
-                        System.nanoTime >= deadlineNs)) // If we're throttled, break out
-                  null //We reached our boundaries, abort
-                else self.dequeue //Dequeue the next message
-              }
+            nextMessage = if (self.suspended.locked) {
+              null // If we are suspended, abort
+            } else {
+              // If we aren't suspended, we need to make sure we're not overstepping our boundaries
+              processedMessages += 1
+              if ((processedMessages >= dispatcher.throughput) ||
+                  (isDeadlineEnabled &&
+                      System.nanoTime >= deadlineNs)) // If we're throttled, break out
+                null //We reached our boundaries, abort
+              else self.dequeue //Dequeue the next message
+            }
           } while (nextMessage ne null)
         }
       }
@@ -281,8 +280,8 @@ abstract class PriorityGenerator
     extends java.util.Comparator[MessageInvocation] {
   def gen(message: Any): Int
 
-  final def compare(
-      thisMessage: MessageInvocation, thatMessage: MessageInvocation): Int =
+  final def compare(thisMessage: MessageInvocation,
+                    thatMessage: MessageInvocation): Int =
     gen(thisMessage.message) - gen(thatMessage.message)
 }
 
@@ -299,8 +298,11 @@ class PriorityExecutorBasedEventDrivenDispatcher(
     throughputDeadlineTime: Int = Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS,
     mailboxType: MailboxType = Dispatchers.MAILBOX_TYPE,
     config: ThreadPoolConfig = ThreadPoolConfig())
-    extends ExecutorBasedEventDrivenDispatcher(
-        name, throughput, throughputDeadlineTime, mailboxType, config)
+    extends ExecutorBasedEventDrivenDispatcher(name,
+                                               throughput,
+                                               throughputDeadlineTime,
+                                               mailboxType,
+                                               config)
     with PriorityMailbox {
 
   def this(name: String,

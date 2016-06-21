@@ -50,8 +50,8 @@ object CanFirwin {
           firwinDoubleImpl(taps, omegas, nyquist, zeroPass, scale, optWindow) * multiplier,
           multiplier,
           "FIRKernel1D(firwin): " + taps + " taps, " + omegas + ", " +
-          optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
-          ", scale=" + scale
+            optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
+            ", scale=" + scale
       )
     }
   }
@@ -76,8 +76,8 @@ object CanFirwin {
                   T),
           multiplier,
           "FIRKernel1D(firwin): " + taps + " taps, " + omegas + ", " +
-          optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
-          ", scale=" + scale
+            optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
+            ", scale=" + scale
       )
     }
   }
@@ -90,8 +90,8 @@ object CanFirwin {
                        optWindow: OptWindowFunction): DenseVector[Double] = {
     //various variable conditions which must be met
     require(omegas.length > 0, "At least one cutoff frequency must be given!")
-    require(
-        min(omegas) >= 0, "The cutoff frequencies must be bigger than zero!")
+    require(min(omegas) >= 0,
+            "The cutoff frequencies must be bigger than zero!")
     require(
         max(omegas) <= nyquist,
         "The cutoff frequencies must be smaller than the nyquist frequency!")
@@ -131,11 +131,11 @@ object CanFirwin {
         WindowFunctions.blackmanWindow(taps, a0, a1, a2)
       case OptWindowFunction.None => DenseVector.ones[Double](taps)
       case OptWindowFunction.User(dv) => {
-          require(
-              dv.length == taps,
-              "Length of specified window function is not the same as taps option!")
-          dv
-        }
+        require(
+            dv.length == taps,
+            "Length of specified window function is not the same as taps option!")
+        dv
+      }
     }
 
     h *= win

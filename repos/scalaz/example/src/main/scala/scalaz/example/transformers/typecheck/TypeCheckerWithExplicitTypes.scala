@@ -34,7 +34,10 @@ object TypeCheckerWithExplicitTypes {
       val lt = typeCheck(texp, env)
       val rt = typeCheck(fexp, env)
       val res = compare(
-          lt, rt, lt, "error: if branches not the same type, got: " + (lt, rt))
+          lt,
+          rt,
+          lt,
+          "error: if branches not the same type, got: " + (lt, rt))
       res
     case Fun(arg, argType, body) =>
       val t = typeCheck(body, env + (arg -> argType))
@@ -50,7 +53,7 @@ object TypeCheckerWithExplicitTypes {
                   operandType,
                   resultType,
                   "function expected arg of type: " + argType + ", but got: " +
-                  operandType)
+                    operandType)
         case t =>
           typeError("function application expected function, but got: " + t)
       }

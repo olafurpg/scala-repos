@@ -64,7 +64,7 @@ class HakkerStatusTest
     val name = "TestHakker"
     val hakker = Option(service.getHakker(name, 2))
       .getOrElse(throw new IllegalStateException(
-            "No Hakker was created via DiningHakkerService"))
+              "No Hakker was created via DiningHakkerService"))
 
     // takes some time for the first message to get through
     testProbe.within(10.seconds) {

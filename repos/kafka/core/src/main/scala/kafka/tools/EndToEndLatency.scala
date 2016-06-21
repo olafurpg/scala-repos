@@ -41,7 +41,7 @@ object EndToEndLatency {
   def main(args: Array[String]) {
     if (args.length != 5 && args.length != 6) {
       System.err.println("USAGE: java " + getClass.getName +
-          " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
+            " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
       System.exit(1)
     }
 
@@ -80,8 +80,8 @@ object EndToEndLatency {
       else Utils.loadProps(sslPropsFile)
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     producerProps.put(ProducerConfig.LINGER_MS_CONFIG, "0") //ensure writes are synchronous
-    producerProps.put(
-        ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
+    producerProps
+      .put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
     producerProps.put(ProducerConfig.ACKS_CONFIG, producerAcks.toString)
     producerProps.put(
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
@@ -155,9 +155,8 @@ object EndToEndLatency {
     val p50 = latencies((latencies.length * 0.5).toInt)
     val p99 = latencies((latencies.length * 0.99).toInt)
     val p999 = latencies((latencies.length * 0.999).toInt)
-    println(
-        "Percentiles: 50th = %d, 99th = %d, 99.9th = %d".format(
-            p50, p99, p999))
+    println("Percentiles: 50th = %d, 99th = %d, 99.9th = %d"
+          .format(p50, p99, p999))
 
     finalise()
   }

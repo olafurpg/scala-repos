@@ -85,9 +85,9 @@ object BatcherLaws extends Properties("Batcher") {
 
   def batcherLaws(batcher: Batcher) =
     earliestIs_<=(batcher) && batchesAreWeakOrderings(batcher) &&
-    batchesIncreaseByAtMostOne(batcher) && batchesCoveredByIdent(batcher) &&
-    batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
-    batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
+      batchesIncreaseByAtMostOne(batcher) && batchesCoveredByIdent(batcher) &&
+      batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
+      batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
 
   property("UnitBatcher should always return the same batch") = {
     val batcher = Batcher.unit

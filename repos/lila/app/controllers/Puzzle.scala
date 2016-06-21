@@ -67,7 +67,7 @@ object Puzzle extends LilaController {
 
   private def puzzleJson(puzzle: PuzzleModel)(implicit ctx: Context) =
     (env userInfos ctx.me) zip
-    (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) map {
+      (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) map {
       case (infos, asPlay) =>
         JsData(puzzle,
                infos,
@@ -118,11 +118,11 @@ object Puzzle extends LilaController {
               newCtx =>
                 selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
                   case (Some(puzzle), infos) =>
-                    Ok(JsData(puzzle,
-                              infos,
-                              ctx.isAuth.fold("play", "try"),
-                              animationDuration =
-                                env.AnimationDuration)(newCtx))
+                    Ok(JsData(
+                            puzzle,
+                            infos,
+                            ctx.isAuth.fold("play", "try"),
+                            animationDuration = env.AnimationDuration)(newCtx))
                   case (None, _) => NotFound(noMorePuzzleJson)
                 }
             }

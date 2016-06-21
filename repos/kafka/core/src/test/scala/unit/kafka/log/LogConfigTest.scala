@@ -74,8 +74,7 @@ class LogConfigTest {
   }
 
   private def assertPropertyInvalid(name: String, values: AnyRef*) {
-    values.foreach(
-        (value) => {
+    values.foreach((value) => {
       val props = new Properties
       props.setProperty(name, value.toString)
       intercept[Exception] {

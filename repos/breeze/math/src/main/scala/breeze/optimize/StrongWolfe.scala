@@ -107,7 +107,7 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int)
         val c = phi(t)
         //logger.debug("ZOOM:\n c: " + c + " \n l: " + low + " \nr: " + hi)
         logger.info("Line search t: " + t + " fval: " + c.fval + " rhs: " +
-            (fval + c1 * c.t * dd) + " cdd: " + c.dd)
+              (fval + c1 * c.t * dd) + " cdd: " + c.dd)
 
         ///////////////
         /// Update left or right bracket, or both
@@ -152,7 +152,7 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int)
         t /= 2.0
         logger.error(
             "Encountered bad values in function evaluation. Decreasing step size to " +
-            t)
+              t)
       } else {
 
         // Zoom if "sufficient decrease" condition is not satisfied
@@ -173,7 +173,7 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int)
         // over to the next one.
         if (c.dd >= 0) {
           logger.debug("Line search t: " + t + " fval: " + c.fval + " rhs: " +
-              (fval + c1 * t * dd) + " cdd: " + c.dd)
+                (fval + c1 * t * dd) + " cdd: " + c.dd)
           return zoom(c, low)
         }
 
@@ -181,7 +181,7 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int)
         t *= 1.5
         logger.debug(
             "Sufficent Decrease condition but not curvature condition satisfied. Increased t to: " +
-            t)
+              t)
       }
     }
 

@@ -29,7 +29,7 @@ case class OpenGraph(title: String,
           "type" -> `type`,
           "site_name" -> siteName
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
-      more.map(tupledTag).mkString
+        more.map(tupledTag).mkString
   }
 
   object twitter {
@@ -46,6 +46,6 @@ case class OpenGraph(title: String,
           "description" -> description,
           "site" -> "@lichessorg"
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
-      more.map(tupledTag).mkString
+        more.map(tupledTag).mkString
   }
 }

@@ -193,9 +193,9 @@ trait ExplicitAskSupport {
   def ask(actorRef: ActorRef, messageFactory: ActorRef ⇒ Any)(
       implicit timeout: Timeout): Future[Any] =
     actorRef.internalAsk(messageFactory, timeout, ActorRef.noSender)
-  def ask(
-      actorRef: ActorRef, messageFactory: ActorRef ⇒ Any, sender: ActorRef)(
-      implicit timeout: Timeout): Future[Any] =
+  def ask(actorRef: ActorRef,
+          messageFactory: ActorRef ⇒ Any,
+          sender: ActorRef)(implicit timeout: Timeout): Future[Any] =
     actorRef.internalAsk(messageFactory, timeout, sender)
 
   /**
@@ -264,15 +264,17 @@ object AskableActorRef {
   /**
     * INTERNAL API: for binary compatibility
     */
-  private[pattern] def ask$extension(
-      actorRef: ActorRef, message: Any, timeout: Timeout): Future[Any] =
+  private[pattern] def ask$extension(actorRef: ActorRef,
+                                     message: Any,
+                                     timeout: Timeout): Future[Any] =
     actorRef.internalAsk(message, timeout, ActorRef.noSender)
 
   /**
     * INTERNAL API: for binary compatibility
     */
-  private[pattern] def $qmark$extension(
-      actorRef: ActorRef, message: Any, timeout: Timeout): Future[Any] =
+  private[pattern] def $qmark$extension(actorRef: ActorRef,
+                                        message: Any,
+                                        timeout: Timeout): Future[Any] =
     actorRef.internalAsk(message, timeout, ActorRef.noSender)
 }
 
@@ -304,8 +306,9 @@ final class AskableActorRef(val actorRef: ActorRef) extends AnyVal {
   /**
     * INTERNAL API: for binary compatibility
     */
-  private[pattern] def internalAsk(
-      message: Any, timeout: Timeout, sender: ActorRef) = actorRef match {
+  private[pattern] def internalAsk(message: Any,
+                                   timeout: Timeout,
+                                   sender: ActorRef) = actorRef match {
     case ref: InternalActorRef if ref.isTerminated ⇒
       actorRef ! message
       Future.failed[Any](new AskTimeoutException(
@@ -334,14 +337,14 @@ final class AskableActorRef(val actorRef: ActorRef) extends AnyVal {
  */
 final class ExplicitlyAskableActorRef(val actorRef: ActorRef) extends AnyVal {
 
-  def ask(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
-                                   sender: ActorRef =
-                                     Actor.noSender): Future[Any] =
+  def ask(message: ActorRef ⇒ Any)(
+      implicit timeout: Timeout,
+      sender: ActorRef = Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
-  def ?(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
-                                 sender: ActorRef =
-                                   Actor.noSender): Future[Any] =
+  def ?(message: ActorRef ⇒ Any)(
+      implicit timeout: Timeout,
+      sender: ActorRef = Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
   /**
@@ -362,8 +365,11 @@ final class ExplicitlyAskableActorRef(val actorRef: ActorRef) extends AnyVal {
         Future.failed[Any](new IllegalArgumentException(
                 s"""Timeout length must not be negative, question not sent to [$actorRef]. Sender[$sender] sent the message of type "${message.getClass.getName}"."""))
       } else {
-        val a = PromiseActorRef(
-            ref.provider, timeout, targetName = actorRef, "unknown", sender)
+        val a = PromiseActorRef(ref.provider,
+                                timeout,
+                                targetName = actorRef,
+                                "unknown",
+                                sender)
         val message = messageFactory(a)
         a.messageClassName = message.getClass.getName
         actorRef.tell(message, a)
@@ -385,15 +391,17 @@ object AskableActorSelection {
   /**
     * INTERNAL API: for binary compatibility
     */
-  private[pattern] def ask$extension(
-      actorSel: ActorSelection, message: Any, timeout: Timeout): Future[Any] =
+  private[pattern] def ask$extension(actorSel: ActorSelection,
+                                     message: Any,
+                                     timeout: Timeout): Future[Any] =
     actorSel.internalAsk(message, timeout, ActorRef.noSender)
 
   /**
     * INTERNAL API: for binary compatibility
     */
-  private[pattern] def $qmark$extension(
-      actorSel: ActorSelection, message: Any, timeout: Timeout): Future[Any] =
+  private[pattern] def $qmark$extension(actorSel: ActorSelection,
+                                        message: Any,
+                                        timeout: Timeout): Future[Any] =
     actorSel.internalAsk(message, timeout, ActorRef.noSender)
 }
 
@@ -426,8 +434,9 @@ final class AskableActorSelection(val actorSel: ActorSelection)
   /**
     * INTERNAL API: for binary compatibility
     */
-  private[pattern] def internalAsk(
-      message: Any, timeout: Timeout, sender: ActorRef): Future[Any] =
+  private[pattern] def internalAsk(message: Any,
+                                   timeout: Timeout,
+                                   sender: ActorRef): Future[Any] =
     actorSel.anchor match {
       case ref: InternalActorRef ⇒
         if (timeout.duration.length <= 0)
@@ -454,14 +463,14 @@ final class AskableActorSelection(val actorSel: ActorSelection)
 final class ExplicitlyAskableActorSelection(val actorSel: ActorSelection)
     extends AnyVal {
 
-  def ask(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
-                                   sender: ActorRef =
-                                     Actor.noSender): Future[Any] =
+  def ask(message: ActorRef ⇒ Any)(
+      implicit timeout: Timeout,
+      sender: ActorRef = Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
-  def ?(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
-                                 sender: ActorRef =
-                                   Actor.noSender): Future[Any] =
+  def ?(message: ActorRef ⇒ Any)(
+      implicit timeout: Timeout,
+      sender: ActorRef = Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
   /**
@@ -477,8 +486,11 @@ final class ExplicitlyAskableActorSelection(val actorSel: ActorSelection)
         Future.failed[Any](new IllegalArgumentException(
                 s"""Timeout length must not be negative, question not sent to [$actorSel]. Sender[$sender] sent the message of type "${message.getClass.getName}"."""))
       } else {
-        val a = PromiseActorRef(
-            ref.provider, timeout, targetName = actorSel, "unknown", sender)
+        val a = PromiseActorRef(ref.provider,
+                                timeout,
+                                targetName = actorSel,
+                                "unknown",
+                                sender)
         val message = messageFactory(a)
         a.messageClassName = message.getClass.getName
         actorSel.tell(message, a)
@@ -502,7 +514,9 @@ final class ExplicitlyAskableActorSelection(val actorSel: ActorSelection)
   * INTERNAL API
   */
 private[akka] final class PromiseActorRef private (
-    val provider: ActorRefProvider, val result: Promise[Any], _mcn: String)
+    val provider: ActorRefProvider,
+    val result: Promise[Any],
+    _mcn: String)
     extends MinimalActorRef {
   import AbstractPromiseActorRef.{stateOffset, watchedByOffset}
   import PromiseActorRef._
@@ -540,10 +554,10 @@ private[akka] final class PromiseActorRef private (
       .asInstanceOf[Set[ActorRef]]
 
   @inline
-  private[this] def updateWatchedBy(
-      oldWatchedBy: Set[ActorRef], newWatchedBy: Set[ActorRef]): Boolean =
-    Unsafe.instance.compareAndSwapObject(
-        this, watchedByOffset, oldWatchedBy, newWatchedBy)
+  private[this] def updateWatchedBy(oldWatchedBy: Set[ActorRef],
+                                    newWatchedBy: Set[ActorRef]): Boolean =
+    Unsafe.instance
+      .compareAndSwapObject(this, watchedByOffset, oldWatchedBy, newWatchedBy)
 
   @tailrec // Returns false if the Promise is already completed
   private[this] final def addWatcher(watcher: ActorRef): Boolean =
@@ -635,13 +649,13 @@ private[akka] final class PromiseActorRef private (
                                        existenceConfirmed = true,
                                        addressTerminated = false))
         } else
-          System.err.println("BUG: illegal Watch(%s,%s) for %s".format(
-                  watchee, watcher, this))
+          System.err.println("BUG: illegal Watch(%s,%s) for %s"
+                .format(watchee, watcher, this))
       case Unwatch(watchee, watcher) ⇒
         if (watchee == this && watcher != this) remWatcher(watcher)
         else
-          System.err.println("BUG: illegal Unwatch(%s,%s) for %s".format(
-                  watchee, watcher, this))
+          System.err.println("BUG: illegal Unwatch(%s,%s) for %s"
+                .format(watchee, watcher, this))
       case _ ⇒
     }
 

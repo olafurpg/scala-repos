@@ -26,8 +26,8 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK
 
 /** Holds a cached logical plan and its data */
-private[sql] case class CachedData(
-    plan: LogicalPlan, cachedRepresentation: InMemoryRelation)
+private[sql] case class CachedData(plan: LogicalPlan,
+                                   cachedRepresentation: InMemoryRelation)
 
 /**
   * Provides support in a SQLContext for caching query results and automatically using these cached
@@ -99,8 +99,8 @@ private[sql] class CacheManager extends Logging {
   }
 
   /** Removes the data for the given [[Queryable]] from the cache */
-  private[sql] def uncacheQuery(
-      query: Queryable, blocking: Boolean = true): Unit = writeLock {
+  private[sql] def uncacheQuery(query: Queryable,
+                                blocking: Boolean = true): Unit = writeLock {
     val planToCache = query.queryExecution.analyzed
     val dataIndex =
       cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
@@ -113,7 +113,8 @@ private[sql] class CacheManager extends Logging {
     * if it's cached
     */
   private[sql] def tryUncacheQuery(
-      query: Queryable, blocking: Boolean = true): Boolean = writeLock {
+      query: Queryable,
+      blocking: Boolean = true): Boolean = writeLock {
     val planToCache = query.queryExecution.analyzed
     val dataIndex =
       cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))

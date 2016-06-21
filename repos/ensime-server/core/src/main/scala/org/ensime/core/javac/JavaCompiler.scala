@@ -28,8 +28,7 @@ class JavaCompiler(
     val indexer: ActorRef,
     val search: SearchService,
     val vfs: EnsimeVFS
-)
-    extends JavaDocFinding
+) extends JavaDocFinding
     with JavaCompletion
     with JavaSourceFinding
     with Helpers
@@ -117,8 +116,12 @@ class JavaCompiler(
       case (info: CompilationInfo, path: TreePath) =>
         def withName(name: String): Option[SymbolInfo] = {
           val tpeMirror = Option(info.getTrees().getTypeMirror(path))
-          val nullTpe = new BasicTypeInfo(
-              "NA", DeclaredAs.Nil, "NA", List.empty, List.empty, None)
+          val nullTpe = new BasicTypeInfo("NA",
+                                          DeclaredAs.Nil,
+                                          "NA",
+                                          List.empty,
+                                          List.empty,
+                                          None)
           Some(
               SymbolInfo(
                   fqn(info, path).map(_.toFqnString).getOrElse(name),
@@ -138,8 +141,8 @@ class JavaCompiler(
     }
   }
 
-  def askDocSignatureAtPoint(
-      file: SourceFileInfo, offset: Int): Option[DocSigPair] = {
+  def askDocSignatureAtPoint(file: SourceFileInfo,
+                             offset: Int): Option[DocSigPair] = {
     pathToPoint(file, offset) flatMap {
       case (info: CompilationInfo, path: TreePath) =>
         docSignature(info, path)
@@ -168,7 +171,8 @@ class JavaCompiler(
   }
 
   protected def scopeForPoint(
-      file: SourceFileInfo, offset: Int): Option[(CompilationInfo, Scope)] = {
+      file: SourceFileInfo,
+      offset: Int): Option[(CompilationInfo, Scope)] = {
     val infos = typecheckForUnits(List(file))
     infos.headOption.flatMap { info =>
       val path = Option(new TreeUtilities(info).scopeFor(offset))
@@ -187,8 +191,8 @@ class JavaCompiler(
                   Some(EmptySourcePosition()))
   }
 
-  private def getTypeMirror(
-      info: CompilationInfo, offset: Int): Option[TypeMirror] = {
+  private def getTypeMirror(info: CompilationInfo,
+                            offset: Int): Option[TypeMirror] = {
     val path = Option(new TreeUtilities(info).pathFor(offset))
     // Uncomment to debug the AST path.
     //for (p <- path) { for (t <- p) { System.err.println(t.toString()) } }
@@ -232,7 +236,7 @@ class JavaCompiler(
         .toVector
       task.analyze()
       log.info("Parsed and analyzed for trees: " +
-          (System.currentTimeMillis() - t) + "ms")
+            (System.currentTimeMillis() - t) + "ms")
       units
     } catch {
       case e @ (_: Abort | _: ArrayIndexOutOfBoundsException |

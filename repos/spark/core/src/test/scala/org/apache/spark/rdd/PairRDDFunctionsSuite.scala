@@ -100,8 +100,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSample(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSample(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // vary fractionPositive
@@ -111,8 +111,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSample(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSample(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // Use the same data for the rest of the tests
@@ -130,8 +130,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
 
     // vary sampling rate
     for (samplingRate <- List(0.01, 0.05, 0.1, 0.5)) {
-      StratifiedAuxiliary.testSample(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSample(stratifiedData, samplingRate, defaultSeed, n)
     }
   }
 
@@ -145,8 +145,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // vary fractionPositive
@@ -156,8 +156,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
     }
 
     // Use the same data for the rest of the tests
@@ -170,14 +170,14 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     // vary seed
     for (seed <- defaultSeed to defaultSeed + 5L) {
       val samplingRate = 0.1
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, seed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, seed, n)
     }
 
     // vary sampling rate
     for (samplingRate <- List(0.01, 0.05, 0.1, 0.5)) {
-      StratifiedAuxiliary.testSampleExact(
-          stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary
+        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
     }
   }
 
@@ -716,12 +716,11 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
                       n: Long): Unit = {
       val trials = stratifiedData.countByKey()
       val fractions = Map("1" -> samplingRate, "0" -> samplingRate)
-      val sample =
-        if (exact) {
-          stratifiedData.sampleByKeyExact(false, fractions, seed)
-        } else {
-          stratifiedData.sampleByKey(false, fractions, seed)
-        }
+      val sample = if (exact) {
+        stratifiedData.sampleByKeyExact(false, fractions, seed)
+      } else {
+        stratifiedData.sampleByKey(false, fractions, seed)
+      }
       val sampleCounts = sample.countByKey()
       val takeSample = sample.collect()
       sampleCounts.foreach {
@@ -748,12 +747,11 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
         .countByKey()
         .mapValues(count => math.ceil(count * samplingRate).toInt)
       val fractions = Map("1" -> samplingRate, "0" -> samplingRate)
-      val sample =
-        if (exact) {
-          stratifiedData.sampleByKeyExact(true, fractions, seed)
-        } else {
-          stratifiedData.sampleByKey(true, fractions, seed)
-        }
+      val sample = if (exact) {
+        stratifiedData.sampleByKeyExact(true, fractions, seed)
+      } else {
+        stratifiedData.sampleByKey(true, fractions, seed)
+      }
       val sampleCounts = sample.countByKey()
       val takeSample = sample.collect()
       sampleCounts.foreach {

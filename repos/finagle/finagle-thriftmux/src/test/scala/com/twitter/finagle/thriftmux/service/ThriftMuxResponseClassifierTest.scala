@@ -48,7 +48,8 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
         val rep = mux.Response(Buf.Utf8(in))
         assert(!classifier.isDefinedAt(ReqRep(in, Return(rep))))
         assert(expectedClass == classifier.applyOrElse(
-                ReqRep(in, Return(rep)), ResponseClassifier.Default))
+                ReqRep(in, Return(rep)),
+                ResponseClassifier.Default))
       }
     }
     testApplyOrElse("yep", Success)
@@ -106,7 +107,8 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
         val rep = mux.Response(Buf.Utf8(in))
         assert(!classifier.isDefinedAt(ReqRep(in, Return(rep))))
         assert(expectedClass == classifier.applyOrElse(
-                ReqRep(in, Return(rep)), ResponseClassifier.Default))
+                ReqRep(in, Return(rep)),
+                ResponseClassifier.Default))
       }
     }
 

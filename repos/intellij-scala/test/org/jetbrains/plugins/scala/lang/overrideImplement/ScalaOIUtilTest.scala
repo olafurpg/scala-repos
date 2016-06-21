@@ -32,8 +32,8 @@ class ScalaOIUtilTest extends SimpleTestCase {
   def testSOE() {
     assertUnimplemented(
         "trait A; trait B extends D; " +
-        "trait C extends A with B; trait D extends B with C;" +
-        "object X extends D {}")
+          "trait C extends A with B; trait D extends B with C;" +
+          "object X extends D {}")
   }
 
   def testEmpty() {
@@ -91,14 +91,14 @@ class ScalaOIUtilTest extends SimpleTestCase {
     //todo: important: in script file resolve is ok. In any other file problems with resolve to T,
     //todo: because of wrong package structure.
     assertUnimplemented("trait T { def f }; new T {}", "f: Unit")
-    assertUnimplemented(
-        "1; trait T { def f }; class H extends T {}", "f: Unit")
-    assertUnimplemented(
-        "1; trait T { def f }; abstract class H extends T {}", "f: Unit")
-    assertUnimplemented(
-        "1; trait T { def f }; trait H extends T {}", "f: Unit")
-    assertUnimplemented(
-        "1; trait T { def f }; object H extends T {}", "f: Unit")
+    assertUnimplemented("1; trait T { def f }; class H extends T {}",
+                        "f: Unit")
+    assertUnimplemented("1; trait T { def f }; abstract class H extends T {}",
+                        "f: Unit")
+    assertUnimplemented("1; trait T { def f }; trait H extends T {}",
+                        "f: Unit")
+    assertUnimplemented("1; trait T { def f }; object H extends T {}",
+                        "f: Unit")
   }
 
   private def assertUnimplemented(@Language(value = "Scala",
@@ -108,8 +108,10 @@ class ScalaOIUtilTest extends SimpleTestCase {
     Assert.assertEquals(names.toList, unimplementedIn(code).toList)
   }
 
-  private def unimplementedIn(@Language(
-          value = "Scala", prefix = Prefix, suffix = Suffix) code: String) = {
+  private def unimplementedIn(
+      @Language(value = "Scala",
+                prefix = Prefix,
+                suffix = Suffix) code: String) = {
     val text: String = "" + code + Suffix
     val file: ScalaFile = text.parse
     val templateDefinitions: Seq[ScTemplateDefinition] =

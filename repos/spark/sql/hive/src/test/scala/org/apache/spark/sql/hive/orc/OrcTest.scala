@@ -56,7 +56,8 @@ private[sql] trait OrcTest extends SQLTestUtils with TestHiveSingleton {
     * Orc file will be dropped/deleted after `f` returns.
     */
   protected def withOrcTable[T <: Product: ClassTag: TypeTag](
-      data: Seq[T], tableName: String)(f: => Unit): Unit = {
+      data: Seq[T],
+      tableName: String)(f: => Unit): Unit = {
     withOrcDataFrame(data) { df =>
       sqlContext.registerDataFrameAsTable(df, tableName)
       withTempTable(tableName)(f)
@@ -64,12 +65,14 @@ private[sql] trait OrcTest extends SQLTestUtils with TestHiveSingleton {
   }
 
   protected def makeOrcFile[T <: Product: ClassTag: TypeTag](
-      data: Seq[T], path: File): Unit = {
+      data: Seq[T],
+      path: File): Unit = {
     data.toDF().write.mode(SaveMode.Overwrite).orc(path.getCanonicalPath)
   }
 
   protected def makeOrcFile[T <: Product: ClassTag: TypeTag](
-      df: DataFrame, path: File): Unit = {
+      df: DataFrame,
+      path: File): Unit = {
     df.write.mode(SaveMode.Overwrite).orc(path.getCanonicalPath)
   }
 }

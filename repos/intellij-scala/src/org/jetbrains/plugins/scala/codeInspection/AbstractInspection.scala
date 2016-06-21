@@ -20,8 +20,8 @@ abstract class AbstractInspection(id: String, name: String)
 
   override def getDisplayName: String = name
 
-  override final def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean) =
+  override final def buildVisitor(holder: ProblemsHolder,
+                                  isOnTheFly: Boolean) =
     VisitorWrapper(actionFor(holder))
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any]

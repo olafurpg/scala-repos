@@ -22,7 +22,7 @@ object FormatterUtil {
             calcIndent(node.getTreeParent)
           case parent =>
             calcAbsolutePosition(node) -
-            calcAbsolutePosition(parent.getNode) match {
+              calcAbsolutePosition(parent.getNode) match {
               case i if i >= 0 => i + calcIndent(parent.getNode)
               case _ => calcIndent(parent.getNode)
             }

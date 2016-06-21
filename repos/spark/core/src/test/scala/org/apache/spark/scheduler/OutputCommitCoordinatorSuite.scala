@@ -164,8 +164,9 @@ class OutputCommitCoordinatorSuite extends SparkFunSuite with BeforeAndAfter {
     // Create a mock OutputCommitCoordinator that denies all attempts to commit
     doReturn(false)
       .when(outputCommitCoordinator)
-      .handleAskPermissionToCommit(
-          Matchers.any(), Matchers.any(), Matchers.any())
+      .handleAskPermissionToCommit(Matchers.any(),
+                                   Matchers.any(),
+                                   Matchers.any())
     val rdd: RDD[Int] = sc.parallelize(Seq(1), 1)
     def resultHandler(x: Int, y: Unit): Unit = {}
     val futureAction: SimpleFutureAction[Unit] = sc.submitJob[Int, Unit, Unit](
@@ -190,10 +191,10 @@ class OutputCommitCoordinatorSuite extends SparkFunSuite with BeforeAndAfter {
     val nonAuthorizedCommitter: Int = 100
     outputCommitCoordinator.stageStart(stage, maxPartitionId = 2)
 
-    assert(outputCommitCoordinator.canCommit(
-            stage, partition, authorizedCommitter))
-    assert(!outputCommitCoordinator.canCommit(
-            stage, partition, nonAuthorizedCommitter))
+    assert(outputCommitCoordinator
+          .canCommit(stage, partition, authorizedCommitter))
+    assert(!outputCommitCoordinator
+          .canCommit(stage, partition, nonAuthorizedCommitter))
     // The non-authorized committer fails
     outputCommitCoordinator.taskCompleted(stage,
                                           partition,
@@ -201,19 +202,19 @@ class OutputCommitCoordinatorSuite extends SparkFunSuite with BeforeAndAfter {
                                             nonAuthorizedCommitter,
                                           reason = TaskKilled)
     // New tasks should still not be able to commit because the authorized committer has not failed
-    assert(!outputCommitCoordinator.canCommit(
-            stage, partition, nonAuthorizedCommitter + 1))
+    assert(!outputCommitCoordinator
+          .canCommit(stage, partition, nonAuthorizedCommitter + 1))
     // The authorized committer now fails, clearing the lock
     outputCommitCoordinator.taskCompleted(stage,
                                           partition,
                                           attemptNumber = authorizedCommitter,
                                           reason = TaskKilled)
     // A new task should now be allowed to become the authorized committer
-    assert(outputCommitCoordinator.canCommit(
-            stage, partition, nonAuthorizedCommitter + 2))
+    assert(outputCommitCoordinator
+          .canCommit(stage, partition, nonAuthorizedCommitter + 2))
     // There can only be one authorized committer
-    assert(!outputCommitCoordinator.canCommit(
-            stage, partition, nonAuthorizedCommitter + 3))
+    assert(!outputCommitCoordinator
+          .canCommit(stage, partition, nonAuthorizedCommitter + 3))
   }
 }
 
@@ -259,7 +260,8 @@ private case class OutputCommitFunctions(tempDirPath: String) {
     }
     val sparkHadoopWriter = new SparkHadoopWriter(jobConf) {
       override def newTaskAttemptContext(
-          conf: JobConf, attemptId: TaskAttemptID): TaskAttemptContext = {
+          conf: JobConf,
+          attemptId: TaskAttemptID): TaskAttemptContext = {
         mock(classOf[TaskAttemptContext])
       }
     }

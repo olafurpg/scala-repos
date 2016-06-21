@@ -29,7 +29,7 @@ class ValidationSupportSpec extends Specification {
 
       ageValidatedForm.a.validation must_== params("name").toUpperCase.success
       ageValidatedForm.lower.validation must_==
-        params("surname").toLowerCase.success
+      params("surname").toLowerCase.success
       ageValidatedForm.age.validation must_== 18.success
     }
 
@@ -49,9 +49,9 @@ class ValidationSupportSpec extends Specification {
       }
 
       ageValidatedForm.legalAge.validation aka "the validation result" must_==
-        Failure(ValidationError("Age must be greater than or equal to 18",
-                                FieldName("age"),
-                                ValidationFail))
+      Failure(ValidationError("Age must be greater than or equal to 18",
+                              FieldName("age"),
+                              ValidationFail))
     }
 
     "evaluate non-exhaustive validation as 'accepted'" in {

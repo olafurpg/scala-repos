@@ -25,8 +25,8 @@ class Zk2ResolverTest
     with SpanSugar {
   val zkTimeout: Span = 100.milliseconds
 
-  implicit val config = PatienceConfig(
-      timeout = 45.seconds, interval = zkTimeout)
+  implicit val config =
+    PatienceConfig(timeout = 45.seconds, interval = zkTimeout)
 
   // The Zk2 resolver has a hardcoded session timeout of 10 seconds and a stabilization epoch of
   // 40 seconds. We give these tests double that to observe nodes leaving a serverset.
@@ -72,8 +72,8 @@ class Zk2ResolverTest
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
     val joinAddr = RandomSocket()
-    val status = serverSet.join(
-        joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
+    val status = serverSet
+      .join(joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
     eventually {
       assert(va.sample() == Addr.Bound(address(joinAddr)),
              "resolution is not bound once the serverset exists")

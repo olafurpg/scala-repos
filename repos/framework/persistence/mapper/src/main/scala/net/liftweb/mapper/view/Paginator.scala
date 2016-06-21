@@ -87,8 +87,10 @@ class SortedMapperPaginator[T <: Mapper[T]](
   }, true)
 
   override def page =
-    meta.findAll(constantParams ++ Seq[QueryParam[T]](
-            mapperSort, MaxRows(itemsPerPage), StartAt(first)): _*)
+    meta.findAll(
+        constantParams ++ Seq[QueryParam[T]](mapperSort,
+                                             MaxRows(itemsPerPage),
+                                             StartAt(first)): _*)
   private def mapperSort = sort match {
     case (fieldIndex, ascending) =>
       OrderBy(
@@ -108,6 +110,5 @@ class SortedMapperPaginatorSnippet[T <: Mapper[T]](
     meta: MetaMapper[T],
     initialSort: net.liftweb.mapper.MappedField[_, T],
     headers: (String, MappedField[_, T])*
-)
-    extends SortedMapperPaginator[T](meta, initialSort, headers: _*)
+) extends SortedMapperPaginator[T](meta, initialSort, headers: _*)
     with SortedPaginatorSnippet[T, MappedField[_, T]]

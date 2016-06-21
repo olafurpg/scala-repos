@@ -77,12 +77,11 @@ class Hakker(name: String, left: ActorRef, right: ActorRef) extends Actor {
   //When a hakker is waiting for the last chopstick it can either obtain it
   //and start eating, or the other chopstick was busy, and the hakker goes
   //back to think about how he should obtain his chopsticks :-)
-  def waiting_for(
-      chopstickToWaitFor: ActorRef, otherChopstick: ActorRef): Receive = {
+  def waiting_for(chopstickToWaitFor: ActorRef,
+                  otherChopstick: ActorRef): Receive = {
     case Taken(`chopstickToWaitFor`) =>
-      println(
-          "%s has picked up %s and %s and starts to eat".format(
-              name, left.path.name, right.path.name))
+      println("%s has picked up %s and %s and starts to eat"
+            .format(name, left.path.name, right.path.name))
       become(eating)
       system.scheduler.scheduleOnce(5.seconds, self, Think)
 
@@ -135,8 +134,8 @@ object DiningHakkersOnBecome {
 
   def run(): Unit = {
     //Create 5 chopsticks
-    val chopsticks = for (i <- 1 to 5) yield
-      system.actorOf(Props[Chopstick], "Chopstick" + i)
+    val chopsticks = for (i <- 1 to 5)
+      yield system.actorOf(Props[Chopstick], "Chopstick" + i)
 
     //Create 5 awesome hakkers and assign them their left and right chopstick
     val hakkers = for {

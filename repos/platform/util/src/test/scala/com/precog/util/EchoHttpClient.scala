@@ -75,9 +75,9 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
     EitherT(M point \/-(response))
   }
 
-  private val urlMap: Map[String,
-                          Request[String] => EitherT[
-                              M, HttpClientError, Response[String]]] = Map(
+  private val urlMap: Map[
+      String,
+      Request[String] => EitherT[M, HttpClientError, Response[String]]] = Map(
       "http://wrapper" -> (wrapper(_)),
       "http://echo" -> (echo(_)),
       "http://options" -> (options(_)),
@@ -90,8 +90,10 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
     def execute(request: Request[String])
       : EitherT[M, HttpClientError, Response[String]] =
       urlMap get baseUrl map (_ (request)) getOrElse {
-        EitherT(M.point(-\/(HttpClientError.ConnectionError(
-                        Some(baseUrl), new java.io.IOException))))
+        EitherT(
+            M.point(
+                -\/(HttpClientError.ConnectionError(Some(baseUrl),
+                                                    new java.io.IOException))))
       }
   }
 

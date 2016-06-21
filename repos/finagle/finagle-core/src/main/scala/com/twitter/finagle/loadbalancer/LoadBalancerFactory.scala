@@ -13,10 +13,10 @@ object perHostStats
     extends GlobalFlag(
         false,
         "enable/default per-host stats.\n" +
-        "\tWhen enabled,the configured stats receiver will be used,\n" +
-        "\tor the loaded stats receiver if none given.\n" +
-        "\tWhen disabled, the configured stats receiver will be used,\n" +
-        "\tor the NullStatsReceiver if none given.")
+          "\tWhen enabled,the configured stats receiver will be used,\n" +
+          "\tor the loaded stats receiver if none given.\n" +
+          "\tWhen disabled, the configured stats receiver will be used,\n" +
+          "\tor the NullStatsReceiver if none given.")
 
 object LoadBalancerFactory {
   val role = Stack.Role("LoadBalancer")
@@ -176,7 +176,7 @@ object LoadBalancerFactory {
               if (underlying == null)
                 underlying =
                   next.make(params + Transporter.EndpointAddr(addr) +
-                      param.Stats(stats) + param.Monitor(composite))
+                        param.Stats(stats) + param.Monitor(composite))
             }
             underlying(conn)
           }
@@ -255,8 +255,8 @@ object ConcurrentLoadBalancerFactory {
   // package private for testing
   private[finagle] def replicate(num: Int): Address => Set[Address] = {
     case Address.Inet(ia, metadata) =>
-      for (i: Int <- (0 until num).toSet) yield
-        Address.Inet(ia, metadata + (ReplicaKey -> i))
+      for (i: Int <- (0 until num).toSet)
+        yield Address.Inet(ia, metadata + (ReplicaKey -> i))
     case addr => Set(addr)
   }
 
@@ -275,10 +275,10 @@ object ConcurrentLoadBalancerFactory {
     new StackModule[Req, Rep] {
       val description =
         "Balance requests across multiple connections on a single " +
-        "endpoint, used for pipelining protocols"
+          "endpoint, used for pipelining protocols"
 
-      override def make(
-          params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
+      override def make(params: Stack.Params,
+                        next: Stack[ServiceFactory[Req, Rep]]) = {
         val Param(numConnections) = params[Param]
         val Dest(dest) = params[Dest]
         val newDest = dest.map {
@@ -334,8 +334,8 @@ abstract class LoadBalancerFactory {
   *    Protocol.configured(LoadBalancerFactory.Param(balancer))
   * }}
   */
-@deprecated(
-    "Use com.twitter.finagle.loadbalancer.Balancers per-client.", "2015-06-15")
+@deprecated("Use com.twitter.finagle.loadbalancer.Balancers per-client.",
+            "2015-06-15")
 object defaultBalancer extends GlobalFlag("choice", "Default load balancer")
 
 package exp {

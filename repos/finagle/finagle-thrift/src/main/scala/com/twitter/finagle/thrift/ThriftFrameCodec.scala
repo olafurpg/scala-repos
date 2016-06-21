@@ -10,8 +10,8 @@ import org.jboss.netty.handler.codec.frame.{LengthFieldBasedFrameDecoder, Length
   * of the message that follows.
   */
 private class ThriftFrameCodec extends SimpleChannelHandler {
-  private[this] val decoder = new LengthFieldBasedFrameDecoder(
-      0x7FFFFFFF, 0, 4, 0, 4)
+  private[this] val decoder =
+    new LengthFieldBasedFrameDecoder(0x7FFFFFFF, 0, 4, 0, 4)
   private[this] val encoder = new LengthFieldPrepender(4)
 
   override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) =

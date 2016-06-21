@@ -92,7 +92,7 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
     * @return An instance of [[EngineParams]] converted from JSON.
     */
   @DeveloperApi
-  def jValueToEngineParams(
-      variantJson: JValue, jsonExtractor: JsonExtractorOption): EngineParams =
+  def jValueToEngineParams(variantJson: JValue,
+                           jsonExtractor: JsonExtractorOption): EngineParams =
     throw new NotImplementedError("JSON to EngineParams is not implemented.")
 }

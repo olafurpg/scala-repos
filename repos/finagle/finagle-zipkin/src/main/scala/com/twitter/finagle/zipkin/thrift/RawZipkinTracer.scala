@@ -38,8 +38,8 @@ object RawZipkinTracer {
       .daemon(true)
       .build()
 
-    new Scribe.FinagledClient(
-        new TracelessFilter andThen transport, Protocols.binaryFactory())
+    new Scribe.FinagledClient(new TracelessFilter andThen transport,
+                              Protocols.binaryFactory())
   }
 
   // to make sure we only create one instance of the tracer per host and port
@@ -103,15 +103,14 @@ private[thrift] class RawZipkinTracer(
     poolSize: Int = 10,
     initialBufferSize: StorageUnit = 512.bytes,
     maxBufferSize: StorageUnit = 1.megabyte
-)
-    extends Tracer {
+) extends Tracer {
   private[this] val TraceCategory = "zipkin" // scribe category
 
   private[this] val ErrorAnnotation = "%s: %s" // annotation: errorMessage
 
   // this sends off spans after the deadline is hit, no matter if it ended naturally or not.
-  private[this] val spanMap: DeadlineSpanMap = new DeadlineSpanMap(
-      logSpans(_), 120.seconds, statsReceiver, timer)
+  private[this] val spanMap: DeadlineSpanMap =
+    new DeadlineSpanMap(logSpans(_), 120.seconds, statsReceiver, timer)
 
   private[this] val scopedReceiver = statsReceiver.scope("log_span")
   private[this] val okCounter = scopedReceiver.counter("ok")
@@ -271,12 +270,12 @@ private[thrift] class RawZipkinTracer(
                          key,
                          (if (value) TrueBB else FalseBB).duplicate(),
                          thrift.AnnotationType.BOOL)
-      case tracing.Annotation
-            .BinaryAnnotation(key: String, value: Array[Byte]) =>
-        binaryAnnotation(
-            record, key, ByteBuffer.wrap(value), thrift.AnnotationType.BYTES)
-      case tracing.Annotation
-            .BinaryAnnotation(key: String, value: ByteBuffer) =>
+      case tracing.Annotation.BinaryAnnotation(key: String, value: Array[Byte]) =>
+        binaryAnnotation(record,
+                         key,
+                         ByteBuffer.wrap(value),
+                         thrift.AnnotationType.BYTES)
+      case tracing.Annotation.BinaryAnnotation(key: String, value: ByteBuffer) =>
         binaryAnnotation(record, key, value, thrift.AnnotationType.BYTES)
       case tracing.Annotation.BinaryAnnotation(key: String, value: Short) =>
         binaryAnnotation(record,

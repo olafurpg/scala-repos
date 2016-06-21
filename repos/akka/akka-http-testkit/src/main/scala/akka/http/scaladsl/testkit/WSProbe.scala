@@ -104,7 +104,8 @@ object WSProbe {
     * @param maxChunkCollectionMills The maximum time in milliseconds to collect chunks for streamed messages.
     */
   def apply(maxChunks: Int = 1000, maxChunkCollectionMills: Long = 5000)(
-      implicit system: ActorSystem, materializer: Materializer): WSProbe =
+      implicit system: ActorSystem,
+      materializer: Materializer): WSProbe =
     new WSProbe {
       val subscriber = TestSubscriber.probe[Message]()
       val publisher = TestPublisher.probe[Message]()

@@ -50,8 +50,8 @@ trait IssuesService { self: AccountService =>
       } firstOption
     else None
 
-  def getIssueLabels(
-      owner: String, repository: String, issueId: Int)(implicit s: Session) =
+  def getIssueLabels(owner: String, repository: String, issueId: Int)(
+      implicit s: Session) =
     IssueLabels
       .innerJoin(Labels)
       .on { (t1, t2) =>
@@ -61,9 +61,10 @@ trait IssuesService { self: AccountService =>
       .map(_._2)
       .list
 
-  def getIssueLabel(
-      owner: String, repository: String, issueId: Int, labelId: Int)(
-      implicit s: Session) =
+  def getIssueLabel(owner: String,
+                    repository: String,
+                    issueId: Int,
+                    labelId: Int)(implicit s: Session) =
     IssueLabels filter (_.byPrimaryKey(owner, repository, issueId, labelId)) firstOption
 
   /**
@@ -173,8 +174,12 @@ trait IssuesService { self: AccountService =>
               state,
               targetUrl,
               description) =>
-          (userName, repositoryName, issueId) -> CommitStatusInfo(
-              count, successCount, context, state, targetUrl, description)
+          (userName, repositoryName, issueId) -> CommitStatusInfo(count,
+                                                                  successCount,
+                                                                  context,
+                                                                  state,
+                                                                  targetUrl,
+                                                                  description)
       }.toMap
     }
   }
@@ -189,12 +194,12 @@ trait IssuesService { self: AccountService =>
     * @param repos Tuple of the repository owner and the repository name
     * @return the search result (list of tuples which contain issue, labels and comment count)
     */
-  def searchIssue(condition: IssueSearchCondition,
-                  pullRequest: Boolean,
-                  offset: Int,
-                  limit: Int,
-                  repos: (String, String)*)(
-      implicit s: Session): List[IssueInfo] = {
+  def searchIssue(
+      condition: IssueSearchCondition,
+      pullRequest: Boolean,
+      offset: Int,
+      limit: Int,
+      repos: (String, String)*)(implicit s: Session): List[IssueInfo] = {
     // get issues and comment count and labels
     val result =
       searchIssueQueryBase(condition, pullRequest, offset, limit, repos)
@@ -395,14 +400,16 @@ trait IssuesService { self: AccountService =>
           .update(id) > 0
     } get
 
-  def registerIssueLabel(
-      owner: String, repository: String, issueId: Int, labelId: Int)(
-      implicit s: Session) =
+  def registerIssueLabel(owner: String,
+                         repository: String,
+                         issueId: Int,
+                         labelId: Int)(implicit s: Session) =
     IssueLabels insert IssueLabel(owner, repository, issueId, labelId)
 
-  def deleteIssueLabel(
-      owner: String, repository: String, issueId: Int, labelId: Int)(
-      implicit s: Session) =
+  def deleteIssueLabel(owner: String,
+                       repository: String,
+                       issueId: Int,
+                       labelId: Int)(implicit s: Session) =
     IssueLabels filter (_.byPrimaryKey(owner, repository, issueId, labelId)) delete
 
   def createComment(owner: String,
@@ -462,9 +469,10 @@ trait IssuesService { self: AccountService =>
   def deleteComment(commentId: Int)(implicit s: Session) =
     IssueComments filter (_.byPrimaryKey(commentId)) delete
 
-  def updateClosed(
-      owner: String, repository: String, issueId: Int, closed: Boolean)(
-      implicit s: Session) =
+  def updateClosed(owner: String,
+                   repository: String,
+                   issueId: Int,
+                   closed: Boolean)(implicit s: Session) =
     Issues
       .filter(_.byPrimaryKey(owner, repository, issueId))
       .map { t =>
@@ -549,13 +557,18 @@ trait IssuesService { self: AccountService =>
       .toList
   }
 
-  def closeIssuesFromMessage(
-      message: String, userName: String, owner: String, repository: String)(
-      implicit s: Session) = {
+  def closeIssuesFromMessage(message: String,
+                             userName: String,
+                             owner: String,
+                             repository: String)(implicit s: Session) = {
     extractCloseId(message).foreach { issueId =>
       for (issue <- getIssue(owner, repository, issueId) if !issue.closed) {
-        createComment(
-            owner, repository, userName, issue.issueId, "Close", "close")
+        createComment(owner,
+                      repository,
+                      userName,
+                      issue.issueId,
+                      "Close",
+                      "close")
         updateClosed(owner, repository, issue.issueId, true)
       }
     }
@@ -584,9 +597,9 @@ trait IssuesService { self: AccountService =>
     }
   }
 
-  def createIssueComment(
-      owner: String, repository: String, commit: CommitInfo)(
-      implicit s: Session) = {
+  def createIssueComment(owner: String,
+                         repository: String,
+                         commit: CommitInfo)(implicit s: Session) = {
     StringUtil.extractIssueId(commit.fullMessage).foreach { issueId =>
       if (getIssue(owner, repository, issueId).isDefined) {
         getAccountByMailAddress(commit.committerEmailAddress).foreach {
@@ -688,8 +701,8 @@ object IssuesService {
     /**
       * Restores IssueSearchCondition instance from filter query.
       */
-    def apply(
-        filter: String, milestones: Map[String, Int]): IssueSearchCondition = {
+    def apply(filter: String,
+              milestones: Map[String, Int]): IssueSearchCondition = {
       val conditions = filter
         .split("[ 　\t]+")
         .flatMap { x =>
@@ -743,9 +756,7 @@ object IssuesService {
       */
     def apply(request: HttpServletRequest): IssueSearchCondition =
       IssueSearchCondition(
-          param(request, "labels")
-            .map(_.split(",").toSet)
-            .getOrElse(Set.empty),
+          param(request, "labels").map(_.split(",").toSet).getOrElse(Set.empty),
           param(request, "milestone").map {
             case "none" => None
             case x => Some(x)

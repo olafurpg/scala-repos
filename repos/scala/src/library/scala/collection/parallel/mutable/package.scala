@@ -23,8 +23,10 @@ package mutable {
   /* classes and traits */
   private[mutable] trait SizeMapUtils {
 
-    protected def calcNumElems(
-        from: Int, until: Int, tableLength: Int, sizeMapBucketSize: Int) = {
+    protected def calcNumElems(from: Int,
+                               until: Int,
+                               tableLength: Int,
+                               sizeMapBucketSize: Int) = {
       // find the first bucket
       val fbindex = from / sizeMapBucketSize
 

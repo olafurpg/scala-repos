@@ -116,7 +116,8 @@ object CachedMacroUtil {
 
   @tailrec
   def modCountParamToModTracker(c: whitebox.Context)(
-      tree: c.universe.Tree, psiElement: c.universe.Tree): c.universe.Tree = {
+      tree: c.universe.Tree,
+      psiElement: c.universe.Tree): c.universe.Tree = {
     implicit val x: c.type = c
     import c.universe._
     tree match {

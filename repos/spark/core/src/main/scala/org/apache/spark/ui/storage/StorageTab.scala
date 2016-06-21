@@ -43,8 +43,7 @@ private[ui] class StorageTab(parent: SparkUI)
 class StorageListener(storageStatusListener: StorageStatusListener)
     extends BlockStatusListener {
 
-  private[ui] val _rddInfoMap =
-    mutable.Map[Int, RDDInfo]() // exposed for testing
+  private[ui] val _rddInfoMap = mutable.Map[Int, RDDInfo]() // exposed for testing
 
   def activeStorageStatusList: Seq[StorageStatus] =
     storageStatusListener.storageStatusList

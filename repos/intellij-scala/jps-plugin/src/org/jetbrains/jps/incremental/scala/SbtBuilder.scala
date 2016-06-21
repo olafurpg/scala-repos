@@ -32,11 +32,12 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
       JavaBuilder.IS_ENABLED.set(context, false)
   }
 
-  override def build(context: CompileContext,
-                     chunk: ModuleChunk,
-                     dirtyFilesHolder: DirtyFilesHolder[
-                         JavaSourceRootDescriptor, ModuleBuildTarget],
-                     outputConsumer: ModuleLevelBuilder.OutputConsumer)
+  override def build(
+      context: CompileContext,
+      chunk: ModuleChunk,
+      dirtyFilesHolder: DirtyFilesHolder[JavaSourceRootDescriptor,
+                                         ModuleBuildTarget],
+      outputConsumer: ModuleLevelBuilder.OutputConsumer)
     : ModuleLevelBuilder.ExitCode = {
 
     if (isDisabled(context) || ChunkExclusionService.isExcluded(chunk))
@@ -56,8 +57,8 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     if (filesToCompile.isEmpty) return ExitCode.NOTHING_DONE
 
     // Delete dirty class files (to handle force builds and form changes)
-    BuildOperations.cleanOutputsCorrespondingToChangedFiles(
-        context, dirtyFilesHolder)
+    BuildOperations
+      .cleanOutputsCorrespondingToChangedFiles(context, dirtyFilesHolder)
 
     val sources = filesToCompile.keySet.toSeq
 
@@ -89,8 +90,8 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     util.Arrays.asList("scala", "java")
 
   // TODO Mirror file deletion (either via the outputConsumer or a custom index)
-  private def updateSharedResources(
-      context: CompileContext, chunk: ModuleChunk) {
+  private def updateSharedResources(context: CompileContext,
+                                    chunk: ModuleChunk) {
     val project = context.getProjectDescriptor
 
     val resourceTargets: Seq[ResourcesTarget] = {
@@ -136,8 +137,8 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
   private def hasDirtyFilesOrDependencies(
       context: CompileContext,
       chunk: ModuleChunk,
-      dirtyFilesHolder: DirtyFilesHolder[
-          JavaSourceRootDescriptor, ModuleBuildTarget]): Boolean = {
+      dirtyFilesHolder: DirtyFilesHolder[JavaSourceRootDescriptor,
+                                         ModuleBuildTarget]): Boolean = {
 
     val representativeTarget = chunk.representativeTarget()
 
@@ -230,8 +231,9 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
       .toSeq
   }
 
-  private def logCustomSbtIncOptions(
-      context: CompileContext, chunk: ModuleChunk, client: Client): Unit = {
+  private def logCustomSbtIncOptions(context: CompileContext,
+                                     chunk: ModuleChunk,
+                                     client: Client): Unit = {
     val settings = projectSettings(context).getCompilerSettings(chunk)
     val options = settings.getSbtIncrementalOptions
     client.debug(

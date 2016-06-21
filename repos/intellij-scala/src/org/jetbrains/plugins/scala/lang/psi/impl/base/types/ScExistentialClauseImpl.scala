@@ -40,11 +40,11 @@ class ScExistentialClauseImpl(node: ASTNode)
                              state: ResolveState): Boolean = e match {
     case named: ScNamedElement => processor.execute(named, state)
     case holder: ScDeclaredElementsHolder => {
-        for (declared <- holder.declaredElements) {
-          if (!processor.execute(declared, state)) return false
-        }
-        true
+      for (declared <- holder.declaredElements) {
+        if (!processor.execute(declared, state)) return false
       }
+      true
+    }
     case _ => true
   }
 }

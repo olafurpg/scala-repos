@@ -66,8 +66,8 @@ object Pos extends SFXEnumDelegateCompanion[jfxg.Pos, Pos] {
       "2.2.60")
   val BOTTOM_RIGHT = BottomRight
   val Center = new Pos(jfxg.Pos.CENTER)
-  @deprecated(
-      "Use Center; CENTER will be removed in a future release", "2.2.60")
+  @deprecated("Use Center; CENTER will be removed in a future release",
+              "2.2.60")
   val CENTER = Center
   val CenterLeft = new Pos(jfxg.Pos.CENTER_LEFT)
   @deprecated(
@@ -84,12 +84,12 @@ object Pos extends SFXEnumDelegateCompanion[jfxg.Pos, Pos] {
               "2.2.60")
   val TOP_CENTER = TopCenter
   val TopLeft = new Pos(jfxg.Pos.TOP_LEFT)
-  @deprecated(
-      "Use TopLeft; TOP_LEFT will be removed in a future release", "2.2.60")
+  @deprecated("Use TopLeft; TOP_LEFT will be removed in a future release",
+              "2.2.60")
   val TOP_LEFT = TopLeft
   val TopRight = new Pos(jfxg.Pos.TOP_RIGHT)
-  @deprecated(
-      "Use TopRight; TOP_RIGHT will be removed in a future release", "2.2.60")
+  @deprecated("Use TopRight; TOP_RIGHT will be removed in a future release",
+              "2.2.60")
   val TOP_RIGHT = TopRight
 
   protected override def unsortedValues: Array[Pos] = Array(

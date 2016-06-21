@@ -15,8 +15,8 @@ import scala.collection.JavaConversions._
   * 12/19/13
   */
 class ScalaGoToClassContributor extends ChooseByNameContributor {
-  def getNames(
-      project: Project, includeNonProjectItems: Boolean): Array[String] = {
+  def getNames(project: Project,
+               includeNonProjectItems: Boolean): Array[String] = {
     val classNames = StubIndex
       .getInstance()
       .getAllKeys(ScalaIndexKeys.NOT_VISIBLE_IN_JAVA_SHORT_NAME_KEY, project)

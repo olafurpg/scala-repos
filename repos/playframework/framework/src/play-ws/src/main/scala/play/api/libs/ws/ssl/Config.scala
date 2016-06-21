@@ -89,8 +89,8 @@ case class SSLDebugConfig(all: Boolean = false,
     */
   def enabled =
     all || ssl || certpath || ocsp || record.isDefined ||
-    handshake.isDefined || keygen || session || defaultctx || sslctx ||
-    sessioncache || keymanager || trustmanager || pluggability
+      handshake.isDefined || keygen || session || defaultctx || sslctx ||
+      sessioncache || keymanager || trustmanager || pluggability
 
   def withAll = this.copy(all = true)
 
@@ -129,14 +129,14 @@ case class SSLDebugConfig(all: Boolean = false,
 /**
   * SSL handshake debugging options.
   */
-case class SSLDebugHandshakeOptions(
-    data: Boolean = false, verbose: Boolean = false)
+case class SSLDebugHandshakeOptions(data: Boolean = false,
+                                    verbose: Boolean = false)
 
 /**
   * SSL record debugging options.
   */
-case class SSLDebugRecordOptions(
-    plaintext: Boolean = false, packet: Boolean = false)
+case class SSLDebugRecordOptions(plaintext: Boolean = false,
+                                 packet: Boolean = false)
 
 /**
   * Configuration for specifying loose (potentially dangerous) ssl config.
@@ -178,8 +178,8 @@ case class SSLConfig(
     checkRevocation: Option[Boolean] = None,
     revocationLists: Option[Seq[URL]] = None,
     enabledCipherSuites: Option[Seq[String]] = None,
-    enabledProtocols: Option[Seq[String]] =
-      Some(Seq("TLSv1.2", "TLSv1.1", "TLSv1")),
+    enabledProtocols: Option[Seq[String]] = Some(
+        Seq("TLSv1.2", "TLSv1.1", "TLSv1")),
     disabledSignatureAlgorithms: Seq[String] = Seq("MD2", "MD4", "MD5"),
     disabledKeyAlgorithms: Seq[String] =
       Seq("RSA keySize < 2048", "DSA keySize < 2048", "EC keySize < 224"),
@@ -281,14 +281,13 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
           Some(SSLDebugRecordOptions(plaintext = plaintext, packet = packet))
         } else None
 
-      val handshake =
-        if (config.get[Boolean]("handshake")) {
-          val data = config.get[Boolean]("data")
-          val verbose = config.get[Boolean]("verbose")
-          Some(SSLDebugHandshakeOptions(data = data, verbose = verbose))
-        } else {
-          None
-        }
+      val handshake = if (config.get[Boolean]("handshake")) {
+        val data = config.get[Boolean]("data")
+        val verbose = config.get[Boolean]("verbose")
+        Some(SSLDebugHandshakeOptions(data = data, verbose = verbose))
+      } else {
+        None
+      }
 
       val keygen = config.get[Boolean]("keygen")
       val session = config.get[Boolean]("session")

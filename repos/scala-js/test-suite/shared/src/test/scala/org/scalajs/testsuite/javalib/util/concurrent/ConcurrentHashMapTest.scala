@@ -42,12 +42,12 @@ class ConcurrentHashMapTest extends MapTest {
     assertEquals("two", chm.get("ONE"))
 
     assertFalse(chm.replace("ONE", "one", "two"))
-    expectThrows(
-        classOf[NullPointerException], chm.replace(null, "two", "one"))
-    expectThrows(
-        classOf[NullPointerException], chm.replace("ONE", null, "one"))
-    expectThrows(
-        classOf[NullPointerException], chm.replace("ONE", "two", null))
+    expectThrows(classOf[NullPointerException],
+                 chm.replace(null, "two", "one"))
+    expectThrows(classOf[NullPointerException],
+                 chm.replace("ONE", null, "one"))
+    expectThrows(classOf[NullPointerException],
+                 chm.replace("ONE", "two", null))
 
     assertTrue(chm.replace("ONE", "two", "one"))
     assertEquals("one", chm.get("ONE"))

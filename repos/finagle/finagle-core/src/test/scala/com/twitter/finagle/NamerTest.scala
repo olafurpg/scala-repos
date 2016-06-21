@@ -28,8 +28,8 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
     val exc = new TestException {}
 
     val namer = new Namer {
-      var acts: Map[
-          Path, (Activity[NameTree[Path]], Witness[Try[NameTree[Path]]])] =
+      var acts: Map[Path,
+                    (Activity[NameTree[Path]], Witness[Try[NameTree[Path]]])] =
         Map.empty
 
       def contains(path: String) = acts contains Path.read(path)
@@ -245,8 +245,7 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
           case bound: Addr.Bound =>
             assert(bound.addrs.size == 1)
             bound.addrs.head match {
-              case exp.Address
-                    .ServiceFactory(sf: ServiceFactory[Int, Int], _) =>
+              case exp.Address.ServiceFactory(sf: ServiceFactory[Int, Int], _) =>
                 val svc = Await.result(sf())
                 intercept[ClassCastException] {
                   val rsp = Await.result(svc(3))
@@ -269,8 +268,7 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
   }
 
   test("Namer.resolve") {
-    assert(
-        Namer.resolve("invalid").sample() match {
+    assert(Namer.resolve("invalid").sample() match {
       case Addr.Failed(_: IllegalArgumentException) => true
       case _ => false
     })
@@ -279,8 +277,7 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
 
 class TestNamer extends Namer {
   def lookup(path: Path): Activity[NameTree[Name]] =
-    Activity.value(
-        path match {
+    Activity.value(path match {
       case Path.Utf8("foo") => NameTree.Leaf(Name.Path(Path.Utf8("bar")))
       case _ => NameTree.Neg
     })

@@ -43,8 +43,8 @@ class ConsumerFetcherManager(private val consumerIdString: String,
         "ConsumerFetcherManager-%d".format(SystemTime.milliseconds),
         config.clientId,
         config.numConsumerFetchers) {
-  private var partitionMap: immutable.Map[
-      TopicAndPartition, PartitionTopicInfo] = null
+  private var partitionMap: immutable.Map[TopicAndPartition,
+                                          PartitionTopicInfo] = null
   private var cluster: Cluster = null
   private val noLeaderPartitionSet = new mutable.HashSet[TopicAndPartition]
   private val lock = new ReentrantLock
@@ -92,36 +92,36 @@ class ConsumerFetcherManager(private val consumerIdString: String,
         }
       } catch {
         case t: Throwable => {
-            if (!isRunning.get())
-              throw t /* If this thread is stopped, propagate this exception to kill the thread. */
-            else
-              warn("Failed to find leader for %s".format(noLeaderPartitionSet),
-                   t)
-          }
+          if (!isRunning.get())
+            throw t /* If this thread is stopped, propagate this exception to kill the thread. */
+          else
+            warn("Failed to find leader for %s".format(noLeaderPartitionSet),
+                 t)
+        }
       } finally {
         lock.unlock()
       }
 
       try {
-        addFetcherForPartitions(
-            leaderForPartitionsMap.map {
+        addFetcherForPartitions(leaderForPartitionsMap.map {
           case (topicAndPartition, broker) =>
             topicAndPartition -> BrokerAndInitialOffset(
-                broker, partitionMap(topicAndPartition).getFetchOffset())
+                broker,
+                partitionMap(topicAndPartition).getFetchOffset())
         })
       } catch {
         case t: Throwable => {
-            if (!isRunning.get())
-              throw t /* If this thread is stopped, propagate this exception to kill the thread. */
-            else {
-              warn("Failed to add leader for partitions %s; will retry".format(
-                       leaderForPartitionsMap.keySet.mkString(",")),
-                   t)
-              lock.lock()
-              noLeaderPartitionSet ++= leaderForPartitionsMap.keySet
-              lock.unlock()
-            }
+          if (!isRunning.get())
+            throw t /* If this thread is stopped, propagate this exception to kill the thread. */
+          else {
+            warn("Failed to add leader for partitions %s; will retry".format(
+                     leaderForPartitionsMap.keySet.mkString(",")),
+                 t)
+            lock.lock()
+            noLeaderPartitionSet ++= leaderForPartitionsMap.keySet
+            lock.unlock()
           }
+        }
       }
 
       shutdownIdleFetcherThreads()
@@ -130,18 +130,19 @@ class ConsumerFetcherManager(private val consumerIdString: String,
   }
 
   override def createFetcherThread(
-      fetcherId: Int, sourceBroker: BrokerEndPoint): AbstractFetcherThread = {
+      fetcherId: Int,
+      sourceBroker: BrokerEndPoint): AbstractFetcherThread = {
     new ConsumerFetcherThread(
-        "ConsumerFetcherThread-%s-%d-%d".format(
-            consumerIdString, fetcherId, sourceBroker.id),
+        "ConsumerFetcherThread-%s-%d-%d"
+          .format(consumerIdString, fetcherId, sourceBroker.id),
         config,
         sourceBroker,
         partitionMap,
         this)
   }
 
-  def startConnections(
-      topicInfos: Iterable[PartitionTopicInfo], cluster: Cluster) {
+  def startConnections(topicInfos: Iterable[PartitionTopicInfo],
+                       cluster: Cluster) {
     leaderFinderThread = new LeaderFinderThread(
         consumerIdString + "-leader-finder-thread")
     leaderFinderThread.start()
@@ -152,7 +153,7 @@ class ConsumerFetcherManager(private val consumerIdString: String,
         .toMap
       this.cluster = cluster
       noLeaderPartitionSet ++=
-        topicInfos.map(tpi => TopicAndPartition(tpi.topic, tpi.partitionId))
+      topicInfos.map(tpi => TopicAndPartition(tpi.topic, tpi.partitionId))
       cond.signalAll()
     }
   }

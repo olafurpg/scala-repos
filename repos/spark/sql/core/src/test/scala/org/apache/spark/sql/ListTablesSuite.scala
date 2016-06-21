@@ -51,7 +51,8 @@ class ListTablesSuite
 
     sqlContext.sessionState.catalog
       .unregisterTable(TableIdentifier("ListTablesSuiteTable"))
-    assert(sqlContext
+    assert(
+        sqlContext
           .tables()
           .filter("tableName = 'ListTablesSuiteTable'")
           .count() === 0)
@@ -69,7 +70,8 @@ class ListTablesSuite
 
     sqlContext.sessionState.catalog
       .unregisterTable(TableIdentifier("ListTablesSuiteTable"))
-    assert(sqlContext
+    assert(
+        sqlContext
           .tables()
           .filter("tableName = 'ListTablesSuiteTable'")
           .count() === 0)
@@ -78,7 +80,9 @@ class ListTablesSuite
   test("query the returned DataFrame of tables") {
     val expectedSchema = StructType(
         StructField("tableName", StringType, false) :: StructField(
-            "isTemporary", BooleanType, false) :: Nil)
+            "isTemporary",
+            BooleanType,
+            false) :: Nil)
 
     Seq(sqlContext.tables(), sql("SHOW TABLes")).foreach {
       case tableDF =>

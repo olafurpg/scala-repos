@@ -71,12 +71,12 @@ trait HttpComponentsClient extends Client {
     withResponse(HttpComponentsClientResponse(client.execute(req))) { f }
   }
 
-  protected def submitMultipart[A](method: String,
-                                   path: String,
-                                   params: Iterable[(String, String)],
-                                   headers: Iterable[(String, String)],
-                                   files: Iterable[(String, Any)])(
-      f: => A): A = {
+  protected def submitMultipart[A](
+      method: String,
+      path: String,
+      params: Iterable[(String, String)],
+      headers: Iterable[(String, String)],
+      files: Iterable[(String, Any)])(f: => A): A = {
     val client = createClient
     val url = "%s/%s".format(baseUrl, path)
     val req = createMethod(method.toUpperCase, url)
@@ -96,8 +96,8 @@ trait HttpComponentsClient extends Client {
     builder.build()
   }
 
-  private def attachHeaders(
-      req: HttpRequestBase, headers: Iterable[(String, String)]) {
+  private def attachHeaders(req: HttpRequestBase,
+                            headers: Iterable[(String, String)]) {
     headers.foreach { case (name, value) => req.addHeader(name, value) }
   }
 
@@ -178,7 +178,7 @@ trait HttpComponentsClient extends Client {
     case s: Any =>
       throw new IllegalArgumentException(
           ("The body type for file parameter '%s' could not be inferred. The " +
-              "supported types are java.util.File and org.scalatra.test.Uploadable")
+                "supported types are java.util.File and org.scalatra.test.Uploadable")
             .format(name))
   }
 }

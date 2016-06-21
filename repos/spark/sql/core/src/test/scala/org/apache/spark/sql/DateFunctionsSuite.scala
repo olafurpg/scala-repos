@@ -44,8 +44,8 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df1.select(countDistinct(current_timestamp())), Row(1))
 
     // Execution in one query should return the same value
-    checkAnswer(
-        sql("""SELECT CURRENT_TIMESTAMP() = CURRENT_TIMESTAMP()"""), Row(true))
+    checkAnswer(sql("""SELECT CURRENT_TIMESTAMP() = CURRENT_TIMESTAMP()"""),
+                Row(true))
 
     // Current timestamp should return the current timestamp ...
     val before = System.currentTimeMillis
@@ -102,11 +102,11 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
   test("year") {
     val df = Seq((d, sdfDate.format(d), ts)).toDF("a", "b", "c")
 
-    checkAnswer(
-        df.select(year($"a"), year($"b"), year($"c")), Row(2015, 2015, 2013))
+    checkAnswer(df.select(year($"a"), year($"b"), year($"c")),
+                Row(2015, 2015, 2013))
 
-    checkAnswer(
-        df.selectExpr("year(a)", "year(b)", "year(c)"), Row(2015, 2015, 2013))
+    checkAnswer(df.selectExpr("year(a)", "year(b)", "year(c)"),
+                Row(2015, 2015, 2013))
   }
 
   test("quarter") {
@@ -114,11 +114,11 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
 
     val df = Seq((d, sdfDate.format(d), ts)).toDF("a", "b", "c")
 
-    checkAnswer(
-        df.select(quarter($"a"), quarter($"b"), quarter($"c")), Row(2, 2, 4))
+    checkAnswer(df.select(quarter($"a"), quarter($"b"), quarter($"c")),
+                Row(2, 2, 4))
 
-    checkAnswer(
-        df.selectExpr("quarter(a)", "quarter(b)", "quarter(c)"), Row(2, 2, 4))
+    checkAnswer(df.selectExpr("quarter(a)", "quarter(b)", "quarter(c)"),
+                Row(2, 2, 4))
   }
 
   test("month") {
@@ -126,8 +126,8 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.select(month($"a"), month($"b"), month($"c")), Row(4, 4, 4))
 
-    checkAnswer(
-        df.selectExpr("month(a)", "month(b)", "month(c)"), Row(4, 4, 4))
+    checkAnswer(df.selectExpr("month(a)", "month(b)", "month(c)"),
+                Row(4, 4, 4))
   }
 
   test("dayofmonth") {
@@ -137,8 +137,8 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
         df.select(dayofmonth($"a"), dayofmonth($"b"), dayofmonth($"c")),
         Row(8, 8, 8))
 
-    checkAnswer(
-        df.selectExpr("day(a)", "day(b)", "dayofmonth(c)"), Row(8, 8, 8))
+    checkAnswer(df.selectExpr("day(a)", "day(b)", "dayofmonth(c)"),
+                Row(8, 8, 8))
   }
 
   test("dayofyear") {
@@ -162,21 +162,21 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
   test("minute") {
     val df = Seq((d, sdf.format(d), ts)).toDF("a", "b", "c")
 
-    checkAnswer(
-        df.select(minute($"a"), minute($"b"), minute($"c")), Row(0, 10, 10))
+    checkAnswer(df.select(minute($"a"), minute($"b"), minute($"c")),
+                Row(0, 10, 10))
 
-    checkAnswer(
-        df.selectExpr("minute(a)", "minute(b)", "minute(c)"), Row(0, 10, 10))
+    checkAnswer(df.selectExpr("minute(a)", "minute(b)", "minute(c)"),
+                Row(0, 10, 10))
   }
 
   test("second") {
     val df = Seq((d, sdf.format(d), ts)).toDF("a", "b", "c")
 
-    checkAnswer(
-        df.select(second($"a"), second($"b"), second($"c")), Row(0, 15, 15))
+    checkAnswer(df.select(second($"a"), second($"b"), second($"c")),
+                Row(0, 15, 15))
 
-    checkAnswer(
-        df.selectExpr("second(a)", "second(b)", "second(c)"), Row(0, 15, 15))
+    checkAnswer(df.selectExpr("second(a)", "second(b)", "second(c)"),
+                Row(0, 15, 15))
   }
 
   test("weekofyear") {
@@ -246,8 +246,8 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
         Seq(Row(Date.valueOf("2015-05-31")), Row(Date.valueOf("2015-06-01"))))
     checkAnswer(df.select(date_sub(lit(null), 1)).limit(1), Row(null))
 
-    checkAnswer(
-        df.selectExpr("""DATE_SUB(d, null)"""), Seq(Row(null), Row(null)))
+    checkAnswer(df.selectExpr("""DATE_SUB(d, null)"""),
+                Seq(Row(null), Row(null)))
     checkAnswer(
         df.selectExpr("""DATE_SUB(d, 1)"""),
         Seq(Row(Date.valueOf("2015-05-31")), Row(Date.valueOf("2015-06-01"))))
@@ -305,8 +305,8 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
     val df = Seq((t1, d1, s1), (t2, d2, s2)).toDF("t", "d", "s")
     checkAnswer(df.select(months_between(col("t"), col("d"))),
                 Seq(Row(-10.0), Row(7.0)))
-    checkAnswer(
-        df.selectExpr("months_between(t, s)"), Seq(Row(0.5), Row(-0.5)))
+    checkAnswer(df.selectExpr("months_between(t, s)"),
+                Seq(Row(0.5), Row(-0.5)))
   }
 
   test("function last_day") {

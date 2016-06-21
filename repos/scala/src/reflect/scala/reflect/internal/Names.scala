@@ -53,8 +53,10 @@ trait Names extends api.Names {
   /** Is (the ASCII representation of) name at given index equal to
     *  cs[offset..offset+len-1]?
     */
-  private def equals(
-      index: Int, cs: Array[Char], offset: Int, len: Int): Boolean = {
+  private def equals(index: Int,
+                     cs: Array[Char],
+                     offset: Int,
+                     len: Int): Boolean = {
     var i = 0
     while ((i < len) && (chrs(index + i) == cs(offset + i))) i += 1
     i == len
@@ -131,8 +133,10 @@ trait Names extends api.Names {
     if (synchronizeNames) nameLock.synchronized(body) else body
   }
 
-  final def newTypeName(
-      cs: Array[Char], offset: Int, len: Int, cachedString: String): TypeName =
+  final def newTypeName(cs: Array[Char],
+                        offset: Int,
+                        len: Int,
+                        cachedString: String): TypeName =
     newTermName(cs, offset, len, cachedString).toTypeName
 
   /** Create a term name from string. */
@@ -524,15 +528,19 @@ trait Names extends api.Names {
   /** TermName_S and TypeName_S have fields containing the string version of the name.
     *  TermName_R and TypeName_R recreate it each time toString is called.
     */
-  private final class TermName_S(
-      index0: Int, len0: Int, next0: TermName, override val toString: String)
+  private final class TermName_S(index0: Int,
+                                 len0: Int,
+                                 next0: TermName,
+                                 override val toString: String)
       extends TermName(index0, len0, next0) {
     protected def createCompanionName(next: TypeName): TypeName =
       new TypeName_S(index, len, next, toString)
     override def newName(str: String): TermName = newTermNameCached(str)
   }
-  private final class TypeName_S(
-      index0: Int, len0: Int, next0: TypeName, override val toString: String)
+  private final class TypeName_S(index0: Int,
+                                 len0: Int,
+                                 next0: TypeName,
+                                 override val toString: String)
       extends TypeName(index0, len0, next0) {
     override def newName(str: String): TypeName = newTypeNameCached(str)
   }

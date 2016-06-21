@@ -32,15 +32,15 @@ private[persistence] trait AsyncWriteProxy
   protected var store: Option[ActorRef] = None
   private val storeNotInitialized = Future.failed(
       new TimeoutException("Store not initialized. " +
-          "Use `SharedLeveldbJournal.setStore(sharedStore, system)`"))
+            "Use `SharedLeveldbJournal.setStore(sharedStore, system)`"))
 
   override protected[akka] def aroundPreStart(): Unit = {
     context.system.scheduler.scheduleOnce(timeout.duration, self, InitTimeout)
     super.aroundPreStart()
   }
 
-  override protected[akka] def aroundReceive(
-      receive: Receive, msg: Any): Unit =
+  override protected[akka] def aroundReceive(receive: Receive,
+                                             msg: Any): Unit =
     if (isInitialized) {
       if (msg != InitTimeout) super.aroundReceive(receive, msg)
     } else
@@ -66,19 +66,19 @@ private[persistence] trait AsyncWriteProxy
       case None ⇒ storeNotInitialized
     }
 
-  def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] =
+  def asyncDeleteMessagesTo(persistenceId: String,
+                            toSequenceNr: Long): Future[Unit] =
     store match {
       case Some(s) ⇒
         (s ? DeleteMessagesTo(persistenceId, toSequenceNr)).mapTo[Unit]
       case None ⇒ storeNotInitialized
     }
 
-  def asyncReplayMessages(persistenceId: String,
-                          fromSequenceNr: Long,
-                          toSequenceNr: Long,
-                          max: Long)(
-      replayCallback: PersistentRepr ⇒ Unit): Future[Unit] =
+  def asyncReplayMessages(
+      persistenceId: String,
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long)(replayCallback: PersistentRepr ⇒ Unit): Future[Unit] =
     store match {
       case Some(s) ⇒
         val replayCompletionPromise = Promise[Unit]()
@@ -94,8 +94,8 @@ private[persistence] trait AsyncWriteProxy
       case None ⇒ storeNotInitialized
     }
 
-  def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] =
+  def asyncReadHighestSequenceNr(persistenceId: String,
+                                 fromSequenceNr: Long): Future[Long] =
     store match {
       case Some(s) ⇒
         (s ? ReplayMessages(persistenceId,

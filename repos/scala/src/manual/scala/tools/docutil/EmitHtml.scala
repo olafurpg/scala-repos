@@ -140,7 +140,7 @@ object EmitHtml {
 
     val name = section.title.replaceAll("\\p{Space}", "_").toLowerCase()
     out.println("\n<h" + depth + " id=\"" + name + "\">" + section.title +
-        "</h" + depth + ">")
+          "</h" + depth + ">")
     section.paragraphs foreach emitParagraph
   }
 
@@ -183,7 +183,7 @@ object EmitHtml {
     out.println("<meta http-equiv=\"Content-Language\" content=\"en\"/>")
     out.println(
         "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" +
-        document.encoding + "\"/>")
+          document.encoding + "\"/>")
     out.println("<meta name=\"Author\" content=\"" + document.author + "\"/>")
     out println "<style type=\"text/css\">"
     out println "  <!--"

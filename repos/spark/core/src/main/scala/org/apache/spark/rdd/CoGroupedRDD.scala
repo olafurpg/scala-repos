@@ -37,8 +37,7 @@ private[spark] case class NarrowCoGroupSplitDep(
     @transient rdd: RDD[_],
     @transient splitIndex: Int,
     var split: Partition
-)
-    extends Serializable {
+) extends Serializable {
 
   @throws(classOf[IOException])
   private def writeObject(oos: ObjectOutputStream): Unit =
@@ -58,7 +57,8 @@ private[spark] case class NarrowCoGroupSplitDep(
   *                   narrowDeps should always be equal to the number of parents.
   */
 private[spark] class CoGroupPartition(
-    idx: Int, val narrowDeps: Array[Option[NarrowCoGroupSplitDep]])
+    idx: Int,
+    val narrowDeps: Array[Option[NarrowCoGroupSplitDep]])
     extends Partition
     with Serializable {
   override val index: Int = idx
@@ -78,7 +78,8 @@ private[spark] class CoGroupPartition(
   */
 @DeveloperApi
 class CoGroupedRDD[K: ClassTag](
-    @transient var rdds: Seq[RDD[_ <: Product2[K, _]]], part: Partitioner)
+    @transient var rdds: Seq[RDD[_ <: Product2[K, _]]],
+    part: Partitioner)
     extends RDD[(K, Array[Iterable[_]])](rdds.head.context, Nil) {
 
   // For example, `(k, a) cogroup (k, b)` produces k -> Array(ArrayBuffer as, ArrayBuffer bs).
@@ -104,7 +105,9 @@ class CoGroupedRDD[K: ClassTag](
       } else {
         logDebug("Adding shuffle dependency with " + rdd)
         new ShuffleDependency[K, Any, CoGroupCombiner](
-            rdd.asInstanceOf[RDD[_ <: Product2[K, _]]], part, serializer)
+            rdd.asInstanceOf[RDD[_ <: Product2[K, _]]],
+            part,
+            serializer)
       }
     }
   }
@@ -164,7 +167,8 @@ class CoGroupedRDD[K: ClassTag](
     context.taskMetrics().incDiskBytesSpilled(map.diskBytesSpilled)
     context.taskMetrics().incPeakExecutionMemory(map.peakMemoryUsedBytes)
     new InterruptibleIterator(
-        context, map.iterator.asInstanceOf[Iterator[(K, Array[Iterable[_]])]])
+        context,
+        map.iterator.asInstanceOf[Iterator[(K, Array[Iterable[_]])]])
   }
 
   private def createExternalMap(numRdds: Int)
@@ -189,8 +193,9 @@ class CoGroupedRDD[K: ClassTag](
         }
         combiner1
       }
-    new ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner](
-        createCombiner, mergeValue, mergeCombiners)
+    new ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner](createCombiner,
+                                                                mergeValue,
+                                                                mergeCombiners)
   }
 
   override def clearDependencies() {

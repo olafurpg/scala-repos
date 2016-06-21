@@ -41,8 +41,8 @@ trait Enumeratee2TFunctions {
           }
         }
 
-        def step(
-            s: StepM[A], rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
+        def step(s: StepM[A],
+                 rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
           s.fold[IterateeT[J, IterateeM, StepM[A]]](
               cont = contf => {
                 for {

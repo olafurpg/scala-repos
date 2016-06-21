@@ -9,8 +9,10 @@ object Test extends App {
   import scala.tools.reflect.ToolBox
 
   val macrobody = Select(Ident(TermName("Impls")), TermName("foo"))
-  val macroparam = ValDef(
-      NoMods, TermName("x"), TypeTree(definitions.IntClass.toType), EmptyTree)
+  val macroparam = ValDef(NoMods,
+                          TermName("x"),
+                          TypeTree(definitions.IntClass.toType),
+                          EmptyTree)
   val macrodef = DefDef(Modifiers(MACRO),
                         TermName("foo"),
                         Nil,

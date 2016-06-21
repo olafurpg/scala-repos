@@ -58,24 +58,22 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     val firstLine = findFirstLine(csvOptions, rdd)
     val firstRow = new LineCsvReader(csvOptions).parseLine(firstLine)
 
-    val header =
-      if (csvOptions.headerFlag) {
-        firstRow
-      } else {
-        firstRow.zipWithIndex.map { case (value, index) => s"C$index" }
-      }
+    val header = if (csvOptions.headerFlag) {
+      firstRow
+    } else {
+      firstRow.zipWithIndex.map { case (value, index) => s"C$index" }
+    }
 
     val parsedRdd = tokenRdd(sqlContext, csvOptions, header, paths)
-    val schema =
-      if (csvOptions.inferSchemaFlag) {
-        CSVInferSchema.infer(parsedRdd, header, csvOptions.nullValue)
-      } else {
-        // By default fields are assumed to be StringType
-        val schemaFields = header.map { fieldName =>
-          StructField(fieldName.toString, StringType, nullable = true)
-        }
-        StructType(schemaFields)
+    val schema = if (csvOptions.inferSchemaFlag) {
+      CSVInferSchema.infer(parsedRdd, header, csvOptions.nullValue)
+    } else {
+      // By default fields are assumed to be StringType
+      val schemaFields = header.map { fieldName =>
+        StructField(fieldName.toString, StringType, nullable = true)
       }
+      StructType(schemaFields)
+    }
     Some(schema)
   }
 

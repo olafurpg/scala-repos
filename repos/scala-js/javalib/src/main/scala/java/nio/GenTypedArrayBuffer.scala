@@ -30,7 +30,9 @@ private[nio] object GenTypedArrayBuffer {
     val viewCapacity =
       (byteBufferLimit - byteBufferPos) / newTypedArrayBuffer.bytesPerElem
     val viewTypedArray = newTypedArrayBuffer.newTypedArray(
-        byteArray.buffer, byteArray.byteOffset + byteBufferPos, viewCapacity)
+        byteArray.buffer,
+        byteArray.byteOffset + byteBufferPos,
+        viewCapacity)
     newTypedArrayBuffer(viewTypedArray, 0, viewCapacity, byteBuffer.isReadOnly)
   }
 }
@@ -46,8 +48,10 @@ private[nio] final class GenTypedArrayBuffer[B <: Buffer](val self: B)
   def generic_slice()(
       implicit newTypedArrayBuffer: NewThisTypedArrayBuffer): BufferType = {
     val slicedTypedArray = _typedArray.subarray(position, limit)
-    newTypedArrayBuffer(
-        slicedTypedArray, 0, slicedTypedArray.length, isReadOnly)
+    newTypedArrayBuffer(slicedTypedArray,
+                        0,
+                        slicedTypedArray.length,
+                        isReadOnly)
   }
 
   @inline

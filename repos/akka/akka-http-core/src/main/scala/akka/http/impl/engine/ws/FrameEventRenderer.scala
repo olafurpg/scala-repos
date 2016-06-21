@@ -81,7 +81,8 @@ private[http] class FrameEventRenderer
     def bool(b: Boolean, mask: Int): Int = if (b) mask else 0
     val flags =
       bool(header.fin, FIN_MASK) | bool(header.rsv1, RSV1_MASK) | bool(
-          header.rsv2, RSV2_MASK) | bool(header.rsv3, RSV3_MASK)
+          header.rsv2,
+          RSV2_MASK) | bool(header.rsv3, RSV3_MASK)
 
     data(0) = (flags | header.opcode.code).toByte
     data(1) = (bool(header.mask.isDefined, MASK_MASK) | lengthBits).toByte

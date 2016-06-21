@@ -31,8 +31,7 @@ import org.apache.spark.serializer.Serializer
 class CustomRecoveryModeFactory(
     conf: SparkConf,
     serializer: Serializer
-)
-    extends StandaloneRecoveryModeFactory(conf, serializer) {
+) extends StandaloneRecoveryModeFactory(conf, serializer) {
 
   CustomRecoveryModeFactory.instantiationAttempts += 1
 
@@ -88,8 +87,8 @@ class CustomPersistenceEngine(serializer: Serializer)
     */
   override def read[T: ClassTag](prefix: String): Seq[T] = {
     CustomPersistenceEngine.readAttempts += 1
-    val results = for ((name, bytes) <- data; if name.startsWith(prefix)) yield
-      serializer.newInstance().deserialize[T](ByteBuffer.wrap(bytes))
+    val results = for ((name, bytes) <- data; if name.startsWith(prefix))
+      yield serializer.newInstance().deserialize[T](ByteBuffer.wrap(bytes))
     results.toSeq
   }
 }

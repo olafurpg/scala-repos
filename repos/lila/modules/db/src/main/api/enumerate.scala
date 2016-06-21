@@ -13,7 +13,8 @@ import lila.db.Implicits._
 object $enumerate {
 
   def apply[A: BSONDocumentReader](
-      query: QueryBuilder, limit: Int = Int.MaxValue)(op: A => Any): Funit =
+      query: QueryBuilder,
+      limit: Int = Int.MaxValue)(op: A => Any): Funit =
     query.cursor[A]().enumerate(limit) run {
       Iteratee.foreach((obj: A) => op(obj))
     }
@@ -28,8 +29,9 @@ object $enumerate {
     }
 
   def bulk[A: BSONDocumentReader](
-      query: QueryBuilder, size: Int, limit: Int = Int.MaxValue)(
-      op: List[A] => Funit): Funit =
+      query: QueryBuilder,
+      size: Int,
+      limit: Int = Int.MaxValue)(op: List[A] => Funit): Funit =
     query.batch(size).cursor[A]().enumerateBulks(limit) run {
       Iteratee.foldM(()) {
         case (_, objs) => op(objs.toList)

@@ -48,15 +48,16 @@ abstract class SyntheticNamedElement(val manager: PsiManager, name: String)
   override def getNameIdentifier: PsiIdentifier = null
 }
 
-class ScSyntheticTypeParameter(
-    manager: PsiManager, override val name: String, val owner: ScFun)
+class ScSyntheticTypeParameter(manager: PsiManager,
+                               override val name: String,
+                               val owner: ScFun)
     extends SyntheticNamedElement(manager, name)
     with ScTypeParam
     with PsiClassFake {
   def typeParameterText: String = name
 
   override def getPresentation: ItemPresentation =
-    super [ScTypeParam].getPresentation
+    super[ScTypeParam].getPresentation
 
   def getPsiElementId: PsiElement = null
 
@@ -83,8 +84,9 @@ class ScSyntheticTypeParameter(
 }
 // we could try and implement all type system related stuff
 // with class types, but it is simpler to indicate types corresponding to synthetic classes explicitly
-class ScSyntheticClass(
-    manager: PsiManager, val className: String, val t: StdType)
+class ScSyntheticClass(manager: PsiManager,
+                       val className: String,
+                       val t: StdType)
     extends SyntheticNamedElement(manager, className)
     with PsiClass
     with PsiClassFake {
@@ -113,13 +115,14 @@ class ScSyntheticClass(
       with mutable.MultiMap[String, ScSyntheticFunction]
   protected object specialMethods
       extends mutable.HashMap[
-          String, mutable.Set[GlobalSearchScope => ScSyntheticFunction]]
+          String,
+          mutable.Set[GlobalSearchScope => ScSyntheticFunction]]
       with mutable.MultiMap[String, GlobalSearchScope => ScSyntheticFunction]
 
   def addMethod(method: ScSyntheticFunction) =
     methods.addBinding(method.name, method)
-  def addMethod(
-      method: GlobalSearchScope => ScSyntheticFunction, methodName: String) =
+  def addMethod(method: GlobalSearchScope => ScSyntheticFunction,
+                methodName: String) =
     specialMethods.addBinding(methodName, method)
 
   import com.intellij.psi.scope.PsiScopeProcessor
@@ -309,8 +312,9 @@ class SyntheticClasses(project: Project)
     registerClass(Unit, "Unit")
 
     val boolc = registerClass(Boolean, "Boolean")
-    for (op <- bool_bin_ops) boolc.addMethod(
-        new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(Boolean))))
+    for (op <- bool_bin_ops)
+      boolc.addMethod(
+          new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(Boolean))))
     boolc.addMethod(
         new ScSyntheticFunction(manager, "unary_!", Boolean, Seq.empty))
 
@@ -323,24 +327,36 @@ class SyntheticClasses(project: Project)
     registerNumericClass(registerClass(Double, "Double"))
 
     for (nc <- numeric) {
-      for (nc1 <- numeric; op <- numeric_comp_ops) nc.addMethod(
-          new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(nc1.t))))
-      for (nc1 <- numeric; op <- numeric_arith_ops) nc.addMethod(
-          new ScSyntheticFunction(
-              manager, op, op_type(nc, nc1), Seq(Seq(nc1.t))))
-      for (nc1 <- numeric) nc.addMethod(new ScSyntheticFunction(
-              manager, "to" + nc1.className, nc1.t, Seq.empty))
-      for (un_op <- numeric_arith_unary_ops) nc.addMethod(
-          new ScSyntheticFunction(manager, "unary_" + un_op, nc.t match {
-        case Long | Double | Float => nc.t
-        case _ => Int
-      }, Seq.empty))
+      for (nc1 <- numeric; op <- numeric_comp_ops)
+        nc.addMethod(
+            new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(nc1.t))))
+      for (nc1 <- numeric; op <- numeric_arith_ops)
+        nc.addMethod(
+            new ScSyntheticFunction(manager,
+                                    op,
+                                    op_type(nc, nc1),
+                                    Seq(Seq(nc1.t))))
+      for (nc1 <- numeric)
+        nc.addMethod(
+            new ScSyntheticFunction(manager,
+                                    "to" + nc1.className,
+                                    nc1.t,
+                                    Seq.empty))
+      for (un_op <- numeric_arith_unary_ops)
+        nc.addMethod(
+            new ScSyntheticFunction(manager, "unary_" + un_op, nc.t match {
+          case Long | Double | Float => nc.t
+          case _ => Int
+        }, Seq.empty))
     }
 
     for (ic <- integer) {
-      for (ic1 <- integer; op <- bitwise_bin_ops) ic.addMethod(
-          new ScSyntheticFunction(
-              manager, op, op_type(ic, ic1), Seq(Seq(ic1.t))))
+      for (ic1 <- integer; op <- bitwise_bin_ops)
+        ic.addMethod(
+            new ScSyntheticFunction(manager,
+                                    op,
+                                    op_type(ic, ic1),
+                                    Seq(Seq(ic1.t))))
       ic.addMethod(
           new ScSyntheticFunction(manager, "unary_~", ic.t, Seq.empty))
 
@@ -359,11 +375,13 @@ class SyntheticClasses(project: Project)
     try {
       val stringClass = ScalaPsiManager
         .instance(project)
-        .getCachedClass(
-            GlobalSearchScope.allScope(project), "java.lang.String")
+        .getCachedClass(GlobalSearchScope.allScope(project),
+                        "java.lang.String")
       stringClass.map { stringClass =>
         scriptSyntheticValues += new ScSyntheticValue(
-            manager, "args", JavaArrayType(ScDesignatorType(stringClass)))
+            manager,
+            "args",
+            JavaArrayType(ScDesignatorType(stringClass)))
       }
     } catch {
       case _: ProcessCanceledException =>

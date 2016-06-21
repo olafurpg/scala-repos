@@ -35,8 +35,8 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
       try {
         val brokerMetaProps = new Properties()
         brokerMetaProps.setProperty("version", 0.toString)
-        brokerMetaProps.setProperty(
-            "broker.id", brokerMetadata.brokerId.toString)
+        brokerMetaProps.setProperty("broker.id",
+                                    brokerMetadata.brokerId.toString)
         val temp = new File(file.getAbsolutePath + ".tmp")
         val fileOutputStream = new FileOutputStream(temp)
         brokerMetaProps.store(fileOutputStream, "")
@@ -67,7 +67,7 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
           case _ =>
             throw new IOException(
                 "Unrecognized version of the server meta.properties file: " +
-                version)
+                  version)
         }
       } catch {
         case e: FileNotFoundException =>

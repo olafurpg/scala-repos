@@ -159,8 +159,7 @@ object Test extends App {
   println(mn.foo()())
   println(mn.bar(10))
   // anonymous class
-  println(
-      (new M {
+  println((new M {
     def foo[T >: String](x: Int, y: T)(z: String = "2") = z;
     def bar(x: Int, y: Double) = x
   }).foo()())
@@ -184,8 +183,7 @@ object Test extends App {
   println(argName) // should be 4
   test5 { argName = 5 }
   println(argName) // should be 5
-  val a: Unit =
-    test1(a = 10, b = "2") // local values a and b exist, but it's not ambiguous since they're vals
+  val a: Unit = test1(a = 10, b = "2") // local values a and b exist, but it's not ambiguous since they're vals
 
   // dependent types and copy method
   val a11 = new A2
@@ -414,14 +412,16 @@ object Test extends App {
 }
 
 class Base {
-  def test1[T1, T2](a: Int = 100, b: T1)(
-      c: T2, d: String = a + ": " + b)(e: T2 = c, f: Int) =
+  def test1[T1, T2](a: Int = 100, b: T1)(c: T2, d: String = a + ": " + b)(
+      e: T2 = c,
+      f: Int) =
     println(a + ": " + d + ", " + b + ", " + c + ", " + e + ", " + f)
 }
 
 class Sub1 extends Base {
   override def test1[U1, U2](b: Int, a: U1)(m: U2, r: String = "overridden")(
-      o: U2, f: Int = 555) =
+      o: U2,
+      f: Int = 555) =
     println(b + ": " + r + ", " + a + ", " + m + ", " + o + ", " + f)
 }
 

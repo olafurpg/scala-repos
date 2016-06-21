@@ -61,8 +61,8 @@ object CheckBoxTreeCell {
     if (cell != null) cell.delegate else null
 
   private[cell] implicit def selectedTreeItemPropertyToGetSelectedProperty[T](
-      selectedProperty: TreeItem[T] => ObservableValue[
-          Boolean, java.lang.Boolean])
+      selectedProperty: TreeItem[T] => ObservableValue[Boolean,
+                                                       java.lang.Boolean])
     : jfxu.Callback[jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]] =
     new jfxu.Callback[jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]] {
       def call(x: jfxsc.TreeItem[T]) = selectedProperty(x)
@@ -107,8 +107,9 @@ object CheckBoxTreeCell {
       message =
         "Use forTreeView[T](TreeItem[T] => ObservableValue[Boolean, java.lang.Boolean]])",
       since = "1.0")
-  def forTreeView[T](getSelectedProperty: jfxu.Callback[
-          jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]]) =
+  def forTreeView[T](
+      getSelectedProperty: jfxu.Callback[jfxsc.TreeItem[T],
+                                         jfxbv.ObservableValue[JBoolean]]) =
     jfxscc.CheckBoxTreeCell.forTreeView[T](getSelectedProperty)
 
   /**
@@ -136,9 +137,10 @@ object CheckBoxTreeCell {
       message =
         "Use forTreeView[T](TreeItem[T] => ObservableValue[Boolean, java.lang.Boolean], StringConverter[TreeItem[T]])",
       since = "1.0")
-  def forTreeView[T](getSelectedProperty: jfxu.Callback[
-                         jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]],
-                     converter: jfxu.StringConverter[jfxsc.TreeItem[T]]) =
+  def forTreeView[T](
+      getSelectedProperty: jfxu.Callback[jfxsc.TreeItem[T],
+                                         jfxbv.ObservableValue[JBoolean]],
+      converter: jfxu.StringConverter[jfxsc.TreeItem[T]]) =
     jfxscc.CheckBoxTreeCell.forTreeView[T](getSelectedProperty, converter)
 }
 

@@ -9,7 +9,8 @@ object NightlyPlugin extends AutoPlugin {
   override def requires = plugins.JvmPlugin
   object autoImport {
     lazy val includeTestDependencies = SettingKey[Boolean](
-        "includeTestDependencies", "Doesn't declare test dependencies.")
+        "includeTestDependencies",
+        "Doesn't declare test dependencies.")
 
     def testDependencies = libraryDependencies <++= includeTestDependencies {
       incl =>

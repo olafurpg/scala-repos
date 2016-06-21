@@ -89,8 +89,7 @@ object InterpretedOrdering {
     * Creates a [[InterpretedOrdering]] for the given schema, in natural ascending order.
     */
   def forSchema(dataTypes: Seq[DataType]): InterpretedOrdering = {
-    new InterpretedOrdering(
-        dataTypes.zipWithIndex.map {
+    new InterpretedOrdering(dataTypes.zipWithIndex.map {
       case (dt, index) =>
         new SortOrder(BoundReference(index, dt, nullable = true), Ascending)
     })

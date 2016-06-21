@@ -18,16 +18,15 @@ object Directory {
         case Some(env) => new File(env)
         // default is HOME/.gitbucket
         case None => {
-            val oldHome = new File(
-                System.getProperty("user.home"), "gitbucket")
-            if (oldHome.exists && oldHome.isDirectory &&
-                new File(oldHome, "version").exists) {
-              //FileUtils.moveDirectory(oldHome, newHome)
-              oldHome
-            } else {
-              new File(System.getProperty("user.home"), ".gitbucket")
-            }
+          val oldHome = new File(System.getProperty("user.home"), "gitbucket")
+          if (oldHome.exists && oldHome.isDirectory &&
+              new File(oldHome, "version").exists) {
+            //FileUtils.moveDirectory(oldHome, newHome)
+            oldHome
+          } else {
+            new File(System.getProperty("user.home"), ".gitbucket")
           }
+        }
       }
   }).getAbsolutePath
 
@@ -79,8 +78,9 @@ object Directory {
   /**
     * Temporary directory which is used to create an archive to download repository contents.
     */
-  def getDownloadWorkDir(
-      owner: String, repository: String, sessionId: String): File =
+  def getDownloadWorkDir(owner: String,
+                         repository: String,
+                         sessionId: String): File =
     new File(getTemporaryDir(owner, repository), s"download/${sessionId}")
 
   /**

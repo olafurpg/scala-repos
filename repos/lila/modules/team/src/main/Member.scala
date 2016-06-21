@@ -4,8 +4,10 @@ import org.joda.time.DateTime
 
 import lila.user.User
 
-private[team] case class Member(
-    id: String, team: String, user: String, date: DateTime) {
+private[team] case class Member(id: String,
+                                team: String,
+                                user: String,
+                                date: DateTime) {
 
   def is(userId: String): Boolean = user == userId
   def is(user: User): Boolean = is(user.id)

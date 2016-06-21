@@ -145,8 +145,8 @@ sealed abstract class Rational
     * See [[http://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Mediants_and_binary_search]]
     */
   def limitDenominatorTo(limit: SafeLong): Rational = {
-    require(
-        limit.signum > 0, "Cannot limit denominator to non-positive number.")
+    require(limit.signum > 0,
+            "Cannot limit denominator to non-positive number.")
 
     // TODO: We should always perform a binary search from the left or right to
     //       speed up computation. For example, if in a search, we have a lower
@@ -165,8 +165,8 @@ sealed abstract class Rational
 
     @tailrec
     def closest(l: Rational, u: Rational): Rational = {
-      val mediant = Rational(
-          l.numerator + u.numerator, l.denominator + u.denominator)
+      val mediant =
+        Rational(l.numerator + u.numerator, l.denominator + u.denominator)
 
       if (mediant.denominator > limit) {
         if ((this - l).abs > (u - this).abs) u else l
@@ -262,8 +262,10 @@ object Rational extends RationalInstances {
     else build0(-n, -d)
   }
 
-  private[math] def buildWithDiv(
-      num: Long, ngcd: Long, rd: Long, lden: Long): Rational = {
+  private[math] def buildWithDiv(num: Long,
+                                 ngcd: Long,
+                                 rd: Long,
+                                 lden: Long): Rational = {
     val n = num / ngcd
     val d = rd / ngcd
     Checked.tryOrReturn {
@@ -587,8 +589,8 @@ object Rational extends RationalInstances {
             val dgcd: Long = spire.math.gcd(d, (r.d % d).toLong)
             if (dgcd == 1L) {
               Rational(
-                  spire.math.gcd(
-                      spire.math.abs(n), spire.math.abs((r.n % n).toLong)),
+                  spire.math
+                    .gcd(spire.math.abs(n), spire.math.abs((r.n % n).toLong)),
                   SafeLong(d) * r.d)
             } else {
               val lm = d / dgcd

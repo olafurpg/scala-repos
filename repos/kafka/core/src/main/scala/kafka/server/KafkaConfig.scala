@@ -393,7 +393,7 @@ object KafkaConfig {
   val ZkSessionTimeoutMsDoc = "Zookeeper session timeout"
   val ZkConnectionTimeoutMsDoc =
     "The max time that the client waits to establish a connection to zookeeper. If not set, the value in " +
-    ZkSessionTimeoutMsProp + " is used"
+      ZkSessionTimeoutMsProp + " is used"
   val ZkSyncTimeMsDoc = "How far a ZK follower can be behind a ZK leader"
   val ZkEnableSecureAclsDoc = "Set client to use secure ACLs"
 
@@ -403,8 +403,8 @@ object KafkaConfig {
   val MaxReservedBrokerIdDoc = "Max number that can be used for a broker.id"
   val BrokerIdDoc =
     "The broker id for this server. If unset, a unique broker id will be generated." +
-    "To avoid conflicts between zookeeper generated broker id's and user configured broker id's, generated broker ids" +
-    "start from " + MaxReservedBrokerIdProp + " + 1."
+      "To avoid conflicts between zookeeper generated broker id's and user configured broker id's, generated broker ids" +
+      "start from " + MaxReservedBrokerIdProp + " + 1."
   val MessageMaxBytesDoc =
     "The maximum size of message that the server can receive"
   val NumNetworkThreadsDoc =
@@ -427,24 +427,24 @@ object KafkaConfig {
     "hostname of broker. If this is set, it will only bind to this address. If this is not set, it will bind to all interfaces"
   val ListenersDoc =
     "Listener List - Comma-separated list of URIs we will listen on and their protocols.\n" +
-    " Specify hostname as 0.0.0.0 to bind to all interfaces.\n" +
-    " Leave hostname empty to bind to default interface.\n" +
-    " Examples of legal listener lists:\n" +
-    " PLAINTEXT://myhost:9092,TRACE://:9091\n" +
-    " PLAINTEXT://0.0.0.0:9092, TRACE://localhost:9093\n"
+      " Specify hostname as 0.0.0.0 to bind to all interfaces.\n" +
+      " Leave hostname empty to bind to default interface.\n" +
+      " Examples of legal listener lists:\n" +
+      " PLAINTEXT://myhost:9092,TRACE://:9091\n" +
+      " PLAINTEXT://0.0.0.0:9092, TRACE://localhost:9093\n"
   val AdvertisedHostNameDoc =
     "Hostname to publish to ZooKeeper for clients to use. In IaaS environments, this may " +
-    "need to be different from the interface to which the broker binds. If this is not set, " +
-    "it will use the value for \"host.name\" if configured. Otherwise " +
-    "it will use the value returned from java.net.InetAddress.getCanonicalHostName()."
+      "need to be different from the interface to which the broker binds. If this is not set, " +
+      "it will use the value for \"host.name\" if configured. Otherwise " +
+      "it will use the value returned from java.net.InetAddress.getCanonicalHostName()."
   val AdvertisedPortDoc =
     "The port to publish to ZooKeeper for clients to use. In IaaS environments, this may " +
-    "need to be different from the port to which the broker binds. If this is not set, " +
-    "it will publish the same port that the broker binds to."
+      "need to be different from the port to which the broker binds. If this is not set, " +
+      "it will publish the same port that the broker binds to."
   val AdvertisedListenersDoc =
     "Listeners to publish to ZooKeeper for clients to use, if different than the listeners above." +
-    " In IaaS environments, this may need to be different from the interface to which the broker binds." +
-    " If this is not set, the value for \"listeners\" will be used."
+      " In IaaS environments, this may need to be different from the interface to which the broker binds." +
+      " If this is not set, the value for \"listeners\" will be used."
   val SocketSendBufferBytesDoc =
     "The SO_SNDBUF buffer of the socket sever sockets"
   val SocketReceiveBufferBytesDoc =
@@ -466,35 +466,35 @@ object KafkaConfig {
   val NumPartitionsDoc = "The default number of log partitions per topic"
   val LogDirDoc =
     "The directory in which the log data is kept (supplemental for " +
-    LogDirsProp + " property)"
+      LogDirsProp + " property)"
   val LogDirsDoc =
     "The directories in which the log data is kept. If not set, the value in " +
-    LogDirProp + " is used"
+      LogDirProp + " is used"
   val LogSegmentBytesDoc = "The maximum size of a single log file"
   val LogRollTimeMillisDoc =
     "The maximum time before a new log segment is rolled out (in milliseconds). If not set, the value in " +
-    LogRollTimeHoursProp + " is used"
+      LogRollTimeHoursProp + " is used"
   val LogRollTimeHoursDoc =
     "The maximum time before a new log segment is rolled out (in hours), secondary to " +
-    LogRollTimeMillisProp + " property"
+      LogRollTimeMillisProp + " property"
 
   val LogRollTimeJitterMillisDoc =
     "The maximum jitter to subtract from logRollTimeMillis (in milliseconds). If not set, the value in " +
-    LogRollTimeJitterHoursProp + " is used"
+      LogRollTimeJitterHoursProp + " is used"
   val LogRollTimeJitterHoursDoc =
     "The maximum jitter to subtract from logRollTimeMillis (in hours), secondary to " +
-    LogRollTimeJitterMillisProp + " property"
+      LogRollTimeJitterMillisProp + " property"
 
   val LogRetentionTimeMillisDoc =
     "The number of milliseconds to keep a log file before deleting it (in milliseconds), If not set, the value in " +
-    LogRetentionTimeMinutesProp + " is used"
+      LogRetentionTimeMinutesProp + " is used"
   val LogRetentionTimeMinsDoc =
     "The number of minutes to keep a log file before deleting it (in minutes), secondary to " +
-    LogRetentionTimeMillisProp + " property. If not set, the value in " +
-    LogRetentionTimeHoursProp + " is used"
+      LogRetentionTimeMillisProp + " property. If not set, the value in " +
+      LogRetentionTimeHoursProp + " is used"
   val LogRetentionTimeHoursDoc =
     "The number of hours to keep a log file before deleting it (in hours), tertiary to " +
-    LogRetentionTimeMillisProp + " property"
+      LogRetentionTimeMillisProp + " property"
 
   val LogRetentionBytesDoc = "The maximum size of the log before deleting it"
   val LogCleanupIntervalMsDoc =
@@ -511,7 +511,7 @@ object KafkaConfig {
     "The total memory used for log cleaner I/O buffers across all cleaner threads"
   val LogCleanerDedupeBufferLoadFactorDoc =
     "Log cleaner dedupe buffer load factor. The percentage full the dedupe buffer can become. A higher value " +
-    "will allow more log to be cleaned at once but will lead to more hash collisions"
+      "will allow more log to be cleaned at once but will lead to more hash collisions"
   val LogCleanerBackoffMsDoc =
     "The amount of time to sleep when there are no logs to clean"
   val LogCleanerMinCleanRatioDoc =
@@ -530,23 +530,23 @@ object KafkaConfig {
     "The frequency in ms that the log flusher checks whether any log needs to be flushed to disk"
   val LogFlushIntervalMsDoc =
     "The maximum time in ms that a message in any topic is kept in memory before flushed to disk. If not set, the value in " +
-    LogFlushSchedulerIntervalMsProp + " is used"
+      LogFlushSchedulerIntervalMsProp + " is used"
   val LogFlushOffsetCheckpointIntervalMsDoc =
     "The frequency with which we update the persistent record of the last flush which acts as the log recovery point"
   val LogPreAllocateEnableDoc =
     "Should pre allocate file when create new segment? If you are using Kafka on Windows, you probably need to set it to true."
   val LogMessageFormatVersionDoc =
     "Specify the message format version the broker will use to append messages to the logs. The value should be a valid ApiVersion. " +
-    "Some examples are: 0.8.2, 0.9.0.0, 0.10.0, check ApiVersion for more details. By setting a particular message format version, the " +
-    "user is certifying that all the existing messages on disk are smaller or equal than the specified version. Setting this value incorrectly " +
-    "will cause consumers with older versions to break as they will receive messages with a format that they don't understand."
+      "Some examples are: 0.8.2, 0.9.0.0, 0.10.0, check ApiVersion for more details. By setting a particular message format version, the " +
+      "user is certifying that all the existing messages on disk are smaller or equal than the specified version. Setting this value incorrectly " +
+      "will cause consumers with older versions to break as they will receive messages with a format that they don't understand."
   val LogMessageTimestampTypeDoc =
     "Define whether the timestamp in the message is message create time or log append time. The value should be either " +
-    "`CreateTime` or `LogAppendTime`"
+      "`CreateTime` or `LogAppendTime`"
   val LogMessageTimestampDifferenceMaxMsDoc =
     "The maximum difference allowed between the timestamp when a broker receives " +
-    "a message and the timestamp specified in the message. If message.timestamp.type=CreateTime, a message will be rejected " +
-    "if the difference in timestamp exceeds this threshold. This configuration is ignored if message.timestamp.type=LogAppendTime."
+      "a message and the timestamp specified in the message. If message.timestamp.type=CreateTime, a message will be rejected " +
+      "if the difference in timestamp exceeds this threshold. This configuration is ignored if message.timestamp.type=LogAppendTime."
   val NumRecoveryThreadsPerDataDirDoc =
     "The number of threads per data directory to be used for log recovery at startup and flushing at shutdown"
   val AutoCreateTopicsEnableDoc = "Enable auto creation of topic on the server"
@@ -562,7 +562,7 @@ object KafkaConfig {
     "default replication factors for automatically created topics"
   val ReplicaLagTimeMaxMsDoc =
     "If a follower hasn't sent any fetch requests or hasn't consumed up to the leaders log end offset for at least this time," +
-    " the leader will remove the follower from isr"
+      " the leader will remove the follower from isr"
   val ReplicaSocketTimeoutMsDoc =
     "The socket timeout for network requests. Its value should be at least replica.fetch.wait.max.ms"
   val ReplicaSocketReceiveBufferBytesDoc =
@@ -571,12 +571,12 @@ object KafkaConfig {
     "The number of byes of messages to attempt to fetch"
   val ReplicaFetchWaitMaxMsDoc =
     "max wait time for each fetcher request issued by follower replicas. This value should always be less than the " +
-    "replica.lag.time.max.ms at all times to prevent frequent shrinking of ISR for low throughput topics"
+      "replica.lag.time.max.ms at all times to prevent frequent shrinking of ISR for low throughput topics"
   val ReplicaFetchMinBytesDoc =
     "Minimum bytes expected for each fetch response. If not enough bytes, wait up to replicaMaxWaitTimeMs"
   val NumReplicaFetchersDoc =
     "Number of fetcher threads used to replicate messages from a source broker. " +
-    "Increasing this value can increase the degree of I/O parallelism in the follower broker."
+      "Increasing this value can increase the degree of I/O parallelism in the follower broker."
   val ReplicaFetchBackoffMsDoc =
     "The amount of time to sleep when fetch partition error occurs."
   val ReplicaHighWatermarkCheckpointIntervalMsDoc =
@@ -595,11 +595,11 @@ object KafkaConfig {
     "Indicates whether to enable replicas not in the ISR set to be elected as leader as a last resort, even though doing so may result in data loss"
   val InterBrokerSecurityProtocolDoc =
     "Security protocol used to communicate between brokers. Valid values are: " +
-    s"${SecurityProtocol.nonTestingValues.asScala.toSeq.map(_.name).mkString(", ")}."
+      s"${SecurityProtocol.nonTestingValues.asScala.toSeq.map(_.name).mkString(", ")}."
   val InterBrokerProtocolVersionDoc =
     "Specify which version of the inter-broker protocol will be used.\n" +
-    " This is typically bumped after all brokers were upgraded to a new version.\n" +
-    " Example of some valid values are: 0.8.0, 0.8.1, 0.8.1.1, 0.8.2, 0.8.2.0, 0.8.2.1, 0.9.0.0, 0.9.0.1 Check ApiVersion for the full list."
+      " This is typically bumped after all brokers were upgraded to a new version.\n" +
+      " Example of some valid values are: 0.8.0, 0.8.1, 0.8.1.1, 0.8.2, 0.8.2.0, 0.8.2.1, 0.9.0.0, 0.9.0.1 Check ApiVersion for the full list."
 
   /** ********* Controlled shutdown configuration ***********/
   val ControlledShutdownMaxRetriesDoc =
@@ -621,10 +621,10 @@ object KafkaConfig {
     "Batch size for reading from the offsets segments when loading offsets into the cache."
   val OffsetsTopicReplicationFactorDoc =
     "The replication factor for the offsets topic (set higher to ensure availability). " +
-    "To ensure that the effective replication factor of the offsets topic is the configured value, " +
-    "the number of alive brokers has to be at least the replication factor at the time of the " +
-    "first request for the offsets topic. If not, either the offsets topic creation will fail or " +
-    "it will get a replication factor of min(alive brokers, configured replication factor)"
+      "To ensure that the effective replication factor of the offsets topic is the configured value, " +
+      "the number of alive brokers has to be at least the replication factor at the time of the " +
+      "first request for the offsets topic. If not, either the offsets topic creation will fail or " +
+      "it will get a replication factor of min(alive brokers, configured replication factor)"
   val OffsetsTopicPartitionsDoc =
     "The number of partitions for the offset commit topic (should not change after deployment)"
   val OffsetsTopicSegmentBytesDoc =
@@ -637,7 +637,7 @@ object KafkaConfig {
     "Frequency at which to check for stale offsets"
   val OffsetCommitTimeoutMsDoc =
     "Offset commit will be delayed until all replicas for the offsets topic receive the commit " +
-    "or this timeout is reached. This is similar to the producer request timeout."
+      "or this timeout is reached. This is similar to the producer request timeout."
   val OffsetCommitRequiredAcksDoc =
     "The required acks before the commit can be accepted. In general, the default (-1) should not be overridden"
 
@@ -653,8 +653,8 @@ object KafkaConfig {
     "Enables delete topic. Delete topic through the admin tool will have no effect if this config is turned off"
   val CompressionTypeDoc =
     "Specify the final compression type for a given topic. This configuration accepts the standard compression codecs " +
-    "('gzip', 'snappy', 'lz4'). It additionally accepts 'uncompressed' which is equivalent to no compression; and " +
-    "'producer' which means retain the original compression codec set by the producer."
+      "('gzip', 'snappy', 'lz4'). It additionally accepts 'uncompressed' which is equivalent to no compression; and " +
+      "'producer' which means retain the original compression codec set by the producer."
 
   /** ********* Kafka Metrics Configuration ***********/
   val MetricSampleWindowMsDoc =
@@ -1378,8 +1378,9 @@ object KafkaConfig {
   def validateNames(props: Properties) {
     import scala.collection.JavaConversions._
     val names = configDef.names()
-    for (name <- props.keys) require(
-        names.contains(name), "Unknown configuration \"%s\".".format(name))
+    for (name <- props.keys)
+      require(names.contains(name),
+              "Unknown configuration \"%s\".".format(name))
   }
 
   def fromProps(props: Properties): KafkaConfig =
@@ -1589,8 +1590,8 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
   val metricNumSamples = getInt(KafkaConfig.MetricNumSamplesProp)
   val metricSampleWindowMs = getLong(KafkaConfig.MetricSampleWindowMsProp)
   val metricReporterClasses: java.util.List[MetricsReporter] =
-    getConfiguredInstances(
-        KafkaConfig.MetricReporterClassesProp, classOf[MetricsReporter])
+    getConfiguredInstances(KafkaConfig.MetricReporterClassesProp,
+                           classOf[MetricsReporter])
 
   /** ********* SSL Configuration **************/
   val principalBuilderClass = getClass(KafkaConfig.PrincipalBuilderClassProp)
@@ -1654,15 +1655,15 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     millis
   }
 
-  private def getMap(
-      propName: String, propValue: String): Map[String, String] = {
+  private def getMap(propName: String,
+                     propValue: String): Map[String, String] = {
     try {
       CoreUtils.parseCsvMap(propValue)
     } catch {
       case e: Exception =>
         throw new IllegalArgumentException(
-            "Error parsing configuration property '%s': %s".format(
-                propName, e.getMessage))
+            "Error parsing configuration property '%s': %s"
+              .format(propName, e.getMessage))
     }
   }
 
@@ -1674,8 +1675,8 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     } catch {
       case e: Exception =>
         throw new IllegalArgumentException(
-            "Error creating broker listeners from '%s': %s".format(
-                listeners, e.getMessage))
+            "Error creating broker listeners from '%s': %s"
+              .format(listeners, e.getMessage))
     }
     // filter port 0 for unit tests
     val endpointsWithoutZeroPort = endpoints.map(ep => ep.port).filter(_ != 0)
@@ -1728,8 +1729,8 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     } else {
       require(brokerId >= 0, "broker.id must be equal or greater than 0")
     }
-    require(
-        logRollTimeMillis >= 1, "log.roll.ms must be equal or greater than 1")
+    require(logRollTimeMillis >= 1,
+            "log.roll.ms must be equal or greater than 1")
     require(logRollTimeJitterMillis >= 0,
             "log.roll.jitter.ms must be equal or greater than 0")
     require(
@@ -1742,30 +1743,30 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     require(
         replicaFetchWaitMaxMs <= replicaSocketTimeoutMs,
         "replica.socket.timeout.ms should always be at least replica.fetch.wait.max.ms" +
-        " to prevent unnecessary socket timeouts")
+          " to prevent unnecessary socket timeouts")
     require(
         replicaFetchMaxBytes >= messageMaxBytes,
         "replica.fetch.max.bytes should be equal or greater than message.max.bytes")
     require(
         replicaFetchWaitMaxMs <= replicaLagTimeMaxMs,
         "replica.fetch.wait.max.ms should always be at least replica.lag.time.max.ms" +
-        " to prevent frequent changes in ISR")
+          " to prevent frequent changes in ISR")
     require(
         offsetCommitRequiredAcks >= -1 &&
-        offsetCommitRequiredAcks <= offsetsTopicReplicationFactor,
+          offsetCommitRequiredAcks <= offsetsTopicReplicationFactor,
         "offsets.commit.required.acks must be greater or equal -1 and less or equal to offsets.topic.replication.factor")
     require(BrokerCompressionCodec.isValid(compressionType),
             "compression.type : " + compressionType + " is not valid." +
-            " Valid options are " +
-            BrokerCompressionCodec.brokerCompressionOptions.mkString(","))
+              " Valid options are " +
+              BrokerCompressionCodec.brokerCompressionOptions.mkString(","))
     require(
         advertisedListeners.keySet.contains(interBrokerSecurityProtocol),
         s"${KafkaConfig.InterBrokerSecurityProtocolProp} must be a protocol in the configured set of ${KafkaConfig.AdvertisedListenersProp}. " +
-        s"The valid options based on currently configured protocols are ${advertisedListeners.keySet}")
+          s"The valid options based on currently configured protocols are ${advertisedListeners.keySet}")
     require(
         advertisedListeners.keySet.subsetOf(listeners.keySet),
         s"${KafkaConfig.AdvertisedListenersProp} protocols must be equal to or a subset of ${KafkaConfig.ListenersProp} protocols. " +
-        s"Found ${advertisedListeners.keySet}. The valid options based on currently configured protocols are ${listeners.keySet}")
+          s"Found ${advertisedListeners.keySet}. The valid options based on currently configured protocols are ${listeners.keySet}")
     require(
         interBrokerProtocolVersion >= logMessageFormatVersion,
         s"log.message.format.version $logMessageFormatVersionString cannot be used when inter.broker.protocol.version is set to $interBrokerProtocolVersionString")

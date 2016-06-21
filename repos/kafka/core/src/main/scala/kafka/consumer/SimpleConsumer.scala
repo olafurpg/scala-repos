@@ -40,7 +40,11 @@ class SimpleConsumer(val host: String,
   ConsumerConfig.validateClientId(clientId)
   private val lock = new Object()
   private val blockingChannel = new BlockingChannel(
-      host, port, bufferSize, BlockingChannel.UseDefaultBufferSize, soTimeout)
+      host,
+      port,
+      bufferSize,
+      BlockingChannel.UseDefaultBufferSize,
+      soTimeout)
   private val fetchRequestAndResponseStats =
     FetchRequestAndResponseStatsRegistry.getFetchRequestAndResponseStats(
         clientId)
@@ -201,9 +205,9 @@ class SimpleConsumer(val host: String,
                              earliestOrLatest: Long,
                              consumerId: Int): Long = {
     val request = OffsetRequest(
-        requestInfo =
-          Map(topicAndPartition -> PartitionOffsetRequestInfo(earliestOrLatest,
-                                                              1)),
+        requestInfo = Map(
+            topicAndPartition -> PartitionOffsetRequestInfo(earliestOrLatest,
+                                                            1)),
         clientId = clientId,
         replicaId = consumerId)
     val partitionErrorAndOffset =

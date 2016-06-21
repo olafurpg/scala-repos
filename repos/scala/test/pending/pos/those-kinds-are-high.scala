@@ -46,8 +46,8 @@ class A {
   /** Working version explicitly typed.
     */
   def fExplicit =
-    List[Template[Container] with Container[String]](
-        new C1[String], new C2[String])
+    List[Template[Container] with Container[String]](new C1[String],
+                                                     new C2[String])
 
   // nope
   def fFail = List(new C1[String], new C2[String])

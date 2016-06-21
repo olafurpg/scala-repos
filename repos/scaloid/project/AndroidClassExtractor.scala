@@ -42,8 +42,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
   }
 
   private def fixClassParamedType(tpe: ScalaType) =
-    tpe.copy(
-        params = tpe.params.map { t =>
+    tpe.copy(params = tpe.params.map { t =>
       if (t.isVar && t.bounds.head.name == "Any") {
         t.copy(bounds = List(ScalaType("AnyRef")))
       } else t
@@ -175,8 +174,12 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                 else if (name.equals("enabled")) Some("")
                 else None
 
-              Some(AndroidProperty(
-                      name, tpe, getter, setters, switch, nameClashes))
+              Some(AndroidProperty(name,
+                                   tpe,
+                                   getter,
+                                   setters,
+                                   switch,
+                                   nameClashes))
             }
         }
         .flatten
@@ -267,7 +270,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     val constructorNames: Map[List[String], List[String]] = {
       val constRegex = ("public +" + clsName +
-          """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
+            """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
       val argRegex = """(.+?) +([a-z][^\[,. ]*)(?:,|$)""".r
 
       constRegex

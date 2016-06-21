@@ -19,8 +19,8 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
 
   private val scalaDocProvider = new ScalaDocumentationProvider
 
-  override def getQuickNavigateInfo(
-      element: PsiElement, originalElement: PsiElement): String = {
+  override def getQuickNavigateInfo(element: PsiElement,
+                                    originalElement: PsiElement): String = {
     val scalaDoc = Option(
         scalaDocProvider.getQuickNavigateInfo(element, originalElement))
     scalaDoc.map { doc =>
@@ -28,8 +28,8 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
     }.orNull
   }
 
-  override def generateDoc(
-      element: PsiElement, originalElement: PsiElement): String = {
+  override def generateDoc(element: PsiElement,
+                           originalElement: PsiElement): String = {
     val scalaDoc = Option(
         scalaDocProvider.generateDoc(element, originalElement))
     scalaDoc.map { doc =>

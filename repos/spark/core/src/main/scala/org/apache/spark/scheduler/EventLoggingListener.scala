@@ -74,12 +74,11 @@ private[spark] class EventLoggingListener(appId: String,
   private val outputBufferSize =
     sparkConf.getInt("spark.eventLog.buffer.kb", 100) * 1024
   private val fileSystem = Utils.getHadoopFileSystem(logBaseDir, hadoopConf)
-  private val compressionCodec =
-    if (shouldCompress) {
-      Some(CompressionCodec.createCodec(sparkConf))
-    } else {
-      None
-    }
+  private val compressionCodec = if (shouldCompress) {
+    Some(CompressionCodec.createCodec(sparkConf))
+  } else {
+    None
+  }
   private val compressionCodecName = compressionCodec.map { c =>
     CompressionCodec.getShortName(c.getClass.getName)
   }
@@ -93,8 +92,8 @@ private[spark] class EventLoggingListener(appId: String,
   private[scheduler] val loggedEvents = new ArrayBuffer[JValue]
 
   // Visible for tests only.
-  private[scheduler] val logPath = getLogPath(
-      logBaseDir, appId, appAttemptId, compressionCodecName)
+  private[scheduler] val logPath =
+    getLogPath(logBaseDir, appId, appAttemptId, compressionCodecName)
 
   /**
     * Creates the log file in the configured log directory.
@@ -147,8 +146,8 @@ private[spark] class EventLoggingListener(appId: String,
   }
 
   /** Log the event as JSON. */
-  private def logEvent(
-      event: SparkListenerEvent, flushLogger: Boolean = false) {
+  private def logEvent(event: SparkListenerEvent,
+                       flushLogger: Boolean = false) {
     val eventJson = JsonProtocol.sparkEventToJson(event)
     // scalastyle:off println
     writer.foreach(_.println(compact(render(eventJson))))
@@ -338,8 +337,8 @@ private[spark] object EventLoggingListener extends Logging {
     val logName = log.getName.stripSuffix(IN_PROGRESS)
     val codecName: Option[String] = logName.split("\\.").tail.lastOption
     val codec = codecName.map { c =>
-      codecMap.getOrElseUpdate(
-          c, CompressionCodec.createCodec(new SparkConf, c))
+      codecMap.getOrElseUpdate(c,
+                               CompressionCodec.createCodec(new SparkConf, c))
     }
 
     try {

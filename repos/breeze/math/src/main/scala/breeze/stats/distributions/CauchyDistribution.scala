@@ -30,8 +30,8 @@ class CauchyDistribution(median: Double, scale: Double)(
   val rng: RandomGenerator = rand.generator
   val inverseCumAccuracy: Double =
     ApacheCauchyDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY
-  protected final val inner = new ApacheCauchyDistribution(
-      rng, median, scale, inverseCumAccuracy)
+  protected final val inner =
+    new ApacheCauchyDistribution(rng, median, scale, inverseCumAccuracy)
 }
 
 object CauchyDistribution

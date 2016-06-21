@@ -91,12 +91,9 @@ class FunctionKeyFlatMapOperation[K1, K2, V](
     extends FlatMapOperation[(K1, V), (K2, V)] {
   val boxed = Externalizer(fm)
   def apply(t: (K1, V)) = {
-    Future.value(
-        boxed
-          .get(t._1)
-          .map { newK =>
-        (newK, t._2)
-      })
+    Future.value(boxed.get(t._1).map { newK =>
+      (newK, t._2)
+    })
   }
 }
 

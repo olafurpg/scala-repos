@@ -75,7 +75,8 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
     def websocketMultipleProtocolRoute =
       path("services") {
         handleWebSocketMessagesForProtocol(greeterService, "greeter") ~ handleWebSocketMessagesForProtocol(
-            echoService, "echo")
+            echoService,
+            "echo")
       }
 
     // tests:

@@ -46,8 +46,8 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
       TypeCheckResult.TypeCheckFailure(
           "input to function coalesce cannot be empty")
     } else {
-      TypeUtils.checkForSameTypeInputExpr(
-          children.map(_.dataType), "function coalesce")
+      TypeUtils.checkForSameTypeInputExpr(children.map(_.dataType),
+                                          "function coalesce")
     }
   }
 

@@ -25,8 +25,7 @@ trait FindersApiTest
                      testNames: Set[String]) = {
     val location = createLocation(lineNumber, offset, fileName)
     var selection: Selection = null
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit =
         selection = new ScalaTestAstTransformer().testSelection(location)
     })
@@ -50,8 +49,10 @@ trait FindersApiTest
     //on 'feature' word
     checkSelection(3, 7, fileName, Set(scenarioA, scenarioB))
     //on feature name
-    checkSelection(
-        14, 15, fileName, Set("Feature: Feature 2 Scenario: Scenario C"))
+    checkSelection(14,
+                   15,
+                   fileName,
+                   Set("Feature: Feature 2 Scenario: Scenario C"))
     //inside scenario
     checkSelection(5, 8, fileName, Set(scenarioA))
   }
@@ -79,8 +80,8 @@ trait FindersApiTest
   def testBehaviorFlatSpec() {
     addBehaviorFlatSpec()
 
-    val testNames = Set(
-        "FlatSpec should run scopes", "FlatSpec should do other stuff")
+    val testNames =
+      Set("FlatSpec should run scopes", "FlatSpec should do other stuff")
     val fileName = "BehaviorFlatSpec.scala"
 
     //'behavior' word

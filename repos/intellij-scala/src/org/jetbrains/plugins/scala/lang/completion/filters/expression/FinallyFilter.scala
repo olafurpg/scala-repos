@@ -22,7 +22,8 @@ class FinallyFilter extends ElementFilter {
     if (leaf != null) {
       val parent = leaf.getParent
       var i = getPrevNotWhitespaceAndComment(
-          context.getTextRange.getStartOffset - 1, context)
+          context.getTextRange.getStartOffset - 1,
+          context)
       var leaf1 = getLeafByOffset(i, context)
       while (leaf1 != null && !leaf1.isInstanceOf[ScTryStmt]) leaf1 =
         leaf1.getParent
@@ -31,8 +32,8 @@ class FinallyFilter extends ElementFilter {
             .getChildren(null)
             .exists(_.getElementType == ScalaElementTypes.FINALLY_BLOCK))
         return false
-      i = getNextNotWhitespaceAndComment(
-          context.getTextRange.getEndOffset, context)
+      i = getNextNotWhitespaceAndComment(context.getTextRange.getEndOffset,
+                                         context)
       if (Array("catch", "finally").contains(
               getLeafByOffset(i, context).getText)) return false
       return true
@@ -57,7 +58,8 @@ class FinallyFilter extends ElementFilter {
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
       return getPrevNotWhitespaceAndComment(
-          leaf.getTextRange.getStartOffset - 1, context)
+          leaf.getTextRange.getStartOffset - 1,
+          context)
     i
   }
 
@@ -70,8 +72,8 @@ class FinallyFilter extends ElementFilter {
                context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
-      return getNextNotWhitespaceAndComment(
-          leaf.getTextRange.getEndOffset, context)
+      return getNextNotWhitespaceAndComment(leaf.getTextRange.getEndOffset,
+                                            context)
     i
   }
 }

@@ -862,7 +862,7 @@ sealed abstract class EmptyBox extends Box[Nothing] with Serializable {
   def openOrThrowException(justification: String) =
     throw new NullPointerException(
         "An Empty Box was opened.  The justification for allowing the openOrThrowException was " +
-        justification)
+          justification)
 
   override def openOr[B >: Nothing](default: => B): B = default
 
@@ -892,16 +892,17 @@ object Failure {
   * exception and/or a chain of previous `Failure`s that may have caused this
   * one.
   */
-sealed case class Failure(
-    msg: String, exception: Box[Throwable], chain: Box[Failure])
+sealed case class Failure(msg: String,
+                          exception: Box[Throwable],
+                          chain: Box[Failure])
     extends EmptyBox {
   type A = Nothing
 
   override def openOrThrowException(justification: String) =
     throw new NullPointerException(
         "An Failure Box was opened.  Failure Message: " + msg +
-        ".  The justification for allowing the openOrThrowException was " +
-        justification) {
+          ".  The justification for allowing the openOrThrowException was " +
+          justification) {
       override def getCause() = exception openOr null
     }
 
@@ -991,8 +992,10 @@ sealed case class Failure(
   * well as allow pattern-matching on the `ParamFailure`.
   */
 object ParamFailure {
-  def apply[T](
-      msg: String, exception: Box[Throwable], chain: Box[Failure], param: T) =
+  def apply[T](msg: String,
+               exception: Box[Throwable],
+               chain: Box[Failure],
+               param: T) =
     new ParamFailure(msg, exception, chain, param)
 
   def apply[T](msg: String, param: T) =
@@ -1044,7 +1047,7 @@ final class ParamFailure[T](override val msg: String,
     with Serializable {
   override def toString(): String =
     "ParamFailure(" + msg + ", " + exception + ", " + chain + ", " + param +
-    ")"
+      ")"
 
   override def equals(that: Any): Boolean = that match {
     case ParamFailure(m, e, c, p) =>

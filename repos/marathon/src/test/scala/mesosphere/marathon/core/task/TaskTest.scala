@@ -12,8 +12,8 @@ class TaskTest extends FunSuite with Mockito with GivenWhenThen with Matchers {
   import scala.collection.JavaConverters._
 
   class Fixture {
-    val appWithoutIpAddress = AppDefinition(
-        id = PathId("/foo/bar"), ipAddress = None)
+    val appWithoutIpAddress =
+      AppDefinition(id = PathId("/foo/bar"), ipAddress = None)
     val appWithIpAddress = AppDefinition(id = PathId("/foo/bar"),
                                          portDefinitions = Seq.empty,
                                          ipAddress = Some(IpAddress()))

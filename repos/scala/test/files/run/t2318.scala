@@ -33,7 +33,7 @@ object Test {
     val b = new Bar { def bar = println("bar") }
     b.bar
 
-    val structural = b.asInstanceOf[ { def bar: Unit }]
+    val structural = b.asInstanceOf[{ def bar: Unit }]
     structural.bar
   }
 

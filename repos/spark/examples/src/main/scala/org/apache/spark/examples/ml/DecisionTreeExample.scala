@@ -82,7 +82,7 @@ object DecisionTreeExample {
         .action((x, c) => c.copy(maxBins = x))
       opt[Int]("minInstancesPerNode")
         .text(s"min number of instances required at child nodes to create the parent split," +
-            s" default: ${defaultParams.minInstancesPerNode}")
+              s" default: ${defaultParams.minInstancesPerNode}")
         .action((x, c) => c.copy(minInstancesPerNode = x))
       opt[Double]("minInfoGain")
         .text(
@@ -90,27 +90,27 @@ object DecisionTreeExample {
         .action((x, c) => c.copy(minInfoGain = x))
       opt[Double]("fracTest")
         .text(s"fraction of data to hold out for testing.  If given option testInput, " +
-            s"this option is ignored. default: ${defaultParams.fracTest}")
+              s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[Boolean]("cacheNodeIds")
         .text(s"whether to use node Id cache during training, " +
-            s"default: ${defaultParams.cacheNodeIds}")
+              s"default: ${defaultParams.cacheNodeIds}")
         .action((x, c) => c.copy(cacheNodeIds = x))
       opt[String]("checkpointDir")
         .text(
             s"checkpoint directory where intermediate node Id caches will be stored, " +
-            s"default: ${defaultParams.checkpointDir match {
-          case Some(strVal) => strVal
-          case None => "None"
-        }}")
+              s"default: ${defaultParams.checkpointDir match {
+            case Some(strVal) => strVal
+            case None => "None"
+          }}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
-            s"default: ${defaultParams.checkpointInterval}")
+              s"default: ${defaultParams.checkpointInterval}")
         .action((x, c) => c.copy(checkpointInterval = x))
       opt[String]("testInput")
         .text(s"input path to test dataset.  If given, option fracTest is ignored." +
-            s" default: ${defaultParams.testInput}")
+              s" default: ${defaultParams.testInput}")
         .action((x, c) => c.copy(testInput = x))
       opt[String]("dataFormat")
         .text(
@@ -141,11 +141,11 @@ object DecisionTreeExample {
   }
 
   /** Load a dataset from the given path, using the given format */
-  private[ml] def loadData(sqlContext: SQLContext,
-                           path: String,
-                           format: String,
-                           expectedNumFeatures: Option[Int] =
-                             None): DataFrame = {
+  private[ml] def loadData(
+      sqlContext: SQLContext,
+      path: String,
+      format: String,
+      expectedNumFeatures: Option[Int] = None): DataFrame = {
     import sqlContext.implicits._
 
     format match {
@@ -185,17 +185,16 @@ object DecisionTreeExample {
     val origExamples: DataFrame = loadData(sqlContext, input, dataFormat)
 
     // Load or create test set
-    val dataframes: Array[DataFrame] =
-      if (testInput != "") {
-        // Load testInput.
-        val numFeatures = origExamples.first().getAs[Vector](1).size
-        val origTestExamples: DataFrame = loadData(
-            sqlContext, testInput, dataFormat, Some(numFeatures))
-        Array(origExamples, origTestExamples)
-      } else {
-        // Split input into training, test.
-        origExamples.randomSplit(Array(1.0 - fracTest, fracTest), seed = 12345)
-      }
+    val dataframes: Array[DataFrame] = if (testInput != "") {
+      // Load testInput.
+      val numFeatures = origExamples.first().getAs[Vector](1).size
+      val origTestExamples: DataFrame =
+        loadData(sqlContext, testInput, dataFormat, Some(numFeatures))
+      Array(origExamples, origTestExamples)
+    } else {
+      // Split input into training, test.
+      origExamples.randomSplit(Array(1.0 - fracTest, fracTest), seed = 12345)
+    }
 
     val training = dataframes(0).cache()
     val test = dataframes(1).cache()
@@ -330,8 +329,9 @@ object DecisionTreeExample {
     *
     * TODO: Change model type to ClassificationModel once that API is public. SPARK-5995
     */
-  private[ml] def evaluateClassificationModel(
-      model: Transformer, data: DataFrame, labelColName: String): Unit = {
+  private[ml] def evaluateClassificationModel(model: Transformer,
+                                              data: DataFrame,
+                                              labelColName: String): Unit = {
     val fullPredictions = model.transform(data).cache()
     val predictions =
       fullPredictions.select("prediction").rdd.map(_.getDouble(0))
@@ -356,8 +356,9 @@ object DecisionTreeExample {
     *
     * TODO: Change model type to RegressionModel once that API is public. SPARK-5995
     */
-  private[ml] def evaluateRegressionModel(
-      model: Transformer, data: DataFrame, labelColName: String): Unit = {
+  private[ml] def evaluateRegressionModel(model: Transformer,
+                                          data: DataFrame,
+                                          labelColName: String): Unit = {
     val fullPredictions = model.transform(data).cache()
     val predictions =
       fullPredictions.select("prediction").rdd.map(_.getDouble(0))

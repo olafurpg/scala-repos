@@ -31,8 +31,8 @@ import org.apache.spark.io.CompressionCodec
 import org.apache.spark.streaming.scheduler.JobGenerator
 import org.apache.spark.util.Utils
 
-private[streaming] class Checkpoint(
-    ssc: StreamingContext, val checkpointTime: Time)
+private[streaming] class Checkpoint(ssc: StreamingContext,
+                                    val checkpointTime: Time)
     extends Logging
     with Serializable {
   val master = ssc.sc.master
@@ -164,7 +164,8 @@ private[streaming] object Checkpoint extends Logging {
       // in other places (e.g., http://jira.codehaus.org/browse/GROOVY-1627)
       val zis = compressionCodec.compressedInputStream(inputStream)
       ois = new ObjectInputStreamWithLoader(
-          zis, Thread.currentThread().getContextClassLoader)
+          zis,
+          Thread.currentThread().getContextClassLoader)
       val cp = ois.readObject.asInstanceOf[Checkpoint]
       cp.validate()
       cp
@@ -184,8 +185,7 @@ private[streaming] class CheckpointWriter(
     conf: SparkConf,
     checkpointDir: String,
     hadoopConf: Configuration
-)
-    extends Logging {
+) extends Logging {
   val MAX_ATTEMPTS = 3
   val executor = Executors.newFixedThreadPool(1)
   val compressionCodec = CompressionCodec.createCodec(conf)
@@ -225,7 +225,7 @@ private[streaming] class CheckpointWriter(
         try {
           logInfo(
               "Saving checkpoint for time " + checkpointTime + " to file '" +
-              checkpointFile + "'")
+                checkpointFile + "'")
 
           // Write checkpoint to temp file
           if (fs.exists(tempFile)) {
@@ -272,31 +272,33 @@ private[streaming] class CheckpointWriter(
           val finishTime = System.currentTimeMillis()
           logInfo(
               "Checkpoint for time " + checkpointTime + " saved to file '" +
-              checkpointFile + "', took " + bytes.length + " bytes and " +
-              (finishTime - startTime) + " ms")
-          jobGenerator.onCheckpointCompletion(
-              checkpointTime, clearCheckpointDataLater)
+                checkpointFile + "', took " + bytes.length + " bytes and " +
+                (finishTime - startTime) + " ms")
+          jobGenerator
+            .onCheckpointCompletion(checkpointTime, clearCheckpointDataLater)
           return
         } catch {
           case ioe: IOException =>
             logWarning("Error in attempt " + attempts +
-                       " of writing checkpoint to " + checkpointFile,
+                         " of writing checkpoint to " + checkpointFile,
                        ioe)
             reset()
         }
       }
       logWarning("Could not write checkpoint for time " + checkpointTime +
-          " to file " + checkpointFile + "'")
+            " to file " + checkpointFile + "'")
     }
   }
 
   def write(checkpoint: Checkpoint, clearCheckpointDataLater: Boolean) {
     try {
       val bytes = Checkpoint.serialize(checkpoint, conf)
-      executor.execute(new CheckpointWriteHandler(
-              checkpoint.checkpointTime, bytes, clearCheckpointDataLater))
+      executor.execute(
+          new CheckpointWriteHandler(checkpoint.checkpointTime,
+                                     bytes,
+                                     clearCheckpointDataLater))
       logInfo("Submitted checkpoint of time " + checkpoint.checkpointTime +
-          " writer queue")
+            " writer queue")
     } catch {
       case rej: RejectedExecutionException =>
         logError(
@@ -317,7 +319,7 @@ private[streaming] class CheckpointWriter(
     }
     val endTime = System.currentTimeMillis()
     logInfo("CheckpointWriter executor terminated ? " + terminated +
-        ", waited for " + (endTime - startTime) + " ms.")
+          ", waited for " + (endTime - startTime) + " ms.")
     stopped = true
   }
 
@@ -395,8 +397,8 @@ private[streaming] object CheckpointReader extends Logging {
   }
 }
 
-private[streaming] class ObjectInputStreamWithLoader(
-    _inputStream: InputStream, loader: ClassLoader)
+private[streaming] class ObjectInputStreamWithLoader(_inputStream: InputStream,
+                                                     loader: ClassLoader)
     extends ObjectInputStream(_inputStream) {
 
   override def resolveClass(desc: ObjectStreamClass): Class[_] = {

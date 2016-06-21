@@ -72,8 +72,8 @@ class BrokerEndPointTest extends Logging {
   def testFromJsonV2 {
     val brokerInfoStr =
       "{\"version\":2," + "\"host\":\"localhost\"," + "\"port\":9092," +
-      "\"jmx_port\":9999," + "\"timestamp\":\"1416974968782\"," +
-      "\"endpoints\":[\"PLAINTEXT://localhost:9092\"]}"
+        "\"jmx_port\":9999," + "\"timestamp\":\"1416974968782\"," +
+        "\"endpoints\":[\"PLAINTEXT://localhost:9092\"]}"
     val broker = Broker.createBroker(1, brokerInfoStr)
     assert(broker.id == 1)
     assert(

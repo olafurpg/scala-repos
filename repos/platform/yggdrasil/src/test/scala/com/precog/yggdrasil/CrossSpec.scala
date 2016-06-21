@@ -39,8 +39,7 @@ trait CrossSpec[M[+ _]]
 
     def removeUndefined(jv: JValue): JValue = jv match {
       case JObject(jfields) =>
-        JObject(
-            jfields collect {
+        JObject(jfields collect {
           case JField(s, v) if v != JUndefined => JField(s, removeUndefined(v))
         })
       case JArray(jvs) =>
@@ -54,8 +53,10 @@ trait CrossSpec[M[+ _]]
       lv <- l.data
       rv <- r.data
     } yield {
-      JObject(JField("left", removeUndefined(lv)) :: JField(
-              "right", removeUndefined(rv)) :: Nil)
+      JObject(
+          JField("left", removeUndefined(lv)) :: JField(
+              "right",
+              removeUndefined(rv)) :: Nil)
     }
 
     val result = ltable.cross(rtable)(

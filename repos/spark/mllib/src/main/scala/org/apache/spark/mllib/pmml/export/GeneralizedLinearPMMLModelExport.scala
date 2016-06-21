@@ -27,7 +27,8 @@ import org.apache.spark.mllib.regression.GeneralizedLinearModel
   * PMML Model Export for GeneralizedLinearModel abstract class
   */
 private[mllib] class GeneralizedLinearPMMLModelExport(
-    model: GeneralizedLinearModel, description: String)
+    model: GeneralizedLinearModel,
+    description: String)
     extends PMMLModelExport {
 
   populateGeneralizedLinearPMML(model)

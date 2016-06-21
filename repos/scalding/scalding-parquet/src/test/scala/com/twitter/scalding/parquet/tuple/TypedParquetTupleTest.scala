@@ -78,8 +78,11 @@ object TestValues {
                    Map(SampleClassD(0, "q") -> SampleClassF(4, 3))))
 }
 
-case class SampleClassA(
-    bool: Boolean, short: Short, long: Long, float: Float, byte: Byte)
+case class SampleClassA(bool: Boolean,
+                        short: Short,
+                        long: Long,
+                        float: Float,
+                        byte: Byte)
 
 case class SampleClassB(string: String,
                         double: Option[Double],

@@ -41,7 +41,7 @@ private[http] object Protocol {
             f"Opcode must be 4bit long but was 0x$code%02X")
     }
 
-    sealed abstract class AbstractOpcode private[Opcode](val code: Byte)
+    sealed abstract class AbstractOpcode private[Opcode] (val code: Byte)
         extends Opcode {
       def isControl: Boolean = (code & 0x8) != 0
     }
@@ -64,7 +64,7 @@ private[http] object Protocol {
     def isError(code: Int): Boolean = !(code == Regular || code == GoingAway)
     def isValid(code: Int): Boolean =
       ((code >= 1000) && (code <= 1003)) || (code >= 1007) && (code <= 1011) ||
-      (code >= 3000) && (code <= 4999)
+        (code >= 3000) && (code <= 4999)
 
     val Regular = 1000
     val GoingAway = 1001

@@ -35,13 +35,13 @@ import java.io.Serializable
   */
 object CompletedBuilder {
   def injectionRegistrar[T: Manifest](injection: Injection[T, Array[Byte]]) =
-    InjectionRegistrar(
-        manifest[T].runtimeClass.asInstanceOf[Class[T]], injection)
+    InjectionRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
+                       injection)
 
   def injectionDefaultRegistrar[T: Manifest](
       injection: Injection[T, Array[Byte]]) =
-    InjectionDefaultRegistrar(
-        manifest[T].runtimeClass.asInstanceOf[Class[T]], injection)
+    InjectionDefaultRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
+                              injection)
 }
 
 case class CompletedBuilder[P <: Platform[P], K, V](
@@ -51,8 +51,8 @@ case class CompletedBuilder[P <: Platform[P], K, V](
     @transient keyCodec: Injection[K, Array[Byte]],
     @transient valCodec: Injection[V, Array[Byte]],
     id: String,
-    @transient opts: Map[String, Options])(
-    implicit val keyMf: Manifest[K], val valMf: Manifest[V])
+    @transient opts: Map[String, Options])(implicit val keyMf: Manifest[K],
+                                           val valMf: Manifest[V])
     extends Serializable {
   import SourceBuilder.adjust
   import CompletedBuilder._

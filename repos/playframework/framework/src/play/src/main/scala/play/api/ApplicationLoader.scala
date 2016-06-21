@@ -52,8 +52,9 @@ object ApplicationLoader {
     * Locate and instantiate the ApplicationLoader.
     */
   def apply(context: Context): ApplicationLoader = {
-    Reflect.configuredClass[
-        ApplicationLoader, play.ApplicationLoader, GuiceApplicationLoader](
+    Reflect.configuredClass[ApplicationLoader,
+                            play.ApplicationLoader,
+                            GuiceApplicationLoader](
         context.environment,
         PlayConfig(context.initialConfiguration),
         "play.application.loader",
@@ -91,11 +92,11 @@ object ApplicationLoader {
     *                        into the application.
     * @param sourceMapper An optional source mapper.
     */
-  def createContext(environment: Environment,
-                    initialSettings: Map[String, AnyRef] =
-                      Map.empty[String, AnyRef],
-                    sourceMapper: Option[SourceMapper] = None,
-                    webCommands: WebCommands = new DefaultWebCommands) = {
+  def createContext(
+      environment: Environment,
+      initialSettings: Map[String, AnyRef] = Map.empty[String, AnyRef],
+      sourceMapper: Option[SourceMapper] = None,
+      webCommands: WebCommands = new DefaultWebCommands) = {
     val configuration = Configuration.load(environment, initialSettings)
     Context(environment, sourceMapper, webCommands, configuration)
   }

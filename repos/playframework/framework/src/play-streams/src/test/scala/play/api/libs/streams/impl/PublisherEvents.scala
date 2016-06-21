@@ -15,8 +15,8 @@ trait PublisherEvents[T] { self: EventRecorder =>
 
   import PublisherEvents._
 
-  case class BoundedSubscription[T, U >: T](
-      pr: Publisher[T], sr: Subscriber[U])
+  case class BoundedSubscription[T, U >: T](pr: Publisher[T],
+                                            sr: Subscriber[U])
       extends Subscription {
     def cancel(): Unit = {
       record(Cancel)

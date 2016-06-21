@@ -175,8 +175,8 @@ object BasicCommands {
         val parentLoader = getClass.getClassLoader
         state.log.info(
             "Applying State transformations " + args.mkString(", ") +
-            (if (cp.isEmpty) ""
-             else " from " + cp.mkString(File.pathSeparator)))
+              (if (cp.isEmpty) ""
+               else " from " + cp.mkString(File.pathSeparator)))
         val loader =
           if (cp.isEmpty) parentLoader
           else toLoader(cp.map(f => new File(f)), parentLoader)
@@ -188,7 +188,7 @@ object BasicCommands {
     }
   def callParser: Parser[(Seq[String], Seq[String])] =
     token(Space) ~>
-    ((classpathOptionParser ?? Nil) ~ rep1sep(className, token(Space)))
+      ((classpathOptionParser ?? Nil) ~ rep1sep(className, token(Space)))
   private[this] def className: Parser[String] = {
     val base =
       StringBasic & not('-' ~> any.*, "Class name cannot start with '-'.")
@@ -209,13 +209,13 @@ object BasicCommands {
   def continuous =
     Command(ContinuousExecutePrefix, continuousBriefHelp, continuousDetail)(
         otherCommandParser) { (s, arg) =>
-      withAttribute(
-          s, Watched.Configuration, "Continuous execution not configured.") {
-        w =>
-          val repeat =
-            ContinuousExecutePrefix + (if (arg.startsWith(" ")) arg
-                                       else " " + arg)
-          Watched.executeContinuously(w, s, arg, repeat)
+      withAttribute(s,
+                    Watched.Configuration,
+                    "Continuous execution not configured.") { w =>
+        val repeat =
+          ContinuousExecutePrefix + (if (arg.startsWith(" ")) arg
+                                     else " " + arg)
+        Watched.executeContinuously(w, s, arg, repeat)
       }
     }
 
@@ -283,8 +283,8 @@ object BasicCommands {
           s
         }
     }
-  private def readMessage(
-      port: Int, previousSuccess: Boolean): Option[String] = {
+  private def readMessage(port: Int,
+                          previousSuccess: Boolean): Option[String] = {
     // split into two connections because this first connection ends the previous communication
     xsbt.IPC.client(port) { _.send(previousSuccess.toString) }
     //   and this second connection starts the next communication
@@ -305,8 +305,8 @@ object BasicCommands {
       applyEffect(base)(t => runAlias(s, t))
     }
 
-  def runAlias(
-      s: State, args: Option[(String, Option[Option[String]])]): State =
+  def runAlias(s: State,
+               args: Option[(String, Option[Option[String]])]): State =
     args match {
       case None =>
         printAliases(s); s
@@ -351,8 +351,8 @@ object BasicCommands {
 
   def aliasNames(s: State): Seq[String] = allAliases(s).map(_._1)
   def allAliases(s: State): Seq[(String, String)] = aliases(s, (n, v) => true)
-  def aliases(
-      s: State, pred: (String, String) => Boolean): Seq[(String, String)] =
+  def aliases(s: State,
+              pred: (String, String) => Boolean): Seq[(String, String)] =
     s.definedCommands.flatMap(c => getAlias(c).filter(tupled(pred)))
 
   def newAlias(name: String, value: String): Command =

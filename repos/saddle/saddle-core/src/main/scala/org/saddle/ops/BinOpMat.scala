@@ -28,8 +28,8 @@ trait BinOpMat {
   // ***************
 
   // Binary element-wise operation on one Mat and one scalar
-  final class MatSclrElemOp[OP <: ScalarOp, @spec(Int, Long, Double) A, @spec(
-          Int, Long, Double) B, @spec(Int, Long, Double) C: ST](
+  final class MatSclrElemOp[OP <: ScalarOp, @spec(Int, Long, Double) A,
+      @spec(Int, Long, Double) B, @spec(Int, Long, Double) C: ST](
       val op: BinOp[OP, A, B, C])
       extends BinOp[OP, Mat[A], B, Mat[C]] {
     def apply(v1: Mat[A], v2: B) = {
@@ -78,8 +78,8 @@ trait BinOpMat {
   // ***************
 
   // Binary element-wise operation on two Mats                                                              scala
-  final class MatMatElemOp[OP <: ScalarOp, @spec(Int, Long, Double) A, @spec(
-          Int, Long, Double) B, @spec(Int, Long, Double) C: ST](
+  final class MatMatElemOp[OP <: ScalarOp, @spec(Int, Long, Double) A,
+      @spec(Int, Long, Double) B, @spec(Int, Long, Double) C: ST](
       op: BinOp[OP, A, B, C])
       extends BinOp[OP, Mat[A], Mat[B], Mat[C]] {
 
@@ -133,8 +133,9 @@ trait BinOpMat {
   // Binary linear alg operation on two Mats (inner product)
 
   // Binary op: matrix/vector multiplication
-  implicit def matmulOpWithVector[A, B, OP <: InnerProd](
-      implicit cb: ST[B], na: NUM[A], nb: NUM[B]) =
+  implicit def matmulOpWithVector[A, B, OP <: InnerProd](implicit cb: ST[B],
+                                                         na: NUM[A],
+                                                         nb: NUM[B]) =
     new BinOp[InnerProd, Mat[A], Vec[B], Mat[Double]] {
       def apply(m1: Mat[A], m2: Vec[B]): Mat[Double] = {
         m1.mult(Mat(m2))
@@ -142,8 +143,9 @@ trait BinOpMat {
     }
 
   // Binary op: vector/matrix multiplication
-  implicit def vecmulOpWithMatrix[A, B, OP <: InnerProd](
-      implicit cb: ST[A], na: NUM[A], nb: NUM[B]) =
+  implicit def vecmulOpWithMatrix[A, B, OP <: InnerProd](implicit cb: ST[A],
+                                                         na: NUM[A],
+                                                         nb: NUM[B]) =
     new BinOp[InnerProd, Vec[A], Mat[B], Mat[Double]] {
       def apply(m1: Vec[A], m2: Mat[B]): Mat[Double] = {
         Mat(m1).transpose.mult(m2)
@@ -151,8 +153,9 @@ trait BinOpMat {
     }
 
   // Binary op: matrix/matrix multiplication
-  implicit def matmulOpWithMatrix[A, B, OP <: InnerProd](
-      implicit cb: ST[B], na: NUM[A], nb: NUM[B]) =
+  implicit def matmulOpWithMatrix[A, B, OP <: InnerProd](implicit cb: ST[B],
+                                                         na: NUM[A],
+                                                         nb: NUM[B]) =
     new BinOp[InnerProd, Mat[A], Mat[B], Mat[Double]] {
       def apply(m1: Mat[A], m2: Mat[B]): Mat[Double] = {
         m1.mult(m2)

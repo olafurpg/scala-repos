@@ -67,8 +67,9 @@ object Validation {
       violation: Violation,
       parentDesc: Option[String] = None,
       prependSlash: Boolean = false): Set[RuleViolation] = {
-    def concatPath(
-        parent: String, child: Option[String], slash: Boolean): String = {
+    def concatPath(parent: String,
+                   child: Option[String],
+                   slash: Boolean): String = {
       child.map(c => parent + { if (slash) "/" else "" } + c).getOrElse(parent)
     }
 
@@ -119,8 +120,9 @@ object Validation {
               http.setRequestMethod("HEAD")
               if (http.getResponseCode == HttpURLConnection.HTTP_OK) Success
               else
-                Failure(Set(RuleViolation(
-                            url, "URL could not be resolved.", None)))
+                Failure(Set(RuleViolation(url,
+                                          "URL could not be resolved.",
+                                          None)))
             case other: URLConnection =>
               other.getInputStream
               Success //if we come here, we could read the stream

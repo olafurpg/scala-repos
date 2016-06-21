@@ -59,8 +59,7 @@ object WebAccountFinder extends Logging {
     val serviceConfig = config.detach("service")
     serviceConfig.get[String]("hardcoded_account") map { accountId =>
       implicit val M = ResponseMonad(new FutureMonad(executor))
-      success(
-          new StaticAccountFinder[Response](
+      success(new StaticAccountFinder[Response](
               accountId,
               serviceConfig[String]("hardcoded_rootKey", ""),
               serviceConfig.get[String]("hardcoded_rootPath")))
@@ -109,7 +108,7 @@ class WebAccountFinder(protocol: String,
 
   def findAccountByAPIKey(apiKey: APIKey): Response[Option[AccountId]] = {
     logger.debug("Finding account for API key " + apiKey + " with " +
-        (protocol, host, port, path, user, password).toString)
+          (protocol, host, port, path, user, password).toString)
     invoke { client =>
       logger.info("Querying accounts service for API key %s".format(apiKey))
       eitherT(client.query("apiKey", apiKey).get[JValue]("/accounts/") map {
@@ -127,15 +126,15 @@ class WebAccountFinder(protocol: String,
         case res =>
           logger.error(
               "Unexpected response from accounts service for findAccountByAPIKey: " +
-              res)
+                res)
           left("Unexpected response from accounts service; unable to proceed: " +
-              res)
+                res)
       } recoverWith {
         case ex =>
           logger.error("findAccountByAPIKey for " + apiKey + "failed.", ex)
           Promise.successful(
               left("Client error accessing accounts service; unable to proceed: " +
-                  ex.getMessage))
+                    ex.getMessage))
       })
     }
   }
@@ -153,15 +152,15 @@ class WebAccountFinder(protocol: String,
         case res =>
           logger.error(
               "Unexpected response from accounts serviceon findAccountDetailsById: " +
-              res)
+                res)
           left("Unexpected response from accounts service; unable to proceed: " +
-              res)
+                res)
       } recoverWith {
         case ex =>
           logger.error("findAccountById for " + accountId + "failed.", ex)
           Promise.successful(
               left("Client error accessing accounts service; unable to proceed: " +
-                  ex.getMessage))
+                    ex.getMessage))
       })
     }
   }

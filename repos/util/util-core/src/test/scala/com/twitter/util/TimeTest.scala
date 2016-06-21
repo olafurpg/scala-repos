@@ -19,8 +19,12 @@ trait TimeLikeSpec[T <: TimeLike[T]]
   import ops._
 
   "Top, Bottom, Undefined, Nanoseconds(_), Finite(_)" should {
-    val easyVs = Seq(
-        Zero, Top, Bottom, Undefined, fromNanoseconds(1), fromNanoseconds(-1))
+    val easyVs = Seq(Zero,
+                     Top,
+                     Bottom,
+                     Undefined,
+                     fromNanoseconds(1),
+                     fromNanoseconds(-1))
     val vs =
       easyVs ++ Seq(fromNanoseconds(Long.MaxValue - 1),
                     fromNanoseconds(Long.MinValue + 1))
@@ -306,8 +310,8 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "round to itself" in {
-      for (s <- Seq(Long.MinValue, -1, 1, Long.MaxValue); t = s.nanoseconds) assert(
-          t.floor(t.inNanoseconds.nanoseconds) == t)
+      for (s <- Seq(Long.MinValue, -1, 1, Long.MaxValue); t = s.nanoseconds)
+        assert(t.floor(t.inNanoseconds.nanoseconds) == t)
     }
   }
 

@@ -371,8 +371,7 @@ class ORSetSpec extends WordSpec with Matchers {
       val msg: Any = Changed(ORSetKey[String]("key"))(s1)
       msg match {
         case c @ Changed(ORSetKey("key")) ⇒
-          val ORSet(elements3) =
-            c.dataValue // `unapply(a: ReplicatedData)` is used here
+          val ORSet(elements3) = c.dataValue // `unapply(a: ReplicatedData)` is used here
           // if `unapply(a: ReplicatedData)` isn't defined the next line doesn't compile:
           //   type mismatch; found : scala.collection.immutable.Set[A] where type A required: Set[Any] Note: A <: Any,
           //   but trait Set is invariant in type A. You may wish to investigate a wildcard type such as _ <: Any. (SLS 3.2.10)

@@ -44,8 +44,8 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import CValueGenerators.JSchema
 
-case class SampleData(
-    data: Stream[JValue], schema: Option[(Int, JSchema)] = None) {
+case class SampleData(data: Stream[JValue],
+                      schema: Option[(Int, JSchema)] = None) {
   override def toString = {
     "SampleData: \ndata = " + data
       .map(_.toString.replaceAll("\n", "\n  "))
@@ -150,8 +150,8 @@ object SampleData extends CValueGenerators {
         for {
           sampleData <- arbitrary(sample)
         } yield {
-          SampleData(
-              distinctBy(sampleData.data)(_ \ "keys"), sampleData.schema)
+          SampleData(distinctBy(sampleData.data)(_ \ "keys"),
+                     sampleData.schema)
         }
     )
   }
@@ -161,8 +161,8 @@ object SampleData extends CValueGenerators {
         for {
           sampleData <- arbitrary(sample)
         } yield {
-          SampleData(
-              distinctBy(sampleData.data)(_ \ "value"), sampleData.schema)
+          SampleData(distinctBy(sampleData.data)(_ \ "value"),
+                     sampleData.schema)
         }
     )
   }
@@ -183,16 +183,16 @@ object SampleData extends CValueGenerators {
     val gen = for {
       sampleData <- arbitrary(sample)
     } yield {
-      val rows = for (row <- sampleData.data) yield
-        if (Random.nextDouble < 0.25) JUndefined else row
+      val rows = for (row <- sampleData.data)
+        yield if (Random.nextDouble < 0.25) JUndefined else row
       SampleData(rows, sampleData.schema)
     }
 
     Arbitrary(gen)
   }
 
-  def undefineRowsForColumn(
-      sample: Arbitrary[SampleData], path: JPath): Arbitrary[SampleData] = {
+  def undefineRowsForColumn(sample: Arbitrary[SampleData],
+                            path: JPath): Arbitrary[SampleData] = {
     val gen = for {
       sampleData <- arbitrary(sample)
     } yield {

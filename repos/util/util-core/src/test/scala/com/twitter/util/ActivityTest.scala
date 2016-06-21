@@ -115,7 +115,7 @@ class ActivityTest extends FunSuite {
   }
 
   test("Activity.future: produce an Activity that doesn't propagate " +
-      "cancellation back to the parent future") {
+        "cancellation back to the parent future") {
     val p = new Promise[Unit]
     val obs = Activity.future(p).run.changes.register(Witness(_ => ()))
     Await.ready(obs.close())
@@ -158,8 +158,12 @@ class ActivityTest extends FunSuite {
     assert(ref.get == Seq(Return(1), Throw(exc1), Return(2), Throw(exc2)))
 
     w.notify(Return(3))
-    assert(ref.get == Seq(
-            Return(1), Throw(exc1), Return(2), Throw(exc2), Return(3)))
+    assert(
+        ref.get == Seq(Return(1),
+                       Throw(exc1),
+                       Return(2),
+                       Throw(exc2),
+                       Return(3)))
 
     w.notify(Return(333))
     assert(
@@ -199,8 +203,10 @@ class ActivityTest extends FunSuite {
     aw.notify(Return(1))
     assert(ref.get == Seq(Activity.Pending, Activity.Pending))
     bw.notify(Return("ok"))
-    assert(ref.get == Seq(
-            Activity.Pending, Activity.Pending, Activity.Ok((1, "ok"))))
+    assert(
+        ref.get == Seq(Activity.Pending,
+                       Activity.Pending,
+                       Activity.Ok((1, "ok"))))
 
     val exc = new Exception
     aw.notify(Throw(exc))

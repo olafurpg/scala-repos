@@ -166,7 +166,9 @@ trait NIHDBQueryExecutorComponent {
 
       val jobManager = extJobManager
       val permissionsFinder = new PermissionsFinder(
-          extApiKeyFinder, extAccountFinder, yggConfig.timestampRequiredAfter)
+          extApiKeyFinder,
+          extAccountFinder,
+          yggConfig.timestampRequiredAfter)
       val resourceBuilder = new ResourceBuilder(actorSystem,
                                                 clock,
                                                 masterChef,
@@ -181,8 +183,9 @@ trait NIHDBQueryExecutorComponent {
                                      clock)))
       val ingestSystem = initShardActors(permissionsFinder, projectionsActor)
 
-      private val actorVFS = new ActorVFS(
-          projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
+      private val actorVFS = new ActorVFS(projectionsActor,
+                                          yggConfig.storageTimeout,
+                                          yggConfig.storageTimeout)
       val vfs = new SecureVFS(actorVFS, permissionsFinder, jobManager, clock)
 
       private val (scheduleStorage, scheduleStorageStoppable) =
@@ -195,14 +198,14 @@ trait NIHDBQueryExecutorComponent {
                                     platform,
                                     clock)))
 
-      val scheduler = new ActorScheduler(
-          scheduleActor, yggConfig.schedulingTimeout)
+      val scheduler =
+        new ActorScheduler(scheduleActor, yggConfig.schedulingTimeout)
 
       trait TableCompanion extends VFSColumnarTableCompanion
       object Table extends TableCompanion
 
-      def ingestFailureLog(
-          checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog =
+      def ingestFailureLog(checkpoint: YggCheckpoint,
+                           logRoot: File): IngestFailureLog =
         FilesystemIngestFailureLog(logRoot, checkpoint)
 
       def asyncExecutorFor(apiKey: APIKey) = {
@@ -253,8 +256,8 @@ trait NIHDBQueryExecutorComponent {
           _ <- Stoppable.stop(ingestSystem
                     .map(_.stoppable)
                     .getOrElse(Stoppable.fromFuture(Future(()))))
-          _ <- IngestSystem.actorStop(
-                  yggConfig, projectionsActor, "projections")
+          _ <- IngestSystem
+                .actorStop(yggConfig, projectionsActor, "projections")
           _ <- IngestSystem.actorStop(yggConfig, masterChef, "masterChef")
           _ <- Stoppable.stop(scheduleStorageStoppable)
           _ <- chefs

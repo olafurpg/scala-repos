@@ -13,8 +13,7 @@ import org.jboss.netty.handler.codec.http._
 private[twitter] class StreamServerDispatcher[Req: RequestType](
     trans: Transport[Any, Any],
     service: Service[Req, StreamResponse]
-)
-    extends GenSerialServerDispatcher[Req, StreamResponse, Any, Any](trans) {
+) extends GenSerialServerDispatcher[Req, StreamResponse, Any, Any](trans) {
   import Bijections._
 
   trans.onClose ensure {
@@ -46,15 +45,16 @@ private[twitter] class StreamServerDispatcher[Req: RequestType](
     val httpRes: HttpResponse = from(rep.info)
 
     httpRes.setChunked(httpRes.getProtocolVersion == HttpVersion.HTTP_1_1 &&
-        httpRes.headers.get(HttpHeaders.Names.CONTENT_LENGTH) == null)
+          httpRes.headers.get(HttpHeaders.Names.CONTENT_LENGTH) == null)
 
     if (httpRes.isChunked) {
       HttpHeaders.setHeader(httpRes,
                             HttpHeaders.Names.TRANSFER_ENCODING,
                             HttpHeaders.Values.CHUNKED)
     } else {
-      HttpHeaders.setHeader(
-          httpRes, HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+      HttpHeaders.setHeader(httpRes,
+                            HttpHeaders.Names.CONNECTION,
+                            HttpHeaders.Values.CLOSE)
     }
 
     val f = trans

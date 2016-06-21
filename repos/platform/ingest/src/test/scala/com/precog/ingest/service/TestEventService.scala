@@ -84,8 +84,8 @@ trait TestEventService
   private val to = Duration(5, "seconds")
 
   val asyncContext = defaultFutureDispatch
-  implicit val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(
-      asyncContext, to)
+  implicit val M: Monad[Future] with Comonad[Future] =
+    new UnsafeFutureComonad(asyncContext, to)
 
   private val apiKeyManager =
     new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
@@ -105,8 +105,8 @@ trait TestEventService
       Map(testAccount.apiKey -> testAccount.accountId),
       Map(testAccount.accountId -> testAccount))
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      0, Duration(1, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(0, Duration(1, "second"))
 
   val shortFutureTimeouts = FutureTimeouts(5, Duration(50, "millis"))
 
@@ -140,8 +140,9 @@ trait TestEventService
 
   def configureEventService(config: Configuration): EventService.State = {
     val apiKeyFinder = new DirectAPIKeyFinder(apiKeyManager)
-    val permissionsFinder = new PermissionsFinder(
-        apiKeyFinder, accountFinder, new Instant(1363327426906L))
+    val permissionsFinder = new PermissionsFinder(apiKeyFinder,
+                                                  accountFinder,
+                                                  new Instant(1363327426906L))
     val eventStore = new EventStore[Future] {
       def save(action: Event, timeout: Timeout) = M.point {
         stored += action; \/-(PrecogUnit)
@@ -172,13 +173,14 @@ trait TestEventService
 
   implicit def jValueToFutureJValue(j: JValue) = Future(j)
 
-  def track[A](contentType: MimeType,
-               apiKey: Option[APIKey],
-               path: Path,
-               ownerAccountId: Option[AccountId],
-               sync: Boolean = true,
-               batch: Boolean = false)(data: A)(
-      implicit bi: A => Future[JValue], t: AsyncHttpTranscoder[A, ByteChunk])
+  def track[A](
+      contentType: MimeType,
+      apiKey: Option[APIKey],
+      path: Path,
+      ownerAccountId: Option[AccountId],
+      sync: Boolean = true,
+      batch: Boolean = false)(data: A)(implicit bi: A => Future[JValue],
+                                       t: AsyncHttpTranscoder[A, ByteChunk])
     : Future[(HttpResponse[JValue], List[Ingest])] = {
     val svc = client
       .contentType[A](contentType)

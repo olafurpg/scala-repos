@@ -46,7 +46,7 @@ object IPC {
   private def ipc[T](s: Socket)(f: IPC => T): T =
     try { f(new IPC(s)) } finally { s.close() }
 
-  final class Server private[IPC](s: ServerSocket) extends NotNull {
+  final class Server private[IPC] (s: ServerSocket) extends NotNull {
     def port = s.getLocalPort
     def close() = s.close()
     def isClosed: Boolean = s.isClosed

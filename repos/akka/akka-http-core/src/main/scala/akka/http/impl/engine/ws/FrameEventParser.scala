@@ -89,8 +89,9 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
           if (noMoreData) ReadFrameHeader
           else new ReadData(length - thisFrameData.length)
 
-        ParseResult(
-            Some(FrameStart(header, thisFrameData.compact)), nextState, true)
+        ParseResult(Some(FrameStart(header, thisFrameData.compact)),
+                    nextState,
+                    true)
       }
     }
 
@@ -100,8 +101,9 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
       override def parse(reader: ByteReader): ParseResult[FrameEvent] =
         if (reader.remainingSize < remaining) {
           remaining -= reader.remainingSize
-          ParseResult(
-              Some(FrameData(reader.takeAll(), lastPart = false)), this, true)
+          ParseResult(Some(FrameData(reader.takeAll(), lastPart = false)),
+                      this,
+                      true)
         } else {
           ParseResult(
               Some(FrameData(reader.take(remaining.toInt), lastPart = true)),
@@ -121,8 +123,7 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
     @tailrec def rec(bytes: Array[Byte], offset: Int, mask: Int): Int =
       if (offset >= bytes.length) mask
       else {
-        val newMask =
-          Integer.rotateLeft(mask, 8) // we cycle through the mask in BE order
+        val newMask = Integer.rotateLeft(mask, 8) // we cycle through the mask in BE order
         bytes(offset) = (bytes(offset) ^ (newMask & 0xff)).toByte
         rec(bytes, offset + 1, newMask)
       }

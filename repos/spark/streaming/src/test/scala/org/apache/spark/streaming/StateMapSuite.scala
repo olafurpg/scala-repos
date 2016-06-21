@@ -112,8 +112,11 @@ class StateMapSuite extends SparkFunSuite {
     map.put(4, 4000, 400)
     assert(map.get(4) === Some(4000)) // item removed + updated in this map
 
-    assert(map.getAll().toSet === Set(
-            (1, 1000, 100), (2, 2000, 200), (3, 3000, 300), (4, 4000, 400)))
+    assert(
+        map.getAll().toSet === Set((1, 1000, 100),
+                                   (2, 2000, 200),
+                                   (3, 3000, 300),
+                                   (4, 4000, 400)))
     assert(parentMap.getAll().toSet === Set((2, 200, 2)))
 
     map.remove(2) // remove item present in parent map, so that its not visible in child map
@@ -136,7 +139,8 @@ class StateMapSuite extends SparkFunSuite {
     map1.put(1, 100, 1)
     map1.put(2, 200, 2)
     testSerialization(
-        map1, "error deserializing and serialized map with data + no delta")
+        map1,
+        "error deserializing and serialized map with data + no delta")
 
     val map2 = map1.copy().asInstanceOf[OpenHashMapBasedStateMap[Int, Int]]
     // Do not test compaction
@@ -148,7 +152,8 @@ class StateMapSuite extends SparkFunSuite {
     map2.put(3, 300, 3)
     map2.put(4, 400, 4)
     testSerialization(
-        map2, "error deserializing and serialized map with 1 delta + new data")
+        map2,
+        "error deserializing and serialized map with 1 delta + new data")
 
     val map3 = map2.copy().asInstanceOf[OpenHashMapBasedStateMap[Int, Int]]
     assert(map3.shouldCompact === false)
@@ -158,7 +163,8 @@ class StateMapSuite extends SparkFunSuite {
     map3.put(3, 600, 3)
     map3.remove(2)
     testSerialization(
-        map3, "error deserializing and serialized map with 2 delta + new data")
+        map3,
+        "error deserializing and serialized map with 2 delta + new data")
   }
 
   test(
@@ -178,7 +184,8 @@ class StateMapSuite extends SparkFunSuite {
     assert(map.shouldCompact === true)
 
     val deser_map = testSerialization(
-        map, "Deserialized + compacted map not same as original map")
+        map,
+        "Deserialized + compacted map not same as original map")
     assert(deser_map.deltaChainLength < deltaChainThreshold)
     assert(deser_map.shouldCompact === false)
   }
@@ -231,11 +238,9 @@ class StateMapSuite extends SparkFunSuite {
 
     val numTypeMapOps = 2 // 0 = put a new value, 1 = remove value
     val numSets = 3
-    val numOpsPerSet =
-      3 // to test seq of ops like update -> remove -> update in same set
+    val numOpsPerSet = 3 // to test seq of ops like update -> remove -> update in same set
     val numTotalOps = numOpsPerSet * numSets
-    val numKeys =
-      math.pow(numTypeMapOps, numTotalOps).toInt // to get all combinations of ops
+    val numKeys = math.pow(numTypeMapOps, numTotalOps).toInt // to get all combinations of ops
 
     val refMap = new mutable.HashMap[Int, (Int, Long)]()
     var prevSetRefMap: immutable.Map[Int, (Int, Long)] = null
@@ -267,8 +272,10 @@ class StateMapSuite extends SparkFunSuite {
         }
 
         // Test whether the current state map after all key updates is correct
-        assertMap(
-            stateMap, refMap, time, "State map does not match reference map")
+        assertMap(stateMap,
+                  refMap,
+                  time,
+                  "State map does not match reference map")
 
         // Test whether the previous map before copy has not changed
         if (prevSetStateMap != null && prevSetRefMap != null) {
@@ -389,7 +396,8 @@ class StateMapSuite extends SparkFunSuite {
     map.put(new KryoState("a"), new KryoState("b"), 1)
 
     val record = MapWithStateRDDRecord[KryoState, KryoState, KryoState](
-        map, Seq(new KryoState("c")))
+        map,
+        Seq(new KryoState("c")))
     val deserRecord = serializeAndDeserialize(new KryoSerializer(conf), record)
     assert(!(record eq deserRecord))
     assert(
@@ -397,8 +405,8 @@ class StateMapSuite extends SparkFunSuite {
     assert(record.mappedData === deserRecord.mappedData)
   }
 
-  private def serializeAndDeserialize[T: ClassTag](
-      serializer: Serializer, t: T): T = {
+  private def serializeAndDeserialize[T: ClassTag](serializer: Serializer,
+                                                   t: T): T = {
     val serializerInstance = serializer.newInstance()
     serializerInstance.deserialize[T](
         serializerInstance.serialize(t),

@@ -144,8 +144,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     "work with same-thread executor plus blocking" in {
       val ec = akka.dispatch.ExecutionContexts.sameThreadExecutionContext
       var x = 0
-      ec.execute(
-          new Runnable {
+      ec.execute(new Runnable {
         override def run = {
           ec.execute(new Runnable {
             override def run = blocking {
@@ -158,8 +157,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     }
 
     "work with same-thread dispatcher plus blocking" in {
-      val a = TestActorRef(
-          Props(new Actor {
+      val a = TestActorRef(Props(new Actor {
         def receive = {
           case msg ⇒
             blocking {
@@ -167,8 +165,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
             }
         }
       }))
-      val b = TestActorRef(
-          Props(new Actor {
+      val b = TestActorRef(Props(new Actor {
         def receive = {
           case msg ⇒ a forward msg
         }

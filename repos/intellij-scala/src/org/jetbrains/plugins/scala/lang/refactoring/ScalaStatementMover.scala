@@ -30,8 +30,8 @@ class ScalaStatementMover extends LineMover {
 
     def aim(sourceClass: ElementClass,
             predicate: PsiElement => Boolean,
-            canUseLineAsTarget: Boolean =
-              true): Option[(PsiElement, LineRange)] = {
+            canUseLineAsTarget: Boolean = true)
+      : Option[(PsiElement, LineRange)] = {
       findSourceOf(sourceClass).map { source =>
         val targetRange = findTargetRangeFor(source, predicate).getOrElse {
           if (canUseLineAsTarget) nextLineRangeFor(source) else null
@@ -51,7 +51,7 @@ class ScalaStatementMover extends LineMover {
         .filter(!_.isInstanceOf[PsiComment])
         .takeWhile(it =>
               it.isInstanceOf[PsiWhiteSpace] || it.isInstanceOf[PsiComment] ||
-              it.isInstanceOf[ScImportStmt] || predicate(it))
+                it.isInstanceOf[ScImportStmt] || predicate(it))
         .find(predicate)
         .map(rangeOf(_, editor))
     }
@@ -75,7 +75,7 @@ class ScalaStatementMover extends LineMover {
       .orElse(aim(classOf[ScMember],
                   it =>
                     it.isInstanceOf[ScMember] ||
-                    it.isInstanceOf[ScImportStmt]))
+                      it.isInstanceOf[ScImportStmt]))
       .orElse(aim(classOf[ScIfStmt], _ => false))
       .orElse(aim(classOf[ScForStatement], _ => false))
       .orElse(aim(classOf[ScMatchStmt], _ => false))

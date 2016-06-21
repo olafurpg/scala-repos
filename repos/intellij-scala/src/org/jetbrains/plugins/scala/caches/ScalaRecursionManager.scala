@@ -33,16 +33,17 @@ object ScalaRecursionManager {
     }
   }
 
-  private def getSearches[Dom <: PsiElement](
-      element: Dom, key: String): List[Object] = {
+  private def getSearches[Dom <: PsiElement](element: Dom,
+                                             key: String): List[Object] = {
     recursionMap.get().get((element, key)) match {
       case Some(buffer: List[Object]) => buffer
       case _ => List.empty
     }
   }
 
-  private def addLast[Dom <: PsiElement](
-      element: Dom, key: String, obj: Object) {
+  private def addLast[Dom <: PsiElement](element: Dom,
+                                         key: String,
+                                         obj: Object) {
     recursionMap.get().get((element, key)) match {
       case Some(list) =>
         recursionMap.set(

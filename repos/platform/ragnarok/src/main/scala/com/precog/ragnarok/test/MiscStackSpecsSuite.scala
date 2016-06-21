@@ -280,7 +280,8 @@ object MiscStackSpecsSuite extends PerfTestSuite {
     }
 
     "solve the results of a set and a stdlib op1 function" := {
-      query("""
+      query(
+          """
         | clicks := //clicks
         | clicks' := clicks with { foo: std::time::getMillis("2012-10-29") }
         | solve 'a clicks' where clicks'.time = 'a
@@ -1398,7 +1399,8 @@ object MiscStackSpecsSuite extends PerfTestSuite {
     //}
 
     "produce something other than the empty set for join of conditional results" := {
-      query("""
+      query(
+          """
         | clicks := //clicks
         | 
         | predicted := clicks with { female : 0 }

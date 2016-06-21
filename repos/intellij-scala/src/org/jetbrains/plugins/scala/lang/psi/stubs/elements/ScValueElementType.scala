@@ -18,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 abstract class ScValueElementType[Value <: ScValue](debugName: String)
     extends ScStubElementType[ScValueStub, ScValue](debugName) {
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScValue, parentStub: StubElement[ParentPsi]): ScValueStub = {
+      psi: ScValue,
+      parentStub: StubElement[ParentPsi]): ScValueStub = {
     val isDecl = psi.isInstanceOf[ScValueDeclaration]
     val typeText = psi.typeElement match {
       case Some(te) => te.getText
@@ -56,8 +57,8 @@ abstract class ScValueElementType[Value <: ScValue](debugName: String)
     dataStream.writeBoolean(stub.isLocal)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScValueStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScValueStub = {
     val isDecl = dataStream.readBoolean
     val namesLength = dataStream.readInt
     val names = new Array[StringRef](namesLength)

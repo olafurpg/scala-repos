@@ -66,13 +66,13 @@ class MatrixFactorizationModel @Since("0.8.0")(
   validateFeatures("Product", productFeatures)
 
   /** Validates factors and warns users if there are performance concerns. */
-  private def validateFeatures(
-      name: String, features: RDD[(Int, Array[Double])]): Unit = {
+  private def validateFeatures(name: String,
+                               features: RDD[(Int, Array[Double])]): Unit = {
     require(features.first()._2.length == rank,
             s"$name feature dimension does not match the rank $rank.")
     if (features.partitioner.isEmpty) {
       logWarning(s"$name factor does not have a partitioner. " +
-          "Prediction on individual records could be slow.")
+            "Prediction on individual records could be slow.")
     }
     if (features.getStorageLevel == StorageLevel.NONE) {
       logWarning(s"$name factor is not cached. Prediction could be slow.")
@@ -357,8 +357,8 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       case _ =>
         throw new IOException(
             "MatrixFactorizationModel.load did not recognize model with" +
-            s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
-            s"  ($classNameV1_0, 1.0)")
+              s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
+              s"  ($classNameV1_0, 1.0)")
     }
   }
 
@@ -378,7 +378,7 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
       val metadata = compact(render(("class" -> thisClassName) ~
-              ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
+                ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
       model.userFeatures.toDF("id", "features").write.parquet(userPath(path))
       model.productFeatures

@@ -26,7 +26,8 @@ object DistributedPubSubMediatorSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -103,8 +104,9 @@ object DistributedPubSubMediatorSpec extends MultiNodeConfig {
     def receive = {
       case in: String ⇒
         val out = in.toUpperCase
-        mediator ! Send(
-            path = "/user/destination", msg = out, localAffinity = true)
+        mediator ! Send(path = "/user/destination",
+                        msg = out,
+                        localAffinity = true)
     }
   }
   //#sender

@@ -47,8 +47,8 @@ class KernelDensitySuite extends SparkFunSuite with MLlibTestSparkContext {
     val normal2 = new NormalDistribution(10.0, 3.0)
     val acceptableErr = 1e-6
     assert(math.abs(densities(0) -
-            (normal1.density(5.0) + normal2.density(5.0)) / 2) < acceptableErr)
+              (normal1.density(5.0) + normal2.density(5.0)) / 2) < acceptableErr)
     assert(math.abs(densities(1) -
-            (normal1.density(6.0) + normal2.density(6.0)) / 2) < acceptableErr)
+              (normal1.density(6.0) + normal2.density(6.0)) / 2) < acceptableErr)
   }
 }

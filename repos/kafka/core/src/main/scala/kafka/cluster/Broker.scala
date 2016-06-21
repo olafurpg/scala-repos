@@ -75,23 +75,24 @@ object Broker {
         case Some(m) =>
           val brokerInfo = m.asInstanceOf[Map[String, Any]]
           val version = brokerInfo("version").asInstanceOf[Int]
-          val endpoints =
-            if (version < 1)
-              throw new KafkaException(
-                  s"Unsupported version of broker registration: $brokerInfoString")
-            else if (version == 1) {
-              val host = brokerInfo("host").asInstanceOf[String]
-              val port = brokerInfo("port").asInstanceOf[Int]
-              Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
-                      host, port, SecurityProtocol.PLAINTEXT))
-            } else {
-              val listeners =
-                brokerInfo("endpoints").asInstanceOf[List[String]]
-              listeners.map { listener =>
-                val ep = EndPoint.createEndPoint(listener)
-                (ep.protocolType, ep)
-              }.toMap
-            }
+          val endpoints = if (version < 1)
+            throw new KafkaException(
+                s"Unsupported version of broker registration: $brokerInfoString")
+          else if (version == 1) {
+            val host = brokerInfo("host").asInstanceOf[String]
+            val port = brokerInfo("port").asInstanceOf[Int]
+            Map(
+                SecurityProtocol.PLAINTEXT -> new EndPoint(
+                    host,
+                    port,
+                    SecurityProtocol.PLAINTEXT))
+          } else {
+            val listeners = brokerInfo("endpoints").asInstanceOf[List[String]]
+            listeners.map { listener =>
+              val ep = EndPoint.createEndPoint(listener)
+              (ep.protocolType, ep)
+            }.toMap
+          }
           val rack = brokerInfo
             .get("rack")
             .filter(_ != null)

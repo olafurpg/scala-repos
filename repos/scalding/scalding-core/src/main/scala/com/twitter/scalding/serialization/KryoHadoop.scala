@@ -50,13 +50,13 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
     // Some of the monoids from Algebird that we use:
     newK.register(classOf[com.twitter.algebird.AveragedValue],
                   new AveragedValueSerializer)
-    newK.register(
-        classOf[com.twitter.algebird.DecayedValue], new DecayedValueSerializer)
+    newK.register(classOf[com.twitter.algebird.DecayedValue],
+                  new DecayedValueSerializer)
     newK.register(classOf[com.twitter.algebird.HyperLogLogMonoid],
                   new HLLMonoidSerializer)
     newK.register(classOf[com.twitter.algebird.Moments], new MomentsSerializer)
-    newK.addDefaultSerializer(
-        classOf[com.twitter.algebird.HLL], new HLLSerializer)
+    newK.addDefaultSerializer(classOf[com.twitter.algebird.HLL],
+                              new HLLSerializer)
     // Don't serialize Boxed instances using Kryo.
     newK.addDefaultSerializer(
         classOf[com.twitter.scalding.serialization.Boxed[_]],
@@ -68,11 +68,13 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
       */
     newK.register(classOf[com.twitter.algebird.DenseVector[_]],
                   new FieldSerializer[com.twitter.algebird.DenseVector[_]](
-                      newK, classOf[com.twitter.algebird.DenseVector[_]]))
+                      newK,
+                      classOf[com.twitter.algebird.DenseVector[_]]))
 
     newK.register(classOf[com.twitter.algebird.SparseVector[_]],
                   new FieldSerializer[com.twitter.algebird.SparseVector[_]](
-                      newK, classOf[com.twitter.algebird.SparseVector[_]]))
+                      newK,
+                      classOf[com.twitter.algebird.SparseVector[_]]))
 
     newK.addDefaultSerializer(classOf[com.twitter.algebird.AdaptiveVector[_]],
                               classOf[FieldSerializer[_]])
@@ -85,8 +87,8 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
       * a more robust solution is to use Spark's closure cleaner approach on every object that
       * is serialized, but that's very expensive.
       */
-    newK.addDefaultSerializer(
-        classOf[cascading.pipe.Pipe], new SingletonSerializer(null))
+    newK.addDefaultSerializer(classOf[cascading.pipe.Pipe],
+                              new SingletonSerializer(null))
 
     newK.setReferences(useRefs)
 

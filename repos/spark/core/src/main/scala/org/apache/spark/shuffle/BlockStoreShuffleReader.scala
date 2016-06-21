@@ -75,9 +75,10 @@ private[spark] class BlockStoreShuffleReader[K, C](
     val readMetrics = context.taskMetrics.registerTempShuffleReadMetrics()
     val metricIter = CompletionIterator[(Any, Any), Iterator[(Any, Any)]](
         recordIter.map(record => {
-      readMetrics.incRecordsRead(1)
-      record
-    }), context.taskMetrics().mergeShuffleReadMetrics())
+          readMetrics.incRecordsRead(1)
+          record
+        }),
+        context.taskMetrics().mergeShuffleReadMetrics())
 
     // An interruptible iterator must be used here in order to support task cancellation
     val interruptibleIter =
@@ -110,8 +111,9 @@ private[spark] class BlockStoreShuffleReader[K, C](
       case Some(keyOrd: Ordering[K]) =>
         // Create an ExternalSorter to sort the data. Note that if spark.shuffle.spill is disabled,
         // the ExternalSorter won't spill to disk.
-        val sorter = new ExternalSorter[K, C, C](
-            context, ordering = Some(keyOrd), serializer = dep.serializer)
+        val sorter = new ExternalSorter[K, C, C](context,
+                                                 ordering = Some(keyOrd),
+                                                 serializer = dep.serializer)
         sorter.insertAll(aggregatedIter)
         context.taskMetrics().incMemoryBytesSpilled(sorter.memoryBytesSpilled)
         context.taskMetrics().incDiskBytesSpilled(sorter.diskBytesSpilled)
@@ -119,7 +121,8 @@ private[spark] class BlockStoreShuffleReader[K, C](
           .taskMetrics()
           .incPeakExecutionMemory(sorter.peakMemoryUsedBytes)
         CompletionIterator[Product2[K, C], Iterator[Product2[K, C]]](
-            sorter.iterator, sorter.stop())
+            sorter.iterator,
+            sorter.stop())
       case None =>
         aggregatedIter
     }

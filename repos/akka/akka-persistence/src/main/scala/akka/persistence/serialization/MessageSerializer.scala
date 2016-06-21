@@ -124,9 +124,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
       .iterator()
       .asScala foreach { next ⇒
       unconfirmedDeliveries +=
-        UnconfirmedDelivery(next.getDeliveryId,
-                            ActorPath.fromString(next.getDestination),
-                            payload(next.getPayload))
+      UnconfirmedDelivery(next.getDeliveryId,
+                          ActorPath.fromString(next.getDestination),
+                          payload(next.getPayload))
     }
 
     AtLeastOnceDeliverySnapshot(
@@ -228,8 +228,7 @@ class MessageSerializer(val system: ExtendedActorSystem)
 
   private def atomicWrite(atomicWrite: mf.AtomicWrite): AtomicWrite = {
     import scala.collection.JavaConverters._
-    AtomicWrite(
-        atomicWrite.getPayloadList.asScala
+    AtomicWrite(atomicWrite.getPayloadList.asScala
           .map(persistent)(collection.breakOut))
   }
 

@@ -24,8 +24,8 @@ class ParquetProtobufCompatibilitySuite
     extends ParquetCompatibilityTest
     with SharedSQLContext {
   test("unannotated array of primitive type") {
-    checkAnswer(
-        readResourceParquetFile("old-repeated-int.parquet"), Row(Seq(1, 2, 3)))
+    checkAnswer(readResourceParquetFile("old-repeated-int.parquet"),
+                Row(Seq(1, 2, 3)))
   }
 
   test("unannotated array of struct") {

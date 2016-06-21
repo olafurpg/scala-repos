@@ -79,8 +79,8 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
       }
     }
 
-    def withClient[T](
-        block: play.libs.ws.WSClient => T)(implicit port: Port): T = {
+    def withClient[T](block: play.libs.ws.WSClient => T)(
+        implicit port: Port): T = {
       val wsClient = play.libs.ws.WS.newClient(port.value)
       try {
         block(wsClient)
@@ -93,8 +93,7 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
 
     "make GET Requests" in withServer { ws =>
       val req = ws.url("/get").get
-      val rep =
-        req.toCompletableFuture.get(10, TimeUnit.SECONDS) // AWait result
+      val rep = req.toCompletableFuture.get(10, TimeUnit.SECONDS) // AWait result
 
       rep.getStatus aka "status" must_== 200 and
       (rep.asJson.path("origin").textValue must not beNull)
@@ -189,8 +188,11 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
       val file =
         new File(this.getClass.getResource("/testassets/bar.txt").toURI)
       val dp = new Http.MultipartFormData.DataPart("hello", "world")
-      val fp = new Http.MultipartFormData.FilePart(
-          "upload", "bar.txt", "text/plain", FileIO.fromFile(file).asJava)
+      val fp =
+        new Http.MultipartFormData.FilePart("upload",
+                                            "bar.txt",
+                                            "text/plain",
+                                            FileIO.fromFile(file).asJava)
       val source = akka.stream.javadsl.Source.from(util.Arrays.asList(dp, fp))
 
       val res = ws.url("/post").post(source)
@@ -304,8 +306,10 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
       val file =
         new File(this.getClass.getResource("/testassets/foo.txt").toURI)
       val dp = MultipartFormData.DataPart("hello", "world")
-      val fp = MultipartFormData.FilePart(
-          "upload", "foo.txt", None, FileIO.fromFile(file))
+      val fp = MultipartFormData.FilePart("upload",
+                                          "foo.txt",
+                                          None,
+                                          FileIO.fromFile(file))
       val source = Source(List(dp, fp))
       val res = ws.url("/post").post(source)
       val body = await(res).json

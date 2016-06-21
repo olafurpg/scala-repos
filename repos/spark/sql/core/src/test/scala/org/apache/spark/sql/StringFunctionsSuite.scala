@@ -30,8 +30,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(concat($"a", $"b"), concat($"a", $"b", $"c")),
                 Row("ab", null))
 
-    checkAnswer(
-        df.selectExpr("concat(a, b)", "concat(a, b, c)"), Row("ab", null))
+    checkAnswer(df.selectExpr("concat(a, b)", "concat(a, b, c)"),
+                Row("ab", null))
   }
 
   test("string concat_ws") {
@@ -57,7 +57,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(regexp_replace($"a", "(\\d+)", "num"),
                           regexp_extract($"a", "(\\d+)-(\\d+)", 1)),
                 Row("num-num", "100") :: Row("num-num", "100") :: Row(
-                    "num-num", "100") :: Nil)
+                    "num-num",
+                    "100") :: Nil)
 
     // for testing the mutable state of the expression in code gen.
     // This is a hack way to enable the codegen, thus the codegen is enable by default,
@@ -80,11 +81,11 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
   test("string base64/unbase64 function") {
     val bytes = Array[Byte](1, 2, 3, 4)
     val df = Seq((bytes, "AQIDBA==")).toDF("a", "b")
-    checkAnswer(
-        df.select(base64($"a"), unbase64($"b")), Row("AQIDBA==", bytes))
+    checkAnswer(df.select(base64($"a"), unbase64($"b")),
+                Row("AQIDBA==", bytes))
 
-    checkAnswer(
-        df.selectExpr("base64(a)", "unbase64(b)"), Row("AQIDBA==", bytes))
+    checkAnswer(df.selectExpr("base64(a)", "unbase64(b)"),
+                Row("AQIDBA==", bytes))
   }
 
   test("string / binary substring function") {
@@ -98,8 +99,18 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("string encode/decode function") {
-    val bytes = Array[Byte](
-        -27, -92, -89, -27, -115, -125, -28, -72, -106, -25, -107, -116)
+    val bytes = Array[Byte](-27,
+                            -92,
+                            -89,
+                            -27,
+                            -115,
+                            -125,
+                            -28,
+                            -72,
+                            -106,
+                            -25,
+                            -107,
+                            -116)
     // scalastyle:off
     // non ascii characters are not allowed in the code, so we disable the scalastyle here.
     val df = Seq(("大千世界", "utf-8", bytes)).toDF("a", "b", "c")
@@ -162,8 +173,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
   test("string locate function") {
     val df = Seq(("aaads", "aa", "zz", 1)).toDF("a", "b", "c", "d")
 
-    checkAnswer(
-        df.select(locate("aa", $"a"), locate("aa", $"a", 1)), Row(1, 2))
+    checkAnswer(df.select(locate("aa", $"a"), locate("aa", $"a", 1)),
+                Row(1, 2))
 
     checkAnswer(df.selectExpr("locate(b, a)", "locate(b, a, d)"), Row(1, 2))
   }
@@ -189,8 +200,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.select(repeat($"a", 2)), Row("hihi"))
 
-    checkAnswer(
-        df.selectExpr("repeat(a, 2)", "repeat(a, b)"), Row("hihi", "hihi"))
+    checkAnswer(df.selectExpr("repeat(a, 2)", "repeat(a, b)"),
+                Row("hihi", "hihi"))
   }
 
   test("string reverse function") {
@@ -212,8 +223,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.select(split($"a", "[1-9]+")), Row(Seq("aa", "bb", "cc")))
 
-    checkAnswer(
-        df.selectExpr("split(a, '[1-9]+')"), Row(Seq("aa", "bb", "cc")))
+    checkAnswer(df.selectExpr("split(a, '[1-9]+')"),
+                Row(Seq("aa", "bb", "cc")))
   }
 
   test("string / binary length function") {

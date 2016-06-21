@@ -97,7 +97,7 @@ private[memory] class StorageMemoryPool(lock: Object)
   def releaseMemory(size: Long): Unit = lock.synchronized {
     if (size > _memoryUsed) {
       logWarning(s"Attempted to release $size bytes of storage " +
-          s"memory when we only have ${_memoryUsed} bytes")
+            s"memory when we only have ${_memoryUsed} bytes")
       _memoryUsed = 0
     } else {
       _memoryUsed -= size

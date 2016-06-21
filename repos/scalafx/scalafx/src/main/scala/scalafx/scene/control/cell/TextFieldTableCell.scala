@@ -79,8 +79,8 @@ object TextFieldTableCell {
   /**
     * Added to satisfy Spec Texts.
     */
-  @deprecated(
-      message = "Use forTableColumn[S, T](StringConverter[T])", since = "1.0")
+  @deprecated(message = "Use forTableColumn[S, T](StringConverter[T])",
+              since = "1.0")
   def forTableColumn[S, T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldTableCell.forTableColumn[S, T](converter)
 }

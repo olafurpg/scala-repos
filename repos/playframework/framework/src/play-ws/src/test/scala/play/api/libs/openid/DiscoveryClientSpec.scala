@@ -203,8 +203,9 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.google.com/a/example.com/o8/ud"
 
-        verifyValidOpenIDRequest(
-            parseQueryString(redirectUrl), identifierSelection, returnTo)
+        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
+                                 identifierSelection,
+                                 returnTo)
       }
 
       "should fall back to HTML based discovery if OP Identifier cannot be found in the XRDS" in {
@@ -279,8 +280,9 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(
-            parseQueryString(redirectUrl), openId, returnTo)
+        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
+                                 openId,
+                                 returnTo)
       }
 
       "when given a response that includes a local identifier (using openid2.local_id openid.delegate)" in {
@@ -308,15 +310,15 @@ object DiscoveryClientSpec extends Specification with Mockito {
   }
 
   // See 9.1 http://openid.net/specs/openid-authentication-2_0.html#anchor27
-  private def verifyValidOpenIDRequest(params: Map[String, Seq[String]],
-                                       claimedId: String,
-                                       returnTo: String,
-                                       opLocalIdentifier: Option[String] =
-                                         None,
-                                       realm: Option[String] = None) = {
+  private def verifyValidOpenIDRequest(
+      params: Map[String, Seq[String]],
+      claimedId: String,
+      returnTo: String,
+      opLocalIdentifier: Option[String] = None,
+      realm: Option[String] = None) = {
     "valid request parameters need to be present" in {
       params.get("openid.ns") must_==
-        Some(Seq("http://specs.openid.net/auth/2.0"))
+      Some(Seq("http://specs.openid.net/auth/2.0"))
       params.get("openid.mode") must_== Some(Seq("checkid_setup"))
       params.get("openid.claimed_id") must_== Some(Seq(claimedId))
       params.get("openid.return_to") must_== Some(Seq(returnTo))
@@ -340,8 +342,9 @@ object DiscoveryClientSpec extends Specification with Mockito {
   }
 
   // Define matchers based on the expected value. Param must be absent if the expected value is None, it must match otherwise
-  private def verifyOptionalParam(
-      params: Params, key: String, expected: Option[String] = None) =
+  private def verifyOptionalParam(params: Params,
+                                  key: String,
+                                  expected: Option[String] = None) =
     expected match {
       case Some(value) => params.get(key) must_== Some(Seq(value))
       case _ => params.get(key) must beNone

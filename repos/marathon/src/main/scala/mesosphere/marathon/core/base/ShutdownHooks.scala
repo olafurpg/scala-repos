@@ -38,8 +38,7 @@ private[base] class BaseShutdownHooks extends ShutdownHooks {
   * Extends BaseShutdownHooks by ensuring that the hooks are run when the VM shuts down.
   */
 private class DefaultShutdownHooks extends BaseShutdownHooks {
-  Runtime.getRuntime.addShutdownHook(
-      new Thread() {
+  Runtime.getRuntime.addShutdownHook(new Thread() {
     override def run(): Unit = {
       shutdown()
     }

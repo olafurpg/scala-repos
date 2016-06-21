@@ -86,8 +86,10 @@ trait BasicBackend { self =>
     private[slick] final def runInternal[R](
         a: DBIOAction[R, NoStream, Nothing],
         useSameThread: Boolean): Future[R] =
-      try runInContext(
-          a, createDatabaseActionContext(useSameThread), false, true) catch {
+      try runInContext(a,
+                       createDatabaseActionContext(useSameThread),
+                       false,
+                       true) catch {
         case NonFatal(ex) => Future.failed(ex)
       }
 
@@ -118,8 +120,8 @@ trait BasicBackend { self =>
     private[slick] final def streamInternal[T](
         a: DBIOAction[_, Streaming[T], Nothing],
         useSameThread: Boolean): DatabasePublisher[T] =
-      createPublisher(
-          a, s => createStreamingDatabaseActionContext(s, useSameThread))
+      createPublisher(a, s =>
+            createStreamingDatabaseActionContext(s, useSameThread))
 
     /** Create a Reactive Streams `Publisher` using the given context factory. */
     protected[this] def createPublisher[T](
@@ -153,7 +155,8 @@ trait BasicBackend { self =>
 
     /** Create the default StreamingDatabaseActionContext for this backend. */
     protected[this] def createStreamingDatabaseActionContext[T](
-        s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext
+        s: Subscriber[_ >: T],
+        useSameThread: Boolean): StreamingContext
 
     /** Run an Action in an existing DatabaseActionContext. This method can be overridden in
       * subclasses to support new DatabaseActions which cannot be expressed through
@@ -178,8 +181,10 @@ trait BasicBackend { self =>
         case AndThenAction(actions) =>
           val last = actions.length - 1
           def run(pos: Int, v: Any): Future[Any] = {
-            val f1 = runInContext(
-                actions(pos), ctx, streaming && pos == last, pos == 0)
+            val f1 = runInContext(actions(pos),
+                                  ctx,
+                                  streaming && pos == last,
+                                  pos == 0)
             if (pos == last) f1
             else f1.flatMap(run(pos + 1, _))(DBIO.sameThreadExecutionContext)
           }
@@ -209,8 +214,7 @@ trait BasicBackend { self =>
           val p = Promise[R]()
           runInContext(base, ctx, streaming, topLevel).onComplete { t1 =>
             try {
-              val a2 = f(
-                  t1 match {
+              val a2 = f(t1 match {
                 case Success(_) => None
                 case Failure(t) => Some(t)
               })
@@ -241,8 +245,10 @@ trait BasicBackend { self =>
           if (streaming) {
             if (a.supportsStreaming)
               streamSynchronousDatabaseAction(
-                  a.asInstanceOf[SynchronousDatabaseAction[
-                          _, _ <: NoStream, This, _ <: Effect]],
+                  a.asInstanceOf[SynchronousDatabaseAction[_,
+                                                           _ <: NoStream,
+                                                           This,
+                                                           _ <: Effect]],
                   ctx.asInstanceOf[StreamingContext],
                   !topLevel).asInstanceOf[Future[R]]
             else
@@ -258,8 +264,10 @@ trait BasicBackend { self =>
                   topLevel)
           } else
             runSynchronousDatabaseAction(
-                a.asInstanceOf[SynchronousDatabaseAction[
-                        R, NoStream, This, _]],
+                a.asInstanceOf[SynchronousDatabaseAction[R,
+                                                         NoStream,
+                                                         This,
+                                                         _]],
                 ctx,
                 !topLevel)
         case a: DatabaseAction[_, _, _] =>
@@ -275,8 +283,8 @@ trait BasicBackend { self =>
       *
       * @param discardErrors If set to true, swallow all non-fatal errors that arise while
       *        closing the Session. */
-    protected[this] final def releaseSession(
-        ctx: Context, discardErrors: Boolean): Unit =
+    protected[this] final def releaseSession(ctx: Context,
+                                             discardErrors: Boolean): Unit =
       if (!ctx.isPinned) {
         try ctx.currentSession.close() catch {
           case NonFatal(ex) if (discardErrors) =>
@@ -355,7 +363,8 @@ trait BasicBackend { self =>
                     if (debug)
                       streamLogger.debug((if (state eq null) "Starting initial"
                                           else "Restarting ") +
-                          " streaming action, realDemand = " + str(realDemand))
+                            " streaming action, realDemand = " + str(
+                              realDemand))
                     if (ctx.cancelled) {
                       if (ctx.deferredError ne null) throw ctx.deferredError
                       if (state ne null) {
@@ -388,8 +397,8 @@ trait BasicBackend { self =>
                     if (state eq null)
                       streamLogger.debug(
                           s"Sent up to ${str(realDemand)} elements - Stream " +
-                          (if (ctx.cancelled) "cancelled"
-                           else "completely delivered"))
+                            (if (ctx.cancelled) "cancelled"
+                             else "completely delivered"))
                     else
                       streamLogger.debug(
                           s"Sent ${str(realDemand)} elements, more available - Performing atomic state transition")
@@ -419,8 +428,8 @@ trait BasicBackend { self =>
       * SynchronousDatabaseActions for asynchronous execution. */
     protected[this] def synchronousExecutionContext: ExecutionContext
 
-    protected[this] def logAction(
-        a: DBIOAction[_, NoStream, Nothing], ctx: Context): Unit = {
+    protected[this] def logAction(a: DBIOAction[_, NoStream, Nothing],
+                                  ctx: Context): Unit = {
       if (actionLogger.isDebugEnabled && a.isLogged) {
         ctx.sequenceCounter += 1
         val logA = a.nonFusedEquivalentAction
@@ -432,7 +441,7 @@ trait BasicBackend { self =>
           }).get(logA)
         val msg =
           DumpInfo.highlight("#" + ctx.sequenceCounter) + ": " +
-          dump.substring(0, dump.length - 1)
+            dump.substring(0, dump.length - 1)
         actionLogger.debug(msg)
       }
     }
@@ -511,7 +520,10 @@ trait BasicBackend { self =>
 
     /** The streaming action which may need to be continued with the suspended state */
     private[BasicBackend] var streamingAction: SynchronousDatabaseAction[
-        _, _ <: NoStream, This, _ <: Effect] = null
+        _,
+        _ <: NoStream,
+        This,
+        _ <: Effect] = null
 
     @volatile private[this] var cancelRequested = false
 

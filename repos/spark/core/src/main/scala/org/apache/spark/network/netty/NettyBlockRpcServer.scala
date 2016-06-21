@@ -37,8 +37,9 @@ import org.apache.spark.storage.{BlockId, StorageLevel}
   * Opened blocks are registered with the "one-for-one" strategy, meaning each Transport-layer Chunk
   * is equivalent to one Spark-level shuffle block.
   */
-class NettyBlockRpcServer(
-    appId: String, serializer: Serializer, blockManager: BlockDataManager)
+class NettyBlockRpcServer(appId: String,
+                          serializer: Serializer,
+                          blockManager: BlockDataManager)
     extends RpcHandler
     with Logging {
 

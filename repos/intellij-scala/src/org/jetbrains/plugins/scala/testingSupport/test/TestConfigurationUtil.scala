@@ -44,8 +44,8 @@ object TestConfigurationUtil {
     settings
   }
 
-  def isPackageConfiguration(
-      element: PsiElement, configuration: RunConfiguration): Boolean = {
+  def isPackageConfiguration(element: PsiElement,
+                             configuration: RunConfiguration): Boolean = {
     val pack: PsiPackage = element match {
       case dir: PsiDirectory =>
         JavaDirectoryService.getInstance.getPackage(dir)
@@ -55,7 +55,7 @@ object TestConfigurationUtil {
     configuration match {
       case configuration: AbstractTestRunConfiguration =>
         configuration.getTestKind == TestRunConfigurationForm.TestKind.ALL_IN_PACKAGE &&
-        configuration.getTestPackagePath == pack.getQualifiedName
+          configuration.getTestPackagePath == pack.getQualifiedName
       case _ => false
     }
   }
@@ -68,7 +68,8 @@ object TestConfigurationUtil {
   }
 
   private def getStaticTestNameElement(
-      element: PsiElement, allowSymbolLiterals: Boolean): Option[Any] = {
+      element: PsiElement,
+      allowSymbolLiterals: Boolean): Option[Any] = {
     val noArgMethods = Seq("toLowerCase", "trim", "toString")
     val oneArgMethods = Seq("stripSuffix", "stripPrefix", "substring")
     val twoArgMethods = Seq("replace", "substring")
@@ -100,7 +101,7 @@ object TestConfigurationUtil {
         Some(escapeTestName(literal.getValue.asInstanceOf[String]))
       case literal: ScLiteral
           if allowSymbolLiterals && literal.isSymbol &&
-          literal.getValue.isInstanceOf[Symbol] =>
+            literal.getValue.isInstanceOf[Symbol] =>
         Some(escapeTestName(literal.getValue.asInstanceOf[Symbol].name))
       case literal: ScLiteral if literal.getValue.isInstanceOf[Number] =>
         Some(literal.getValue)
@@ -111,19 +112,20 @@ object TestConfigurationUtil {
           case refExpr: ScReferenceExpression if refExpr.refName == "+" =>
             getStaticTestNameElement(infixExpr.lOp, allowSymbolLiterals)
               .flatMap(left =>
-                  getStaticTestNameElement(infixExpr.rOp, allowSymbolLiterals)
-                    .map(left + _.toString))
+                    getStaticTestNameElement(
+                        infixExpr.rOp,
+                        allowSymbolLiterals).map(left + _.toString))
           case _ => None
         }
       case methodCall: ScMethodCall =>
         methodCall.getInvokedExpr match {
           case refExpr: ScReferenceExpression
               if noArgMethods.contains(refExpr.refName) &&
-              methodCall.argumentExpressions.isEmpty =>
+                methodCall.argumentExpressions.isEmpty =>
             processNoArgMethods(refExpr)
           case refExpr: ScReferenceExpression
               if oneArgMethods.contains(refExpr.refName) &&
-              methodCall.argumentExpressions.size == 1 =>
+                methodCall.argumentExpressions.size == 1 =>
             def helper(anyExpr: Any, arg: Any): Option[Any] =
               (anyExpr, refExpr.refName, arg) match {
                 case (expr: String, "stripSuffix", string: String) =>
@@ -143,7 +145,7 @@ object TestConfigurationUtil {
                       .flatMap(helper(_, arg)))
           case refExpr: ScReferenceExpression
               if twoArgMethods.contains(refExpr.refName) &&
-              methodCall.argumentExpressions.size == 2 =>
+                methodCall.argumentExpressions.size == 2 =>
             def helper(anyExpr: Any, arg1: Any, arg2: Any): Option[Any] =
               (anyExpr, refExpr.refName, arg1, arg2) match {
                 case (expr: String, "replace", s1: String, s2: String) =>
@@ -153,9 +155,11 @@ object TestConfigurationUtil {
                 case _ => None
               }
             val arg1Opt = getStaticTestNameElement(
-                methodCall.argumentExpressions.head, allowSymbolLiterals)
+                methodCall.argumentExpressions.head,
+                allowSymbolLiterals)
             val arg2Opt = getStaticTestNameElement(
-                methodCall.argumentExpressions(1), allowSymbolLiterals)
+                methodCall.argumentExpressions(1),
+                allowSymbolLiterals)
             (arg1Opt, arg2Opt) match {
               case (Some(arg1), Some(arg2)) =>
                 refExpr.smartQualifier
@@ -186,7 +190,8 @@ object TestConfigurationUtil {
   }
 
   private def getStaticTestNameRaw(
-      element: PsiElement, allowSymbolLiterals: Boolean): Option[String] =
+      element: PsiElement,
+      allowSymbolLiterals: Boolean): Option[String] =
     getStaticTestNameElement(element, allowSymbolLiterals)
       .filter(_.isInstanceOf[String])
       .map(_.asInstanceOf[String])
@@ -195,8 +200,9 @@ object TestConfigurationUtil {
                         allowSymbolLiterals: Boolean = false): Option[String] =
     getStaticTestNameRaw(element, allowSymbolLiterals).map(_.trim)
 
-  def getStaticTestNameOrDefault(
-      element: PsiElement, default: String, allowSymbolLiterals: Boolean) =
+  def getStaticTestNameOrDefault(element: PsiElement,
+                                 default: String,
+                                 allowSymbolLiterals: Boolean) =
     getStaticTestName(element, allowSymbolLiterals).getOrElse(default)
 
   def escapeTestName(testName: String) =

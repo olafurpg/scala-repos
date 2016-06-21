@@ -111,8 +111,11 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
                          newIndex,
                          insertPos + 1,
                          used - insertPos - 1)
-        System.arraycopy(
-            data, insertPos, newData, insertPos + 1, used - insertPos - 1)
+        System.arraycopy(data,
+                         insertPos,
+                         newData,
+                         insertPos + 1,
+                         used - insertPos - 1)
 
         // update pointers
         _rowIndices = newIndex
@@ -124,8 +127,11 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
                          _rowIndices,
                          insertPos + 1,
                          used - insertPos - 1)
-        System.arraycopy(
-            data, insertPos, data, insertPos + 1, used - insertPos - 1)
+        System.arraycopy(data,
+                         insertPos,
+                         data,
+                         insertPos + 1,
+                         used - insertPos - 1)
       }
 
       // assign new value
@@ -150,14 +156,14 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
 
   def activeKeysIterator: Iterator[(Int, Int)] = {
     for (c <- Iterator.range(0, cols);
-         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1))) yield
-      (rowIndices(rr), c)
+         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1)))
+      yield (rowIndices(rr), c)
   }
 
   def activeIterator: Iterator[((Int, Int), V)] = {
     for (c <- Iterator.range(0, cols);
-         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1))) yield
-      (rowIndices(rr), c) -> data(rr)
+         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1)))
+      yield (rowIndices(rr), c) -> data(rr)
   }
 
   def activeValuesIterator: Iterator[V] = data.iterator.take(used)
@@ -254,8 +260,8 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
     }
   }
 
-  override def toDenseMatrix(
-      implicit cm: ClassTag[V], zero: Zero[V]): DenseMatrix[V] = {
+  override def toDenseMatrix(implicit cm: ClassTag[V],
+                             zero: Zero[V]): DenseMatrix[V] = {
     toDense
   }
 
@@ -311,7 +317,9 @@ object CSCMatrix
     with CSCMatrixOps
     with SerializableLogging {
   def zeros[@specialized(Int, Float, Double) V: ClassTag: Zero](
-      rows: Int, cols: Int, initialNonzero: Int) = {
+      rows: Int,
+      cols: Int,
+      initialNonzero: Int) = {
     new CSCMatrix[V](new Array(initialNonzero),
                      rows,
                      cols,
@@ -321,10 +329,13 @@ object CSCMatrix
   }
 
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
-      rows: Int, cols: Int): CSCMatrix[V] = zeros(rows, cols, 0)
+      rows: Int,
+      cols: Int): CSCMatrix[V] = zeros(rows, cols, 0)
 
   def create[@spec(Double, Int, Float, Long) V: Zero](
-      rows: Int, cols: Int, data: Array[V]): CSCMatrix[V] = {
+      rows: Int,
+      cols: Int,
+      data: Array[V]): CSCMatrix[V] = {
     val z = implicitly[Zero[V]].zero
     implicit val man =
       ClassTag[V](data.getClass.getComponentType.asInstanceOf[Class[V]])
@@ -479,8 +490,8 @@ object CSCMatrix
     }
   }
 
-  implicit def canTransposeComplex: CanTranspose[
-      CSCMatrix[Complex], CSCMatrix[Complex]] = {
+  implicit def canTransposeComplex: CanTranspose[CSCMatrix[Complex],
+                                                 CSCMatrix[Complex]] = {
     new CanTranspose[CSCMatrix[Complex], CSCMatrix[Complex]] {
       def apply(from: CSCMatrix[Complex]) = {
         val transposedMtx = CSCMatrix.zeros[Complex](from.cols, from.rows)
@@ -507,7 +518,9 @@ object CSCMatrix
     * @param initNnz initial number of nonzero entries
     */
   class Builder[@spec(Double, Int, Float, Long) T: ClassTag: Semiring: Zero](
-      val rows: Int, val cols: Int, initNnz: Int = 16) {
+      val rows: Int,
+      val cols: Int,
+      initNnz: Int = 16) {
     private def ring = implicitly[Semiring[T]]
 
     def add(r: Int, c: Int, v: T) {
@@ -555,12 +568,11 @@ object CSCMatrix
         return new CSCMatrix(vs, _rows, _cols, outCols, 0, Array())
       }
 
-      val order: Array[Int] =
-        if (keysAlreadySorted) {
-          VectorBuilder.range(nnz)
-        } else {
-          sortedIndices(indices)
-        }
+      val order: Array[Int] = if (keysAlreadySorted) {
+        VectorBuilder.range(nnz)
+      } else {
+        sortedIndices(indices)
+      }
 
       val outRows = new Array[Int](nnz)
       val outData = new Array[T](nnz)
@@ -616,7 +628,10 @@ object CSCMatrix
     // returns indices of a lexicgraphic sort of the indices (columns major, rows minor)
     private def sortedIndices(indices: Array[Long]) = {
       val sortedOffsets = Sorting.indexSort(
-          VectorBuilder.range(indices.length), 0, indices.length, indices)
+          VectorBuilder.range(indices.length),
+          0,
+          indices.length,
+          indices)
 //      val qq = Array.range(0, rs.length).sortWith { (i, j) =>
 //        (cs(i) < cs(j))  || (cs(i) == cs(j) && rs(i) < rs(j))
 //      }

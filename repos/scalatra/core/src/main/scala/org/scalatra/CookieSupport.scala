@@ -68,8 +68,9 @@ case class Cookie(name: String, value: String)(
     sb.toString
   }
 
-  private[this] def appendMaxAge(
-      sb: StringBuilder, maxAge: Int, version: Int): StringBuilder = {
+  private[this] def appendMaxAge(sb: StringBuilder,
+                                 maxAge: Int,
+                                 version: Int): StringBuilder = {
     val dateInMillis = maxAge match {
       case a if a < 0 =>
         None // we don't do anything for max-age when it's < 0 then it becomes a session cookie
@@ -87,8 +88,8 @@ case class Cookie(name: String, value: String)(
     agedOpt getOrElse sb
   }
 
-  private[this] def appendExpires(
-      sb: StringBuilder, expires: Date): StringBuilder =
+  private[this] def appendExpires(sb: StringBuilder,
+                                  expires: Date): StringBuilder =
     sb append "; Expires=" append formatExpires(expires)
 }
 
@@ -133,8 +134,9 @@ class SweetCookies(private[this] val reqCookies: Map[String, String],
     delete(key)(cookieOptions)
   }
 
-  private def addCookie(
-      name: String, value: String, options: CookieOptions): Cookie = {
+  private def addCookie(name: String,
+                        value: String,
+                        options: CookieOptions): Cookie = {
     val cookie = new Cookie(name, value)(options)
     response.addCookie(cookie)
     cookie
@@ -160,7 +162,7 @@ trait CookieContext { self: ScalatraContext =>
     request.get(SweetCookiesKey).orNull.asInstanceOf[SweetCookies]
   }
 }
-@deprecated(
-    "You can remove this mixin, it's included in core by default", "2.2")
+@deprecated("You can remove this mixin, it's included in core by default",
+            "2.2")
 trait CookieSupport { self: ScalatraBase =>
 }

@@ -73,21 +73,17 @@ trait RouteTest
       implicit timeout: Duration = 1.second): T = {
     def msg(e: Throwable) =
       s"Could not unmarshal entity to type '${implicitly[ClassTag[T]]}' for `entityAs` assertion: $e\n\nResponse was: $responseSafe"
-    Await.result(Unmarshal(responseEntity)
-                   .to[T]
-                   .fast
-                   .recover[T] { case error ⇒ failTest(msg(error)) },
-                 timeout)
+    Await.result(Unmarshal(responseEntity).to[T].fast.recover[T] {
+      case error ⇒ failTest(msg(error))
+    }, timeout)
   }
   def responseAs[T: FromResponseUnmarshaller: ClassTag](
       implicit timeout: Duration = 1.second): T = {
     def msg(e: Throwable) =
       s"Could not unmarshal response to type '${implicitly[ClassTag[T]]}' for `responseAs` assertion: $e\n\nResponse was: $responseSafe"
-    Await.result(Unmarshal(response)
-                   .to[T]
-                   .fast
-                   .recover[T] { case error ⇒ failTest(msg(error)) },
-                 timeout)
+    Await.result(Unmarshal(response).to[T].fast.recover[T] {
+      case error ⇒ failTest(msg(error))
+    }, timeout)
   }
   def contentType: ContentType = responseEntity.contentType
   def mediaType: MediaType = contentType.mediaType
@@ -119,7 +115,7 @@ trait RouteTest
 
   def isWebSocketUpgrade: Boolean =
     status == StatusCodes.SwitchingProtocols &&
-    header[Upgrade].exists(_.hasWebSocket)
+      header[Upgrade].exists(_.hasWebSocket)
 
   /**
     * Asserts that the received response is a WebSocket upgrade response and the extracts

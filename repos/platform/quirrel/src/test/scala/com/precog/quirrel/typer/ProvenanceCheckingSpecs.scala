@@ -759,11 +759,11 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(input)
 
       tree.provenance must beLike {
-        case CoproductProvenance(
-            ProductProvenance(StaticProvenance("/foo"),
-                              StaticProvenance("/bar")),
-            ProductProvenance(StaticProvenance("/bar"),
-                              StaticProvenance("/baz"))) =>
+        case CoproductProvenance(ProductProvenance(StaticProvenance("/foo"),
+                                                   StaticProvenance("/bar")),
+                                 ProductProvenance(
+                                 StaticProvenance("/bar"),
+                                 StaticProvenance("/baz"))) =>
           ok
       }
 
@@ -1041,11 +1041,11 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(input)
 
       tree.provenance must beLike {
-        case CoproductProvenance(
-            ProductProvenance(StaticProvenance("/foo"),
-                              StaticProvenance("/bar")),
-            ProductProvenance(StaticProvenance("/bar"),
-                              StaticProvenance("/baz"))) =>
+        case CoproductProvenance(ProductProvenance(StaticProvenance("/foo"),
+                                                   StaticProvenance("/bar")),
+                                 ProductProvenance(
+                                 StaticProvenance("/bar"),
+                                 StaticProvenance("/baz"))) =>
           ok
       }
 

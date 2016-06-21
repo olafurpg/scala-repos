@@ -89,8 +89,9 @@ case class SortBasedAggregate(
               initialInputBufferOffset,
               resultExpressions,
               (expressions, inputSchema) =>
-                newMutableProjection(
-                    expressions, inputSchema, subexpressionEliminationEnabled),
+                newMutableProjection(expressions,
+                                     inputSchema,
+                                     subexpressionEliminationEnabled),
               numOutputRows)
           if (!hasInput && groupingExpressions.isEmpty) {
             // There is no input and there is no grouping expressions.

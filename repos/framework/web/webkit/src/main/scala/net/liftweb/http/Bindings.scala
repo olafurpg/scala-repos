@@ -118,9 +118,8 @@ object Bindings {
         case Failure(msg, ex, _) if Props.mode == Props.RunModes.Development =>
           Text(ex.map(_.getMessage).openOr(msg))
         case Empty if Props.mode == Props.RunModes.Development =>
-          Text(
-              "Unable to find template with path " +
-              templatePath.mkString("/", "/", ""))
+          Text("Unable to find template with path " +
+                templatePath.mkString("/", "/", ""))
         case _ => NodeSeq.Empty
       }
     }

@@ -19,21 +19,19 @@ case class ApiCommit(id: String,
                      removed: List[String],
                      modified: List[String],
                      author: ApiPersonIdent,
-                     committer: ApiPersonIdent)(
-    repositoryName: RepositoryName, urlIsHtmlUrl: Boolean)
+                     committer: ApiPersonIdent)(repositoryName: RepositoryName,
+                                                urlIsHtmlUrl: Boolean)
     extends FieldSerializable {
-  val url =
-    if (urlIsHtmlUrl) {
-      ApiPath(s"/${repositoryName.fullName}/commit/${id}")
-    } else {
-      ApiPath(s"/api/v3/${repositoryName.fullName}/commits/${id}")
-    }
-  val html_url =
-    if (urlIsHtmlUrl) {
-      None
-    } else {
-      Some(ApiPath(s"/${repositoryName.fullName}/commit/${id}"))
-    }
+  val url = if (urlIsHtmlUrl) {
+    ApiPath(s"/${repositoryName.fullName}/commit/${id}")
+  } else {
+    ApiPath(s"/api/v3/${repositoryName.fullName}/commits/${id}")
+  }
+  val html_url = if (urlIsHtmlUrl) {
+    None
+  } else {
+    Some(ApiPath(s"/${repositoryName.fullName}/commit/${id}"))
+  }
 }
 
 object ApiCommit {
@@ -55,7 +53,7 @@ object ApiCommit {
         modified = diffs._1.collect {
           case x
               if x.changeType != DiffEntry.ChangeType.ADD &&
-              x.changeType != DiffEntry.ChangeType.DELETE =>
+                x.changeType != DiffEntry.ChangeType.DELETE =>
             x.newPath
         },
         author = ApiPersonIdent.author(commit),

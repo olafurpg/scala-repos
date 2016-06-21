@@ -39,8 +39,12 @@ private[stream] object AbstractStage {
   private class PushPullGraphLogic[In, Out](
       private val shape: FlowShape[In, Out],
       val attributes: Attributes,
-      val stage: AbstractStage[
-          In, Out, Directive, Directive, Context[Out], LifecycleContext])
+      val stage: AbstractStage[In,
+                               Out,
+                               Directive,
+                               Directive,
+                               Context[Out],
+                               LifecycleContext])
       extends GraphStageLogic(shape)
       with DetachedContext[Out] {
 
@@ -48,8 +52,12 @@ private[stream] object AbstractStage {
 
     private def ctx: DetachedContext[Out] = this
 
-    private var currentStage: AbstractStage[
-        In, Out, Directive, Directive, Context[Out], LifecycleContext] = stage
+    private var currentStage: AbstractStage[In,
+                                            Out,
+                                            Directive,
+                                            Directive,
+                                            Context[Out],
+                                            LifecycleContext] = stage
 
     {
       // No need to refer to the handle in a private val
@@ -193,19 +201,29 @@ private[stream] object AbstractStage {
     override def createLogicAndMaterializedValue(
         inheritedAttributes: Attributes): (GraphStageLogic, Mat) = {
       val stageAndMat = factory(inheritedAttributes)
-      val stage: AbstractStage[
-          In, Out, Directive, Directive, Context[Out], LifecycleContext] =
-        stageAndMat._1.asInstanceOf[AbstractStage[
-                In, Out, Directive, Directive, Context[Out], LifecycleContext]]
+      val stage: AbstractStage[In,
+                               Out,
+                               Directive,
+                               Directive,
+                               Context[Out],
+                               LifecycleContext] =
+        stageAndMat._1.asInstanceOf[AbstractStage[In,
+                                                  Out,
+                                                  Directive,
+                                                  Directive,
+                                                  Context[Out],
+                                                  LifecycleContext]]
       (new PushPullGraphLogic(shape, inheritedAttributes, stage),
        stageAndMat._2)
     }
   }
 
   class PushPullGraphStage[-In, +Out, Ext](
-      _factory: (Attributes) ⇒ Stage[In, Out], _stageAttributes: Attributes)
+      _factory: (Attributes) ⇒ Stage[In, Out],
+      _stageAttributes: Attributes)
       extends PushPullGraphStageWithMaterializedValue[In, Out, Ext, NotUsed](
-          (att: Attributes) ⇒ (_factory(att), NotUsed), _stageAttributes)
+          (att: Attributes) ⇒ (_factory(att), NotUsed),
+          _stageAttributes)
 }
 
 @deprecated("Please use GraphStage instead.", "2.4.2")
@@ -364,8 +382,12 @@ abstract class AbstractStage[-In,
   */
 @deprecated("Please use GraphStage instead.", "2.4.2")
 abstract class PushPullStage[In, Out]
-    extends AbstractStage[
-        In, Out, SyncDirective, SyncDirective, Context[Out], LifecycleContext]
+    extends AbstractStage[In,
+                          Out,
+                          SyncDirective,
+                          SyncDirective,
+                          Context[Out],
+                          LifecycleContext]
 
 /**
   * `PushStage` is a [[PushPullStage]] that always perform transitive pull by calling `ctx.pull` from `onPull`.
@@ -454,8 +476,8 @@ private[akka] object StatefulStage {
   *
   * Use [[#terminationEmit]] to push final elements from [[#onUpstreamFinish]] or [[#onUpstreamFailure]].
   */
-@deprecated(
-    "StatefulStage is deprecated, please use GraphStage instead.", "2.0-M2")
+@deprecated("StatefulStage is deprecated, please use GraphStage instead.",
+            "2.0-M2")
 abstract class StatefulStage[In, Out] extends PushPullStage[In, Out] {
   import StatefulStage._
 
@@ -515,8 +537,8 @@ abstract class StatefulStage[In, Out] extends PushPullStage[In, Out] {
     * Java API: Can be used from [[StageState#onPush]] or [[StageState#onPull]] to push more than one
     * element downstream.
     */
-  final def emit(
-      iter: java.util.Iterator[Out], ctx: Context[Out]): SyncDirective = {
+  final def emit(iter: java.util.Iterator[Out],
+                 ctx: Context[Out]): SyncDirective = {
     import scala.collection.JavaConverters._
     emit(iter.asScala, ctx)
   }
@@ -560,8 +582,8 @@ abstract class StatefulStage[In, Out] extends PushPullStage[In, Out] {
     * Scala API: Can be used from [[StageState#onPush]] or [[StageState#onPull]] to push more than one
     * element downstream and after that finish (complete downstreams, cancel upstreams).
     */
-  final def emitAndFinish(
-      iter: Iterator[Out], ctx: Context[Out]): SyncDirective = {
+  final def emitAndFinish(iter: Iterator[Out],
+                          ctx: Context[Out]): SyncDirective = {
     if (emitting) throw new IllegalStateException("already in emitting state")
     if (iter.isEmpty) ctx.finish()
     else {
@@ -578,8 +600,8 @@ abstract class StatefulStage[In, Out] extends PushPullStage[In, Out] {
     * Java API: Can be used from [[StageState#onPush]] or [[StageState#onPull]] to push more than one
     * element downstream and after that finish (complete downstreams, cancel upstreams).
     */
-  final def emitAndFinish(
-      iter: java.util.Iterator[Out], ctx: Context[Out]): SyncDirective = {
+  final def emitAndFinish(iter: java.util.Iterator[Out],
+                          ctx: Context[Out]): SyncDirective = {
     import scala.collection.JavaConverters._
     emitAndFinish(iter.asScala, ctx)
   }
@@ -590,8 +612,8 @@ abstract class StatefulStage[In, Out] extends PushPullStage[In, Out] {
     * [[#onUpstreamFailure]] the failure will be absorbed and the stream will be completed
     * successfully.
     */
-  final def terminationEmit(
-      iter: Iterator[Out], ctx: Context[Out]): TerminationDirective = {
+  final def terminationEmit(iter: Iterator[Out],
+                            ctx: Context[Out]): TerminationDirective = {
     if (iter.isEmpty) {
       if (emitting) ctx.absorbTermination()
       else ctx.finish()

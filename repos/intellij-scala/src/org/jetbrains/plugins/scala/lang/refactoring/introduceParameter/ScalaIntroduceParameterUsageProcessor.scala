@@ -71,8 +71,8 @@ class ScalaIntroduceParameterUsageProcessor
 
   override def processPrimaryMethod(changeInfo: ChangeInfo): Boolean = false
 
-  override def shouldPreviewUsages(
-      changeInfo: ChangeInfo, usages: Array[UsageInfo]): Boolean = false
+  override def shouldPreviewUsages(changeInfo: ChangeInfo,
+                                   usages: Array[UsageInfo]): Boolean = false
 
   override def findConflicts(
       info: ChangeInfo,

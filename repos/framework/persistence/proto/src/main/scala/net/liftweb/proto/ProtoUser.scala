@@ -420,7 +420,8 @@ trait ProtoUser {
     */
   protected def createUserMenuLocParams: List[LocParam[Unit]] =
     Template(() => wrapIt(signupFunc.map(_ ()) openOr signup)) :: If(
-        notLoggedIn_? _, S.?("logout.first")) :: Nil
+        notLoggedIn_? _,
+        S.?("logout.first")) :: Nil
 
   /**
     * The menu item for lost password (make this "Empty" to disable)
@@ -456,7 +457,8 @@ trait ProtoUser {
     */
   protected def resetPasswordMenuLocParams: List[LocParam[Unit]] =
     Hidden :: Template(() => wrapIt(passwordReset(snarfLastItem))) :: If(
-        notLoggedIn_? _, S.?("logout.first")) :: Nil
+        notLoggedIn_? _,
+        S.?("logout.first")) :: Nil
 
   /**
     * The menu item for editing the user (make this "Empty" to disable)
@@ -508,7 +510,8 @@ trait ProtoUser {
     */
   protected def validateUserMenuLocParams: List[LocParam[Unit]] =
     Hidden :: Template(() => wrapIt(validateUser(snarfLastItem))) :: If(
-        notLoggedIn_? _, S.?("logout.first")) :: Nil
+        notLoggedIn_? _,
+        S.?("logout.first")) :: Nil
 
   /**
     * An alias for the sitemap property
@@ -721,7 +724,8 @@ trait ProtoUser {
     * but you can send additional or alternative mail by override this method.
     */
   protected def generateValidationEmailBodies(
-      user: TheUserType, resetLink: String): List[MailBodyType] =
+      user: TheUserType,
+      resetLink: String): List[MailBodyType] =
     List(xmlToMailBodyType(signupMailBody(user, resetLink)))
 
   protected object signupFunc extends RequestVar[Box[() => NodeSeq]](Empty) {
@@ -731,8 +735,8 @@ trait ProtoUser {
   /**
     * Override this method to do something else after the user signs up
     */
-  protected def actionsAfterSignup(
-      theUser: TheUserType, func: () => Nothing): Nothing = {
+  protected def actionsAfterSignup(theUser: TheUserType,
+                                   func: () => Nothing): Nothing = {
     theUser.setValidated(skipEmailValidation).resetUniqueId()
     theUser.save
     if (!skipEmailValidation) {
@@ -867,23 +871,23 @@ trait ProtoUser {
       S.param("username").flatMap(username => findUserByUserName(username)) match {
         case Full(user)
             if user.validated_? && user.testPassword(S.param("password")) => {
-            val preLoginState = capturePreLoginState()
-            val redir = loginRedirect.get match {
-              case Full(url) =>
-                loginRedirect(Empty)
-                url
-              case _ =>
-                homePage
-            }
-
-            logUserIn(user, () => {
-              S.notice(S.?("logged.in"))
-
-              preLoginState()
-
-              S.redirectTo(redir)
-            })
+          val preLoginState = capturePreLoginState()
+          val redir = loginRedirect.get match {
+            case Full(url) =>
+              loginRedirect(Empty)
+              url
+            case _ =>
+              homePage
           }
+
+          logUserIn(user, () => {
+            S.notice(S.?("logged.in"))
+
+            preLoginState()
+
+            S.redirectTo(redir)
+          })
+        }
 
         case Full(user) if !user.validated_? =>
           S.error(S.?("account.validation.error"))
@@ -945,7 +949,8 @@ trait ProtoUser {
     * but you can send additional or alternative mail by overriding this method.
     */
   protected def generateResetEmailBodies(
-      user: TheUserType, resetLink: String): List[MailBodyType] =
+      user: TheUserType,
+      resetLink: String): List[MailBodyType] =
     List(xmlToMailBodyType(passwordResetMailBody(user, resetLink)))
 
   def passwordResetEmailSubject = S.?("reset.password.request")
@@ -962,7 +967,7 @@ trait ProtoUser {
         user.resetUniqueId().save
         val resetLink =
           S.hostAndPath + passwordResetPath.mkString("/", "/", "/") +
-          urlEncode(user.getUniqueId())
+            urlEncode(user.getUniqueId())
 
         val email: String = user.getEmail
 
@@ -970,7 +975,7 @@ trait ProtoUser {
             From(emailFrom),
             Subject(passwordResetEmailSubject),
             (To(user.getEmail) :: generateResetEmailBodies(user, resetLink) :::
-                (bccEmail.toList.map(BCC(_)))): _*)
+                  (bccEmail.toList.map(BCC(_)))): _*)
 
         S.notice(S.?("password.reset.email.sent"))
         S.redirectTo(homePage)
@@ -992,8 +997,8 @@ trait ProtoUser {
     bind(lostPasswordXhtml)
   }
 
-  def lostPasswordSubmitButton(
-      name: String, func: () => Any = () => {}): NodeSeq = {
+  def lostPasswordSubmitButton(name: String,
+                               func: () => Any = () => {}): NodeSeq = {
     standardSubmitButton(name, func)
   }
 
@@ -1021,20 +1026,21 @@ trait ProtoUser {
           }
         }
 
-        val passwordInput = SHtml.password_*(
-            "", (p: List[String]) => user.setPasswordFromListString(p))
+        val passwordInput = SHtml.password_*("", (p: List[String]) =>
+              user.setPasswordFromListString(p))
 
         val bind = {
           "type=password" #> passwordInput & "type=submit" #> resetPasswordSubmitButton(
-              S.?("set.password"), finishSet _)
+              S.?("set.password"),
+              finishSet _)
         }
 
         bind(passwordResetXhtml)
       case _ => S.error(S.?("password.link.invalid")); S.redirectTo(homePage)
     }
 
-  def resetPasswordSubmitButton(
-      name: String, func: () => Any = () => {}): NodeSeq = {
+  def resetPasswordSubmitButton(name: String,
+                                func: () => Any = () => {}): NodeSeq = {
     standardSubmitButton(name, func)
   }
 
@@ -1075,14 +1081,15 @@ trait ProtoUser {
         SHtml.password_*("", LFuncHolder(s => newPassword = s))
 
       ".old-password" #> SHtml.password("", s => oldPassword = s) & ".new-password" #> passwordInput & "type=submit" #> changePasswordSubmitButton(
-          S.?("change"), testAndSet _)
+          S.?("change"),
+          testAndSet _)
     }
 
     bind(changePasswordXhtml)
   }
 
-  def changePasswordSubmitButton(
-      name: String, func: () => Any = () => {}): NodeSeq = {
+  def changePasswordSubmitButton(name: String,
+                                 func: () => Any = () => {}): NodeSeq = {
     standardSubmitButton(name, func)
   }
 
@@ -1149,7 +1156,8 @@ trait ProtoUser {
     * that to an actual instance of a BaseField on the instance of TheCrudType
     */
   protected def computeFieldFromPointer(
-      instance: TheUserType, pointer: FieldPointerType): Box[BaseField]
+      instance: TheUserType,
+      pointer: FieldPointerType): Box[BaseField]
 
   protected def localForm(user: TheUserType,
                           ignorePassword: Boolean,
@@ -1157,14 +1165,13 @@ trait ProtoUser {
     for {
       pointer <- fields
       field <- computeFieldFromPointer(user, pointer).toList if field.show_? &&
-      (!ignorePassword || !pointer.isPasswordField_?)
+        (!ignorePassword || !pointer.isPasswordField_?)
       form <- field.toForm.toList
     } yield <tr><td>{field.displayName}</td><td>{form}</td></tr>
   }
 
   protected def wrapIt(in: NodeSeq): NodeSeq =
-    screenWrap.map(
-        new RuleTransformer(new RewriteRule {
+    screenWrap.map(new RuleTransformer(new RewriteRule {
       override def transform(n: Node) = n match {
         case e: Elem if "bind" == e.label && "lift" == e.prefix => in
         case _ => n

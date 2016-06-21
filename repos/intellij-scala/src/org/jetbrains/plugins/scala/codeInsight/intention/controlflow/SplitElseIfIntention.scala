@@ -22,8 +22,9 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Split 'else if'"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -34,7 +35,7 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
     if (thenBranch == null || elseBranch == null) return false
 
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-            offset <= elseBranch.getTextRange.getStartOffset)) return false
+              offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     val elseIfExpr = ifStmt.elseBranch.orNull
     if (elseIfExpr != null && elseIfExpr.isInstanceOf[ScIfStmt]) {
@@ -52,15 +53,15 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
     val start = ifStmt.getTextRange.getStartOffset
     val startIndex =
       ifStmt.thenBranch.get.getTextRange.getEndOffset -
-      ifStmt.getTextRange.getStartOffset
+        ifStmt.getTextRange.getStartOffset
     val endIndex =
       ifStmt.elseBranch.get.getTextRange.getStartOffset -
-      ifStmt.getTextRange.getStartOffset
+        ifStmt.getTextRange.getStartOffset
     val elseIndex =
       ifStmt.getText.substring(startIndex, endIndex).indexOf("else") - 1
     val diff =
       editor.getCaretModel.getOffset -
-      ifStmt.thenBranch.get.getTextRange.getEndOffset - elseIndex
+        ifStmt.thenBranch.get.getTextRange.getEndOffset - elseIndex
 
     val expr = new StringBuilder
     expr
@@ -72,12 +73,11 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
       .append(ifStmt.elseBranch.get.getText)
       .append("\n}")
 
-    val newIfStmt: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+    val newIfStmt: ScExpression = ScalaPsiElementFactory
+      .createExpressionFromText(expr.toString(), element.getManager)
     val size =
       newIfStmt.asInstanceOf[ScIfStmt].thenBranch.get.getTextRange.getEndOffset -
-      newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
+        newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, true)

@@ -292,8 +292,8 @@ case object EmptyBody extends WSBody
 /**
   * A streamed response containing a response header and a streamable body.
   */
-case class StreamedResponse(
-    headers: WSResponseHeaders, body: Source[ByteString, _])
+case class StreamedResponse(headers: WSResponseHeaders,
+                            body: Source[ByteString, _])
 
 /**
   * A WS Request builder.
@@ -310,8 +310,7 @@ trait WSRequest {
     */
   lazy val uri: URI = {
     val enc = (p: String) => java.net.URLEncoder.encode(p, "utf-8")
-    new java.net.URI(
-        if (queryString.isEmpty) url
+    new java.net.URI(if (queryString.isEmpty) url
         else {
       val qs = (for {
         (n, vs) <- queryString
@@ -380,8 +379,9 @@ trait WSRequest {
   /**
     * sets the authentication realm
     */
-  def withAuth(
-      username: String, password: String, scheme: WSAuthScheme): WSRequest
+  def withAuth(username: String,
+               password: String,
+               scheme: WSAuthScheme): WSRequest
 
   /**
     * adds any number of HTTP headers
@@ -748,8 +748,8 @@ trait WSResponseHeaders {
   def headers: Map[String, Seq[String]]
 }
 
-case class DefaultWSResponseHeaders(
-    status: Int, headers: Map[String, Seq[String]])
+case class DefaultWSResponseHeaders(status: Int,
+                                    headers: Map[String, Seq[String]])
     extends WSResponseHeaders
 
 /**

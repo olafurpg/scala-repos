@@ -31,8 +31,9 @@ class MongoSpec extends Specification {
     val jndiName = "test_a"
   }
 
-  def passDefinitionTests(
-      id: ConnectionIdentifier, mc: MongoClient, db: String): Result = {
+  def passDefinitionTests(id: ConnectionIdentifier,
+                          mc: MongoClient,
+                          db: String): Result = {
     // define the db
     MongoDB.defineDb(id, mc, db)
 

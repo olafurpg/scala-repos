@@ -82,8 +82,8 @@ abstract class Aggregator[-I, B, O] extends Serializable {
     */
   def toColumn(implicit bEncoder: Encoder[B],
                cEncoder: Encoder[O]): TypedColumn[I, O] = {
-    val expr = new AggregateExpression(
-        TypedAggregateExpression(this), Complete, false)
+    val expr =
+      new AggregateExpression(TypedAggregateExpression(this), Complete, false)
 
     new TypedColumn[I, O](expr, encoderFor[O])
   }

@@ -32,8 +32,12 @@ object Infos {
               superClass: Option[String] = None,
               interfaces: List[String] = Nil,
               methods: List[MethodInfo] = Nil): ClassInfo = {
-      new ClassInfo(
-          encodedName, isExported, kind, superClass, interfaces, methods)
+      new ClassInfo(encodedName,
+                    isExported,
+                    kind,
+                    superClass,
+                    interfaces,
+                    methods)
     }
   }
 

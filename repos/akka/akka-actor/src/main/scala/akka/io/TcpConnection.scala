@@ -24,8 +24,9 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
   *
   * INTERNAL API
   */
-private[io] abstract class TcpConnection(
-    val tcp: TcpExt, val channel: SocketChannel, val pullMode: Boolean)
+private[io] abstract class TcpConnection(val tcp: TcpExt,
+                                         val channel: SocketChannel,
+                                         val pullMode: Boolean)
     extends Actor
     with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
@@ -39,8 +40,7 @@ private[io] abstract class TcpConnection(
   private[this] var writingSuspended = false
   private[this] var readingSuspended = pullMode
   private[this] var interestedInResume: Option[ActorRef] = None
-  var closedMessage: CloseInformation =
-    _ // for ConnectionClosed message in postStop
+  var closedMessage: CloseInformation = _ // for ConnectionClosed message in postStop
   private var watchedActor: ActorRef = context.system.deadLetters
 
   def signDeathPact(actor: ActorRef): Unit = {
@@ -58,8 +58,8 @@ private[io] abstract class TcpConnection(
   // STATES
 
   /** connection established, waiting for registration from user handler */
-  def waitingForRegistration(
-      registration: ChannelRegistration, commander: ActorRef): Receive = {
+  def waitingForRegistration(registration: ChannelRegistration,
+                             commander: ActorRef): Receive = {
     case Register(handler, keepOpenOnPeerClosed, useResumeWriting) ⇒
       // up to this point we've been watching the commander,
       // but since registration is now complete we only need to watch the handler from here on
@@ -70,8 +70,10 @@ private[io] abstract class TcpConnection(
       if (TraceLogging)
         log.debug("[{}] registered as connection handler", handler)
 
-      val info = ConnectionInfo(
-          registration, handler, keepOpenOnPeerClosed, useResumeWriting)
+      val info = ConnectionInfo(registration,
+                                handler,
+                                keepOpenOnPeerClosed,
+                                useResumeWriting)
 
       // if we have resumed reading from pullMode while waiting for Register then register OP_READ interest
       if (pullMode && !readingSuspended) resumeReading(info)
@@ -141,8 +143,8 @@ private[io] abstract class TcpConnection(
   }
 
   /** connection is closed on our side and we're waiting from confirmation from the other side */
-  def closing(
-      info: ConnectionInfo, closeCommander: Option[ActorRef]): Receive = {
+  def closing(info: ConnectionInfo,
+              closeCommander: Option[ActorRef]): Receive = {
     case SuspendReading ⇒ suspendReading(info)
     case ResumeReading ⇒ resumeReading(info)
     case ChannelReadable ⇒ doRead(info, closeCommander)
@@ -432,8 +434,7 @@ private[io] abstract class TcpConnection(
 
     def doWrite(info: ConnectionInfo): PendingWrite = {
       @tailrec def writeToChannel(data: ByteString): PendingWrite = {
-        val writtenBytes =
-          channel.write(buffer) // at first we try to drain the remaining bytes from the buffer
+        val writtenBytes = channel.write(buffer) // at first we try to drain the remaining bytes from the buffer
         if (TraceLogging)
           log.debug("Wrote [{}] bytes to channel", writtenBytes)
         if (buffer.hasRemaining) {
@@ -509,8 +510,8 @@ private[io] abstract class TcpConnection(
           release()
           val andThen =
             if (!ack.isInstanceOf[NoAck]) () ⇒ commander ! ack else doNothing
-          self ! UpdatePendingWriteAndThen(
-              PendingWrite(commander, tail), andThen)
+          self ! UpdatePendingWriteAndThen(PendingWrite(commander, tail),
+                                           andThen)
         }
       } catch {
         case e: IOException ⇒ self ! WriteFileFailed(e)
@@ -531,8 +532,8 @@ private[io] object TcpConnection {
     * Used to transport information to the postStop method to notify
     * interested party about a connection close.
     */
-  final case class CloseInformation(
-      notificationsTo: Set[ActorRef], closedEvent: Event)
+  final case class CloseInformation(notificationsTo: Set[ActorRef],
+                                    closedEvent: Event)
 
   /**
     * Groups required connection-related data that are only available once the connection has been fully established.
@@ -544,8 +545,8 @@ private[io] object TcpConnection {
 
   // INTERNAL MESSAGES
 
-  final case class UpdatePendingWriteAndThen(
-      remainingWrite: PendingWrite, work: () ⇒ Unit)
+  final case class UpdatePendingWriteAndThen(remainingWrite: PendingWrite,
+                                             work: () ⇒ Unit)
       extends NoSerializationVerificationNeeded
   final case class WriteFileFailed(e: IOException)
 

@@ -271,8 +271,7 @@ object LAFuture {
     */
   def apply[T](f: () => T, scheduler: LAScheduler = LAScheduler): LAFuture[T] = {
     val ret = new LAFuture[T](scheduler)
-    scheduler.execute(
-        () => {
+    scheduler.execute(() => {
       try {
         ret.satisfy(f())
       } catch {
@@ -308,8 +307,7 @@ object LAFuture {
 
   private def executeWithObservers(scheduler: LAScheduler, f: () => Unit) {
     val cur = threadInfo.get()
-    scheduler.execute(
-        () => {
+    scheduler.execute(() => {
       val old = threadInfo.get()
       threadInfo.set(cur)
       try {
@@ -399,16 +397,16 @@ object LAFuture {
             sync.synchronized {
               vb match {
                 case Full(v) => {
-                    vals.insert(idx, Full(v))
-                    gotCnt += 1
-                    if (gotCnt >= len) {
-                      ret.satisfy(Full(vals.toList.flatten))
-                    }
+                  vals.insert(idx, Full(v))
+                  gotCnt += 1
+                  if (gotCnt >= len) {
+                    ret.satisfy(Full(vals.toList.flatten))
                   }
+                }
 
                 case eb: EmptyBox => {
-                    ret.satisfy(eb)
-                  }
+                  ret.satisfy(eb)
+                }
               }
             }
           }

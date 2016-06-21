@@ -76,8 +76,8 @@ trait HoconIncludeResolutionTest {
 
           assertEquals(parentText, expectedFiles, actualFiles)
         } else {
-          assertTrue(
-              "Expected no references in " + parentText, references.isEmpty)
+          assertTrue("Expected no references in " + parentText,
+                     references.isEmpty)
         }
       case _ =>
     }

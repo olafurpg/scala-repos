@@ -72,8 +72,8 @@ class AppInfoBaseDataTest
 
     import scala.concurrent.ExecutionContext.Implicits.global
     f.taskTracker.tasksByApp()(global) returns Future.successful(
-        TaskTracker.TasksByApp.of(TaskTracker.AppTasks.forTasks(
-                app.id, Iterable(running1, running2, running3))))
+        TaskTracker.TasksByApp.of(TaskTracker.AppTasks
+              .forTasks(app.id, Iterable(running1, running2, running3))))
 
     val alive = Health(running2.taskId, lastSuccess = Some(Timestamp(1)))
     val unhealthy = Health(running3.taskId, lastFailure = Some(Timestamp(1)))
@@ -173,12 +173,14 @@ class AppInfoBaseDataTest
       DeploymentPlan(emptyGroup, emptyGroup.copy(apps = Set(other)))
     f.marathonSchedulerService.listRunningDeployments() returns Future
       .successful(
-        Seq[DeploymentStepInfo](
-            DeploymentStepInfo(
-                relatedDeployment, DeploymentStep(Seq.empty), 1),
-            DeploymentStepInfo(
-                unrelatedDeployment, DeploymentStep(Seq.empty), 1)
-        ))
+          Seq[DeploymentStepInfo](
+              DeploymentStepInfo(relatedDeployment,
+                                 DeploymentStep(Seq.empty),
+                                 1),
+              DeploymentStepInfo(unrelatedDeployment,
+                                 DeploymentStep(Seq.empty),
+                                 1)
+          ))
 
     When("Getting AppInfos without counts")
     val appInfo =
@@ -203,8 +205,8 @@ class AppInfoBaseDataTest
     Given("No deployments")
     f.marathonSchedulerService.listRunningDeployments() returns Future
       .successful(
-        Seq.empty[DeploymentStepInfo]
-    )
+          Seq.empty[DeploymentStepInfo]
+      )
 
     When("Getting AppInfos with deployments")
     val appInfo =
@@ -273,17 +275,20 @@ class AppInfoBaseDataTest
     val f = new Fixture
     Given("one staged and two running tasks in the taskTracker")
     val staged = MarathonTestHelper.stagedTask(
-        "task1", stagedAt = (f.clock.now() - 10.seconds).toDateTime.getMillis)
+        "task1",
+        stagedAt = (f.clock.now() - 10.seconds).toDateTime.getMillis)
     val running = MarathonTestHelper.runningTask(
-        "task2", stagedAt = (f.clock.now() - 11.seconds).toDateTime.getMillis)
+        "task2",
+        stagedAt = (f.clock.now() - 11.seconds).toDateTime.getMillis)
     val running2 = MarathonTestHelper.runningTask(
-        "task3", stagedAt = (f.clock.now() - 11.seconds).toDateTime.getMillis)
+        "task3",
+        stagedAt = (f.clock.now() - 11.seconds).toDateTime.getMillis)
 
     import scala.concurrent.ExecutionContext.Implicits.global
     val tasks: Set[Task] = Set(staged, running, running2)
-    f.taskTracker.tasksByApp()(global) returns Future.successful(
-        TaskTracker.TasksByApp.of(
-            TaskTracker.AppTasks.forTasks(app.id, tasks)))
+    f.taskTracker.tasksByApp()(global) returns Future
+      .successful(TaskTracker.TasksByApp.of(
+              TaskTracker.AppTasks.forTasks(app.id, tasks)))
 
     val statuses: Map[Task.Id, Seq[Health]] = Map(
         staged.taskId -> Seq(),
@@ -313,8 +318,10 @@ class AppInfoBaseDataTest
       appInfo should be(
           AppInfo(
               app,
-              maybeTaskStats = Some(TaskStatsByVersion(
-                      f.clock.now(), app.versionInfo, tasks, statuses))
+              maybeTaskStats = Some(TaskStatsByVersion(f.clock.now(),
+                                                       app.versionInfo,
+                                                       tasks,
+                                                       statuses))
           ))
     }
 
@@ -335,13 +342,14 @@ class AppInfoBaseDataTest
         Some(TaskFailureTestHelper.taskFailure))
     f.marathonSchedulerService.listRunningDeployments() returns Future
       .successful(
-        Seq.empty[DeploymentStepInfo]
-    )
+          Seq.empty[DeploymentStepInfo]
+      )
 
     When("Getting AppInfos with last task failures and deployments")
     val appInfo = f.baseData
       .appInfoFuture(
-          app, Set(AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Deployments))
+          app,
+          Set(AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Deployments))
       .futureValue
 
     Then("we get the failure in the app info")

@@ -149,9 +149,9 @@ trait IndicesSpec[M[+ _]]
 
     "determine unique groupkey values" in {
       index.getUniqueKeys(0) must_==
-        Set(CLong(1), CLong(2), CLong(3), CString("foo"))
+      Set(CLong(1), CLong(2), CLong(3), CString("foo"))
       index.getUniqueKeys(1) must_==
-        Set(CLong(2), CLong(999), CString("bar"), CString(""))
+      Set(CLong(2), CLong(999), CString("bar"), CString(""))
     }
 
     "determine unique groupkey sets" in {
@@ -165,8 +165,9 @@ trait IndicesSpec[M[+ _]]
       )
     }
 
-    def subtableSet(
-        index: TableIndex, ids: Seq[Int], vs: Seq[RValue]): Set[RValue] =
+    def subtableSet(index: TableIndex,
+                    ids: Seq[Int],
+                    vs: Seq[RValue]): Set[RValue] =
       index.getSubTable(ids, vs).toJson.copoint.toSet.map(RValue.fromJValue)
 
     def test(vs: Seq[RValue], result: Set[RValue]): Unit =

@@ -23,8 +23,8 @@ object FilterIsEmptyCheck extends SimplificationType {
     expr match {
       case CheckIsEmpty(qual `.filter` (pred), s, e)
           if qual != null && !hasSideEffects(pred) =>
-        val notExistsText = invocationText(
-            negation = true, qual, "exists", pred)
+        val notExistsText =
+          invocationText(negation = true, qual, "exists", pred)
         val start = Math.min(s, qual.end)
         val end = Math.max(e, expr.end)
         Some(replace(expr).withText(notExistsText).highlightRange(start, end))
@@ -73,8 +73,8 @@ object FilterNotNonEmptyCheck extends SimplificationType {
       case CheckNonEmpty(qual `.filterNot` (pred), s, e) =>
         val start = Math.min(s, qual.end)
         val end = Math.max(e, expr.end)
-        val notForallText = invocationText(
-            negation = true, qual, "forall", pred)
+        val notForallText =
+          invocationText(negation = true, qual, "forall", pred)
         Some(replace(expr).withText(notForallText).highlightRange(start, end))
       case _ => None
     }

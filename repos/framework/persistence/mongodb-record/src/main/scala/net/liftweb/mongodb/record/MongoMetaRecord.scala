@@ -87,8 +87,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
     * Find a single row by a qry, using a DBObject.
     */
   def find(qry: DBObject): Box[BaseRecord] = {
-    useColl(
-        coll =>
+    useColl(coll =>
           coll.findOne(qry) match {
         case null => Empty
         case dbo => Full(fromDBObject(dbo))
@@ -212,8 +211,9 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
   /**
     * Find all documents using a DBObject query with sort
     */
-  def findAll(
-      qry: DBObject, sort: DBObject, opts: FindOption*): List[BaseRecord] =
+  def findAll(qry: DBObject,
+              sort: DBObject,
+              opts: FindOption*): List[BaseRecord] =
     findAll(qry, Some(sort), opts: _*)
 
   /**
@@ -226,10 +226,12 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
   /**
     * Find all documents using a JObject query with sort
     */
-  def findAll(
-      qry: JObject, sort: JObject, opts: FindOption*): List[BaseRecord] =
-    findAll(
-        JObjectParser.parse(qry), Some(JObjectParser.parse(sort)), opts: _*)
+  def findAll(qry: JObject,
+              sort: JObject,
+              opts: FindOption*): List[BaseRecord] =
+    findAll(JObjectParser.parse(qry),
+            Some(JObjectParser.parse(sort)),
+            opts: _*)
 
   /**
     * Find all documents using a k, v query
@@ -240,8 +242,10 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
   /**
     * Find all documents using a k, v query with JOBject sort
     */
-  def findAll(
-      k: String, o: Any, sort: JObject, opts: FindOption*): List[BaseRecord] =
+  def findAll(k: String,
+              o: Any,
+              sort: JObject,
+              opts: FindOption*): List[BaseRecord] =
     findAll(new BasicDBObject(k, o), Some(JObjectParser.parse(sort)), opts: _*)
 
   /**
@@ -312,8 +316,10 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
   /*
    * Update records with a JObject query using the given Mongo instance
    */
-  def update(
-      qry: JObject, newbr: BaseRecord, db: DB, opts: UpdateOption*): Unit = {
+  def update(qry: JObject,
+             newbr: BaseRecord,
+             db: DB,
+             opts: UpdateOption*): Unit = {
     update(JObjectParser.parse(qry), newbr.asDBObject, db, opts: _*)
   }
 

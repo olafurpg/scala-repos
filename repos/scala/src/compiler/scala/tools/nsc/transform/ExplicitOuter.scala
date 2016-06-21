@@ -96,7 +96,7 @@ abstract class ExplicitOuter
   def newOuterField(clazz: Symbol) = {
     val accFlags =
       SYNTHETIC | ARTIFACT | PARAMACCESSOR |
-      (if (clazz.isEffectivelyFinal) PrivateLocal else PROTECTED)
+        (if (clazz.isEffectivelyFinal) PrivateLocal else PROTECTED)
     val sym = clazz.newValue(nme.OUTER_LOCAL, clazz.pos, accFlags)
 
     sym setInfo clazz.outerClass.thisType
@@ -201,8 +201,8 @@ abstract class ExplicitOuter
                   s"Reusing outer accessor symbol of $clazz for the mixin outer accessor of $mc")
             else {
               if (decls1 eq decls) decls1 = decls.cloneScope
-              val newAcc = mixinOuterAcc.cloneSymbol(
-                  clazz, mixinOuterAcc.flags & ~DEFERRED)
+              val newAcc = mixinOuterAcc
+                .cloneSymbol(clazz, mixinOuterAcc.flags & ~DEFERRED)
               newAcc setInfo (clazz.thisType memberType mixinOuterAcc)
               decls1 enter newAcc
             }
@@ -268,8 +268,7 @@ abstract class ExplicitOuter
           EmptyTree
         }
       } else {
-        val currentClass =
-          this.currentClass //todo: !!! if this line is removed, we get a build failure that protected$currentClass need an override modifier
+        val currentClass = this.currentClass //todo: !!! if this line is removed, we get a build failure that protected$currentClass need an override modifier
         // outerFld is the $outer field of the current class, if the reference can
         // use it (i.e. reference is allowed to be of the form this.$outer),
         // otherwise it is NoSymbol
@@ -399,7 +398,7 @@ abstract class ExplicitOuter
       def mixinPrefix = (currentClass.thisType baseType mixinClass).prefix
       assert(outerAcc != NoSymbol,
              "No outer accessor for inner mixin " + mixinClass + " in " +
-             currentClass)
+               currentClass)
       assert(
           outerAcc.alternatives.size == 1,
           s"Multiple outer accessors match inner mixin $mixinClass in $currentClass : ${outerAcc.alternatives
@@ -437,11 +436,10 @@ abstract class ExplicitOuter
                 newDefs += outerAccessorDef // (1)
               }
               if (!currentClass.isTrait)
-                for (mc <- currentClass.mixinClasses) if (outerAccessor(mc) != NoSymbol &&
-                                                          !skipMixinOuterAccessor(
-                                                              currentClass,
-                                                              mc))
-                  newDefs += mixinOuterAccessorDef(mc)
+                for (mc <- currentClass.mixinClasses)
+                  if (outerAccessor(mc) != NoSymbol &&
+                      !skipMixinOuterAccessor(currentClass, mc))
+                    newDefs += mixinOuterAccessorDef(mc)
             }
           }
           super.transform(
@@ -456,19 +454,18 @@ abstract class ExplicitOuter
                 sys.error("unexpected case") //todo: remove
               case _ =>
                 val clazz = sym.owner
-                val vparamss1 =
-                  if (isInner(clazz)) {
-                    // (4)
-                    if (isUnderConstruction(clazz.outerClass)) {
-                      reporter.error(
-                          tree.pos,
-                          s"Implementation restriction: ${clazz.fullLocationString} requires premature access to ${clazz.outerClass}.")
-                    }
-                    val outerParam =
-                      sym.newValueParameter(nme.OUTER, sym.pos) setInfo clazz.outerClass
-                        .thisType
-                    ((ValDef(outerParam) setType NoType) :: vparamss.head) :: vparamss.tail
-                  } else vparamss
+                val vparamss1 = if (isInner(clazz)) {
+                  // (4)
+                  if (isUnderConstruction(clazz.outerClass)) {
+                    reporter.error(
+                        tree.pos,
+                        s"Implementation restriction: ${clazz.fullLocationString} requires premature access to ${clazz.outerClass}.")
+                  }
+                  val outerParam =
+                    sym.newValueParameter(nme.OUTER, sym.pos) setInfo clazz.outerClass
+                      .thisType
+                  ((ValDef(outerParam) setType NoType) :: vparamss.head) :: vparamss.tail
+                } else vparamss
                 super.transform(copyDefDef(tree)(vparamss = vparamss1))
             }
           } else super.transform(tree)
@@ -495,7 +492,7 @@ abstract class ExplicitOuter
           val qsym = qual.tpe.widen.typeSymbol
           if (sym.isProtected && //(4)
               (qsym.isTrait || !(qual.isInstanceOf[Super] ||
-                      (qsym isSubClass currentClass))))
+                        (qsym isSubClass currentClass))))
             sym setFlag notPROTECTED
           super.transform(tree)
 
@@ -517,10 +514,10 @@ abstract class ExplicitOuter
         // for the new pattern matcher
         // base.<outer>.eq(o) --> base.$outer().eq(o) if there's an accessor, else the whole tree becomes TRUE
         // TODO remove the synthetic `<outer>` method from outerFor??
-        case Apply(
-            eqsel @ Select(
-            eqapp @ Apply(sel @ Select(base, nme.OUTER_SYNTH), Nil), eq),
-            args) =>
+        case Apply(eqsel @ Select(
+                   eqapp @ Apply(sel @ Select(base, nme.OUTER_SYNTH), Nil),
+                   eq),
+                   args) =>
           val outerFor = sel.symbol.owner
           val acc = outerAccessor(outerFor)
 
@@ -539,8 +536,8 @@ abstract class ExplicitOuter
             // achieves the same as: localTyper typed atPos(tree.pos)(outerPath(base, base.tpe.typeSymbol, outerFor.outerClass))
             // println("(b, tpsym, outerForI, outerFor, outerClass)= "+ (base, base.tpe.typeSymbol, outerFor, sel.symbol.owner, outerFor.outerClass))
             // println("outerSelect = "+ outerSelect)
-            transform(treeCopy.Apply(
-                    tree, treeCopy.Select(eqsel, outerSelect, eq), args))
+            transform(treeCopy
+                  .Apply(tree, treeCopy.Select(eqsel, outerSelect, eq), args))
           }
 
         case _ =>

@@ -33,8 +33,8 @@ object SolverSpecs
 
   import ast._
 
-  val someFunction = Dispatch(
-      LineStream(), Identifier(Vector(), "x"), Vector())
+  val someFunction =
+    Dispatch(LineStream(), Identifier(Vector(), "x"), Vector())
 
   "simple expression solution" should {
     "solve left addition" in {

@@ -45,19 +45,19 @@ object RoutesFileParserSpec extends Specification {
 
     "parse a path with dynamic parts and it should be encodeable" in {
       parseRoute("GET /s/:d/s p.c.m(d)").path must_==
-        PathPattern(Seq(StaticPart("s/"),
-                        DynamicPart("d", "[^/]+", true),
-                        StaticPart("/s")))
+      PathPattern(Seq(StaticPart("s/"),
+                      DynamicPart("d", "[^/]+", true),
+                      StaticPart("/s")))
     }
 
     "parse a path with multiple dynamic parts and it should not be encodeable" in {
       parseRoute("GET /s/*e p.c.m(e)").path must_==
-        PathPattern(Seq(StaticPart("s/"), DynamicPart("e", ".+", false)))
+      PathPattern(Seq(StaticPart("s/"), DynamicPart("e", ".+", false)))
     }
 
     "path with regex should not be encodeable" in {
       parseRoute("GET /s/$id<[0-9]+> p.c.m(id)").path must_==
-        PathPattern(Seq(StaticPart("s/"), DynamicPart("id", "[0-9]+", false)))
+      PathPattern(Seq(StaticPart("s/"), DynamicPart("id", "[0-9]+", false)))
     }
 
     "parse a single element package" in {
@@ -86,15 +86,15 @@ object RoutesFileParserSpec extends Specification {
 
     "parse method with arguments" in {
       parseRoute("GET /s p.c.m(s1, s2)").call.parameters must_==
-        Some(Seq(Parameter("s1", "String", None, None),
-                 Parameter("s2", "String", None, None)))
+      Some(Seq(Parameter("s1", "String", None, None),
+               Parameter("s2", "String", None, None)))
     }
 
     "parse method with more than 22 arguments" in {
       parseRoute(
           "GET /s p.c.m(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int, i: Int, j: Int, k: String, l: String, m: String, n: String, " +
-          "o: String, p: String, q: Option[Int], r: Option[Int], s: Option[Int], t: Option[Int], u: Option[String], v: Float, w: Float, x: Int)").call.parameters must_==
-        Some(
+            "o: String, p: String, q: Option[Int], r: Option[Int], s: Option[Int], t: Option[Int], u: Option[String], v: Float, w: Float, x: Int)").call.parameters must_==
+      Some(
           Seq(Parameter("a", "Int", None, None),
               Parameter("b", "Int", None, None),
               Parameter("c", "Int", None, None),
@@ -137,7 +137,7 @@ object RoutesFileParserSpec extends Specification {
 
     "parse argument with complex name" in {
       parseRoute("GET /s p.c.m(`b[]`: List[String] ?= [])").call.parameters must_==
-        Some(Seq(Parameter("`b[]`", "List[String]", None, Some("[]"))))
+      Some(Seq(Parameter("`b[]`", "List[String]", None, Some("[]"))))
     }
 
     "parse a non instantiating route" in {

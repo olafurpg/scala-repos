@@ -12,7 +12,8 @@ import bintray.BintrayPlugin.autoImport._
 object Release {
 
   val branchVersion = SettingKey[String](
-      "branch-version", "The version to use if Play is on a branch.")
+      "branch-version",
+      "The version to use if Play is on a branch.")
 
   def settings: Seq[Setting[_]] = Seq(
       // Disable cross building because we're using sbt-doge cross building

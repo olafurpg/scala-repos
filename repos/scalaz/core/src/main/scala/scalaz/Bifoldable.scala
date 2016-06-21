@@ -53,13 +53,13 @@ trait Bifoldable[F[_, _]] { self =>
   }
 
   /**Curried version of `bifoldRight` */
-  final def bifoldR[A, B, C](fa: F[A, B], z: => C)(f: A => (=> C) => C)(
-      g: B => (=> C) => C): C =
+  final def bifoldR[A, B, C](fa: F[A, B], z: => C)(
+      f: A => (=> C) => C)(g: B => (=> C) => C): C =
     bifoldRight(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
   /**Curried version of `bifoldLeft` */
-  final def bifoldL[A, B, C](fa: F[A, B], z: C)(f: C => A => C)(
-      g: C => B => C): C =
+  final def bifoldL[A, B, C](fa: F[A, B], z: C)(
+      f: C => A => C)(g: C => B => C): C =
     bifoldLeft(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
   /** Extract the Foldable on the first parameter. */
@@ -135,8 +135,8 @@ object Bifoldable {
     * Template trait to define `Bifoldable` in terms of `bifoldR`
     */
   trait FromBifoldr[F[_, _]] extends Bifoldable[F] {
-    override def bifoldMap[A, B, M](fa: F[A, B])(
-        f: A => M)(g: B => M)(implicit F: Monoid[M]) =
+    override def bifoldMap[A, B, M](fa: F[A, B])(f: A => M)(
+        g: B => M)(implicit F: Monoid[M]) =
       bifoldR(fa, F.zero)(x => y => F.append(f(x), y))(x =>
             y => F.append(g(x), y))
   }

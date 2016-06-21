@@ -15,8 +15,8 @@ class ListTests extends CatsSuite {
   checkAll("CoflatMap[List]", SerializableTests.serializable(CoflatMap[List]))
 
   checkAll("List[Int]", MonadCombineTests[List].monadCombine[Int, Int, Int])
-  checkAll(
-      "MonadCombine[List]", SerializableTests.serializable(MonadCombine[List]))
+  checkAll("MonadCombine[List]",
+           SerializableTests.serializable(MonadCombine[List]))
 
   checkAll(
       "List[Int] with Option",

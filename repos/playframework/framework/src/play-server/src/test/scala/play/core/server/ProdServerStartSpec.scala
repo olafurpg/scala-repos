@@ -29,8 +29,9 @@ object ProdServerStartSpec extends Specification {
     }
   }
 
-  case class ExitException(
-      message: String, cause: Option[Throwable] = None, returnCode: Int = -1)
+  case class ExitException(message: String,
+                           cause: Option[Throwable] = None,
+                           returnCode: Int = -1)
       extends Exception(s"Exit with $message, $returnCode", cause.orNull)
 
   def exitResult[A](f: => A): Either[(String, Option[String]), A] =

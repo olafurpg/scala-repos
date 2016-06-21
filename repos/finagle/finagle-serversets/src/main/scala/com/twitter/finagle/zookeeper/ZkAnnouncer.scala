@@ -64,8 +64,8 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
           }
 
           change.addr foreach { addr =>
-            conf.status = Some(conf.serverSet.join(
-                    addr, change.endpoints.asJava, conf.shardId))
+            conf.status = Some(conf.serverSet
+                  .join(addr, change.endpoints.asJava, conf.shardId))
           }
 
           change.onComplete.setDone()

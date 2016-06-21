@@ -26,8 +26,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing}
   * Date: 22.02.2008
   * Time: 9:54:54
   */
-class ScTypeAliasDeclarationImpl private (
-    stub: StubElement[ScTypeAlias], nodeType: IElementType, node: ASTNode)
+class ScTypeAliasDeclarationImpl private (stub: StubElement[ScTypeAlias],
+                                          nodeType: IElementType,
+                                          node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTypeAliasDeclaration {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -45,8 +46,8 @@ class ScTypeAliasDeclarationImpl private (
   def nameId = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
     case null =>
       ScalaPsiElementFactory
-        .createIdentifier(
-            getStub.asInstanceOf[ScTypeAliasStub].getName, getManager)
+        .createIdentifier(getStub.asInstanceOf[ScTypeAliasStub].getName,
+                          getManager)
         .getPsi
     case n => n
   }
@@ -105,14 +106,14 @@ class ScTypeAliasDeclarationImpl private (
       def getTextAttributesKey: TextAttributesKey = null
       def getLocationString: String =
         "(" + ScTypeAliasDeclarationImpl.this.containingClass.qualifiedName +
-        ")"
+          ")"
       override def getIcon(open: Boolean) =
         ScTypeAliasDeclarationImpl.this.getIcon(0)
     }
   }
 
   override def getOriginalElement: PsiElement =
-    super [ScTypeAliasDeclaration].getOriginalElement
+    super[ScTypeAliasDeclaration].getOriginalElement
 
   override def accept(visitor: ScalaElementVisitor) {
     visitor.visitTypeAliasDeclaration(this)

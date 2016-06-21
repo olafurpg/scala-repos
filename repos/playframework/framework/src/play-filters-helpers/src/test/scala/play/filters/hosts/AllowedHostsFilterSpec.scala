@@ -39,13 +39,14 @@ object AllowedHostsFilterSpec extends PlaySpecification {
     def filters = Seq(allowedHostsFilter)
   }
 
-  def newApplication(
-      result: RequestHeader => Result, config: String): Application = {
+  def newApplication(result: RequestHeader => Result,
+                     config: String): Application = {
     new GuiceApplicationBuilder()
       .configure(Configuration(ConfigFactory.parseString(config)))
       .overrides(
-          bind[Router].to(
-              Router.from { case request => Action(result(request)) }),
+          bind[Router].to(Router.from {
+            case request => Action(result(request))
+          }),
           bind[HttpFilters].to[Filters]
       )
       .build()
@@ -66,7 +67,8 @@ object AllowedHostsFilterSpec extends PlaySpecification {
 
   "the allowed hosts filter" should {
     "disallow non-local hosts with default config" in withApplication(
-        okWithHost, "") {
+        okWithHost,
+        "") {
       status(request("localhost")) must_== OK
       status(request("typesafe.com")) must_== BAD_REQUEST
       status(request("")) must_== BAD_REQUEST

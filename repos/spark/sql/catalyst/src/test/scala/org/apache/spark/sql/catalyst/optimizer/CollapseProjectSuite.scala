@@ -29,7 +29,9 @@ class CollapseProjectSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", FixedPoint(10), EliminateSubqueryAliases) :: Batch(
-          "CollapseProject", Once, CollapseProject) :: Nil
+          "CollapseProject",
+          Once,
+          CollapseProject) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int)

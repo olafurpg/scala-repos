@@ -25,8 +25,8 @@ class DocServerStart {
             port: java.lang.Integer): ServerWithStop = {
 
     val application: Application = {
-      val environment = Environment(
-          projectPath, this.getClass.getClassLoader, Mode.Test)
+      val environment =
+        Environment(projectPath, this.getClass.getClassLoader, Mode.Test)
       val context = ApplicationLoader.createContext(environment)
       val components = new BuiltInComponentsFromContext(context) {
         lazy val router = Router.empty
@@ -66,8 +66,8 @@ class DocServerStart {
         mode = Mode.Test,
         properties = System.getProperties
     )
-    val serverProvider: ServerProvider = ServerProvider.fromConfiguration(
-        getClass.getClassLoader, config.configuration)
+    val serverProvider: ServerProvider = ServerProvider
+      .fromConfiguration(getClass.getClassLoader, config.configuration)
     val context = ServerProvider.Context(
         config,
         applicationProvider,

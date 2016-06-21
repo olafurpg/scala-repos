@@ -48,12 +48,12 @@ trait TypeInferencerSpecs[M[+ _]]
         Schema.ctypes(p).map(tpe => (JPath.Identity, Some(tpe)))
 
       case JArrayFixedT(elems) =>
-        for ((i, jtpe) <- elems.toSet; (path, ctpes) <- flattenAux(jtpe)) yield
-          (JPathIndex(i) \ path, ctpes)
+        for ((i, jtpe) <- elems.toSet; (path, ctpes) <- flattenAux(jtpe))
+          yield (JPathIndex(i) \ path, ctpes)
 
       case JObjectFixedT(fields) =>
-        for ((field, jtpe) <- fields.toSet; (path, ctpes) <- flattenAux(jtpe)) yield
-          (JPathField(field) \ path, ctpes)
+        for ((field, jtpe) <- fields.toSet; (path, ctpes) <- flattenAux(jtpe))
+          yield (JPathField(field) \ path, ctpes)
 
       case JUnionT(left, right) => flattenAux(left) ++ flattenAux(right)
 
@@ -135,8 +135,8 @@ trait TypeInferencerSpecs[M[+ _]]
     }
   }
 
-  val cLiterals = Set(
-      CBoolean, CLong, CDouble, CNum, CString, CNull, CDate, CPeriod)
+  val cLiterals =
+    Set(CBoolean, CLong, CDouble, CNum, CString, CNull, CDate, CPeriod)
 
   "type inference" should {
     "propagate structure/type information through a trivial Join/DerefObject node" in {
@@ -528,41 +528,37 @@ trait TypeInferencerSpecs[M[+ _]]
 
       // clicks := //clicks forall 'user { user: 'user, age: clicks.age, num: count(clicks.user where clicks.user = 'user) }
       val input =
-        Split(Group(
-                  0,
-                  Join(DerefObject,
-                       Cross(None),
-                       clicks,
-                       Const(CString("user"))(line))(line),
-                  UnfixedSolution(
-                      1,
-                      Join(DerefObject,
-                           Cross(None),
-                           clicks,
-                           Const(CString("user"))(line))(line))),
-              Join(
-                  JoinObject,
-                  Cross(None),
-                  Join(
-                      JoinObject,
-                      Cross(None),
-                      Join(WrapObject,
-                           Cross(None),
-                           Const(CString("user"))(line),
-                           SplitParam(1, id)(line))(line),
-                      Join(WrapObject,
-                           Cross(None),
-                           Const(CString("num"))(line),
-                           Reduce(Count,
-                                  SplitGroup(0, clicks.identities, id)(line))(
-                               line))(line))(line),
-                  Join(WrapObject,
-                       Cross(None),
-                       Const(CString("age"))(line),
-                       Join(DerefObject,
-                            Cross(None),
-                            clicks,
-                            Const(CString("age"))(line))(line))(line))(line),
+        Split(Group(0,
+                    Join(DerefObject,
+                         Cross(None),
+                         clicks,
+                         Const(CString("user"))(line))(line),
+                    UnfixedSolution(1,
+                                    Join(DerefObject,
+                                         Cross(None),
+                                         clicks,
+                                         Const(CString("user"))(line))(line))),
+              Join(JoinObject,
+                   Cross(None),
+                   Join(JoinObject,
+                        Cross(None),
+                        Join(WrapObject,
+                             Cross(None),
+                             Const(CString("user"))(line),
+                             SplitParam(1, id)(line))(line),
+                        Join(WrapObject,
+                             Cross(None),
+                             Const(CString("num"))(line),
+                             Reduce(Count,
+                                    SplitGroup(0, clicks.identities, id)(
+                                        line))(line))(line))(line),
+                   Join(WrapObject,
+                        Cross(None),
+                        Const(CString("age"))(line),
+                        Join(DerefObject,
+                             Cross(None),
+                             clicks,
+                             Const(CString("age"))(line))(line))(line))(line),
               id)(line)
 
       val result = extractLoads(inferTypes(JType.JPrimitiveUnfixedT)(input))
@@ -630,8 +626,10 @@ trait TypeInferencerSpecs[M[+ _]]
 
       val id = new Identifier
 
-      val clicksTime = Join(
-          DerefObject, Cross(None), clicks, Const(CString("time"))(line))(line)
+      val clicksTime = Join(DerefObject,
+                            Cross(None),
+                            clicks,
+                            Const(CString("time"))(line))(line)
 
       val split =
         Split(Group(0, clicks, UnfixedSolution(1, clicksTime)),
@@ -643,8 +641,10 @@ trait TypeInferencerSpecs[M[+ _]]
                               id)(line))(line),
               id)(line)
 
-      val input = Join(
-          DerefObject, Cross(None), split, Const(CString("foo"))(line))(line)
+      val input = Join(DerefObject,
+                       Cross(None),
+                       split,
+                       Const(CString("foo"))(line))(line)
 
       /*
        clicks := //clicks

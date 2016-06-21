@@ -34,7 +34,7 @@ import org.apache.spark.util.sketch.{BloomFilter, CountMinSketch}
   * @since 1.4.0
   */
 @Experimental
-final class DataFrameStatFunctions private[sql](df: DataFrame) {
+final class DataFrameStatFunctions private[sql] (df: DataFrame) {
 
   /**
     * Calculates the approximate quantiles of a numerical column of a DataFrame.
@@ -122,7 +122,7 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
   def corr(col1: String, col2: String, method: String): Double = {
     require(method == "pearson",
             "Currently only the calculation of the Pearson Correlation " +
-            "coefficient is supported.")
+              "coefficient is supported.")
     StatFunctions.pearsonCorrelation(df, Seq(col1, col2))
   }
 
@@ -332,8 +332,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     *
     * @since 1.5.0
     */
-  def sampleBy[T](
-      col: String, fractions: Map[T, Double], seed: Long): DataFrame = {
+  def sampleBy[T](col: String,
+                  fractions: Map[T, Double],
+                  seed: Long): DataFrame = {
     require(fractions.values.forall(p => p >= 0.0 && p <= 1.0),
             s"Fractions must be in [0, 1], but got $fractions.")
     import org.apache.spark.sql.functions.{rand, udf}
@@ -356,8 +357,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     *
     * @since 1.5.0
     */
-  def sampleBy[T](
-      col: String, fractions: ju.Map[T, jl.Double], seed: Long): DataFrame = {
+  def sampleBy[T](col: String,
+                  fractions: ju.Map[T, jl.Double],
+                  seed: Long): DataFrame = {
     sampleBy(col, fractions.asScala.toMap.asInstanceOf[Map[T, Double]], seed)
   }
 
@@ -371,8 +373,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @return a [[CountMinSketch]] over column `colName`
     * @since 2.0.0
     */
-  def countMinSketch(
-      colName: String, depth: Int, width: Int, seed: Int): CountMinSketch = {
+  def countMinSketch(colName: String,
+                     depth: Int,
+                     width: Int,
+                     seed: Int): CountMinSketch = {
     countMinSketch(Column(colName), depth, width, seed)
   }
 
@@ -403,8 +407,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @return a [[CountMinSketch]] over column `colName`
     * @since 2.0.0
     */
-  def countMinSketch(
-      col: Column, depth: Int, width: Int, seed: Int): CountMinSketch = {
+  def countMinSketch(col: Column,
+                     depth: Int,
+                     width: Int,
+                     seed: Int): CountMinSketch = {
     countMinSketch(col, CountMinSketch.create(depth, width, seed))
   }
 
@@ -425,8 +431,8 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     countMinSketch(col, CountMinSketch.create(eps, confidence, seed))
   }
 
-  private def countMinSketch(
-      col: Column, zero: CountMinSketch): CountMinSketch = {
+  private def countMinSketch(col: Column,
+                             zero: CountMinSketch): CountMinSketch = {
     val singleCol = df.select(col)
     val colType = singleCol.schema.head.dataType
 
@@ -451,7 +457,7 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
         case _ =>
         throw new IllegalArgumentException(
             s"Count-min Sketch only supports string type and integral types, " +
-            s"and does not support type $colType."
+              s"and does not support type $colType."
         )
     }
 
@@ -472,10 +478,11 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @param fpp expected false positive probability of the filter.
     * @since 2.0.0
     */
-  def bloomFilter(
-      colName: String, expectedNumItems: Long, fpp: Double): BloomFilter = {
-    buildBloomFilter(
-        Column(colName), BloomFilter.create(expectedNumItems, fpp))
+  def bloomFilter(colName: String,
+                  expectedNumItems: Long,
+                  fpp: Double): BloomFilter = {
+    buildBloomFilter(Column(colName),
+                     BloomFilter.create(expectedNumItems, fpp))
   }
 
   /**
@@ -486,8 +493,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @param fpp expected false positive probability of the filter.
     * @since 2.0.0
     */
-  def bloomFilter(
-      col: Column, expectedNumItems: Long, fpp: Double): BloomFilter = {
+  def bloomFilter(col: Column,
+                  expectedNumItems: Long,
+                  fpp: Double): BloomFilter = {
     buildBloomFilter(col, BloomFilter.create(expectedNumItems, fpp))
   }
 
@@ -499,10 +507,11 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @param numBits expected number of bits of the filter.
     * @since 2.0.0
     */
-  def bloomFilter(
-      colName: String, expectedNumItems: Long, numBits: Long): BloomFilter = {
-    buildBloomFilter(
-        Column(colName), BloomFilter.create(expectedNumItems, numBits))
+  def bloomFilter(colName: String,
+                  expectedNumItems: Long,
+                  numBits: Long): BloomFilter = {
+    buildBloomFilter(Column(colName),
+                     BloomFilter.create(expectedNumItems, numBits))
   }
 
   /**
@@ -513,8 +522,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @param numBits expected number of bits of the filter.
     * @since 2.0.0
     */
-  def bloomFilter(
-      col: Column, expectedNumItems: Long, numBits: Long): BloomFilter = {
+  def bloomFilter(col: Column,
+                  expectedNumItems: Long,
+                  numBits: Long): BloomFilter = {
     buildBloomFilter(col, BloomFilter.create(expectedNumItems, numBits))
   }
 
@@ -547,7 +557,7 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
         case _ =>
         throw new IllegalArgumentException(
             s"Bloom filter only supports string type and integral types, " +
-            s"and does not support type $colType."
+              s"and does not support type $colType."
         )
     }
 

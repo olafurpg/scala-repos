@@ -74,8 +74,8 @@ object ThreadRepo {
   def reallyDeleteByCreatorId(user: ID) =
     $remove(Json.obj("creatorId" -> user))
 
-  def visibleByUserContainingExists(
-      user: ID, containing: String): Fu[Boolean] =
+  def visibleByUserContainingExists(user: ID,
+                                    containing: String): Fu[Boolean] =
     $count.exists(visibleByUserQuery(user) ++ Json.obj(
             "posts.0.text" -> $regex(containing)))
 

@@ -80,8 +80,8 @@ object WebSocketHandler {
             currentFrameData ++= data
             ctx.pull()
           case FrameData(data, true) =>
-            val message = frameToRawMessage(
-                currentFrameHeader, currentFrameData ++ data)
+            val message =
+              frameToRawMessage(currentFrameHeader, currentFrameData ++ data)
             currentFrameHeader = null
             currentFrameData = null
             ctx.push(Right(message))
@@ -158,7 +158,9 @@ object WebSocketHandler {
     * Handles the protocol failures by gracefully closing the connection.
     */
   private def handleProtocolFailures: Flow[RawMessage, Message, _] => Flow[
-      Either[Message, RawMessage], Message, _] = {
+      Either[Message, RawMessage],
+      Message,
+      _] = {
     AkkaStreams.bypassWith(
         Flow[Either[Message, RawMessage]].transform(() =>
               new PushStage[Either[Message, RawMessage],

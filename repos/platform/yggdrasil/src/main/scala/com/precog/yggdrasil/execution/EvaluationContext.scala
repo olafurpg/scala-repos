@@ -46,8 +46,8 @@ object EvaluationContext {
   val schemaV1 =
     "apiKey" :: "account" :: "basePath" :: "scriptPath" :: "startTime" :: HNil
 
-  implicit val decomposer: Decomposer[EvaluationContext] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val extractor: Extractor[EvaluationContext] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val decomposer: Decomposer[EvaluationContext] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val extractor: Extractor[EvaluationContext] =
+    extractorV(schemaV1, Some("1.0".v))
 }

@@ -11,8 +11,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   // don't waste too much time testing this and keep things small
-  implicit override val generatorDrivenConfig = PropertyCheckConfig(
-      minSuccessful = 5, minSize = 2, maxSize = 10)
+  implicit override val generatorDrivenConfig =
+    PropertyCheckConfig(minSuccessful = 5, minSize = 2, maxSize = 10)
 
   test("ImmutableLRU insertion") {
     forAll(Gen.zip(Gen.identifier, arbitrary[Int])) {

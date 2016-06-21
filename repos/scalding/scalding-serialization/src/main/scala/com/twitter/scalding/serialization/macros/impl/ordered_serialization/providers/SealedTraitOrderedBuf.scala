@@ -29,8 +29,8 @@ object SealedTraitOrderedBuf {
     val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
       case tpe
           if (tpe.typeSymbol.isClass &&
-              (tpe.typeSymbol.asClass.isAbstractClass ||
-                  tpe.typeSymbol.asClass.isTrait)) =>
+                (tpe.typeSymbol.asClass.isAbstractClass ||
+                      tpe.typeSymbol.asClass.isTrait)) =>
         SealedTraitOrderedBuf(c)(buildDispatcher, tpe)
     }
     pf
@@ -76,8 +76,8 @@ object SealedTraitOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) =
         SealedTraitLike.compareBinary(c)(inputStreamA, inputStreamB)(subData)
       override def hash(element: ctx.TermName): ctx.Tree =
         SealedTraitLike.hash(c)(element)(subData)
@@ -85,8 +85,8 @@ object SealedTraitOrderedBuf {
         SealedTraitLike.put(c)(inputStream, element)(subData)
       override def get(inputStream: ctx.TermName): ctx.Tree =
         SealedTraitLike.get(c)(inputStream)(subData)
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree =
         SealedTraitLike.compare(c)(outerType, elementA, elementB)(subData)
       override def length(element: Tree): CompileTimeLengthTypes[c.type] =
         SealedTraitLike.length(c)(element)(subData)

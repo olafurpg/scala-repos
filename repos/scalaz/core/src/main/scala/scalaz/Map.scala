@@ -60,8 +60,8 @@ sealed abstract class ==>>[A, B] {
     *   (key, insertedValue, existingValue) => resolvedValue
     * @param kx key
     * @param x value to insert if the key is not already present */
-  def insertWithKey(
-      f: (A, B, B) => B, kx: A, x: B)(implicit o: Order[A]): A ==>> B =
+  def insertWithKey(f: (A, B, B) => B, kx: A, x: B)(
+      implicit o: Order[A]): A ==>> B =
     this match {
       case Tip() =>
         singleton(kx, x)
@@ -111,8 +111,8 @@ sealed abstract class ==>>[A, B] {
     updateWithKey(k, (_, x) => f(x))
 
   /** like [[update]] but with the key available in the update function - O(log n) */
-  def updateWithKey(
-      k: A, f: (A, B) => Option[B])(implicit o: Order[A]): A ==>> B =
+  def updateWithKey(k: A, f: (A, B) => Option[B])(
+      implicit o: Order[A]): A ==>> B =
     this match {
       case Tip() =>
         empty
@@ -566,9 +566,9 @@ sealed abstract class ==>>[A, B] {
     }
   }
 
-  private def hedgeUnionL(
-      cmpLo: A => Ordering, cmpHi: A => Ordering, other: A ==>> B)(
-      implicit o: Order[A]): A ==>> B =
+  private def hedgeUnionL(cmpLo: A => Ordering,
+                          cmpHi: A => Ordering,
+                          other: A ==>> B)(implicit o: Order[A]): A ==>> B =
     (this, other) match {
       case (t1, Tip()) =>
         t1
@@ -665,8 +665,8 @@ sealed abstract class ==>>[A, B] {
       implicit o: Order[A]): A ==>> D =
     intersectionWithKey(other)((_, x, y: C) => f(x, y))
 
-  def intersectionWithKey[C, D](other: A ==>> C)(f: (A, B, C) => D)(
-      implicit o: Order[A]): A ==>> D =
+  def intersectionWithKey[C, D](other: A ==>> C)(
+      f: (A, B, C) => D)(implicit o: Order[A]): A ==>> D =
     (this, other) match {
       case (Tip(), _) =>
         empty
@@ -738,8 +738,8 @@ sealed abstract class ==>>[A, B] {
   def partition(p: B => Boolean)(implicit o: Order[A]): (A ==>> B, A ==>> B) =
     partitionWithKey((_, x) => p(x))
 
-  def partitionWithKey(
-      p: (A, B) => Boolean)(implicit o: Order[A]): (A ==>> B, A ==>> B) =
+  def partitionWithKey(p: (A, B) => Boolean)(
+      implicit o: Order[A]): (A ==>> B, A ==>> B) =
     this match {
       case Tip() =>
         (empty, empty)
@@ -772,8 +772,8 @@ sealed abstract class ==>>[A, B] {
       implicit o: Order[A]): (A ==>> C, A ==>> D) =
     mapEitherWithKey((_, x) => f(x))
 
-  def mapEitherWithKey[C, D](
-      f: (A, B) => C \/ D)(implicit o: Order[A]): (A ==>> C, A ==>> D) =
+  def mapEitherWithKey[C, D](f: (A, B) => C \/ D)(
+      implicit o: Order[A]): (A ==>> C, A ==>> D) =
     this match {
       case Tip() =>
         (empty, empty)
@@ -807,8 +807,8 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def splitLookup(k: A)(
-      implicit o: Order[A]): (A ==>> B, Option[B], A ==>> B) =
+  def splitLookup(
+      k: A)(implicit o: Order[A]): (A ==>> B, Option[B], A ==>> B) =
     this match {
       case Tip() =>
         (empty, none, empty)
@@ -1028,8 +1028,8 @@ sealed abstract class MapInstances extends MapInstances0 {
         Order[List[(A, B)]].order(o1.toAscList, o2.toAscList)
     }
 
-  implicit def mapUnion[A, B](
-      implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
+  implicit def mapUnion[A, B](implicit A: Order[A],
+                              B: Semigroup[B]): Monoid[A ==>> B] =
     Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
 
   implicit def mapIntersection[A, B](
@@ -1089,8 +1089,8 @@ sealed abstract class MapInstances extends MapInstances0 {
       override def index[A](fa: S ==>> A, i: Int) =
         fa.elemAt(i).map(_._2)
 
-      def traverseImpl[F[_], A, B](fa: S ==>> A)(
-          f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
+      def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(
+          implicit G: Applicative[F]): F[S ==>> B] =
         fa match {
           case Tip() =>
             G.point(Tip())
@@ -1120,8 +1120,8 @@ sealed abstract class MapInstances extends MapInstances0 {
     }
 
   implicit val mapBifoldable: Bifoldable[==>>] = new Bifoldable[==>>] {
-    def bifoldMap[A, B, M](fa: A ==>> B)(f: A => M)(g: B => M)(
-        implicit F: Monoid[M]): M =
+    def bifoldMap[A, B, M](
+        fa: A ==>> B)(f: A => M)(g: B => M)(implicit F: Monoid[M]): M =
       fa match {
         case Tip() =>
           F.zero
@@ -1130,8 +1130,8 @@ sealed abstract class MapInstances extends MapInstances0 {
                    F.append(f(k), F.append(g(x), bifoldMap(r)(f)(g))))
       }
 
-    def bifoldRight[A, B, C](fa: A ==>> B, z: => C)(f: (A, => C) => C)(
-        g: (B, => C) => C): C =
+    def bifoldRight[A, B, C](fa: A ==>> B, z: => C)(
+        f: (A, => C) => C)(g: (B, => C) => C): C =
       fa.foldrWithKey(z)((a, b, c) => f(a, g(b, c)))
 
     override def bifoldLeft[A, B, C](fa: A ==>> B, z: C)(f: (C, A) => C)(
@@ -1148,7 +1148,7 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
   implicit def B: Equal[B]
   final override def equal(a1: A ==>> B, a2: A ==>> B) =
     Equal[Int].equal(a1.size, a2.size) &&
-    Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
+      Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
 }
 
 object ==>> extends MapInstances {
@@ -1160,8 +1160,10 @@ object ==>> extends MapInstances {
     def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
   }
 
-  private[scalaz] final case class Bin[A, B](
-      k: A, v: B, l: A ==>> B, r: A ==>> B)
+  private[scalaz] final case class Bin[A, B](k: A,
+                                             v: B,
+                                             l: A ==>> B,
+                                             r: A ==>> B)
       extends ==>>[A, B] {
     val size = l.size + r.size + 1
   }
@@ -1200,8 +1202,8 @@ object ==>> extends MapInstances {
       f: (B, B) => B): A ==>> B =
     fromFoldableWithKey(fa)((_, x, y) => f(x, y))
 
-  final def fromFoldableWithKey[F[_]: Foldable, A: Order, B](fa: F[(A, B)])(
-      f: (A, B, B) => B): A ==>> B =
+  final def fromFoldableWithKey[F[_]: Foldable, A: Order, B](
+      fa: F[(A, B)])(f: (A, B, B) => B): A ==>> B =
     Foldable[F].foldLeft(fa, empty[A, B])((a, c) =>
           a.insertWithKey(f, c._1, c._2))
 
@@ -1215,8 +1217,10 @@ object ==>> extends MapInstances {
   private[scalaz] final val ratio = 2
   private[scalaz] final val delta = 4
 
-  private[scalaz] def balance[A, B](
-      k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B = {
+  private[scalaz] def balance[A, B](k: A,
+                                    x: B,
+                                    l: A ==>> B,
+                                    r: A ==>> B): A ==>> B = {
     if (l.size + r.size <= 1) Bin(k, x, l, r)
     else if (r.size >= delta * l.size) rotateL(k, x, l, r)
     else if (l.size >= delta * r.size) rotateR(k, x, l, r)
@@ -1233,15 +1237,19 @@ object ==>> extends MapInstances {
         sys.error("rotateL Tip")
     }
 
-  private def singleL[A, B](
-      k1: A, x1: B, t1: A ==>> B, r: Bin[A, B]): A ==>> B =
+  private def singleL[A, B](k1: A,
+                            x1: B,
+                            t1: A ==>> B,
+                            r: Bin[A, B]): A ==>> B =
     r match {
       case Bin(k2, x2, t2, t3) =>
         Bin(k2, x2, Bin(k1, x1, t1, t2), t3)
     }
 
-  private def doubleL[A, B](
-      k1: A, x1: B, t1: A ==>> B, r: Bin[A, B]): A ==>> B =
+  private def doubleL[A, B](k1: A,
+                            x1: B,
+                            t1: A ==>> B,
+                            r: Bin[A, B]): A ==>> B =
     r match {
       case Bin(k2, x2, Bin(k3, x3, t2, t3), t4) =>
         Bin(k3, x3, Bin(k1, x1, t1, t2), Bin(k2, x2, t3, t4))
@@ -1259,15 +1267,19 @@ object ==>> extends MapInstances {
         sys.error("rotateR Tip")
     }
 
-  private def singleR[A, B](
-      k1: A, x1: B, l: Bin[A, B], t3: A ==>> B): A ==>> B =
+  private def singleR[A, B](k1: A,
+                            x1: B,
+                            l: Bin[A, B],
+                            t3: A ==>> B): A ==>> B =
     l match {
       case Bin(k2, x2, t1, t2) =>
         Bin(k2, x2, t1, Bin(k1, x1, t2, t3))
     }
 
-  private def doubleR[A, B](
-      k1: A, x1: B, l: Bin[A, B], t4: A ==>> B): A ==>> B =
+  private def doubleR[A, B](k1: A,
+                            x1: B,
+                            l: Bin[A, B],
+                            t4: A ==>> B): A ==>> B =
     l match {
       case Bin(k2, x2, t1, Bin(k3, x3, t2, t3)) =>
         Bin(k3, x3, Bin(k2, x2, t1, t2), Bin(k1, x1, t3, t4))

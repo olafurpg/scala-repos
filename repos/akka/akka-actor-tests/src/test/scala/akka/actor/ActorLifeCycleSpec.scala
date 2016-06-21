@@ -17,8 +17,9 @@ import java.util.UUID.{randomUUID ⇒ newUuid}
 
 object ActorLifeCycleSpec {
 
-  class LifeCycleTestActor(
-      testActor: ActorRef, id: String, generationProvider: AtomicInteger)
+  class LifeCycleTestActor(testActor: ActorRef,
+                           id: String,
+                           generationProvider: AtomicInteger)
       extends Actor {
     def report(msg: Any) = testActor ! message(msg)
     def message(msg: Any): Tuple3[Any, String, Int] = (msg, id, currentGen)
@@ -47,8 +48,7 @@ class ActorLifeCycleSpec
                                OneForOneStrategy(maxNrOfRetries = 3)(
                                    List(classOf[Exception]))))
         val gen = new AtomicInteger(0)
-        val restarterProps = Props(
-            new LifeCycleTestActor(testActor, id, gen) {
+        val restarterProps = Props(new LifeCycleTestActor(testActor, id, gen) {
           override def preRestart(reason: Throwable, message: Option[Any]) {
             report("preRestart")
           }
@@ -148,12 +148,11 @@ class ActorLifeCycleSpec
 
     "clear the behavior stack upon restart" in {
       final case class Become(recv: ActorContext ⇒ Receive)
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case Become(beh) ⇒ {
-              context.become(beh(context), discardOld = false); sender() ! "ok"
-            }
+            context.become(beh(context), discardOld = false); sender() ! "ok"
+          }
           case x ⇒ sender() ! 42
         }
       }))

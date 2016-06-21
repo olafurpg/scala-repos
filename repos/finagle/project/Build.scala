@@ -36,7 +36,7 @@ object Finagle extends Build {
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion exclude
-      ("com.google.guava", "guava"),
+        ("com.google.guava", "guava"),
       guavaLib
   )
   val thriftLibs = Seq(
@@ -48,9 +48,9 @@ object Finagle extends Build {
 
   def util(which: String) =
     "com.twitter" %% ("util-" + which) % utilVersion excludeAll
-    (ExclusionRule(organization = "junit"),
-        ExclusionRule(organization = "org.scala-tools.testing"),
-        ExclusionRule(organization = "org.mockito"))
+      (ExclusionRule(organization = "junit"),
+          ExclusionRule(organization = "org.scala-tools.testing"),
+          ExclusionRule(organization = "org.mockito"))
 
   def scalacOptionsVersion(sv: String): Seq[String] = {
     Seq(
@@ -86,9 +86,9 @@ object Finagle extends Build {
       resolvers += "twitter-repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
         (CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, 10)) => false
-            case _ => true
-          }),
+              case Some((2, 10)) => false
+              case _ => true
+            }),
       javaOptions in Test := Seq("-DSKIP_FLAKY=1"),
       ivyXML := <dependencies>
         <exclude org="com.sun.jmx" module="jmxri" />
@@ -146,15 +146,15 @@ object Finagle extends Build {
       },
       resourceGenerators in Compile <+=
         (resourceManaged in Compile, name, version) map { (dir, name, ver) =>
-        val file = dir / "com" / "twitter" / name / "build.properties"
-        val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
-        val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
-          .format(new java.util.Date)
-        val contents =
-          s"name=$name\nversion=$ver\nbuild_revision=$buildRev\nbuild_name=$buildName"
-        IO.write(file, contents)
-        Seq(file)
-      }
+          val file = dir / "com" / "twitter" / name / "build.properties"
+          val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
+          val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
+            .format(new java.util.Date)
+          val contents =
+            s"name=$name\nversion=$ver\nbuild_revision=$buildRev\nbuild_name=$buildName"
+          IO.write(file, contents)
+          Seq(file)
+        }
   )
 
   val jmockSettings = Seq(
@@ -177,15 +177,15 @@ object Finagle extends Build {
                 inAnyProject -- inProjects(finagleExample)
           )
     ) aggregate
-    (// Core, support.
-        finagleCore, finagleStats, finagleNetty4, finagleZipkin,
-        finagleServersets, finagleCacheResolver, finagleException,
-        finagleIntegration, finagleCommonsStats, finagleExp, finagleMdns,
-        finagleTesters, finagleOstrich4, // Protocols
-        finagleHttp, finagleHttpCompat, finagleStream, finagleNative,
-        finagleThrift, finagleMemcached, finagleKestrel, finagleMux,
-        finagleThriftMux, finagleMySQL, finagleSpdy, finagleRedis,
-        finagleHttpNetty4
+      (// Core, support.
+          finagleCore, finagleStats, finagleNetty4, finagleZipkin,
+          finagleServersets, finagleCacheResolver, finagleException,
+          finagleIntegration, finagleCommonsStats, finagleExp, finagleMdns,
+          finagleTesters, finagleOstrich4, // Protocols
+          finagleHttp, finagleHttpCompat, finagleStream, finagleNative,
+          finagleThrift, finagleMemcached, finagleKestrel, finagleMux,
+          finagleThriftMux, finagleMySQL, finagleSpdy, finagleRedis,
+          finagleHttpNetty4
 
         // finagleBenchmark
 
@@ -613,8 +613,8 @@ object Finagle extends Build {
             settings =
               Defaults.coreDefaultSettings ++ site.settings ++ site
                 .sphinxSupport() ++ sharedSettings ++ Seq(
-                  scalacOptions in doc <++= version.map(
-                      v => Seq("-doc-title", "Finagle", "-doc-version", v)),
+                  scalacOptions in doc <++= version.map(v =>
+                        Seq("-doc-title", "Finagle", "-doc-version", v)),
                   includeFilter in Sphinx :=
                     ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
                   // Workaround for sbt bug: Without a testGrouping for all test configs,

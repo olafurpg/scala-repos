@@ -70,8 +70,9 @@ class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
     this
   }
 
-  override protected def predictPoint(
-      dataMatrix: Vector, weightMatrix: Vector, intercept: Double) = {
+  override protected def predictPoint(dataMatrix: Vector,
+                                      weightMatrix: Vector,
+                                      intercept: Double) = {
     val margin = weightMatrix.toBreeze.dot(dataMatrix.toBreeze) + intercept
     threshold match {
       case Some(t) => if (margin > t) 1.0 else 0.0
@@ -116,7 +117,7 @@ object SVMModel extends Loader[SVMModel] {
         assert(
             model.weights.size == numFeatures,
             s"SVMModel.load with numFeatures=$numFeatures" +
-            s" was given non-matching weights vector of size ${model.weights.size}")
+              s" was given non-matching weights vector of size ${model.weights.size}")
         assert(
             numClasses == 2,
             s"SVMModel.load was given numClasses=$numClasses but only supports 2 classes")
@@ -128,8 +129,8 @@ object SVMModel extends Loader[SVMModel] {
       case _ =>
         throw new Exception(
             s"SVMModel.load did not recognize model with (className, format version):" +
-            s"($loadedClassName, $version).  Supported:\n" +
-            s"  ($classNameV1_0, 1.0)")
+              s"($loadedClassName, $version).  Supported:\n" +
+              s"  ($classNameV1_0, 1.0)")
     }
   }
 }

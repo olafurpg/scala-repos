@@ -42,7 +42,8 @@ class MacroExpansionProvider extends LineMarkerProvider {
                 inWriteAction {
                   val newPsi = ScalaPsiElementFactory
                     .createBlockExpressionWithoutBracesFromText(
-                      saved, PsiManager.getInstance(current.getProject))
+                        saved,
+                        PsiManager.getInstance(current.getProject))
                   current.replace(newPsi)
                   saved
                 }

@@ -204,8 +204,8 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3) => A)(f: (A) => (T1, T2, T3) => B) =
         (t1, t2, t3) => f(fa(t1, t2, t3))(t1, t2, t3)
 
-      def tailrecM[A, B](
-          f: A => (T1, T2, T3) => A \/ B)(a: A): (T1, T2, T3) => B =
+      def tailrecM[A, B](f: A => (T1, T2, T3) => A \/ B)(
+          a: A): (T1, T2, T3) => B =
         (t1, t2, t3) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -223,12 +223,12 @@ trait FunctionInstances extends FunctionInstances0 {
       def point[A](a: => A) =
         (_, _, _, _) => a
 
-      def bind[A, B](fa: (T1, T2, T3, T4) => A)(
-          f: (A) => (T1, T2, T3, T4) => B) =
+      def bind[A, B](fa: (T1, T2,
+                          T3, T4) => A)(f: (A) => (T1, T2, T3, T4) => B) =
         (t1, t2, t3, t4) => f(fa(t1, t2, t3, t4))(t1, t2, t3, t4)
 
-      def tailrecM[A, B](
-          f: A => (T1, T2, T3, T4) => A \/ B)(a: A): (T1, T2, T3, T4) => B =
+      def tailrecM[A, B](f: A => (T1, T2, T3,
+                                  T4) => A \/ B)(a: A): (T1, T2, T3, T4) => B =
         (t1, t2, t3, t4) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -247,8 +247,8 @@ trait FunctionInstances extends FunctionInstances0 {
       def point[A](a: => A) =
         (_, _, _, _, _) => a
 
-      def bind[A, B](fa: (T1, T2, T3, T4, T5) => A)(
-          f: (A) => (T1, T2, T3, T4, T5) => B) =
+      def bind[A, B](fa: (T1, T2, T3,
+                          T4, T5) => A)(f: (A) => (T1, T2, T3, T4, T5) => B) =
         (t1, t2, t3, t4, t5) => f(fa(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5) => A \/ B)(
@@ -272,8 +272,8 @@ trait FunctionInstances extends FunctionInstances0 {
       def point[A](a: => A) =
         (_, _, _, _, _, _) => a
 
-      def bind[A, B](fa: (T1, T2, T3, T4, T5, T6) => A)(
-          f: (A) => (T1, T2, T3, T4, T5, T6) => B) =
+      def bind[A, B](fa: (T1, T2, T3, T4, T5,
+                          T6) => A)(f: (A) => (T1, T2, T3, T4, T5, T6) => B) =
         (t1, t2, t3, t4, t5, t6) =>
           f(fa(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
 

@@ -33,7 +33,8 @@ import org.apache.spark.util.{JsonProtocol, JsonProtocolSuite, Utils}
   */
 class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
   private val fileSystem = Utils.getHadoopFileSystem(
-      "/", SparkHadoopUtil.get.newConfiguration(new SparkConf()))
+      "/",
+      SparkHadoopUtil.get.newConfiguration(new SparkConf()))
   private var testDir: File = _
 
   before {
@@ -48,8 +49,12 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     val logFilePath = Utils.getFilePath(testDir, "events.txt")
     val fstream = fileSystem.create(logFilePath)
     val writer = new PrintWriter(fstream)
-    val applicationStart = SparkListenerApplicationStart(
-        "Greatest App (N)ever", None, 125L, "Mickey", None)
+    val applicationStart =
+      SparkListenerApplicationStart("Greatest App (N)ever",
+                                    None,
+                                    125L,
+                                    "Mickey",
+                                    None)
     val applicationEnd = SparkListenerApplicationEnd(1000L)
     // scalastyle:off println
     writer.println(

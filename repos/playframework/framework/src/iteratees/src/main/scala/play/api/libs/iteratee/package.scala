@@ -39,7 +39,7 @@ package play.api.libs.iteratee {
         body
       }(ec /* Future.apply will prepare */ )
         .flatMap(identityFunc.asInstanceOf[Future[A] => Future[A]])(
-          Execution.trampoline)
+            Execution.trampoline)
     }
 
     /**

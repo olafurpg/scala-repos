@@ -56,8 +56,8 @@ object TooltipDemo extends JFXApp {
     alignment = Pos.Center
     alignmentInParent = Pos.TopCenter
     hgrow = Priority.Always
-    children = List(
-        new TooltipControls(myTooltip), new PopupControlControls(myTooltip))
+    children =
+      List(new TooltipControls(myTooltip), new PopupControlControls(myTooltip))
   }
 
   val mainPane = new VBox {

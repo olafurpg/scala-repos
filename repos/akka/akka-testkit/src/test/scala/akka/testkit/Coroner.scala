@@ -44,8 +44,8 @@ object Coroner {
     val finishedLatch = new CountDownLatch(1)
 
     def waitForStart(): Unit = {
-      startedLatch.await(
-          startAndStopDuration.length, startAndStopDuration.unit)
+      startedLatch
+        .await(startAndStopDuration.length, startAndStopDuration.unit)
     }
 
     def started(): Unit = startedLatch.countDown()
@@ -56,8 +56,8 @@ object Coroner {
 
     override def cancel(): Unit = {
       cancelPromise.trySuccess(true)
-      finishedLatch.await(
-          startAndStopDuration.length, startAndStopDuration.unit)
+      finishedLatch
+        .await(startAndStopDuration.length, startAndStopDuration.unit)
     }
 
     override def ready(atMost: Duration)(
@@ -105,9 +105,9 @@ object Coroner {
               s"Coroner not cancelled after ${duration.toMillis}ms. Looking for signs of foul play...")
           try printReport(reportTitle, out) catch {
             case NonFatal(ex) ⇒ {
-                out.println("Error displaying Coroner's Report")
-                ex.printStackTrace(out)
-              }
+              out.println("Error displaying Coroner's Report")
+              ex.printStackTrace(out)
+            }
           }
         }
       } finally {
@@ -154,14 +154,13 @@ object Coroner {
     }
 
     def findDeadlockedThreads: (Seq[ThreadInfo], String) = {
-      val (ids, desc) =
-        if (threadMx.isSynchronizerUsageSupported()) {
-          (threadMx.findDeadlockedThreads(),
-           "monitors and ownable synchronizers")
-        } else {
-          (threadMx.findMonitorDeadlockedThreads(),
-           "monitors, but NOT ownable synchronizers")
-        }
+      val (ids, desc) = if (threadMx.isSynchronizerUsageSupported()) {
+        (threadMx.findDeadlockedThreads(),
+         "monitors and ownable synchronizers")
+      } else {
+        (threadMx.findMonitorDeadlockedThreads(),
+         "monitors, but NOT ownable synchronizers")
+      }
       if (ids == null) {
         (Seq.empty, desc)
       } else {

@@ -44,8 +44,8 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
     bigRats = init(size)(
         BigIntRational(BigInt(bits, Random), BigInt(bits, Random) + 1))
     if (bits <= 32) {
-      longRats = init(size)(LongRational(
-              BigInt(bits, Random).toLong, BigInt(bits, Random).toLong + 1L))
+      longRats = init(size)(LongRational(BigInt(bits, Random).toLong,
+                                         BigInt(bits, Random).toLong + 1L))
     } else {
       longRats = Array[LongRational]()
     }

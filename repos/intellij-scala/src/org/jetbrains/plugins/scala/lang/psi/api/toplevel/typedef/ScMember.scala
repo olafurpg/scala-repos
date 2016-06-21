@@ -67,8 +67,8 @@ trait ScMember
       case (found, _: ScClassParameter | _: ScPrimaryConstructor) => found
       case (found, _)
           if context == found.extendsBlock ||
-          found.extendsBlock.templateBody.contains(context) ||
-          found.extendsBlock.earlyDefinitions.contains(context) =>
+            found.extendsBlock.templateBody.contains(context) ||
+            found.extendsBlock.earlyDefinitions.contains(context) =>
         found
       case (found, _) => null // See SCL-3178
     }
@@ -89,7 +89,7 @@ trait ScMember
           this match {
             case fun: ScFunction
                 if fun.isSyntheticApply || fun.isSyntheticUnapply ||
-                fun.isSyntheticUnapplySeq =>
+                  fun.isSyntheticUnapplySeq =>
               //this is special case for synthetic apply and unapply methods
               ScalaPsiUtil.getCompanionModule(c) match {
                 case Some(td) => return td
@@ -186,8 +186,8 @@ trait ScMember
     val accessModifier = Option(getModifierList).flatMap(_.accessModifier)
 
     def fromContainingBlockOrMember(): Option[SearchScope] = {
-      val blockOrMember = PsiTreeUtil.getContextOfType(
-          this, true, classOf[ScBlock], classOf[ScMember])
+      val blockOrMember = PsiTreeUtil
+        .getContextOfType(this, true, classOf[ScBlock], classOf[ScMember])
       blockOrMember match {
         case null => None
         case block: ScBlock => Some(new LocalSearchScope(block))

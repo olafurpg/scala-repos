@@ -18,8 +18,9 @@ object ScalaWebSockets extends PlaySpecification {
 
   "Scala WebSockets" should {
 
-    def runWebSocket[In, Out](
-        webSocket: WebSocket, in: Source[Message, _], expectOut: Int)(
+    def runWebSocket[In, Out](webSocket: WebSocket,
+                              in: Source[Message, _],
+                              expectOut: Int)(
         implicit mat: Materializer): Either[Result, List[Message]] = {
       await(webSocket(FakeRequest())).right.map { flow =>
         // When running in the real world, if the flow cancels upstream, Play's WebSocket protocol implementation will
@@ -30,13 +31,13 @@ object ScalaWebSockets extends PlaySpecification {
         val flowResult =
           in via flow runWith Sink
             .fold[(List[Message], Int), Message]((Nil, expectOut)) {
-            (state, out) =>
-              val (result, remaining) = state
-              if (remaining == 1) {
-                promise.success(result :+ out)
-              }
-              (result :+ out, remaining - 1)
-          }
+              (state, out) =>
+                val (result, remaining) = state
+                if (remaining == 1) {
+                  promise.success(result :+ out)
+                }
+                (result :+ out, remaining - 1)
+            }
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         await(
             Future.firstCompletedOf(Seq(promise.future, flowResult.map(_._1))))
@@ -204,8 +205,7 @@ object Samples {
     import play.api.Play.materializer
 
     def socket = WebSocket.tryAcceptWithActor[String, String] { request =>
-      Future.successful(
-          request.session.get("user") match {
+      Future.successful(request.session.get("user") match {
         case None => Left(Forbidden)
         case Some(_) => Right(MyWebSocketActor.props)
       })

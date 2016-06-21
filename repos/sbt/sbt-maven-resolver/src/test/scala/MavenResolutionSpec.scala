@@ -154,7 +154,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
     val jars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name == "scala-library") ||
-      (m.module.name contains "parser")
+        (m.module.name contains "parser")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     jars should have size 2
@@ -162,12 +162,14 @@ class MavenResolutionSpec extends BaseIvySpecification {
 
   def failIfPomMissing = {
     // TODO - we need the jar to not exist too.
-    val m = module(
-        ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-        Seq(ModuleID(
-                "org.scala-sbt", "does-not-exist", "1.0", Some("compile"))),
-        Some("2.10.2"),
-        defaultUpdateOptions)
+    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+                   Seq(
+                       ModuleID("org.scala-sbt",
+                                "does-not-exist",
+                                "1.0",
+                                Some("compile"))),
+                   Some("2.10.2"),
+                   defaultUpdateOptions)
     an[Exception] should be thrownBy ivyUpdate(m)
   }
 
@@ -220,13 +222,13 @@ class MavenResolutionSpec extends BaseIvySpecification {
     val transitiveJars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
-      !(m.module.name contains "testkit")
+        !(m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     val directJars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
-      (m.module.name contains "testkit")
+        (m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     (report.configurations should have size configurations.size)
@@ -266,7 +268,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
       if conf.configuration == "compile"
       m <- conf.modules
       (a, f) <- m.artifacts if (f.getName contains "sources") ||
-      (f.getName contains "javadoc")
+        (f.getName contains "javadoc")
     } yield f
     (report.configurations should have size configurations.size)
     (jars should have size 2)

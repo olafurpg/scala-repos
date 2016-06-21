@@ -42,8 +42,8 @@ private[remote] trait TcpHandlers extends CommonHandlers {
                             remoteAddress: Address): AssociationHandle =
     new TcpAssociationHandle(localAddress, remoteAddress, transport, channel)
 
-  override def onDisconnect(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
+  override def onDisconnect(ctx: ChannelHandlerContext,
+                            e: ChannelStateEvent): Unit =
     notifyListener(e.getChannel, Disassociated(AssociationHandle.Unknown))
 
   override def onMessage(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
@@ -52,8 +52,8 @@ private[remote] trait TcpHandlers extends CommonHandlers {
       notifyListener(e.getChannel, InboundPayload(ByteString(bytes)))
   }
 
-  override def onException(
-      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
+  override def onException(ctx: ChannelHandlerContext,
+                           e: ExceptionEvent): Unit = {
     notifyListener(e.getChannel, Disassociated(AssociationHandle.Unknown))
     e.getChannel.close() // No graceful close here
   }
@@ -68,21 +68,21 @@ private[remote] class TcpServerHandler(
     extends ServerHandler(_transport, _associationListenerFuture)
     with TcpHandlers {
 
-  override def onConnect(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
+  override def onConnect(ctx: ChannelHandlerContext,
+                         e: ChannelStateEvent): Unit =
     initInbound(e.getChannel, e.getChannel.getRemoteAddress, null)
 }
 
 /**
   * INTERNAL API
   */
-private[remote] class TcpClientHandler(
-    _transport: NettyTransport, remoteAddress: Address)
+private[remote] class TcpClientHandler(_transport: NettyTransport,
+                                       remoteAddress: Address)
     extends ClientHandler(_transport, remoteAddress)
     with TcpHandlers {
 
-  override def onConnect(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
+  override def onConnect(ctx: ChannelHandlerContext,
+                         e: ChannelStateEvent): Unit =
     initOutbound(e.getChannel, e.getChannel.getRemoteAddress, null)
 }
 

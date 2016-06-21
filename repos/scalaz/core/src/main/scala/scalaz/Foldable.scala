@@ -60,8 +60,8 @@ trait Foldable[F[_]] { self =>
   }
 
   /**Right-associative, monadic fold of a structure. */
-  def foldRightM[G[_], A, B](fa: F[A], z: => B)(f: (A, => B) => G[B])(
-      implicit M: Monad[G]): G[B] =
+  def foldRightM[G[_], A, B](fa: F[A], z: => B)(
+      f: (A, => B) => G[B])(implicit M: Monad[G]): G[B] =
     foldLeft[A, B => G[B]](fa, M.point(_))((b, a) => w => M.bind(f(a, w))(b))(
         z)
 
@@ -72,8 +72,8 @@ trait Foldable[F[_]] { self =>
         z)
 
   /** Specialization of foldRightM when `B` has a `Monoid`. */
-  def foldMapM[G[_], A, B](
-      fa: F[A])(f: A => G[B])(implicit B: Monoid[B], G: Monad[G]): G[B] =
+  def foldMapM[G[_], A, B](fa: F[A])(f: A => G[B])(implicit B: Monoid[B],
+                                                   G: Monad[G]): G[B] =
     foldRightM[G, A, B](fa, B.zero)((a, b2) =>
           G.map(f(a))(b1 => B.append(b1, b2)))
 
@@ -112,8 +112,8 @@ trait Foldable[F[_]] { self =>
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B =
     foldRight(fa, z)((a, b) => f(a)(b))
-  def foldMapRight1Opt[A, B](fa: F[A])(
-      z: A => B)(f: (A, => B) => B): Option[B] =
+  def foldMapRight1Opt[A, B](
+      fa: F[A])(z: A => B)(f: (A, => B) => B): Option[B] =
     foldRight(fa, None: Option[B])((a, optB) =>
           optB map (f(a, _)) orElse Some(z(a)))
   def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] =
@@ -135,13 +135,13 @@ trait Foldable[F[_]] { self =>
           optA map (aa => f(aa)(a)) orElse Some(a))
 
   /**Curried version of `foldRightM` */
-  final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => (=> B) => G[B])(
-      implicit M: Monad[G]): G[B] =
+  final def foldrM[G[_], A, B](fa: F[A], z: => B)(
+      f: A => (=> B) => G[B])(implicit M: Monad[G]): G[B] =
     foldRightM(fa, z)((a, b) => f(a)(b))
 
   /**Curried version of `foldLeftM` */
-  final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(
-      implicit M: Monad[G]): G[B] =
+  final def foldlM[G[_], A, B](fa: F[A], z: => B)(
+      f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
   /** map elements in a Foldable with a monadic function and return the first element that is mapped successfully */
@@ -199,8 +199,8 @@ trait Foldable[F[_]] { self =>
     foldRight(fa, true)(p(_) && _)
 
   /** `all` with monadic traversal. */
-  def allM[G[_], A](fa: F[A])(
-      p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
+  def allM[G[_], A](
+      fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(true))((a, b) =>
           G.bind(p(a))(q => if (q) b else G.point(false)))
 
@@ -209,8 +209,8 @@ trait Foldable[F[_]] { self =>
     foldRight(fa, false)(p(_) || _)
 
   /** `any` with monadic traversal. */
-  def anyM[G[_], A](fa: F[A])(
-      p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
+  def anyM[G[_], A](
+      fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(false))((a, b) =>
           G.bind(p(a))(q => if (q) G.point(true) else b))
 
@@ -314,15 +314,14 @@ trait Foldable[F[_]] { self =>
     * Selects groups of elements that satisfy p and discards others.
     */
   def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
-    foldRight(fa, (List[NonEmptyList[A]](), false))(
-        (a, xb) =>
+    foldRight(fa, (List[NonEmptyList[A]](), false))((a, xb) =>
           xb match {
         case (x, b) => {
-            val pa = p(a)
-            (if (pa) if (b) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
-             else x,
-             pa)
-          }
+          val pa = p(a)
+          (if (pa) if (b) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
+           else x,
+           pa)
+        }
     })._1
 
   /** ``O(n log n)`` complexity */

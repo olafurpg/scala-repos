@@ -214,7 +214,7 @@ class MetricsGossipSpec
 
       val m2Updated =
         m2 copy
-        (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+          (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
       val g2 = g1 :+ m2Updated // merge peers
       g2.nodes.size should ===(2)
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
@@ -238,7 +238,7 @@ class MetricsGossipSpec
                            collector.sample.metrics)
       val m2Updated =
         m2 copy
-        (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+          (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       val g2 = MetricsGossip.empty :+ m3 :+ m2Updated
@@ -312,10 +312,12 @@ class MetricValuesSpec
 
   val collector = createMetricsCollector
 
-  val node1 = NodeMetrics(
-      Address("akka.tcp", "sys", "a", 2554), 1, collector.sample.metrics)
-  val node2 = NodeMetrics(
-      Address("akka.tcp", "sys", "a", 2555), 1, collector.sample.metrics)
+  val node1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                          1,
+                          collector.sample.metrics)
+  val node2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
+                          1,
+                          collector.sample.metrics)
 
   val nodes: Seq[NodeMetrics] = {
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒

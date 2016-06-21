@@ -284,7 +284,7 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         case LogicalRelation(_: HadoopFsRelation, _, _) => // OK
         case _ =>
           fail("test_parquet_ctas should be converted to " +
-              s"${classOf[HadoopFsRelation].getCanonicalName}")
+                s"${classOf[HadoopFsRelation].getCanonicalName}")
       }
     }
   }
@@ -307,9 +307,9 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         case ExecutedCommand(_: InsertIntoHadoopFsRelation) => // OK
         case o =>
           fail("test_insert_parquet should be converted to a " +
-              s"${classOf[HadoopFsRelation].getCanonicalName} and " +
-              s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan. " +
-              s"However, found a ${o.toString} ")
+                s"${classOf[HadoopFsRelation].getCanonicalName} and " +
+                s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan. " +
+                s"However, found a ${o.toString} ")
       }
 
       checkAnswer(
@@ -338,9 +338,9 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         case ExecutedCommand(_: InsertIntoHadoopFsRelation) => // OK
         case o =>
           fail("test_insert_parquet should be converted to a " +
-              s"${classOf[HadoopFsRelation].getCanonicalName} and " +
-              s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan." +
-              s"However, found a ${o.toString} ")
+                s"${classOf[HadoopFsRelation].getCanonicalName} and " +
+                s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan." +
+                s"However, found a ${o.toString} ")
       }
 
       checkAnswer(
@@ -428,11 +428,12 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
       sessionState.catalog.cachedDataSourceTables.getIfPresent(tableIdentifier) match {
         case null =>
           fail("Converted test_parquet should be cached in the cache.")
-        case logical @ LogicalRelation(
-            parquetRelation: HadoopFsRelation, _, _) => // OK
+        case logical @ LogicalRelation(parquetRelation: HadoopFsRelation,
+                                       _,
+                                       _) => // OK
         case other =>
           fail("The cached test_parquet should be a Parquet Relation. " +
-              s"However, $other is returned form the cache.")
+                s"However, $other is returned form the cache.")
       }
     }
 
@@ -491,8 +492,8 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         |  OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
       """.stripMargin)
 
-    tableIdentifier = _catalog.QualifiedTableName(
-        "default", "test_parquet_partitioned_cache_test")
+    tableIdentifier = _catalog
+      .QualifiedTableName("default", "test_parquet_partitioned_cache_test")
     assert(sessionState.catalog.cachedDataSourceTables
           .getIfPresent(tableIdentifier) === null)
     sql("""
@@ -652,7 +653,9 @@ class ParquetSourceSuite extends ParquetPartitioningTest {
     val arrayType1 = ArrayType(IntegerType, containsNull = false)
     val expectedSchema1 = StructType(
         StructField("m", mapType1, nullable = true) :: StructField(
-            "a", arrayType1, nullable = true) :: Nil)
+            "a",
+            arrayType1,
+            nullable = true) :: Nil)
     assert(df.schema === expectedSchema1)
 
     withTable("alwaysNullable") {
@@ -661,9 +664,11 @@ class ParquetSourceSuite extends ParquetPartitioningTest {
       val mapType2 =
         MapType(IntegerType, IntegerType, valueContainsNull = true)
       val arrayType2 = ArrayType(IntegerType, containsNull = true)
-      val expectedSchema2 =
-        StructType(StructField("m", mapType2, nullable = true) :: StructField(
-                "a", arrayType2, nullable = true) :: Nil)
+      val expectedSchema2 = StructType(
+          StructField("m", mapType2, nullable = true) :: StructField(
+              "a",
+              arrayType2,
+              nullable = true) :: Nil)
 
       assert(table("alwaysNullable").schema === expectedSchema2)
 
@@ -750,8 +755,11 @@ abstract class ParquetPartitioningTest
       sparkContext
         .makeRDD(1 to 10)
         .map { i =>
-          ParquetDataWithKeyAndComplexTypes(
-              p, i, s"part-$p", StructContainer(i, f"${i}_string"), 1 to i)
+          ParquetDataWithKeyAndComplexTypes(p,
+                                            i,
+                                            s"part-$p",
+                                            StructContainer(i, f"${i}_string"),
+                                            1 to i)
         }
         .toDF()
         .write
@@ -765,8 +773,10 @@ abstract class ParquetPartitioningTest
       sparkContext
         .makeRDD(1 to 10)
         .map { i =>
-          ParquetDataWithComplexTypes(
-              i, s"part-$p", StructContainer(i, f"${i}_string"), 1 to i)
+          ParquetDataWithComplexTypes(i,
+                                      s"part-$p",
+                                      StructContainer(i, f"${i}_string"),
+                                      1 to i)
         }
         .toDF()
         .write
@@ -828,7 +838,9 @@ abstract class ParquetPartitioningTest
               "part-7",
               7,
               10) :: Row("part-8", 8, 10) :: Row("part-9", 9, 10) :: Row(
-              "part-10", 10, 10) :: Nil
+              "part-10",
+              10,
+              10) :: Nil
       )
     }
 

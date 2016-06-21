@@ -14,9 +14,10 @@ class NoTailRecursionAnnotationInspection
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunctionDefinition
         if f.canBeTailRecursive && !f.hasTailRecursionAnnotation &&
-        f.recursionType == RecursionType.TailRecursion =>
-      holder.registerProblem(
-          f.nameId, getDisplayName, new AddAnnotationQuickFix(f))
+          f.recursionType == RecursionType.TailRecursion =>
+      holder.registerProblem(f.nameId,
+                             getDisplayName,
+                             new AddAnnotationQuickFix(f))
   }
 
   class AddAnnotationQuickFix(holder: ScAnnotationsHolder)

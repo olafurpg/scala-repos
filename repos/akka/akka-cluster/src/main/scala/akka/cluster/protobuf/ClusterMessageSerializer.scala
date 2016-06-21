@@ -39,38 +39,40 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
 
   private val fromBinaryMap = collection.immutable
     .HashMap[Class[_ <: ClusterMessage], Array[Byte] ⇒ AnyRef](
-      classOf[InternalClusterAction.Join] -> {
-        case bytes ⇒
-          val m = cm.Join.parseFrom(bytes)
-          InternalClusterAction.Join(
-              uniqueAddressFromProto(m.getNode),
-              Set.empty[String] ++ m.getRolesList.asScala)
-      },
-      classOf[InternalClusterAction.Welcome] -> {
-        case bytes ⇒
-          val m = cm.Welcome.parseFrom(decompress(bytes))
-          InternalClusterAction.Welcome(uniqueAddressFromProto(m.getFrom),
-                                        gossipFromProto(m.getGossip))
-      },
-      classOf[ClusterUserAction.Leave] ->
-      (bytes ⇒ ClusterUserAction.Leave(addressFromBinary(bytes))),
-      classOf[ClusterUserAction.Down] ->
-      (bytes ⇒ ClusterUserAction.Down(addressFromBinary(bytes))),
-      InternalClusterAction.InitJoin.getClass ->
-      (_ ⇒ InternalClusterAction.InitJoin),
-      classOf[InternalClusterAction.InitJoinAck] ->
-      (bytes ⇒ InternalClusterAction.InitJoinAck(addressFromBinary(bytes))),
-      classOf[InternalClusterAction.InitJoinNack] ->
-      (bytes ⇒ InternalClusterAction.InitJoinNack(addressFromBinary(bytes))),
-      classOf[ClusterHeartbeatSender.Heartbeat] ->
-      (bytes ⇒ ClusterHeartbeatSender.Heartbeat(addressFromBinary(bytes))),
-      classOf[ClusterHeartbeatSender.HeartbeatRsp] ->
-      (bytes ⇒
-            ClusterHeartbeatSender.HeartbeatRsp(
-                uniqueAddressFromBinary(bytes))),
-      classOf[GossipStatus] -> gossipStatusFromBinary,
-      classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
-      classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary)
+        classOf[InternalClusterAction.Join] -> {
+          case bytes ⇒
+            val m = cm.Join.parseFrom(bytes)
+            InternalClusterAction.Join(
+                uniqueAddressFromProto(m.getNode),
+                Set.empty[String] ++ m.getRolesList.asScala)
+        },
+        classOf[InternalClusterAction.Welcome] -> {
+          case bytes ⇒
+            val m = cm.Welcome.parseFrom(decompress(bytes))
+            InternalClusterAction.Welcome(uniqueAddressFromProto(m.getFrom),
+                                          gossipFromProto(m.getGossip))
+        },
+        classOf[ClusterUserAction.Leave] ->
+          (bytes ⇒ ClusterUserAction.Leave(addressFromBinary(bytes))),
+        classOf[ClusterUserAction.Down] ->
+          (bytes ⇒ ClusterUserAction.Down(addressFromBinary(bytes))),
+        InternalClusterAction.InitJoin.getClass ->
+          (_ ⇒ InternalClusterAction.InitJoin),
+        classOf[InternalClusterAction.InitJoinAck] ->
+          (bytes ⇒
+                InternalClusterAction.InitJoinAck(addressFromBinary(bytes))),
+        classOf[InternalClusterAction.InitJoinNack] ->
+          (bytes ⇒
+                InternalClusterAction.InitJoinNack(addressFromBinary(bytes))),
+        classOf[ClusterHeartbeatSender.Heartbeat] ->
+          (bytes ⇒ ClusterHeartbeatSender.Heartbeat(addressFromBinary(bytes))),
+        classOf[ClusterHeartbeatSender.HeartbeatRsp] ->
+          (bytes ⇒
+                ClusterHeartbeatSender.HeartbeatRsp(
+                    uniqueAddressFromBinary(bytes))),
+        classOf[GossipStatus] -> gossipStatusFromBinary,
+        classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
+        classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary)
 
   def includeManifest: Boolean = true
 
@@ -203,8 +205,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
 
   private def uniqueAddressFromProto(
       uniqueAddress: cm.UniqueAddress): UniqueAddress =
-    UniqueAddress(
-        addressFromProto(uniqueAddress.getAddress), uniqueAddress.getUid)
+    UniqueAddress(addressFromProto(uniqueAddress.getAddress),
+                  uniqueAddress.getUid)
 
   private val memberStatusToInt =
     scala.collection.immutable.HashMap[MemberStatus, Int](
@@ -230,8 +232,9 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     case (a, b) ⇒ (b, a)
   }
 
-  private def mapWithErrorMessage[T](
-      map: Map[T, Int], value: T, unknown: String): Int =
+  private def mapWithErrorMessage[T](map: Map[T, Int],
+                                     value: T,
+                                     unknown: String): Int =
     map.get(value) match {
       case Some(x) ⇒ x
       case _ ⇒
@@ -373,8 +376,11 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
         observerReachability: Iterable[cm.ObserverReachability])
       : Reachability = {
       val recordBuilder = new immutable.VectorBuilder[Reachability.Record]
-      val versionsBuilder = new scala.collection.mutable.MapBuilder[
-          UniqueAddress, Long, Map[UniqueAddress, Long]](Map.empty)
+      val versionsBuilder =
+        new scala.collection.mutable.MapBuilder[UniqueAddress,
+                                                Long,
+                                                Map[UniqueAddress, Long]](
+            Map.empty)
       for (o ← observerReachability) {
         val observer = addressMapping(o.getAddressIndex)
         versionsBuilder += ((observer, o.getVersion))
@@ -413,8 +419,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
            vectorClockFromProto(gossip.getVersion, hashMapping))
   }
 
-  private def vectorClockFromProto(
-      version: cm.VectorClock, hashMapping: immutable.Seq[String]) = {
+  private def vectorClockFromProto(version: cm.VectorClock,
+                                   hashMapping: immutable.Seq[String]) = {
     import scala.collection.breakOut
     VectorClock(version.getVersionsList.asScala.map(v ⇒
               (VectorClock.Node.fromHash(hashMapping(v.getHashIndex)),
@@ -436,8 +442,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
   private def gossipStatusFromProto(status: cm.GossipStatus): GossipStatus =
     GossipStatus(
         uniqueAddressFromProto(status.getFrom),
-        vectorClockFromProto(
-            status.getVersion, status.getAllHashesList.asScala.toVector))
+        vectorClockFromProto(status.getVersion,
+                             status.getAllHashesList.asScala.toVector))
 
   private def metricsGossipEnvelopeToProto(
       envelope: MetricsGossipEnvelope): cm.MetricsGossipEnvelope = {

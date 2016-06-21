@@ -28,10 +28,10 @@ case class Query(user1: Option[String] = None,
 
   def nonEmpty =
     user1.nonEmpty || user2.nonEmpty || winner.nonEmpty ||
-    winnerColor.nonEmpty || perf.nonEmpty || source.nonEmpty ||
-    status.nonEmpty || turns.nonEmpty || averageRating.nonEmpty ||
-    hasAi.nonEmpty || aiLevel.nonEmpty || rated.nonEmpty || date.nonEmpty ||
-    duration.nonEmpty || clock.nonEmpty || analysed.nonEmpty
+      winnerColor.nonEmpty || perf.nonEmpty || source.nonEmpty ||
+      status.nonEmpty || turns.nonEmpty || averageRating.nonEmpty ||
+      hasAi.nonEmpty || aiLevel.nonEmpty || rated.nonEmpty || date.nonEmpty ||
+      duration.nonEmpty || clock.nonEmpty || analysed.nonEmpty
 }
 
 object Query {
@@ -125,8 +125,9 @@ object Query {
         1 to 6,
         "d",
         "%d day{s} ago") ++ options(1 to 3, "w", "%d week{s} ago") ++ options(
-        1 to 6, "m", "%d month{s} ago") ++ options(
-        1 to 5, "y", "%d year{s} ago")
+        1 to 6,
+        "m",
+        "%d month{s} ago") ++ options(1 to 5, "y", "%d year{s} ago")
 
   val statuses = Status.finishedNotCheated.map {
     case s if s.is(_.Timeout) => none

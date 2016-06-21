@@ -42,8 +42,8 @@ private[netty] abstract class NettyRpcCallContext(
 /**
   * If the sender and the receiver are in the same process, the reply can be sent back via `Promise`.
   */
-private[netty] class LocalNettyRpcCallContext(
-    senderAddress: RpcAddress, p: Promise[Any])
+private[netty] class LocalNettyRpcCallContext(senderAddress: RpcAddress,
+                                              p: Promise[Any])
     extends NettyRpcCallContext(senderAddress) {
 
   override protected def send(message: Any): Unit = {

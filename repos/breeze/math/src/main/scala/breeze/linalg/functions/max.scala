@@ -52,8 +52,10 @@ object max
           }
         }
 
-        override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(arr: Array[S],
+                                offset: Int,
+                                length: Int,
+                                stride: Int): Unit = {
           if (length >= 0) {
             visitedOne = true
           }
@@ -177,8 +179,10 @@ object min extends UFunc {
           }
         }
 
-        override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(arr: Array[S],
+                                offset: Int,
+                                length: Int,
+                                stride: Int): Unit = {
           var i = 0
           var off = offset
           while (i < length) {
@@ -279,8 +283,10 @@ object ptp extends UFunc {
           }
         }
 
-        override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(arr: Array[S],
+                                offset: Int,
+                                length: Int,
+                                stride: Int): Unit = {
           var i = 0
           var off = offset
           while (i < length) {
@@ -336,8 +342,10 @@ object minMax extends UFunc {
           }
         }
 
-        override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(arr: Array[S],
+                                offset: Int,
+                                length: Int,
+                                stride: Int): Unit = {
           var i = 0
           var off = offset
           while (i < length) {

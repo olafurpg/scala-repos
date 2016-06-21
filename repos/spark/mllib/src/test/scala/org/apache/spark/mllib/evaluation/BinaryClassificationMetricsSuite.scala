@@ -32,13 +32,13 @@ class BinaryClassificationMetricsSuite
       x: ((Double, Double), (Double, Double))): Boolean =
     (x._1._1 ~= x._2._1 absTol 1E-5) && (x._1._2 ~= x._2._2 absTol 1E-5)
 
-  private def assertSequencesMatch(
-      left: Seq[Double], right: Seq[Double]): Unit = {
+  private def assertSequencesMatch(left: Seq[Double],
+                                   right: Seq[Double]): Unit = {
     assert(left.zip(right).forall(areWithinEpsilon))
   }
 
-  private def assertTupleSequencesMatch(
-      left: Seq[(Double, Double)], right: Seq[(Double, Double)]): Unit = {
+  private def assertTupleSequencesMatch(left: Seq[(Double, Double)],
+                                        right: Seq[(Double, Double)]): Unit = {
     assert(left.zip(right).forall(pairsWithinEpsilon))
   }
 
@@ -53,12 +53,10 @@ class BinaryClassificationMetricsSuite
 
     assertSequencesMatch(metrics.thresholds().collect(), expectedThresholds)
     assertTupleSequencesMatch(metrics.roc().collect(), expectedROCCurve)
-    assert(
-        metrics.areaUnderROC() ~==
+    assert(metrics.areaUnderROC() ~==
           AreaUnderCurve.of(expectedROCCurve) absTol 1E-5)
     assertTupleSequencesMatch(metrics.pr().collect(), expectedPRCurve)
-    assert(
-        metrics.areaUnderPR() ~==
+    assert(metrics.areaUnderPR() ~==
           AreaUnderCurve.of(expectedPRCurve) absTol 1E-5)
     assertTupleSequencesMatch(metrics.fMeasureByThreshold().collect(),
                               expectedThresholds.zip(expectedFMeasures1))
@@ -97,8 +95,14 @@ class BinaryClassificationMetricsSuite
     val f1 = pr.map { case (r, p) => 2.0 * (p * r) / (p + r) }
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
-    validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+    validateMetrics(metrics,
+                    thresholds,
+                    rocCurve,
+                    prCurve,
+                    f1,
+                    f2,
+                    precisions,
+                    recalls)
   }
 
   test(
@@ -116,8 +120,14 @@ class BinaryClassificationMetricsSuite
     val f1 = pr.map { case (r, p) => 2.0 * (p * r) / (p + r) }
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
-    validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+    validateMetrics(metrics,
+                    thresholds,
+                    rocCurve,
+                    prCurve,
+                    f1,
+                    f2,
+                    precisions,
+                    recalls)
   }
 
   test(
@@ -141,8 +151,14 @@ class BinaryClassificationMetricsSuite
       case (r, p) => 5.0 * (p * r) / (4.0 * p + r)
     }
 
-    validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+    validateMetrics(metrics,
+                    thresholds,
+                    rocCurve,
+                    prCurve,
+                    f1,
+                    f2,
+                    precisions,
+                    recalls)
   }
 
   test("binary evaluation metrics with downsampling") {
@@ -185,7 +201,7 @@ class BinaryClassificationMetricsSuite
     assert(
         // May have to add 1 if the sample factor didn't divide evenly
         2 + (numBins +
-            (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
+              (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
     assert(
         List(
             (0.0, 0.0),

@@ -26,6 +26,7 @@ class EditorMock(text: String, offset: Int) extends EditorStub {
   override def getCaretModel: CaretModel =
     new CaretModelMock(offset, offsetToLogicalPosition(offset))
 
-  override def offsetToVisualPosition(
-      i: Int, b: Boolean, b1: Boolean): VisualPosition = null
+  override def offsetToVisualPosition(i: Int,
+                                      b: Boolean,
+                                      b1: Boolean): VisualPosition = null
 }

@@ -2,7 +2,7 @@ import language._
 
 object ScalaZeee {
   trait HFold[M[_], U] {
-    type Apply [E, A <: U] <: U
+    type Apply[E, A <: U] <: U
   }
   trait GenericCons[M[_], H, +T <: GenericList[M]] extends GenericList[M] {
     val tail: T
@@ -11,7 +11,7 @@ object ScalaZeee {
   }
   val KNil: GenericList[Nothing] = ???
   sealed trait GenericList[+M[_]] {
-    type Folded [N[X] >: M[X], U, F <: HFold[N, U]] <: U
+    type Folded[N[X] >: M[X], U, F <: HFold[N, U]] <: U
   }
 }
 

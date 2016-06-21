@@ -42,18 +42,20 @@ class SimplifyJumpsTest {
     )
     val method = genMethod()(
         Op(ACONST_NULL) :: Jump(GOTO, Label(2)) :: // replaced by ATHROW
-        rest: _*
+          rest: _*
     )
     assertTrue(LocalOptImpls.simplifyJumps(method))
-    assertSameCode(
-        instructionsFromMethod(method), Op(ACONST_NULL) :: Op(ATHROW) :: rest)
+    assertSameCode(instructionsFromMethod(method),
+                   Op(ACONST_NULL) :: Op(ATHROW) :: rest)
   }
 
   @Test
   def gotoThrowInTry(): Unit = {
     val handler = List(
-        ExceptionHandler(
-            Label(1), Label(2), Label(4), Some("java/lang/Throwable")))
+        ExceptionHandler(Label(1),
+                         Label(2),
+                         Label(4),
+                         Some("java/lang/Throwable")))
     val initialInstrs = List(
         Label(1),
         Op(ACONST_NULL),

@@ -85,8 +85,10 @@ class MesosSchedulerBackendSuite
     conf.set("spark.mesos.mesosExecutor.cores", mesosExecutorCores.toString)
 
     val listenerBus = mock[LiveListenerBus]
-    listenerBus.post(SparkListenerExecutorAdded(
-            anyLong, "s1", new ExecutorInfo("host1", 2, Map.empty)))
+    listenerBus.post(
+        SparkListenerExecutorAdded(anyLong,
+                                   "s1",
+                                   new ExecutorInfo("host1", 2, Map.empty)))
 
     val sc = mock[SparkContext]
     when(sc.getSparkHome()).thenReturn(Option("/spark-home"))
@@ -122,8 +124,10 @@ class MesosSchedulerBackendSuite
     conf.set("spark.mesos.executor.home", "/mesos-home")
 
     val listenerBus = mock[LiveListenerBus]
-    listenerBus.post(SparkListenerExecutorAdded(
-            anyLong, "s1", new ExecutorInfo("host1", 2, Map.empty)))
+    listenerBus.post(
+        SparkListenerExecutorAdded(anyLong,
+                                   "s1",
+                                   new ExecutorInfo("host1", 2, Map.empty)))
 
     val sc = mock[SparkContext]
     when(sc.getSparkHome()).thenReturn(Option("/spark-home"))
@@ -152,7 +156,8 @@ class MesosSchedulerBackendSuite
     val (executorInfo1, _) =
       mesosSchedulerBackend.createExecutorInfo(resources, "test-id")
     assert(
-        executorInfo1.getCommand.getValue === s"cd test-app-1*;  ./bin/spark-class ${classOf[MesosExecutorBackend].getName}")
+        executorInfo1.getCommand.getValue === s"cd test-app-1*;  ./bin/spark-class ${classOf[
+        MesosExecutorBackend].getName}")
   }
 
   test("spark docker properties correctly populate the DockerInfo message") {
@@ -165,8 +170,10 @@ class MesosSchedulerBackendSuite
       .set("spark.mesos.executor.docker.portmaps", "80:8080,53:53:tcp")
 
     val listenerBus = mock[LiveListenerBus]
-    listenerBus.post(SparkListenerExecutorAdded(
-            anyLong, "s1", new ExecutorInfo("host1", 2, Map.empty)))
+    listenerBus.post(
+        SparkListenerExecutorAdded(anyLong,
+                                   "s1",
+                                   new ExecutorInfo("host1", 2, Map.empty)))
 
     val sc = mock[SparkContext]
     when(sc.executorMemory).thenReturn(100)
@@ -178,7 +185,8 @@ class MesosSchedulerBackendSuite
     val backend = new MesosSchedulerBackend(taskScheduler, sc, "master")
 
     val (execInfo, _) = backend.createExecutorInfo(
-        Arrays.asList(backend.createResource("cpus", 4)), "mockExecutor")
+        Arrays.asList(backend.createResource("cpus", 4)),
+        "mockExecutor")
     assert(execInfo.getContainer.getDocker.getImage.equals("spark/mock"))
     val portmaps = execInfo.getContainer.getDocker.getPortMappingsList
     assert(portmaps.get(0).getHostPort.equals(80))
@@ -228,8 +236,10 @@ class MesosSchedulerBackendSuite
     val taskScheduler = mock[TaskSchedulerImpl]
 
     val listenerBus = mock[LiveListenerBus]
-    listenerBus.post(SparkListenerExecutorAdded(
-            anyLong, "s1", new ExecutorInfo("host1", 2, Map.empty)))
+    listenerBus.post(
+        SparkListenerExecutorAdded(anyLong,
+                                   "s1",
+                                   new ExecutorInfo("host1", 2, Map.empty)))
 
     val sc = mock[SparkContext]
     when(sc.executorMemory).thenReturn(100)
@@ -261,8 +271,12 @@ class MesosSchedulerBackendSuite
             mesosOffers.get(2).getHostname,
             (minCpu - backend.mesosExecutorCores).toInt
         ))
-    val taskDesc = new TaskDescription(
-        1L, 0, "s1", "n1", 0, ByteBuffer.wrap(new Array[Byte](0)))
+    val taskDesc = new TaskDescription(1L,
+                                       0,
+                                       "s1",
+                                       "n1",
+                                       0,
+                                       ByteBuffer.wrap(new Array[Byte](0)))
     when(taskScheduler.resourceOffers(expectedWorkerOffers))
       .thenReturn(Seq(Seq(taskDesc)))
     when(taskScheduler.CPUS_PER_TASK).thenReturn(2)
@@ -317,8 +331,10 @@ class MesosSchedulerBackendSuite
     val taskScheduler = mock[TaskSchedulerImpl]
 
     val listenerBus = mock[LiveListenerBus]
-    listenerBus.post(SparkListenerExecutorAdded(
-            anyLong, "s1", new ExecutorInfo("host1", 2, Map.empty)))
+    listenerBus.post(
+        SparkListenerExecutorAdded(anyLong,
+                                   "s1",
+                                   new ExecutorInfo("host1", 2, Map.empty)))
 
     val sc = mock[SparkContext]
     when(sc.executorMemory).thenReturn(100)
@@ -373,8 +389,12 @@ class MesosSchedulerBackendSuite
             2 // Deducting 1 for executor
         ))
 
-    val taskDesc = new TaskDescription(
-        1L, 0, "s1", "n1", 0, ByteBuffer.wrap(new Array[Byte](0)))
+    val taskDesc = new TaskDescription(1L,
+                                       0,
+                                       "s1",
+                                       "n1",
+                                       0,
+                                       ByteBuffer.wrap(new Array[Byte](0)))
     when(taskScheduler.resourceOffers(expectedWorkerOffers))
       .thenReturn(Seq(Seq(taskDesc)))
     when(taskScheduler.CPUS_PER_TASK).thenReturn(1)

@@ -40,16 +40,16 @@ import scala.compat.java8.FunctionConverters._
   * responses.
   */
 @Singleton
-class GzipFilter @Inject()(
-    config: GzipFilterConfig)(implicit mat: Materializer)
+class GzipFilter @Inject()(config: GzipFilterConfig)(
+    implicit mat: Materializer)
     extends EssentialFilter {
 
   import play.api.http.HeaderNames._
 
   def this(bufferSize: Int = 8192,
            chunkedThreshold: Int = 102400,
-           shouldGzip: (RequestHeader, Result) => Boolean = (_, _) =>
-             true)(implicit mat: Materializer) =
+           shouldGzip: (RequestHeader, Result) => Boolean = (_, _) => true)(
+      implicit mat: Materializer) =
     this(GzipFilterConfig(bufferSize, chunkedThreshold, shouldGzip))
 
   def apply(next: EssentialAction) = new EssentialAction {
@@ -62,8 +62,8 @@ class GzipFilter @Inject()(
     }
   }
 
-  private def handleResult(
-      request: RequestHeader, result: Result): Future[Result] = {
+  private def handleResult(request: RequestHeader,
+                           result: Result): Future[Result] = {
     if (shouldCompress(result) && config.shouldGzip(request, result)) {
       val header =
         result.header.copy(headers = setupHeader(result.header.headers))
@@ -85,7 +85,7 @@ class GzipFilter @Inject()(
           // It's above the chunked threshold, compress through the gzip flow, and send as chunked
           val gzipped =
             data via GzipFlow.gzip(config.bufferSize) map
-            (d => HttpChunk.Chunk(d))
+              (d => HttpChunk.Chunk(d))
           Future.successful(
               Result(header, HttpEntity.Chunked(gzipped, contentType)))
 
@@ -128,11 +128,11 @@ class GzipFilter @Inject()(
     }
   }
 
-  private def compressStrictEntity(
-      data: ByteString, contentType: Option[String]) = {
+  private def compressStrictEntity(data: ByteString,
+                                   contentType: Option[String]) = {
     val builder = ByteString.newBuilder
-    val gzipOs = new GZIPOutputStream(
-        builder.asOutputStream, config.bufferSize, true)
+    val gzipOs =
+      new GZIPOutputStream(builder.asOutputStream, config.bufferSize, true)
     gzipOs.write(data.toArray)
     gzipOs.close()
     HttpEntity.Strict(builder.result(), contentType)
@@ -165,7 +165,7 @@ class GzipFilter @Inject()(
     */
   private def shouldCompress(result: Result) =
     isAllowedContent(result.header) && isNotAlreadyCompressed(result.header) &&
-    !result.body.isKnownEmpty
+      !result.body.isKnownEmpty
 
   /**
     * Certain response codes are forbidden by the HTTP spec to contain content, but a gzipped response always contains
@@ -181,8 +181,9 @@ class GzipFilter @Inject()(
     header.headers.get(CONTENT_ENCODING).isEmpty
 
   private def setupHeader(header: Map[String, String]): Map[String, String] = {
-    header + (CONTENT_ENCODING -> "gzip") + addToVaryHeader(
-        header, VARY, ACCEPT_ENCODING)
+    header + (CONTENT_ENCODING -> "gzip") + addToVaryHeader(header,
+                                                            VARY,
+                                                            ACCEPT_ENCODING)
   }
 
   /**
@@ -194,9 +195,7 @@ class GzipFilter @Inject()(
     existingHeaders.get(headerName) match {
       case None => (headerName, headerValue)
       case Some(existing)
-          if existing
-            .split(",")
-            .exists(_.trim.equalsIgnoreCase(headerValue)) =>
+          if existing.split(",").exists(_.trim.equalsIgnoreCase(headerValue)) =>
         (headerName, existing)
       case Some(existing) => (headerName, s"$existing,$headerValue")
     }
@@ -211,10 +210,10 @@ class GzipFilter @Inject()(
   * @param shouldGzip Whether the given request/result should be gzipped.  This can be used, for example, to implement
   *                   black/white lists for gzipping by content type.
   */
-case class GzipFilterConfig(
-    bufferSize: Int = 8192,
-    chunkedThreshold: Int = 102400,
-    shouldGzip: (RequestHeader, Result) => Boolean = (_, _) => true) {
+case class GzipFilterConfig(bufferSize: Int = 8192,
+                            chunkedThreshold: Int = 102400,
+                            shouldGzip: (RequestHeader, Result) => Boolean =
+                              (_, _) => true) {
 
   // alternate constructor and builder methods for Java
   def this() = this(shouldGzip = (_, _) => true)
@@ -224,9 +223,9 @@ case class GzipFilterConfig(
     copy(shouldGzip = shouldGzip)
 
   def withShouldGzip(
-      shouldGzip: BiFunction[
-          play.mvc.Http.RequestHeader, play.mvc.Result, Boolean])
-    : GzipFilterConfig =
+      shouldGzip: BiFunction[play.mvc.Http.RequestHeader,
+                             play.mvc.Result,
+                             Boolean]): GzipFilterConfig =
     withShouldGzip((req, res) =>
           shouldGzip.asScala(new j.RequestHeaderImpl(req), res.asJava))
 

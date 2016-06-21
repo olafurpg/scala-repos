@@ -81,10 +81,12 @@ class ZookeeperConsumerConnectorTest
         TestUtils.createConsumerProperties(zkConnect, group, consumer0)) {
       override val consumerTimeoutMs = 200
     }
-    val zkConsumerConnector0 = new ZookeeperConsumerConnector(
-        consumerConfig0, true)
+    val zkConsumerConnector0 =
+      new ZookeeperConsumerConnector(consumerConfig0, true)
     val topicMessageStreams0 = zkConsumerConnector0.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
 
     // no messages to consume, we should hit timeout;
     // also the iterator should support re-entrant, so loop it twice
@@ -102,8 +104,10 @@ class ZookeeperConsumerConnectorTest
 
     // send some messages to each broker
     val sentMessages1 =
-      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(
-          servers, topic, nMessages, 1)
+      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(servers,
+                                                                 topic,
+                                                                 nMessages,
+                                                                 1)
 
     // wait to make sure the topic and partition have a leader for the successful case
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
@@ -115,18 +119,20 @@ class ZookeeperConsumerConnectorTest
     // create a consumer
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer1))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
 
     val receivedMessages1 = getMessages(topicMessageStreams1, nMessages * 2)
     assertEquals(sentMessages1.sorted, receivedMessages1.sorted)
 
     // also check partition ownership
     val actual_1 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_1 = List(
-        ("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
+    val expected_1 =
+      List(("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
     assertEquals(expected_1, actual_1)
 
     // commit consumed offsets
@@ -137,47 +143,55 @@ class ZookeeperConsumerConnectorTest
         TestUtils.createConsumerProperties(zkConnect, group, consumer2)) {
       override val rebalanceBackoffMs = RebalanceBackoffMs
     }
-    val zkConsumerConnector2 = new ZookeeperConsumerConnector(
-        consumerConfig2, true)
+    val zkConsumerConnector2 =
+      new ZookeeperConsumerConnector(consumerConfig2, true)
     val topicMessageStreams2 = zkConsumerConnector2.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
     // send some messages to each broker
     val sentMessages2 =
-      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(
-          servers, topic, nMessages, 1)
+      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(servers,
+                                                                 topic,
+                                                                 nMessages,
+                                                                 1)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
 
     val receivedMessages2 =
       getMessages(topicMessageStreams1, nMessages) ++ getMessages(
-          topicMessageStreams2, nMessages)
+          topicMessageStreams2,
+          nMessages)
     assertEquals(sentMessages2.sorted, receivedMessages2.sorted)
 
     // also check partition ownership
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(
-        ("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
+    val expected_2 =
+      List(("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
     assertEquals(expected_2, actual_2)
 
     // create a consumer with empty map
     val consumerConfig3 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer3))
-    val zkConsumerConnector3 = new ZookeeperConsumerConnector(
-        consumerConfig3, true)
+    val zkConsumerConnector3 =
+      new ZookeeperConsumerConnector(consumerConfig3, true)
     val topicMessageStreams3 = zkConsumerConnector3.createMessageStreams(
         new mutable.HashMap[String, Int]())
     // send some messages to each broker
     val sentMessages3 =
-      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(
-          servers, topic, nMessages, 1)
+      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(servers,
+                                                                 topic,
+                                                                 nMessages,
+                                                                 1)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
 
     val receivedMessages3 =
       getMessages(topicMessageStreams1, nMessages) ++ getMessages(
-          topicMessageStreams2, nMessages)
+          topicMessageStreams2,
+          nMessages)
     assertEquals(sentMessages3.sorted, receivedMessages3.sorted)
 
     // also check partition ownership
@@ -209,7 +223,11 @@ class ZookeeperConsumerConnectorTest
     // send some messages to each broker
     val sentMessages1 =
       sendMessages(servers, topic, nMessages, 0, GZIPCompressionCodec) ++ sendMessages(
-          servers, topic, nMessages, 1, GZIPCompressionCodec)
+          servers,
+          topic,
+          nMessages,
+          1,
+          GZIPCompressionCodec)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
@@ -220,17 +238,19 @@ class ZookeeperConsumerConnectorTest
     // create a consumer
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer1))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
     val receivedMessages1 = getMessages(topicMessageStreams1, nMessages * 2)
     assertEquals(sentMessages1.sorted, receivedMessages1.sorted)
 
     // also check partition ownership
     val actual_1 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_1 = List(
-        ("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
+    val expected_1 =
+      List(("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
     assertEquals(expected_1, actual_1)
 
     // commit consumed offsets
@@ -241,34 +261,41 @@ class ZookeeperConsumerConnectorTest
         TestUtils.createConsumerProperties(zkConnect, group, consumer2)) {
       override val rebalanceBackoffMs = RebalanceBackoffMs
     }
-    val zkConsumerConnector2 = new ZookeeperConsumerConnector(
-        consumerConfig2, true)
+    val zkConsumerConnector2 =
+      new ZookeeperConsumerConnector(consumerConfig2, true)
     val topicMessageStreams2 = zkConsumerConnector2.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
     // send some messages to each broker
     val sentMessages2 =
       sendMessages(servers, topic, nMessages, 0, GZIPCompressionCodec) ++ sendMessages(
-          servers, topic, nMessages, 1, GZIPCompressionCodec)
+          servers,
+          topic,
+          nMessages,
+          1,
+          GZIPCompressionCodec)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
 
     val receivedMessages2 =
       getMessages(topicMessageStreams1, nMessages) ++ getMessages(
-          topicMessageStreams2, nMessages)
+          topicMessageStreams2,
+          nMessages)
     assertEquals(sentMessages2.sorted, receivedMessages2.sorted)
 
     // also check partition ownership
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(
-        ("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
+    val expected_2 =
+      List(("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
     assertEquals(expected_2, actual_2)
 
     // create a consumer with empty map
     val consumerConfig3 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer3))
-    val zkConsumerConnector3 = new ZookeeperConsumerConnector(
-        consumerConfig3, true)
+    val zkConsumerConnector3 =
+      new ZookeeperConsumerConnector(consumerConfig3, true)
     val topicMessageStreams3 = zkConsumerConnector3.createMessageStreams(
         new mutable.HashMap[String, Int](),
         new StringDecoder(),
@@ -276,14 +303,19 @@ class ZookeeperConsumerConnectorTest
     // send some messages to each broker
     val sentMessages3 =
       sendMessages(servers, topic, nMessages, 0, GZIPCompressionCodec) ++ sendMessages(
-          servers, topic, nMessages, 1, GZIPCompressionCodec)
+          servers,
+          topic,
+          nMessages,
+          1,
+          GZIPCompressionCodec)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
 
     val receivedMessages3 =
       getMessages(topicMessageStreams1, nMessages) ++ getMessages(
-          topicMessageStreams2, nMessages)
+          topicMessageStreams2,
+          nMessages)
     assertEquals(sentMessages3.sorted, receivedMessages3.sorted)
 
     // also check partition ownership
@@ -302,24 +334,30 @@ class ZookeeperConsumerConnectorTest
     // send some messages to each broker
     val sentMessages =
       sendMessages(servers, topic, 200, 0, DefaultCompressionCodec) ++ sendMessages(
-          servers, topic, 200, 1, DefaultCompressionCodec)
+          servers,
+          topic,
+          200,
+          1,
+          DefaultCompressionCodec)
 
     TestUtils.waitUntilMetadataIsPropagated(servers, topic, 0)
     TestUtils.waitUntilMetadataIsPropagated(servers, topic, 1)
 
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer0))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
     val receivedMessages = getMessages(topicMessageStreams1, 400)
     assertEquals(sentMessages.sorted, receivedMessages.sorted)
 
     // also check partition ownership
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(
-        ("0", "group1_consumer0-0"), ("1", "group1_consumer0-0"))
+    val expected_2 =
+      List(("0", "group1_consumer0-0"), ("1", "group1_consumer0-0"))
     assertEquals(expected_2, actual_2)
 
     zkConsumerConnector1.shutdown
@@ -334,7 +372,11 @@ class ZookeeperConsumerConnectorTest
     // send some messages to each broker
     val sentMessages =
       sendMessages(servers, topic, nMessages, 0, NoCompressionCodec) ++ sendMessages(
-          servers, topic, nMessages, 1, NoCompressionCodec)
+          servers,
+          topic,
+          nMessages,
+          1,
+          NoCompressionCodec)
 
     TestUtils.waitUntilMetadataIsPropagated(servers, topic, 0)
     TestUtils.waitUntilMetadataIsPropagated(servers, topic, 1)
@@ -345,10 +387,12 @@ class ZookeeperConsumerConnectorTest
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
 
-    val zkConsumerConnector = new ZookeeperConsumerConnector(
-        consumerConfig, true)
+    val zkConsumerConnector =
+      new ZookeeperConsumerConnector(consumerConfig, true)
     val topicMessageStreams = zkConsumerConnector.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
 
     var receivedMessages: List[String] = Nil
     for ((topic, messageStreams) <- topicMessageStreams) {
@@ -385,10 +429,12 @@ class ZookeeperConsumerConnectorTest
     // create a consumer
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer1))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
     val topicRegistry = zkConsumerConnector1.getTopicRegistry
     assertEquals(1, topicRegistry.map(r => r._1).size)
     assertEquals(topic, topicRegistry.map(r => r._1).head)
@@ -416,13 +462,15 @@ class ZookeeperConsumerConnectorTest
 
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer1))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     // Register consumer rebalance listener
     val rebalanceListener1 = new TestConsumerRebalanceListener()
     zkConsumerConnector1.setConsumerRebalanceListener(rebalanceListener1)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
 
     // Check if rebalance listener is fired
     assertEquals(true, rebalanceListener1.beforeReleasingPartitionsCalled)
@@ -447,33 +495,35 @@ class ZookeeperConsumerConnectorTest
     rebalanceListener1.beforeStartingFetchersCalled = false
 
     val actual_1 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_1 = List(
-        ("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
+    val expected_1 =
+      List(("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
     assertEquals(expected_1, actual_1)
 
     val consumerConfig2 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer2))
-    val zkConsumerConnector2 = new ZookeeperConsumerConnector(
-        consumerConfig2, true)
+    val zkConsumerConnector2 =
+      new ZookeeperConsumerConnector(consumerConfig2, true)
     // Register consumer rebalance listener
     val rebalanceListener2 = new TestConsumerRebalanceListener()
     zkConsumerConnector2.setConsumerRebalanceListener(rebalanceListener2)
     val topicMessageStreams2 = zkConsumerConnector2.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+        Map(topic -> 1),
+        new StringDecoder(),
+        new StringDecoder())
 
     // Consume messages from consumer 1 to make sure it has finished rebalance
     getMessages(topicMessageStreams1, nMessages)
 
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(
-        ("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
+    val expected_2 =
+      List(("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
     assertEquals(expected_2, actual_2)
 
     // Check if rebalance listener is fired
     assertEquals(true, rebalanceListener1.beforeReleasingPartitionsCalled)
     assertEquals(true, rebalanceListener1.beforeStartingFetchersCalled)
-    assertEquals(
-        Set[Int](0, 1), rebalanceListener1.partitionOwnership.get(topic))
+    assertEquals(Set[Int](0, 1),
+                 rebalanceListener1.partitionOwnership.get(topic))
     // Check if global partition ownership in rebalance listener is correct
     assertEquals(
         "group1_consumer1",
@@ -515,13 +565,16 @@ class ZookeeperConsumerConnectorTest
     var beforeReleasingPartitionsCalled: Boolean = false
     var beforeStartingFetchersCalled: Boolean = false
     var consumerId: String = "";
-    var partitionOwnership: java.util.Map[
-        String, java.util.Set[java.lang.Integer]] = null
+    var partitionOwnership: java.util.Map[String,
+                                          java.util.Set[java.lang.Integer]] =
+      null
     var globalPartitionOwnership: java.util.Map[
-        String, java.util.Map[java.lang.Integer, ConsumerThreadId]] = null
+        String,
+        java.util.Map[java.lang.Integer, ConsumerThreadId]] = null
 
-    override def beforeReleasingPartitions(partitionOwnership: java.util.Map[
-            String, java.util.Set[java.lang.Integer]]) {
+    override def beforeReleasingPartitions(
+        partitionOwnership: java.util.Map[String,
+                                          java.util.Set[java.lang.Integer]]) {
       beforeReleasingPartitionsCalled = true
       this.partitionOwnership = partitionOwnership
     }
@@ -529,7 +582,8 @@ class ZookeeperConsumerConnectorTest
     override def beforeStartingFetchers(
         consumerId: String,
         globalPartitionOwnership: java.util.Map[
-            String, java.util.Map[java.lang.Integer, ConsumerThreadId]]) {
+            String,
+            java.util.Map[java.lang.Integer, ConsumerThreadId]]) {
       beforeStartingFetchersCalled = true
       this.consumerId = consumerId
       this.globalPartitionOwnership = globalPartitionOwnership

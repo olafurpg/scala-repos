@@ -17,8 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScPrimaryConstructorStubI
 class ScPrimaryConstructorElementType[Func <: ScPrimaryConstructor]
     extends ScStubElementType[ScPrimaryConstructorStub, ScPrimaryConstructor](
         "primary constructor") {
-  def serialize(
-      stub: ScPrimaryConstructorStub, dataStream: StubOutputStream): Unit = {}
+  def serialize(stub: ScPrimaryConstructorStub,
+                dataStream: StubOutputStream): Unit = {}
 
   def createPsi(stub: ScPrimaryConstructorStub): ScPrimaryConstructor = {
     new ScPrimaryConstructorImpl(stub)
@@ -33,7 +33,8 @@ class ScPrimaryConstructorElementType[Func <: ScPrimaryConstructor]
   def deserializeImpl(dataStream: StubInputStream,
                       parentStub: Any): ScPrimaryConstructorStub = {
     new ScPrimaryConstructorStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+        parentStub.asInstanceOf[StubElement[PsiElement]],
+        this)
   }
 
   def indexStub(stub: ScPrimaryConstructorStub, sink: IndexSink): Unit = {}

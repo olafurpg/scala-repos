@@ -128,14 +128,18 @@ class EvaluationInstanceSerializer
             case i: EvaluationInstance =>
               JObject(
                   JField("id", JString(i.id)) :: JField(
-                      "status", JString(i.status)) :: JField(
-                      "startTime", JString(i.startTime.toString)) :: JField(
+                      "status",
+                      JString(i.status)) :: JField(
+                      "startTime",
+                      JString(i.startTime.toString)) :: JField(
                       "endTime",
                       JString(i.endTime.toString)) :: JField(
-                      "evaluationClass", JString(i.evaluationClass)) :: JField(
+                      "evaluationClass",
+                      JString(i.evaluationClass)) :: JField(
                       "engineParamsGeneratorClass",
                       JString(i.engineParamsGeneratorClass)) :: JField(
-                      "batch", JString(i.batch)) :: JField(
+                      "batch",
+                      JString(i.batch)) :: JField(
                       "env",
                       Extraction.decompose(i.env)(DefaultFormats)) :: JField(
                       "sparkConf",

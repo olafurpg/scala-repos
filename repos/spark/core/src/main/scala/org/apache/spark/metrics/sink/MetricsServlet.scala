@@ -45,8 +45,10 @@ private[spark] class MetricsServlet(val property: Properties,
     .map(_.toBoolean)
     .getOrElse(SERVLET_DEFAULT_SAMPLE)
 
-  val mapper = new ObjectMapper().registerModule(new MetricsModule(
-          TimeUnit.SECONDS, TimeUnit.MILLISECONDS, servletShowSample))
+  val mapper =
+    new ObjectMapper().registerModule(new MetricsModule(TimeUnit.SECONDS,
+                                                        TimeUnit.MILLISECONDS,
+                                                        servletShowSample))
 
   def getHandlers(conf: SparkConf): Array[ServletContextHandler] = {
     Array[ServletContextHandler](

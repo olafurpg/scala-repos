@@ -169,8 +169,9 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   }
 
   /** Start a query */
-  private[sql] def startQuery(
-      name: String, df: DataFrame, sink: Sink): ContinuousQuery = {
+  private[sql] def startQuery(name: String,
+                              df: DataFrame,
+                              sink: Sink): ContinuousQuery = {
     activeQueriesLock.synchronized {
       if (activeQueries.contains(name)) {
         throw new IllegalArgumentException(

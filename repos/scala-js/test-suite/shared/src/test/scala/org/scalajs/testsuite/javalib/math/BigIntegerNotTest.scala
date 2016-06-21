@@ -222,8 +222,20 @@ class BigIntegerNotTest {
     val aBytes =
       Array[Byte](-128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26, -117)
     val aSign = 1
-    val rBytes = Array[Byte](
-        -1, 127, -57, -101, 1, 75, -90, -46, -92, -4, 14, -36, -27, 116)
+    val rBytes = Array[Byte](-1,
+                             127,
+                             -57,
+                             -101,
+                             1,
+                             75,
+                             -90,
+                             -46,
+                             -92,
+                             -4,
+                             14,
+                             -36,
+                             -27,
+                             116)
     val aNumber = new BigInteger(aSign, aBytes)
     val result = aNumber.not()
     var resBytes = Array.ofDim[Byte](rBytes.length)

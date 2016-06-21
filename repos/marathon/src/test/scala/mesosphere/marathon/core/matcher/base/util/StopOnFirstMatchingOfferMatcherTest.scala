@@ -55,11 +55,11 @@ class StopOnFirstMatchingOfferMatcherTest
     Given("a sequence of matchers, the second matching")
     val f = new Fixture {
       override lazy val matchers: Seq[OfferMatcher] = Seq(
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = true)),
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
-                                                           resendThisOffer =
-                                                             false))
+          offerMatcher(OfferMatcher.MatchedTaskOps
+                .noMatch(offer.getId, resendThisOffer = true)),
+          offerMatcher(
+              OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                  resendThisOffer = false))
       )
     }
 
@@ -75,11 +75,11 @@ class StopOnFirstMatchingOfferMatcherTest
     Given("a sequence of matchers, the second matching")
     val f = new Fixture {
       override lazy val matchers: Seq[OfferMatcher] = Seq(
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = false)),
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
-                                                           resendThisOffer =
-                                                             true))
+          offerMatcher(OfferMatcher.MatchedTaskOps
+                .noMatch(offer.getId, resendThisOffer = false)),
+          offerMatcher(
+              OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                  resendThisOffer = true))
       )
     }
 
@@ -106,8 +106,8 @@ class StopOnFirstMatchingOfferMatcherTest
 
     def offerMatcher(matching: OfferMatcher.MatchedTaskOps): OfferMatcher =
       new OfferMatcher {
-        override def matchOffer(
-            deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+        override def matchOffer(deadline: Timestamp,
+                                offer: Offer): Future[MatchedTaskOps] = {
           Future.successful(matching)
         }
       }

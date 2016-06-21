@@ -112,7 +112,7 @@ case class InputState[T](state: T) {
 
   override def toString: String = {
     val curState = stateTracking.get
-    "Input State Wrapper(count: %d, failed: %s)".format(
-        curState.counter, curState.failed.toString)
+    "Input State Wrapper(count: %d, failed: %s)"
+      .format(curState.counter, curState.failed.toString)
   }
 }

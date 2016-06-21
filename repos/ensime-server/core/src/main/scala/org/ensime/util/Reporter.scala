@@ -34,8 +34,10 @@ class PresentationReporter(handler: ReportHandler)
     }
   }
 
-  override def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean): Unit = {
+  override def info0(pos: Position,
+                     msg: String,
+                     severity: Severity,
+                     force: Boolean): Unit = {
     severity.count += 1
     try {
       if (severity.id == 0) {
@@ -45,12 +47,11 @@ class PresentationReporter(handler: ReportHandler)
           if (pos.isDefined) {
             val source = pos.source
             val f = source.file.absolute.path
-            val posColumn =
-              if (pos.point == -1) {
-                0
-              } else {
-                pos.column
-              }
+            val posColumn = if (pos.point == -1) {
+              0
+            } else {
+              pos.column
+            }
 
             val note = new Note(
                 f,

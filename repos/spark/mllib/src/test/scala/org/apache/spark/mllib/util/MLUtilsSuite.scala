@@ -58,8 +58,11 @@ class MLUtilsSuite extends SparkFunSuite with MLlibTestSparkContext {
         fastSquaredDistance(v1, norm1, v2, norm2, precision)
       assert((fastSquaredDist1 - squaredDist) <= precision * squaredDist,
              s"failed with m = $m")
-      val fastSquaredDist2 = fastSquaredDistance(
-          v1, norm1, Vectors.dense(v2.toArray), norm2, precision)
+      val fastSquaredDist2 = fastSquaredDistance(v1,
+                                                 norm1,
+                                                 Vectors.dense(v2.toArray),
+                                                 norm2,
+                                                 precision)
       assert((fastSquaredDist2 - squaredDist) <= precision * squaredDist,
              s"failed with m = $m")
       val squaredDist2 = breezeSquaredDistance(v2.toBreeze, v3.toBreeze)
@@ -98,13 +101,13 @@ class MLUtilsSuite extends SparkFunSuite with MLlibTestSparkContext {
     for (points <- Seq(pointsWithNumFeatures, pointsWithoutNumFeatures)) {
       assert(points.length === 3)
       assert(points(0).label === 1.0)
-      assert(points(0).features === Vectors.sparse(
-              6, Seq((0, 1.0), (2, 2.0), (4, 3.0))))
+      assert(points(0).features === Vectors
+            .sparse(6, Seq((0, 1.0), (2, 2.0), (4, 3.0))))
       assert(points(1).label == 0.0)
       assert(points(1).features == Vectors.sparse(6, Seq()))
       assert(points(2).label === 0.0)
-      assert(points(2).features === Vectors.sparse(
-              6, Seq((1, 4.0), (3, 5.0), (5, 6.0))))
+      assert(points(2).features === Vectors
+            .sparse(6, Seq((1, 4.0), (3, 5.0), (5, 6.0))))
     }
 
     val multiclassPoints = loadLibSVMFile(sc, path).collect()

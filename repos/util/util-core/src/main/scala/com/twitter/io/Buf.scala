@@ -222,8 +222,7 @@ object Buf {
       private[Buf] val bytes: Array[Byte],
       private[Buf] val begin: Int,
       private[Buf] val end: Int
-  )
-      extends Buf {
+  ) extends Buf {
 
     def write(buf: Array[Byte], off: Int): Unit =
       System.arraycopy(bytes, begin, buf, off, length)
@@ -622,7 +621,7 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff) << 24) | ((arr(1) & 0xff) << 16) |
-          ((arr(2) & 0xff) << 8) | ((arr(3) & 0xff))
+            ((arr(2) & 0xff) << 8) | ((arr(3) & 0xff))
         Some((value, rem))
       }
   }
@@ -657,9 +656,9 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff).toLong << 56) | ((arr(1) & 0xff).toLong << 48) |
-          ((arr(2) & 0xff).toLong << 40) | ((arr(3) & 0xff).toLong << 32) |
-          ((arr(4) & 0xff).toLong << 24) | ((arr(5) & 0xff).toLong << 16) |
-          ((arr(6) & 0xff).toLong << 8) | ((arr(7) & 0xff).toLong)
+            ((arr(2) & 0xff).toLong << 40) | ((arr(3) & 0xff).toLong << 32) |
+            ((arr(4) & 0xff).toLong << 24) | ((arr(5) & 0xff).toLong << 16) |
+            ((arr(6) & 0xff).toLong << 8) | ((arr(7) & 0xff).toLong)
         Some((value, rem))
       }
   }
@@ -690,7 +689,7 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff)) | ((arr(1) & 0xff) << 8) | ((arr(2) & 0xff) << 16) |
-          ((arr(3) & 0xff) << 24)
+            ((arr(3) & 0xff) << 24)
         Some((value, rem))
       }
   }
@@ -725,9 +724,9 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
-          ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
-          ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
-          ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)
+            ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
+            ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
+            ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)
         Some((value, rem))
       }
   }

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `ApplicativePlus` */
-final class ApplicativePlusOps[F[_], A] private[syntax](val self: F[A])(
+final class ApplicativePlusOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: ApplicativePlus[F])
     extends Ops[F[A]] {
   ////

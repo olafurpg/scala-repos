@@ -47,7 +47,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrintResolutionSpec
     extends SimpleSFXDelegateSpec[jfxp.PrintResolution, PrintResolution](
-        classOf[jfxp.PrintResolution], classOf[PrintResolution]) {
+        classOf[jfxp.PrintResolution],
+        classOf[PrintResolution]) {
 
   val skipingMessage: String =
     if (jfxp.Printer.getDefaultPrinter == null ||

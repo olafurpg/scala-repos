@@ -68,8 +68,7 @@ class DCTSuite
     }
     val expectedResult = Vectors.dense(expectedResultBuffer)
 
-    val dataset = sqlContext.createDataFrame(
-        Seq(
+    val dataset = sqlContext.createDataFrame(Seq(
             DCTTestData(data, expectedResult)
         ))
 

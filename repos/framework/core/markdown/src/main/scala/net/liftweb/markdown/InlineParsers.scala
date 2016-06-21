@@ -195,7 +195,7 @@ trait InlineParsers extends BaseParsers {
     */
   val code: Parser[String] =
     ((("``" ~> ((not("``") ~> aChar) +) <~ "``") ^^ { _.mkString }) |
-        ('`' ~> markdownText(Set('`'), false) <~ '`')) ^^ { c =>
+          ('`' ~> markdownText(Set('`'), false) <~ '`')) ^^ { c =>
       deco.decorateCode(c.mkString)
     }
 
@@ -250,7 +250,7 @@ trait InlineParsers extends BaseParsers {
   def linkInline(ctx: InlineContext): Parser[String] =
     //( (not(']') ~> oneInline(ctx.addTag("a")))* ) ^^ {_.mkString}
     ((markdownText(specialLinkInlineChars, true) | elementParsers(ctx) |
-        ((not(']') ~> aChar))) *) ^^ { _.mkString }
+          ((not(']') ~> aChar))) *) ^^ { _.mkString }
 
   /** We parse everything as a link/img url until we hit whitespace or a closing brace.
     */
@@ -262,18 +262,18 @@ trait InlineParsers extends BaseParsers {
     */
   val title: Parser[Option[String]] =
     opt('"' ~>
-        ((markdownText(Set('"'), true) ~ opt(not('"' ~ ows ~ ')') ~> aChar)) *) <~ '"') ^^ {
+          ((markdownText(Set('"'), true) ~ opt(not('"' ~ ows ~ ')') ~> aChar)) *) <~ '"') ^^ {
       case None => None
       case Some(chunks) => {
-          val result = new StringBuilder()
-          for (chunk <- chunks) {
-            chunk match {
-              case (text) ~ None => result.append(text)
-              case (text) ~ Some(s) => result.append(text).append(s)
-            }
+        val result = new StringBuilder()
+        for (chunk <- chunks) {
+          chunk match {
+            case (text) ~ None => result.append(text)
+            case (text) ~ Some(s) => result.append(text).append(s)
           }
-          Some(result.toString)
         }
+        Some(result.toString)
+      }
     }
 
   /** Plaintext variant to refInline. Escapable text until a square bracket is hit.
@@ -297,9 +297,9 @@ trait InlineParsers extends BaseParsers {
     ('[' ~> linkInline(ctx) ~ (']' ~ opt(' ') ~ '[') ~ idReference(ctx) <~ ']' ^^ {
           case t ~ dummy ~ pair => (pair._2, t)
         }) |
-    ('[' ~> idReference(ctx) <~ (']' ~ opt(opt(' ') ~ '[' ~ ows ~ ']')) ^^ {
-          case (t, ld) => (ld, t)
-        })
+      ('[' ~> idReference(ctx) <~ (']' ~ opt(opt(' ') ~ '[' ~ ows ~ ']')) ^^ {
+            case (t, ld) => (ld, t)
+          })
 
   /**
     * Parses either a referenced or a directly defined image.
@@ -325,13 +325,13 @@ trait InlineParsers extends BaseParsers {
     */
   def spanInline(end: Parser[Any], ctx: InlineContext): Parser[String] =
     (markdownText(specialInlineChars, true) | elementParsers(ctx) |
-        (not(end) ~> aChar)) ^^ { _.mkString }
+          (not(end) ~> aChar)) ^^ { _.mkString }
 
   /** Parses a span element like __foo__ or *bar*
     */
   def span(limiter: String, ctx: InlineContext): Parser[String] =
     (limiter ~ not(ws)) ~>
-    (spanInline((not(lookbehind(Set(' ', '\t', '\n'))) ~ limiter), ctx) +) <~ limiter ^^ {
+      (spanInline((not(lookbehind(Set(' ', '\t', '\n'))) ~ limiter), ctx) +) <~ limiter ^^ {
       _.mkString
     }
 

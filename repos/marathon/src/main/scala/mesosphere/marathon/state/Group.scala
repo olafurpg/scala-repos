@@ -175,8 +175,8 @@ case class Group(id: PathId,
     val graph = new DefaultDirectedGraph[AppDefinition, DefaultEdge](
         classOf[DefaultEdge])
     for (app <- transitiveApps) graph.addVertex(app)
-    for ((app, dependent) <- applicationDependencies) graph.addEdge(
-        app, dependent)
+    for ((app, dependent) <- applicationDependencies)
+      graph.addEdge(app, dependent)
     new UnmodifiableDirectedGraph(graph)
   }
 

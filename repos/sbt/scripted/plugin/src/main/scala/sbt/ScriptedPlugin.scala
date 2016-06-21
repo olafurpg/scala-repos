@@ -62,8 +62,8 @@ object ScriptedPlugin extends Plugin {
     val id = charClass(c => !c.isWhitespace && c != '/').+.string
     val groupP = token(id.examples(pairMap.keySet)) <~ token('/')
     def nameP(group: String) = token("*".id | id.examples(pairMap(group)))
-    val testID = for (group <- groupP; name <- nameP(group)) yield
-      (group, name)
+    val testID = for (group <- groupP; name <- nameP(group))
+      yield (group, name)
     (token(Space) ~> matched(testID)).*
   }
 
@@ -97,8 +97,8 @@ object ScriptedPlugin extends Plugin {
       scriptedRun <<= scriptedRunTask,
       scriptedDependencies <<=
         (compile in Test, publishLocal) map { (analysis, pub) =>
-        Unit
-      },
+          Unit
+        },
       scriptedLaunchOpts := Seq(),
       scripted <<= scriptedTask
   )

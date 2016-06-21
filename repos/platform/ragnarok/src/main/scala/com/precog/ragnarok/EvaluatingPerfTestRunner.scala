@@ -78,8 +78,8 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
   type YggConfig <: PerfTestRunnerConfig
 
   private implicit val nt = NaturalTransformation.refl[M]
-  def Evaluator[N[+ _]](N0: Monad[N])(
-      implicit mn: M ~> N, nm: N ~> M): EvaluatorLike[N]
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: M ~> N,
+                                      nm: N ~> M): EvaluatorLike[N]
 
   val dummyAccount = AccountDetails("dummyAccount",
                                     "nobody@precog.com",
@@ -88,8 +88,11 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
                                     Path.Root,
                                     AccountPlan.Free)
   def dummyEvaluationContext =
-    EvaluationContext(
-        yggConfig.apiKey, dummyAccount, Path.Root, Path.Root, new DateTime)
+    EvaluationContext(yggConfig.apiKey,
+                      dummyAccount,
+                      Path.Root,
+                      Path.Root,
+                      new DateTime)
 
   def eval(query: String): M[Result] =
     try {
@@ -98,7 +101,7 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
 
       if (valid.isEmpty) {
         sys.error("Error parsing query:\n" +
-            (forest flatMap { _.errors } map { _.toString } mkString "\n"))
+              (forest flatMap { _.errors } map { _.toString } mkString "\n"))
       } else if (valid.size > 1) {
         sys.error("Ambiguous parse tree.")
       }
@@ -113,8 +116,8 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
 
         case Right(dag) =>
           for {
-            table <- Evaluator(M).eval(
-                        dag, dummyEvaluationContext, yggConfig.optimize)
+            table <- Evaluator(M)
+                      .eval(dag, dummyEvaluationContext, yggConfig.optimize)
             size <- Timing.timeM("Counting stream")(
                        countStream(table.renderJson("", ",", "")))
           } yield size

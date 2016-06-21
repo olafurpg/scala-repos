@@ -18,10 +18,10 @@ private[akka] class ResizableMultiReaderRingBuffer[T](
     maxSize: Int, // constructor param, not field
     val cursors: Cursors) {
   require(Integer.lowestOneBit(maxSize) == maxSize && 0 < maxSize &&
-          maxSize <= Int.MaxValue / 2,
+            maxSize <= Int.MaxValue / 2,
           "maxSize must be a power of 2 that is > 0 and < Int.MaxValue/2")
   require(Integer.lowestOneBit(initialSize) == initialSize &&
-          0 < initialSize && initialSize <= maxSize,
+            0 < initialSize && initialSize <= maxSize,
           "initialSize must be a power of 2 that is > 0 and <= maxSize")
 
   private[this] val maxSizeBit = Integer.numberOfTrailingZeros(maxSize)
@@ -32,8 +32,7 @@ private[akka] class ResizableMultiReaderRingBuffer[T](
    * handled by always looking at differences or masked values
    */
   private[this] var writeIx = 0
-  private[this] var readIx =
-    0 // the "oldest" of all read cursor indices, i.e. the one that is most behind
+  private[this] var readIx = 0 // the "oldest" of all read cursor indices, i.e. the one that is most behind
 
   // current array.length log2, we don't keep it as an extra field because `Integer.numberOfTrailingZeros`
   // is a JVM intrinsic compiling down to a `BSF` instruction on x86, which is very fast on modern CPUs

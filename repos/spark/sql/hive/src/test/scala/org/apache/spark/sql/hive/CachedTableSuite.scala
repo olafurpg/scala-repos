@@ -177,8 +177,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
     sql("REFRESH TABLE refreshTable")
     // We are using the new data.
     assertCached(table("refreshTable"))
-    checkAnswer(
-        table("refreshTable"), table("src").unionAll(table("src")).collect())
+    checkAnswer(table("refreshTable"),
+                table("src").unionAll(table("src")).collect())
 
     // Drop the table and create it again.
     sql("DROP TABLE refreshTable")
@@ -188,8 +188,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
     // Refresh the table. REFRESH TABLE command should not make a uncached
     // table cached.
     sql("REFRESH TABLE refreshTable")
-    checkAnswer(
-        table("refreshTable"), table("src").unionAll(table("src")).collect())
+    checkAnswer(table("refreshTable"),
+                table("src").unionAll(table("src")).collect())
     // It is not cached.
     assert(!isCached("refreshTable"), "refreshTable should not be cached.")
 

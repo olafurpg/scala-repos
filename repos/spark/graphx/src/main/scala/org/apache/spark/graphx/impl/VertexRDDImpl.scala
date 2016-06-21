@@ -24,12 +24,12 @@ import org.apache.spark.graphx._
 import org.apache.spark.rdd._
 import org.apache.spark.storage.StorageLevel
 
-class VertexRDDImpl[VD] private[graphx](
+class VertexRDDImpl[VD] private[graphx] (
     @transient val partitionsRDD: RDD[ShippableVertexPartition[VD]],
     val targetStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)(
     implicit override protected val vdTag: ClassTag[VD])
-    extends VertexRDD[VD](
-        partitionsRDD.context, List(new OneToOneDependency(partitionsRDD))) {
+    extends VertexRDD[VD](partitionsRDD.context,
+                          List(new OneToOneDependency(partitionsRDD))) {
 
   require(partitionsRDD.partitioner.isDefined)
 
@@ -114,11 +114,11 @@ class VertexRDDImpl[VD] private[graphx](
       case other: VertexRDD[_] if this.partitioner == other.partitioner =>
         this.withPartitionsRDD[VD](
             partitionsRDD.zipPartitions(other.partitionsRDD,
-                                        preservesPartitioning =
-                                          true) { (thisIter, otherIter) =>
-          val thisPart = thisIter.next()
-          val otherPart = otherIter.next()
-          Iterator(thisPart.minus(otherPart))
+                                        preservesPartitioning = true) {
+          (thisIter, otherIter) =>
+            val thisPart = thisIter.next()
+            val otherPart = otherIter.next()
+            Iterator(thisPart.minus(otherPart))
         })
       case _ =>
         this.withPartitionsRDD[VD](
@@ -154,8 +154,8 @@ class VertexRDDImpl[VD] private[graphx](
   }
 
   override def leftZipJoin[VD2: ClassTag, VD3: ClassTag](
-      other: VertexRDD[VD2])(
-      f: (VertexId, VD, Option[VD2]) => VD3): VertexRDD[VD3] = {
+      other: VertexRDD[VD2])(f: (VertexId, VD,
+                                 Option[VD2]) => VD3): VertexRDD[VD3] = {
     val newPartitionsRDD = partitionsRDD.zipPartitions(
         other.partitionsRDD,
         preservesPartitioning = true
@@ -168,8 +168,8 @@ class VertexRDDImpl[VD] private[graphx](
   }
 
   override def leftJoin[VD2: ClassTag, VD3: ClassTag](
-      other: RDD[(VertexId, VD2)])(
-      f: (VertexId, VD, Option[VD2]) => VD3): VertexRDD[VD3] = {
+      other: RDD[(VertexId, VD2)])(f: (VertexId, VD,
+                                       Option[VD2]) => VD3): VertexRDD[VD3] = {
     // Test if the other vertex is a VertexRDD to choose the optimal join strategy.
     // If the other set is a VertexRDD then we use the much more efficient leftZipJoin
     other match {

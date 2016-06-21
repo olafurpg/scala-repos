@@ -34,8 +34,11 @@ object SbtWatcherMain {
     def write2source(message: String) {
       out.write(
           Base64Converter
-            .encode(MessageEvent(
-                    BuildMessage.Kind.INFO, message, None, None, None).toBytes)
+            .encode(MessageEvent(BuildMessage.Kind.INFO,
+                                 message,
+                                 None,
+                                 None,
+                                 None).toBytes)
             .getBytes)
     }
 
@@ -95,7 +98,7 @@ object SbtWatcherMain {
         currentExec match {
           case Some((watcher, cons, args))
               if watcher.isRunning && args.head == argsTail.head &&
-              cm == LOOP =>
+                cm == LOOP =>
             val oldDelegate = cons.delegate
             val newDelegate = delegate
             cons.delegate = newDelegate

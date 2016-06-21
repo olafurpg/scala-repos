@@ -112,7 +112,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertEquals(6, pq.size())
   }
 
-  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit = {
+  @Test
+  def should_check_contained_values_even_in_double_corner_cases(): Unit = {
     val pq = factory.empty[Double]
 
     assertTrue(pq.add(11111.0))

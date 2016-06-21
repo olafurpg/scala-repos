@@ -109,14 +109,16 @@ trait NIHDBTestActors
 
   type YggConfig <: NIHDBTestActorsConfig
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executor, yggConfig.storageTimeout.duration)
+    new blueeyes.bkka.UnsafeFutureComonad(executor,
+                                          yggConfig.storageTimeout.duration)
 
-  val accountFinder = new StaticAccountFinder[Future](
-      TestStack.testAccount, TestStack.testAPIKey, Some("/"))
+  val accountFinder = new StaticAccountFinder[Future](TestStack.testAccount,
+                                                      TestStack.testAPIKey,
+                                                      Some("/"))
   val apiKeyFinder = new StaticAPIKeyFinder[Future](TestStack.testAPIKey)
-  val permissionsFinder = new PermissionsFinder(
-      apiKeyFinder, accountFinder, yggConfig.clock.instant())
+  val permissionsFinder = new PermissionsFinder(apiKeyFinder,
+                                                accountFinder,
+                                                yggConfig.clock.instant())
   val jobManager = new InMemoryJobManager[Future]
 
   val masterChef = actorSystem.actorOf(
@@ -161,8 +163,8 @@ trait NIHDBTestStack
 
   //val accountFinder = None
 
-  def Evaluator[N[+ _]](
-      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                      nm: N ~> Future) =
     new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
       with ExceptionQueryLogger[N, instructions.Line]
@@ -177,10 +179,11 @@ trait NIHDBTestStack
       def freshIdScanner = self.freshIdScanner
     }
 
-  val actorVFS = new ActorVFS(
-      projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
-  val vfs = new SecureVFS(
-      actorVFS, permissionsFinder, jobManager, yggConfig.clock)
+  val actorVFS = new ActorVFS(projectionsActor,
+                              yggConfig.storageTimeout,
+                              yggConfig.storageTimeout)
+  val vfs =
+    new SecureVFS(actorVFS, permissionsFinder, jobManager, yggConfig.clock)
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
   with ExceptionQueryLogger[Future, instructions.Line]

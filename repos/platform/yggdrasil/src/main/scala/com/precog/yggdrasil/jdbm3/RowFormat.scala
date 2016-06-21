@@ -269,7 +269,7 @@ trait RowFormatSupport { self: StdCodecs =>
       case (cType, col) =>
         sys.error(
             "Cannot create column encoder, columns of wrong type (expected %s, found %s)." format
-            (cType, col.tpe))
+              (cType, col.tpe))
     }
 
   protected trait ColumnValueDecoder {
@@ -588,54 +588,55 @@ trait SortingRowFormat extends RowFormat with StdCodecs with RowFormatSupport {
   def ColumnEncoder(cols: Seq[Column]) = {
     import ByteBufferPool._
 
-    val colValueEncoders: Array[ColumnValueEncoder] = zipWithSelectors(cols)
-      .map({
-      case (_, colsAndTypes) =>
-        val writers: Seq[ColumnValueEncoder] =
-          colsAndTypes map {
-            case (col, cType) =>
-              val writer = getColumnEncoder(cType, col)
-              new ColumnValueEncoder {
-                def encode(row: Int,
-                           buffer: ByteBuffer,
-                           pool: ByteBufferPool): Option[List[ByteBuffer]] = {
-                  val flag = SortingRowFormat.flagForCType(cType)
-                  if (buffer.remaining() > 0) {
-                    buffer.put(flag)
-                    writer.encode(row, buffer, pool)
-                  } else {
-                    val nextBuffer = pool.acquire
-                    nextBuffer.put(flag)
-                    writer.encode(row, nextBuffer, pool) match {
-                      case Some(buffers) => Some(buffer :: buffers)
-                      case None => Some(buffer :: nextBuffer :: Nil)
+    val colValueEncoders: Array[ColumnValueEncoder] =
+      zipWithSelectors(cols).map({
+        case (_, colsAndTypes) =>
+          val writers: Seq[ColumnValueEncoder] =
+            colsAndTypes map {
+              case (col, cType) =>
+                val writer = getColumnEncoder(cType, col)
+                new ColumnValueEncoder {
+                  def encode(
+                      row: Int,
+                      buffer: ByteBuffer,
+                      pool: ByteBufferPool): Option[List[ByteBuffer]] = {
+                    val flag = SortingRowFormat.flagForCType(cType)
+                    if (buffer.remaining() > 0) {
+                      buffer.put(flag)
+                      writer.encode(row, buffer, pool)
+                    } else {
+                      val nextBuffer = pool.acquire
+                      nextBuffer.put(flag)
+                      writer.encode(row, nextBuffer, pool) match {
+                        case Some(buffers) => Some(buffer :: buffers)
+                        case None => Some(buffer :: nextBuffer :: Nil)
+                      }
                     }
                   }
                 }
-              }
-          }
+            }
 
-        val selCols: Seq[Column] = colsAndTypes map (_._1)
+          val selCols: Seq[Column] = colsAndTypes map (_._1)
 
-        new ColumnValueEncoder {
-          def encode(row: Int,
-                     buffer: ByteBuffer,
-                     pool: ByteBufferPool): Option[List[ByteBuffer]] = {
-            (writers zip selCols) find (_._2.isDefinedAt(row)) map
-            (_._1.encode(row, buffer, pool)) getOrElse {
-              val flag = SortingRowFormat.flagForCType(CUndefined)
-              if (buffer.remaining() > 0) {
-                buffer.put(flag)
-                None
-              } else {
-                val nextBuffer = pool.acquire
-                nextBuffer.put(flag)
-                Some(buffer :: nextBuffer :: Nil)
+          new ColumnValueEncoder {
+            def encode(row: Int,
+                       buffer: ByteBuffer,
+                       pool: ByteBufferPool): Option[List[ByteBuffer]] = {
+              (writers zip selCols) find (_._2.isDefinedAt(row)) map
+              (_._1.encode(row, buffer, pool)) getOrElse {
+                val flag = SortingRowFormat.flagForCType(CUndefined)
+                if (buffer.remaining() > 0) {
+                  buffer.put(flag)
+                  None
+                } else {
+                  val nextBuffer = pool.acquire
+                  nextBuffer.put(flag)
+                  Some(buffer :: nextBuffer :: Nil)
+                }
               }
             }
           }
-        }
-    })(collection.breakOut)
+      })(collection.breakOut)
 
     new ColumnEncoder {
       val undefined = RawBitSet.create(0)
@@ -702,8 +703,7 @@ trait SortingRowFormat extends RowFormat with StdCodecs with RowFormatSupport {
         } yield ()
     }.sequence
 
-    pool.run(
-        for {
+    pool.run(for {
       _ <- writes
       bytes <- flipBytes
       _ <- release

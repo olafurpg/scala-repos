@@ -82,8 +82,10 @@ abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
           passwd.get,
           driver.get,
           getTableDesc(tableName, columnNames, columnDefinitions),
-          getJDBCScheme(
-              columnNames, filterCondition, updateBy, replaceOnInsert))
+          getJDBCScheme(columnNames,
+                        filterCondition,
+                        updateBy,
+                        replaceOnInsert))
       tap.setConcurrentReads(maxConcurrentReads)
       tap.setBatchSize(batchSize)
       tap
@@ -92,8 +94,8 @@ abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
         sys.error("Could not find DB credential information.")
     }
 
-  override def createTap(
-      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(readOrWrite: AccessMode)(
+      implicit mode: Mode): Tap[_, _, _] =
     mode match {
       case Hdfs(_, _) => createJDBCTap.asInstanceOf[Tap[_, _, _]]
       // TODO: support Local mode here, and better testing.

@@ -56,8 +56,8 @@ object NamedPF {
     * @return a Full Box containing the PartialFunction if found,
     * or Empty othewise.
     */
-  def find[A, B](
-      value: A, lst: Seq[PartialFunction[A, B]]): Box[PartialFunction[A, B]] =
+  def find[A, B](value: A,
+                 lst: Seq[PartialFunction[A, B]]): Box[PartialFunction[A, B]] =
     lst.find(_.isDefinedAt(value))
 
   /**

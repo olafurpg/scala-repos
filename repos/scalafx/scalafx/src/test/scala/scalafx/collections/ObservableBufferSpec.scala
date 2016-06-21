@@ -47,7 +47,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableBufferSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.ObservableList[T], ObservableBuffer[T]](
-        classOf[jfxc.ObservableList[T]], classOf[ObservableBuffer[T]]) {
+        classOf[jfxc.ObservableList[T]],
+        classOf[ObservableBuffer[T]]) {
 
   /**
     * Verifies if a generated Buffer is the same instance than a original Buffer. If it should not be,

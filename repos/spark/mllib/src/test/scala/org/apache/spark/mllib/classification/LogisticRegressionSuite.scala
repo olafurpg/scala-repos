@@ -114,8 +114,9 @@ object LogisticRegressionSuite {
       val probs = Array.ofDim[Double](nClasses)
 
       for (i <- 0 until nClasses - 1) {
-        for (j <- 0 until xDim) margins(i + 1) +=
-          weights(i * xWithInterceptsDim + j) * xArray(j)
+        for (j <- 0 until xDim)
+          margins(i + 1) +=
+            weights(i * xWithInterceptsDim + j) * xArray(j)
         if (addIntercept)
           margins(i + 1) += weights((i + 1) * xWithInterceptsDim - 1)
       }
@@ -167,8 +168,8 @@ object LogisticRegressionSuite {
       numFeatures = 2,
       numClasses = 3)
 
-  private def checkModelsEqual(
-      a: LogisticRegressionModel, b: LogisticRegressionModel): Unit = {
+  private def checkModelsEqual(a: LogisticRegressionModel,
+                               b: LogisticRegressionModel): Unit = {
     assert(a.weights == b.weights)
     assert(a.intercept == b.intercept)
     assert(a.numClasses == b.numClasses)
@@ -201,13 +202,18 @@ class LogisticRegressionSuite
      */
     binaryDataset = {
       val nPoints = 10000
-      val coefficients = Array(
-          -0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
+      val coefficients =
+        Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
 
       val testData = LogisticRegressionSuite.generateMultinomialLogisticInput(
-          coefficients, xMean, xVariance, true, nPoints, 42)
+          coefficients,
+          xMean,
+          xVariance,
+          true,
+          nPoints,
+          42)
 
       sc.parallelize(testData, 2)
     }
@@ -222,7 +228,7 @@ class LogisticRegressionSuite
     }
     // At least 83% of the predictions should be on.
     ((input.length -
-            numOffPredictions).toDouble / input.length) should be > expectedAcc
+              numOffPredictions).toDouble / input.length) should be > expectedAcc
   }
 
   // Test if we can correctly learn A, B where Y = logistic(A + B*X)
@@ -253,12 +259,12 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
   }
 
   // Test if we can correctly learn A, B where Y = logistic(A + B*X)
@@ -296,12 +302,12 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
   }
 
   test("logistic regression with initial weights with SGD") {
@@ -332,12 +338,12 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
   }
 
   test(
@@ -407,12 +413,12 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
   }
 
   test(
@@ -507,8 +513,13 @@ class LogisticRegressionSuite
     val xMean = Array(5.843, 3.057, 3.758, 1.199)
     val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
 
-    val testData = LogisticRegressionSuite.generateMultinomialLogisticInput(
-        weights, xMean, xVariance, true, nPoints, 42)
+    val testData =
+      LogisticRegressionSuite.generateMultinomialLogisticInput(weights,
+                                                               xMean,
+                                                               xVariance,
+                                                               true,
+                                                               nPoints,
+                                                               42)
 
     val testRDD = sc.parallelize(testData, 2)
     testRDD.cache()
@@ -584,8 +595,12 @@ class LogisticRegressionSuite
     assert(model.weights ~== weightsR relTol 0.05)
 
     val validationData =
-      LogisticRegressionSuite.generateMultinomialLogisticInput(
-          weights, xMean, xVariance, true, nPoints, 17)
+      LogisticRegressionSuite.generateMultinomialLogisticInput(weights,
+                                                               xMean,
+                                                               xVariance,
+                                                               true,
+                                                               nPoints,
+                                                               17)
     val validationRDD = sc.parallelize(validationData, 2)
     // The validation accuracy is not good since this model (even the original weights) doesn't have
     // very steep curve in logistic function so that when we draw samples from distribution, it's

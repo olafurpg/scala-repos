@@ -62,8 +62,8 @@ trait ScFun extends ScTypeParametersOwner {
   def polymorphicType: ScType = {
     if (typeParameters.isEmpty) methodType
     else
-      ScTypePolymorphicType(
-          methodType, typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(methodType,
+                            typeParameters.map(new TypeParameter(_)))
   }
 }
 
@@ -173,8 +173,8 @@ trait ScFunction
           case Some((fun: ScSyntheticFunction, subst)) =>
             var typeParamSubst = ScSubstitutor.empty
             fun.typeParameters.zip(typeParameters).foreach {
-              case (
-                  oldParam: ScSyntheticTypeParameter, newParam: ScTypeParam) =>
+              case (oldParam: ScSyntheticTypeParameter,
+                    newParam: ScTypeParam) =>
                 typeParamSubst = typeParamSubst.bindT(
                     (oldParam.name, ScalaPsiUtil.getPsiElementId(oldParam)),
                     new ScTypeParameterType(newParam, subst))
@@ -191,8 +191,9 @@ trait ScFunction
             Some(
                 typeParamSubst
                   .followed(subst)
-                  .subst(ScType.create(
-                          fun.getReturnType, getProject, getResolveScope)))
+                  .subst(ScType.create(fun.getReturnType,
+                                       getProject,
+                                       getResolveScope)))
           case _ => None
         }
         superReturnType
@@ -256,10 +257,11 @@ trait ScFunction
         clauses.foldRight[ScType](resultType) {
           (clause: ScParameterClause, tp: ScType) =>
             new ScMethodType(tp, clause.getSmartParameters, clause.isImplicit)(
-                getProject, getResolveScope)
+                getProject,
+                getResolveScope)
         } else
-        new ScMethodType(resultType, Seq.empty, false)(
-            getProject, getResolveScope)
+        new ScMethodType(resultType, Seq.empty, false)(getProject,
+                                                       getResolveScope)
     res.asInstanceOf[ScMethodType]
   }
 
@@ -269,8 +271,8 @@ trait ScFunction
   def polymorphicType(result: Option[ScType] = None): ScType = {
     if (typeParameters.isEmpty) methodType(result)
     else
-      ScTypePolymorphicType(
-          methodType(result), typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(methodType(result),
+                            typeParameters.map(new TypeParameter(_)))
   }
 
   /**
@@ -328,8 +330,8 @@ trait ScFunction
             fun.returnTypeInner
           case _ =>
         }
-        parent.putUserData(
-            ScFunction.calculatedBlockKey, java.lang.Boolean.TRUE)
+        parent
+          .putUserData(ScFunction.calculatedBlockKey, java.lang.Boolean.TRUE)
         returnTypeInner
       }
     } else returnTypeInner
@@ -357,15 +359,15 @@ trait ScFunction
         case owner: ScTypeParametersOwner =>
           if (hasImplicit) None
           else
-            ScalaPsiUtil.syntheticParamClause(
-                owner, paramClauses, classParam = false)
+            ScalaPsiUtil
+              .syntheticParamClause(owner, paramClauses, classParam = false)
         case _ => None
       }
     } else {
       if (hasImplicit) None
       else
-        ScalaPsiUtil.syntheticParamClause(
-            this, paramClauses, classParam = false)
+        ScalaPsiUtil
+          .syntheticParamClause(this, paramClauses, classParam = false)
     }
   }
 
@@ -376,15 +378,15 @@ trait ScFunction
     * @param name parameter name
     * @param clausePosition = -1, effective clause number, if -1 then parameter in any explicit? clause
     */
-  def getParamByName(
-      name: String, clausePosition: Int = -1): Option[ScParameter] = {
+  def getParamByName(name: String,
+                     clausePosition: Int = -1): Option[ScParameter] = {
     clausePosition match {
       case -1 =>
         parameters.find {
           case param =>
             ScalaPsiUtil.memberNamesEquals(param.name, name) ||
-            param.deprecatedName.exists(
-                ScalaPsiUtil.memberNamesEquals(_, name))
+              param.deprecatedName.exists(
+                  ScalaPsiUtil.memberNamesEquals(_, name))
         }
       case i if i < 0 || i >= effectiveParameterClauses.length => None
       case _ =>
@@ -394,8 +396,8 @@ trait ScFunction
           .find {
             case param =>
               ScalaPsiUtil.memberNamesEquals(param.name, name) ||
-              param.deprecatedName.exists(
-                  ScalaPsiUtil.memberNamesEquals(_, name))
+                param.deprecatedName.exists(
+                    ScalaPsiUtil.memberNamesEquals(_, name))
           }
     }
   }
@@ -444,8 +446,10 @@ trait ScFunction
   }
 
   def getTypeParameterList =
-    new FakePsiTypeParameterList(
-        getManager, getLanguage, typeParameters.toArray, this)
+    new FakePsiTypeParameterList(getManager,
+                                 getLanguage,
+                                 typeParameters.toArray,
+                                 this)
 
   def hasTypeParameters = typeParameters.nonEmpty
 
@@ -467,10 +471,10 @@ trait ScFunction
     * @return Empty array, if containing class is null.
     */
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  def getFunctionWrappers(isStatic: Boolean,
-                          isInterface: Boolean,
-                          cClass: Option[PsiClass] =
-                            None): Seq[ScFunctionWrapper] = {
+  def getFunctionWrappers(
+      isStatic: Boolean,
+      isInterface: Boolean,
+      cClass: Option[PsiClass] = None): Seq[ScFunctionWrapper] = {
     val buffer = new ArrayBuffer[ScFunctionWrapper]
     if (cClass.isDefined || containingClass != null) {
       buffer += new ScFunctionWrapper(this, isStatic, isInterface, cClass)
@@ -479,8 +483,11 @@ trait ScFunction
         first <- clause.clauses.headOption if first.hasRepeatedParam
         if isJavaVarargs
       } {
-        buffer += new ScFunctionWrapper(
-            this, isStatic, isInterface, cClass, isJavaVarargs = true)
+        buffer += new ScFunctionWrapper(this,
+                                        isStatic,
+                                        isInterface,
+                                        cClass,
+                                        isJavaVarargs = true)
       }
 
       val params = parameters
@@ -696,7 +703,8 @@ trait ScFunction
   }
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, strictCheck: Boolean) = m match {
+      m: ScMember,
+      strictCheck: Boolean) = m match {
     case f: ScFunction =>
       f.name == name && {
         if (strictCheck)
@@ -762,8 +770,8 @@ trait ScFunction
   def getTypeNoImplicits(ctx: TypingContext): TypeResult[ScType] =
     getTypeNoImplicits(ctx, returnType)
 
-  def getTypeNoImplicits(
-      ctx: TypingContext, rt: TypeResult[ScType]): TypeResult[ScType] = {
+  def getTypeNoImplicits(ctx: TypingContext,
+                         rt: TypeResult[ScType]): TypeResult[ScType] = {
     collectReverseParamTypesNoImplicits match {
       case Some(params) =>
         val project = getProject
@@ -809,8 +817,8 @@ object ScFunction {
     val WithFilter = "withFilter"
 
     val Unapplies: Set[String] = Set(Unapply, UnapplySeq)
-    val ForComprehensions: Set[String] = Set(
-        Foreach, Map, FlatMap, Filter, WithFilter)
+    val ForComprehensions: Set[String] =
+      Set(Foreach, Map, FlatMap, Filter, WithFilter)
     val Special: Set[String] =
       Set(Apply, Update) ++ Unapplies ++ ForComprehensions
   }

@@ -33,8 +33,10 @@ case object NoScalaVersion extends ScalaVersion {
   * final, release candidate, milestone, and development builds. The build argument is used
   * to segregate builds
   */
-case class SpecificScalaVersion(
-    major: Int, minor: Int, rev: Int, build: ScalaBuild)
+case class SpecificScalaVersion(major: Int,
+                                minor: Int,
+                                rev: Int,
+                                build: ScalaBuild)
     extends ScalaVersion {
   def unparse = s"${major}.${minor}.${rev}${build.unparse}"
 
@@ -78,8 +80,8 @@ object ScalaVersion {
   private val rcpat = """(?i)rc(\d*)""".r
   private val mspat = """(?i)m(\d*)""".r
 
-  def apply(
-      versionString: String, errorHandler: String => Unit): ScalaVersion = {
+  def apply(versionString: String,
+            errorHandler: String => Unit): ScalaVersion = {
     def error() = errorHandler(
         s"Bad version (${versionString}) not major[.minor[.revision[-suffix]]]"
     )
@@ -101,8 +103,10 @@ object ScalaVersion {
       case "" => NoScalaVersion
       case "any" => AnyScalaVersion
       case vpat(majorS, minorS, revS, buildS) =>
-        SpecificScalaVersion(
-            toInt(majorS), toInt(minorS), toInt(revS), toBuild(buildS))
+        SpecificScalaVersion(toInt(majorS),
+                             toInt(minorS),
+                             toInt(revS),
+                             toBuild(buildS))
       case _ => error(); AnyScalaVersion
     }
   }

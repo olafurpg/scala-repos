@@ -35,8 +35,8 @@ abstract class CompletionTestBase
   }
 
   protected def loadAndSetFileText(filePath: String, file: VirtualFile) = {
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil
+          .loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(filePath, fileText)
     fileText
   }
@@ -56,11 +56,12 @@ abstract class CompletionTestBase
     * @param offset Caret position
     * @return Array of lookup strings
     */
-  protected def getCompletionItems(
-      file: VirtualFile, offset: Integer): Array[String] = {
+  protected def getCompletionItems(file: VirtualFile,
+                                   offset: Integer): Array[String] = {
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
     val editor = fileEditorManager.openTextEditor(
-        new OpenFileDescriptor(getProjectAdapter, file, offset), false)
+        new OpenFileDescriptor(getProjectAdapter, file, offset),
+        false)
 
     val completionType =
       if (getTestName(false).startsWith("Smart")) CompletionType.SMART

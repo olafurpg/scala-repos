@@ -91,8 +91,8 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
     }
 
     getOutputCommitter().setupTask(getTaskContext())
-    writer = getOutputFormat().getRecordWriter(
-        fs, conf.value, outputName, Reporter.NULL)
+    writer = getOutputFormat()
+      .getRecordWriter(fs, conf.value, outputName, Reporter.NULL)
   }
 
   def write(key: AnyRef, value: AnyRef) {
@@ -108,8 +108,8 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
   }
 
   def commit() {
-    SparkHadoopMapRedUtil.commitTask(
-        getOutputCommitter(), getTaskContext(), jobID, splitID)
+    SparkHadoopMapRedUtil
+      .commitTask(getOutputCommitter(), getTaskContext(), jobID, splitID)
   }
 
   def commitJob() {
@@ -149,7 +149,8 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
   }
 
   protected def newTaskAttemptContext(
-      conf: JobConf, attemptId: TaskAttemptID): TaskAttemptContext = {
+      conf: JobConf,
+      attemptId: TaskAttemptID): TaskAttemptContext = {
     new TaskAttemptContextImpl(conf, attemptId)
   }
 
@@ -160,8 +161,9 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
 
     jID = new SerializableWritable[JobID](
         SparkHadoopWriter.createJobID(now, jobid))
-    taID = new SerializableWritable[TaskAttemptID](new TaskAttemptID(
-            new TaskID(jID.value, TaskType.MAP, splitID), attemptID))
+    taID = new SerializableWritable[TaskAttemptID](
+        new TaskAttemptID(new TaskID(jID.value, TaskType.MAP, splitID),
+                          attemptID))
   }
 }
 

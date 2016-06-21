@@ -74,8 +74,8 @@ class OccurrenceData(typeElement: ScTypeElement,
   def getAllOccurrences =
     getUsualOccurrences ++ getCompanionObjOccurrences ++ getExtendedOccurrences
 
-  private def getOccurrences(
-      occ: Array[ScTypeElement], needAll: Boolean): Array[ScTypeElement] = {
+  private def getOccurrences(occ: Array[ScTypeElement],
+                             needAll: Boolean): Array[ScTypeElement] = {
     if (needAll) {
       occ
     } else {

@@ -26,7 +26,8 @@ object NodeChurnMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+                """
       akka.cluster.auto-down-unreachable-after = 1s
       akka.remote.log-frame-size-exceeding = 2000b
       """))

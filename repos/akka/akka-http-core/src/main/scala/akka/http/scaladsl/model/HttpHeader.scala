@@ -57,16 +57,16 @@ object HttpHeader {
     */
   def parse(name: String,
             value: String,
-            settings: HeaderParser.Settings =
-              HeaderParser.DefaultSettings): ParsingResult =
+            settings: HeaderParser.Settings = HeaderParser.DefaultSettings)
+    : ParsingResult =
     if (name.forall(CharacterClasses.tchar)) {
       import akka.parboiled2.Parser.DeliveryScheme.Try
       val parser = new HeaderParser(value, settings)
       parser.`header-field-value`.run() match {
         case Success(preProcessedValue) ⇒
           try {
-            HeaderParser.parseFull(
-                name.toLowerCase, preProcessedValue, settings) match {
+            HeaderParser
+              .parseFull(name.toLowerCase, preProcessedValue, settings) match {
               case Right(header) ⇒ ParsingResult.Ok(header, Nil)
               case Left(info) ⇒
                 val errors =

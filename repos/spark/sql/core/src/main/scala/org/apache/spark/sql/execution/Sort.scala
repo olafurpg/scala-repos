@@ -72,8 +72,11 @@ case class Sort(sortOrder: Seq[SortOrder],
     }
 
     val pageSize = SparkEnv.get.memoryManager.pageSizeBytes
-    val sorter = new UnsafeExternalRowSorter(
-        schema, ordering, prefixComparator, prefixComputer, pageSize)
+    val sorter = new UnsafeExternalRowSorter(schema,
+                                             ordering,
+                                             prefixComparator,
+                                             prefixComputer,
+                                             pageSize)
     if (testSpillFrequency > 0) {
       sorter.setTestSpillFrequency(testSpillFrequency)
     }
@@ -128,8 +131,9 @@ case class Sort(sortOrder: Seq[SortOrder],
         metrics,
         s"$metrics = org.apache.spark.TaskContext.get().taskMetrics();")
     val sortedIterator = ctx.freshName("sortedIter")
-    ctx.addMutableState(
-        "scala.collection.Iterator<UnsafeRow>", sortedIterator, "")
+    ctx.addMutableState("scala.collection.Iterator<UnsafeRow>",
+                        sortedIterator,
+                        "")
 
     val addToSorter = ctx.freshName("addToSorter")
     ctx.addNewFunction(addToSorter, s"""
@@ -165,8 +169,9 @@ case class Sort(sortOrder: Seq[SortOrder],
      """.stripMargin.trim
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     if (row != null) {
       s"$sorterVariable.insertRow((UnsafeRow)$row);"
     } else {

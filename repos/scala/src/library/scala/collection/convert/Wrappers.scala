@@ -439,7 +439,7 @@ private[collection] trait Wrappers {
 
     def iterator =
       enumerationAsScalaIterator(underlying.keys) map
-      (k => (k, underlying get k))
+        (k => (k, underlying get k))
 
     override def clear() = underlying.clear()
   }

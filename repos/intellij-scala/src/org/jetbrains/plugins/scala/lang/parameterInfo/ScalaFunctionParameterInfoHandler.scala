@@ -41,8 +41,9 @@ import scala.collection.Seq
   * Date: 18.01.2009
   */
 class ScalaFunctionParameterInfoHandler
-    extends ParameterInfoHandlerWithTabActionSupport[
-        PsiElement, Any, ScExpression] {
+    extends ParameterInfoHandlerWithTabActionSupport[PsiElement,
+                                                     Any,
+                                                     ScExpression] {
   def getArgListStopSearchClasses: java.util.Set[_ <: Class[_]] = {
     java.util.Collections.singleton(classOf[PsiMethod])
   }
@@ -89,7 +90,8 @@ class ScalaFunctionParameterInfoHandler
   }
 
   def getParametersForDocumentation(
-      p: Any, context: ParameterInfoContext): Array[Object] = {
+      p: Any,
+      context: ParameterInfoContext): Array[Object] = {
     p match {
       case x: ScFunction =>
         x.parameters.toArray
@@ -97,13 +99,13 @@ class ScalaFunctionParameterInfoHandler
     }
   }
 
-  def showParameterInfo(
-      element: PsiElement, context: CreateParameterInfoContext) {
+  def showParameterInfo(element: PsiElement,
+                        context: CreateParameterInfoContext) {
     context.showHint(element, element.getTextRange.getStartOffset, this)
   }
 
-  def getParametersForLookup(
-      item: LookupElement, context: ParameterInfoContext): Array[Object] = {
+  def getParametersForLookup(item: LookupElement,
+                             context: ParameterInfoContext): Array[Object] = {
     if (!item.isInstanceOf[LookupItem[_]]) return null
     val allElements =
       JavaCompletionUtil.getAllPsiElements(item.asInstanceOf[LookupItem[_]])
@@ -194,9 +196,10 @@ class ScalaFunctionParameterInfoHandler
                 } else {
                   exprs(k) match {
                     case assign @ NamedAssignStmt(name) =>
-                      val ind = parameters.indexWhere(param =>
-                            ScalaPsiUtil.memberNamesEquals(
-                                param._1.name, name))
+                      val ind =
+                        parameters.indexWhere(param =>
+                              ScalaPsiUtil.memberNamesEquals(param._1.name,
+                                                             name))
                       if (ind == -1 || used(ind)) {
                         doNoNamed(assign)
                       } else {
@@ -226,9 +229,10 @@ class ScalaFunctionParameterInfoHandler
                 } else {
                   exprs(k) match {
                     case NamedAssignStmt(name) =>
-                      val ind = parameters.indexWhere(param =>
-                            ScalaPsiUtil.memberNamesEquals(
-                                param._1.name, name))
+                      val ind =
+                        parameters.indexWhere(param =>
+                              ScalaPsiUtil.memberNamesEquals(param._1.name,
+                                                             name))
                       if (ind == -1 || used(ind)) {
                         appendFirst()
                       } else {
@@ -288,7 +292,7 @@ class ScalaFunctionParameterInfoHandler
                                  false,
                                  paramIndex),
                    t._1 + ": " + ScType.presentableText(t._2) +
-                   (if (t._3 != null) " = " + t._3.getText else ""))
+                     (if (t._3 != null) " = " + t._3.getText else ""))
               }
               applyToParameters(paramsSeq,
                                 ScSubstitutor.empty,
@@ -393,9 +397,9 @@ class ScalaFunctionParameterInfoHandler
                         .mkString(", "))
                 }
             }
-          case (
-              constructor: ScPrimaryConstructor, subst: ScSubstitutor, i: Int)
-              if constructor.isValid =>
+          case (constructor: ScPrimaryConstructor,
+                subst: ScSubstitutor,
+                i: Int) if constructor.isValid =>
             val clauses = constructor.effectiveParameterClauses
             if (clauses.length <= i)
               buffer.append(
@@ -524,7 +528,7 @@ class ScalaFunctionParameterInfoHandler
                   true
                 case notExpr
                     if !notExpr.isInstanceOf[ScExpression] ||
-                    notExpr.isInstanceOf[ScBlockExpr] =>
+                      notExpr.isInstanceOf[ScBlockExpr] =>
                   true
                 case _ => false
               }
@@ -554,20 +558,23 @@ class ScalaFunctionParameterInfoHandler
                 def process(functionName: String): Unit = {
                   val i = if (functionName == "update") -1 else 0
                   val processor = new CompletionProcessor(
-                      StdKinds.refExprQualRef, call, true, Some(functionName))
+                      StdKinds.refExprQualRef,
+                      call,
+                      true,
+                      Some(functionName))
                   processor.processType(typez, call)
                   val variants: Array[ScalaResolveResult] =
                     processor.candidates
                   for {
                     variant <- variants
                     if !variant.getElement.isInstanceOf[PsiMember] ||
-                    ResolveUtils.isAccessible(
-                        variant.getElement.asInstanceOf[PsiMember],
-                        call)
+                      ResolveUtils.isAccessible(
+                          variant.getElement.asInstanceOf[PsiMember],
+                          call)
                   } {
                     variant match {
-                      case ScalaResolveResult(
-                          method: ScFunction, subst: ScSubstitutor) =>
+                      case ScalaResolveResult(method: ScFunction,
+                                              subst: ScSubstitutor) =>
                         res +=
                           ((new PhysicalSignature(
                                 method,
@@ -586,9 +593,8 @@ class ScalaFunctionParameterInfoHandler
                   if (count > 1) {
                     //todo: missed case with last implicit call
                     ref.bind() match {
-                      case Some(
-                          ScalaResolveResult(
-                          function: ScFunction, subst: ScSubstitutor))
+                      case Some(ScalaResolveResult(function: ScFunction,
+                                                   subst: ScSubstitutor))
                           if function.effectiveParameterClauses.length >= count =>
                         res +=
                           ((new PhysicalSignature(
@@ -598,7 +604,7 @@ class ScalaFunctionParameterInfoHandler
                       case _ =>
                         for (typez <- call.getEffectiveInvokedExpr.getType(
                                          TypingContext.empty)) //todo: implicit conversions
-                        { collectForType(typez) }
+                          { collectForType(typez) }
                     }
                   } else {
                     val variants: Array[ResolveResult] =
@@ -606,21 +612,21 @@ class ScalaFunctionParameterInfoHandler
                     for {
                       variant <- variants
                       if !variant.getElement.isInstanceOf[PsiMember] ||
-                      ResolveUtils.isAccessible(
-                          variant.getElement.asInstanceOf[PsiMember],
-                          ref)
+                        ResolveUtils.isAccessible(
+                            variant.getElement.asInstanceOf[PsiMember],
+                            ref)
                     } {
                       variant match {
                         //todo: Synthetic function
-                        case ScalaResolveResult(
-                            method: PsiMethod, subst: ScSubstitutor) =>
+                        case ScalaResolveResult(method: PsiMethod,
+                                                subst: ScSubstitutor) =>
                           res +=
                             ((new PhysicalSignature(
                                   method,
                                   subst.followed(collectSubstitutor(method))),
                               0))
-                        case ScalaResolveResult(
-                            typed: ScTypedDefinition, subst: ScSubstitutor) =>
+                        case ScalaResolveResult(typed: ScTypedDefinition,
+                                                subst: ScSubstitutor) =>
                           val typez = subst.subst(typed
                                 .getType(TypingContext.empty)
                                 .getOrNothing) //todo: implicit conversions
@@ -646,8 +652,8 @@ class ScalaFunctionParameterInfoHandler
             val res: ArrayBuffer[Object] = new ArrayBuffer[Object]
             val typeElement = constr.typeElement
             val i = constr.arguments.indexOf(args.element)
-            ScType.extractClassType(
-                typeElement.calcType, Some(file.getProject)) match {
+            ScType.extractClassType(typeElement.calcType,
+                                    Some(file.getProject)) match {
               case Some((clazz: PsiClass, subst: ScSubstitutor)) =>
                 clazz match {
                   case clazz: ScClass =>
@@ -660,14 +666,18 @@ class ScalaFunctionParameterInfoHandler
                                   (p.name, ScalaPsiUtil.getPsiElementId(p)))
                             val typeArgs: Seq[ScTypeElement] =
                               gen.typeArgList.typeArgs
-                            val map = new collection.mutable.HashMap[
-                                (String, PsiElement), ScType]
+                            val map =
+                              new collection.mutable.HashMap[(String,
+                                                              PsiElement),
+                                                             ScType]
                             for (i <- 0 to Math.min(tp.length, typeArgs.length) -
-                                     1) {
+                                       1) {
                               map += ((tp(i), typeArgs(i).calcType))
                             }
                             val substitutor = new ScSubstitutor(
-                                Map(map.toSeq: _*), Map.empty, None)
+                                Map(map.toSeq: _*),
+                                Map.empty,
+                                None)
                             res += ((constr, substitutor.followed(subst), i))
                           case _ => res += ((constr, subst, i))
                         }
@@ -677,11 +687,12 @@ class ScalaFunctionParameterInfoHandler
                     }
                     for (constr <- clazz.functions
                          if !constr.isInstanceOf[ScPrimaryConstructor] &&
-                         constr.isConstructor && ((constr.clauses match {
+                           constr.isConstructor && ((constr.clauses match {
                                case Some(x) => x.clauses.length
                                case None => 1
-                             }) > i)) res +=
-                      ((new PhysicalSignature(constr, subst), i))
+                             }) > i))
+                      res +=
+                        ((new PhysicalSignature(constr, subst), i))
                   case clazz: PsiClass if clazz.isAnnotationType =>
                     val resulting: (AnnotationParameters, Int) =
                       (AnnotationParameters(
@@ -707,17 +718,20 @@ class ScalaFunctionParameterInfoHandler
                           val typeArgs: Seq[ScTypeElement] =
                             gen.typeArgList.typeArgs
                           val map = new collection.mutable.HashMap[
-                              (String, PsiElement), ScType]
+                              (String, PsiElement),
+                              ScType]
                           for (i <- 0 to Math.min(tp.length, typeArgs.length) -
-                                   1) {
+                                     1) {
                             map += ((tp(i), typeArgs(i).calcType))
                           }
                           val substitutor = new ScSubstitutor(
-                              Map(map.toSeq: _*), Map.empty, None)
+                              Map(map.toSeq: _*),
+                              Map.empty,
+                              None)
                           res +=
-                            ((new PhysicalSignature(
-                                  constructor, substitutor.followed(subst)),
-                              i))
+                          ((new PhysicalSignature(constructor,
+                                                  substitutor.followed(subst)),
+                            i))
                         case _ =>
                           res +=
                             ((new PhysicalSignature(constructor, subst), i))
@@ -746,13 +760,13 @@ class ScalaFunctionParameterInfoHandler
                 for {
                   constr <- clazz.functions
                   if !constr.isInstanceOf[ScPrimaryConstructor] &&
-                  constr.isConstructor &&
-                  constr.clauses.map(_.clauses.length).getOrElse(1) > i
+                    constr.isConstructor &&
+                    constr.clauses.map(_.clauses.length).getOrElse(1) > i
                 } {
                   if (!PsiTreeUtil.isAncestor(constr, self, true) &&
                       constr.getTextRange.getStartOffset < self.getTextRange.getStartOffset) {
                     res +=
-                      ((new PhysicalSignature(constr, ScSubstitutor.empty), i))
+                    ((new PhysicalSignature(constr, ScSubstitutor.empty), i))
                   }
                 }
               case _ =>

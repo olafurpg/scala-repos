@@ -8,12 +8,15 @@ object DenseVectorBenchmark extends MyRunner(classOf[DenseVectorBenchmark])
 
 trait BuildsRandomVectors {
   private val uniform = Uniform(0, 1)
-  def randomArray(
-      size: Int, offset: Int = 0, stride: Int = 1): DenseVector[Double] = {
+  def randomArray(size: Int,
+                  offset: Int = 0,
+                  stride: Int = 1): DenseVector[Double] = {
     require(offset >= 0)
     require(stride >= 1)
-    val result = new DenseVector(
-        new Array[Double](offset + stride * size), offset, stride, size)
+    val result = new DenseVector(new Array[Double](offset + stride * size),
+                                 offset,
+                                 stride,
+                                 size)
     var i = 0
     while (i < size) {
       result.unsafeUpdate(i, uniform.draw())
@@ -34,8 +37,8 @@ trait BuildsRandomVectors {
     new DenseMatrix(m, n, d, 0, m)
   }
 
-  def randomSparseVector(
-      size: Int, sparsity: Double = 0.01): SparseVector[Double] = {
+  def randomSparseVector(size: Int,
+                         sparsity: Double = 0.01): SparseVector[Double] = {
     val nnz = (size * sparsity).toInt
     val vb = VectorBuilder.zeros[Double](size)
     cforRange(0 until nnz) { i =>
@@ -102,8 +105,7 @@ class DenseVectorBenchmark extends BreezeBenchmark with BuildsRandomVectors {
     unsafeValueAtBench(reps, 1024 * 8, 4)
 
   def updateBench(reps: Int, size: Int, stride: Int) =
-    runWith(reps, { randomArray(size, stride = stride) })(
-        arr => {
+    runWith(reps, { randomArray(size, stride = stride) })(arr => {
       var i = 0
       while (i < arr.size) {
         arr.update(i, i.toDouble)
@@ -116,8 +118,7 @@ class DenseVectorBenchmark extends BreezeBenchmark with BuildsRandomVectors {
   def timeUpdateStride4(reps: Int) = updateBench(reps, 1024 * 8, 4)
 
   def unsafeUpdateBench(reps: Int, size: Int, stride: Int) =
-    runWith(reps, { randomArray(size, stride = stride) })(
-        arr => {
+    runWith(reps, { randomArray(size, stride = stride) })(arr => {
       var i = 0
       while (i < arr.size) {
         arr.unsafeUpdate(i, i.toDouble)

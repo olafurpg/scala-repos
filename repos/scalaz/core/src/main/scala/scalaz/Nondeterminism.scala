@@ -35,16 +35,14 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
       (x: (A \/ B, Seq[F[A \/ B]])) =>
         x match {
           case (-\/(a), Seq(br)) =>
-            -\/(
-                (a, map(br) {
+            -\/((a, map(br) {
               case \/-(b) => b
               case _ =>
                 sys.error(
                     "broken residual handling in a Nondeterminism instance")
             }))
           case (\/-(b), Seq(ar)) =>
-            \/-(
-                (map(ar) {
+            \/-((map(ar) {
               case -\/(a) => a
               case _ =>
                 sys.error(
@@ -113,8 +111,12 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     * Apply a function to 6 results, nondeterminstically ordering their effects 
     */
   def nmap6[A, B, C, D, E, FF, R](
-      a: F[A], b: F[B], c: F[C], d: F[D], e: F[E], ff: F[FF])(
-      f: (A, B, C, D, E, FF) => R): F[R] =
+      a: F[A],
+      b: F[B],
+      c: F[C],
+      d: F[D],
+      e: F[E],
+      ff: F[FF])(f: (A, B, C, D, E, FF) => R): F[R] =
     nmap2(nmap3(a, b, c)((_, _, _)), nmap3(d, e, ff)((_, _, _)))((abc, deff) =>
           f(abc._1, abc._2, abc._3, deff._1, deff._2, deff._3))
 

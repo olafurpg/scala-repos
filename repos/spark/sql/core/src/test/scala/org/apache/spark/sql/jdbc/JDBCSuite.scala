@@ -109,7 +109,7 @@ class JDBCSuite
     conn
       .prepareStatement(
           "create table test.inttypes (a INT, b BOOLEAN, c TINYINT, " +
-          "d SMALLINT, e BIGINT)")
+            "d SMALLINT, e BIGINT)")
       .executeUpdate()
     conn
       .prepareStatement(
@@ -129,7 +129,7 @@ class JDBCSuite
     conn
       .prepareStatement(
           "create table test.strtypes (a BINARY(20), b VARCHAR(20), " +
-          "c VARCHAR_IGNORECASE(20), d CHAR(20), e BLOB, f CLOB)")
+            "c VARCHAR_IGNORECASE(20), d CHAR(20), e BLOB, f CLOB)")
       .executeUpdate()
     val stmt = conn.prepareStatement(
         "insert into test.strtypes values (?, ?, ?, ?, ?, ?)")
@@ -152,11 +152,11 @@ class JDBCSuite
       .executeUpdate()
     conn
       .prepareStatement("insert into test.timetypes values ('12:34:56', " +
-          "'1996-01-01', '2002-02-20 11:22:33.543543543')")
+            "'1996-01-01', '2002-02-20 11:22:33.543543543')")
       .executeUpdate()
     conn
       .prepareStatement("insert into test.timetypes values ('12:34:56', " +
-          "null, '2002-02-20 11:22:33.543543543')")
+            "null, '2002-02-20 11:22:33.543543543')")
       .executeUpdate()
     conn.commit()
     sql(s"""
@@ -171,8 +171,8 @@ class JDBCSuite
       .executeUpdate()
     conn
       .prepareStatement("insert into test.flttypes values (" +
-          "1.0000000000000002220446049250313080847263336181640625, " +
-          "1.00000011920928955078125, " + "123456789012345.543215432154321)")
+            "1.0000000000000002220446049250313080847263336181640625, " +
+            "1.00000011920928955078125, " + "123456789012345.543215432154321)")
       .executeUpdate()
     conn.commit()
     sql(s"""
@@ -188,8 +188,8 @@ class JDBCSuite
       """.stripMargin.replaceAll("\n", " ")).executeUpdate()
     conn
       .prepareStatement("insert into test.nulltypes values (" +
-          "null, null, null, null, null, null, null, null, null, " +
-          "null, null, null, null, null, null)")
+            "null, null, null, null, null, null, null, null, null, " +
+            "null, null, null, null, null, null)")
       .executeUpdate()
     conn.commit()
     sql(s"""
@@ -200,7 +200,7 @@ class JDBCSuite
 
     conn
       .prepareStatement("create table test.emp(name TEXT(32) NOT NULL," +
-          " theid INTEGER, \"Dept\" INTEGER)")
+            " theid INTEGER, \"Dept\" INTEGER)")
       .executeUpdate()
     conn
       .prepareStatement("insert into test.emp values ('fred', 1, 10)")
@@ -288,9 +288,10 @@ class JDBCSuite
             sql("SELECT * FROM foobar WHERE THEID = 1 OR NAME = 'mary'"))
           .collect()
           .size == 2)
-    assert(checkPushdown(
+    assert(
+        checkPushdown(
             sql("SELECT * FROM foobar WHERE THEID = 1 OR NAME = 'mary' " +
-                "AND THEID = 2")).collect().size == 2)
+                  "AND THEID = 2")).collect().size == 2)
     assert(checkPushdown(sql("SELECT * FROM foobar WHERE NAME LIKE 'fr%'"))
           .collect()
           .size == 1)
@@ -479,14 +480,24 @@ class JDBCSuite
   test("Partitioning on column that might have null values.") {
     assert(
         sqlContext.read
-          .jdbc(
-              urlWithUserAndPass, "TEST.EMP", "theid", 0, 4, 3, new Properties)
+          .jdbc(urlWithUserAndPass,
+                "TEST.EMP",
+                "theid",
+                0,
+                4,
+                3,
+                new Properties)
           .collect()
           .length === 4)
     assert(
         sqlContext.read
-          .jdbc(
-              urlWithUserAndPass, "TEST.EMP", "THEID", 0, 4, 3, new Properties)
+          .jdbc(urlWithUserAndPass,
+                "TEST.EMP",
+                "THEID",
+                0,
+                4,
+                3,
+                new Properties)
           .collect()
           .length === 4)
     // partitioning on a nullable quoted column
@@ -683,7 +694,8 @@ class JDBCSuite
     assert(
         doCompileFilter(Or(EqualTo("col0", 2), EqualTo("col1", "ghi"))) === "(col0 = 2) OR (col1 = 'ghi')")
     assert(doCompileFilter(LessThan("col0", 5)) === "col0 < 5")
-    assert(doCompileFilter(LessThan(
+    assert(
+        doCompileFilter(LessThan(
                 "col3",
                 Timestamp.valueOf("1995-11-21 00:00:00.0"))) === "col3 < '1995-11-21 00:00:00.0'")
     assert(
@@ -700,7 +712,7 @@ class JDBCSuite
         doCompileFilter(
             And(EqualNullSafe("col0", "abc"),
                 EqualTo("col1", "def"))) === "((NOT (col0 != 'abc' OR col0 IS NULL OR 'abc' IS NULL) " +
-        "OR (col0 IS NULL AND 'abc' IS NULL))) AND (col1 = 'def')")
+          "OR (col0 IS NULL AND 'abc' IS NULL))) AND (col1 = 'def')")
   }
 
   test("Dialect unregister") {
@@ -791,8 +803,8 @@ class JDBCSuite
     // Regression test for bug SPARK-11788
     val timestamp = java.sql.Timestamp.valueOf("2001-02-20 11:22:33.543543");
     val date = java.sql.Date.valueOf("1995-01-01")
-    val jdbcDf = sqlContext.read.jdbc(
-        urlWithUserAndPass, "TEST.TIMETYPES", new Properties)
+    val jdbcDf = sqlContext.read
+      .jdbc(urlWithUserAndPass, "TEST.TIMETYPES", new Properties)
     val rows = jdbcDf.where($"B" > date && $"C" > timestamp).collect()
     assert(rows(0).getAs[java.sql.Date](1) === java.sql.Date
           .valueOf("1996-01-01"))

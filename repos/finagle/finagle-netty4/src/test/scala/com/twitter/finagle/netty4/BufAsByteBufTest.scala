@@ -1293,8 +1293,8 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
     assertEquals(0, buffer.slice(1, buffer.capacity - 1).readerIndex)
     assertEquals(0, buffer.slice(1, buffer.capacity - 2).readerIndex)
 
-    assertEquals(
-        buffer.capacity, buffer.slice(0, buffer.capacity).writerIndex())
+    assertEquals(buffer.capacity,
+                 buffer.slice(0, buffer.capacity).writerIndex())
     assertEquals(buffer.capacity - 1,
                  buffer.slice(0, buffer.capacity - 1).writerIndex())
     assertEquals(buffer.capacity - 1,

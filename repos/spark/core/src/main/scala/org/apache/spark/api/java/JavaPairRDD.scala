@@ -43,7 +43,8 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
 
 class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
-    implicit val kClassTag: ClassTag[K], implicit val vClassTag: ClassTag[V])
+    implicit val kClassTag: ClassTag[K],
+    implicit val vClassTag: ClassTag[V])
     extends AbstractJavaRDDLike[(K, V), JavaPairRDD[K, V]] {
 
   override def wrapRDD(rdd: RDD[(K, V)]): JavaPairRDD[K, V] =
@@ -272,8 +273,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
                       mergeValue: JFunction2[C, V, C],
                       mergeCombiners: JFunction2[C, C, C],
                       partitioner: Partitioner): JavaPairRDD[K, C] = {
-    combineByKey(
-        createCombiner, mergeValue, mergeCombiners, partitioner, true, null)
+    combineByKey(createCombiner,
+                 mergeValue,
+                 mergeCombiners,
+                 partitioner,
+                 true,
+                 null)
   }
 
   /**
@@ -294,8 +299,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * also perform the merging locally on each mapper before sending results to a reducer, similarly
     * to a "combiner" in MapReduce.
     */
-  def reduceByKey(
-      partitioner: Partitioner, func: JFunction2[V, V, V]): JavaPairRDD[K, V] =
+  def reduceByKey(partitioner: Partitioner,
+                  func: JFunction2[V, V, V]): JavaPairRDD[K, V] =
     fromRDD(rdd.reduceByKey(partitioner, func))
 
   /**
@@ -323,10 +328,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * Approximate version of countByKey that can return a partial result if it does
     * not finish within a timeout.
     */
-  def countByKeyApprox(
-      timeout: Long,
-      confidence: Double =
-        0.95): PartialResult[java.util.Map[K, BoundedDouble]] =
+  def countByKeyApprox(timeout: Long, confidence: Double = 0.95)
+    : PartialResult[java.util.Map[K, BoundedDouble]] =
     rdd.countByKeyApprox(timeout, confidence).map(mapAsSerializableJavaMap)
 
   /**
@@ -411,8 +414,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * also perform the merging locally on each mapper before sending results to a reducer, similarly
     * to a "combiner" in MapReduce. Output will be hash-partitioned with numPartitions partitions.
     */
-  def reduceByKey(
-      func: JFunction2[V, V, V], numPartitions: Int): JavaPairRDD[K, V] =
+  def reduceByKey(func: JFunction2[V, V, V],
+                  numPartitions: Int): JavaPairRDD[K, V] =
     fromRDD(rdd.reduceByKey(func, numPartitions))
 
   /**
@@ -449,8 +452,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   /**
     * Return an RDD with the elements from `this` that are not in `other`.
     */
-  def subtract(
-      other: JavaPairRDD[K, V], numPartitions: Int): JavaPairRDD[K, V] =
+  def subtract(other: JavaPairRDD[K, V],
+               numPartitions: Int): JavaPairRDD[K, V] =
     fromRDD(rdd.subtract(other, numPartitions))
 
   /**
@@ -471,15 +474,15 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   }
 
   /** Return an RDD with the pairs from `this` whose keys are not in `other`. */
-  def subtractByKey[W](
-      other: JavaPairRDD[K, W], numPartitions: Int): JavaPairRDD[K, V] = {
+  def subtractByKey[W](other: JavaPairRDD[K, W],
+                       numPartitions: Int): JavaPairRDD[K, V] = {
     implicit val ctag: ClassTag[W] = fakeClassTag
     fromRDD(rdd.subtractByKey(other, numPartitions))
   }
 
   /** Return an RDD with the pairs from `this` whose keys are not in `other`. */
-  def subtractByKey[W](
-      other: JavaPairRDD[K, W], p: Partitioner): JavaPairRDD[K, V] = {
+  def subtractByKey[W](other: JavaPairRDD[K, W],
+                       p: Partitioner): JavaPairRDD[K, V] = {
     implicit val ctag: ClassTag[W] = fakeClassTag
     fromRDD(rdd.subtractByKey(other, p))
   }
@@ -509,8 +512,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       other: JavaPairRDD[K, W],
       partitioner: Partitioner): JavaPairRDD[K, (V, Optional[W])] = {
     val joinResult = rdd.leftOuterJoin(other, partitioner)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) => (v, JavaUtils.optionToOptional(w))
     })
   }
@@ -525,8 +527,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       other: JavaPairRDD[K, W],
       partitioner: Partitioner): JavaPairRDD[K, (Optional[V], W)] = {
     val joinResult = rdd.rightOuterJoin(other, partitioner)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) => (JavaUtils.optionToOptional(v), w)
     })
   }
@@ -543,8 +544,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       other: JavaPairRDD[K, W],
       partitioner: Partitioner): JavaPairRDD[K, (Optional[V], Optional[W])] = {
     val joinResult = rdd.fullOuterJoin(other, partitioner)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) =>
         (JavaUtils.optionToOptional(v), JavaUtils.optionToOptional(w))
     })
@@ -600,8 +600,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * pair of elements will be returned as a (k, (v1, v2)) tuple, where (k, v1) is in `this` and
     * (k, v2) is in `other`. Performs a hash join across the cluster.
     */
-  def join[W](
-      other: JavaPairRDD[K, W], numPartitions: Int): JavaPairRDD[K, (V, W)] =
+  def join[W](other: JavaPairRDD[K, W],
+              numPartitions: Int): JavaPairRDD[K, (V, W)] =
     fromRDD(rdd.join(other, numPartitions))
 
   /**
@@ -613,8 +613,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def leftOuterJoin[W](
       other: JavaPairRDD[K, W]): JavaPairRDD[K, (V, Optional[W])] = {
     val joinResult = rdd.leftOuterJoin(other)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) => (v, JavaUtils.optionToOptional(w))
     })
   }
@@ -629,8 +628,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       other: JavaPairRDD[K, W],
       numPartitions: Int): JavaPairRDD[K, (V, Optional[W])] = {
     val joinResult = rdd.leftOuterJoin(other, numPartitions)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) => (v, JavaUtils.optionToOptional(w))
     })
   }
@@ -644,8 +642,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def rightOuterJoin[W](
       other: JavaPairRDD[K, W]): JavaPairRDD[K, (Optional[V], W)] = {
     val joinResult = rdd.rightOuterJoin(other)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) => (JavaUtils.optionToOptional(v), w)
     })
   }
@@ -660,8 +657,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       other: JavaPairRDD[K, W],
       numPartitions: Int): JavaPairRDD[K, (Optional[V], W)] = {
     val joinResult = rdd.rightOuterJoin(other, numPartitions)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) => (JavaUtils.optionToOptional(v), w)
     })
   }
@@ -678,8 +674,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def fullOuterJoin[W](
       other: JavaPairRDD[K, W]): JavaPairRDD[K, (Optional[V], Optional[W])] = {
     val joinResult = rdd.fullOuterJoin(other)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) =>
         (JavaUtils.optionToOptional(v), JavaUtils.optionToOptional(w))
     })
@@ -697,8 +692,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       other: JavaPairRDD[K, W],
       numPartitions: Int): JavaPairRDD[K, (Optional[V], Optional[W])] = {
     val joinResult = rdd.fullOuterJoin(other, numPartitions)
-    fromRDD(
-        joinResult.mapValues {
+    fromRDD(joinResult.mapValues {
       case (v, w) =>
         (JavaUtils.optionToOptional(v), JavaUtils.optionToOptional(w))
     })
@@ -761,7 +755,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
                           other2: JavaPairRDD[K, W2],
                           other3: JavaPairRDD[K, W3],
                           partitioner: Partitioner): JavaPairRDD[
-      K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
+      K,
+      (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
     fromRDD(
         cogroupResult3ToJava(rdd.cogroup(other1, other2, other3, partitioner)))
 
@@ -789,7 +784,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def cogroup[W1, W2, W3](other1: JavaPairRDD[K, W1],
                           other2: JavaPairRDD[K, W2],
                           other3: JavaPairRDD[K, W3]): JavaPairRDD[
-      K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
+      K,
+      (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
     fromRDD(cogroupResult3ToJava(rdd.cogroup(other1, other2, other3)))
 
   /**
@@ -820,7 +816,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
                           other2: JavaPairRDD[K, W2],
                           other3: JavaPairRDD[K, W3],
                           numPartitions: Int): JavaPairRDD[
-      K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
+      K,
+      (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
     fromRDD(cogroupResult3ToJava(
             rdd.cogroup(other1, other2, other3, numPartitions)))
 
@@ -838,7 +835,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def groupWith[W1, W2, W3](other1: JavaPairRDD[K, W1],
                             other2: JavaPairRDD[K, W2],
                             other3: JavaPairRDD[K, W3]): JavaPairRDD[
-      K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
+      K,
+      (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3])] =
     fromRDD(cogroupResult3ToJava(rdd.groupWith(other1, other2, other3)))
 
   /**
@@ -881,8 +879,11 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       valueClass: Class[_],
       outputFormatClass: Class[F],
       conf: Configuration) {
-    rdd.saveAsNewAPIHadoopFile(
-        path, keyClass, valueClass, outputFormatClass, conf)
+    rdd.saveAsNewAPIHadoopFile(path,
+                               keyClass,
+                               valueClass,
+                               outputFormatClass,
+                               conf)
   }
 
   /**
@@ -934,9 +935,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * because it can push the sorting down into the shuffle machinery.
     */
   def repartitionAndSortWithinPartitions(
-      partitioner: Partitioner, comp: Comparator[K]): JavaPairRDD[K, V] = {
-    implicit val ordering =
-      comp // Allow implicit conversion of Comparator to Ordering.
+      partitioner: Partitioner,
+      comp: Comparator[K]): JavaPairRDD[K, V] = {
+    implicit val ordering = comp // Allow implicit conversion of Comparator to Ordering.
     fromRDD(
         new OrderedRDDFunctions[K, V, (K, V)](rdd)
           .repartitionAndSortWithinPartitions(partitioner))
@@ -989,8 +990,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * order of the keys).
     */
   def sortByKey(comp: Comparator[K], ascending: Boolean): JavaPairRDD[K, V] = {
-    implicit val ordering =
-      comp // Allow implicit conversion of Comparator to Ordering.
+    implicit val ordering = comp // Allow implicit conversion of Comparator to Ordering.
     fromRDD(new OrderedRDDFunctions[K, V, (K, V)](rdd).sortByKey(ascending))
   }
 
@@ -1003,8 +1003,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def sortByKey(comp: Comparator[K],
                 ascending: Boolean,
                 numPartitions: Int): JavaPairRDD[K, V] = {
-    implicit val ordering =
-      comp // Allow implicit conversion of Comparator to Ordering.
+    implicit val ordering = comp // Allow implicit conversion of Comparator to Ordering.
     fromRDD(new OrderedRDDFunctions[K, V, (K, V)](rdd)
           .sortByKey(ascending, numPartitions))
   }
@@ -1048,8 +1047,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     *                   It must be greater than 0.000017.
     * @param numPartitions number of partitions of the resulting RDD.
     */
-  def countApproxDistinctByKey(
-      relativeSD: Double, numPartitions: Int): JavaPairRDD[K, jl.Long] = {
+  def countApproxDistinctByKey(relativeSD: Double,
+                               numPartitions: Int): JavaPairRDD[K, jl.Long] = {
     fromRDD(rdd.countApproxDistinctByKey(relativeSD, numPartitions))
       .asInstanceOf[JavaPairRDD[K, jl.Long]]
   }

@@ -57,20 +57,20 @@ object HeadHelper {
           e match {
             case e: Elem
                 if (e.label == "script") && (src != null) &&
-                (jsSources contains src) =>
+                  (jsSources contains src) =>
               NodeSeq.Empty
             case e: Elem
                 if (e.label == "script") && (src != null) &&
-                (!(jsSources contains src)) =>
+                  (!(jsSources contains src)) =>
               jsSources += src; e
 
             case e: Elem
                 if (e.label == "link") && (href != null) &&
-                (hrefs contains href) =>
+                  (hrefs contains href) =>
               NodeSeq.Empty
             case e: Elem
                 if (e.label == "link") && (href != null) &&
-                !(hrefs contains href) =>
+                  !(hrefs contains href) =>
               hrefs += href; e
 
             case e: Text if (e.text.trim.length == 0) => NodeSeq.Empty
@@ -89,8 +89,8 @@ object HeadHelper {
   def mergeToHtmlHead(xhtml: NodeSeq): NodeSeq = {
 
     val headInBody: NodeSeq = (for (body <- xhtml \ "body";
-                                    head <- findElems(body)(_.label == "head")) yield
-      head.child).flatMap { e =>
+                                    head <- findElems(body)(_.label == "head"))
+      yield head.child).flatMap { e =>
       e
     }
 

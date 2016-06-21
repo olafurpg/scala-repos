@@ -26,8 +26,8 @@ import scala.collection.mutable
   * Date: 22.07.2008
   */
 class ScDocCommentImpl(text: CharSequence)
-    extends LazyParseablePsiElement(
-        ScalaDocElementTypes.SCALA_DOC_COMMENT, text)
+    extends LazyParseablePsiElement(ScalaDocElementTypes.SCALA_DOC_COMMENT,
+                                    text)
     with ScDocComment {
   def version: Int = {
     val firstLineIsEmpty = getNode
@@ -83,7 +83,7 @@ class ScDocCommentImpl(text: CharSequence)
       currentChild match {
         case docTag: ScDocTag
             if docTag.getNode.getElementType == ScalaDocElementTypes.DOC_TAG &&
-            filter(docTag.name) =>
+              filter(docTag.name) =>
           answer += currentChild.asInstanceOf[PsiDocTag]
         case _ =>
       }

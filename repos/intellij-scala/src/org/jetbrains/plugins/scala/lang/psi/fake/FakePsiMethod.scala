@@ -30,8 +30,7 @@ class FakePsiMethod(
     val params: Array[Parameter],
     val retType: ScType,
     hasModifier: String => Boolean
-)
-    extends {
+) extends {
   val project: Project = navElement.getProject
   val scope: GlobalSearchScope = navElement.getResolveScope
   val manager = navElement.getManager
@@ -124,8 +123,9 @@ class FakePsiMethod(
   def isConstructor: Boolean = false
 
   def getThrowsList: PsiReferenceList =
-    new FakePsiReferenceList(
-        manager, language, PsiReferenceList.Role.THROWS_LIST)
+    new FakePsiReferenceList(manager,
+                             language,
+                             PsiReferenceList.Role.THROWS_LIST)
 
   def isVarArgs: Boolean = false
 
@@ -158,8 +158,9 @@ class FakePsiTypeElement(manager: PsiManager, language: Language, tp: ScType)
   def getInnermostComponentReferenceElement: PsiJavaCodeReferenceElement = null
 
   def getType: PsiType =
-    ScType.toPsi(
-        tp, manager.getProject, GlobalSearchScope.allScope(manager.getProject))
+    ScType.toPsi(tp,
+                 manager.getProject,
+                 GlobalSearchScope.allScope(manager.getProject))
 
   def addAnnotation(qualifiedName: String): PsiAnnotation = null
 
@@ -226,8 +227,9 @@ class FakePsiParameter(manager: PsiManager,
     new FakePsiTypeElement(manager, language, parameter.paramType)
 }
 
-class FakePsiParameterList(
-    manager: PsiManager, language: Language, params: Array[Parameter])
+class FakePsiParameterList(manager: PsiManager,
+                           language: Language,
+                           params: Array[Parameter])
     extends LightElement(manager, language)
     with PsiParameterList {
   def getParameters: Array[PsiParameter] =
@@ -247,8 +249,9 @@ class FakePsiParameterList(
     new FakePsiParameterList(manager, language, params)
 }
 
-class FakePsiReferenceList(
-    manager: PsiManager, language: Language, role: PsiReferenceList.Role)
+class FakePsiReferenceList(manager: PsiManager,
+                           language: Language,
+                           role: PsiReferenceList.Role)
     extends LightElement(manager, language)
     with PsiReferenceList {
   override def getText: String = ""

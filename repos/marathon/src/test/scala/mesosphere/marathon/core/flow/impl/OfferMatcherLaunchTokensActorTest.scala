@@ -62,8 +62,9 @@ class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
     offerMatcherManager = mock[OfferMatcherManager]
 
     actorRef = TestActorRef[OfferMatcherLaunchTokensActor](
-        OfferMatcherLaunchTokensActor.props(
-            conf, taskStatusObservables, offerMatcherManager)
+        OfferMatcherLaunchTokensActor.props(conf,
+                                            taskStatusObservables,
+                                            offerMatcherManager)
     )
   }
 

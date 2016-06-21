@@ -10,8 +10,8 @@ class SystemPropertiesTest {
   @Test
   def filterAll(): Unit = {
     val isEmpty = sys.props.filter(_ => false).size == 0
-    assertTrue(
-        "A filter matching nothing should produce an empty result", isEmpty)
+    assertTrue("A filter matching nothing should produce an empty result",
+               isEmpty)
   }
 
   @Test

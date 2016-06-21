@@ -79,8 +79,8 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
            }
          })
 
-  private def addSuperCallCompletions(
-      parameters: CompletionParameters, result: CompletionResultSet): Unit = {
+  private def addSuperCallCompletions(parameters: CompletionParameters,
+                                      result: CompletionResultSet): Unit = {
     val position = positionFromParameters(parameters)
     val elementType = position.getNode.getElementType
     if (elementType != ScalaTokenTypes.tIDENTIFIER) return
@@ -96,16 +96,18 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
             val function =
               PsiTreeUtil.getContextOfType(ref, classOf[ScFunction])
             if (function != null && function.name == ref.refName) {
-              val variants = ref.getSimpleVariants(
-                  implicits = false, filterNotNamedVariants = false)
+              val variants = ref.getSimpleVariants(implicits = false,
+                                                   filterNotNamedVariants =
+                                                     false)
               val signatures = variants.toSeq.map {
                 case ScalaResolveResult(fun: ScMethodLike, subst) =>
                   val params = fun.effectiveParameterClauses
                   if (params.length > index)
-                    params(index).effectiveParameters.map(p =>
-                          (p.name,
-                           subst.subst(
-                               p.getType(TypingContext.empty).getOrAny)))
+                    params(index).effectiveParameters
+                      .map(p =>
+                            (p.name,
+                             subst.subst(
+                                 p.getType(TypingContext.empty).getOrAny)))
                   else Seq.empty
                 case ScalaResolveResult(method: PsiMethod, subst) =>
                   if (index != 0) Seq.empty
@@ -130,8 +132,8 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
     }
   }
 
-  private def addConstructorCompletions(
-      parameters: CompletionParameters, result: CompletionResultSet): Unit = {
+  private def addConstructorCompletions(parameters: CompletionParameters,
+                                        result: CompletionResultSet): Unit = {
     val position = positionFromParameters(parameters)
     val elementType = position.getNode.getElementType
     if (elementType != ScalaTokenTypes.tIDENTIFIER) return
@@ -148,8 +150,8 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
               ScType.extractClassType(tp, Some(position.getProject)) match {
                 case Some((clazz: ScClass, subst))
                     if !clazz.hasTypeParameters ||
-                    (clazz.hasTypeParameters && typeElement
-                          .isInstanceOf[ScParameterizedTypeElement]) =>
+                      (clazz.hasTypeParameters && typeElement
+                            .isInstanceOf[ScParameterizedTypeElement]) =>
                   clazz.constructors.toSeq.map {
                     case fun: ScMethodLike =>
                       val params = fun.effectiveParameterClauses
@@ -162,8 +164,8 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                   }.filter(_.length > 1)
                 case Some((clazz: PsiClass, subst))
                     if !clazz.hasTypeParameters ||
-                    (clazz.hasTypeParameters && typeElement
-                          .isInstanceOf[ScParameterizedTypeElement]) =>
+                      (clazz.hasTypeParameters && typeElement
+                            .isInstanceOf[ScParameterizedTypeElement]) =>
                   clazz.getConstructors.toSeq.map {
                     case c: PsiMethod =>
                       if (index != 0) Seq.empty
@@ -222,15 +224,15 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
 
               val file = context.getFile
               val element = file.findElementAt(context.getStartOffset)
-              val exprs = PsiTreeUtil.getContextOfType(
-                  element, classOf[ScArgumentExprList])
+              val exprs = PsiTreeUtil
+                .getContextOfType(element, classOf[ScArgumentExprList])
               if (exprs == null) return
               context.getEditor.getCaretModel.moveToOffset(
                   exprs.getTextRange.getEndOffset) // put caret after )
             }
           })
-        element.putUserData(
-            JavaCompletionUtil.SUPER_METHOD_PARAMETERS, java.lang.Boolean.TRUE)
+        element.putUserData(JavaCompletionUtil.SUPER_METHOD_PARAMETERS,
+                            java.lang.Boolean.TRUE)
         result.addElement(element)
       }
     }

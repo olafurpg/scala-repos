@@ -108,8 +108,7 @@ class SliderControls(target: Slider)
   }
 
   val txfLabelFormatter = new TextField
-  txfLabelFormatter.text.onChange(
-      if (txfLabelFormatter.text.get.isEmpty) {
+  txfLabelFormatter.text.onChange(if (txfLabelFormatter.text.get.isEmpty) {
     target.labelFormatter = null
   } else {
     target.labelFormatter = new DoubleStringConverter

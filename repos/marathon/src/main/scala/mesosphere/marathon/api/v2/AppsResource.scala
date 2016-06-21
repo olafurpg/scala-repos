@@ -55,7 +55,7 @@ class AppsResource @Inject()(clock: Clock,
       // additional embeds are deprecated!
       val resolvedEmbed =
         InfoEmbedResolver.resolveApp(embed.asScala.toSet) +
-        AppInfo.Embed.Counts + AppInfo.Embed.Deployments
+          AppInfo.Embed.Counts + AppInfo.Embed.Deployments
       val mapped = result(appInfoService.selectAppsBy(selector, resolvedEmbed))
       Response.ok(jsonObjString("apps" -> mapped)).build()
   }
@@ -81,8 +81,8 @@ class AppsResource @Inject()(clock: Clock,
                         s"An app with id [${app.id}] already exists."))
               .getOrElse(app)
 
-          val plan = result(groupManager.updateApp(
-                  app.id, createOrThrow, app.version, force))
+          val plan = result(groupManager
+                .updateApp(app.id, createOrThrow, app.version, force))
 
           val appWithDeployments = AppInfo(
               app,
@@ -119,8 +119,8 @@ class AppsResource @Inject()(clock: Clock,
         result(groupManager.group(groupId)) match {
           case Some(group) =>
             checkAuthorization(ViewGroup, group)
-            val appsWithTasks = result(appInfoService.selectAppsInGroup(
-                    groupId, allAuthorized, resolvedEmbed))
+            val appsWithTasks = result(appInfoService
+                  .selectAppsInGroup(groupId, allAuthorized, resolvedEmbed))
             ok(jsonObjString("*" -> appsWithTasks))
           case None =>
             unknownGroup(groupId)
@@ -155,8 +155,11 @@ class AppsResource @Inject()(clock: Clock,
 
       withValid(Json.parse(body).as[AppUpdate].copy(id = Some(appId))) {
         appUpdate =>
-          val plan = result(groupManager.updateApp(
-                  appId, updateOrCreate(appId, _, appUpdate, now), now, force))
+          val plan = result(
+              groupManager.updateApp(appId,
+                                     updateOrCreate(appId, _, appUpdate, now),
+                                     now,
+                                     force))
 
           val response = plan.original
             .app(appId)
@@ -189,8 +192,8 @@ class AppsResource @Inject()(clock: Clock,
               }
           }
 
-          deploymentResult(result(groupManager.update(
-                      PathId.empty, updateGroup, version, force)))
+          deploymentResult(result(groupManager
+                    .update(PathId.empty, updateGroup, version, force)))
       }
   }
 
@@ -204,13 +207,14 @@ class AppsResource @Inject()(clock: Clock,
       val appId = id.toRootPath
 
       def deleteAppFromGroup(group: Group) = {
-        checkAuthorization(
-            DeleteApp, group.app(appId), UnknownAppException(appId))
+        checkAuthorization(DeleteApp,
+                           group.app(appId),
+                           UnknownAppException(appId))
         group.removeApplication(appId)
       }
 
-      deploymentResult(result(groupManager.update(
-                  appId.parent, deleteAppFromGroup, force = force)))
+      deploymentResult(result(groupManager
+                .update(appId.parent, deleteAppFromGroup, force = force)))
   }
 
   @Path("{appId:.+}/tasks")
@@ -218,8 +222,11 @@ class AppsResource @Inject()(clock: Clock,
 
   @Path("{appId:.+}/versions")
   def appVersionsResource(): AppVersionsResource =
-    new AppVersionsResource(
-        service, groupManager, authenticator, authorizer, config)
+    new AppVersionsResource(service,
+                            groupManager,
+                            authenticator,
+                            authorizer,
+                            config)
 
   @POST
   @Path("{id:.+}/restart")
@@ -238,18 +245,20 @@ class AppsResource @Inject()(clock: Clock,
 
       val newVersion = clock.now()
       val restartDeployment = result(
-          groupManager.updateApp(
-              id.toRootPath, markForRestartingOrThrow, newVersion, force)
+          groupManager.updateApp(id.toRootPath,
+                                 markForRestartingOrThrow,
+                                 newVersion,
+                                 force)
       )
 
       deploymentResult(restartDeployment)
     }
 
-  private def updateOrCreate(appId: PathId,
-                             existing: Option[AppDefinition],
-                             appUpdate: AppUpdate,
-                             newVersion: Timestamp)(
-      implicit identity: Identity): AppDefinition = {
+  private def updateOrCreate(
+      appId: PathId,
+      existing: Option[AppDefinition],
+      appUpdate: AppUpdate,
+      newVersion: Timestamp)(implicit identity: Identity): AppDefinition = {
     def createApp(): AppDefinition = {
       val app = validateOrThrow(appUpdate(AppDefinition(appId)))
       checkAuthorization(CreateApp, app)

@@ -29,11 +29,18 @@ import scala.language.implicitConversions
   */
 trait Evaluation extends Deployment {
   protected[this] var _evaluatorSet: Boolean = false
-  protected[this] var _evaluator: BaseEvaluator[
-      _, _, _, _, _ <: BaseEvaluatorResult] = _
+  protected[this] var _evaluator: BaseEvaluator[_,
+                                                _,
+                                                _,
+                                                _,
+                                                _ <: BaseEvaluatorResult] = _
 
   private[prediction] def evaluator: BaseEvaluator[
-      _, _, _, _, _ <: BaseEvaluatorResult] = {
+      _,
+      _,
+      _,
+      _,
+      _ <: BaseEvaluatorResult] = {
     assert(_evaluatorSet, "Evaluator not set")
     _evaluator
   }

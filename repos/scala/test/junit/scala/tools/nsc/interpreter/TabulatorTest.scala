@@ -6,11 +6,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-case class Tabby(
-    width: Int = 80, isAcross: Boolean = false, marginSize: Int = 3)
+case class Tabby(width: Int = 80,
+                 isAcross: Boolean = false,
+                 marginSize: Int = 3)
     extends Tabulator
-case class VTabby(
-    width: Int = 80, isAcross: Boolean = false, marginSize: Int = 3)
+case class VTabby(width: Int = 80,
+                  isAcross: Boolean = false,
+                  marginSize: Int = 3)
     extends VariColumnTabulator
 
 @RunWith(classOf[JUnit4])

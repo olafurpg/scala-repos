@@ -40,7 +40,8 @@ trait ArrayColumn[@spec(Boolean, Long, Double) A]
 }
 
 class ArrayHomogeneousArrayColumn[@spec(Boolean, Long, Double) A](
-    val defined: BitSet, values: Array[Array[A]])(val tpe: CArrayType[A])
+    val defined: BitSet,
+    values: Array[Array[A]])(val tpe: CArrayType[A])
     extends HomogeneousArrayColumn[A]
     with ArrayColumn[Array[A]] {
   def apply(row: Int) = values(row)
@@ -54,10 +55,11 @@ class ArrayHomogeneousArrayColumn[@spec(Boolean, Long, Double) A](
 object ArrayHomogeneousArrayColumn {
   def apply[@spec(Boolean, Long, Double) A: CValueType](
       values: Array[Array[A]]) =
-    new ArrayHomogeneousArrayColumn(
-        BitSetUtil.range(0, values.length), values)(CArrayType(CValueType[A]))
+    new ArrayHomogeneousArrayColumn(BitSetUtil.range(0, values.length),
+                                    values)(CArrayType(CValueType[A]))
   def apply[@spec(Boolean, Long, Double) A: CValueType](
-      defined: BitSet, values: Array[Array[A]]) =
+      defined: BitSet,
+      values: Array[Array[A]]) =
     new ArrayHomogeneousArrayColumn(defined.copy, values)(
         CArrayType(CValueType[A]))
   def empty[@spec(Boolean, Long, Double) A](size: Int)(
@@ -84,8 +86,8 @@ object ArrayBoolColumn {
   def apply(defined: BitSet, values: BitSet) =
     new ArrayBoolColumn(defined.copy, values.copy)
   def apply(defined: BitSet, values: Array[Boolean]) =
-    new ArrayBoolColumn(
-        defined.copy, BitSetUtil.filteredRange(0, values.length)(values))
+    new ArrayBoolColumn(defined.copy,
+                        BitSetUtil.filteredRange(0, values.length)(values))
   def apply(values: Array[Boolean]) = {
     val d = BitSetUtil.range(0, values.length)
     val v = BitSetUtil.filteredRange(0, values.length)(values)

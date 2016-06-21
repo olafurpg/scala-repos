@@ -60,13 +60,13 @@ object KafkaEventServer
     val accountFinder = new CachingAccountFinder(WebAccountFinder(
             config.detach("accounts")).map(_.withM[Future]) valueOr { errs =>
       sys.error("Unable to build new WebAccountFinder: " +
-          errs.list.mkString("\n", "\n", ""))
+            errs.list.mkString("\n", "\n", ""))
     })
 
     val apiKeyFinder = new CachingAPIKeyFinder(WebAPIKeyFinder(
             config.detach("security")).map(_.withM[Future]) valueOr { errs =>
       sys.error("Unable to build new WebAPIKeyFinder: " +
-          errs.list.mkString("\n", "\n", ""))
+            errs.list.mkString("\n", "\n", ""))
     })
 
     val permissionsFinder = new PermissionsFinder(
@@ -79,13 +79,13 @@ object KafkaEventServer
       KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr {
         errs =>
           sys.error("Unable to build new KafkaEventStore: " +
-              errs.list.mkString("\n", "\n", ""))
+                errs.list.mkString("\n", "\n", ""))
       }
 
     val jobManager =
       WebJobManager(config.detach("jobs")) valueOr { errs =>
         sys.error("Unable to build new WebJobManager: " +
-            errs.list.mkString("\n", "\n", ""))
+              errs.list.mkString("\n", "\n", ""))
       }
 
     val serviceConfig =

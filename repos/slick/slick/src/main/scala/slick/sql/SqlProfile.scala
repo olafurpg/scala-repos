@@ -74,8 +74,8 @@ trait SqlProfile
     override def equals(o: Any) = o match {
       case ddl: DDL =>
         self.createPhase1 == ddl.createPhase1 &&
-        self.createPhase2 == ddl.createPhase2 &&
-        self.dropPhase1 == ddl.dropPhase1 && self.dropPhase2 == ddl.dropPhase2
+          self.createPhase2 == ddl.createPhase2 &&
+          self.dropPhase1 == ddl.dropPhase1 && self.dropPhase2 == ddl.dropPhase2
       case _ => false
     }
   }
@@ -160,15 +160,17 @@ trait SqlTableComponent extends RelationalTableComponent {
 trait SqlActionComponent extends RelationalActionComponent {
   this: SqlProfile =>
 
-  type ProfileAction [+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
-  type StreamingProfileAction [+R, +T, -E <: Effect] <: SqlStreamingAction[
-      R, T, E] with ProfileAction[R, Streaming[T], E]
+  type ProfileAction[+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
+  type StreamingProfileAction[+R, +T, -E <: Effect] <: SqlStreamingAction[
+      R,
+      T,
+      E] with ProfileAction[R, Streaming[T], E]
 }
 
 trait SqlAction[+R, +S <: NoStream, -E <: Effect]
     extends BasicAction[R, S, E] {
 
-  type ResultAction [+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
+  type ResultAction[+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
 
   /** Return the SQL statements that will be executed for this Action */
   def statements: Iterable[String]

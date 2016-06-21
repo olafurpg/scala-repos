@@ -38,7 +38,7 @@ class FNSpec extends Specification {
         case Some(c: LongColumn) => c(0) must_== 2L
       }
 
-/*
+      /*
       val f1 = AddOneLongP.toF1
       f1(col5).forall(_.isDefinedAt(0)) must beFalse
       f1(col4).forall(_.isDefinedAt(0)) must beTrue

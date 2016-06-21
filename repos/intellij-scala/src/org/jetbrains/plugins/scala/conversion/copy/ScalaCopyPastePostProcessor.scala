@@ -54,8 +54,9 @@ class ScalaCopyPastePostProcessor
           override def run(): Unit = {
             breakable {
               for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
-                   element <- getElementsStrictlyInRange(
-                                 file, startOffset, endOffset);
+                   element <- getElementsStrictlyInRange(file,
+                                                         startOffset,
+                                                         endOffset);
                    reference <- element.asOptionOf[ScReferenceElement];
                    dependency <- Dependency.dependencyFor(reference)
                    if dependency.isExternal;
@@ -64,12 +65,12 @@ class ScalaCopyPastePostProcessor
                 if (System.currentTimeMillis > timeBound) {
                   Log.warn("Time-out while collecting dependencies in %s:\n%s"
                         .format(
-                          file.getName,
-                          file.getText.substring(startOffset, endOffset)))
+                            file.getName,
+                            file.getText.substring(startOffset, endOffset)))
                   break()
                 }
                 associations ::=
-                  Association(dependency.kind, range, dependency.path)
+                Association(dependency.kind, range, dependency.path)
               }
             }
           }
@@ -144,14 +145,18 @@ class ScalaCopyPastePostProcessor
     }
   }
 
-  def restoreAssociations(
-      value: Associations, file: PsiFile, offset: Int, project: Project) {
+  def restoreAssociations(value: Associations,
+                          file: PsiFile,
+                          offset: Int,
+                          project: Project) {
     doRestoreAssociations(value, file, offset, project)(identity)
   }
 
   private def doRestoreAssociations(
-      value: Associations, file: PsiFile, offset: Int, project: Project)(
-      filter: Seq[Binding] => Seq[Binding]) {
+      value: Associations,
+      file: PsiFile,
+      offset: Int,
+      project: Project)(filter: Seq[Binding] => Seq[Binding]) {
     val bindings = (for {
       association <- value.associations
       element <- elementFor(association, file, offset)
@@ -175,8 +180,8 @@ class ScalaCopyPastePostProcessor
 
     inWriteAction {
       for (Binding(ref, path) <- bindingsToRestore;
-           holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject)) holder
-        .addImportForPath(path, ref)
+           holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject))
+        holder.addImportForPath(path, ref)
     }
   }
 
@@ -189,8 +194,9 @@ class ScalaCopyPastePostProcessor
          parent <- ref.parent if parent.getTextRange == range) yield parent
   }
 
-  private def getElementsStrictlyInRange(
-      file: PsiFile, startOffset: Int, endOffset: Int): Seq[PsiElement] = {
+  private def getElementsStrictlyInRange(file: PsiFile,
+                                         startOffset: Int,
+                                         endOffset: Int): Seq[PsiElement] = {
     val range = TextRange.create(startOffset, endOffset)
     CollectHighlightsUtil
       .getElementsInRange(file, startOffset, endOffset)

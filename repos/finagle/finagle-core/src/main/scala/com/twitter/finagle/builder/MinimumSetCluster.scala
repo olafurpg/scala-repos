@@ -15,8 +15,7 @@ class MinimumSetCluster[T](
     minimum: Set[T],
     supplementary: Cluster[T],
     statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends Cluster[T] {
+) extends Cluster[T] {
 
   private[this] val censoredAdd = statsReceiver.counter("censored_add")
   private[this] val censoredRem = statsReceiver.counter("censored_rem")

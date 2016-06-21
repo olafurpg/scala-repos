@@ -45,36 +45,37 @@ private[jackson] object JsValueSerializer extends JsonSerializer[JsValue] {
   import java.math.{BigDecimal => JBigDec, BigInteger}
   import com.fasterxml.jackson.databind.node.{BigIntegerNode, DecimalNode}
 
-  override def serialize(
-      value: JsValue, json: JsonGenerator, provider: SerializerProvider) {
+  override def serialize(value: JsValue,
+                         json: JsonGenerator,
+                         provider: SerializerProvider) {
     value match {
       case JsNumber(v) => {
-          // Workaround #3784: Same behaviour as if JsonGenerator were
-          // configured with WRITE_BIGDECIMAL_AS_PLAIN, but forced as this
-          // configuration is ignored when called from ObjectMapper.valueToTree
-          val raw = v.bigDecimal.stripTrailingZeros.toPlainString
+        // Workaround #3784: Same behaviour as if JsonGenerator were
+        // configured with WRITE_BIGDECIMAL_AS_PLAIN, but forced as this
+        // configuration is ignored when called from ObjectMapper.valueToTree
+        val raw = v.bigDecimal.stripTrailingZeros.toPlainString
 
-          if (raw contains ".")
-            json.writeTree(new DecimalNode(new JBigDec(raw)))
-          else json.writeTree(new BigIntegerNode(new BigInteger(raw)))
-        }
+        if (raw contains ".")
+          json.writeTree(new DecimalNode(new JBigDec(raw)))
+        else json.writeTree(new BigIntegerNode(new BigInteger(raw)))
+      }
       case JsString(v) => json.writeString(v)
       case JsBoolean(v) => json.writeBoolean(v)
       case JsArray(elements) => {
-          json.writeStartArray()
-          elements.foreach { t =>
-            serialize(t, json, provider)
-          }
-          json.writeEndArray()
+        json.writeStartArray()
+        elements.foreach { t =>
+          serialize(t, json, provider)
         }
+        json.writeEndArray()
+      }
       case JsObject(values) => {
-          json.writeStartObject()
-          values.foreach { t =>
-            json.writeFieldName(t._1)
-            serialize(t._2, json, provider)
-          }
-          json.writeEndObject()
+        json.writeStartObject()
+        values.foreach { t =>
+          json.writeFieldName(t._1)
+          serialize(t._2, json, provider)
         }
+        json.writeEndObject()
+      }
       case JsNull => json.writeNull()
     }
   }
@@ -92,8 +93,8 @@ private[jackson] case class ReadingList(content: ListBuffer[JsValue])
 }
 
 // Context for reading an Object
-private[jackson] case class KeyRead(
-    content: ListBuffer[(String, JsValue)], fieldName: String)
+private[jackson] case class KeyRead(content: ListBuffer[(String, JsValue)],
+                                    fieldName: String)
     extends DeserializerContext {
   def addValue(value: JsValue): DeserializerContext =
     ReadingMap(content += (fieldName -> value))
@@ -109,14 +110,14 @@ private[jackson] case class ReadingMap(content: ListBuffer[(String, JsValue)])
         "Cannot add a value on an object without a key, malformed JSON object!")
 }
 
-private[jackson] class JsValueDeserializer(
-    factory: TypeFactory, klass: Class[_])
+private[jackson] class JsValueDeserializer(factory: TypeFactory,
+                                           klass: Class[_])
     extends JsonDeserializer[Object] {
 
   override def isCachable: Boolean = true
 
-  override def deserialize(
-      jp: JsonParser, ctxt: DeserializationContext): JsValue = {
+  override def deserialize(jp: JsonParser,
+                           ctxt: DeserializationContext): JsValue = {
     val value = deserialize(jp, ctxt, List())
 
     if (!klass.isAssignableFrom(value.getClass)) {
@@ -261,8 +262,8 @@ private[json] object JacksonJson {
   def parseJsValue(stream: InputStream): JsValue =
     mapper.readValue(jsonParser(stream), classOf[JsValue])
 
-  def generateFromJsValue(
-      jsValue: JsValue, escapeNonASCII: Boolean = false): String = {
+  def generateFromJsValue(jsValue: JsValue,
+                          escapeNonASCII: Boolean = false): String = {
     val sw = new java.io.StringWriter
     val gen = stringJsonGenerator(sw)
 

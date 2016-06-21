@@ -80,7 +80,7 @@ object RandomForestExample {
         .action((x, c) => c.copy(maxBins = x))
       opt[Int]("minInstancesPerNode")
         .text(s"min number of instances required at child nodes to create the parent split," +
-            s" default: ${defaultParams.minInstancesPerNode}")
+              s" default: ${defaultParams.minInstancesPerNode}")
         .action((x, c) => c.copy(minInstancesPerNode = x))
       opt[Double]("minInfoGain")
         .text(
@@ -92,32 +92,32 @@ object RandomForestExample {
         .action((x, c) => c.copy(numTrees = x))
       opt[String]("featureSubsetStrategy")
         .text(s"number of features to use per node (supported:" +
-            s" ${RandomForestClassifier.supportedFeatureSubsetStrategies.mkString(",")})," +
-            s" default: ${defaultParams.numTrees}")
+              s" ${RandomForestClassifier.supportedFeatureSubsetStrategies.mkString(",")})," +
+              s" default: ${defaultParams.numTrees}")
         .action((x, c) => c.copy(featureSubsetStrategy = x))
       opt[Double]("fracTest")
         .text(s"fraction of data to hold out for testing.  If given option testInput, " +
-            s"this option is ignored. default: ${defaultParams.fracTest}")
+              s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[Boolean]("cacheNodeIds")
         .text(s"whether to use node Id cache during training, " +
-            s"default: ${defaultParams.cacheNodeIds}")
+              s"default: ${defaultParams.cacheNodeIds}")
         .action((x, c) => c.copy(cacheNodeIds = x))
       opt[String]("checkpointDir")
         .text(
             s"checkpoint directory where intermediate node Id caches will be stored, " +
-            s"default: ${defaultParams.checkpointDir match {
-          case Some(strVal) => strVal
-          case None => "None"
-        }}")
+              s"default: ${defaultParams.checkpointDir match {
+            case Some(strVal) => strVal
+            case None => "None"
+          }}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
-            s"default: ${defaultParams.checkpointInterval}")
+              s"default: ${defaultParams.checkpointInterval}")
         .action((x, c) => c.copy(checkpointInterval = x))
       opt[String]("testInput")
         .text(s"input path to test dataset.  If given, option fracTest is ignored." +
-            s" default: ${defaultParams.testInput}")
+              s" default: ${defaultParams.testInput}")
         .action((x, c) => c.copy(testInput = x))
       opt[String]("dataFormat")
         .text(
@@ -247,18 +247,18 @@ object RandomForestExample {
     algo match {
       case "classification" =>
         println("Training data results:")
-        DecisionTreeExample.evaluateClassificationModel(
-            pipelineModel, training, labelColName)
+        DecisionTreeExample
+          .evaluateClassificationModel(pipelineModel, training, labelColName)
         println("Test data results:")
-        DecisionTreeExample.evaluateClassificationModel(
-            pipelineModel, test, labelColName)
+        DecisionTreeExample
+          .evaluateClassificationModel(pipelineModel, test, labelColName)
       case "regression" =>
         println("Training data results:")
-        DecisionTreeExample.evaluateRegressionModel(
-            pipelineModel, training, labelColName)
+        DecisionTreeExample
+          .evaluateRegressionModel(pipelineModel, training, labelColName)
         println("Test data results:")
-        DecisionTreeExample.evaluateRegressionModel(
-            pipelineModel, test, labelColName)
+        DecisionTreeExample
+          .evaluateRegressionModel(pipelineModel, test, labelColName)
       case _ =>
         throw new IllegalArgumentException(
             "Algo ${params.algo} not supported.")

@@ -34,8 +34,8 @@ import com.precog.common.security.APIKeyFinder
 import com.precog.standalone.StandaloneShardServer
 
 object MongoShardServer extends StandaloneShardServer {
-  val caveatMessage =
-    Some("""
+  val caveatMessage = Some(
+      """
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Precog for MongoDB is a free product that Precog provides to the
 MongoDB community for doing data analysis on MongoDB.

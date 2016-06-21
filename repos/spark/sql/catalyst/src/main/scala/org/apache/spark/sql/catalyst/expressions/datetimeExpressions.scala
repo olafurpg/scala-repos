@@ -681,8 +681,9 @@ case class TimeAdd(start: Expression, interval: Expression)
 
   override def nullSafeEval(start: Any, interval: Any): Any = {
     val itvl = interval.asInstanceOf[CalendarInterval]
-    DateTimeUtils.timestampAddInterval(
-        start.asInstanceOf[Long], itvl.months, itvl.microseconds)
+    DateTimeUtils.timestampAddInterval(start.asInstanceOf[Long],
+                                       itvl.months,
+                                       itvl.microseconds)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -706,8 +707,8 @@ case class FromUTCTimestamp(left: Expression, right: Expression)
   override def prettyName: String = "from_utc_timestamp"
 
   override def nullSafeEval(time: Any, timezone: Any): Any = {
-    DateTimeUtils.fromUTCTime(
-        time.asInstanceOf[Long], timezone.asInstanceOf[UTF8String].toString)
+    DateTimeUtils.fromUTCTime(time.asInstanceOf[Long],
+                              timezone.asInstanceOf[UTF8String].toString)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -722,8 +723,9 @@ case class FromUTCTimestamp(left: Expression, right: Expression)
       } else {
         val tzTerm = ctx.freshName("tz")
         val tzClass = classOf[TimeZone].getName
-        ctx.addMutableState(
-            tzClass, tzTerm, s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
+        ctx.addMutableState(tzClass,
+                            tzTerm,
+                            s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
         val eval = left.gen(ctx)
         s"""
            |${eval.code}
@@ -761,8 +763,9 @@ case class TimeSub(start: Expression, interval: Expression)
 
   override def nullSafeEval(start: Any, interval: Any): Any = {
     val itvl = interval.asInstanceOf[CalendarInterval]
-    DateTimeUtils.timestampAddInterval(
-        start.asInstanceOf[Long], 0 - itvl.months, 0 - itvl.microseconds)
+    DateTimeUtils.timestampAddInterval(start.asInstanceOf[Long],
+                                       0 - itvl.months,
+                                       0 - itvl.microseconds)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -788,8 +791,8 @@ case class AddMonths(startDate: Expression, numMonths: Expression)
   override def dataType: DataType = DateType
 
   override def nullSafeEval(start: Any, months: Any): Any = {
-    DateTimeUtils.dateAddMonths(
-        start.asInstanceOf[Int], months.asInstanceOf[Int])
+    DateTimeUtils
+      .dateAddMonths(start.asInstanceOf[Int], months.asInstanceOf[Int])
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -844,8 +847,8 @@ case class ToUTCTimestamp(left: Expression, right: Expression)
   override def prettyName: String = "to_utc_timestamp"
 
   override def nullSafeEval(time: Any, timezone: Any): Any = {
-    DateTimeUtils.toUTCTime(
-        time.asInstanceOf[Long], timezone.asInstanceOf[UTF8String].toString)
+    DateTimeUtils.toUTCTime(time.asInstanceOf[Long],
+                            timezone.asInstanceOf[UTF8String].toString)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -860,8 +863,9 @@ case class ToUTCTimestamp(left: Expression, right: Expression)
       } else {
         val tzTerm = ctx.freshName("tz")
         val tzClass = classOf[TimeZone].getName
-        ctx.addMutableState(
-            tzClass, tzTerm, s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
+        ctx.addMutableState(tzClass,
+                            tzTerm,
+                            s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
         val eval = left.gen(ctx)
         s"""
            |${eval.code}
@@ -921,12 +925,11 @@ case class TruncDate(date: Expression, format: Expression)
     DateTimeUtils.parseTruncLevel(format.eval().asInstanceOf[UTF8String])
 
   override def eval(input: InternalRow): Any = {
-    val level =
-      if (format.foldable) {
-        truncLevel
-      } else {
-        DateTimeUtils.parseTruncLevel(format.eval().asInstanceOf[UTF8String])
-      }
+    val level = if (format.foldable) {
+      truncLevel
+    } else {
+      DateTimeUtils.parseTruncLevel(format.eval().asInstanceOf[UTF8String])
+    }
     if (level == -1) {
       // unknown format
       null

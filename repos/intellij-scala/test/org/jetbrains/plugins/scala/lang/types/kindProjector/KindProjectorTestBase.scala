@@ -39,8 +39,8 @@ abstract class KindProjectorTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil
+          .loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(startExprMarker)
@@ -54,9 +54,12 @@ abstract class KindProjectorTestBase
         endOffset != -1,
         "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
-    val expr: ScParameterizedTypeElement = PsiTreeUtil
-      .findElementOfClassAtRange(
-        scalaFile, startOffset, endOffset, classOf[ScParameterizedTypeElement])
+    val expr: ScParameterizedTypeElement =
+      PsiTreeUtil.findElementOfClassAtRange(
+          scalaFile,
+          startOffset,
+          endOffset,
+          classOf[ScParameterizedTypeElement])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.computeDesugarizedType
     typez match {

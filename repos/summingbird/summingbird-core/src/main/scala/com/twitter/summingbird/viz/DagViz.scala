@@ -29,31 +29,31 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
   private def defaultName[T](node: T): String =
     node.getClass.getName.replaceFirst("com.twitter.summingbird.", "")
 
-  def getName[T](curLookupTable: BaseLookupTable[T],
-                 node: T,
-                 requestedName: Option[String] =
-                   None): (BaseLookupTable[T], String) = {
+  def getName[T](
+      curLookupTable: BaseLookupTable[T],
+      node: T,
+      requestedName: Option[String] = None): (BaseLookupTable[T], String) = {
     val nodeLookupTable = curLookupTable._1
     val nameLookupTable = curLookupTable._2
     val preferredName = requestedName.getOrElse(defaultName(node))
     nodeLookupTable.get(node) match {
       case Some(name) => (curLookupTable, name)
       case None => {
-          nameLookupTable.get(preferredName) match {
-            case Some(count) => {
-                val newNum = count + 1
-                val newName = preferredName + "[" + newNum + "]"
-                (((nodeLookupTable + (node -> newName)),
-                  (nameLookupTable + (preferredName -> newNum))),
-                 newName)
-              }
-            case None => {
-                (((nodeLookupTable + (node -> preferredName)),
-                  (nameLookupTable + (preferredName -> 1))),
-                 preferredName)
-              }
+        nameLookupTable.get(preferredName) match {
+          case Some(count) => {
+            val newNum = count + 1
+            val newName = preferredName + "[" + newNum + "]"
+            (((nodeLookupTable + (node -> newName)),
+              (nameLookupTable + (preferredName -> newNum))),
+             newName)
+          }
+          case None => {
+            (((nodeLookupTable + (node -> preferredName)),
+              (nameLookupTable + (preferredName -> 1))),
+             preferredName)
           }
         }
+      }
     }
   }
 
@@ -96,7 +96,9 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
           val shortName = "cluster_" + node.hashCode.toHexString
           val newNodeShortName = nodeShortName + (node -> shortName)
           val nextCluster = "subgraph %s {\n\tlabel=\"%s\"\n%s\n}\n".format(
-              shortName, dag.getNodeName(node), nodeDefinitions.mkString("\n"))
+              shortName,
+              dag.getNodeName(node),
+              nodeDefinitions.mkString("\n"))
           (nextCluster :: clusters,
            mappings ++ producerMappings,
            newNameLookupTable,
@@ -107,8 +109,8 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
       case node =>
         dag.dependantsOf(node).collect {
           case n =>
-            "cluster_%s -> cluster_%s [style=dashed]".format(
-                node.hashCode.toHexString, n.hashCode.toHexString)
+            "cluster_%s -> cluster_%s [style=dashed]"
+              .format(node.hashCode.toHexString, n.hashCode.toHexString)
         }
     }
 

@@ -225,8 +225,9 @@ class VersionLog(logFiles: VersionLog.LogFiles,
   }
 }
 
-case class VersionEntry(
-    id: UUID, typeName: PathData.DataType, timestamp: Instant)
+case class VersionEntry(id: UUID,
+                        typeName: PathData.DataType,
+                        timestamp: Instant)
 
 object VersionEntry {
   implicit val versionEntryIso =
@@ -234,8 +235,8 @@ object VersionEntry {
 
   val schemaV1 = "id" :: "typeName" :: "timestamp" :: HNil
 
-  implicit val Decomposer: Decomposer[VersionEntry] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val Extractor: Extractor[VersionEntry] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val Decomposer: Decomposer[VersionEntry] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val Extractor: Extractor[VersionEntry] =
+    extractorV(schemaV1, Some("1.0".v))
 }

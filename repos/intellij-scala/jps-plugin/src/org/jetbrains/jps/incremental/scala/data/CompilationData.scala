@@ -97,7 +97,8 @@ object CompilationData {
       } catch {
         case t: Throwable =>
           throw new IOException(
-              "Cannot create output directory: " + output.toString, t)
+              "Cannot create output directory: " + output.toString,
+              t)
       }
     }
   }
@@ -108,8 +109,8 @@ object CompilationData {
       .map("Output directory not specified for module " + _.getModule.getName)
   }
 
-  private def javaOptionsFor(
-      context: CompileContext, chunk: ModuleChunk): Seq[String] = {
+  private def javaOptionsFor(context: CompileContext,
+                             chunk: ModuleChunk): Seq[String] = {
     val compilerConfig = {
       val project = context.getProjectDescriptor.getProject
       JpsJavaExtensionService.getInstance.getOrCreateCompilerConfiguration(
@@ -125,8 +126,10 @@ object CompilationData {
       compilerConfig.getAnnotationProcessingProfile(module)
     }
 
-    JavaBuilder.addCompilationOptions(
-        options, context, chunk, annotationProcessingProfile)
+    JavaBuilder.addCompilationOptions(options,
+                                      context,
+                                      chunk,
+                                      annotationProcessingProfile)
 
     options.asScala
   }
@@ -161,8 +164,8 @@ object CompilationData {
     outputClashesIn(targetToOutput).toLeft {
       val paths = context.getProjectDescriptor.dataManager.getDataPaths
 
-      for ((target, output) <- targetToOutput.toMap) yield
-        (output, new File(paths.getTargetDataRoot(target), "cache.dat"))
+      for ((target, output) <- targetToOutput.toMap)
+        yield (output, new File(paths.getTargetDataRoot(target), "cache.dat"))
     }
   }
 
@@ -206,7 +209,7 @@ object CompilationData {
     else
       Some(
           errors.mkString("\n") +
-          "\nPlease configure separate output paths to proceed with the compilation." +
-          "\nTIP: you can use Project Artifacts to combine compiled classes if needed.")
+            "\nPlease configure separate output paths to proceed with the compilation." +
+            "\nTIP: you can use Project Artifacts to combine compiled classes if needed.")
   }
 }

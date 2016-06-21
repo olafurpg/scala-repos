@@ -20,11 +20,14 @@ private[akka] object CachingConfig {
     val exists: Boolean
     val config: Config
   }
-  final case class ValuePathEntry(
-      valid: Boolean, exists: Boolean, config: Config = emptyConfig)
+  final case class ValuePathEntry(valid: Boolean,
+                                  exists: Boolean,
+                                  config: Config = emptyConfig)
       extends PathEntry
-  final case class StringPathEntry(
-      valid: Boolean, exists: Boolean, config: Config, value: String)
+  final case class StringPathEntry(valid: Boolean,
+                                   exists: Boolean,
+                                   config: Config,
+                                   value: String)
       extends PathEntry
 
   val invalidPathEntry = ValuePathEntry(false, true)

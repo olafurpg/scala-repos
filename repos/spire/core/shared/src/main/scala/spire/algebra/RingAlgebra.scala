@@ -8,8 +8,8 @@ package algebra
 trait RingAlgebra[V, @sp R] extends Any with Module[V, R] with Rng[V]
 
 object RingAlgebra {
-  implicit def ZAlgebra[A](
-      implicit vector0: Ring[A], scalar0: Ring[Int]): ZAlgebra[A] =
+  implicit def ZAlgebra[A](implicit vector0: Ring[A],
+                           scalar0: Ring[Int]): ZAlgebra[A] =
     new ZAlgebra[A] {
       val vector: Ring[A] = vector0
       val scalar: Ring[Int] = scalar0

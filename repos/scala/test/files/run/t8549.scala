@@ -66,8 +66,8 @@ object Test extends App {
     assert(f(instance) == f(reconstituted), (f(instance), f(reconstituted)))
   }
 
-  def check[T <: AnyRef](instance: => T)(
-      prevResult: String, f: T => AnyRef = (x: T) => x) {
+  def check[T <: AnyRef](instance: => T)(prevResult: String,
+                                         f: T => AnyRef = (x: T) => x) {
     val result = serialize(instance)
     overwrite match {
       case Some(f) =>

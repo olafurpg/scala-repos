@@ -11,8 +11,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   ////
 
   /** Collect `G`s while applying `f` and `g` in some order. */
-  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: F[A, B])(
-      f: A => G[C], g: B => G[D]): G[F[C, D]]
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](
+      fab: F[A, B])(f: A => G[C], g: B => G[D]): G[F[C, D]]
 
   // derived functions
 
@@ -34,7 +34,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
 
   /** Flipped `bitraverse`. */
   def bitraverseF[G[_]: Applicative, A, B, C, D](
-      f: A => G[C], g: B => G[D]): F[A, B] => G[F[C, D]] =
+      f: A => G[C],
+      g: B => G[D]): F[A, B] => G[F[C, D]] =
     bitraverseImpl(_)(f, g)
 
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D] = {
@@ -69,12 +70,12 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
       g: B => G[D]): G[F[C, D]] =
     bitraversal[G].run(fa)(f)(g)
 
-  def bitraverseS[S, A, B, C, D](fa: F[A, B])(
-      f: A => State[S, C])(g: B => State[S, D]): State[S, F[C, D]] =
+  def bitraverseS[S, A, B, C, D](fa: F[A, B])(f: A => State[S, C])(
+      g: B => State[S, D]): State[S, F[C, D]] =
     bitraversalS[S].run(fa)(f)(g)
 
-  def runBitraverseS[S, A, B, C, D](fa: F[A, B], s: S)(
-      f: A => State[S, C])(g: B => State[S, D]): (S, F[C, D]) =
+  def runBitraverseS[S, A, B, C, D](fa: F[A, B], s: S)(f: A => State[S, C])(
+      g: B => State[S, D]): (S, F[C, D]) =
     bitraverseS(fa)(f)(g)(s)
 
   /** Bitraverse `fa` with a `State[S, G[C]]` and `State[S, G[D]]`, internally using a `Trampoline` to avoid stack overflow. */
@@ -108,8 +109,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     })
   }
 
-  def bifoldLShape[A, B, C](fa: F[A, B], z: C)(
-      f: (C, A) => C)(g: (C, B) => C): (C, F[Unit, Unit]) =
+  def bifoldLShape[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(
+      g: (C, B) => C): (C, F[Unit, Unit]) =
     runBitraverseS(fa, z)(a => State.modify(f(_, a)))(b =>
           State.modify(g(_, b)))
 
@@ -120,13 +121,13 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
       g: (C, B) => C): C =
     bifoldLShape(fa, z)(f)(g)._1
 
-  def bifoldMap[A, B, M](fa: F[A, B])(f: A => M)(g: B => M)(
-      implicit F: Monoid[M]): M =
+  def bifoldMap[A, B, M](fa: F[A, B])(
+      f: A => M)(g: B => M)(implicit F: Monoid[M]): M =
     bifoldLShape(fa, F.zero)((m, a) => F.append(m, f(a)))((m, b) =>
           F.append(m, g(b)))._1
 
-  def bifoldRight[A, B, C](fa: F[A, B], z: => C)(
-      f: (A, => C) => C)(g: (B, => C) => C): C =
+  def bifoldRight[A, B, C](fa: F[A, B], z: => C)(f: (A, => C) => C)(
+      g: (B, => C) => C): C =
     bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) =>
           (Endo.endo(g(b, _: C)))) apply z
 

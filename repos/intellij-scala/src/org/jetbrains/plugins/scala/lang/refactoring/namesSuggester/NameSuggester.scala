@@ -34,8 +34,8 @@ object NameSuggester {
   }
   def suggestNames(expr: ScExpression): Array[String] =
     suggestNames(expr, emptyValidator(expr.getProject))
-  def suggestNames(
-      expr: ScExpression, validator: NameValidator): Array[String] = {
+  def suggestNames(expr: ScExpression,
+                   validator: NameValidator): Array[String] = {
     val names = new ArrayBuffer[String]
 
     val types = new ArrayBuffer[ScType]()
@@ -50,7 +50,7 @@ object NameSuggester {
 
     val result =
       (for (name <- names if name != "" && ScalaNamesUtil.isIdentifier(name) ||
-            name == "class") yield {
+              name == "class") yield {
         if (name != "class") name else "clazz"
       }).toList.reverse.toArray
     if (result.size > 0) result
@@ -59,8 +59,8 @@ object NameSuggester {
 
   def suggestNamesByType(typez: ScType): Array[String] = {
     val names = new ArrayBuffer[String]
-    generateNamesByType(typez)(
-        names, emptyValidator(DecompilerUtil.obtainProject))
+    generateNamesByType(typez)(names,
+                               emptyValidator(DecompilerUtil.obtainProject))
     val result = names.map {
       case "class" => "clazz"
       case s => s
@@ -70,14 +70,15 @@ object NameSuggester {
     } else result.reverse.toArray
   }
 
-  private def add(s: String)(
-      implicit validator: NameValidator, names: ArrayBuffer[String]) {
+  private def add(s: String)(implicit validator: NameValidator,
+                             names: ArrayBuffer[String]) {
     val name = validator.validateName(s, increaseNumber = true)
     if (!names.contains(name)) names += name
   }
 
-  private def namesByType(
-      tpe: ScType, withPlurals: Boolean = true, shortVersion: Boolean = true)(
+  private def namesByType(tpe: ScType,
+                          withPlurals: Boolean = true,
+                          shortVersion: Boolean = true)(
       implicit validator: NameValidator): ArrayBuffer[String] = {
     val names = ArrayBuffer[String]()
     generateNamesByType(tpe, shortVersion)(names, validator, withPlurals)
@@ -173,7 +174,7 @@ object NameSuggester {
             addPlurals(args(0))
           case c
               if needPrefix.keySet.contains(c.qualifiedName) &&
-              args.nonEmpty =>
+                args.nonEmpty =>
             for {
               s <- namesByType(args(0), shortVersion = false)
               prefix = needPrefix(c.qualifiedName)
@@ -184,12 +185,12 @@ object NameSuggester {
             addFromTwoTypes(args(0), args(1), "Or")
           case c
               if (isInheritor(c, baseMapClassName) ||
-                  isInheritor(c, baseJavaMapClassName)) && args.size == 2 =>
+                    isInheritor(c, baseJavaMapClassName)) && args.size == 2 =>
             addFromTwoTypes(args(0), args(1), "To")
           case c
               if (isInheritor(c, baseCollectionClassName) ||
-                  isInheritor(c, baseJavaCollectionClassName)) &&
-              args.size == 1 =>
+                    isInheritor(c, baseJavaCollectionClassName)) &&
+                args.size == 1 =>
             addPlurals(args(0))
           case _ =>
         }
@@ -242,7 +243,8 @@ object NameSuggester {
 
   @tailrec
   private def generateNamesByExpr(expr: ScExpression)(
-      implicit names: ArrayBuffer[String], validator: NameValidator) {
+      implicit names: ArrayBuffer[String],
+      validator: NameValidator) {
     expr match {
       case _: ScThisReference => add("thisInstance")
       case _: ScSuperReference => add("superInstance")
@@ -275,7 +277,8 @@ object NameSuggester {
   }
 
   private def generateCamelNames(name: String)(
-      implicit names: ArrayBuffer[String], validator: NameValidator) {
+      implicit names: ArrayBuffer[String],
+      validator: NameValidator) {
     if (name == "") return
     val s =
       if (Array("get", "set", "is").exists(name.startsWith))

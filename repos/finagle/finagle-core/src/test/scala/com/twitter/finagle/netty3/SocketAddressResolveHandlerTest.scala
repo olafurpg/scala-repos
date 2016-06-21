@@ -21,8 +21,7 @@ class SocketAddressResolveHandlerTest extends FunSuite with MockitoSugar {
     val channel = mock[Channel]
     when(ctx.getChannel) thenReturn channel
     val pipeline = mock[ChannelPipeline]
-    doAnswer(
-        new Answer[ChannelFuture] {
+    doAnswer(new Answer[ChannelFuture] {
       override def answer(invocation: InvocationOnMock) = {
         invocation.getArguments.headOption.foreach {
           case r: Runnable => r.run()
@@ -34,15 +33,18 @@ class SocketAddressResolveHandlerTest extends FunSuite with MockitoSugar {
     when(channel.getPipeline) thenReturn pipeline
     val closeFuture = Channels.future(channel)
     when(channel.getCloseFuture) thenReturn closeFuture
-    val remoteAddress = new InetSocketAddress(
-        InetAddress.getLoopbackAddress, 80)
+    val remoteAddress =
+      new InetSocketAddress(InetAddress.getLoopbackAddress, 80)
     when(channel.getRemoteAddress) thenReturn remoteAddress
     val channelFuture = Channels.future(channel, true)
     val resolver = mock[SocketAddressResolver]
 
     def handleSocketAddress(proxyAddress: SocketAddress) {
       val connectRequested = new DownstreamChannelStateEvent(
-          channel, channelFuture, ChannelState.CONNECTED, proxyAddress)
+          channel,
+          channelFuture,
+          ChannelState.CONNECTED,
+          proxyAddress)
       val handler = new SocketAddressResolveHandler(resolver, remoteAddress)
       handler.handleDownstream(ctx, connectRequested)
     }

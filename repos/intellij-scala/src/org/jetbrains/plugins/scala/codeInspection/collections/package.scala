@@ -219,8 +219,8 @@ package object collections {
             case _ => None
           }
         case ScInfixExpr(underscore(), oper, underscore()) => Some(oper)
-        case ScMethodCall(
-            refExpr: ScReferenceExpression, Seq(underscore(), underscore())) =>
+        case ScMethodCall(refExpr: ScReferenceExpression,
+                          Seq(underscore(), underscore())) =>
           Some(refExpr)
         case _ => None
       }
@@ -237,11 +237,11 @@ package object collections {
               (stripped(left), stripped(right)) match {
                 case (leftRef: ScReferenceExpression, rightExpr)
                     if leftRef.resolve() == x &&
-                    isIndependentOf(rightExpr, x) =>
+                      isIndependentOf(rightExpr, x) =>
                   Some(rightExpr)
                 case (leftExpr: ScExpression, rightRef: ScReferenceExpression)
                     if rightRef.resolve() == x &&
-                    isIndependentOf(leftExpr, x) =>
+                      isIndependentOf(leftExpr, x) =>
                   Some(leftExpr)
                 case _ => None
               }
@@ -276,8 +276,9 @@ package object collections {
                   val funExprText = secondArgName + " => " + right.getText
                   Some(
                       ScalaPsiElementFactory
-                        .createExpressionWithContextFromText(
-                          funExprText, expr.getContext, expr))
+                        .createExpressionWithContextFromText(funExprText,
+                                                             expr.getContext,
+                                                             expr))
                 case _ => None
               }
             case _ => None
@@ -325,8 +326,9 @@ package object collections {
     }
   }
 
-  def invocationText(
-      qual: ScExpression, methName: String, args: ScExpression*): String = {
+  def invocationText(qual: ScExpression,
+                     methName: String,
+                     args: ScExpression*): String = {
     val qualText = qual.getText
     val argsText = argListText(args)
     qual match {
@@ -374,11 +376,13 @@ package object collections {
     elem.scalaLanguageLevel.map(_ > Scala_2_9).getOrElse(true)
   }
 
-  def implicitParameterExistsFor(
-      methodName: String, baseExpr: ScExpression): Boolean = {
+  def implicitParameterExistsFor(methodName: String,
+                                 baseExpr: ScExpression): Boolean = {
     val expression =
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          s"${baseExpr.getText}.$methodName", baseExpr.getContext, baseExpr)
+          s"${baseExpr.getText}.$methodName",
+          baseExpr.getContext,
+          baseExpr)
     implicitParameterExistsFor(expression)
   }
 
@@ -556,14 +560,16 @@ package object collections {
 
       sameLevelIterator.collect {
         case assign @ ScAssignStmt(
-            definedOutside(ScalaPsiUtil.inNameContext(_: ScVariable)), _) =>
+            definedOutside(ScalaPsiUtil.inNameContext(_: ScVariable)),
+            _) =>
           assign
         case assign @ ScAssignStmt(mc @ ScMethodCall(definedOutside(_), _), _)
             if mc.isUpdateCall =>
           assign
         case infix @ ScInfixExpr(
-            definedOutside(ScalaPsiUtil.inNameContext(v: ScVariable)), _, _)
-            if infix.isAssignmentOperator =>
+            definedOutside(ScalaPsiUtil.inNameContext(v: ScVariable)),
+            _,
+            _) if infix.isAssignmentOperator =>
           infix
         case MethodRepr(
             itself,
@@ -572,7 +578,7 @@ package object collections {
             Some(ref),
             _)
             if isSideEffectCollectionMethod(ref) || isSetter(ref) ||
-            hasUnitReturnType(ref) =>
+              hasUnitReturnType(ref) =>
           itself
         case MethodRepr(itself, None, Some(ref @ definedOutside(_)), _)
             if hasUnitReturnType(ref) =>

@@ -12,8 +12,8 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
       mapping(
           "title" -> nonEmptyText(minLength = 10, maxLength = 150)
             .verifying(languageMessage, validateLanguage _),
-          "body" -> nonEmptyText(minLength = 10, maxLength = 10000).verifying(
-              languageMessage, validateLanguage _),
+          "body" -> nonEmptyText(minLength = 10, maxLength = 10000)
+            .verifying(languageMessage, validateLanguage _),
           "hidden-tags" -> text,
           "gameId" -> text,
           "move" -> text

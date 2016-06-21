@@ -268,8 +268,9 @@ trait Printers { self: Universe =>
     * Hook to define what `showCode(...)` means.
     * @group Printers
     */
-  protected def newCodePrinter(
-      out: PrintWriter, tree: Tree, printRootPkg: Boolean): TreePrinter
+  protected def newCodePrinter(out: PrintWriter,
+                               tree: Tree,
+                               printRootPkg: Boolean): TreePrinter
 
   /** Renders internal structure of a reflection artifact as the
     *  visualization of a Scala syntax tree.

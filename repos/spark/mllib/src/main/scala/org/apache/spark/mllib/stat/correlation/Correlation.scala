@@ -41,8 +41,8 @@ private[stat] trait Correlation {
     * correlation implementation for RDD[Vector]. Can be NaN if correlation is undefined for the
     * input vectors.
     */
-  def computeCorrelationWithMatrixImpl(
-      x: RDD[Double], y: RDD[Double]): Double = {
+  def computeCorrelationWithMatrixImpl(x: RDD[Double],
+                                       y: RDD[Double]): Double = {
     val mat: RDD[Vector] =
       x.zip(y).map { case (xi, yi) => new DenseVector(Array(xi, yi)) }
     computeCorrelationMatrix(mat)(0, 1)
@@ -75,7 +75,7 @@ private[stat] object Correlations {
       case nse: NoSuchElementException =>
         throw new IllegalArgumentException(
             "Unrecognized method name. Supported correlations: " +
-            CorrelationNames.nameToObjectMap.keys.mkString(", "))
+              CorrelationNames.nameToObjectMap.keys.mkString(", "))
     }
   }
 }
@@ -92,7 +92,7 @@ private[stat] object Correlations {
 private[mllib] object CorrelationNames {
 
   // Note: after new types of correlations are implemented, please update this map.
-  val nameToObjectMap = Map(
-      ("pearson", PearsonCorrelation), ("spearman", SpearmanCorrelation))
+  val nameToObjectMap =
+    Map(("pearson", PearsonCorrelation), ("spearman", SpearmanCorrelation))
   val defaultCorrName: String = "pearson"
 }

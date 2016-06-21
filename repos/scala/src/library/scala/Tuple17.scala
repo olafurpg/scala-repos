@@ -30,8 +30,8 @@ package scala
   *  @param  _16   Element 16 of this Tuple17
   *  @param  _17   Element 17 of this Tuple17
   */
-@deprecatedInheritance(
-    "Tuples will be made final in a future version.", "2.11.0")
+@deprecatedInheritance("Tuples will be made final in a future version.",
+                       "2.11.0")
 case class Tuple17[+T1,
                    +T2,
                    +T3,
@@ -84,6 +84,6 @@ case class Tuple17[+T1,
                       T17] {
   override def toString() =
     "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," +
-    _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + "," + _12 + "," + _13 +
-    "," + _14 + "," + _15 + "," + _16 + "," + _17 + ")"
+      _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + "," + _12 + "," + _13 +
+      "," + _14 + "," + _15 + "," + _16 + "," + _17 + ")"
 }

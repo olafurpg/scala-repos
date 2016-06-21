@@ -36,8 +36,10 @@ private[akkahttp] class ModelConversion(
                      request: HttpRequest)(implicit fm: Materializer)
     : (RequestHeader, Option[Source[ByteString, Any]]) = {
     (
-        convertRequestHeader(
-            requestId, remoteAddress, secureProtocol, request),
+        convertRequestHeader(requestId,
+                             remoteAddress,
+                             secureProtocol,
+                             request),
         convertRequestBody(request)
     )
   }
@@ -75,8 +77,9 @@ private[akkahttp] class ModelConversion(
       override def queryString = request.uri.query().toMultiMap
       override val headers = convertRequestHeaders(request)
       private lazy val remoteConnection: ConnectionInfo = {
-        forwardedHeaderHandler.remoteConnection(
-            remoteAddressArg.getAddress, secureProtocol, headers)
+        forwardedHeaderHandler.remoteConnection(remoteAddressArg.getAddress,
+                                                secureProtocol,
+                                                headers)
       }
       override def remoteAddress = remoteConnection.address.getHostAddress
       override def secure = remoteConnection.secure
@@ -128,16 +131,16 @@ private[akkahttp] class ModelConversion(
   /**
     * Convert a Play `Result` object into an Akka `HttpResponse` object.
     */
-  def convertResult(requestHeaders: RequestHeader,
-                    unvalidated: Result,
-                    protocol: HttpProtocol)(
-      implicit mat: Materializer): HttpResponse = {
+  def convertResult(
+      requestHeaders: RequestHeader,
+      unvalidated: Result,
+      protocol: HttpProtocol)(implicit mat: Materializer): HttpResponse = {
 
     val result = ServerResultUtils.validateResult(requestHeaders, unvalidated)
     val convertedHeaders: AkkaHttpHeaders = convertResponseHeaders(
         result.header.headers)
-    val entity = convertResultBody(
-        requestHeaders, convertedHeaders, result, protocol)
+    val entity =
+      convertResultBody(requestHeaders, convertedHeaders, result, protocol)
     val connectionHeader =
       ServerResultUtils.determineConnectionHeader(requestHeaders, result)
     val closeHeader = connectionHeader.header.map(Connection(_))
@@ -192,8 +195,8 @@ private[akkahttp] class ModelConversion(
     headers.map {
       case (name, value) =>
         HttpHeader.parse(name, value) match {
-          case HttpHeader.ParsingResult.Ok(
-              header, errors /* errors are ignored if Ok */ ) =>
+          case HttpHeader.ParsingResult
+                .Ok(header, errors /* errors are ignored if Ok */ ) =>
             header
           case HttpHeader.ParsingResult.Error(error) =>
             sys.error(s"Error parsing header: $error")

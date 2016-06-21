@@ -127,7 +127,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
     "define a 'filterMsg' method, returning a Failure if the filter predicate is not satisfied" in {
       Full(1).filterMsg("not equal to 0")(_ == 0) must_==
-        Failure("not equal to 0", Empty, Empty)
+      Failure("not equal to 0", Empty, Empty)
     }
     "define a 'foreach' method using its value (to display it for instance)" in {
       var total = 0
@@ -265,7 +265,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
     "define a 'filterMsg' method, returning a Failure" in {
       Empty.filterMsg("not equal to 0")(_ == 0) must_==
-        Failure("not equal to 0", Empty, Empty)
+      Failure("not equal to 0", Empty, Empty)
     }
     "define a 'foreach' doing nothing" in {
       var total = 0
@@ -308,35 +308,35 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     "return its cause as an exception" in {
       case class LiftException(m: String) extends Exception
       Failure("error", Full(new LiftException("broken")), Empty).exception must_==
-        Full(new LiftException("broken"))
+      Full(new LiftException("broken"))
     }
     "return a chained list of causes" in {
       Failure("error",
               Full(new Exception("broken")),
               Full(Failure("nested cause", Empty, Empty))).chain must_==
-        Full(Failure("nested cause", Empty, Empty))
+      Full(Failure("nested cause", Empty, Empty))
     }
     "be converted to a ParamFailure" in {
       Failure("hi mom") ~> 404 must_==
-        ParamFailure("hi mom", Empty, Empty, 404)
+      ParamFailure("hi mom", Empty, Empty, 404)
     }
   }
 
   "A Failure is an Empty Box which" should {
     "return itself if mapped or flatmapped" in {
       Failure("error", Empty, Empty) map { _.toString } must_==
-        Failure("error", Empty, Empty)
+      Failure("error", Empty, Empty)
       Failure("error", Empty, Empty) flatMap { x: String =>
         Full(x.toString)
       } must_== Failure("error", Empty, Empty)
     }
     "return a itself when asked for its status with the operator ?~" in {
       Failure("error", Empty, Empty) ?~ "nothing" must_==
-        Failure("error", Empty, Empty)
+      Failure("error", Empty, Empty)
     }
     "create a new failure with a chained message if asked for its status with the operator ?~!" in {
       Failure("error", Empty, Empty) ?~! "error2" must_==
-        Failure("error2", Empty, Full(Failure("error", Empty, Empty)))
+      Failure("error2", Empty, Full(Failure("error", Empty, Empty)))
     }
     "return false for exist method" in {
       Failure("error", Empty, Empty) exists { _ =>
@@ -353,12 +353,12 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
   "A ParamFailure is a failure which" should {
     "appear in the chain when ~> is invoked on it" in {
       Failure("Apple") ~> 404 ~> "apple" must_==
-        ParamFailure("Apple",
-                     Empty,
-                     Full(
-                         ParamFailure("Apple", Empty, Empty, 404)
-                     ),
-                     "apple")
+      ParamFailure("Apple",
+                   Empty,
+                   Full(
+                       ParamFailure("Apple", Empty, Empty, 404)
+                   ),
+                   "apple")
     }
   }
 
@@ -462,7 +462,7 @@ trait BoxGenerator {
       msg <- listOfN(msgLen, alphaChar)
       exception <- const(Full(new Exception("")))
       chainLen <- choose(1, 5)
-      chain <- frequency(
-                  (1, listOfN(chainLen, genFailureBox)), (3, const(Nil)))
+      chain <- frequency((1, listOfN(chainLen, genFailureBox)),
+                         (3, const(Nil)))
     } yield Failure(msg.mkString, exception, Box(chain.headOption))
 }

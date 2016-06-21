@@ -41,8 +41,8 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
             if (ex.getMessage().startsWith("An HTTP line is larger than "))
               Response(from(badReq.httpVersion), Status.RequestURITooLong)
             else
-              Response(
-                  from(badReq.httpVersion), Status.RequestHeaderFieldsTooLarge)
+              Response(from(badReq.httpVersion),
+                       Status.RequestHeaderFieldsTooLarge)
           case _ =>
             Response(from(badReq.httpVersion), Status.BadRequest)
         }
@@ -57,15 +57,14 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
         Future.value(response)
 
       case reqIn: HttpRequest =>
-        val reader =
-          if (reqIn.isChunked) {
-            val coll = Transport.collate(trans, readChunk)
-            coll.proxyTo(eos)
-            coll: Reader
-          } else {
-            eos.setDone()
-            BufReader(ChannelBufferBuf.Owned(reqIn.getContent))
-          }
+        val reader = if (reqIn.isChunked) {
+          val coll = Transport.collate(trans, readChunk)
+          coll.proxyTo(eos)
+          coll: Reader
+        } else {
+          eos.setDone()
+          BufReader(ChannelBufferBuf.Owned(reqIn.getContent))
+        }
 
         val addr = trans.remoteAddress match {
           case ia: InetSocketAddress => ia
@@ -96,7 +95,8 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       val p = new Promise[Unit]
       val f =
         trans.write(from[Response, HttpResponse](rep)) before streamChunks(
-            trans, rep.reader)
+            trans,
+            rep.reader)
       f.proxyTo(p)
       // This awkwardness is unfortunate but necessary for now as you may be
       // interrupted in the middle of a write, or when there otherwise isn’t
@@ -104,8 +104,8 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       f.onFailure { t =>
         Logger
           .get(this.getClass.getName)
-          .debug(
-              t, "Failed mid-stream. Terminating stream, closing connection")
+          .debug(t,
+                 "Failed mid-stream. Terminating stream, closing connection")
         failureReceiver.counter(Throwables.mkString(t): _*).incr()
         rep.reader.discard()
       }

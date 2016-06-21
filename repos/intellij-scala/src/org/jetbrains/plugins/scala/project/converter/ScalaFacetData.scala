@@ -19,7 +19,7 @@ private case class ScalaFacetData(languageLevel: String,
       .scalaFacetElementIn(module)
       .getOrElse(throw new IllegalStateException(
               "Cannot remove Scala facet from module: " +
-              module.getModuleName))
+                module.getModuleName))
 
     facetElement.detach()
   }

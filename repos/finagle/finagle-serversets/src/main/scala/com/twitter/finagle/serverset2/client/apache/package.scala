@@ -6,9 +6,9 @@ package object apache {
   private[apache] def toByteArray(buf: Buf): Array[Byte] = buf match {
     case Buf.ByteArray.Owned(a, 0, len) if len == buf.length => a
     case b => {
-        val bytes = new Array[Byte](b.length)
-        b.write(bytes, 0)
-        bytes
-      }
+      val bytes = new Array[Byte](b.length)
+      b.write(bytes, 0)
+      bytes
+    }
   }
 }

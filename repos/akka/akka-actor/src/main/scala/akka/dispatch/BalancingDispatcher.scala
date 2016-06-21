@@ -58,8 +58,8 @@ class BalancingDispatcher(
   private[akka] val messageQueue: MessageQueue =
     _mailboxType.create(None, None)
 
-  private class SharingMailbox(
-      val system: ActorSystemImpl, _messageQueue: MessageQueue)
+  private class SharingMailbox(val system: ActorSystemImpl,
+                               _messageQueue: MessageQueue)
       extends Mailbox(_messageQueue)
       with DefaultSystemMessageQueue {
     override def cleanUp(): Unit = {
@@ -77,7 +77,8 @@ class BalancingDispatcher(
   }
 
   protected[akka] override def createMailbox(
-      actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox =
+      actor: akka.actor.Cell,
+      mailboxType: MailboxType): Mailbox =
     new SharingMailbox(actor.systemImpl, messageQueue)
 
   protected[akka] override def register(actor: ActorCell): Unit = {
@@ -91,8 +92,8 @@ class BalancingDispatcher(
     teamWork()
   }
 
-  override protected[akka] def dispatch(
-      receiver: ActorCell, invocation: Envelope) = {
+  override protected[akka] def dispatch(receiver: ActorCell,
+                                        invocation: Envelope) = {
     messageQueue.enqueue(receiver.self, invocation)
     if (!registerForExecution(receiver.mailbox, false, false)) teamWork()
   }

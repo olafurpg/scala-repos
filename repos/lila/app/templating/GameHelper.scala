@@ -101,8 +101,9 @@ trait GameHelper {
     case Mode.Rated => trans.rated.en()
   }
 
-  def playerUsername(
-      player: Player, withRating: Boolean = true, withTitle: Boolean = true) =
+  def playerUsername(player: Player,
+                     withRating: Boolean = true,
+                     withTitle: Boolean = true) =
     Namer.player(player, withRating, withTitle)(lightUser)
 
   def playerText(player: Player, withRating: Boolean = false) =

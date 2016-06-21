@@ -14,17 +14,17 @@ trait OptionalTests {
     val msg =
       s"CapabilityFlag `${flag.name}` was turned `" + (if (flag.value) "on"
                                                        else "off") + "`. " +
-      (if (!flag.value)
-         "To enable the related tests override it with `CapabilityFlag.on` (or `true` in Scala)."
-       else "")
+        (if (!flag.value)
+           "To enable the related tests override it with `CapabilityFlag.on` (or `true` in Scala)."
+         else "")
     info(msg)
     if (flag.value)
       try test catch {
         case ex: Exception ⇒
           throw new AssertionError(
               "Imlpementation did not pass this spec. " +
-              "If your journal will be (by definition) unable to abide the here tested rule, you can disable this test," +
-              s"by overriding [${flag.name}] with CapabilityFlag.off in your test class.")
+                "If your journal will be (by definition) unable to abide the here tested rule, you can disable this test," +
+                s"by overriding [${flag.name}] with CapabilityFlag.off in your test class.")
       }
   }
 }

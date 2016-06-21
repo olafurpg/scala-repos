@@ -81,8 +81,8 @@ class OfferMatcherManagerActorTest
     object Config extends ScallopConf with OfferMatcherManagerConfig
     Config.afterInit()
     val offerMatcherManager = TestActorRef[OfferMatcherManagerActor](
-        OfferMatcherManagerActor.props(
-            metrics, random, clock, Config, observer))
+        OfferMatcherManagerActor
+          .props(metrics, random, clock, Config, observer))
 
     def matcher(precedence: Option[PathId] = None): OfferMatcher = {
       val matcher = mock[OfferMatcher]

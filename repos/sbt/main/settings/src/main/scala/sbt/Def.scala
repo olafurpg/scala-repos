@@ -31,18 +31,19 @@ object Def extends Init[Scope] with TaskMacroExtra {
       def apply(key: ScopedKey[_]) = displayFull(key, keyNameColor)
     }
 
-  def showRelativeKey(current: ProjectRef,
-                      multi: Boolean,
-                      keyNameColor: Option[String] =
-                        None): Show[ScopedKey[_]] =
+  def showRelativeKey(
+      current: ProjectRef,
+      multi: Boolean,
+      keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
     new Show[ScopedKey[_]] {
       def apply(key: ScopedKey[_]) =
         Scope.display(key.scope,
                       colored(key.key.label, keyNameColor),
                       ref => displayRelative(current, multi, ref))
     }
-  def displayRelative(
-      current: ProjectRef, multi: Boolean, project: Reference): String =
+  def displayRelative(current: ProjectRef,
+                      multi: Boolean,
+                      project: Reference): String =
     project match {
       case BuildRef(current.build) => "{.}/"
       case `current` => if (multi) current.project + "/" else ""
@@ -60,12 +61,12 @@ object Def extends Init[Scope] with TaskMacroExtra {
     case None => s
   }
 
-  override def deriveAllowed[T](
-      s: Setting[T], allowDynamic: Boolean): Option[String] =
+  override def deriveAllowed[T](s: Setting[T],
+                                allowDynamic: Boolean): Option[String] =
     super.deriveAllowed(s, allowDynamic) orElse
-    (if (s.key.scope != ThisScope)
-       Some(s"Scope cannot be defined for ${definedSettingString(s)}")
-     else None) orElse s.dependencies
+      (if (s.key.scope != ThisScope)
+         Some(s"Scope cannot be defined for ${definedSettingString(s)}")
+       else None) orElse s.dependencies
       .find(k => k.scope != ThisScope)
       .map(k =>
             s"Scope cannot be defined for dependency ${k.key.label} of ${definedSettingString(s)}")
@@ -145,13 +146,14 @@ object Def extends Init[Scope] with TaskMacroExtra {
     .inputKeyImpl[T]
 
   private[sbt] def dummy[T: Manifest](
-      name: String, description: String): (TaskKey[T], Task[T]) =
+      name: String,
+      description: String): (TaskKey[T], Task[T]) =
     (TaskKey[T](name, description, DTask), dummyTask(name))
   private[sbt] def dummyTask[T](name: String): Task[T] = {
     import std.TaskExtra.{task => newTask, _}
     val base: Task[T] =
       newTask(sys.error("Dummy task '" + name +
-              "' did not get converted to a full task.")) named name
+                "' did not get converted to a full task.")) named name
     base.copy(info = base.info.set(isDummyTask, true))
   }
   private[sbt] def isDummy(t: Task[_]): Boolean =

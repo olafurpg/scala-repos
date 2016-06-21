@@ -35,8 +35,10 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     (for (i <- 2 to n by 2) yield nearlyMaxG(a, n) + nearlyMaxG(b, n)).sum
   }
 
-  def nearlyMaxF(
-      a: Array[Float], k: Int, start: Int = 0, end: Int = -1): Float = {
+  def nearlyMaxF(a: Array[Float],
+                 k: Int,
+                 start: Int = 0,
+                 end: Int = -1): Float = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
     val ai = new Array[Float](max(k, 0) + 1)
@@ -58,8 +60,10 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     ai(k)
   }
 
-  def nearlyMaxD(
-      a: Array[Double], k: Int, start: Int = 0, end: Int = -1): Double = {
+  def nearlyMaxD(a: Array[Double],
+                 k: Int,
+                 start: Int = 0,
+                 end: Int = -1): Double = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
     val ai = new Array[Double](max(k, 0) + 1)
@@ -81,8 +85,10 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     ai(k)
   }
 
-  def nearlyMaxG[@sp A: Numeric: ClassTag](
-      a: Array[A], k: Int, start: Int = 0, end: Int = -1): A = {
+  def nearlyMaxG[@sp A: Numeric: ClassTag](a: Array[A],
+                                           k: Int,
+                                           start: Int = 0,
+                                           end: Int = -1): A = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
     val ai = new Array[A](max(k, 0) + 1)

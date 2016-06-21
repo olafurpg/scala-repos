@@ -127,13 +127,13 @@ final class JsonView {
       "metric" -> metric,
       "dimension" -> dimension,
       "filters" ->
-      (filters
-            .split('/')
-            .map(_ split ':')
-            .collect {
-              case Array(key, values) =>
-                key -> JsArray(values.split(',').map(JsString.apply))
-            }
-            .toMap: Map[String, JsArray])
+        (filters
+              .split('/')
+              .map(_ split ':')
+              .collect {
+                case Array(key, values) =>
+                  key -> JsArray(values.split(',').map(JsString.apply))
+              }
+              .toMap: Map[String, JsArray])
   )
 }

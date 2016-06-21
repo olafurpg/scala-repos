@@ -29,8 +29,8 @@ sealed trait ZipAndJarFileLookupFactory {
 
   protected def createForZipFile(zipFile: AbstractFile): FlatClassPath
 
-  private def createUsingCache(
-      zipFile: AbstractFile, settings: Settings): FlatClassPath =
+  private def createUsingCache(zipFile: AbstractFile,
+                               settings: Settings): FlatClassPath =
     cache.synchronized {
       def newClassPathInstance = {
         if (settings.verbose || settings.Ylogcp)
@@ -104,7 +104,8 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       * Classes for given package can be then easily loaded when they are needed.
       */
     private lazy val cachedPackages: collection.mutable.HashMap[
-        String, PackageFileInfo] = {
+        String,
+        PackageFileInfo] = {
       val packages = collection.mutable.HashMap[String, PackageFileInfo]()
 
       def getSubpackages(dir: AbstractFile): List[AbstractFile] =
@@ -132,10 +133,11 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
         }
 
       val subpackages = getSubpackages(file)
-      packages.put(
-          FlatClassPath.RootPackage, PackageFileInfo(file, subpackages))
-      traverse(
-          FlatClassPath.RootPackage, subpackages, collection.mutable.Queue())
+      packages
+        .put(FlatClassPath.RootPackage, PackageFileInfo(file, subpackages))
+      traverse(FlatClassPath.RootPackage,
+               subpackages,
+               collection.mutable.Queue())
       packages
     }
 
@@ -152,8 +154,8 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       cachedPackages.get(inPackage) match {
         case None => Seq.empty
         case Some(PackageFileInfo(pkg, _)) =>
-          (for (file <- pkg if file.isClass) yield
-            ClassFileEntryImpl(file))(collection.breakOut)
+          (for (file <- pkg if file.isClass)
+            yield ClassFileEntryImpl(file))(collection.breakOut)
       }
 
     override private[nsc] def list(inPackage: String): FlatClassPathEntries =
@@ -161,10 +163,10 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
   }
 
   private object ManifestResourcesFlatClassPath {
-    case class PackageFileInfo(
-        packageFile: AbstractFile, subpackages: Seq[AbstractFile])
-    case class PackageInfo(
-        packageName: String, subpackages: List[AbstractFile])
+    case class PackageFileInfo(packageFile: AbstractFile,
+                               subpackages: Seq[AbstractFile])
+    case class PackageInfo(packageName: String,
+                           subpackages: List[AbstractFile])
   }
 
   override protected def createForZipFile(

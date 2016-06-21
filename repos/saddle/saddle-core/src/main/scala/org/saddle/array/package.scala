@@ -71,8 +71,8 @@ package object array {
   /**
     * Repeat elements of the array some number of times
     */
-  def tile[@spec(Boolean, Int, Long, Double) T: ST](
-      arr: Array[T], n: Int): Array[T] = {
+  def tile[@spec(Boolean, Int, Long, Double) T: ST](arr: Array[T],
+                                                    n: Int): Array[T] = {
     require(n >= 0, "n must not be negative")
     val sz = arr.length * n
     val res = empty[T](sz)
@@ -214,7 +214,9 @@ package object array {
     * }}}
     */
   def take[@spec(Boolean, Int, Long, Double) T: ST](
-      arr: Array[T], offsets: Array[Int], missing: => T): Array[T] = {
+      arr: Array[T],
+      offsets: Array[Int],
+      missing: => T): Array[T] = {
     val res = empty[T](offsets.length)
     var i = 0
     while (i < offsets.length) {
@@ -237,7 +239,9 @@ package object array {
     * }}}
     */
   def sum[@spec(Boolean, Int, Long, Double) T: ST: NUM: ops.AddOp](
-      arr: Array[T], offsets: Array[Int], missing: => T): T = {
+      arr: Array[T],
+      offsets: Array[Int],
+      missing: => T): T = {
     val st = implicitly[ST[T]]
     val nm = implicitly[NUM[T]]
     val op = implicitly[ops.AddOp[T]]
@@ -268,7 +272,8 @@ package object array {
     * }}}
     */
   def send[@spec(Boolean, Int, Long, Double) T: ST](
-      arr: Array[T], offsets: Array[Int]): Array[T] = {
+      arr: Array[T],
+      offsets: Array[Int]): Array[T] = {
     val res = empty[T](offsets.length)
     var i = 0
     while (i < offsets.length) {
@@ -283,7 +288,8 @@ package object array {
     * produce a new array.
     */
   def remove[@spec(Boolean, Int, Long, Double) T: ST](
-      arr: Array[T], locs: Array[Int]): Array[T] = {
+      arr: Array[T],
+      locs: Array[Int]): Array[T] = {
     val set = new IntOpenHashSet(locs.length)
 
     var i = 0
@@ -312,8 +318,9 @@ package object array {
   /**
     * Put a single value into array arr at particular offsets, so as to produce a new array.
     */
-  def put[@spec(Boolean, Int, Long, Double) T](
-      arr: Array[T], offsets: Array[Int], value: T): Array[T] = {
+  def put[@spec(Boolean, Int, Long, Double) T](arr: Array[T],
+                                               offsets: Array[Int],
+                                               value: T): Array[T] = {
     val res = arr.clone()
     var i = 0
     while (i < offsets.length) {
@@ -328,8 +335,9 @@ package object array {
     * Put a value into array arr at particular offsets provided by a boolean array where its locations
     * are true, so as to produce a new array.
     */
-  def put[@spec(Boolean, Int, Long, Double) T](
-      arr: Array[T], offsets: Array[Boolean], value: T): Array[T] = {
+  def put[@spec(Boolean, Int, Long, Double) T](arr: Array[T],
+                                               offsets: Array[Boolean],
+                                               value: T): Array[T] = {
     val res = arr.clone()
     var i = 0
     while (i < offsets.length) {
@@ -343,8 +351,9 @@ package object array {
     * Put n values into array arr at particular offsets, where the values come from another array,
     * so as to produce a new array.
     */
-  def putn[@spec(Boolean, Int, Long, Double) T](
-      arr: Array[T], offsets: Array[Int], values: Array[T]): Array[T] = {
+  def putn[@spec(Boolean, Int, Long, Double) T](arr: Array[T],
+                                                offsets: Array[Int],
+                                                values: Array[T]): Array[T] = {
     val res = arr.clone()
     var i = 0
     while (i < offsets.length) {

@@ -23,8 +23,8 @@ import org.apache.spark.streaming.Time
 import org.apache.spark.streaming.scheduler.{BatchInfo, OutputOperationInfo, StreamInputInfo}
 import org.apache.spark.streaming.ui.StreamingJobProgressListener._
 
-private[ui] case class OutputOpIdAndSparkJobId(
-    outputOpId: OutputOpId, sparkJobId: SparkJobId)
+private[ui] case class OutputOpIdAndSparkJobId(outputOpId: OutputOpId,
+                                               sparkJobId: SparkJobId)
 
 private[ui] case class BatchUIData(
     val batchTime: Time,
@@ -104,7 +104,7 @@ private[ui] object BatchUIData {
   def apply(batchInfo: BatchInfo): BatchUIData = {
     val outputOperations = mutable.HashMap[OutputOpId, OutputOperationUIData]()
     outputOperations ++=
-      batchInfo.outputOperationInfos.mapValues(OutputOperationUIData.apply)
+    batchInfo.outputOperationInfos.mapValues(OutputOperationUIData.apply)
     new BatchUIData(
         batchInfo.batchTime,
         batchInfo.streamIdToInputInfo,

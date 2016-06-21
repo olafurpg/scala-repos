@@ -87,8 +87,8 @@ trait Application {
   /**
     * The router used by this application.
     */
-  @deprecated(
-      "Either use HttpRequestHandler, or have the router injected", "2.4.0")
+  @deprecated("Either use HttpRequestHandler, or have the router injected",
+              "2.4.0")
   def routes: Router = {
     // Use a cached value because the injector might be slow
     if (cachedRoutes != null) cachedRoutes
@@ -257,15 +257,20 @@ trait BuiltInComponents {
 
   lazy val injector: Injector =
     new SimpleInjector(NewInstanceInjector) + router + cookieSigner +
-    csrfTokenSigner + httpConfiguration + tempFileCreator + global + crypto
+      csrfTokenSigner + httpConfiguration + tempFileCreator + global + crypto
 
   lazy val httpConfiguration: HttpConfiguration =
     HttpConfiguration.fromConfiguration(configuration)
   lazy val httpRequestHandler: HttpRequestHandler =
-    new DefaultHttpRequestHandler(
-        router, httpErrorHandler, httpConfiguration, httpFilters: _*)
+    new DefaultHttpRequestHandler(router,
+                                  httpErrorHandler,
+                                  httpConfiguration,
+                                  httpFilters: _*)
   lazy val httpErrorHandler: HttpErrorHandler = new DefaultHttpErrorHandler(
-      environment, configuration, sourceMapper, Some(router))
+      environment,
+      configuration,
+      sourceMapper,
+      Some(router))
   lazy val httpFilters: Seq[EssentialFilter] = Nil
 
   lazy val applicationLifecycle: DefaultApplicationLifecycle =
@@ -281,20 +286,22 @@ trait BuiltInComponents {
       materializer)
 
   lazy val actorSystem: ActorSystem = new ActorSystemProvider(
-      environment, configuration, applicationLifecycle).get
+      environment,
+      configuration,
+      applicationLifecycle).get
   implicit lazy val materializer: Materializer =
     ActorMaterializer()(actorSystem)
 
-  lazy val cryptoConfig: CryptoConfig = new CryptoConfigParser(
-      environment, configuration).get
+  lazy val cryptoConfig: CryptoConfig =
+    new CryptoConfigParser(environment, configuration).get
 
   lazy val cookieSigner: CookieSigner =
     new CookieSignerProvider(cryptoConfig).get
   lazy val csrfTokenSigner: CSRFTokenSigner = new CSRFTokenSignerProvider(
       cookieSigner).get
   lazy val aesCrypter: AESCrypter = new AESCrypterProvider(cryptoConfig).get
-  lazy val crypto: Crypto = new Crypto(
-      cookieSigner, csrfTokenSigner, aesCrypter)
+  lazy val crypto: Crypto =
+    new Crypto(cookieSigner, csrfTokenSigner, aesCrypter)
 
   @deprecated("Use dependency injection", "2.5.x")
   lazy val global: GlobalSettings.Deprecated =

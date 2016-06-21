@@ -25,7 +25,7 @@ object DeleteZKPath {
   def main(args: Array[String]) {
     if (args.length < 2) {
       println("USAGE: " + DeleteZKPath.getClass.getName +
-          " consumer.properties zk_path")
+            " consumer.properties zk_path")
       System.exit(1)
     }
 

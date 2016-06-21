@@ -56,7 +56,7 @@ object Simple3DBoxApp extends JFXApp {
       camera = new PerspectiveCamera(true) {
         transforms +=
           (new Rotate(-20, Rotate.YAxis), new Rotate(-20, Rotate.XAxis),
-            new Translate(0, 0, -15))
+              new Translate(0, 0, -15))
       }
     }
   }

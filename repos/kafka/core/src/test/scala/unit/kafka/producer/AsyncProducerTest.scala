@@ -47,11 +47,12 @@ class AsyncProducerTest {
   // One of the few cases we can just set a fixed port because the producer is mocked out here since this uses mocks
   val props = Seq(createBrokerConfig(1, "127.0.0.1:1", port = 65534))
   val configs = props.map(KafkaConfig.fromProps)
-  val brokerList = configs
-    .map(c =>
-          org.apache.kafka.common.utils.Utils
-            .formatAddress(c.hostName, c.port))
-    .mkString(",")
+  val brokerList =
+    configs
+      .map(c =>
+            org.apache.kafka.common.utils.Utils
+              .formatAddress(c.hostName, c.port))
+      .mkString(",")
 
   @Test
   def testProducerQueueSize() {
@@ -91,7 +92,8 @@ class AsyncProducerTest {
   def testProduceAfterClosed() {
     val produceData = getProduceData(10)
     val producer = createProducer[String, String](
-        brokerList, encoder = classOf[StringEncoder].getName)
+        brokerList,
+        encoder = classOf[StringEncoder].getName)
 
     producer.close
 
@@ -120,7 +122,12 @@ class AsyncProducerTest {
 
     val queue = new LinkedBlockingQueue[KeyedMessage[String, String]](10)
     val producerSendThread = new ProducerSendThread[String, String](
-        "thread1", queue, mockHandler, Integer.MAX_VALUE, 5, "")
+        "thread1",
+        queue,
+        mockHandler,
+        Integer.MAX_VALUE,
+        5,
+        "")
     producerSendThread.start()
 
     for (producerData <- producerDataList) queue.put(producerData)
@@ -146,7 +153,12 @@ class AsyncProducerTest {
     val queueExpirationTime = 200
     val queue = new LinkedBlockingQueue[KeyedMessage[String, String]](10)
     val producerSendThread = new ProducerSendThread[String, String](
-        "thread1", queue, mockHandler, queueExpirationTime, 5, "")
+        "thread1",
+        queue,
+        mockHandler,
+        queueExpirationTime,
+        5,
+        "")
     producerSendThread.start()
 
     for (producerData <- producerDataList) queue.put(producerData)
@@ -160,22 +172,28 @@ class AsyncProducerTest {
   def testPartitionAndCollateEvents() {
     val producerDataList = new ArrayBuffer[KeyedMessage[Int, Message]]
     // use bogus key and partition key override for some messages
-    producerDataList.append(new KeyedMessage[Int, Message](
-            "topic1", key = 0, message = new Message("msg1".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[Int, Message]("topic1",
+                                       key = 0,
+                                       message = new Message("msg1".getBytes)))
     producerDataList.append(
         new KeyedMessage[Int, Message]("topic2",
                                        key = -99,
                                        partKey = 1,
                                        message = new Message("msg2".getBytes)))
-    producerDataList.append(new KeyedMessage[Int, Message](
-            "topic1", key = 2, message = new Message("msg3".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[Int, Message]("topic1",
+                                       key = 2,
+                                       message = new Message("msg3".getBytes)))
     producerDataList.append(
         new KeyedMessage[Int, Message]("topic1",
                                        key = -101,
                                        partKey = 3,
                                        message = new Message("msg4".getBytes)))
-    producerDataList.append(new KeyedMessage[Int, Message](
-            "topic2", key = 4, message = new Message("msg5".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[Int, Message]("topic2",
+                                       key = 4,
+                                       message = new Message("msg5".getBytes)))
 
     val props = new Properties()
     props.put("metadata.broker.list", brokerList)
@@ -183,14 +201,14 @@ class AsyncProducerTest {
     val broker2 = new BrokerEndPoint(1, "localhost", 9093)
 
     // form expected partitions metadata
-    val partition1Metadata = new PartitionMetadata(
-        0, Some(broker1), List(broker1, broker2))
-    val partition2Metadata = new PartitionMetadata(
-        1, Some(broker2), List(broker1, broker2))
-    val topic1Metadata = new TopicMetadata(
-        "topic1", List(partition1Metadata, partition2Metadata))
-    val topic2Metadata = new TopicMetadata(
-        "topic2", List(partition1Metadata, partition2Metadata))
+    val partition1Metadata =
+      new PartitionMetadata(0, Some(broker1), List(broker1, broker2))
+    val partition2Metadata =
+      new PartitionMetadata(1, Some(broker2), List(broker1, broker2))
+    val topic1Metadata =
+      new TopicMetadata("topic1", List(partition1Metadata, partition2Metadata))
+    val topic2Metadata =
+      new TopicMetadata("topic2", List(partition1Metadata, partition2Metadata))
 
     val topicPartitionInfos =
       new collection.mutable.HashMap[String, TopicMetadata]
@@ -213,19 +231,26 @@ class AsyncProducerTest {
         topicPartitionInfos = topicPartitionInfos)
 
     val topic1Broker1Data = ArrayBuffer[KeyedMessage[Int, Message]](
-        new KeyedMessage[Int, Message](
-            "topic1", 0, new Message("msg1".getBytes)),
-        new KeyedMessage[Int, Message](
-            "topic1", 2, new Message("msg3".getBytes)))
-    val topic1Broker2Data =
-      ArrayBuffer[KeyedMessage[Int, Message]](new KeyedMessage[Int, Message](
-              "topic1", -101, 3, new Message("msg4".getBytes)))
-    val topic2Broker1Data =
-      ArrayBuffer[KeyedMessage[Int, Message]](new KeyedMessage[Int, Message](
-              "topic2", 4, new Message("msg5".getBytes)))
-    val topic2Broker2Data =
-      ArrayBuffer[KeyedMessage[Int, Message]](new KeyedMessage[Int, Message](
-              "topic2", -99, 1, new Message("msg2".getBytes)))
+        new KeyedMessage[Int, Message]("topic1",
+                                       0,
+                                       new Message("msg1".getBytes)),
+        new KeyedMessage[Int, Message]("topic1",
+                                       2,
+                                       new Message("msg3".getBytes)))
+    val topic1Broker2Data = ArrayBuffer[KeyedMessage[Int, Message]](
+        new KeyedMessage[Int, Message]("topic1",
+                                       -101,
+                                       3,
+                                       new Message("msg4".getBytes)))
+    val topic2Broker1Data = ArrayBuffer[KeyedMessage[Int, Message]](
+        new KeyedMessage[Int, Message]("topic2",
+                                       4,
+                                       new Message("msg5".getBytes)))
+    val topic2Broker2Data = ArrayBuffer[KeyedMessage[Int, Message]](
+        new KeyedMessage[Int, Message]("topic2",
+                                       -99,
+                                       1,
+                                       new Message("msg2".getBytes)))
     val expectedResult = Some(
         Map(
             0 -> Map(TopicAndPartition("topic1", 0) -> topic1Broker1Data,
@@ -265,24 +290,28 @@ class AsyncProducerTest {
     val serializedData = handler.serialize(produceData)
     val deserializedData = serializedData.map(d =>
           new KeyedMessage[String, String](
-              d.topic, TestUtils.readString(d.message.payload)))
+              d.topic,
+              TestUtils.readString(d.message.payload)))
 
     // Test that the serialize handles seq from a Stream
     val streamedSerializedData = handler.serialize(Stream(produceData: _*))
     val deserializedStreamData = streamedSerializedData.map(d =>
           new KeyedMessage[String, String](
-              d.topic, TestUtils.readString(d.message.payload)))
+              d.topic,
+              TestUtils.readString(d.message.payload)))
 
     TestUtils.checkEquals(produceData.iterator, deserializedData.iterator)
-    TestUtils.checkEquals(
-        produceData.iterator, deserializedStreamData.iterator)
+    TestUtils
+      .checkEquals(produceData.iterator, deserializedStreamData.iterator)
   }
 
   @Test
   def testInvalidPartition() {
     val producerDataList = new ArrayBuffer[KeyedMessage[String, Message]]
-    producerDataList.append(new KeyedMessage[String, Message](
-            "topic1", "key1", new Message("msg1".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[String, Message]("topic1",
+                                          "key1",
+                                          new Message("msg1".getBytes)))
     val props = new Properties()
     props.put("metadata.broker.list", brokerList)
     val config = new ProducerConfig(props)
@@ -388,19 +417,22 @@ class AsyncProducerTest {
         producerPool = producerPool,
         topicPartitionInfos = topicPartitionInfos)
     val producerDataList = new ArrayBuffer[KeyedMessage[String, Message]]
-    producerDataList.append(new KeyedMessage[String, Message](
-            "topic1", new Message("msg1".getBytes)))
-    producerDataList.append(new KeyedMessage[String, Message](
-            "topic2", new Message("msg2".getBytes)))
-    producerDataList.append(new KeyedMessage[String, Message](
-            "topic1", new Message("msg3".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[String, Message]("topic1",
+                                          new Message("msg1".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[String, Message]("topic2",
+                                          new Message("msg2".getBytes)))
+    producerDataList.append(
+        new KeyedMessage[String, Message]("topic1",
+                                          new Message("msg3".getBytes)))
 
     val partitionedDataOpt = handler.partitionAndCollate(producerDataList)
     partitionedDataOpt match {
       case Some(partitionedData) =>
         for ((brokerId, dataPerBroker) <- partitionedData) {
-          for ((TopicAndPartition(topic, partitionId), dataPerTopic) <- dataPerBroker) assertTrue(
-              partitionId == 0)
+          for ((TopicAndPartition(topic, partitionId), dataPerTopic) <- dataPerBroker)
+            assertTrue(partitionId == 0)
         }
       case None =>
         fail("Failed to collate requests by topic, partition")
@@ -413,15 +445,15 @@ class AsyncProducerTest {
     props.put("metadata.broker.list", brokerList)
     props.put("request.required.acks", "1")
     props.put("serializer.class", classOf[StringEncoder].getName.toString)
-    props.put(
-        "key.serializer.class", classOf[NullEncoder[Int]].getName.toString)
+    props
+      .put("key.serializer.class", classOf[NullEncoder[Int]].getName.toString)
     props.put("producer.num.retries", 3.toString)
 
     val config = new ProducerConfig(props)
 
     val topic1 = "topic1"
-    val topic1Metadata = getTopicMetadata(
-        topic1, Array(0, 1), 0, "localhost", 9092)
+    val topic1Metadata =
+      getTopicMetadata(topic1, Array(0, 1), 0, "localhost", 9092)
     val topicPartitionInfos =
       new collection.mutable.HashMap[String, TopicMetadata]
     topicPartitionInfos.put("topic1", topic1Metadata)
@@ -551,8 +583,9 @@ class AsyncProducerTest {
 
   def getProduceData(nEvents: Int): Seq[KeyedMessage[String, String]] = {
     val producerDataList = new ArrayBuffer[KeyedMessage[String, String]]
-    for (i <- 0 until nEvents) producerDataList.append(
-        new KeyedMessage[String, String]("topic1", null, "msg" + i))
+    for (i <- 0 until nEvents)
+      producerDataList.append(
+          new KeyedMessage[String, String]("topic1", null, "msg" + i))
     producerDataList
   }
 
@@ -583,12 +616,11 @@ class AsyncProducerTest {
                                                Message.MagicValue_V1)): _*)
   }
 
-  def messagesToSet(
-      key: Array[Byte], messages: Seq[Array[Byte]]): ByteBufferMessageSet = {
+  def messagesToSet(key: Array[Byte],
+                    messages: Seq[Array[Byte]]): ByteBufferMessageSet = {
     new ByteBufferMessageSet(
         NoCompressionCodec,
-        messages.map(
-            m =>
+        messages.map(m =>
               new Message(key = key,
                           bytes = m,
                           timestamp = 0L,

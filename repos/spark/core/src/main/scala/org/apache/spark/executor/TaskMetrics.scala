@@ -45,7 +45,7 @@ import org.apache.spark.storage.{BlockId, BlockStatus}
   *                      these requirements.
   */
 @DeveloperApi
-class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
+class TaskMetrics private[spark] (initialAccums: Seq[Accumulator[_]])
     extends Serializable {
   import InternalAccumulator._
 
@@ -91,8 +91,8 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
   private val _diskBytesSpilled = getAccum(DISK_BYTES_SPILLED)
   private val _peakExecutionMemory = getAccum(PEAK_EXECUTION_MEMORY)
   private val _updatedBlockStatuses =
-    TaskMetrics.getAccum[Seq[(BlockId, BlockStatus)]](
-        initialAccumsMap, UPDATED_BLOCK_STATUSES)
+    TaskMetrics.getAccum[Seq[(BlockId, BlockStatus)]](initialAccumsMap,
+                                                      UPDATED_BLOCK_STATUSES)
 
   /**
     * Time taken on the executor to deserialize this task.
@@ -399,8 +399,8 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
   * UnsupportedOperationException, we choose not to do so because the overrides would quickly become
   * out-of-date when new metrics are added.
   */
-private[spark] class ListenerTaskMetrics(
-    initialAccums: Seq[Accumulator[_]], accumUpdates: Seq[AccumulableInfo])
+private[spark] class ListenerTaskMetrics(initialAccums: Seq[Accumulator[_]],
+                                         accumUpdates: Seq[AccumulableInfo])
     extends TaskMetrics(initialAccums) {
 
   override def accumulatorUpdates(): Seq[AccumulableInfo] = accumUpdates
@@ -417,8 +417,8 @@ private[spark] object TaskMetrics extends Logging {
   /**
     * Get an accumulator from the given map by name, assuming it exists.
     */
-  def getAccum[T](
-      accumMap: Map[String, Accumulator[_]], name: String): Accumulator[T] = {
+  def getAccum[T](accumMap: Map[String, Accumulator[_]],
+                  name: String): Accumulator[T] = {
     require(accumMap.contains(name), s"metric '$name' is missing")
     val accum = accumMap(name)
     try {
@@ -426,8 +426,8 @@ private[spark] object TaskMetrics extends Logging {
       accum.asInstanceOf[Accumulator[T]]
     } catch {
       case e: ClassCastException =>
-        throw new SparkException(
-            s"accumulator $name was of unexpected type", e)
+        throw new SparkException(s"accumulator $name was of unexpected type",
+                                 e)
     }
   }
 

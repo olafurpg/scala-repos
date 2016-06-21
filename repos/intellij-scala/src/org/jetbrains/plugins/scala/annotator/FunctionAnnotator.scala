@@ -19,8 +19,8 @@ trait FunctionAnnotator {
                        typeAware: Boolean) {
     if (!function.hasExplicitType && !function.returnTypeIsDefined) {
       function.recursiveReferences.foreach { ref =>
-        val message = ScalaBundle.message(
-            "function.recursive.need.result.type", function.name)
+        val message = ScalaBundle
+          .message("function.recursive.need.result.type", function.name)
         holder.createErrorAnnotation(ref.element, message)
       }
     }
@@ -96,8 +96,8 @@ trait FunctionAnnotator {
       }
 
       def needsTypeAnnotation() = {
-        val message = ScalaBundle.message(
-            "function.must.define.type.explicitly", function.name)
+        val message = ScalaBundle
+          .message("function.must.define.type.explicitly", function.name)
         val returnTypes =
           function.returnUsages(withBooleanInfix = false).toSeq.collect {
             case retStmt: ScReturnStmt =>
@@ -106,23 +106,26 @@ trait FunctionAnnotator {
           }
         val lub = Bounds.lub(returnTypes)
         val annotation = holder.createErrorAnnotation(
-            usage.asInstanceOf[ScReturnStmt].returnKeyword, message)
+            usage.asInstanceOf[ScReturnStmt].returnKeyword,
+            message)
         annotation.registerFix(new AddReturnTypeFix(function, lub))
       }
 
       def redundantReturnExpression() = {
-        val message = ScalaBundle.message(
-            "return.expression.is.redundant", usageType.presentableText)
+        val message = ScalaBundle
+          .message("return.expression.is.redundant", usageType.presentableText)
         holder.createWarningAnnotation(
-            usage.asInstanceOf[ScReturnStmt].expr.get, message)
+            usage.asInstanceOf[ScReturnStmt].expr.get,
+            message)
       }
 
       def typeMismatch() {
         if (typeAware) {
           val (usageTypeText, functionTypeText) =
             ScTypePresentation.different(usageType, functionType)
-          val message = ScalaBundle.message(
-              "type.mismatch.found.required", usageTypeText, functionTypeText)
+          val message = ScalaBundle.message("type.mismatch.found.required",
+                                            usageTypeText,
+                                            functionTypeText)
           val returnExpression =
             if (explicitReturn) usage.asInstanceOf[ScReturnStmt].expr else None
           val expr = returnExpression.getOrElse(usage) match {

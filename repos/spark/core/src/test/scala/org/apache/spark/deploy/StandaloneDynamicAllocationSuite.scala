@@ -61,8 +61,8 @@ class StandaloneDynamicAllocationSuite
     masterRpcEnv =
       RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
-      RpcEnv.create(
-          Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
+      RpcEnv
+        .create(Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
     }
     master = makeMaster()
     workers = makeWorkers(10, 2048)
@@ -483,8 +483,8 @@ class StandaloneDynamicAllocationSuite
 
   /** Make a master to which our application will send executor requests. */
   private def makeMaster(): Master = {
-    val master = new Master(
-        masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
+    val master =
+      new Master(masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
     masterRpcEnv.setupEndpoint(Master.ENDPOINT_NAME, master)
     master
   }
@@ -529,8 +529,9 @@ class StandaloneDynamicAllocationSuite
   }
 
   /** Kill the given executor, specifying whether to force kill it. */
-  private def killExecutor(
-      sc: SparkContext, executorId: String, force: Boolean): Boolean = {
+  private def killExecutor(sc: SparkContext,
+                           executorId: String,
+                           force: Boolean): Boolean = {
     syncExecutors(sc)
     sc.schedulerBackend match {
       case b: CoarseGrainedSchedulerBackend =>

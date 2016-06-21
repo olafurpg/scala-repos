@@ -44,21 +44,24 @@ class Migration @Inject()(store: PersistentStore,
         new MigrationTo0_11(groupRepo, appRepo).migrateApps().recover {
           case NonFatal(e) =>
             throw new MigrationFailedException(
-                "while migrating storage to 0.11", e)
+                "while migrating storage to 0.11",
+                e)
         }
       },
       StorageVersions(0, 13, 0) -> { () =>
         new MigrationTo0_13(taskRepo, store).migrate().recover {
           case NonFatal(e) =>
             throw new MigrationFailedException(
-                "while migrating storage to 0.13", e)
+                "while migrating storage to 0.13",
+                e)
         }
       },
       StorageVersions(0, 16, 0) -> { () =>
         new MigrationTo0_16(groupRepo, appRepo).migrate().recover {
           case NonFatal(e) =>
             throw new MigrationFailedException(
-                "while migrating storage to 0.16", e)
+                "while migrating storage to 0.16",
+                e)
         }
       }
   )
@@ -77,7 +80,7 @@ class Migration @Inject()(store: PersistentStore,
           resultsFuture.flatMap { res =>
             log.info(
                 s"Migration for storage: ${from.str} to current: ${current.str}: " +
-                s"apply change for version: ${migrateVersion.str} "
+                  s"apply change for version: ${migrateVersion.str} "
             )
             change.apply().map(_ => res :+ migrateVersion)
           }
@@ -136,8 +139,8 @@ class Migration @Inject()(store: PersistentStore,
   * * Add version info to the AppDefinition by looking at all saved versions.
   * * Make the groupRepository the ultimate source of truth for the latest app version.
   */
-class MigrationTo0_11(
-    groupRepository: GroupRepository, appRepository: AppRepository) {
+class MigrationTo0_11(groupRepository: GroupRepository,
+                      appRepository: AppRepository) {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   def migrateApps(): Future[Unit] = {
@@ -157,11 +160,12 @@ class MigrationTo0_11(
   }
 
   private[this] def storeUpdatedAppsInRootGroup(
-      rootGroup: Group, updatedApps: Iterable[AppDefinition]): Future[Unit] = {
+      rootGroup: Group,
+      updatedApps: Iterable[AppDefinition]): Future[Unit] = {
     val updatedGroup = updatedApps.foldLeft(rootGroup) {
       (updatedGroup, updatedApp) =>
-        updatedGroup.updateApp(
-            updatedApp.id, _ => updatedApp, updatedApp.version)
+        updatedGroup.updateApp(updatedApp.id, _ =>
+              updatedApp, updatedApp.version)
     }
     groupRepository
       .store(groupRepository.zkRootName, updatedGroup)
@@ -188,7 +192,8 @@ class MigrationTo0_11(
   }
 
   private[this] def addVersionInfo(
-      id: PathId, appInGroup: AppDefinition): Future[Option[AppDefinition]] = {
+      id: PathId,
+      appInGroup: AppDefinition): Future[Option[AppDefinition]] = {
     def addVersionInfoToVersioned(
         maybeLastApp: Option[AppDefinition],
         nextVersion: Timestamp,
@@ -209,8 +214,8 @@ class MigrationTo0_11(
       }
     }
 
-    def loadApp(
-        id: PathId, version: Timestamp): Future[Option[AppDefinition]] = {
+    def loadApp(id: PathId,
+                version: Timestamp): Future[Option[AppDefinition]] = {
       if (appInGroup.version == version) {
         Future.successful(Some(appInGroup))
       } else {
@@ -230,8 +235,9 @@ class MigrationTo0_11(
           for {
             maybeLastApp <- maybeLastAppFuture
             maybeNextApp <- loadApp(id, nextVersion)
-            withVersionInfo = addVersionInfoToVersioned(
-                maybeLastApp, nextVersion, maybeNextApp)
+            withVersionInfo = addVersionInfoToVersioned(maybeLastApp,
+                                                        nextVersion,
+                                                        maybeNextApp)
             storedResult <- withVersionInfo
                              .map((newApp: AppDefinition) =>
                                    appRepository.store(newApp).map(Some(_)))
@@ -249,8 +255,8 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
 
   // the bytes stored via TaskTracker are incompatible to EntityRepo, so we have to parse them 'manually'
   def fetchLegacyTask(taskKey: String): Future[Option[MarathonTask]] = {
-    def deserialize(
-        taskKey: String, source: ObjectInputStream): Option[MarathonTask] = {
+    def deserialize(taskKey: String,
+                    source: ObjectInputStream): Option[MarathonTask] = {
       if (source.available > 0) {
         try {
           val size = source.readInt
@@ -358,8 +364,8 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
   * * Save all apps, the logic in [[AppDefinition.toProto]] will save the new portDefinitions and skip the deprecated
   *   ports
   */
-class MigrationTo0_16(
-    groupRepository: GroupRepository, appRepository: AppRepository) {
+class MigrationTo0_16(groupRepository: GroupRepository,
+                      appRepository: AppRepository) {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   def migrate(): Future[Unit] = {

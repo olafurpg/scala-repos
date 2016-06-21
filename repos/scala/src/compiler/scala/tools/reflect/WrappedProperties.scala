@@ -39,7 +39,7 @@ trait WrappedProperties extends PropertiesTrait {
       val props = System.getProperties
       val it =
         props.stringPropertyNames().asScala.iterator map
-        (k => (k, props getProperty k)) filter (_._2 ne null)
+          (k => (k, props getProperty k)) filter (_._2 ne null)
       it.toList
     } getOrElse Nil
   }

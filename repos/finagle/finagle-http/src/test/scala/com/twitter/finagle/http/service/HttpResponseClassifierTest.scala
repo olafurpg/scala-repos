@@ -42,7 +42,9 @@ class HttpResponseClassifierTest extends FunSuite {
             ReqRep(Request("fail" -> "1"), rep(Status.Ok))))
 
     assert(!classifier.isDefinedAt(ReqRep(req, rep(Status.Ok))))
-    assert(ResponseClass.Success == classifier.applyOrElse(
-            ReqRep(req, rep(Status.Ok)), ResponseClassifier.Default))
+    assert(
+        ResponseClass.Success == classifier.applyOrElse(
+            ReqRep(req, rep(Status.Ok)),
+            ResponseClassifier.Default))
   }
 }

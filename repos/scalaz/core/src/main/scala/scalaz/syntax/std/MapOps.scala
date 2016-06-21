@@ -2,8 +2,8 @@ package scalaz
 package syntax
 package std
 
-final class MapOps[Map[_, _], BKC[_], K, A](self: Map[K, A])(
-    dict: scalaz.std.MapSubFunctions {
+final class MapOps[Map[_, _], BKC[_], K, A](
+    self: Map[K, A])(dict: scalaz.std.MapSubFunctions {
   type XMap[A, B] = Map[A, B]
   type BuildKeyConstraint[A] = BKC[A]
 }) {

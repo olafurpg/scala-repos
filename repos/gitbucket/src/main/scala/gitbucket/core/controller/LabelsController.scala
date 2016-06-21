@@ -29,21 +29,21 @@ trait LabelsControllerBase extends ControllerBase {
       "labelColor" -> trim(label("Color", text(required, color)))
   )(LabelForm.apply)
 
-  get("/:owner/:repository/issues/labels")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/issues/labels")(referrersOnly { repository =>
     html.list(getLabels(repository.owner, repository.name),
               countIssueGroupByLabels(repository.owner,
                                       repository.name,
                                       IssuesService.IssueSearchCondition(),
                                       Map.empty),
               repository,
-              hasWritePermission(
-                  repository.owner, repository.name, context.loginAccount))
+              hasWritePermission(repository.owner,
+                                 repository.name,
+                                 context.loginAccount))
   })
 
-  ajaxGet("/:owner/:repository/issues/labels/new")(
-      collaboratorsOnly { repository =>
-    html.edit(None, repository)
+  ajaxGet("/:owner/:repository/issues/labels/new")(collaboratorsOnly {
+    repository =>
+      html.edit(None, repository)
   })
 
   ajaxPost("/:owner/:repository/issues/labels/new", labelForm)(
@@ -59,8 +59,9 @@ trait LabelsControllerBase extends ControllerBase {
                                        IssuesService.IssueSearchCondition(),
                                        Map.empty),
                repository,
-               hasWritePermission(
-                   repository.owner, repository.name, context.loginAccount))
+               hasWritePermission(repository.owner,
+                                  repository.name,
+                                  context.loginAccount))
   })
 
   ajaxGet("/:owner/:repository/issues/labels/:labelId/edit")(
@@ -87,8 +88,9 @@ trait LabelsControllerBase extends ControllerBase {
                                        IssuesService.IssueSearchCondition(),
                                        Map.empty),
                repository,
-               hasWritePermission(
-                   repository.owner, repository.name, context.loginAccount))
+               hasWritePermission(repository.owner,
+                                  repository.name,
+                                  context.loginAccount))
   })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/delete")(
@@ -101,8 +103,9 @@ trait LabelsControllerBase extends ControllerBase {
     * Constraint for the identifier such as user name, repository name or page name.
     */
   private def labelName: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] =
       if (value.contains(',')) {
         Some(s"${name} contains invalid character.")
       } else if (value.startsWith("_") || value.startsWith("-")) {

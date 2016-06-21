@@ -130,8 +130,8 @@ object PathMatchers {
     */
   def rest: PathMatcher[String] = matcher(_.Rest)
 
-  def segmentFromString[T](
-      convert: Function[String, T], clazz: Class[T]): PathMatcher[T] =
+  def segmentFromString[T](convert: Function[String, T],
+                           clazz: Class[T]): PathMatcher[T] =
     matcher(_ ⇒ ScalaPathMatchers.Segment.map(convert(_)))(ClassTag(clazz))
 
   private def matcher[T: ClassTag](

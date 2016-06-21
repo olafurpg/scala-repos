@@ -75,8 +75,8 @@ trait Internals { self: Universe =>
       * }}}
       * @group TagInterop
       */
-    def typeTagToManifest[T: ClassTag](
-        mirror: Any, tag: Universe#TypeTag[T]): Manifest[T] =
+    def typeTagToManifest[T: ClassTag](mirror: Any,
+                                       tag: Universe#TypeTag[T]): Manifest[T] =
       throw new UnsupportedOperationException(
           "This universe does not support tag -> manifest conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
 
@@ -91,8 +91,8 @@ trait Internals { self: Universe =>
       * }}}
       * @group TagInterop
       */
-    def manifestToTypeTag[T](
-        mirror: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
+    def manifestToTypeTag[T](mirror: Any,
+                             manifest: Manifest[T]): Universe#TypeTag[T] =
       throw new UnsupportedOperationException(
           "This universe does not support manifest -> tag conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
 
@@ -111,8 +111,9 @@ trait Internals { self: Universe =>
     /** Substitute symbols in `to` for corresponding occurrences of references to
       *  symbols `from` in this type.
       */
-    def substituteSymbols(
-        tree: Tree, from: List[Symbol], to: List[Symbol]): Tree
+    def substituteSymbols(tree: Tree,
+                          from: List[Symbol],
+                          to: List[Symbol]): Tree
 
     /** Substitute types in `to` for corresponding occurrences of references to
       *  symbols `from` in this tree.
@@ -200,11 +201,11 @@ trait Internals { self: Universe =>
                       pos: Position = NoPosition,
                       flags: FlagSet = NoFlags): TermSymbol
 
-    def newModuleAndClassSymbol(owner: Symbol,
-                                name: Name,
-                                pos: Position = NoPosition,
-                                flags: FlagSet =
-                                  NoFlags): (ModuleSymbol, ClassSymbol)
+    def newModuleAndClassSymbol(
+        owner: Symbol,
+        name: Name,
+        pos: Position = NoPosition,
+        flags: FlagSet = NoFlags): (ModuleSymbol, ClassSymbol)
 
     def newMethodSymbol(owner: Symbol,
                         name: TermName,
@@ -310,8 +311,9 @@ trait Internals { self: Universe =>
 
     /** A creator for `RefinedType` types.
       */
-    def refinedType(
-        parents: List[Type], decls: Scope, clazz: Symbol): RefinedType
+    def refinedType(parents: List[Type],
+                    decls: Scope,
+                    clazz: Symbol): RefinedType
 
     /** A creator for `RefinedType` types.
       */
@@ -323,8 +325,10 @@ trait Internals { self: Universe =>
 
     /** A creator for `RefinedType` types.
       */
-    def refinedType(
-        parents: List[Type], owner: Symbol, decls: Scope, pos: Position): Type
+    def refinedType(parents: List[Type],
+                    owner: Symbol,
+                    decls: Scope,
+                    pos: Position): Type
 
     /** A creator for intersection type where intersections of a single type are
       *  replaced by the type itself.
@@ -341,8 +345,9 @@ trait Internals { self: Universe =>
 
     /** A creator for `ClassInfoType` types.
       */
-    def classInfoType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): ClassInfoType
+    def classInfoType(parents: List[Type],
+                      decls: Scope,
+                      typeSymbol: Symbol): ClassInfoType
 
     /** A creator for `MethodType` types.
       */
@@ -360,8 +365,8 @@ trait Internals { self: Universe =>
 
     /** A creator for `ExistentialType` types.
       */
-    def existentialType(
-        quantified: List[Symbol], underlying: Type): ExistentialType
+    def existentialType(quantified: List[Symbol],
+                        underlying: Type): ExistentialType
 
     /** A creator for existential types. This generates:
       *
@@ -386,8 +391,8 @@ trait Internals { self: Universe =>
 
     /** A creator for `AnnotatedType` types.
       */
-    def annotatedType(
-        annotations: List[Annotation], underlying: Type): AnnotatedType
+    def annotatedType(annotations: List[Annotation],
+                      underlying: Type): AnnotatedType
 
     /** A creator for `TypeBounds` types.
       */
@@ -407,7 +412,7 @@ trait Internals { self: Universe =>
     trait DecoratorApi {
 
       /** Extension methods for trees */
-      type TreeDecorator [T <: Tree] <: TreeDecoratorApi[T]
+      type TreeDecorator[T <: Tree] <: TreeDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       implicit def treeDecorator[T <: Tree](tree: T): TreeDecorator[T]
@@ -435,7 +440,7 @@ trait Internals { self: Universe =>
       }
 
       /** Extension methods for symbols */
-      type SymbolDecorator [T <: Symbol] <: SymbolDecoratorApi[T]
+      type SymbolDecorator[T <: Symbol] <: SymbolDecoratorApi[T]
 
       /** @see [[SymbolDecorator]] */
       implicit def symbolDecorator[T <: Symbol](symbol: T): SymbolDecorator[T]
@@ -506,7 +511,7 @@ trait Internals { self: Universe =>
       }
 
       /** Extension methods for types */
-      type TypeDecorator [T <: Type] <: TypeDecoratorApi[T]
+      type TypeDecorator[T <: Type] <: TypeDecoratorApi[T]
 
       /** @see [[TypeDecorator]] */
       implicit def typeDecorator[T <: Type](tp: T): TypeDecorator[T]
@@ -538,8 +543,9 @@ trait Internals { self: Universe =>
 
     /** Selects overloaded method symbol with given name and index
       */
-    def selectOverloadedMethod(
-        owner: Symbol, name: String, index: Int): MethodSymbol
+    def selectOverloadedMethod(owner: Symbol,
+                               name: String,
+                               index: Int): MethodSymbol
 
     /** A fresh symbol with given name `name`, position `pos` and flags `flags` that has
       *  the current symbol as its owner.
@@ -599,11 +605,13 @@ trait Internals { self: Universe =>
 
     def TypeRef(pre: Type, sym: Symbol, args: List[Type]): Type
 
-    def RefinedType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): RefinedType
+    def RefinedType(parents: List[Type],
+                    decls: Scope,
+                    typeSymbol: Symbol): RefinedType
 
-    def ClassInfoType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): ClassInfoType
+    def ClassInfoType(parents: List[Type],
+                      decls: Scope,
+                      typeSymbol: Symbol): ClassInfoType
 
     def MethodType(params: List[Symbol], resultType: Type): MethodType
 
@@ -611,11 +619,11 @@ trait Internals { self: Universe =>
 
     def PolyType(typeParams: List[Symbol], resultType: Type): PolyType
 
-    def ExistentialType(
-        quantified: List[Symbol], underlying: Type): ExistentialType
+    def ExistentialType(quantified: List[Symbol],
+                        underlying: Type): ExistentialType
 
-    def AnnotatedType(
-        annotations: List[Annotation], underlying: Type): AnnotatedType
+    def AnnotatedType(annotations: List[Annotation],
+                      underlying: Type): AnnotatedType
 
     def TypeBounds(lo: Type, hi: Type): TypeBounds
 
@@ -654,8 +662,8 @@ trait Internals { self: Universe =>
     val ImplicitParams: ImplicitParamsExtractor
 
     trait ImplicitParamsExtractor {
-      def apply(
-          paramss: List[List[Tree]], implparams: List[Tree]): List[List[Tree]]
+      def apply(paramss: List[List[Tree]],
+                implparams: List[Tree]): List[List[Tree]]
       def unapply(vparamss: List[List[ValDef]])
         : Some[(List[List[ValDef]], List[ValDef])]
     }
@@ -1207,14 +1215,14 @@ trait Internals { self: Universe =>
 
     /** @see [[InternalApi.typeTagToManifest]] */
     @deprecated("Use `internal.typeTagToManifest` instead", "2.11.0")
-    def typeTagToManifest[T: ClassTag](
-        mirror: Any, tag: Universe#TypeTag[T]): Manifest[T] =
+    def typeTagToManifest[T: ClassTag](mirror: Any,
+                                       tag: Universe#TypeTag[T]): Manifest[T] =
       internal.typeTagToManifest(mirror, tag)
 
     /** @see [[InternalApi.manifestToTypeTag]] */
     @deprecated("Use `internal.manifestToTypeTag` instead", "2.11.0")
-    def manifestToTypeTag[T](
-        mirror: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
+    def manifestToTypeTag[T](mirror: Any,
+                             manifest: Manifest[T]): Universe#TypeTag[T] =
       internal.manifestToTypeTag(mirror, manifest)
 
     /** @see [[InternalApi.newScopeWith]] */
@@ -1226,14 +1234,14 @@ trait Internals { self: Universe =>
     implicit class CompatibleBuildApi(api: BuildApi) {
 
       /** @see [[BuildApi.setInfo]] */
-      @deprecated(
-          "Use `internal.reificationSupport.setInfo` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.setInfo` instead",
+                  "2.11.0")
       def setTypeSignature[S <: Symbol](sym: S, tpe: Type): S =
         internal.reificationSupport.setInfo(sym, tpe)
 
       /** @see [[BuildApi.FlagsRepr]] */
-      @deprecated(
-          "Use `internal.reificationSupport.FlagsRepr` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.FlagsRepr` instead",
+                  "2.11.0")
       def flagsFromBits(bits: Long): FlagSet =
         internal.reificationSupport.FlagsRepr(bits)
 
@@ -1246,19 +1254,19 @@ trait Internals { self: Universe =>
       def This(sym: Symbol): Tree = internal.reificationSupport.mkThis(sym)
 
       /** @see [[BuildApi.mkSelect]] */
-      @deprecated(
-          "Use `internal.reificationSupport.mkSelect` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.mkSelect` instead",
+                  "2.11.0")
       def Select(qualifier: Tree, sym: Symbol): Select =
         internal.reificationSupport.mkSelect(qualifier, sym)
 
       /** @see [[BuildApi.mkIdent]] */
-      @deprecated(
-          "Use `internal.reificationSupport.mkIdent` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.mkIdent` instead",
+                  "2.11.0")
       def Ident(sym: Symbol): Ident = internal.reificationSupport.mkIdent(sym)
 
       /** @see [[BuildApi.mkTypeTree]] */
-      @deprecated(
-          "Use `internal.reificationSupport.mkTypeTree` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.mkTypeTree` instead",
+                  "2.11.0")
       def TypeTree(tp: Type): TypeTree =
         internal.reificationSupport.mkTypeTree(tp)
     }
@@ -1308,8 +1316,8 @@ trait Internals { self: Universe =>
       def isLocal: Boolean =
         symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol].isLocal
 
-      @deprecated(
-          "This API is unreliable. Use `overrides.nonEmpty` instead", "2.11.0")
+      @deprecated("This API is unreliable. Use `overrides.nonEmpty` instead",
+                  "2.11.0")
       def isOverride: Boolean =
         symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol].isOverride
 

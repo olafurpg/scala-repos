@@ -76,8 +76,7 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
     val convertedSQL = try new SQLBuilder(df).toSQL catch {
       case NonFatal(e) =>
-        fail(
-            s"""Cannot convert the following HiveQL query plan back to SQL query string:
+        fail(s"""Cannot convert the following HiveQL query plan back to SQL query string:
              |
              |# Original HiveQL query string:
              |$hiveQl
@@ -416,7 +415,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   }
 
   test("script transformation - alias list with type") {
-    checkHiveQl("""FROM
+    checkHiveQl(
+        """FROM
         |(FROM parquet_t1 SELECT TRANSFORM(key, value) USING 'cat' AS (thing1 int, thing2 string)) t
         |SELECT thing1 + 1
       """.stripMargin)
@@ -424,7 +424,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
   test(
       "script transformation - row format delimited clause with only one format property") {
-    checkHiveQl("""SELECT TRANSFORM (key) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+    checkHiveQl(
+        """SELECT TRANSFORM (key) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
         |USING 'cat' AS (tKey) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
         |FROM parquet_t1
       """.stripMargin)
@@ -432,7 +433,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
   test(
       "script transformation - row format delimited clause with multiple format properties") {
-    checkHiveQl("""SELECT TRANSFORM (key)
+    checkHiveQl(
+        """SELECT TRANSFORM (key)
         |ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\t'
         |USING 'cat' AS (tKey)
         |ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\t'
@@ -441,7 +443,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   }
 
   test("script transformation - row format serde clauses with SERDEPROPERTIES") {
-    checkHiveQl("""SELECT TRANSFORM (key, value)
+    checkHiveQl(
+        """SELECT TRANSFORM (key, value)
         |ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
         |WITH SERDEPROPERTIES('field.delim' = '|')
         |USING 'cat' AS (tKey, tValue)
@@ -453,7 +456,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
   test(
       "script transformation - row format serde clauses without SERDEPROPERTIES") {
-    checkHiveQl("""SELECT TRANSFORM (key, value)
+    checkHiveQl(
+        """SELECT TRANSFORM (key, value)
         |ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
         |USING 'cat' AS (tKey, tValue)
         |ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
@@ -547,14 +551,16 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
          |SELECT key, value, ROUND(AVG(key) OVER (), 2)
          |FROM parquet_t1 ORDER BY key
       """.stripMargin)
-    checkHiveQl("""
+    checkHiveQl(
+        """
          |SELECT value, MAX(key + 1) OVER (PARTITION BY key % 5 ORDER BY key % 7) AS max
          |FROM parquet_t1
       """.stripMargin)
   }
 
   test("multiple window functions in one expression") {
-    checkHiveQl("""
+    checkHiveQl(
+        """
         |SELECT
         |  MAX(key) OVER (ORDER BY key DESC, value) / MIN(key) OVER (PARTITION BY key % 3)
         |FROM parquet_t1
@@ -581,7 +587,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   }
 
   test("window with the same window specification with aggregate + having") {
-    checkHiveQl("""
+    checkHiveQl(
+        """
          |SELECT key, value,
          |MAX(value) OVER (PARTITION BY key % 5 ORDER BY key DESC) AS max
          |FROM parquet_t1 GROUP BY key, value HAVING key > 5
@@ -597,7 +604,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   }
 
   test("window with the same window specification with aggregate") {
-    checkHiveQl("""
+    checkHiveQl(
+        """
          |SELECT key, value,
          |DENSE_RANK() OVER (DISTRIBUTE BY key SORT BY key, value) AS dr,
          |COUNT(key)
@@ -607,7 +615,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
   test(
       "window with the same window specification without aggregate and filter") {
-    checkHiveQl("""
+    checkHiveQl(
+        """
          |SELECT key, value,
          |DENSE_RANK() OVER (DISTRIBUTE BY key SORT BY key, value) AS dr,
          |COUNT(key) OVER(DISTRIBUTE BY key SORT BY key, value) AS ca
@@ -616,7 +625,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   }
 
   test("window clause") {
-    checkHiveQl("""
+    checkHiveQl(
+        """
          |SELECT key, MAX(value) OVER w1 AS MAX, MIN(value) OVER w2 AS min
          |FROM parquet_t1
          |WINDOW w1 AS (PARTITION BY key % 5 ORDER BY key), w2 AS (PARTITION BY key % 6)
@@ -640,7 +650,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   }
 
   test("window with join") {
-    checkHiveQl("""
+    checkHiveQl(
+        """
         |SELECT x.key, MAX(y.key) OVER (PARTITION BY x.key % 5 ORDER BY x.key)
         |FROM parquet_t1 x JOIN parquet_t1 y ON x.key = y.key
       """.stripMargin)

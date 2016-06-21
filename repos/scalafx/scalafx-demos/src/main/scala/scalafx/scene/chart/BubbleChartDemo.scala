@@ -37,10 +37,10 @@ object BubbleChartDemo extends JFXApp {
   stage = new JFXApp.PrimaryStage {
     title = "BubbleChartDemo"
     scene = new Scene {
-      val xAxis = NumberAxis(
-          "X", lowerBound = 0, upperBound = 150, tickUnit = 20)
-      val yAxis = NumberAxis(
-          "Y", lowerBound = 0, upperBound = 150, tickUnit = 20)
+      val xAxis =
+        NumberAxis("X", lowerBound = 0, upperBound = 150, tickUnit = 20)
+      val yAxis =
+        NumberAxis("Y", lowerBound = 0, upperBound = 150, tickUnit = 20)
       root = new BubbleChart(xAxis, yAxis) {
         title = "Bubble Chart"
         legendSide = Side.Right
@@ -66,8 +66,7 @@ object BubbleChartDemo extends JFXApp {
   def xyrSeries(name: String, data: Seq[(Int, Int, Int)]) =
     XYChart.Series[Number, Number](
         name,
-        ObservableBuffer(
-            data.map {
+        ObservableBuffer(data.map {
           case (x, y, r) => XYChart.Data[Number, Number](x, y, r)
         })
     )

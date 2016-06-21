@@ -55,8 +55,8 @@ object ImportZkOffsets extends Logging {
     parser.accepts("help", "Print this message.")
 
     if (args.length == 0)
-      CommandLineUtils.printUsageAndDie(
-          parser, "Import offsets to zookeeper from files.")
+      CommandLineUtils
+        .printUsageAndDie(parser, "Import offsets to zookeeper from files.")
 
     val options = parser.parse(args: _*)
 
@@ -70,8 +70,8 @@ object ImportZkOffsets extends Logging {
     val zkConnect = options.valueOf(zkConnectOpt)
     val partitionOffsetFile = options.valueOf(inFileOpt)
 
-    val zkUtils = ZkUtils(
-        zkConnect, 30000, 30000, JaasUtils.isZkSecurityEnabled())
+    val zkUtils =
+      ZkUtils(zkConnect, 30000, 30000, JaasUtils.isZkSecurityEnabled())
     val partitionOffsets: Map[String, String] = getPartitionOffsetsFromFile(
         partitionOffsetFile)
 
@@ -97,8 +97,8 @@ object ImportZkOffsets extends Logging {
     partOffsetsMap
   }
 
-  private def updateZkOffsets(
-      zkUtils: ZkUtils, partitionOffsets: Map[String, String]): Unit = {
+  private def updateZkOffsets(zkUtils: ZkUtils,
+                              partitionOffsets: Map[String, String]): Unit = {
     for ((partition, offset) <- partitionOffsets) {
       debug("updating [" + partition + "] with offset [" + offset + "]")
 

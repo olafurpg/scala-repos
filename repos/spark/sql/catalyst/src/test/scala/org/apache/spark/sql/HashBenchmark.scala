@@ -35,12 +35,13 @@ object HashBenchmark {
     val attrs = schema.toAttributes
     val safeProjection = GenerateSafeProjection.generate(attrs, attrs)
 
-    val rows = (1 to numRows)
-      .map(_ =>
-            // The output of encoder is UnsafeRow, use safeProjection to turn in into safe format.
-            safeProjection(encoder.toRow(generator().asInstanceOf[Row]))
-              .copy())
-      .toArray
+    val rows =
+      (1 to numRows)
+        .map(_ =>
+              // The output of encoder is UnsafeRow, use safeProjection to turn in into safe format.
+              safeProjection(encoder.toRow(generator().asInstanceOf[Row]))
+                .copy())
+        .toArray
 
     val benchmark = new Benchmark("Hash For " + name, iters * numRows)
     benchmark.addCase("interpreted version") { _: Int =>

@@ -65,12 +65,11 @@ case class StaticInvoke(staticObject: Class[_],
     val argString = argGen.map(_.value).mkString(", ")
 
     if (propagateNull) {
-      val objNullCheck =
-        if (ctx.defaultValue(dataType) == "null") {
-          s"${ev.isNull} = ${ev.value} == null;"
-        } else {
-          ""
-        }
+      val objNullCheck = if (ctx.defaultValue(dataType) == "null") {
+        s"${ev.isNull} = ${ev.value} == null;"
+      } else {
+        ""
+      }
 
       val argsNonNull = s"!(${argGen.map(_.isNull).mkString(" || ")})"
       s"""
@@ -165,12 +164,11 @@ case class Invoke(targetObject: Expression,
 
     // If the function can return null, we do an extra check to make sure our null bit is still set
     // correctly.
-    val objNullCheck =
-      if (ctx.defaultValue(dataType) == "null") {
-        s"${ev.isNull} = ${ev.value} == null;"
-      } else {
-        ""
-      }
+    val objNullCheck = if (ctx.defaultValue(dataType) == "null") {
+      s"${ev.isNull} = ${ev.value} == null;"
+    } else {
+      ""
+    }
 
     val value = unboxer(s"${obj.value}.$functionName($argString)")
 
@@ -483,22 +481,20 @@ case class MapObjects private (loopVar: LambdaVariable,
     // Because of the way Java defines nested arrays, we have to handle the syntax specially.
     // Specifically, we have to insert the [$dataLength] in between the type and any extra nested
     // array declarations (i.e. new String[1][]).
-    val arrayConstructor =
-      if (convertedType contains "[]") {
-        val rawType = convertedType.takeWhile(_ != '[')
-        val arrayPart =
-          convertedType.reverse.takeWhile(c => c == '[' || c == ']').reverse
-        s"new $rawType[$dataLength]$arrayPart"
-      } else {
-        s"new $convertedType[$dataLength]"
-      }
+    val arrayConstructor = if (convertedType contains "[]") {
+      val rawType = convertedType.takeWhile(_ != '[')
+      val arrayPart =
+        convertedType.reverse.takeWhile(c => c == '[' || c == ']').reverse
+      s"new $rawType[$dataLength]$arrayPart"
+    } else {
+      s"new $convertedType[$dataLength]"
+    }
 
-    val loopNullCheck =
-      if (primitiveElement) {
-        s"boolean ${loopVar.isNull} = ${genInputData.value}.isNullAt($loopIndex);"
-      } else {
-        s"boolean ${loopVar.isNull} = ${genInputData.isNull} || ${loopVar.value} == null;"
-      }
+    val loopNullCheck = if (primitiveElement) {
+      s"boolean ${loopVar.isNull} = ${genInputData.value}.isNullAt($loopIndex);"
+    } else {
+      s"boolean ${loopVar.isNull} = ${genInputData.isNull} || ${loopVar.value} == null;"
+    }
 
     s"""
       ${genInputData.code}
@@ -624,8 +620,9 @@ case class EncodeUsingSerializer(child: Expression, kryo: Boolean)
   * is not an implicit parameter because TreeNode cannot copy implicit parameters.
   * @param kryo if true, use Kryo. Otherwise, use Java.
   */
-case class DecodeUsingSerializer[T](
-    child: Expression, tag: ClassTag[T], kryo: Boolean)
+case class DecodeUsingSerializer[T](child: Expression,
+                                    tag: ClassTag[T],
+                                    kryo: Boolean)
     extends UnaryExpression
     with NonSQLExpression {
 
@@ -666,8 +663,8 @@ case class DecodeUsingSerializer[T](
 /**
   * Initialize a Java Bean instance by setting its field values via setters.
   */
-case class InitializeJavaBean(
-    beanInstance: Expression, setters: Map[String, Expression])
+case class InitializeJavaBean(beanInstance: Expression,
+                              setters: Map[String, Expression])
     extends Expression
     with NonSQLExpression {
 
@@ -728,10 +725,10 @@ case class AssertNotNull(child: Expression, walkedTypePath: Seq[String])
 
     val errMsg =
       "Null value appeared in non-nullable field:" +
-      walkedTypePath.mkString("\n", "\n", "\n") +
-      "If the schema is inferred from a Scala tuple/case class, or a Java bean, " +
-      "please try to use scala.Option[_] or other nullable types " +
-      "(e.g. java.lang.Integer instead of int/scala.Int)."
+        walkedTypePath.mkString("\n", "\n", "\n") +
+        "If the schema is inferred from a Scala tuple/case class, or a Java bean, " +
+        "please try to use scala.Option[_] or other nullable types " +
+        "(e.g. java.lang.Integer instead of int/scala.Int)."
     val idx = ctx.references.length
     ctx.references += errMsg
 

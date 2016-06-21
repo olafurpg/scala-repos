@@ -73,7 +73,8 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
 
     assert(client.ketamaNodeGrp().size == 2)
     assert(client.ketamaNodeGrp().map(_._1) == Set(
-            KetamaClientKey(key1.toString), KetamaClientKey(key2.toString)))
+            KetamaClientKey(key1.toString),
+            KetamaClientKey(key2.toString)))
 
     Await.result(client.delete("foo"))
     assert(Await.result(client.get("foo")) == None)
@@ -98,8 +99,8 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
 
   test("using custom keys doesn't blow up") {
     val client = KetamaClientBuilder()
-      .nodes("localhost:%d:1:key1,localhost:%d:1:key2".format(
-              address1.getPort, address2.getPort))
+      .nodes("localhost:%d:1:key1,localhost:%d:1:key2"
+            .format(address1.getPort, address2.getPort))
       .build()
 
     Await.result(client.delete("foo"))

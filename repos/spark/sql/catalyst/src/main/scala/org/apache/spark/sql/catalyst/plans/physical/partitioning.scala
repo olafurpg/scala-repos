@@ -54,8 +54,8 @@ case class ClusteredDistribution(clustering: Seq[Expression])
   require(
       clustering != Nil,
       "The clustering expressions of a ClusteredDistribution should not be Nil. " +
-      "An AllTuples should be used to represent a distribution that only has " +
-      "a single partition.")
+        "An AllTuples should be used to represent a distribution that only has " +
+        "a single partition.")
 }
 
 /**
@@ -69,8 +69,8 @@ case class OrderedDistribution(ordering: Seq[SortOrder]) extends Distribution {
   require(
       ordering != Nil,
       "The ordering expressions of a OrderedDistribution should not be Nil. " +
-      "An AllTuples should be used to represent a distribution that only has " +
-      "a single partition.")
+        "An AllTuples should be used to represent a distribution that only has " +
+        "a single partition.")
 
   // TODO: This is not really valid...
   def clustering: Set[Expression] = ordering.map(_.child).toSet

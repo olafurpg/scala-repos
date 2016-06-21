@@ -88,8 +88,8 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
       else {
         val path = s.substring(0, n)
         new ProtectionDomain(
-            new CodeSource(
-                new URL(path), null.asInstanceOf[Array[Certificate]]),
+            new CodeSource(new URL(path),
+                           null.asInstanceOf[Array[Certificate]]),
             null,
             this,
             null)
@@ -126,8 +126,8 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
                                                     classOf[URL],
                                                     classOf[ClassLoader])
           ctor.setAccessible(true)
-          ctor.newInstance(
-              name, null, null, null, null, null, null, null, this)
+          ctor
+            .newInstance(name, null, null, null, null, null, null, null, this)
         })
     }
 

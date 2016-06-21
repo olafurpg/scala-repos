@@ -33,7 +33,7 @@ import org.apache.spark.{SparkContext, SparkJobInfo, SparkStageInfo}
   *
   * NOTE: this class's constructor should be considered private and may be subject to change.
   */
-class JavaSparkStatusTracker private[spark](sc: SparkContext) {
+class JavaSparkStatusTracker private[spark] (sc: SparkContext) {
 
   /**
     * Return a list of all known jobs in a particular job group.  If `jobGroup` is `null`, then

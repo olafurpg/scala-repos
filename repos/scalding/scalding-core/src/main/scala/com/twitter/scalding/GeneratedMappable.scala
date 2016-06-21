@@ -125,8 +125,8 @@ trait Mappable19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
         Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]] {
   def converter[
       Z >: Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]] =
-    TupleConverter.asSuperConverter(TupleConverter.of[Tuple19[
-                A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]])
+    TupleConverter.asSuperConverter(TupleConverter.of[
+            Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]])
 }
 
 trait Mappable20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
@@ -152,15 +152,73 @@ trait Mappable20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
                              R,
                              S,
                              T]] =
-    TupleConverter.asSuperConverter(TupleConverter.of[Tuple20[
-                A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]])
+    TupleConverter.asSuperConverter(
+        TupleConverter.of[Tuple20[A,
+                                  B,
+                                  C,
+                                  D,
+                                  E,
+                                  F,
+                                  G,
+                                  H,
+                                  I,
+                                  J,
+                                  K,
+                                  L,
+                                  M,
+                                  N,
+                                  O,
+                                  P,
+                                  Q,
+                                  R,
+                                  S,
+                                  T]])
 }
 
 trait Mappable21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
-    extends Mappable[Tuple21[
-            A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] {
-  def converter[Z >: Tuple21[
-          A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] =
+    extends Mappable[
+        Tuple21[A,
+                B,
+                C,
+                D,
+                E,
+                F,
+                G,
+                H,
+                I,
+                J,
+                K,
+                L,
+                M,
+                N,
+                O,
+                P,
+                Q,
+                R,
+                S,
+                T,
+                U]] {
+  def converter[Z >: Tuple21[A,
+                             B,
+                             C,
+                             D,
+                             E,
+                             F,
+                             G,
+                             H,
+                             I,
+                             J,
+                             K,
+                             L,
+                             M,
+                             N,
+                             O,
+                             P,
+                             Q,
+                             R,
+                             S,
+                             T,
+                             U]] =
     TupleConverter.asSuperConverter(
         TupleConverter.of[Tuple21[A,
                                   B,
@@ -210,8 +268,29 @@ trait Mappable22[
                 T,
                 U,
                 V]] {
-  def converter[Z >: Tuple22[
-          A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]] =
+  def converter[
+      Z >: Tuple22[A,
+                   B,
+                   C,
+                   D,
+                   E,
+                   F,
+                   G,
+                   H,
+                   I,
+                   J,
+                   K,
+                   L,
+                   M,
+                   N,
+                   O,
+                   P,
+                   Q,
+                   R,
+                   S,
+                   T,
+                   U,
+                   V]] =
     TupleConverter.asSuperConverter(
         TupleConverter.of[Tuple22[A,
                                   B,

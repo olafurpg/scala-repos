@@ -151,8 +151,8 @@ abstract class QueryTest extends PlanTest {
     checkAnswer(df, Seq(expectedAnswer))
   }
 
-  protected def checkAnswer(
-      df: => DataFrame, expectedAnswer: DataFrame): Unit = {
+  protected def checkAnswer(df: => DataFrame,
+                            expectedAnswer: DataFrame): Unit = {
     checkAnswer(df, expectedAnswer.collect())
   }
 
@@ -162,8 +162,9 @@ abstract class QueryTest extends PlanTest {
     * @param expectedAnswer the expected result in a [[Seq]] of [[Row]]s.
     * @param absTol the absolute tolerance between actual and expected answers.
     */
-  protected def checkAggregatesWithTol(
-      dataFrame: DataFrame, expectedAnswer: Seq[Row], absTol: Double): Unit = {
+  protected def checkAggregatesWithTol(dataFrame: DataFrame,
+                                       expectedAnswer: Seq[Row],
+                                       absTol: Double): Unit = {
     // TODO: catch exceptions in data frame execution
     val actualAnswer = dataFrame.collect()
     require(
@@ -176,8 +177,9 @@ abstract class QueryTest extends PlanTest {
     }
   }
 
-  protected def checkAggregatesWithTol(
-      dataFrame: DataFrame, expectedAnswer: Row, absTol: Double): Unit = {
+  protected def checkAggregatesWithTol(dataFrame: DataFrame,
+                                       expectedAnswer: Row,
+                                       absTol: Double): Unit = {
     checkAggregatesWithTol(dataFrame, Seq(expectedAnswer), absTol)
   }
 
@@ -194,7 +196,7 @@ abstract class QueryTest extends PlanTest {
     assert(
         cachedData.size == numCachedTables,
         s"Expected query to contain $numCachedTables, but it actually had ${cachedData.size}\n" +
-        planWithCaching)
+          planWithCaching)
   }
 
   private def checkJsonFormat(df: DataFrame): Unit = {
@@ -279,11 +281,10 @@ abstract class QueryTest extends PlanTest {
     assert(inMemoryRelations.isEmpty)
 
     if (normalized1 != normalized2) {
-      fail(
-          s"""
+      fail(s"""
            |== FAIL: the logical plan parsed from json does not match the original one ===
            |${sideBySide(logicalPlan.treeString, normalized2.treeString)
-           .mkString("\n")}
+            .mkString("\n")}
           """.stripMargin)
     }
   }
@@ -351,8 +352,7 @@ object QueryTest {
 
   // We need to call prepareRow recursively to handle schemas with struct types.
   def prepareRow(row: Row): Row = {
-    Row.fromSeq(
-        row.toSeq.map {
+    Row.fromSeq(row.toSeq.map {
       case null => null
       case d: java.math.BigDecimal => BigDecimal(d)
       // Convert array to Seq for easy equality check.
@@ -365,16 +365,18 @@ object QueryTest {
   def sameRows(expectedAnswer: Seq[Row],
                sparkAnswer: Seq[Row],
                isSorted: Boolean = false): Option[String] = {
-    if (prepareAnswer(expectedAnswer, isSorted) != prepareAnswer(
-            sparkAnswer, isSorted)) {
+    if (prepareAnswer(expectedAnswer, isSorted) != prepareAnswer(sparkAnswer,
+                                                                 isSorted)) {
       val errorMessage =
         s"""
          |== Results ==
          |${sideBySide(
                s"== Correct Answer - ${expectedAnswer.size} ==" +: prepareAnswer(
-                   expectedAnswer, isSorted).map(_.toString()),
+                   expectedAnswer,
+                   isSorted).map(_.toString()),
                s"== Spark Answer - ${sparkAnswer.size} ==" +: prepareAnswer(
-                   sparkAnswer, isSorted).map(_.toString())).mkString("\n")}
+                   sparkAnswer,
+                   isSorted).map(_.toString())).mkString("\n")}
         """.stripMargin
       return Some(errorMessage)
     }
@@ -387,11 +389,12 @@ object QueryTest {
     * @param expectedAnswer the expected result in a[[Row]].
     * @param absTol the absolute tolerance between actual and expected answers.
     */
-  protected def checkAggregatesWithTol(
-      actualAnswer: Row, expectedAnswer: Row, absTol: Double) = {
+  protected def checkAggregatesWithTol(actualAnswer: Row,
+                                       expectedAnswer: Row,
+                                       absTol: Double) = {
     require(actualAnswer.length == expectedAnswer.length,
             s"actual answer length ${actualAnswer.length} != " +
-            s"expected answer length ${expectedAnswer.length}")
+              s"expected answer length ${expectedAnswer.length}")
 
     // TODO: support other numeric types besides Double
     // TODO: support struct types?

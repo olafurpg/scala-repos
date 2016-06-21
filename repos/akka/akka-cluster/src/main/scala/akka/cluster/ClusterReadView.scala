@@ -34,8 +34,8 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
     * Current internal cluster stats, updated periodically via event bus.
     */
   @volatile
-  private var _latestStats = CurrentInternalStats(
-      GossipStats(), VectorClockStats())
+  private var _latestStats =
+    CurrentInternalStats(GossipStats(), VectorClockStats())
 
   /**
     * Current cluster metrics, updated periodically via event bus.

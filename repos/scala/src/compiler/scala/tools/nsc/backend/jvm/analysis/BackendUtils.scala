@@ -68,15 +68,15 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       size(method) < sourceValueSizeLimit
   }
 
-  class ProdConsAnalyzer(
-      val methodNode: MethodNode, classInternalName: InternalName)
+  class ProdConsAnalyzer(val methodNode: MethodNode,
+                         classInternalName: InternalName)
       extends AsmAnalyzer(methodNode,
                           classInternalName,
                           new Analyzer(new InitialProducerSourceInterpreter))
       with ProdConsAnalyzerImpl
 
-  class NonLubbingTypeFlowAnalyzer(
-      val methodNode: MethodNode, classInternalName: InternalName)
+  class NonLubbingTypeFlowAnalyzer(val methodNode: MethodNode,
+                                   classInternalName: InternalName)
       extends AsmAnalyzer(methodNode,
                           classInternalName,
                           new Analyzer(new NonLubbingTypeFlowInterpreter))
@@ -112,8 +112,9 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
                               null)
       mv.visitCode()
       mv.visitVarInsn(ALOAD, 0)
-      mv.visitInvokeDynamicInsn(
-          "lambdaDeserialize", serlamObjDesc, lambdaDeserializeBootstrapHandle)
+      mv.visitInvokeDynamicInsn("lambdaDeserialize",
+                                serlamObjDesc,
+                                lambdaDeserializeBootstrapHandle)
       mv.visitInsn(ARETURN)
       mv.visitEnd()
     }
@@ -125,8 +126,8 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     * a boolean indicating if the instruction list contains an instantiation of a serializable SAM
     * type.
     */
-  def cloneInstructions(
-      methodNode: MethodNode, labelMap: Map[LabelNode, LabelNode])
+  def cloneInstructions(methodNode: MethodNode,
+                        labelMap: Map[LabelNode, LabelNode])
     : (InsnList, Map[AbstractInsnNode, AbstractInsnNode], Boolean) = {
     val javaLabelMap = labelMap.asJava
     val result = new InsnList
@@ -159,8 +160,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
 
   private val anonfunAdaptedName = """.*\$anonfun\$\d+\$adapted""".r
   def hasAdaptedImplMethod(closureInit: ClosureInstantiation): Boolean = {
-    isrJFunctionType(
-        Type
+    isrJFunctionType(Type
           .getReturnType(closureInit.lambdaMetaFactoryCall.indy.desc)
           .getInternalName) && anonfunAdaptedName.pattern
       .matcher(closureInit.lambdaMetaFactoryCall.implMethod.getName)
@@ -275,7 +275,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     insn match {
       case fi: FieldInsnNode =>
         fi.getOpcode == GETSTATIC && fi.owner == moduleName &&
-        fi.name == "MODULE$" && fi.desc == ("L" + moduleName + ";")
+          fi.name == "MODULE$" && fi.desc == ("L" + moduleName + ";")
       case _ => false
     }
 
@@ -404,7 +404,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
 
     visitInternalName(classNode.name)
     innerClasses ++=
-      classBTypeFromParsedClassfile(classNode.name).info.get.nestedClasses
+    classBTypeFromParsedClassfile(classNode.name).info.get.nestedClasses
 
     visitInternalName(classNode.superName)
     classNode.interfaces.asScala foreach visitInternalName
@@ -543,8 +543,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
           insn match {
             case v: VarInsnNode =>
               val longSize = if (isSize2LoadOrStore(v.getOpcode)) 1 else 0
-              maxLocals =
-                math.max(maxLocals, v.`var` + longSize + 1) // + 1 because local numbers are 0-based
+              maxLocals = math.max(maxLocals, v.`var` + longSize + 1) // + 1 because local numbers are 0-based
 
             case i: IincInsnNode =>
               maxLocals = math.max(maxLocals, i.`var` + 1)

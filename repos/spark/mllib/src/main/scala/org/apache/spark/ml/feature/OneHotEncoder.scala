@@ -55,8 +55,8 @@ class OneHotEncoder(override val uid: String)
     * Whether to drop the last category in the encoded vector (default: true)
     * @group param
     */
-  final val dropLast: BooleanParam = new BooleanParam(
-      this, "dropLast", "whether to drop the last category")
+  final val dropLast: BooleanParam =
+    new BooleanParam(this, "dropLast", "whether to drop the last category")
   setDefault(dropLast -> true)
 
   /** @group setParam */
@@ -113,15 +113,14 @@ class OneHotEncoder(override val uid: String)
       }
     }
 
-    val outputAttrGroup =
-      if (filteredOutputAttrNames.isDefined) {
-        val attrs: Array[Attribute] = filteredOutputAttrNames.get.map { name =>
-          BinaryAttribute.defaultAttr.withName(name)
-        }
-        new AttributeGroup($(outputCol), attrs)
-      } else {
-        new AttributeGroup($(outputCol))
+    val outputAttrGroup = if (filteredOutputAttrNames.isDefined) {
+      val attrs: Array[Attribute] = filteredOutputAttrNames.get.map { name =>
+        BinaryAttribute.defaultAttr.withName(name)
       }
+      new AttributeGroup($(outputCol), attrs)
+    } else {
+      new AttributeGroup($(outputCol))
+    }
 
     val outputFields = inputFields :+ outputAttrGroup.toStructField()
     StructType(outputFields)

@@ -206,7 +206,8 @@ trait BinOpVec {
   final class VecVecDot[@spec(Int, Long, Double) A,
                         @spec(Int, Long, Double) B,
                         @spec(Int, Long, Double) C: ST: NUM](
-      opadd: BinOp[Add, C, C, C], opmul: BinOp[Multiply, A, B, C])
+      opadd: BinOp[Add, C, C, C],
+      opmul: BinOp[Multiply, A, B, C])
       extends BinOp[InnerProd, Vec[A], Vec[B], C] {
 
     def apply(v1: Vec[A], v2: Vec[B]) = {

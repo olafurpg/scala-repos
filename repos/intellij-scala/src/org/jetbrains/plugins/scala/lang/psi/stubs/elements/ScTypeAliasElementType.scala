@@ -70,8 +70,8 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
     dataStream.writeBoolean(stub.isStableQualifier)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeAliasStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTypeAliasStub = {
     val name = StringRef.toString(dataStream.readName)
     val isDecl = dataStream.readBoolean
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]

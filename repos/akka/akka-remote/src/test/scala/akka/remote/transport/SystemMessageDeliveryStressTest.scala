@@ -60,8 +60,8 @@ object SystemMessageDeliveryStressTest {
     }
                                                    """)
 
-  private[akka] class SystemMessageSequenceVerifier(
-      system: ActorSystem, testActor: ActorRef)
+  private[akka] class SystemMessageSequenceVerifier(system: ActorSystem,
+                                                    testActor: ActorRef)
       extends MinimalActorRef {
     val provider = RARP(system).provider
     val path = provider.tempPath()
@@ -167,13 +167,15 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
 
       // Schedule peridodic disassociates
       systemA.scheduler.schedule(3.second, 8.seconds) {
-        transportA.managementCommand(ForceDisassociateExplicitly(
-                addressB, reason = AssociationHandle.Unknown))
+        transportA.managementCommand(
+            ForceDisassociateExplicitly(addressB,
+                                        reason = AssociationHandle.Unknown))
       }
 
       systemB.scheduler.schedule(7.seconds, 8.seconds) {
-        transportB.managementCommand(ForceDisassociateExplicitly(
-                addressA, reason = AssociationHandle.Unknown))
+        transportB.managementCommand(
+            ForceDisassociateExplicitly(addressA,
+                                        reason = AssociationHandle.Unknown))
       }
 
       systemB.actorOf(
@@ -223,7 +225,8 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
 
 class SystemMessageDeliveryRetryGate
     extends SystemMessageDeliveryStressTest(
-        "passive connections on", "akka.remote.retry-gate-closed-for = 0.5 s")
+        "passive connections on",
+        "akka.remote.retry-gate-closed-for = 0.5 s")
 class SystemMessageDeliveryNoPassiveRetryGate
     extends SystemMessageDeliveryStressTest(
         "passive connections off",

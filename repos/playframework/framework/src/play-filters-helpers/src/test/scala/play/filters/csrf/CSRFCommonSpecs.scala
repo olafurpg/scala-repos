@@ -64,8 +64,8 @@ trait CSRFCommonSpecs extends Specification with PlaySpecification {
     "accept requests with token in form body" in {
       lazy val token = generate
       csrfCheckRequest(req =>
-            addToken(req, token).post(
-                Map("foo" -> "bar", TokenName -> token)))(_.status must_== OK)
+            addToken(req, token).post(Map("foo" -> "bar", TokenName -> token)))(
+          _.status must_== OK)
     }
     "accept requests with a session token and token in multipart body" in {
       lazy val token = generate
@@ -162,8 +162,8 @@ trait CSRFCommonSpecs extends Specification with PlaySpecification {
 
       "reject requests with unsigned token in body" in {
         csrfCheckRequest(req =>
-              addToken(req, generate)
-                .post(Map("foo" -> "bar", TokenName -> "foo")))(
+              addToken(req, generate).post(
+                  Map("foo" -> "bar", TokenName -> "foo")))(
             _.status must_== FORBIDDEN)
       }
       "reject requests with unsigned token in session" in {

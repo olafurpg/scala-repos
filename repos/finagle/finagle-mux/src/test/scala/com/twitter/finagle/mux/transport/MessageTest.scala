@@ -35,8 +35,8 @@ class MessageTest extends FunSuite with AssertionsForJUnit {
       Dtab(ds.toIndexedSeq)
     }
   val goodDests = Seq("/", "/okay", "/foo/bar/baz") map (Path.read)
-  val goodDurationLeases = Seq(
-      Message.Tlease.MinLease, Message.Tlease.MaxLease)
+  val goodDurationLeases =
+    Seq(Message.Tlease.MinLease, Message.Tlease.MaxLease)
   val goodTimeLeases = Seq(Time.epoch, Time.now, Time.now + 5.minutes)
   val goodContexts =
     Seq() ++ (for { k <- goodKeys; v <- goodBufs } yield
@@ -114,7 +114,7 @@ class MessageTest extends FunSuite with AssertionsForJUnit {
       case (Tdispatch(tag1, ctxs1, dst1, dtab1, req1),
             Tdispatch(tag2, ctxs2, dst2, dtab2, req2)) =>
         assert(tag1 == tag2 && ctxs1 == ctxs2 && dst1 == dst2 &&
-            Equiv[Dtab].equiv(dtab1, dtab2) && req1 == req2)
+              Equiv[Dtab].equiv(dtab1, dtab2) && req1 == req2)
       case (a, b) => assert(a == b)
     }
 

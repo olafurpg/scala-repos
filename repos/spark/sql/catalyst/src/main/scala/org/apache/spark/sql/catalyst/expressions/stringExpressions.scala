@@ -138,8 +138,8 @@ case class ConcatWs(children: Seq[Expression])
             if (!${eval.isNull}) {
               final int $size = ${eval.value}.numElements();
               for (int j = 0; j < $size; j ++) {
-                $array[$idxInVararg ++] = ${ctx.getValue(
-                    eval.value, StringType, "j")};
+                $array[$idxInVararg ++] = ${ctx
+                  .getValue(eval.value, StringType, "j")};
               }
             }
             """)
@@ -283,8 +283,9 @@ object StringTranslate {
   * The translate will happen when any character in the string matching with the character
   * in the `matchingExpr`.
   */
-case class StringTranslate(
-    srcExpr: Expression, matchingExpr: Expression, replaceExpr: Expression)
+case class StringTranslate(srcExpr: Expression,
+                           matchingExpr: Expression,
+                           replaceExpr: Expression)
     extends TernaryExpression
     with ImplicitCastInputTypes {
 
@@ -292,8 +293,9 @@ case class StringTranslate(
   @transient private var lastReplace: UTF8String = _
   @transient private var dict: JMap[Character, Character] = _
 
-  override def nullSafeEval(
-      srcEval: Any, matchingEval: Any, replaceEval: Any): Any = {
+  override def nullSafeEval(srcEval: Any,
+                            matchingEval: Any,
+                            replaceEval: Any): Any = {
     if (matchingEval != lastMatching || replaceEval != lastReplace) {
       lastMatching = matchingEval.asInstanceOf[UTF8String].clone()
       lastReplace = replaceEval.asInstanceOf[UTF8String].clone()
@@ -308,19 +310,20 @@ case class StringTranslate(
     val termDict = ctx.freshName("dict")
     val classNameDict = classOf[JMap[Character, Character]].getCanonicalName
 
-    ctx.addMutableState(
-        "UTF8String", termLastMatching, s"$termLastMatching = null;")
-    ctx.addMutableState(
-        "UTF8String", termLastReplace, s"$termLastReplace = null;")
+    ctx.addMutableState("UTF8String",
+                        termLastMatching,
+                        s"$termLastMatching = null;")
+    ctx.addMutableState("UTF8String",
+                        termLastReplace,
+                        s"$termLastReplace = null;")
     ctx.addMutableState(classNameDict, termDict, s"$termDict = null;")
 
     nullSafeCodeGen(ctx, ev, (src, matching, replace) => {
-      val check =
-        if (matchingExpr.foldable && replaceExpr.foldable) {
-          s"$termDict == null"
-        } else {
-          s"!$matching.equals($termLastMatching) || !$replace.equals($termLastReplace)"
-        }
+      val check = if (matchingExpr.foldable && replaceExpr.foldable) {
+        s"$termDict == null"
+      } else {
+        s"!$matching.equals($termLastMatching) || !$replace.equals($termLastReplace)"
+      }
       s"""if ($check) {
         // Not all of them is literal or matching or replace value changed
         $termLastMatching = $matching.clone();
@@ -356,8 +359,8 @@ case class FindInSet(left: Expression, right: Expression)
     set.asInstanceOf[UTF8String].findInSet(word.asInstanceOf[UTF8String])
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(
-        ctx, ev, (word, set) => s"${ev.value} = $set.findInSet($word);")
+    nullSafeCodeGen(ctx, ev, (word, set) =>
+          s"${ev.value} = $set.findInSet($word);")
   }
 
   override def dataType: DataType = IntegerType
@@ -447,8 +450,9 @@ case class StringInstr(str: Expression, substr: Expression)
   * returned. If count is negative, every to the right of the final delimiter (counting from the
   * right) is returned. substring_index performs a case-sensitive match when searching for delim.
   */
-case class SubstringIndex(
-    strExpr: Expression, delimExpr: Expression, countExpr: Expression)
+case class SubstringIndex(strExpr: Expression,
+                          delimExpr: Expression,
+                          countExpr: Expression)
     extends TernaryExpression
     with ImplicitCastInputTypes {
 
@@ -465,8 +469,8 @@ case class SubstringIndex(
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(
-        ctx, ev, (str, delim, count) => s"$str.subStringIndex($delim, $count)")
+    defineCodeGen(ctx, ev, (str, delim, count) =>
+          s"$str.subStringIndex($delim, $count)")
   }
 }
 
@@ -625,14 +629,13 @@ case class FormatString(children: Expression*)
     val argListCode = argListGen.map(_._2.code + "\n")
 
     val argListString = argListGen.foldLeft("")((s, v) => {
-      val nullSafeString =
-        if (ctx.boxedType(v._1) != ctx.javaType(v._1)) {
-          // Java primitives get boxed in order to allow null values.
-          s"(${v._2.isNull}) ? (${ctx.boxedType(v._1)}) null : " +
-          s"new ${ctx.boxedType(v._1)}(${v._2.value})"
-        } else {
-          s"(${v._2.isNull}) ? null : ${v._2.value}"
-        }
+      val nullSafeString = if (ctx.boxedType(v._1) != ctx.javaType(v._1)) {
+        // Java primitives get boxed in order to allow null values.
+        s"(${v._2.isNull}) ? (${ctx.boxedType(v._1)}) null : " +
+        s"new ${ctx.boxedType(v._1)}(${v._2.value})"
+      } else {
+        s"(${v._2.isNull}) ? null : ${v._2.value}"
+      }
       s + "," + nullSafeString
     })
 
@@ -730,10 +733,7 @@ case class StringSpace(child: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(
-        ctx,
-        ev,
-        (length) =>
+    nullSafeCodeGen(ctx, ev, (length) =>
           s"""${ev.value} = UTF8String.blankString(($length < 0) ? 0 : $length);""")
   }
 
@@ -823,10 +823,8 @@ case class Levenshtein(left: Expression, right: Expression)
       .levenshteinDistance(rightValue.asInstanceOf[UTF8String])
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(
-        ctx,
-        ev,
-        (left, right) => s"${ev.value} = $left.levenshteinDistance($right);")
+    nullSafeCodeGen(ctx, ev, (left, right) =>
+          s"${ev.value} = $left.levenshteinDistance($right);")
   }
 }
 
@@ -1019,8 +1017,8 @@ case class FormatNumber(x: Expression, d: Expression)
   // SPARK-13515: US Locale configures the DecimalFormat object to use a dot ('.')
   // as a decimal separator.
   @transient
-  private val numberFormat = new DecimalFormat(
-      "", new DecimalFormatSymbols(Locale.US))
+  private val numberFormat =
+    new DecimalFormat("", new DecimalFormatSymbols(Locale.US))
 
   override protected def nullSafeEval(xObject: Any, dObject: Any): Any = {
     val dValue = dObject.asInstanceOf[Int]

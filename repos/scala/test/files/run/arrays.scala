@@ -603,8 +603,7 @@ object Test {
     //######################################################################
 
     ucheck(id_TSa_a[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSa_a[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSa_a[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSa_a[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSa_a[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -619,13 +618,11 @@ object Test {
     ocheck(
         id_TSa_a[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSa_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSa_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSa_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     ucheck(id_TSv_a[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSv_a[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSv_a[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSv_a[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSv_a[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -641,8 +638,7 @@ object Test {
     ocheck(
         id_TSr_a[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSr_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSr_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSr_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     rcheck(
@@ -650,21 +646,18 @@ object Test {
     ocheck(
         id_TSo_a[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSo_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSo_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSo_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     mcheck(id_TSm_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
 
-    ncheck(
-        id_TSn_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSn_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     //######################################################################
 
     ucheck(id_TSa_r[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSa_r[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSa_r[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSa_r[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSa_r[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -679,13 +672,11 @@ object Test {
     ocheck(
         id_TSa_r[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSa_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSa_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSa_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     ucheck(id_TSv_r[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSv_r[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSv_r[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSv_r[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSv_r[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -701,8 +692,7 @@ object Test {
     ocheck(
         id_TSr_r[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSr_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSr_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSr_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     rcheck(
@@ -710,21 +700,18 @@ object Test {
     ocheck(
         id_TSo_r[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSo_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSo_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSo_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     mcheck(id_TSm_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
 
-    ncheck(
-        id_TSn_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSn_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     //######################################################################
 
     ucheck(id_TSa_o[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSa_o[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSa_o[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSa_o[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSa_o[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -739,13 +726,11 @@ object Test {
     ocheck(
         id_TSa_o[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSa_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSa_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSa_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     ucheck(id_TSv_o[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSv_o[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSv_o[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSv_o[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSv_o[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -761,8 +746,7 @@ object Test {
     ocheck(
         id_TSr_o[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSr_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSr_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSr_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     rcheck(
@@ -770,14 +754,12 @@ object Test {
     ocheck(
         id_TSo_o[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSo_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSo_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSo_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     mcheck(id_TSm_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
 
-    ncheck(
-        id_TSn_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSn_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     //######################################################################
@@ -823,8 +805,7 @@ object Test {
     //######################################################################
 
     ucheck(id_TSa_a[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSa_a[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSa_a[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSa_a[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSa_a[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -839,13 +820,11 @@ object Test {
     ocheck(
         id_TSa_a[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSa_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSa_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSa_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     ucheck(id_TSv_a[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSv_a[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSv_a[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSv_a[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSv_a[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -861,8 +840,7 @@ object Test {
     ocheck(
         id_TSr_a[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSr_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSr_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSr_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     rcheck(
@@ -870,21 +848,18 @@ object Test {
     ocheck(
         id_TSo_a[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSo_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSo_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSo_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     mcheck(id_TSm_a[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
 
-    ncheck(
-        id_TSn_a[Strings, Array[Strings]](narray)
+    ncheck(id_TSn_a[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     //######################################################################
 
     ucheck(id_TSa_r[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSa_r[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSa_r[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSa_r[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSa_r[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -899,13 +874,11 @@ object Test {
     ocheck(
         id_TSa_r[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSa_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSa_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSa_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     ucheck(id_TSv_r[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSv_r[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSv_r[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSv_r[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSv_r[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -921,8 +894,7 @@ object Test {
     ocheck(
         id_TSr_r[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSr_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSr_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSr_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     rcheck(
@@ -930,21 +902,18 @@ object Test {
     ocheck(
         id_TSo_r[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSo_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSo_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSo_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     mcheck(id_TSm_r[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
 
-    ncheck(
-        id_TSn_r[Strings, Array[Strings]](narray)
+    ncheck(id_TSn_r[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     //######################################################################
 
     ucheck(id_TSa_o[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSa_o[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSa_o[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSa_o[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSa_o[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -959,13 +928,11 @@ object Test {
     ocheck(
         id_TSa_o[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSa_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSa_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSa_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     ucheck(id_TSv_o[Unit, Array[Unit]](uarray).asInstanceOf[Array[Unit]]);
-    zcheck(
-        id_TSv_o[Boolean, Array[Boolean]](zarray)
+    zcheck(id_TSv_o[Boolean, Array[Boolean]](zarray)
           .asInstanceOf[Array[Boolean]]);
     bcheck(id_TSv_o[Byte, Array[Byte]](barray).asInstanceOf[Array[Byte]]);
     scheck(id_TSv_o[Short, Array[Short]](sarray).asInstanceOf[Array[Short]]);
@@ -981,8 +948,7 @@ object Test {
     ocheck(
         id_TSr_o[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSr_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSr_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSr_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     rcheck(
@@ -990,14 +956,12 @@ object Test {
     ocheck(
         id_TSo_o[Object, Array[Object]](oarray).asInstanceOf[Array[Object]]);
     mcheck(id_TSo_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
-    ncheck(
-        id_TSo_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSo_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     mcheck(id_TSm_o[Map, Array[Map]](marray).asInstanceOf[Array[Map]]);
 
-    ncheck(
-        id_TSn_o[Strings, Array[Strings]](narray)
+    ncheck(id_TSn_o[Strings, Array[Strings]](narray)
           .asInstanceOf[Array[Strings]]);
 
     //######################################################################

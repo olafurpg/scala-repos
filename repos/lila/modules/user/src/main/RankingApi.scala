@@ -81,8 +81,9 @@ final class RankingApi(coll: lila.db.Types.Coll,
           cache(perf.id) map { _ get userId map (perf.key -> _) }
       } map (_.flatten.toMap)
 
-    private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](
-        f = compute, timeToLive = 15 minutes)
+    private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](f = compute,
+                                                                timeToLive =
+                                                                  15 minutes)
 
     private def compute(perfId: Perf.ID): Fu[Map[User.ID, Rank]] = {
       val enumerator = coll
@@ -122,19 +123,21 @@ final class RankingApi(coll: lila.db.Types.Coll,
         .PerfType(perfId)
         .exists(lila.rating.PerfType.leaderboardable.contains) ?? {
         coll
-          .aggregate(Match(BSONDocument("perf" -> perfId)),
-                     List(Project(
-                              BSONDocument(
-                                  "_id" -> false,
-                                  "r" -> BSONDocument(
-                                      "$subtract" -> BSONArray(
-                                          "$rating",
-                                          BSONDocument("$mod" -> BSONArray(
-                                                  "$rating", Stat.group))
-                                      )
-                                  )
-                              )),
-                          GroupField("r")("nb" -> SumValue(1))))
+          .aggregate(
+              Match(BSONDocument("perf" -> perfId)),
+              List(
+                  Project(
+                      BSONDocument(
+                          "_id" -> false,
+                          "r" -> BSONDocument(
+                              "$subtract" -> BSONArray(
+                                  "$rating",
+                                  BSONDocument("$mod" -> BSONArray("$rating",
+                                                                   Stat.group))
+                              )
+                          )
+                      )),
+                  GroupField("r")("nb" -> SumValue(1))))
           .map { res =>
             val hash = res.documents.flatMap { obj =>
               for {

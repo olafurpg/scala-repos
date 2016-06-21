@@ -166,8 +166,8 @@ object Counter extends CounterOps {
     new CanTraverseKeyValuePairs[Counter[K, V], K, V] {
 
       /** Traverses all values from the given collection. */
-      override def traverse(
-          from: Counter[K, V], fn: KeyValuePairsVisitor[K, V]): Unit = {
+      override def traverse(from: Counter[K, V],
+                            fn: KeyValuePairsVisitor[K, V]): Unit = {
         for ((k, v) <- from.activeIterator) {
           fn.visit(k, v)
         }

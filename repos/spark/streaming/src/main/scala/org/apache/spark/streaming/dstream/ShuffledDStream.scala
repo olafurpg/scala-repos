@@ -30,8 +30,7 @@ private[streaming] class ShuffledDStream[K: ClassTag, V: ClassTag, C: ClassTag](
     mergeCombiner: (C, C) => C,
     partitioner: Partitioner,
     mapSideCombine: Boolean = true
-)
-    extends DStream[(K, C)](parent.ssc) {
+) extends DStream[(K, C)](parent.ssc) {
 
   override def dependencies: List[DStream[_]] = List(parent)
 

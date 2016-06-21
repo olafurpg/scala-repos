@@ -69,7 +69,7 @@ trait PersistentFSM[S <: FSMState, D, E]
     * After recovery events are handled as in usual FSM actor
     */
   override def receiveCommand: Receive = {
-    super [PersistentFSMBase].receive
+    super[PersistentFSMBase].receive
   }
 
   /**
@@ -94,8 +94,8 @@ trait PersistentFSM[S <: FSMState, D, E]
     //Prevent StateChangeEvent persistence when staying in the same state, except when state defines a timeout
     if (nextState.notifies || nextState.timeout.nonEmpty) {
       eventsToPersist =
-        eventsToPersist :+ StateChangeEvent(
-            nextState.stateName.identifier, nextState.timeout)
+        eventsToPersist :+ StateChangeEvent(nextState.stateName.identifier,
+                                            nextState.timeout)
     }
 
     if (eventsToPersist.isEmpty) {
@@ -139,7 +139,8 @@ object PersistentFSM {
     * @param timeout FSM state timeout
     */
   private[persistence] case class StateChangeEvent(
-      stateIdentifier: String, timeout: Option[FiniteDuration])
+      stateIdentifier: String,
+      timeout: Option[FiniteDuration])
       extends PersistentFsmEvent
 
   /**
@@ -167,15 +168,18 @@ object PersistentFSM {
     * [[akka.actor.FSM.SubscribeTransitionCallBack]] before sending any
     * [[akka.actor.FSM.Transition]] messages.
     */
-  final case class CurrentState[S](
-      fsmRef: ActorRef, state: S, timeout: Option[FiniteDuration])
+  final case class CurrentState[S](fsmRef: ActorRef,
+                                   state: S,
+                                   timeout: Option[FiniteDuration])
 
   /**
     * Message type which is used to communicate transitions between states to
     * all subscribed listeners (use [[akka.actor.FSM.SubscribeTransitionCallBack]]).
     */
-  final case class Transition[S](
-      fsmRef: ActorRef, from: S, to: S, timeout: Option[FiniteDuration])
+  final case class Transition[S](fsmRef: ActorRef,
+                                 from: S,
+                                 to: S,
+                                 timeout: Option[FiniteDuration])
 
   /**
     * Send this to an [[akka.actor.FSM]] to request first the [[PersistentFSM.CurrentState]]
@@ -226,8 +230,10 @@ object PersistentFSM {
     */
   // FIXME: what about the cancellable?
   private[persistence] final case class Timer(
-      name: String, msg: Any, repeat: Boolean, generation: Int)(
-      context: ActorContext)
+      name: String,
+      msg: Any,
+      repeat: Boolean,
+      generation: Int)(context: ActorContext)
       extends NoSerializationVerificationNeeded {
     private var ref: Option[Cancellable] = _
     private val scheduler = context.system.scheduler
@@ -264,15 +270,15 @@ object PersistentFSM {
     * accumulated while processing the last message, possibly domain event and handler
     * to be executed after FSM moves to the new state (also triggered when staying in the same state)
     */
-  final case class State[S, D, E](stateName: S,
-                                  stateData: D,
-                                  timeout: Option[FiniteDuration] = None,
-                                  stopReason: Option[Reason] = None,
-                                  replies: List[Any] = Nil,
-                                  domainEvents: Seq[E] = Nil,
-                                  afterTransitionDo: D ⇒ Unit = { _: D ⇒
-                                  })(
-      private[akka] val notifies: Boolean = true) {
+  final case class State[S, D, E](
+      stateName: S,
+      stateData: D,
+      timeout: Option[FiniteDuration] = None,
+      stopReason: Option[Reason] = None,
+      replies: List[Any] = Nil,
+      domainEvents: Seq[E] = Nil,
+      afterTransitionDo: D ⇒ Unit = { _: D ⇒
+        })(private[akka] val notifies: Boolean = true) {
 
     /**
       * Copy object and update values if needed.
@@ -362,8 +368,9 @@ object PersistentFSM {
     * Case class representing the state of the [[akka.actor.FSM]] whithin the
     * `onTermination` block.
     */
-  final case class StopEvent[S, D](
-      reason: Reason, currentState: S, stateData: D)
+  final case class StopEvent[S, D](reason: Reason,
+                                   currentState: S,
+                                   stateData: D)
       extends NoSerializationVerificationNeeded
 }
 

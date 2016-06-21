@@ -48,8 +48,8 @@ trait StreamingInvokerAction[R, T, -E <: Effect]
     if (if (bufferNext) it.hasNext else count == limit) it else null
   }
 
-  override final def cancelStream(
-      ctx: JdbcBackend#StreamingContext, state: StreamState): Unit =
+  override final def cancelStream(ctx: JdbcBackend#StreamingContext,
+                                  state: StreamState): Unit =
     state.close()
 
   override def getDumpInfo =

@@ -156,9 +156,8 @@ trait DocumentCleaner {
 
     for (node <- naughtyList5) {
 
-      trace(
-          "Removing node with class: " + node.attr("class") + " id: " +
-          node.id + " name: " + node.attr("name"))
+      trace("Removing node with class: " + node.attr("class") + " id: " +
+            node.id + " name: " + node.attr("name"))
 
       removeNode(node)
     }
@@ -184,15 +183,15 @@ trait DocumentCleaner {
       val naughtyList3: Elements =
         doc.getElementsByAttributeValueMatching("class", pattern)
       trace(naughtyList3.size + " CLASS elements found against pattern: " +
-          pattern)
+            pattern)
 
       for (node <- naughtyList3) {
         removeNode(node)
       }
     } catch {
       case e: IllegalArgumentException => {
-          warn(e, e.toString)
-        }
+        warn(e, e.toString)
+      }
     }
     doc
   }
@@ -214,7 +213,8 @@ trait DocumentCleaner {
   }
 
   private def convertWantedTagsToParagraphs(
-      doc: Document, wantedTags: TagsEvaluator): Document = {
+      doc: Document,
+      wantedTags: TagsEvaluator): Document = {
 
     val selected = Collector.collect(wantedTags, doc)
 
@@ -224,8 +224,7 @@ trait DocumentCleaner {
       } else {
         val replacements = getReplacementNodes(doc, elem)
         elem.children().foreach(_.remove())
-        replacements.foreach(
-            n => {
+        replacements.foreach(n => {
           try {
             elem.appendChild(n)
           } catch {
@@ -238,8 +237,8 @@ trait DocumentCleaner {
     doc
   }
 
-  private def convertDivsToParagraphs(
-      doc: Document, domType: String): Document = {
+  private def convertDivsToParagraphs(doc: Document,
+                                      domType: String): Document = {
     trace("Starting to replace bad divs...")
     var badDivs: Int = 0
     var convertedTextNodes: Int = 0
@@ -257,8 +256,7 @@ trait DocumentCleaner {
           val replaceNodes = getReplacementNodes(doc, div)
 
           div.children().foreach(_.remove())
-          replaceNodes.foreach(
-              node => {
+          replaceNodes.foreach(node => {
 
             try {
               div.appendChild(node)
@@ -269,8 +267,8 @@ trait DocumentCleaner {
         }
       } catch {
         case e: NullPointerException => {
-            logger.error(e.toString)
-          }
+          logger.error(e.toString)
+        }
       }
       divIndex += 1
     }
@@ -394,8 +392,16 @@ object DocumentCleaner extends Logging {
   val divToPElementsPattern: Pattern =
     Pattern.compile("<(a|blockquote|dl|div|img|ol|p|pre|table|ul)")
 
-  val blockElemementTags = TagsEvaluator(
-      "a", "blockquote", "dl", "div", "img", "ol", "p", "pre", "table", "ul")
+  val blockElemementTags = TagsEvaluator("a",
+                                         "blockquote",
+                                         "dl",
+                                         "div",
+                                         "img",
+                                         "ol",
+                                         "p",
+                                         "pre",
+                                         "table",
+                                         "ul")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")

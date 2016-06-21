@@ -85,8 +85,8 @@ class CachedMacros(override val c: whitebox.Context)
       c.warning(
           c.enclosingPosition,
           s"Cached[$tpe] called from a Lazy/Strict, you might want to consider caching " +
-          "an implicit earlier, so that the whole Lazy/Strict itself gets cached. Caching " +
-          "is disabled here.")
+            "an implicit earlier, so that the whole Lazy/Strict itself gets cached. Caching " +
+            "is disabled here.")
 
     if (CachedMacros.deriving || concurrentLazy) {
       // Caching only the first (root) Cached, not subsequent ones as here

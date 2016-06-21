@@ -205,7 +205,7 @@ class FormatterTest extends WordSpec {
       "log even blank exceptions" in {
         assert(
             utcFormatter.format(record4) == "ERR [20080329-05:53:16.722] jobs: with minimal exception\n" +
-            "ERR [20080329-05:53:16.722] jobs: java.lang.Exception: fast exception no stacktrace\n")
+              "ERR [20080329-05:53:16.722] jobs: java.lang.Exception: fast exception no stacktrace\n")
       }
     }
   }

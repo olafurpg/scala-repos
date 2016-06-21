@@ -59,8 +59,11 @@ object TreeView {
              oldValue: T,
              newValue: T) =
       this(
-          new jfxsc.TreeView.EditEvent[T](
-              source, eventType, treeItem, oldValue, newValue))
+          new jfxsc.TreeView.EditEvent[T](source,
+                                          eventType,
+                                          treeItem,
+                                          oldValue,
+                                          newValue))
 
     /**
       * Returns the new value input into the TreeItem by the end user.
@@ -112,7 +115,7 @@ object TreeView {
     */
   @deprecated(
       "This method does not correctly calculate the distance from the given TreeItem to the root of the TreeView. " +
-      "As of JavaFX 8.0_20, the proper way to do this is via getTreeItemLevel(TreeItem)",
+        "As of JavaFX 8.0_20, the proper way to do this is via getTreeItemLevel(TreeItem)",
       since = "8.0_20")
   def nodeLevel(node: TreeItem[_]) = jfxsc.TreeView.getNodeLevel(node)
 
@@ -121,8 +124,7 @@ object TreeView {
     * TreeView.
     */
   def apply[T](layoutChildrenOp: () => Unit) =
-    new TreeView[T](
-        new jfxsc.TreeView[T] {
+    new TreeView[T](new jfxsc.TreeView[T] {
       override def layoutChildren() {
         layoutChildrenOp()
       }
@@ -218,7 +220,8 @@ class TreeView[T](
   def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]](
-        onScrollTo, v)
+          onScrollTo,
+          v)
   }
 
   /**

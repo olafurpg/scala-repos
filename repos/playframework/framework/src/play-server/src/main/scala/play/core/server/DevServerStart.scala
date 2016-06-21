@@ -171,35 +171,36 @@ object DevServerStart {
                             val webCommands = new DefaultWebCommands
                             currentWebCommands = Some(webCommands)
 
-                            val newApplication = Threads
-                              .withContextClassLoader(projectClassloader) {
-                              val context = ApplicationLoader.createContext(
-                                  environment,
-                                  dirAndDevSettings,
-                                  Some(sourceMapper),
-                                  webCommands)
-                              val loader = ApplicationLoader(context)
-                              loader.load(context)
-                            }
+                            val newApplication =
+                              Threads.withContextClassLoader(
+                                  projectClassloader) {
+                                val context = ApplicationLoader.createContext(
+                                    environment,
+                                    dirAndDevSettings,
+                                    Some(sourceMapper),
+                                    webCommands)
+                                val loader = ApplicationLoader(context)
+                                loader.load(context)
+                              }
 
                             Play.start(newApplication)
 
                             Success(newApplication)
                           } catch {
                             case e: PlayException => {
-                                lastState = Failure(e)
-                                lastState
-                              }
+                              lastState = Failure(e)
+                              lastState
+                            }
                             case NonFatal(e) => {
-                                lastState = Failure(
-                                    UnexpectedException(unexpected = Some(e)))
-                                lastState
-                              }
+                              lastState = Failure(
+                                  UnexpectedException(unexpected = Some(e)))
+                              lastState
+                            }
                             case e: LinkageError => {
-                                lastState = Failure(
-                                    UnexpectedException(unexpected = Some(e)))
-                                lastState
-                              }
+                              lastState = Failure(
+                                  UnexpectedException(unexpected = Some(e)))
+                              lastState
+                            }
                           }
                       }
 
@@ -258,8 +259,8 @@ object DevServerStart {
               Await.result(actorSystem.whenTerminated, Duration.Inf)
               Future.successful(())
             })
-        val serverProvider = ServerProvider.fromConfiguration(
-            classLoader, serverConfig.configuration)
+        val serverProvider = ServerProvider
+          .fromConfiguration(classLoader, serverConfig.configuration)
         serverProvider.createServer(serverContext)
       } catch {
         case e: ExceptionInInitializerError => throw e.getCause

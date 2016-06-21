@@ -28,8 +28,8 @@ trait PartialActionLaws[G, A] extends Laws {
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]
 
-  def leftSemigroupoidPartialAction(
-      implicit G: LeftPartialAction[A, G], G0: Semigroupoid[G]) =
+  def leftSemigroupoidPartialAction(implicit G: LeftPartialAction[A, G],
+                                    G0: Semigroupoid[G]) =
     new ActionProperties(
         name = "leftSemigroupAction",
         sl = _.semigroupoid(G0),
@@ -40,8 +40,8 @@ trait PartialActionLaws[G, A] extends Laws {
         }
     )
 
-  def rightSemigroupoidPartialAction(
-      implicit G: RightPartialAction[A, G], G0: Semigroupoid[G]) =
+  def rightSemigroupoidPartialAction(implicit G: RightPartialAction[A, G],
+                                     G0: Semigroupoid[G]) =
     new ActionProperties(
         name = "rightSemigroupAction",
         sl = _.semigroupoid(G0),
@@ -52,8 +52,8 @@ trait PartialActionLaws[G, A] extends Laws {
         }
     )
 
-  def semigroupoidPartialAction(
-      implicit G: PartialAction[A, G], G0: Semigroupoid[G]) =
+  def semigroupoidPartialAction(implicit G: PartialAction[A, G],
+                                G0: Semigroupoid[G]) =
     new ActionProperties(
         name = "semigroupAction",
         sl = _.semigroupoid(G0),
@@ -82,8 +82,8 @@ trait PartialActionLaws[G, A] extends Laws {
         }
     )
 
-  def leftSemigroupPartialAction(
-      implicit G: LeftPartialAction[A, G], G0: Semigroup[G]) =
+  def leftSemigroupPartialAction(implicit G: LeftPartialAction[A, G],
+                                 G0: Semigroup[G]) =
     new ActionProperties(
         name = "leftSemigroupPartialAction",
         sl = _.semigroup(G0),
@@ -94,8 +94,8 @@ trait PartialActionLaws[G, A] extends Laws {
         }
     )
 
-  def rightSemigroupPartialAction(
-      implicit G: RightPartialAction[A, G], G0: Semigroup[G]) =
+  def rightSemigroupPartialAction(implicit G: RightPartialAction[A, G],
+                                  G0: Semigroup[G]) =
     new ActionProperties(
         name = "rightSemigroupPartialAction",
         sl = _.semigroup(G0),
@@ -106,16 +106,16 @@ trait PartialActionLaws[G, A] extends Laws {
         }
     )
 
-  def semigroupPartialAction(
-      implicit G: PartialAction[A, G], G0: Semigroup[G]) =
+  def semigroupPartialAction(implicit G: PartialAction[A, G],
+                             G0: Semigroup[G]) =
     new ActionProperties(
         name = "semigroupPartialAction",
         sl = _.semigroup(G0),
         parents = Seq(leftSemigroupPartialAction, rightSemigroupPartialAction)
     )
 
-  def leftMonoidPartialAction(
-      implicit G: LeftPartialAction[A, G], G0: Monoid[G]) =
+  def leftMonoidPartialAction(implicit G: LeftPartialAction[A, G],
+                              G0: Monoid[G]) =
     new ActionProperties(
         name = "leftMonoidPartialAction",
         sl = _.monoid(G0),
@@ -125,8 +125,8 @@ trait PartialActionLaws[G, A] extends Laws {
         }
     )
 
-  def rightMonoidPartialAction(
-      implicit G: RightPartialAction[A, G], G0: Monoid[G]) =
+  def rightMonoidPartialAction(implicit G: RightPartialAction[A, G],
+                               G0: Monoid[G]) =
     new ActionProperties(
         name = "rightMonoidPartialAction",
         sl = _.monoid(G0),
@@ -165,8 +165,7 @@ trait PartialActionLaws[G, A] extends Laws {
       val sl: scalarLaws.type => scalarLaws.RuleSet,
       val parents: Seq[ActionProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet {
+  ) extends RuleSet {
     val bases = Seq("scalar" → sl(scalarLaws))
   }
 }

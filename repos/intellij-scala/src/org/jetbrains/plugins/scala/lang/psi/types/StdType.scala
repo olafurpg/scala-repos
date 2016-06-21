@@ -36,20 +36,20 @@ abstract class StdType(val name: String, val tSuper: Option[StdType])
     (this, r) match {
       case (l: StdType, _: StdType) => (l == r, subst)
       case (AnyRef, _) => {
-          ScType.extractClass(r) match {
-            case Some(clazz) if clazz.qualifiedName == "java.lang.Object" =>
-              (true, subst)
-            case _ => (false, subst)
-          }
+        ScType.extractClass(r) match {
+          case Some(clazz) if clazz.qualifiedName == "java.lang.Object" =>
+            (true, subst)
+          case _ => (false, subst)
         }
+      }
       case (_, _) => {
-          ScType.extractClass(r) match {
-            case Some(o: ScObject) => (false, subst)
-            case Some(clazz) if clazz.qualifiedName == "scala." + name =>
-              (true, subst)
-            case _ => (false, subst)
-          }
+        ScType.extractClass(r) match {
+          case Some(o: ScObject) => (false, subst)
+          case Some(clazz) if clazz.qualifiedName == "scala." + name =>
+            (true, subst)
+          case _ => (false, subst)
         }
+      }
     }
   }
 }

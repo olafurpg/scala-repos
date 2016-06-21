@@ -12,11 +12,11 @@ import java.util.concurrent.RejectedExecutionException
   * @param rejectWith A class to reject with. Must have a no-arguments constructor.
   * @param seed A random seed, otherwise a deterministic seed is used.
   */
-case class RejectFailter[Req, Rep](probability: Var[Double],
-                                   rejectWith: (() => Throwable) =
-                                     (() => new RejectedExecutionException()),
-                                   seed: Long = Failter.DefaultSeed,
-                                   stats: StatsReceiver = NullStatsReceiver)
+case class RejectFailter[Req, Rep](
+    probability: Var[Double],
+    rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
+    seed: Long = Failter.DefaultSeed,
+    stats: StatsReceiver = NullStatsReceiver)
     extends SimpleFilter[Req, Rep]
     with Failter {
 

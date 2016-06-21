@@ -116,14 +116,13 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     State(s => (s, get(s)))
 
   def %=[A >: A2 <: A1](f: B1 => B2): PState[A, B2] =
-    State(
-        a =>
+    State(a =>
           run(a) match {
         case None => (a, None)
         case Some(w) => {
-            val r = f(w.pos)
-            (w put r, Some(r))
-          }
+          val r = f(w.pos)
+          (w put r, Some(r))
+        }
     })
 
   def :=[A >: A2 <: A1](b: => B2): PState[A, B2] =
@@ -133,22 +132,20 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     State(a => (mod(f, a), ()))
 
   def %%=[A >: A2 <: A1, C](s: IndexedState[B1, B2, C]): PState[A, C] =
-    State(
-        a =>
+    State(a =>
           run(a) match {
         case None => (a, None)
         case Some(w) => {
-            val r = s.run(w.pos): (B2, C)
-            (w put r._1, Some(r._2))
-          }
+          val r = s.run(w.pos): (B2, C)
+          (w put r._1, Some(r._2))
+        }
     })
 
   def >-[A >: A2 <: A1, C](f: B1 => C): PState[A, C] =
     State(a => (a, get(a) map f))
 
   def >>-[A >: A2 <: A1, C](f: B1 => State[A, C]): PState[A, C] =
-    StateT(
-        a =>
+    StateT(a =>
           get(a) match {
         case None => (a, None)
         case Some(w) =>
@@ -163,8 +160,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   /** Partial Lenses can be composed */
   def compose[C1, C2](
       that: PLensFamily[C1, C2, A1, A2]): PLensFamily[C1, C2, B1, B2] =
-    plensFamily(
-        c =>
+    plensFamily(c =>
           (that run c).flatMap(x => {
         val (ac, a) = x.run
         run(a) map
@@ -243,8 +239,7 @@ trait PLensFamilyFunctions extends PLensInstances {
   def plensFamilyg[A1, A2, B1, B2](
       set: A1 => Option[B2 => A2],
       get: A1 => Option[B1]): PLensFamily[A1, A2, B1, B2] =
-    plensFamily(
-        a =>
+    plensFamily(a =>
           for {
         w <- set(a)
         x <- get(a)
@@ -375,10 +370,9 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   def plensf[A, B](r: PartialFunction[A, Store[B, A]]): PLens[A, B] =
     plens(r.lift)
 
-  def plensg[A, B](
-      set: A => Option[B => A], get: A => Option[B]): PLens[A, B] =
-    plens(
-        a =>
+  def plensg[A, B](set: A => Option[B => A],
+                   get: A => Option[B]): PLens[A, B] =
+    plens(a =>
           for {
         w <- set(a)
         x <- get(a)
@@ -520,7 +514,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   def vectorLastPLens[A]: Vector[A] @?> A =
     plens(v =>
           v.lastOption map
-          (a => Store(x => v patch (v.length - 1, Vector(x), 1), a)))
+            (a => Store(x => v patch (v.length - 1, Vector(x), 1), a)))
 
   import Stream._
 
@@ -635,17 +629,16 @@ abstract class PLensInstances {
             plensFamily(
                 x =>
                   a run x map
-                  (c => {
-                    val (p, q) = c.pos
-                    IndexedStore(a => c.put((a, q)): R, p)
-                  })),
-            plensFamily(
-                x =>
+                    (c => {
+                      val (p, q) = c.pos
+                      IndexedStore(a => c.put((a, q)): R, p)
+                    })),
+            plensFamily(x =>
                   a run x map
-                  (c => {
-                    val (p, q) = c.pos
-                    IndexedStore(a => c.put((p, a)): R, q)
-                  }))
+                    (c => {
+                      val (p, q) = c.pos
+                      IndexedStore(a => c.put((p, a)): R, q)
+                    }))
         )
     }
 
@@ -697,7 +690,7 @@ private[scalaz] trait PLensCategory extends Choice[PLens] with Split[PLens] {
         g run b map (_ map (\/.right))
     }
 
-  def split[A, B, C, D](
-      f: PLens[A, B], g: PLens[C, D]): PLens[(A, C), (B, D)] =
+  def split[A, B, C, D](f: PLens[A, B],
+                        g: PLens[C, D]): PLens[(A, C), (B, D)] =
     f *** g
 }

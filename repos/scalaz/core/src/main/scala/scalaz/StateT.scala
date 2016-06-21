@@ -58,8 +58,8 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
   def imap[X](f: S2 => X)(implicit F: Functor[F]): IndexedStateT[F, S1, X, A] =
     bimap(f)(a => a)
 
-  def bimap[X, B](f: S2 => X)(g: A => B)(
-      implicit F: Functor[F]): IndexedStateT[F, S1, X, B] =
+  def bimap[X, B](f: S2 => X)(
+      g: A => B)(implicit F: Functor[F]): IndexedStateT[F, S1, X, B] =
     mapsf(sf => (s: S1) => F.map(sf(s))(t => (f(t._1), g(t._2))))
 
   def leftMap[X](f: S2 => X)(
@@ -68,8 +68,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
 
   def flatMap[S3, B](f: A => IndexedStateT[F, S2, S3, B])(
       implicit F: Monad[F]): IndexedStateT[F, S1, S3, B] =
-    mapsf(
-        sf =>
+    mapsf(sf =>
           (s: S1) =>
             F.bind[(S2, A), (S3, B)](sf(s)) { t =>
           val sfb: F[(S2 => F[(S3, B)])] = f(t._2).getF(F)
@@ -181,7 +180,8 @@ sealed abstract class IndexedStateTInstances extends IndexedStateTInstances0 {
 
 sealed abstract class StateTInstances3 extends IndexedStateTInstances {
   implicit def stateTBindRec[S, F[_]](
-      implicit F0: Monad[F], F1: BindRec[F]): BindRec[StateT[F, S, ?]] =
+      implicit F0: Monad[F],
+      F1: BindRec[F]): BindRec[StateT[F, S, ?]] =
     new StateTBindRec[S, F] {
       implicit def F: Monad[F] = F0
       implicit def B: BindRec[F] = F1
@@ -215,8 +215,8 @@ abstract class StateTInstances extends StateTInstances0 {
 }
 
 trait IndexedStateTFunctions {
-  def constantIndexedStateT[F[_], S1, S2, A](a: A)(
-      s: => S2)(implicit F: Applicative[F]): IndexedStateT[F, S1, S2, A] =
+  def constantIndexedStateT[F[_], S1, S2, A](a: A)(s: => S2)(
+      implicit F: Applicative[F]): IndexedStateT[F, S1, S2, A] =
     IndexedStateT.createState((m: Monad[F]) => (_: S1) => F.point((s, a)))
 }
 
@@ -244,7 +244,8 @@ private trait IndexedStateTBifunctor[S1, F[_]]
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: IndexedStateT[F, S1, A, B])(
-      f: A => C, g: B => D): IndexedStateT[F, S1, C, D] = fab.bimap(f)(g)
+      f: A => C,
+      g: B => D): IndexedStateT[F, S1, C, D] = fab.bimap(f)(g)
 }
 
 private trait IndexedStateTFunctorLeft[S1, A0, F[_]]
@@ -341,8 +342,8 @@ private trait IndexedStateTPlus[F[_], S1, S2]
     extends Plus[IndexedStateT[F, S1, S2, ?]] {
   implicit def F: Monad[F]
   implicit def G: Plus[F]
-  override final def plus[A](
-      a: IndexedStateT[F, S1, S2, A], b: => IndexedStateT[F, S1, S2, A]) =
+  override final def plus[A](a: IndexedStateT[F, S1, S2, A],
+                             b: => IndexedStateT[F, S1, S2, A]) =
     IndexedStateT(s => G.plus(a.run(s), b.run(s)))
 }
 

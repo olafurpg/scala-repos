@@ -74,11 +74,11 @@ class ProactiveClosureSerializationSuite
   private def xfilter(x: RDD[String], uc: UnserializableClass): RDD[String] =
     x.filter(y => uc.pred(y))
 
-  private def xmapPartitions(
-      x: RDD[String], uc: UnserializableClass): RDD[String] =
+  private def xmapPartitions(x: RDD[String],
+                             uc: UnserializableClass): RDD[String] =
     x.mapPartitions(_.map(y => uc.op(y)))
 
-  private def xmapPartitionsWithIndex(
-      x: RDD[String], uc: UnserializableClass): RDD[String] =
+  private def xmapPartitionsWithIndex(x: RDD[String],
+                                      uc: UnserializableClass): RDD[String] =
     x.mapPartitionsWithIndex((_, it) => it.map(y => uc.op(y)))
 }

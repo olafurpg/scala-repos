@@ -97,16 +97,21 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val c = DenseVector(Complex(6, 0), Complex(2, 0), Complex(3, 0))
     val cs = SparseVector(Complex(6, 0), Complex(2, 0), Complex(3, 0))
     val value: CSCMatrix[Complex] = a * b
-    assert(
-        value === CSCMatrix(
+    assert(value === CSCMatrix(
             (Complex(0, 74), Complex(0, -16), Complex(0, 50)),
             (Complex(0, 170), Complex(0, -46), Complex(0, 134))))
-    assert(b * c === DenseVector(
-            Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
-    assert(b * cs === DenseVector(
-            Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
-    assert(b.t * c === DenseVector(
-            Complex(72, -72), Complex(-18, 18), Complex(65, -65)))
+    assert(
+        b * c === DenseVector(Complex(62, 62),
+                              Complex(-21, -21),
+                              Complex(87, 87)))
+    assert(
+        b * cs === DenseVector(Complex(62, 62),
+                               Complex(-21, -21),
+                               Complex(87, 87)))
+    assert(
+        b.t * c === DenseVector(Complex(72, -72),
+                                Complex(-18, 18),
+                                Complex(65, -65)))
   }
 
   test("Transpose") {
@@ -283,8 +288,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
   }
 
   test("CSCxCSC: OpAddInPlace2:Field") {
-    def testAddInPlace[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+    def testAddInPlace[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                                 b: CSCMatrix[T]) = {
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a += b
@@ -304,8 +309,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
   }
 
   test("CSCxCSC: OpSubInPlace2:Field") {
-    def testSubInPlace[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+    def testSubInPlace[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                                 b: CSCMatrix[T]) = {
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a -= b
@@ -324,8 +329,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === cscB * -2.0)
   }
   test("CSCxCSC: OpMulScalarInPlace2:Field") {
-    def testMulScalarInPlace[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+    def testMulScalarInPlace[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                                       b: CSCMatrix[T]) = {
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a *= b
@@ -364,8 +369,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === CSCMatrix.zeros[Double](3, 4))
   }
   test("ZipMapVals Test") {
-    def testZipMap[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
+    def testZipMap[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                             b: CSCMatrix[T]): CSCMatrix[T] = {
       val f = implicitly[Field[T]]
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
@@ -430,10 +435,16 @@ class CSCMatrixTest extends FunSuite with Checkers {
   }
 
   test("#479") {
-    val m1: Matrix[Double] = new CSCMatrix[Double](
-        Array(1.0, 1, 1), 3, 3, Array(0, 1, 2, 3), Array(0, 1, 2))
-    val m2: Matrix[Double] = new CSCMatrix[Double](
-        Array(1.0, 2, 2, 4), 3, 3, Array(0, 0, 2, 4), Array(1, 2, 1, 2))
+    val m1: Matrix[Double] = new CSCMatrix[Double](Array(1.0, 1, 1),
+                                                   3,
+                                                   3,
+                                                   Array(0, 1, 2, 3),
+                                                   Array(0, 1, 2))
+    val m2: Matrix[Double] = new CSCMatrix[Double](Array(1.0, 2, 2, 4),
+                                                   3,
+                                                   3,
+                                                   Array(0, 0, 2, 4),
+                                                   Array(1, 2, 1, 2))
 
     val sum = (m1 + m2).asInstanceOf[CSCMatrix[Double]]
     require(sum.colPtrs.last == sum.rowIndices.length,
@@ -445,8 +456,9 @@ class CSCMatrixTest extends FunSuite with Checkers {
       CSCMatrix((1.0, 3.0, 4.0), (2.0, 0.0, 6.0)) \ DenseVector(1.0, 3.0)
     import breeze.numerics.inf
     assert(
-        norm(r2 - DenseVector(
-                 0.1813186813186811, -0.3131868131868131, 0.43956043956043944),
+        norm(r2 - DenseVector(0.1813186813186811,
+                              -0.3131868131868131,
+                              0.43956043956043944),
              inf) < 1E-5)
   }
 }

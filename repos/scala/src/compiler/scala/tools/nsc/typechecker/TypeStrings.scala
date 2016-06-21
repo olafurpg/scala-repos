@@ -23,8 +23,10 @@ trait StructuredTypeStrings extends DestructureTypes {
   object LabelAndType {
     val empty = LabelAndType("", "")
   }
-  case class Grouping(
-      ldelim: String, mdelim: String, rdelim: String, labels: Boolean) {
+  case class Grouping(ldelim: String,
+                      mdelim: String,
+                      rdelim: String,
+                      labels: Boolean) {
     def join(elems: String*): String =
       (if (elems.isEmpty) ""
        else
@@ -37,7 +39,8 @@ trait StructuredTypeStrings extends DestructureTypes {
 
   private def str(level: Int)(body: => String): String = "  " * level + body
   private def block(level: Int, grouping: Grouping)(
-      name: String, nodes: List[TypeNode]): String = {
+      name: String,
+      nodes: List[TypeNode]): String = {
     val l1 = str(level)(name + grouping.ldelim)
     val l2 = nodes.map(_ show level + 1)
     val l3 = str(level)(grouping.rdelim)
@@ -45,7 +48,8 @@ trait StructuredTypeStrings extends DestructureTypes {
     l1 +: l2 :+ l3 mkString "\n"
   }
   private def maybeBlock(level: Int, grouping: Grouping)(
-      name: String, nodes: List[TypeNode]): String = {
+      name: String,
+      nodes: List[TypeNode]): String = {
     val threshold = 70
 
     val try1 = str(level)(

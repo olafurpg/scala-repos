@@ -101,8 +101,7 @@ trait MappedForeignKey[
   def immutableMsg: NodeSeq = Text(?("Can't change"))
 
   override def _toForm: Box[Elem] =
-    Full(
-        validSelectValues.flatMap {
+    Full(validSelectValues.flatMap {
       case Nil => Empty
 
       case xs =>
@@ -206,7 +205,8 @@ trait MappedForeignKey[
 }
 
 abstract class MappedLongForeignKey[T <: Mapper[T], O <: KeyedMapper[Long, O]](
-    theOwner: T, _foreignMeta: => KeyedMetaMapper[Long, O])
+    theOwner: T,
+    _foreignMeta: => KeyedMetaMapper[Long, O])
     extends MappedLong[T](theOwner)
     with MappedForeignKey[Long, T, O]
     with BaseForeignKey {
@@ -267,13 +267,13 @@ abstract class MappedLongForeignKey[T <: Mapper[T], O <: KeyedMapper[Long, O]](
   /**
     * Given the driver type, return the string required to create the column in the database
     */
-  override def fieldCreatorString(
-      dbType: DriverType, colName: String): String =
+  override def fieldCreatorString(dbType: DriverType,
+                                  colName: String): String =
     colName + " " + dbType.longForeignKeyColumnType + notNullAppender()
 }
 
-abstract class MappedStringForeignKey[
-    T <: Mapper[T], O <: KeyedMapper[String, O]](
+abstract class MappedStringForeignKey[T <: Mapper[T],
+                                      O <: KeyedMapper[String, O]](
     override val fieldOwner: T,
     foreign: => KeyedMetaMapper[String, O],
     override val maxLen: Int)

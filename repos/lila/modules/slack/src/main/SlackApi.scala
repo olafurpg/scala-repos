@@ -4,8 +4,8 @@ import lila.common.LightUser
 import lila.hub.actorApi.slack._
 import lila.user.User
 
-final class SlackApi(
-    client: SlackClient, implicit val lightUser: String => Option[LightUser]) {
+final class SlackApi(client: SlackClient,
+                     implicit val lightUser: String => Option[LightUser]) {
 
   def donation(event: lila.hub.actorApi.DonationEvent): Funit = {
     val user = event.userId flatMap lightUser

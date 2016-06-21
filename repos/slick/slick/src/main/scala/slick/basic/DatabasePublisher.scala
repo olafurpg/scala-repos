@@ -15,8 +15,7 @@ abstract class DatabasePublisher[T] extends Publisher[T] { self =>
   def mapResult[U](f: T => U): DatabasePublisher[U] =
     new DatabasePublisher[U] {
       def subscribe(s: Subscriber[_ >: U]) =
-        self.subscribe(
-            new Subscriber[T] {
+        self.subscribe(new Subscriber[T] {
           def onSubscribe(sn: Subscription): Unit = s.onSubscribe(sn)
           def onComplete(): Unit = s.onComplete()
           def onError(t: Throwable): Unit = s.onError(t)

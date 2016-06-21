@@ -24,8 +24,9 @@ import generic.CanBuildFrom
   *  rapidly as 2^30 is approached.
   *
   */
-final class LongMap[V] private[collection](
-    defaultEntry: Long => V, initialBufferSize: Int, initBlank: Boolean)
+final class LongMap[V] private[collection] (defaultEntry: Long => V,
+                                            initialBufferSize: Int,
+                                            initBlank: Boolean)
     extends AbstractMap[Long, V]
     with Map[Long, V]
     with MapLike[Long, V, LongMap[V]]
@@ -414,8 +415,14 @@ final class LongMap[V] private[collection](
     val kz = java.util.Arrays.copyOf(_keys, _keys.length)
     val vz = java.util.Arrays.copyOf(_values, _values.length)
     val lm = new LongMap[V](defaultEntry, 1, false)
-    lm.initializeTo(
-        mask, extraKeys, zeroValue, minValue, _size, _vacant, kz, vz)
+    lm.initializeTo(mask,
+                    extraKeys,
+                    zeroValue,
+                    minValue,
+                    _size,
+                    _vacant,
+                    kz,
+                    vz)
     lm
   }
 

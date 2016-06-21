@@ -84,8 +84,8 @@ private[stat] object WelchTTest extends StreamingTestMethod with Logging {
   override def doTest(data: SummaryPairStream): DStream[StreamingTestResult] =
     data.map[StreamingTestResult]((test _).tupled)
 
-  private def test(
-      statsA: StatCounter, statsB: StatCounter): StreamingTestResult = {
+  private def test(statsA: StatCounter,
+                   statsB: StatCounter): StreamingTestResult = {
     def welchDF(sample1: StatisticalSummaryValues,
                 sample2: StatisticalSummaryValues): Double = {
       val s1 = sample1.getVariance
@@ -126,8 +126,8 @@ private[stat] object StudentTTest extends StreamingTestMethod with Logging {
   override def doTest(data: SummaryPairStream): DStream[StreamingTestResult] =
     data.map[StreamingTestResult]((test _).tupled)
 
-  private def test(
-      statsA: StatCounter, statsB: StatCounter): StreamingTestResult = {
+  private def test(statsA: StatCounter,
+                   statsB: StatCounter): StreamingTestResult = {
     def studentDF(sample1: StatisticalSummaryValues,
                   sample2: StatisticalSummaryValues): Double =
       sample1.getN + sample2.getN - 2
@@ -159,6 +159,6 @@ private[stat] object StreamingTestMethod {
       case None =>
         throw new IllegalArgumentException(
             "Unrecognized method name. Supported streaming test methods: " +
-            TEST_NAME_TO_OBJECT.keys.mkString(", "))
+              TEST_NAME_TO_OBJECT.keys.mkString(", "))
     }
 }

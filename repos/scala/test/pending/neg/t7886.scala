@@ -11,8 +11,8 @@ object Test extends Covariant[Any] {
     case _ =>
   }
   def main(args: Array[String]) {
-    f(Unravel[String](
-            new Contra[String] { def accept(x: String) = x.length }, ""))
+    f(Unravel[String](new Contra[String] { def accept(x: String) = x.length },
+                      ""))
   }
 }
 // java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.String

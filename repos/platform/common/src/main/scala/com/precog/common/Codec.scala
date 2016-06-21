@@ -170,8 +170,7 @@ object Codec {
   def writeToArray[A](a: A)(implicit codec: Codec[A]): Array[Byte] = {
     import ByteBufferPool._
 
-    byteBufferPool.run(
-        for {
+    byteBufferPool.run(for {
       _ <- codec.write(a)
       bytes <- flipBytes
       _ <- release
@@ -208,8 +207,10 @@ object Codec {
       sizePackedInt(n >>> 7, size + 1)
     } else size
 
-  case class CompositeCodec[A, B, C](
-      codecA: Codec[A], codecB: Codec[B], from: C => (A, B), to: (A, B) => C)
+  case class CompositeCodec[A, B, C](codecA: Codec[A],
+                                     codecB: Codec[B],
+                                     from: C => (A, B),
+                                     to: (A, B) => C)
       extends Codec[C] {
     type S = Either[(codecA.S, B), codecB.S]
 
@@ -240,7 +241,7 @@ object Codec {
     def writeMore(more: S, buf: ByteBuffer) = more match {
       case Left((s, b)) =>
         (codecA.writeMore(s, buf) map (s => Left((s, b)))) orElse
-        (codecB.writeInit(b, buf) map (Right(_)))
+          (codecB.writeInit(b, buf) map (Right(_)))
       case Right(s) => codecB.writeMore(s, buf) map (Right(_))
     }
 
@@ -297,7 +298,7 @@ object Codec {
       case FALSE_VALUE => false
       case invalid =>
         sys.error("Error reading boolean: expecting %d or %d, found %d" format
-            (TRUE_VALUE, FALSE_VALUE, invalid))
+              (TRUE_VALUE, FALSE_VALUE, invalid))
     }
   }
 
@@ -344,13 +345,12 @@ object Codec {
       }
 
       var n = sn
-      val lo =
-        if (sn < 0) {
-          n = ~sn
-          n & 0x3FL | 0x40L
-        } else {
-          n & 0x3FL
-        }
+      val lo = if (sn < 0) {
+        n = ~sn
+        n & 0x3FL | 0x40L
+      } else {
+        n & 0x3FL
+      }
 
       if ((~0x3FL & n) != 0) {
         buf.put((lo | 0x80L).toByte)
@@ -498,8 +498,8 @@ object Codec {
       x => (x.unscaledValue.toByteArray, x.scale.toLong),
       (u, s) => new BigDec(new java.math.BigInteger(u), s.toInt))
 
-  implicit val BigDecimalCodec = JBigDecimalCodec.as[BigDecimal](
-      _.underlying, BigDecimal(_, MathContext.UNLIMITED))
+  implicit val BigDecimalCodec = JBigDecimalCodec
+    .as[BigDecimal](_.underlying, BigDecimal(_, MathContext.UNLIMITED))
 
   final class IndexedSeqCodec[A](val elemCodec: Codec[A])
       extends Codec[IndexedSeq[A]] {
@@ -547,7 +547,8 @@ object Codec {
       case Left(as) => writeInit(as, sink)
       case Right((s, as)) =>
         elemCodec.writeMore(s, sink) map (Right(_, as)) orElse writeArray(
-            as.toList, sink)
+            as.toList,
+            sink)
     }
 
     def read(src: ByteBuffer): IndexedSeq[A] =
@@ -604,8 +605,9 @@ object Codec {
     }
 
     @tailrec
-    private def writeArray(
-        as: Array[A], row: Int, sink: ByteBuffer): Option[S] =
+    private def writeArray(as: Array[A],
+                           row: Int,
+                           sink: ByteBuffer): Option[S] =
       if (row < as.length) {
         elemCodec.writeInit(as(row), sink) match {
           case Some(s) => Some(Right((s, as, row + 1)))

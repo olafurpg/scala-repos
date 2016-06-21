@@ -48,13 +48,13 @@ private[spark] abstract class EventLoop[E](name: String) extends Logging {
             onReceive(event)
           } catch {
             case NonFatal(e) => {
-                try {
-                  onError(e)
-                } catch {
-                  case NonFatal(e) =>
-                    logError("Unexpected error in " + name, e)
-                }
+              try {
+                onError(e)
+              } catch {
+                case NonFatal(e) =>
+                  logError("Unexpected error in " + name, e)
               }
+            }
           }
         }
       } catch {

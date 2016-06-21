@@ -48,8 +48,7 @@ object ConsumerConfig extends Config {
   val MirrorTopicsWhitelistProp = "mirror.topics.whitelist"
   val MirrorTopicsBlacklistProp = "mirror.topics.blacklist"
   val ExcludeInternalTopics = true
-  val DefaultPartitionAssignmentStrategy =
-    "range" /* select between "range", and "roundrobin" */
+  val DefaultPartitionAssignmentStrategy = "range" /* select between "range", and "roundrobin" */
   val MirrorConsumerNumThreadsProp = "mirror.consumer.numthreads"
   val DefaultClientId = ""
 
@@ -76,9 +75,9 @@ object ConsumerConfig extends Config {
       case _ =>
         throw new InvalidConfigException(
             "Wrong value " +
-            autoOffsetReset + " of auto.offset.reset in ConsumerConfig; " +
-            "Valid values are " + OffsetRequest.SmallestTimeString + " and " +
-            OffsetRequest.LargestTimeString)
+              autoOffsetReset + " of auto.offset.reset in ConsumerConfig; " +
+              "Valid values are " + OffsetRequest.SmallestTimeString + " and " +
+              OffsetRequest.LargestTimeString)
     }
   }
 
@@ -89,8 +88,8 @@ object ConsumerConfig extends Config {
       case _ =>
         throw new InvalidConfigException(
             "Wrong value " + storage +
-            " of offsets.storage in consumer config; " +
-            "Valid values are 'zookeeper' and 'kafka'")
+              " of offsets.storage in consumer config; " +
+              "Valid values are 'zookeeper' and 'kafka'")
     }
   }
 
@@ -101,8 +100,8 @@ object ConsumerConfig extends Config {
       case _ =>
         throw new InvalidConfigException(
             "Wrong value " + strategy +
-            " of partition.assignment.strategy in consumer config; " +
-            "Valid values are 'range' and 'roundrobin'")
+              " of partition.assignment.strategy in consumer config; " +
+              "Valid values are 'range' and 'roundrobin'")
     }
   }
 }
@@ -159,7 +158,7 @@ class ConsumerConfig private (val props: VerifiableProperties)
   val fetchWaitMaxMs = props.getInt("fetch.wait.max.ms", MaxFetchWaitMs)
   require(fetchWaitMaxMs <= socketTimeoutMs,
           "socket.timeout.ms should always be at least fetch.wait.max.ms" +
-          " to prevent unnecessary socket timeouts")
+            " to prevent unnecessary socket timeouts")
 
   /** backoff time between retries during rebalance */
   val rebalanceBackoffMs = props.getInt("rebalance.backoff.ms", zkSyncTimeMs)
@@ -174,8 +173,8 @@ class ConsumerConfig private (val props: VerifiableProperties)
 
   /** socket timeout to use when reading responses for Offset Fetch/Commit requests. This timeout will also be used for
     *  the ConsumerMetdata requests that are used to query for the offset coordinator. */
-  val offsetsChannelSocketTimeoutMs = props.getInt(
-      "offsets.channel.socket.timeout.ms", OffsetsChannelSocketTimeoutMs)
+  val offsetsChannelSocketTimeoutMs = props
+    .getInt("offsets.channel.socket.timeout.ms", OffsetsChannelSocketTimeoutMs)
 
   /** Retry the offset commit up to this many times on failure. This retry count only applies to offset commits during
     * shut-down. It does not apply to commits from the auto-commit thread. It also does not apply to attempts to query
@@ -193,7 +192,8 @@ class ConsumerConfig private (val props: VerifiableProperties)
     * given consumer group, it is safe to turn this off after all instances within that group have been migrated to
     * the new jar that commits offsets to the broker (instead of directly to ZooKeeper). */
   val dualCommitEnabled = props.getBoolean(
-      "dual.commit.enabled", if (offsetsStorage == "kafka") true else false)
+      "dual.commit.enabled",
+      if (offsetsStorage == "kafka") true else false)
 
   /* what to do if an offset is out of range.
      smallest : automatically reset the offset to the smallest offset
@@ -216,7 +216,8 @@ class ConsumerConfig private (val props: VerifiableProperties)
 
   /** Select a strategy for assigning partitions to consumer streams. Possible values: range, roundrobin */
   val partitionAssignmentStrategy = props.getString(
-      "partition.assignment.strategy", DefaultPartitionAssignmentStrategy)
+      "partition.assignment.strategy",
+      DefaultPartitionAssignmentStrategy)
 
   validate(this)
 }

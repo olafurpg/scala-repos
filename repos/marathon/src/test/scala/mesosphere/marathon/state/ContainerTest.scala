@@ -26,35 +26,31 @@ class ContainerTest extends MarathonSpec with Matchers {
         docker = Some(Container.Docker(image = "group/image"))
     )
 
-    lazy val container2 =
-      Container(
-          `type` = mesos.ContainerInfo.Type.DOCKER,
-          volumes =
-            Nil,
-          docker = Some(
-              Container
-                .Docker(
-                  image = "group/image",
-                  network = Some(
-                      mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                  portMappings =
-                    Some(Seq(
-                            Container.Docker.PortMapping(
-                                containerPort = 8080,
-                                hostPort = 32001,
-                                servicePort = 9000,
-                                protocol = Container.Docker.PortMapping.TCP,
-                                name = Some("http"),
-                                labels = Map("foo" -> "bar")),
-                            Container.Docker.PortMapping(
-                                containerPort = 8081,
-                                hostPort = 32002,
-                                servicePort = 9001,
-                                protocol = Container.Docker.PortMapping.UDP)
-                        ))
-              )
-          )
-      )
+    lazy val container2 = Container(
+        `type` = mesos.ContainerInfo.Type.DOCKER,
+        volumes = Nil,
+        docker = Some(
+            Container.Docker(
+                image = "group/image",
+                network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                portMappings = Some(
+                    Seq(
+                        Container.Docker.PortMapping(
+                            containerPort = 8080,
+                            hostPort = 32001,
+                            servicePort = 9000,
+                            protocol = Container.Docker.PortMapping.TCP,
+                            name = Some("http"),
+                            labels = Map("foo" -> "bar")),
+                        Container.Docker.PortMapping(
+                            containerPort = 8081,
+                            hostPort = 32002,
+                            servicePort = 9001,
+                            protocol = Container.Docker.PortMapping.UDP)
+                    ))
+            )
+        )
+    )
 
     lazy val container3 = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,

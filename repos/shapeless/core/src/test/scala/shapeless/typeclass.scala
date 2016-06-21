@@ -81,8 +81,9 @@ package TypeClassAux {
 
       def emptyProduct = EmptyProduct
 
-      def coproduct[L, R <: Coproduct](
-          name: String, l: => Image[L], r: => Image[R]) = Sum(l, name, r)
+      def coproduct[L, R <: Coproduct](name: String,
+                                       l: => Image[L],
+                                       r: => Image[R]) = Sum(l, name, r)
 
       def emptyCoproduct = EmptyCoproduct
 

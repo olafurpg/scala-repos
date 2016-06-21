@@ -24,7 +24,7 @@ object Export extends LilaController {
               initialFen <- GameRepo initialFen game
               pgn = Env.api.pgnDump(game, initialFen)
               analysis ← !get("as").contains("raw") ??
-                        (Env.analyse.analyser get game.id)
+                          (Env.analyse.analyser get game.id)
             } yield
               Env.analyse
                 .annotator(pgn,
@@ -37,8 +37,8 @@ object Export extends LilaController {
         }) map { content =>
           Ok(content).withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                                   CONTENT_DISPOSITION ->
-                                  ("attachment; filename=" +
-                                      (Env.api.pgnDump filename game)))
+                                    ("attachment; filename=" +
+                                          (Env.api.pgnDump filename game)))
         }
       }
     }
@@ -74,13 +74,13 @@ object Export extends LilaController {
     }
   }
 
-  private def OnlyHumans(result: => Fu[Result])(
-      implicit ctx: lila.api.Context) =
+  private def OnlyHumans(
+      result: => Fu[Result])(implicit ctx: lila.api.Context) =
     if (HTTPRequest isBot ctx.req) fuccess(NotFound)
     else result
 
-  private def OnlyHumansAndFacebook(result: => Fu[Result])(
-      implicit ctx: lila.api.Context) =
+  private def OnlyHumansAndFacebook(
+      result: => Fu[Result])(implicit ctx: lila.api.Context) =
     if (HTTPRequest isFacebookBot ctx.req) result
     else if (HTTPRequest isBot ctx.req) fuccess(NotFound)
     else result

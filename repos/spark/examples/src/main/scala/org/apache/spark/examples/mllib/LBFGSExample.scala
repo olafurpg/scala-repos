@@ -66,8 +66,8 @@ object LBFGSExample {
         initialWeightsWithIntercept)
 
     val model = new LogisticRegressionModel(
-        Vectors.dense(weightsWithIntercept.toArray.slice(
-                0, weightsWithIntercept.size - 1)),
+        Vectors.dense(weightsWithIntercept.toArray
+              .slice(0, weightsWithIntercept.size - 1)),
         weightsWithIntercept(weightsWithIntercept.size - 1))
 
     // Clear the default threshold.

@@ -76,7 +76,7 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
     /** checks if the given symbol is a JSExport */
     def isExport(sym: Symbol): Boolean =
       sym.unexpandedName.startsWith(exportPrefix) &&
-      !sym.hasFlag(Flags.DEFAULTPARAM)
+        !sym.hasFlag(Flags.DEFAULTPARAM)
 
     /** retrieves the originally assigned jsName of this export and whether it
       *  is a property

@@ -80,8 +80,9 @@ private[round] final class Round(gameId: String,
 
     case Resign(playerId) =>
       handle(playerId) { pov =>
-        pov.game.resignable ?? finisher.other(
-            pov.game, _.Resign, Some(!pov.color))
+        pov.game.resignable ?? finisher.other(pov.game,
+                                              _.Resign,
+                                              Some(!pov.color))
       }
 
     case GoBerserk(color) =>
@@ -183,11 +184,12 @@ private[round] final class Round(gameId: String,
         pov.game.clock.ifTrue(pov.game moretimeable !pov.color) ?? { clock =>
           val newClock = clock.giveTime(!pov.color, moretimeDuration.toSeconds)
           val progress = (pov.game withClock newClock) + Event.Clock(newClock)
-          messenger.system(pov.game,
-                           (_.untranslated(
-                               "%s + %d seconds".format(
-                                   !pov.color, moretimeDuration.toSeconds)
-                           )))
+          messenger.system(
+              pov.game,
+              (_.untranslated(
+                  "%s + %d seconds".format(!pov.color,
+                                           moretimeDuration.toSeconds)
+              )))
           GameRepo save progress inject progress.events
         }
       }
@@ -224,9 +226,10 @@ private[round] final class Round(gameId: String,
     case AbortForMaintenance =>
       handle { game =>
         messenger.system(
-            game, (_.untranslated("Game aborted for server maintenance")))
-        messenger.system(
-            game, (_.untranslated("Sorry for the inconvenience!")))
+            game,
+            (_.untranslated("Game aborted for server maintenance")))
+        messenger.system(game,
+                         (_.untranslated("Sorry for the inconvenience!")))
         game.playable ?? finisher.other(game, _.Aborted)
       }
   }
@@ -261,8 +264,8 @@ private[round] final class Round(gameId: String,
       }
     } recover errorHandler("handlePov")
 
-  private def handleGame(game: Fu[Option[Game]])(
-      op: Game => Fu[Events]): Funit =
+  private def handleGame(
+      game: Fu[Option[Game]])(op: Game => Fu[Events]): Funit =
     publish {
       game flatten "game not found" flatMap op
     } recover errorHandler("handleGame")

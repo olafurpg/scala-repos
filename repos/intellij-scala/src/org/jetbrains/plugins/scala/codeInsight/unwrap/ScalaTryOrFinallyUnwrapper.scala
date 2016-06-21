@@ -37,7 +37,8 @@ class ScalaTryOrFinallyUnwrapper extends ScalaUnwrapper {
   }
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e.getParent match {
+      e: PsiElement,
+      toExtract: util.List[PsiElement]) = e.getParent match {
     case _: ScTryStmt =>
       super.collectAffectedElements(e, toExtract)
       e

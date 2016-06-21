@@ -22,7 +22,8 @@ class DictionaryTest {
   // scala.scalajs.js.Dictionary
 
   @Test
-  def should_provide_an_equivalent_of_the_JS_delete_keyword_issue_255(): Unit = {
+  def should_provide_an_equivalent_of_the_JS_delete_keyword_issue_255()
+    : Unit = {
     val obj = js.Dictionary.empty[js.Any]
     obj("foo") = 42
     obj("bar") = "foobar"

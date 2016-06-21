@@ -26,8 +26,9 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
     if (global.forScaladoc) {
       List[NscPluginComponent](PrepInteropComponent)
     } else {
-      List[NscPluginComponent](
-          PreTyperComponentComponent, PrepInteropComponent, GenCodeComponent)
+      List[NscPluginComponent](PreTyperComponentComponent,
+                               PrepInteropComponent,
+                               GenCodeComponent)
     }
   }
 
@@ -89,8 +90,8 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
       ScalaJSPlugin.this.generatedJSAST(clDefs)
   }
 
-  override def processOptions(
-      options: List[String], error: String => Unit): Unit = {
+  override def processOptions(options: List[String],
+                              error: String => Unit): Unit = {
     import ScalaJSOptions.URIMap
     import scalaJSOpts._
 
@@ -132,10 +133,10 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
     // Verify constraints
     if (_sourceURIMaps.nonEmpty && relSourceMap.isDefined)
       error("You may not use mapSourceURI and relSourceMap together. " +
-          "Use another mapSourceURI option without second URI.")
+            "Use another mapSourceURI option without second URI.")
     else if (_sourceURIMaps.nonEmpty && absSourceMap.isDefined)
       error("You may not use mapSourceURI and absSourceMap together. " +
-          "Use another mapSourceURI option.")
+            "Use another mapSourceURI option.")
     else if (absSourceMap.isDefined && relSourceMap.isEmpty)
       error("absSourceMap requires the use of relSourceMap")
   }

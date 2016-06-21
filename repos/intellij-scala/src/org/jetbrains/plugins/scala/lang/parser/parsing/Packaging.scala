@@ -28,27 +28,27 @@ object Packaging {
         //parsing body of regular packaging
         builder.getTokenType match {
           case ScalaTokenTypes.tLBRACE => {
-              if (builder.twoNewlinesBeforeCurrentToken) {
-                builder error ScalaBundle.message("lbrace.expected")
-                packMarker.done(ScalaElementTypes.PACKAGING)
-                return true
-              }
-              builder.advanceLexer() //Ate '{'
-              builder.enableNewlines
-              ParserUtils.parseLoopUntilRBrace(builder, () => {
-                //parse packaging body
-                TopStatSeq parse
-                (builder, true)
-              })
-              builder.restoreNewlinesState
-              packMarker.done(ScalaElementTypes.PACKAGING)
-              true
-            }
-          case _ => {
+            if (builder.twoNewlinesBeforeCurrentToken) {
               builder error ScalaBundle.message("lbrace.expected")
               packMarker.done(ScalaElementTypes.PACKAGING)
-              true
+              return true
             }
+            builder.advanceLexer() //Ate '{'
+            builder.enableNewlines
+            ParserUtils.parseLoopUntilRBrace(builder, () => {
+              //parse packaging body
+              TopStatSeq parse
+              (builder, true)
+            })
+            builder.restoreNewlinesState
+            packMarker.done(ScalaElementTypes.PACKAGING)
+            true
+          }
+          case _ => {
+            builder error ScalaBundle.message("lbrace.expected")
+            packMarker.done(ScalaElementTypes.PACKAGING)
+            true
+          }
         }
       case _ =>
         //this code shouldn't be reachable, if it is, this is unexpected error

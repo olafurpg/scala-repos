@@ -48,8 +48,8 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
       _.get(group.getString + "/" + name.getString).map { _.get }
     }
 
-  private def toStream[T](
-      outerProducer: Prod[T], jamfs: JamfMap): (Stream[T], JamfMap) =
+  private def toStream[T](outerProducer: Prod[T],
+                          jamfs: JamfMap): (Stream[T], JamfMap) =
     jamfs.get(outerProducer) match {
       case Some(s) => (s, jamfs)
       case None =>

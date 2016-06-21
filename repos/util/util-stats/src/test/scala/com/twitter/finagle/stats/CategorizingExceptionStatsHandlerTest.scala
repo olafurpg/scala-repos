@@ -80,8 +80,8 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
   test("supports no rollup") {
     val receiver = new InMemoryStatsReceiver
 
-    val esh = new CategorizingExceptionStatsHandler(
-        _ => Some("clienterrors"), _ => Some("service"), false)
+    val esh = new CategorizingExceptionStatsHandler(_ =>
+          Some("clienterrors"), _ => Some("service"), false)
 
     val cwe = new RuntimeException(new Exception("e"))
     esh.record(receiver, cwe)

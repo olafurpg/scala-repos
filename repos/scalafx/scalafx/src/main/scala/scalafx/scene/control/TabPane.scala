@@ -41,8 +41,8 @@ object TabPane {
     if (v != null) v.delegate else null
 
   object TabClosingPolicy
-      extends SFXEnumDelegateCompanion[
-          jfxsc.TabPane.TabClosingPolicy, TabClosingPolicy] {
+      extends SFXEnumDelegateCompanion[jfxsc.TabPane.TabClosingPolicy,
+                                       TabClosingPolicy] {
 
     /**
       * All tabs will have the option to be closed.

@@ -70,8 +70,7 @@ object EstimatorTransformerParamExample {
       .put(lr.regParam -> 0.1, lr.threshold -> 0.55) // Specify multiple Params.
 
     // One can also combine ParamMaps.
-    val paramMap2 =
-      ParamMap(lr.probabilityCol -> "myProbability") // Change output column name
+    val paramMap2 = ParamMap(lr.probabilityCol -> "myProbability") // Change output column name
     val paramMapCombined = paramMap ++ paramMap2
 
     // Now learn a new model using the paramMapCombined parameters.

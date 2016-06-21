@@ -57,10 +57,10 @@ object ManifestScalaType {
     }
   }
 
-  def apply(
-      erasure: Class[_], typeArgs: Seq[ScalaType] = Seq.empty): ScalaType = {
-    val mf = ManifestFactory.manifestOf(
-        erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
+  def apply(erasure: Class[_],
+            typeArgs: Seq[ScalaType] = Seq.empty): ScalaType = {
+    val mf = ManifestFactory
+      .manifestOf(erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
     ManifestScalaType(mf)
   }
 
@@ -150,8 +150,9 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
 
   val typeArgs =
     manifest.typeArguments.map(ta => Reflector.scalaTypeOf(ta)) ++
-    (if (erasure.isArray) List(Reflector.scalaTypeOf(erasure.getComponentType))
-     else Nil)
+      (if (erasure.isArray)
+         List(Reflector.scalaTypeOf(erasure.getComponentType))
+       else Nil)
 
   private[this] var _typeVars: Map[TypeVariable[_], ScalaType] = null
   def typeVars = {
@@ -255,8 +256,8 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
     else if (erasure == classOf[Number]) ManifestScalaType.NumberType
     /* end optimization */
     else {
-      val mf = ManifestFactory.manifestOf(
-          erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
+      val mf = ManifestFactory
+        .manifestOf(erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
       val st = new CopiedManifestScalaType(mf, typeVars, isPrimitive)
       if (typeArgs.isEmpty) types.replace(mf, st)
       else st
@@ -265,8 +266,10 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
 
   override def toString: String = simpleName
 }
-case class PropertyDescriptor(
-    name: String, mangledName: String, returnType: ScalaType, field: Field)
+case class PropertyDescriptor(name: String,
+                              mangledName: String,
+                              returnType: ScalaType,
+                              field: Field)
     extends Descriptor {
   def set(receiver: Any, value: Any) = field.set(receiver, value)
   def get(receiver: AnyRef) = field.get(receiver)
@@ -312,6 +315,7 @@ case class ClassDescriptor(simpleName: String,
     if (constructors.isEmpty) Seq.empty
     else constructors.sortBy(-_.params.size).head.params
 }
-case class PrimitiveDescriptor(
-    simpleName: String, fullName: String, erasure: ScalaType)
+case class PrimitiveDescriptor(simpleName: String,
+                               fullName: String,
+                               erasure: ScalaType)
     extends ObjectDescriptor {}

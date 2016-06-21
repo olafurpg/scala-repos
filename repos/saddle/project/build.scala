@@ -88,8 +88,9 @@ object SaddleBuild extends sbt.Build {
         )
     ) dependsOn (core)
 
-  def project(
-      id: String, base: File, settings: Seq[Project.Setting[_]] = Nil) =
+  def project(id: String,
+              base: File,
+              settings: Seq[Project.Setting[_]] = Nil) =
     Project(
         id = id,
         base = base,

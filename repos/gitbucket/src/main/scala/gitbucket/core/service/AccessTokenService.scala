@@ -29,8 +29,8 @@ trait AccessTokenService {
       token = makeAccessTokenString
       hash = tokenToHash(token)
     } while (AccessTokens.filter(_.tokenHash === hash.bind).exists.run)
-    val newToken = AccessToken(
-        userName = userName, note = note, tokenHash = hash)
+    val newToken =
+      AccessToken(userName = userName, note = note, tokenHash = hash)
     val tokenId =
       (AccessTokens returning AccessTokens.map(_.accessTokenId)) += newToken
     (tokenId, token)
@@ -43,25 +43,25 @@ trait AccessTokenService {
       .filter {
         case (ac, t) =>
           (ac.userName === t.userName) &&
-          (t.tokenHash === tokenToHash(token).bind) &&
-          (ac.removed === false.bind)
+            (t.tokenHash === tokenToHash(token).bind) &&
+            (ac.removed === false.bind)
       }
       .map { case (ac, t) => ac }
       .firstOption
 
-  def getAccessTokens(userName: String)(
-      implicit s: Session): List[AccessToken] =
+  def getAccessTokens(
+      userName: String)(implicit s: Session): List[AccessToken] =
     AccessTokens
       .filter(_.userName === userName.bind)
       .sortBy(_.accessTokenId.desc)
       .list
 
-  def deleteAccessToken(userName: String, accessTokenId: Int)(
-      implicit s: Session): Unit =
+  def deleteAccessToken(userName: String,
+                        accessTokenId: Int)(implicit s: Session): Unit =
     AccessTokens filter
-    (t =>
-          t.userName === userName.bind &&
-          t.accessTokenId === accessTokenId) delete
+      (t =>
+            t.userName === userName.bind &&
+              t.accessTokenId === accessTokenId) delete
 }
 
 object AccessTokenService extends AccessTokenService

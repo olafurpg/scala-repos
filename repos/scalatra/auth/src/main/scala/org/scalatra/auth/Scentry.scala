@@ -20,12 +20,14 @@ object Scentry {
 
   @deprecated("Use method `register` with strings instead.", "2.0")
   def registerStrategy[UserType <: AnyRef](
-      name: Symbol, strategyFactory: StrategyFactory[UserType]) {
+      name: Symbol,
+      strategyFactory: StrategyFactory[UserType]) {
     _globalStrategies += (name.name -> strategyFactory)
   }
 
   def register[UserType <: AnyRef](
-      name: String, strategyFactory: StrategyFactory[UserType]) {
+      name: String,
+      strategyFactory: StrategyFactory[UserType]) {
     _globalStrategies += (name -> strategyFactory)
   }
 
@@ -58,16 +60,16 @@ class Scentry[UserType <: AnyRef](
     _store = newStore
   }
 
-  def isAuthenticated(
-      implicit request: HttpServletRequest, response: HttpServletResponse) = {
+  def isAuthenticated(implicit request: HttpServletRequest,
+                      response: HttpServletResponse) = {
     userOption.isDefined
   }
 
   //def session = app.session
   def params(implicit request: HttpServletRequest): Params =
     app.params(request)
-  def redirect(uri: String)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) {
+  def redirect(uri: String)(implicit request: HttpServletRequest,
+                            response: HttpServletResponse) {
     app.redirect(uri)(request, response)
   }
 
@@ -104,8 +106,8 @@ class Scentry[UserType <: AnyRef](
            response: HttpServletResponse): UserType =
     userOption getOrElse null.asInstanceOf[UserType]
 
-  def user_=(v: UserType)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) = {
+  def user_=(v: UserType)(implicit request: HttpServletRequest,
+                          response: HttpServletResponse) = {
     request(scentryAuthKey) = v
     if (v != null) {
       runCallbacks() { _.beforeSetUser(v) }
@@ -155,7 +157,8 @@ class Scentry[UserType <: AnyRef](
   }
 
   private[this] def runAuthentication(names: String*)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) = {
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse) = {
     val subset =
       if (names.isEmpty) strategies.values
       else
@@ -178,8 +181,8 @@ class Scentry[UserType <: AnyRef](
     defaultUnauthenticated = Some(() ⇒ callback)
   }
 
-  def logout()(
-      implicit request: HttpServletRequest, response: HttpServletResponse) {
+  def logout()(implicit request: HttpServletRequest,
+               response: HttpServletResponse) {
     val usr = user
     runCallbacks() { _.beforeLogout(usr) }
     request -= scentryAuthKey

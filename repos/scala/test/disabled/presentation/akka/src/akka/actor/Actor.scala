@@ -78,23 +78,23 @@ case class MaximumNumberOfRestartsWithinTimeRangeReached(
     extends LifeCycleMessage
 
 // Exceptions for Actors
-class ActorStartException private[akka](
-    message: String, cause: Throwable = null)
+class ActorStartException private[akka] (message: String,
+                                         cause: Throwable = null)
     extends AkkaException(message, cause)
-class IllegalActorStateException private[akka](
-    message: String, cause: Throwable = null)
+class IllegalActorStateException private[akka] (message: String,
+                                                cause: Throwable = null)
     extends AkkaException(message, cause)
-class ActorKilledException private[akka](
-    message: String, cause: Throwable = null)
+class ActorKilledException private[akka] (message: String,
+                                          cause: Throwable = null)
     extends AkkaException(message, cause)
-class ActorInitializationException private[akka](
-    message: String, cause: Throwable = null)
+class ActorInitializationException private[akka] (message: String,
+                                                  cause: Throwable = null)
     extends AkkaException(message, cause)
-class ActorTimeoutException private[akka](
-    message: String, cause: Throwable = null)
+class ActorTimeoutException private[akka] (message: String,
+                                           cause: Throwable = null)
     extends AkkaException(message, cause)
-class InvalidMessageException private[akka](
-    message: String, cause: Throwable = null)
+class InvalidMessageException private[akka] (message: String,
+                                             cause: Throwable = null)
     extends AkkaException(message, cause)
 
 /** This message is thrown by default when an Actors behavior doesn't match a message
@@ -137,8 +137,8 @@ object Actor extends ListenerManagement {
               "You need to have akka-remote.jar on classpath"))
   }
 
-  private[akka] val TIMEOUT = Duration(
-      config.getInt("akka.actor.timeout", 5), TIME_UNIT).toMillis
+  private[akka] val TIMEOUT =
+    Duration(config.getInt("akka.actor.timeout", 5), TIME_UNIT).toMillis
   private[akka] val SERIALIZE_MESSAGES =
     config.getBool("akka.actor.serialize-messages", false)
 
@@ -193,9 +193,9 @@ object Actor extends ListenerManagement {
 
           throw new ActorInitializationException(
               "Could not instantiate Actor of " + clazz +
-              "\nMake sure Actor is NOT defined inside a class/trait," +
-              "\nif so put it outside the class/trait, f.e. in a companion object," +
-              "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
+                "\nMake sure Actor is NOT defined inside a class/trait," +
+                "\nif so put it outside the class/trait, f.e. in a companion object," +
+                "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
               cause)
       }
     }, None)
@@ -247,8 +247,7 @@ object Actor extends ListenerManagement {
   def spawn(body: => Unit)(implicit dispatcher: MessageDispatcher =
                              Dispatchers.defaultGlobalDispatcher): Unit = {
     case object Spawn
-    actorOf(
-        new Actor() {
+    actorOf(new Actor() {
       self.dispatcher = dispatcher
       def receive = {
         case Spawn => try { body } finally { self.stop() }
@@ -341,15 +340,14 @@ trait Actor {
     if (optRef.isEmpty)
       throw new ActorInitializationException(
           "ActorRef for instance of actor [" + getClass.getName +
-          "] is not in scope." +
-          "\n\tYou can not create an instance of an actor explicitly using 'new MyActor'." +
-          "\n\tYou have to use one of the factory methods in the 'Actor' object to create a new actor." +
-          "\n\tEither use:" +
-          "\n\t\t'val actor = Actor.actorOf[MyActor]', or" +
-          "\n\t\t'val actor = Actor.actorOf(new MyActor(..))'")
+            "] is not in scope." +
+            "\n\tYou can not create an instance of an actor explicitly using 'new MyActor'." +
+            "\n\tYou have to use one of the factory methods in the 'Actor' object to create a new actor." +
+            "\n\tEither use:" +
+            "\n\t\t'val actor = Actor.actorOf[MyActor]', or" +
+            "\n\t\t'val actor = Actor.actorOf(new MyActor(..))'")
     Actor.actorRefInCreation.set(None)
-    optRef.asInstanceOf[Some[ActorRef]].get.id =
-      getClass.getName //FIXME: Is this needed?
+    optRef.asInstanceOf[Some[ActorRef]].get.id = getClass.getName //FIXME: Is this needed?
     optRef.asInstanceOf[Some[ActorRef]]
   }
 
@@ -486,7 +484,7 @@ trait Actor {
     if (msg.isInstanceOf[AnyRef] && (msg.asInstanceOf[AnyRef] eq null))
       throw new InvalidMessageException(
           "Message from [" + self.sender + "] to [" + self.toString +
-          "] is null")
+            "] is null")
     val behaviorStack = self.hotswap
     msg match {
       case l: AutoReceivedMessage => autoReceiveMessage(l)
@@ -518,8 +516,7 @@ trait Actor {
           f.get.completeWithException(new ActorKilledException("PoisonPill"))
     }
 
-  private lazy val processingBehavior =
-    receive //ProcessingBehavior is the original behavior
+  private lazy val processingBehavior = receive //ProcessingBehavior is the original behavior
 }
 
 private[actor] class AnyOptionAsTypedOption(anyOption: Option[Any]) {

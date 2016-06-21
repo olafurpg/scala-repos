@@ -17,14 +17,15 @@ case class FromLocalArgEvaluator(delegate: Evaluator) extends Evaluator {
 
   //it is hard to distinguish fields from local vars in async block
   private def evaluateNotFromField(
-      evaluator: Evaluator, context: EvaluationContextImpl): Option[AnyRef] = {
+      evaluator: Evaluator,
+      context: EvaluationContextImpl): Option[AnyRef] = {
     evaluator match {
       case ScalaBoxingEvaluator(inner) =>
         evaluateNotFromField(inner, context).map(
             ScalaBoxingEvaluator.box(_, context))
       case _: ScalaFieldEvaluator => None
-      case ScalaDuplexEvaluator(
-          first: ScalaFieldEvaluator, second: ScalaFieldEvaluator) =>
+      case ScalaDuplexEvaluator(first: ScalaFieldEvaluator,
+                                second: ScalaFieldEvaluator) =>
         None
       case ScalaDuplexEvaluator(first: ScalaFieldEvaluator, second)
           if Try(first.evaluate(context)).isFailure =>

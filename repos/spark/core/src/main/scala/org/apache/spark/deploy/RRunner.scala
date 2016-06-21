@@ -55,12 +55,11 @@ object RRunner {
     // Check if the file path exists.
     // If not, change directory to current working directory for YARN cluster mode
     val rF = new File(rFile)
-    val rFileNormalized =
-      if (!rF.exists()) {
-        new Path(rFile).getName
-      } else {
-        rFile
-      }
+    val rFileNormalized = if (!rF.exists()) {
+      new Path(rFile).getName
+    } else {
+      rFile
+    }
 
     // Launch a SparkR backend server for the R process to connect to; this will let it see our
     // Java system properties etc.
@@ -93,8 +92,9 @@ object RRunner {
         builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
         val process = builder.start()
 
-        new RedirectThread(
-            process.getInputStream, System.out, "redirect R output").start()
+        new RedirectThread(process.getInputStream,
+                           System.out,
+                           "redirect R output").start()
 
         process.waitFor()
       } finally {

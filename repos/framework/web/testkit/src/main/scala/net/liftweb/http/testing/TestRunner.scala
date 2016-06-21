@@ -107,8 +107,8 @@ class TestRunner(clearDB: Box[() => Any],
             val trace = combineStack(e, Nil)
               .takeWhile(e =>
                     e.getClassName != myTrace.getClassName ||
-                    e.getFileName != myTrace.getFileName ||
-                    e.getMethodName != myTrace.getMethodName)
+                      e.getFileName != myTrace.getFileName ||
+                      e.getMethodName != myTrace.getMethodName)
               .dropRight(2)
             (false, trace, Full(e))
         }
@@ -135,18 +135,19 @@ class TestRunner(clearDB: Box[() => Any],
               } catch {
                 case e: Throwable =>
                   def combineStack(
-                      ex: Throwable, base: List[StackTraceElement])
-                    : List[StackTraceElement] = ex match {
-                    case null => base
-                    case _ =>
-                      combineStack(
-                          ex.getCause, ex.getStackTrace.toList ::: base)
-                  }
+                      ex: Throwable,
+                      base: List[StackTraceElement]): List[StackTraceElement] =
+                    ex match {
+                      case null => base
+                      case _ =>
+                        combineStack(ex.getCause,
+                                     ex.getStackTrace.toList ::: base)
+                    }
                   val trace = combineStack(e, Nil)
                     .takeWhile(e =>
                           e.getClassName != myTrace.getClassName ||
-                          e.getFileName != myTrace.getFileName ||
-                          e.getMethodName != myTrace.getMethodName)
+                            e.getFileName != myTrace.getFileName ||
+                            e.getMethodName != myTrace.getMethodName)
                     .dropRight(2)
                   (false, trace, Full(e))
               }
@@ -201,7 +202,7 @@ case class TestResults(res: List[Tracker]) {
                 v.name + " " + v.exception
                   .openOrThrowException("This should be safe")
                   .getMessage + " \n" +
-                v.trace.map(st => "           " + st.toString).mkString("\n"))
+                  v.trace.map(st => "           " + st.toString).mkString("\n"))
           .mkString("\n")
     }
 
@@ -224,7 +225,7 @@ class Item(val name: String,
         () =>
           cf(cnt)
         case _ => () =>
-    }
+      }
   }
 }
 

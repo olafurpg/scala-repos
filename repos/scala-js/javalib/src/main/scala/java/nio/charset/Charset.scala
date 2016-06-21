@@ -4,8 +4,8 @@ import java.nio.{ByteBuffer, CharBuffer}
 
 import scala.scalajs.js
 
-abstract class Charset protected (
-    canonicalName: String, aliases: Array[String])
+abstract class Charset protected (canonicalName: String,
+                                  aliases: Array[String])
     extends AnyRef
     with Comparable[Charset] {
   final def name(): String = canonicalName

@@ -33,8 +33,7 @@ object OptionalSnapshotStoreSpec {
 }
 
 class OptionalSnapshotStoreSpec
-    extends PersistenceSpec(
-        ConfigFactory.parseString(s"""
+    extends PersistenceSpec(ConfigFactory.parseString(s"""
     akka.persistence.publish-plugin-commands = on
     akka.persistence.journal.plugin = "akka.persistence.journal.inmem"
     akka.persistence.journal.leveldb.dir = "target/journal-${classOf[

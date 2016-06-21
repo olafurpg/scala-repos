@@ -43,7 +43,7 @@ private[tracker] class TaskTrackerDelegate(metrics: Option[Metrics],
           case e: AskTimeoutException =>
             throw new TimeoutException(
                 s"timeout while calling list. If you know what you are doing, you can adjust the timeout " +
-                s"with --${config.internalTaskTrackerRequestTimeout.name}."
+                  s"with --${config.internalTaskTrackerRequestTimeout.name}."
             )
         }
     tasksByAppTimer.fold(futureCall())(_.timeFuture(futureCall()))

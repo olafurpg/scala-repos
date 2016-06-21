@@ -124,8 +124,8 @@ object IO {
   /** Concatenates a bunch of VirtualTextFiles to a WritableVirtualTextFile.
     *  Adds a '\n' after each file.
     */
-  def concatFiles(
-      output: WritableVirtualTextFile, files: Seq[VirtualTextFile]): Unit = {
+  def concatFiles(output: WritableVirtualTextFile,
+                  files: Seq[VirtualTextFile]): Unit = {
     val out = output.contentWriter
 
     try {

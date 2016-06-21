@@ -383,8 +383,8 @@ class StopWordsRemover(override val uid: String)
     * Default: [[StopWords.English]]
     * @group param
     */
-  val stopWords: StringArrayParam = new StringArrayParam(
-      this, "stopWords", "stop words")
+  val stopWords: StringArrayParam =
+    new StringArrayParam(this, "stopWords", "stop words")
 
   /** @group setParam */
   def setStopWords(value: Array[String]): this.type = set(stopWords, value)
@@ -412,19 +412,18 @@ class StopWordsRemover(override val uid: String)
 
   override def transform(dataset: DataFrame): DataFrame = {
     val outputSchema = transformSchema(dataset.schema)
-    val t =
-      if ($(caseSensitive)) {
-        val stopWordsSet = $(stopWords).toSet
-        udf { terms: Seq[String] =>
-          terms.filter(s => !stopWordsSet.contains(s))
-        }
-      } else {
-        val toLower = (s: String) => if (s != null) s.toLowerCase else s
-        val lowerStopWords = $(stopWords).map(toLower(_)).toSet
-        udf { terms: Seq[String] =>
-          terms.filter(s => !lowerStopWords.contains(toLower(s)))
-        }
+    val t = if ($(caseSensitive)) {
+      val stopWordsSet = $(stopWords).toSet
+      udf { terms: Seq[String] =>
+        terms.filter(s => !stopWordsSet.contains(s))
       }
+    } else {
+      val toLower = (s: String) => if (s != null) s.toLowerCase else s
+      val lowerStopWords = $(stopWords).map(toLower(_)).toSet
+      udf { terms: Seq[String] =>
+        terms.filter(s => !lowerStopWords.contains(toLower(s)))
+      }
+    }
 
     val metadata = outputSchema($(outputCol)).metadata
     dataset.select(col("*"), t(col($(inputCol))).as($(outputCol), metadata))
@@ -434,8 +433,10 @@ class StopWordsRemover(override val uid: String)
     val inputType = schema($(inputCol)).dataType
     require(inputType.sameType(ArrayType(StringType)),
             s"Input type must be ArrayType(StringType) but got $inputType.")
-    SchemaUtils.appendColumn(
-        schema, $(outputCol), inputType, schema($(inputCol)).nullable)
+    SchemaUtils.appendColumn(schema,
+                             $(outputCol),
+                             inputType,
+                             schema($(inputCol)).nullable)
   }
 
   override def copy(extra: ParamMap): StopWordsRemover = defaultCopy(extra)

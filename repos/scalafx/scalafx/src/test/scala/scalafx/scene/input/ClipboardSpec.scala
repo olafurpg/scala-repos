@@ -43,7 +43,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ClipboardSpec
     extends SimpleSFXDelegateSpec[jfxsi.Clipboard, Clipboard](
-        classOf[jfxsi.Clipboard], classOf[Clipboard])
+        classOf[jfxsi.Clipboard],
+        classOf[Clipboard])
     with RunOnApplicationThread {
 
   override protected def getJavaClassInstance =

@@ -287,7 +287,7 @@ trait Parser extends RegexParsers with Filters with AST {
       // desugared due to some sort of wonky scalac bug that I couldn't minimize...
       case n if n.isInstanceOf[Relate] =>
         !n.asInstanceOf[Relate].from.isInstanceOf[Relate] &&
-        !n.asInstanceOf[Relate].to.isInstanceOf[Relate]
+          !n.asInstanceOf[Relate].to.isInstanceOf[Relate]
 
       case _ => true
     }
@@ -295,13 +295,14 @@ trait Parser extends RegexParsers with Filters with AST {
 
   // %% 
 
-  private def buildDeepRelate(
-      loc: LineStream, relations: Vector[Expr], e: Expr): Expr = {
+  private def buildDeepRelate(loc: LineStream,
+                              relations: Vector[Expr],
+                              e: Expr): Expr = {
     val builders =
       relations zip (relations drop 1) map {
         case (e1, e2) => { e3: Expr =>
-            Relate(loc, e1, e2, e3)
-          }
+          Relate(loc, e1, e2, e3)
+        }
       }
 
     builders.foldRight(e) { _ (_) }
@@ -342,8 +343,7 @@ trait Parser extends RegexParsers with Filters with AST {
 
   case class ParseException(failures: Set[Failure]) extends RuntimeException {
     def mkString = {
-      val tail =
-        failures.head.tail // if we have an empty set of failures, that's bad
+      val tail = failures.head.tail // if we have an empty set of failures, that's bad
       val result = ParseException reduceFailures failures
       tail formatError ("error:%d: " + result + "%n  %s%n  %s")
     }
@@ -372,18 +372,18 @@ trait Parser extends RegexParsers with Filters with AST {
             Parsers.keySet filter { _.first contains expect.head } map Parsers
 
           case ExpectedRegex(regex) => {
-              val first = {
-                val back = RegexUtils first regex
+            val first = {
+              val back = RegexUtils first regex
 
-                if (back contains None) UniversalCharSet
-                else
-                  back flatMap { x =>
-                    x
-                  }
-              }
-
-              Parsers.keySet filterNot { _.first intersect first isEmpty } map Parsers
+              if (back contains None) UniversalCharSet
+              else
+                back flatMap { x =>
+                  x
+                }
             }
+
+            Parsers.keySet filterNot { _.first intersect first isEmpty } map Parsers
+          }
 
           case UnexpectedEndOfStream(Some(expect)) =>
             Parsers.keySet filter { _.first contains expect.head } map Parsers
@@ -410,13 +410,13 @@ trait Parser extends RegexParsers with Filters with AST {
       val expectation =
         pairs.headOption flatMap {
           case (_, headCount) => {
-              val (possibilities, _) = (pairs takeWhile {
-                    case (_, c) => headCount == c
-                  }).unzip
+            val (possibilities, _) = (pairs takeWhile {
+                  case (_, c) => headCount == c
+                }).unzip
 
-              if (possibilities.isEmpty) None
-              else Some(possibilities mkString " or ")
-            }
+            if (possibilities.isEmpty) None
+            else Some(possibilities mkString " or ")
+          }
         }
 
       expectation map { ExpectedPattern format _ } getOrElse SyntaxPattern

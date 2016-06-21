@@ -40,8 +40,8 @@ private[log] case object LogCleaningPaused extends LogCleaningState
   *  While a partition is in the LogCleaningPaused state, it won't be scheduled for cleaning again, until cleaning is
   *  requested to be resumed.
   */
-private[log] class LogCleanerManager(
-    val logDirs: Array[File], val logs: Pool[TopicAndPartition, Log])
+private[log] class LogCleanerManager(val logDirs: Array[File],
+                                     val logs: Pool[TopicAndPartition, Log])
     extends Logging
     with KafkaMetricsGroup {
 
@@ -220,8 +220,8 @@ private[log] class LogCleanerManager(
     }
   }
 
-  def updateCheckpoints(
-      dataDir: File, update: Option[(TopicAndPartition, Long)]) {
+  def updateCheckpoints(dataDir: File,
+                        update: Option[(TopicAndPartition, Long)]) {
     inLock(lock) {
       val checkpoint = checkpoints(dataDir)
       val existing = checkpoint.read().filterKeys(logs.keys) ++ update
@@ -229,8 +229,9 @@ private[log] class LogCleanerManager(
     }
   }
 
-  def maybeTruncateCheckpoint(
-      dataDir: File, topicAndPartition: TopicAndPartition, offset: Long) {
+  def maybeTruncateCheckpoint(dataDir: File,
+                              topicAndPartition: TopicAndPartition,
+                              offset: Long) {
     inLock(lock) {
       if (logs.get(topicAndPartition).config.compact) {
         val checkpoint = checkpoints(dataDir)
@@ -245,8 +246,9 @@ private[log] class LogCleanerManager(
   /**
     * Save out the endOffset and remove the given log from the in-progress set, if not aborted.
     */
-  def doneCleaning(
-      topicAndPartition: TopicAndPartition, dataDir: File, endOffset: Long) {
+  def doneCleaning(topicAndPartition: TopicAndPartition,
+                   dataDir: File,
+                   endOffset: Long) {
     inLock(lock) {
       inProgress(topicAndPartition) match {
         case LogCleaningInProgress =>
@@ -257,8 +259,8 @@ private[log] class LogCleanerManager(
           pausedCleaningCond.signalAll()
         case s =>
           throw new IllegalStateException(
-              "In-progress partition %s cannot be in %s state.".format(
-                  topicAndPartition, s))
+              "In-progress partition %s cannot be in %s state."
+                .format(topicAndPartition, s))
       }
     }
   }

@@ -67,7 +67,7 @@ private[serverset2] class ZkSession(
         // if there was no previous value, ensure we have a gauge
         synchronized {
           watchUpdateGauges ::=
-            statsReceiver.addGauge("last_watch_update", path) {
+          statsReceiver.addGauge("last_watch_update", path) {
             Time.now.inLongSeconds - lastGoodUpdate.getOrElse(path, 0L)
           }
         }
@@ -153,7 +153,7 @@ private[serverset2] class ZkSession(
                     if sessionState == SessionState.Disconnected | sessionState == SessionState.NoSyncConnected =>
                   logger.warning(
                       s"Intermediate Failure session state: $sessionState. " +
-                      s"Session: $sessionIdAsHex. Data is now unavailable.")
+                        s"Session: $sessionIdAsHex. Data is now unavailable.")
                   u() = Activity.Failed(new Exception("" + sessionState))
                 // Do NOT keep retrying, wait to be reconnected automatically by the underlying session
 
@@ -333,8 +333,8 @@ private[serverset2] object ZkSession {
       // Upon initial connection, send auth info, then update `u`.
       zkSession.state.changes.filter {
         _ == WatchState.SessionState(SessionState.SyncConnected)
-      }.toFuture.unit before zkSession.addAuthInfo(
-          "digest", Buf.Utf8(authInfo)) onSuccess { _ =>
+      }.toFuture.unit before zkSession
+        .addAuthInfo("digest", Buf.Utf8(authInfo)) onSuccess { _ =>
         logger.info(
             s"New ZKSession is connected. Session ID: ${zkSession.sessionIdAsHex}")
         v() = zkSession

@@ -784,8 +784,8 @@ trait Types { self: Universe =>
 
     /** @see [[InternalApi.methodType]] */
     @deprecated("Use `internal.methodType` instead", "2.11.0")
-    def apply(params: List[Symbol], resultType: Type)(
-        implicit token: CompatToken): MethodType =
+    def apply(params: List[Symbol],
+              resultType: Type)(implicit token: CompatToken): MethodType =
       internal.methodType(params, resultType)
   }
 
@@ -862,8 +862,8 @@ trait Types { self: Universe =>
 
     /** @see [[InternalApi.polyType]] */
     @deprecated("Use `internal.polyType` instead", "2.11.0")
-    def apply(typeParams: List[Symbol], resultType: Type)(
-        implicit token: CompatToken): PolyType =
+    def apply(typeParams: List[Symbol],
+              resultType: Type)(implicit token: CompatToken): PolyType =
       internal.polyType(typeParams, resultType)
   }
 
@@ -904,8 +904,8 @@ trait Types { self: Universe =>
 
     /** @see [[InternalApi.existentialType]] */
     @deprecated("Use `internal.existentialType` instead", "2.11.0")
-    def apply(quantified: List[Symbol], underlying: Type)(
-        implicit token: CompatToken): ExistentialType =
+    def apply(quantified: List[Symbol],
+              underlying: Type)(implicit token: CompatToken): ExistentialType =
       internal.existentialType(quantified, underlying)
   }
 
@@ -946,8 +946,8 @@ trait Types { self: Universe =>
 
     /** @see [[InternalApi.annotatedType]] */
     @deprecated("Use `internal.annotatedType` instead", "2.11.0")
-    def apply(annotations: List[Annotation], underlying: Type)(
-        implicit token: CompatToken): AnnotatedType =
+    def apply(annotations: List[Annotation],
+              underlying: Type)(implicit token: CompatToken): AnnotatedType =
       internal.annotatedType(annotations, underlying)
   }
 

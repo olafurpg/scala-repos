@@ -91,7 +91,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
     Array[Row](Row.apply("dave", 42, 1), Row.apply("mary", 222, 2))
   private lazy val schema3 =
     StructType(StructField("name", StringType) :: StructField(
-            "id", IntegerType) :: StructField("seq", IntegerType) :: Nil)
+            "id",
+            IntegerType) :: StructField("seq", IntegerType) :: Nil)
 
   test("Basic CREATE") {
     val df =

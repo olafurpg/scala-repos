@@ -16,9 +16,9 @@ trait Calculate { self: Reifier =>
   implicit class RichCalculateType(tpe: Type) {
     def isLocalToReifee =
       tpe != null && (tpe exists
-          (tp =>
-                (localSymbols contains tp.typeSymbol) ||
-                (localSymbols contains tp.termSymbol)))
+            (tp =>
+                  (localSymbols contains tp.typeSymbol) ||
+                    (localSymbols contains tp.termSymbol)))
   }
 
   private def localSymbols: Map[Symbol, Int] =
@@ -29,8 +29,8 @@ trait Calculate { self: Reifier =>
     if (sym != null && sym != NoSymbol) {
       if (localSymbols contains sym)
         assert(localSymbols(sym) == metalevel,
-               "metalevel mismatch: expected %s, actual %s".format(
-                   localSymbols(sym), metalevel))
+               "metalevel mismatch: expected %s, actual %s"
+                 .format(localSymbols(sym), metalevel))
       else localSymbols += (sym -> metalevel)
     }
 
@@ -48,10 +48,10 @@ trait Calculate { self: Reifier =>
       case tree if tree.isDef =>
         if (reifyDebug)
           println(
-              "boundSym: %s of type %s".format(
-                  tree.symbol, (tree.productIterator.toList collect {
-                case tt: TypeTree => tt
-              }).headOption.getOrElse(TypeTree(tree.tpe))))
+              "boundSym: %s of type %s"
+                .format(tree.symbol, (tree.productIterator.toList collect {
+                  case tt: TypeTree => tt
+                }).headOption.getOrElse(TypeTree(tree.tpe))))
         registerLocalSymbol(tree.symbol, currMetalevel)
 
         bindRelatedSymbol(tree.symbol.sourceModule, "sourceModule")
@@ -65,7 +65,7 @@ trait Calculate { self: Reifier =>
         Some(tree) collect {
           case labelDef: LabelDef =>
             labelDef.params foreach
-            (param => bindRelatedSymbol(param.symbol, "labelParam"))
+              (param => bindRelatedSymbol(param.symbol, "labelParam"))
         }
         def bindRelatedSymbol(related: Symbol, name: String): Unit =
           if (related != null && related != NoSymbol) {

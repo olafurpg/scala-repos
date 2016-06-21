@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SplitPaneDividerSpec
     extends SimpleSFXDelegateSpec[jfxsc.SplitPane.Divider, SplitPane.Divider](
-        classOf[jfxsc.SplitPane.Divider], classOf[SplitPane.Divider])
+        classOf[jfxsc.SplitPane.Divider],
+        classOf[SplitPane.Divider])

@@ -146,8 +146,9 @@ class CatalystQlSuite extends PlanTest {
   test("parse expressions") {
     compareExpressions(
         parser.parseExpression("prinln('hello', 'world')"),
-        UnresolvedFunction(
-            "prinln", Literal("hello") :: Literal("world") :: Nil, false))
+        UnresolvedFunction("prinln",
+                           Literal("hello") :: Literal("world") :: Nil,
+                           false))
 
     compareExpressions(
         parser.parseExpression("1 + r.r As q"),
@@ -156,11 +157,12 @@ class CatalystQlSuite extends PlanTest {
     compareExpressions(
         parser.parseExpression("1 - f('o', o(bar))"),
         Subtract(Literal(1),
-                 UnresolvedFunction(
-                     "f",
-                     Literal("o") :: UnresolvedFunction(
-                         "o", UnresolvedAttribute("bar") :: Nil, false) :: Nil,
-                     false)))
+                 UnresolvedFunction("f",
+                                    Literal("o") :: UnresolvedFunction(
+                                        "o",
+                                        UnresolvedAttribute("bar") :: Nil,
+                                        false) :: Nil,
+                                    false)))
 
     intercept[AnalysisException](
         parser.parseExpression("1 - f('o', o(bar)) hello * world"))
@@ -190,23 +192,23 @@ class CatalystQlSuite extends PlanTest {
   test("window function: better support of parentheses") {
     parser.parsePlan(
         "select sum(product + 1) over (partition by ((1) + (product / 2)) " +
-        "order by 2) from windowData")
+          "order by 2) from windowData")
     parser.parsePlan(
         "select sum(product + 1) over (partition by (1 + (product / 2)) " +
-        "order by 2) from windowData")
+          "order by 2) from windowData")
     parser.parsePlan(
         "select sum(product + 1) over (partition by ((product / 2) + 1) " +
-        "order by 2) from windowData")
+          "order by 2) from windowData")
 
     parser.parsePlan(
         "select sum(product + 1) over (partition by ((product) + (1)) order by 2) " +
-        "from windowData")
+          "from windowData")
     parser.parsePlan(
         "select sum(product + 1) over (partition by ((product) + 1) order by 2) " +
-        "from windowData")
+          "from windowData")
     parser.parsePlan(
         "select sum(product + 1) over (partition by (product + (1)) order by 2) " +
-        "from windowData")
+          "from windowData")
   }
 
   test("very long AND/OR expression") {

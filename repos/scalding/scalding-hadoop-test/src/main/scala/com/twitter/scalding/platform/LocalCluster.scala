@@ -99,8 +99,12 @@ class LocalCluster(mutex: Boolean = true) {
     val conf = new Configuration
     val dfs = new MiniDFSCluster(conf, 4, true, null)
     val fileSystem = dfs.getFileSystem
-    val cluster = new MiniMRCluster(
-        4, fileSystem.getUri.toString, 1, null, null, new JobConf(conf))
+    val cluster = new MiniMRCluster(4,
+                                    fileSystem.getUri.toString,
+                                    1,
+                                    null,
+                                    null,
+                                    new JobConf(conf))
     val mrJobConf = cluster.createJobConf()
     mrJobConf.setInt("mapred.submit.replication", 2)
     mrJobConf.set("mapred.map.max.attempts", "2")
@@ -121,7 +125,7 @@ class LocalCluster(mutex: Boolean = true) {
     mrJobConf.set("mapreduce.user.classpath.first", "true")
 
     LOG.debug("Creating directory to store jars on classpath: " +
-        LocalCluster.HADOOP_CLASSPATH_DIR)
+          LocalCluster.HADOOP_CLASSPATH_DIR)
     fileSystem.mkdirs(LocalCluster.HADOOP_CLASSPATH_DIR)
 
     // merge in input configuration
@@ -175,8 +179,8 @@ class LocalCluster(mutex: Boolean = true) {
       LOG.debug("Not yet on Hadoop classpath: " + resourceDir)
       val localJarFile =
         if (resourceDir.isDirectory) MakeJar(resourceDir) else resourceDir
-      val hdfsJarPath = new Path(
-          LocalCluster.HADOOP_CLASSPATH_DIR, localJarFile.getName)
+      val hdfsJarPath =
+        new Path(LocalCluster.HADOOP_CLASSPATH_DIR, localJarFile.getName)
       fileSystem.copyFromLocalFile(
           new Path("file://%s".format(localJarFile.getAbsolutePath)),
           hdfsJarPath)

@@ -76,8 +76,8 @@ object TournamentRepo {
   def startedOrFinishedById(id: String): Fu[Option[Tournament]] =
     byId(id) map { _ filterNot (_.isCreated) }
 
-  def createdByIdAndCreator(
-      id: String, userId: String): Fu[Option[Tournament]] =
+  def createdByIdAndCreator(id: String,
+                            userId: String): Fu[Option[Tournament]] =
     createdById(id) map (_ filter (_.createdBy == userId))
 
   def allEnterable: Fu[List[Tournament]] =
@@ -179,7 +179,7 @@ object TournamentRepo {
         "$or" -> BSONArray(
             BSONDocument("schedule" -> BSONDocument("$exists" -> false)),
             BSONDocument("startsAt" -> BSONDocument("$lt" ->
-                    (DateTime.now plusMinutes aheadMinutes)))
+                      (DateTime.now plusMinutes aheadMinutes)))
         )
     )
 
@@ -265,8 +265,8 @@ object TournamentRepo {
       .reverse
   }
 
-  def lastFinishedScheduledByFreq(
-      freq: Schedule.Freq, since: DateTime): Fu[List[Tournament]] =
+  def lastFinishedScheduledByFreq(freq: Schedule.Freq,
+                                  since: DateTime): Fu[List[Tournament]] =
     coll
       .find(
           finishedSelect ++ sinceSelect(since) ++ variantSelect(
@@ -301,7 +301,7 @@ object TournamentRepo {
 
   def isFinished(id: String): Fu[Boolean] =
     coll.count(BSONDocument("_id" -> id, "status" -> Status.Finished.id).some) map
-    (0 !=)
+      (0 !=)
 
   def toursToWithdrawWhenEntering(tourId: String): Fu[List[Tournament]] =
     coll

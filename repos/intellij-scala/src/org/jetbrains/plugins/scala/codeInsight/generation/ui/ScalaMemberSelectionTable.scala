@@ -10,4 +10,6 @@ class ScalaMemberSelectionTable(
     memberInfoModel: MemberInfoModel[ScNamedElement, ScalaMemberInfo],
     abstractColumnHeader: String)
     extends ScalaMemberSelectionTableBase[ScNamedElement, ScalaMemberInfo](
-        memberInfos, memberInfoModel, abstractColumnHeader)
+        memberInfos,
+        memberInfoModel,
+        abstractColumnHeader)

@@ -70,8 +70,9 @@ class RDDFunctions[T: ClassTag](self: RDD[T]) extends Serializable {
     * @deprecated Use [[org.apache.spark.rdd.RDD#treeAggregate]] instead.
     */
   @deprecated("Use RDD.treeAggregate instead.", "1.3.0")
-  def treeAggregate[U: ClassTag](zeroValue: U)(
-      seqOp: (U, T) => U, combOp: (U, U) => U, depth: Int = 2): U = {
+  def treeAggregate[U: ClassTag](zeroValue: U)(seqOp: (U, T) => U,
+                                               combOp: (U, U) => U,
+                                               depth: Int = 2): U = {
     self.treeAggregate(zeroValue)(seqOp, combOp, depth)
   }
 }

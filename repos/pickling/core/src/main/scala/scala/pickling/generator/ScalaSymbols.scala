@@ -17,9 +17,9 @@ private[pickling] class UnclosedSubclassesException(errors: Seq[String])
   *        remove all knowledge of private symbols from Java classes, because generally it doesn't care about
   *        Java's privates.
   */
-private[pickling] class IrScalaSymbols[
-    U <: Universe with Singleton, C <: Context](
-    override val u: U, tools: Tools[C])
+private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
+                                       C <: Context](override val u: U,
+                                                     tools: Tools[C])
     extends IrSymbolLoader[U](u) {
   import u._
   import compat._
@@ -86,8 +86,9 @@ private[pickling] class IrScalaSymbols[
       tpe.declaration(nme.CONSTRUCTOR) match {
         // NOTE: primary ctor is always the first in the list
         case overloaded: TermSymbol =>
-          Some(new ScalaIrConstructor(
-                  overloaded.alternatives.head.asMethod, this))
+          Some(
+              new ScalaIrConstructor(overloaded.alternatives.head.asMethod,
+                                     this))
         case primaryCtor: MethodSymbol =>
           Some(new ScalaIrConstructor(primaryCtor, this))
         case NoSymbol => None
@@ -220,8 +221,8 @@ private[pickling] class IrScalaSymbols[
     }
   }
 
-  private class ScalaIrField(
-      field: TermSymbol, override val owner: ScalaIrClass)
+  private class ScalaIrField(field: TermSymbol,
+                             override val owner: ScalaIrClass)
       extends IrField {
 
     override def isMarkedTransient: Boolean = {
@@ -268,8 +269,8 @@ private[pickling] class IrScalaSymbols[
       removeTrailingSpace(field.name.toString)
   }
 
-  private class ScalaIrMethod(
-      mthd: MethodSymbol, override val owner: ScalaIrClass)
+  private class ScalaIrMethod(mthd: MethodSymbol,
+                              override val owner: ScalaIrClass)
       extends IrMethod {
     import owner.fillParameters
     override def parameterNames: List[List[String]] =
@@ -348,7 +349,7 @@ private[pickling] class IrScalaSymbols[
     override def isVal: Boolean = mthd.isVal
     override def isVar: Boolean =
       (mthd.getter != NoSymbol) && (mthd.setter != NoSymbol) &&
-      (mthd.setter != mthd) // THis is  hack so the setter doesn't show up in our list of vars.
+        (mthd.setter != mthd) // THis is  hack so the setter doesn't show up in our list of vars.
     override def returnType[U <: Universe with Singleton](
         u: Universe): u.Type =
       // TODO - We need to fill in generic parameters of our owner class so that this actually works.  If we fail to do so,

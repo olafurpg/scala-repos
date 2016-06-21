@@ -123,8 +123,8 @@ class MultipleGroupByJob(args: Args) extends Job(args) {
   import com.twitter.scalding.serialization._
   import MultipleGroupByJobData._
   implicit val stringOrdSer = new StringOrderedSerialization()
-  implicit val stringTup2OrdSer = new OrderedSerialization2(
-      stringOrdSer, stringOrdSer)
+  implicit val stringTup2OrdSer =
+    new OrderedSerialization2(stringOrdSer, stringOrdSer)
   val otherStream = TypedPipe
     .from(data)
     .map { k =>

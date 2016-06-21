@@ -28,8 +28,9 @@ import java.nio.channels.{ReadableByteChannel, WritableByteChannel}
 
 import scalaz._
 
-case class CookedBlockMetadata(
-    blockid: Long, length: Int, segments: Array[(SegmentId, File)]) {
+case class CookedBlockMetadata(blockid: Long,
+                               length: Int,
+                               segments: Array[(SegmentId, File)]) {
   override def equals(that: Any): Boolean = that match {
     case CookedBlockMetadata(`blockid`, `length`, segments2) =>
       if (segments.length != segments2.length) return false
@@ -61,22 +62,29 @@ object V1CookedBlockFormat extends CookedBlockFormat with Chunker {
     .ArrayCodec(Codec.ByteCodec)
     .as[CType](CTypeFlags.getFlagFor, CTypeFlags.cTypeForFlag)
   val ColumnRefCodec = Codec.CompositeCodec[CPath, CType, (CPath, CType)](
-      CPathCodec, CTypeCodec, identity, { (a: CPath, b: CType) =>
-    (a, b)
-  })
+      CPathCodec,
+      CTypeCodec,
+      identity, { (a: CPath, b: CType) =>
+        (a, b)
+      })
 
   val SegmentIdCodec = Codec.CompositeCodec[Long, (CPath, CType), SegmentId](
-      Codec.LongCodec, ColumnRefCodec, { id: SegmentId =>
-    (id.blockid, (id.cpath, id.ctype))
-  }, { case (blockid, (cpath, ctype)) => SegmentId(blockid, cpath, ctype) })
+      Codec.LongCodec,
+      ColumnRefCodec, { id: SegmentId =>
+        (id.blockid, (id.cpath, id.ctype))
+      }, {
+        case (blockid, (cpath, ctype)) => SegmentId(blockid, cpath, ctype)
+      })
 
   val SegmentsCodec = Codec.ArrayCodec({
-    Codec.CompositeCodec[SegmentId, File, (SegmentId, File)](
-        SegmentIdCodec, FileCodec, identity, _ -> _)
+    Codec.CompositeCodec[SegmentId, File, (SegmentId, File)](SegmentIdCodec,
+                                                             FileCodec,
+                                                             identity,
+                                                             _ -> _)
   })
 
-  def writeCookedBlock(
-      channel: WritableByteChannel, metadata: CookedBlockMetadata) = {
+  def writeCookedBlock(channel: WritableByteChannel,
+                       metadata: CookedBlockMetadata) = {
     val maxSize = SegmentsCodec.maxSize(metadata.segments) + 12
 
     write(channel, maxSize) { buffer =>
@@ -107,8 +115,8 @@ case class VersionedCookedBlockFormat(formats: Map[Int, CookedBlockFormat])
     (ver.toShort, fmt)
   }
 
-  def writeCookedBlock(
-      channel: WritableByteChannel, segments: CookedBlockMetadata) = {
+  def writeCookedBlock(channel: WritableByteChannel,
+                       segments: CookedBlockMetadata) = {
     for {
       _ <- writeVersion(channel)
       _ <- format.writeCookedBlock(channel, segments)
@@ -123,7 +131,7 @@ case class VersionedCookedBlockFormat(formats: Map[Int, CookedBlockFormat])
       } getOrElse {
         Failure(new IOException(
                 "Invalid version found. Expected one of %s, found %d." format
-                (formats.keys mkString ",", version)))
+                  (formats.keys mkString ",", version)))
       }
     }
   }

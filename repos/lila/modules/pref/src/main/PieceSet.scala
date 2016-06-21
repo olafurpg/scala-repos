@@ -2,7 +2,7 @@ package lila.pref
 
 import scalaz.NonEmptyList
 
-sealed class PieceSet private[pref](val name: String) {
+sealed class PieceSet private[pref] (val name: String) {
 
   override def toString = name
 

@@ -46,7 +46,7 @@ trait SegmentFormatSupport {
 
   implicit lazy val arbBigDecimal: Arbitrary[BigDecimal] = Arbitrary(
       Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2) map
-      (BigDecimal(_)))
+        (BigDecimal(_)))
 
   def genCPath: Gen[CPath] =
     for {
@@ -80,8 +80,8 @@ trait SegmentFormatSupport {
     val basic: Gen[CValueType[_]] = oneOf(
         Seq(CBoolean, CString, CLong, CDouble, CNum, CDate))
     if (maxDepth > 0) {
-      frequency(
-          6 -> basic, 1 -> (genCValueType(maxDepth - 1) map (CArrayType(_))))
+      frequency(6 -> basic,
+                1 -> (genCValueType(maxDepth - 1) map (CArrayType(_))))
     } else {
       basic
     }
@@ -99,8 +99,8 @@ trait SegmentFormatSupport {
       array
     }
 
-  def genArraySegmentForCType[A](
-      ctype: CValueType[A], length: Int): Gen[ArraySegment[_]] = {
+  def genArraySegmentForCType[A](ctype: CValueType[A],
+                                 length: Int): Gen[ArraySegment[_]] = {
     val g = genForCType(ctype)
     for {
       blockId <- arbitrary[Long]
@@ -178,8 +178,8 @@ trait SegmentFormatMatchers { self: Specification with ScalaCheck =>
 }
 
 final class StubSegmentFormat extends SegmentFormat {
-  val TheOneSegment = NullSegment(
-      42L, CPath("w.t.f"), CNull, BitSetUtil.create(), 100)
+  val TheOneSegment =
+    NullSegment(42L, CPath("w.t.f"), CNull, BitSetUtil.create(), 100)
 
   object reader extends SegmentReader {
     def readSegmentId(

@@ -38,8 +38,10 @@ object WithStrippedMargin {
 
   def unapply(literal: ScLiteral): Option[(ScExpression, Char)] = {
     literal.getParent match {
-      case MethodRepr(
-          refExpr: ScReferenceExpression, Some(lit: ScLiteral), Some(ref), Nil)
+      case MethodRepr(refExpr: ScReferenceExpression,
+                      Some(lit: ScLiteral),
+                      Some(ref),
+                      Nil)
           if lit.isMultiLineString && ref.refName == STRIP_MARGIN =>
         Some(refExpr, '|')
       case _ childOf(MethodRepr(mc: ScMethodCall,
@@ -47,7 +49,7 @@ object WithStrippedMargin {
                                 Some(ref),
                                 List(argLit: ScLiteral)))
           if lit.isMultiLineString && ref.refName == STRIP_MARGIN &&
-          argLit.getFirstChild.getNode.getElementType == ScalaTokenTypes.tCHAR =>
+            argLit.getFirstChild.getNode.getElementType == ScalaTokenTypes.tCHAR =>
         Some(mc, argLit.getValue.asInstanceOf[Char])
       case _ => None
     }

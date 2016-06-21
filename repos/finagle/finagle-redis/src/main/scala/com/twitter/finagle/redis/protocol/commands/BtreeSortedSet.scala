@@ -23,8 +23,8 @@ object BAdd {
 
 object BRem {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(
-        args.length > 2, "BREM requires a hash key and at least one field")
+    RequireClientProtocol(args.length > 2,
+                          "BREM requires a hash key and at least one field")
     new BRem(ChannelBuffers.wrappedBuffer(args(0)),
              args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
   }

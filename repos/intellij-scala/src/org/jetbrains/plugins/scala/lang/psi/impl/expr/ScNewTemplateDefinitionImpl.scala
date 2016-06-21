@@ -73,10 +73,11 @@ class ScNewTemplateDefinitionImpl private (
     }
 
     if (superTypes.length > 1 || holders.nonEmpty || aliases.nonEmpty) {
-      new Success(
-          ScCompoundType.fromPsi(
-              superTypes, holders.toList, aliases.toList, ScSubstitutor.empty),
-          Some(this))
+      new Success(ScCompoundType.fromPsi(superTypes,
+                                         holders.toList,
+                                         aliases.toList,
+                                         ScSubstitutor.empty),
+                  Some(this))
     } else {
       extendsBlock.templateParents match {
         case Some(tp) if tp.allTypeElements.length == 1 =>
@@ -96,8 +97,11 @@ class ScNewTemplateDefinitionImpl private (
                                                   place: PsiElement): Boolean =
     extendsBlock.templateBody match {
       case Some(body) if PsiTreeUtil.isContextAncestor(body, place, false) =>
-        super [ScNewTemplateDefinition].processDeclarationsForTemplateBody(
-            processor, state, lastParent, place)
+        super[ScNewTemplateDefinition].processDeclarationsForTemplateBody(
+            processor,
+            state,
+            lastParent,
+            place)
       case _ => true
     }
   def nameId: PsiElement = null
@@ -123,8 +127,8 @@ class ScNewTemplateDefinitionImpl private (
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super [ScNewTemplateDefinition].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScNewTemplateDefinition]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def getExtendsListTypes: Array[PsiClassType] = innerExtendsListTypes
@@ -132,12 +136,12 @@ class ScNewTemplateDefinitionImpl private (
   override def getImplementsListTypes: Array[PsiClassType] =
     innerExtendsListTypes
 
-  def getTypeWithProjections(
-      ctx: TypingContext, thisProjections: Boolean = false) =
+  def getTypeWithProjections(ctx: TypingContext,
+                             thisProjections: Boolean = false) =
     getType(ctx) //no projections for new template definition
 
   override def isInheritor(baseClass: PsiClass, deep: Boolean): Boolean =
-    super [ScNewTemplateDefinition].isInheritor(baseClass, deep)
+    super[ScNewTemplateDefinition].isInheritor(baseClass, deep)
 
   override def accept(visitor: ScalaElementVisitor) {
     visitor.visitNewTemplateDefinition(this)
@@ -151,61 +155,63 @@ class ScNewTemplateDefinitionImpl private (
     }
   }
 
-  override def findMethodBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = {
-    super [ScNewTemplateDefinition].findMethodBySignature(
-        patternMethod, checkBases)
+  override def findMethodBySignature(patternMethod: PsiMethod,
+                                     checkBases: Boolean): PsiMethod = {
+    super[ScNewTemplateDefinition]
+      .findMethodBySignature(patternMethod, checkBases)
   }
 
   override def findMethodsBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = {
-    super [ScNewTemplateDefinition].findMethodsBySignature(
-        patternMethod, checkBases)
+      patternMethod: PsiMethod,
+      checkBases: Boolean): Array[PsiMethod] = {
+    super[ScNewTemplateDefinition]
+      .findMethodsBySignature(patternMethod, checkBases)
   }
 
   import java.util.{Collection => JCollection, List => JList}
 
   import com.intellij.openapi.util.{Pair => IPair}
 
-  override def findMethodsByName(
-      name: String, checkBases: Boolean): Array[PsiMethod] = {
-    super [ScNewTemplateDefinition].findMethodsByName(name, checkBases)
+  override def findMethodsByName(name: String,
+                                 checkBases: Boolean): Array[PsiMethod] = {
+    super[ScNewTemplateDefinition].findMethodsByName(name, checkBases)
   }
 
   override def findFieldByName(name: String, checkBases: Boolean): PsiField = {
-    super [ScNewTemplateDefinition].findFieldByName(name, checkBases)
+    super[ScNewTemplateDefinition].findFieldByName(name, checkBases)
   }
 
-  override def findInnerClassByName(
-      name: String, checkBases: Boolean): PsiClass = {
-    super [ScNewTemplateDefinition].findInnerClassByName(name, checkBases)
+  override def findInnerClassByName(name: String,
+                                    checkBases: Boolean): PsiClass = {
+    super[ScNewTemplateDefinition].findInnerClassByName(name, checkBases)
   }
 
   override def getAllFields: Array[PsiField] = {
-    super [ScNewTemplateDefinition].getAllFields
+    super[ScNewTemplateDefinition].getAllFields
   }
 
   override def findMethodsAndTheirSubstitutorsByName(
       name: String,
       checkBases: Boolean): JList[IPair[PsiMethod, PsiSubstitutor]] = {
-    super [ScNewTemplateDefinition].findMethodsAndTheirSubstitutorsByName(
-        name, checkBases)
+    super[ScNewTemplateDefinition]
+      .findMethodsAndTheirSubstitutorsByName(name, checkBases)
   }
 
   override def getAllMethodsAndTheirSubstitutors: JList[
       IPair[PsiMethod, PsiSubstitutor]] = {
-    super [ScNewTemplateDefinition].getAllMethodsAndTheirSubstitutors
+    super[ScNewTemplateDefinition].getAllMethodsAndTheirSubstitutors
   }
 
   override def getVisibleSignatures: JCollection[HierarchicalMethodSignature] = {
-    super [ScNewTemplateDefinition].getVisibleSignatures
+    super[ScNewTemplateDefinition].getVisibleSignatures
   }
 
   override def getAllMethods: Array[PsiMethod] = {
     val res = new ArrayBuffer[PsiMethod]()
     TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
-      this.processPsiMethodsForNode(
-          node, isStatic = false, isInterface = false)(res += _)
+      this.processPsiMethodsForNode(node,
+                                    isStatic = false,
+                                    isInterface = false)(res += _)
     }
     res.toArray
   }

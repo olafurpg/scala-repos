@@ -31,29 +31,27 @@ import org.apache.spark.internal.Logging
   * we need more implicit parameters to convert our keys and values to Writable.
   *
   */
-class SequenceFileRDDFunctions[
-    K <% Writable: ClassTag, V <% Writable: ClassTag](
+class SequenceFileRDDFunctions[K <% Writable: ClassTag,
+                               V <% Writable: ClassTag](
     self: RDD[(K, V)],
     _keyWritableClass: Class[_ <: Writable],
     _valueWritableClass: Class[_ <: Writable])
     extends Logging
     with Serializable {
 
-  private val keyWritableClass =
-    if (_keyWritableClass == null) {
-      // pre 1.3.0, we need to use Reflection to get the Writable class
-      getWritableClass[K]()
-    } else {
-      _keyWritableClass
-    }
+  private val keyWritableClass = if (_keyWritableClass == null) {
+    // pre 1.3.0, we need to use Reflection to get the Writable class
+    getWritableClass[K]()
+  } else {
+    _keyWritableClass
+  }
 
-  private val valueWritableClass =
-    if (_valueWritableClass == null) {
-      // pre 1.3.0, we need to use Reflection to get the Writable class
-      getWritableClass[V]()
-    } else {
-      _valueWritableClass
-    }
+  private val valueWritableClass = if (_valueWritableClass == null) {
+    // pre 1.3.0, we need to use Reflection to get the Writable class
+    getWritableClass[V]()
+  } else {
+    _valueWritableClass
+  }
 
   private def getWritableClass[T <% Writable: ClassTag](
       ): Class[_ <: Writable] = {
@@ -68,7 +66,7 @@ class SequenceFileRDDFunctions[
           .getDeclaredMethods()
           .filter(m =>
                 m.getReturnType().toString != "class java.lang.Object" &&
-                m.getName() == "apply")(0)
+                  m.getName() == "apply")(0)
           .getReturnType
       }
       // TODO: use something like WritableConverter to avoid reflection
@@ -84,7 +82,8 @@ class SequenceFileRDDFunctions[
     * file system.
     */
   def saveAsSequenceFile(
-      path: String, codec: Option[Class[_ <: CompressionCodec]] = None): Unit =
+      path: String,
+      codec: Option[Class[_ <: CompressionCodec]] = None): Unit =
     self.withScope {
       def anyToWritable[U <% Writable](u: U): Writable = u
 
@@ -95,15 +94,18 @@ class SequenceFileRDDFunctions[
       val convertKey = self.keyClass != keyWritableClass
       val convertValue = self.valueClass != valueWritableClass
 
-      logInfo(
-          "Saving as sequence file of type (" +
-          keyWritableClass.getSimpleName + "," +
-          valueWritableClass.getSimpleName + ")")
+      logInfo("Saving as sequence file of type (" +
+            keyWritableClass.getSimpleName + "," +
+            valueWritableClass.getSimpleName + ")")
       val format = classOf[SequenceFileOutputFormat[Writable, Writable]]
       val jobConf = new JobConf(self.context.hadoopConfiguration)
       if (!convertKey && !convertValue) {
-        self.saveAsHadoopFile(
-            path, keyWritableClass, valueWritableClass, format, jobConf, codec)
+        self.saveAsHadoopFile(path,
+                              keyWritableClass,
+                              valueWritableClass,
+                              format,
+                              jobConf,
+                              codec)
       } else if (!convertKey && convertValue) {
         self
           .map(x => (x._1, anyToWritable(x._2)))

@@ -100,7 +100,7 @@ case class GlobifierOps(implicit tz: TimeZone, dp: DateParser) {
     def combineDR(existing: DateRange, next: DateRange): DateRange = {
       require(existing.end == next.start - Millisecs(1),
               "Not contigious range: \n" + existing + "\n" + next +
-              "...From:\n" + p.mkString(",\n"))
+                "...From:\n" + p.mkString(",\n"))
       DateRange(existing.start, next.end)
     }
 

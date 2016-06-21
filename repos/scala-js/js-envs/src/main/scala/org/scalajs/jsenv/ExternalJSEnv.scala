@@ -126,8 +126,8 @@ abstract class ExternalJSEnv(
     }
 
     /** send a bunch of JS files to an output stream */
-    final protected def sendJS(
-        files: Seq[VirtualJSFile], out: OutputStream): Unit = {
+    final protected def sendJS(files: Seq[VirtualJSFile],
+                               out: OutputStream): Unit = {
       val writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"))
       try sendJS(files, writer) finally writer.close()
     }
@@ -143,8 +143,8 @@ abstract class ExternalJSEnv(
     }
   }
 
-  protected class ExtRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class ExtRunner(libs: Seq[ResolvedJSDependency],
+                            code: VirtualJSFile)
       extends AbstractExtRunner(libs, code)
       with JSRunner {
 
@@ -158,8 +158,8 @@ abstract class ExternalJSEnv(
     }
   }
 
-  protected class AsyncExtRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class AsyncExtRunner(libs: Seq[ResolvedJSDependency],
+                                 code: VirtualJSFile)
       extends AbstractExtRunner(libs, code)
       with AsyncJSRunner {
 

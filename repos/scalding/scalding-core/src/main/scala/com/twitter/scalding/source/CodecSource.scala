@@ -46,8 +46,8 @@ object CodecSource {
     new CodecSource[T](paths)
 }
 
-class CodecSource[T] private (
-    val hdfsPaths: Seq[String], val maxFailures: Int = 0)(
+class CodecSource[T] private (val hdfsPaths: Seq[String],
+                              val maxFailures: Int = 0)(
     implicit @transient injection: Injection[T, Array[Byte]])
     extends FileSource
     with Mappable[T]
@@ -63,8 +63,9 @@ class CodecSource[T] private (
   override def converter[U >: T] =
     TupleConverter.asSuperConverter[T, U](TupleConverter.singleConverter[T])
   override def hdfsScheme =
-    HadoopSchemeInstance(new WritableSequenceFile(
-            field, classOf[BytesWritable]).asInstanceOf[Scheme[_, _, _, _, _]])
+    HadoopSchemeInstance(
+        new WritableSequenceFile(field, classOf[BytesWritable])
+          .asInstanceOf[Scheme[_, _, _, _, _]])
 
   protected lazy val checkedInversion =
     new MaxFailuresCheck[T, BytesWritable](maxFailures)(injectionBox.get)

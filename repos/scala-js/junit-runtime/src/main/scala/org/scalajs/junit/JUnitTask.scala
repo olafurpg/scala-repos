@@ -17,10 +17,10 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
     continuation(execute(eventHandler, loggers))
   }
 
-  def execute(
-      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] = {
-    val richLogger = new RichLogger(
-        loggers, runner.runSettings, taskDef.fullyQualifiedName)
+  def execute(eventHandler: EventHandler,
+              loggers: Array[Logger]): Array[Task] = {
+    val richLogger =
+      new RichLogger(loggers, runner.runSettings, taskDef.fullyQualifiedName)
 
     if (runner.runSettings.verbose)
       richLogger.info(c("Test run started", INFO))
@@ -32,15 +32,17 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
 
     Try(TestUtils.loadModule(bootstrapperName, runner.testClassLoader)) match {
       case Success(classMetadata: JUnitTestBootstrapper) =>
-        new JUnitExecuteTest(
-            taskDef, runner, classMetadata, richLogger, eventHandler)
-          .executeTests()
+        new JUnitExecuteTest(taskDef,
+                             runner,
+                             classMetadata,
+                             richLogger,
+                             eventHandler).executeTests()
 
       case Success(_) =>
         richLogger.error(
             "Error while loading test class: " +
-            taskDef.fullyQualifiedName + ", expected " + bootstrapperName +
-            " to extend JUnitTestBootstrapper")
+              taskDef.fullyQualifiedName + ", expected " + bootstrapperName +
+              " to extend JUnitTestBootstrapper")
 
       case Failure(exception) =>
         richLogger.error(

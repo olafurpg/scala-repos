@@ -8,8 +8,8 @@ trait LinearAlgebraException extends RuntimeException
 /**
   * Exception thrown if a routine has not converged.
   */
-class NotConvergedException(
-    val reason: NotConvergedException.Reason, msg: String = "")
+class NotConvergedException(val reason: NotConvergedException.Reason,
+                            msg: String = "")
     extends RuntimeException(msg)
     with LinearAlgebraException
 

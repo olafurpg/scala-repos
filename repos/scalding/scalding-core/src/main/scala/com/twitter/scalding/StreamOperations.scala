@@ -43,9 +43,10 @@ trait StreamOperations[+Self <: StreamOperations[Self]]
     * WARNING: mapfn needs to be stateless.  Multiple calls needs to be safe (no mutable
     * state captured)
     */
-  def mapStream[T, X](fieldDef: (Fields, Fields))(
-      mapfn: (Iterator[T]) => TraversableOnce[X])(
-      implicit conv: TupleConverter[T], setter: TupleSetter[X]): Self
+  def mapStream[T, X](
+      fieldDef: (Fields, Fields))(mapfn: (Iterator[T]) => TraversableOnce[X])(
+      implicit conv: TupleConverter[T],
+      setter: TupleSetter[X]): Self
 
   /////////////////////////////////////////
   // All the below functions are implemented in terms of the above
@@ -70,7 +71,8 @@ trait StreamOperations[+Self <: StreamOperations[Self]]
     }(TupleConverter.TupleEntryConverter, TupleSetter.CTupleSetter)
   }
   def scanLeft[X, T](fieldDef: (Fields, Fields))(init: X)(fn: (X, T) => X)(
-      implicit setter: TupleSetter[X], conv: TupleConverter[T]): Self = {
+      implicit setter: TupleSetter[X],
+      conv: TupleConverter[T]): Self = {
     mapStream[T, X](fieldDef) { s =>
       // scala's default is not consistent in 2.8 and 2.9, this standardizes the behavior
       new ScanLeftIterator(s, init, fn)

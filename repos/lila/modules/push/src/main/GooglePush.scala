@@ -4,8 +4,9 @@ import play.api.libs.json._
 import play.api.libs.ws.{WS, WSAuthScheme}
 import play.api.Play.current
 
-private final class GooglePush(
-    getDevice: String => Fu[Option[Device]], url: String, key: String) {
+private final class GooglePush(getDevice: String => Fu[Option[Device]],
+                               url: String,
+                               key: String) {
 
   def apply(userId: String)(data: => PushApi.Data): Funit =
     getDevice(userId) flatMap {

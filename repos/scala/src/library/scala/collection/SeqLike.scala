@@ -202,7 +202,7 @@ trait SeqLike[+A, +Repr]
     private[this] def init() = {
       val m = mutable.HashMap[A, Int]()
       val (es, is) = (thisCollection map
-          (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
+            (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
 
       (es.toBuffer, is.toArray)
     }
@@ -222,8 +222,9 @@ trait SeqLike[+A, +Repr]
 
       /* Calculate this result. */
       val buf = self.newBuilder
-      for (k <- 0 until nums.length; j <- 0 until nums(k)) buf +=
-        elms(offs(k) + j)
+      for (k <- 0 until nums.length; j <- 0 until nums(k))
+        buf +=
+          elms(offs(k) + j)
       val res = buf.result()
 
       /* Prepare for the next call to next. */
@@ -255,7 +256,7 @@ trait SeqLike[+A, +Repr]
 
       // e => (e, weight(e))
       val (es, is) = (thisCollection map
-          (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
+            (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
       val cs = new Array[Int](m.size)
       is foreach (i => cs(i) += 1)
       val ns = new Array[Int](cs.length)
@@ -338,8 +339,13 @@ trait SeqLike[+A, +Repr]
       else if (tl < 1) clippedFrom
       else if (l < tl) -1
       else
-        SeqLike.kmpSearch(
-            thisCollection, clippedFrom, l, that.seq, 0, tl, forward = true)
+        SeqLike.kmpSearch(thisCollection,
+                          clippedFrom,
+                          l,
+                          that.seq,
+                          0,
+                          tl,
+                          forward = true)
     } else {
       var i = from
       var s: Seq[A] = thisCollection drop i
@@ -376,8 +382,13 @@ trait SeqLike[+A, +Repr]
     else if (tl < 1) clippedL
     else if (l < tl) -1
     else
-      SeqLike.kmpSearch(
-          thisCollection, 0, clippedL + tl, that.seq, 0, tl, forward = false)
+      SeqLike.kmpSearch(thisCollection,
+                        0,
+                        clippedL + tl,
+                        that.seq,
+                        0,
+                        tl,
+                        forward = false)
   }
 
   /** Tests whether this $coll contains a given sequence as a slice.
@@ -640,8 +651,7 @@ trait SeqLike[+A, +Repr]
     if (len == 1) b ++= this
     else if (len > 1) {
       b.sizeHint(len)
-      val arr =
-        new Array[AnyRef](len) // Previously used ArraySeq for more compact but slower code
+      val arr = new Array[AnyRef](len) // Previously used ArraySeq for more compact but slower code
       var i = 0
       for (x <- this) {
         arr(i) = x.asInstanceOf[AnyRef]
@@ -681,7 +691,7 @@ trait SeqLike[+A, +Repr]
 
   /* Need to override string, so that it's not the Function1's string that gets mixed in.
    */
-  override def toString = super [IterableLike].toString
+  override def toString = super[IterableLike].toString
 }
 
 /** The companion object for trait `SeqLike`.
@@ -698,8 +708,10 @@ object SeqLike {
     *  @param  n1   The far end of the target sequence that we should use (exclusive)
     *  @return Target packed in an IndexedSeq (taken from iterator unless W already is an IndexedSeq)
     */
-  private def kmpOptimizeWord[B](
-      W: Seq[B], n0: Int, n1: Int, forward: Boolean) = W match {
+  private def kmpOptimizeWord[B](W: Seq[B],
+                                 n0: Int,
+                                 n1: Int,
+                                 forward: Boolean) = W match {
     case iso: IndexedSeq[_] =>
       // Already optimized for indexing--use original (or custom view of original)
       if (forward && n0 == 0 && n1 == W.length) iso.asInstanceOf[IndexedSeq[B]]
@@ -822,8 +834,7 @@ object SeqLike {
           val iter = S.iterator.drop(m0)
           val Wopt = kmpOptimizeWord(W, n0, n1, forward = true)
           val T = kmpJumpTable(Wopt, n1 - n0)
-          val cache =
-            new Array[AnyRef](n1 - n0) // Ring buffer--need a quick way to do a look-behind
+          val cache = new Array[AnyRef](n1 - n0) // Ring buffer--need a quick way to do a look-behind
           var largest = 0
           var i, m = 0
           var answer = -1
@@ -935,8 +946,8 @@ object SeqLike {
     else if (fixed_s1 - s0 < t1 - t0) -1 // Source is too short to find target
     else {
       // Nontrivial search
-      val ans = kmpSearch(
-          source, s0, fixed_s1, target, t0, t1, forward = false)
+      val ans =
+        kmpSearch(source, s0, fixed_s1, target, t0, t1, forward = false)
       if (ans < 0) ans else ans - s0
     }
   }

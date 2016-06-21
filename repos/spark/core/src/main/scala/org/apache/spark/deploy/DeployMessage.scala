@@ -58,8 +58,9 @@ private[deploy] object DeployMessages {
                                 exception: Option[Exception])
       extends DeployMessage
 
-  case class WorkerSchedulerStateResponse(
-      id: String, executors: List[ExecutorDescription], driverIds: Seq[String])
+  case class WorkerSchedulerStateResponse(id: String,
+                                          executors: List[ExecutorDescription],
+                                          driverIds: Seq[String])
 
   /**
     * A worker will send this message to the master when it registers with the master. Then the
@@ -116,8 +117,8 @@ private[deploy] object DeployMessages {
 
   // AppClient to Master
 
-  case class RegisterApplication(
-      appDescription: ApplicationDescription, driver: RpcEndpointRef)
+  case class RegisterApplication(appDescription: ApplicationDescription,
+                                 driver: RpcEndpointRef)
       extends DeployMessage
 
   case class UnregisterApplication(appId: String)
@@ -134,8 +135,11 @@ private[deploy] object DeployMessages {
       extends DeployMessage
 
   // TODO(matei): replace hostPort with host
-  case class ExecutorAdded(
-      id: Int, workerId: String, hostPort: String, cores: Int, memory: Int) {
+  case class ExecutorAdded(id: Int,
+                           workerId: String,
+                           hostPort: String,
+                           cores: Int,
+                           memory: Int) {
     Utils.checkHostPort(hostPort, "Required hostport")
   }
 

@@ -43,15 +43,17 @@ trait ScalaInplaceRenameHandler {
                                project: Project,
                                nameSuggestionContext: PsiElement,
                                editor: Editor): Unit = {
-    PsiElementRenameHandler.rename(
-        element, project, nameSuggestionContext, editor)
+    PsiElementRenameHandler
+      .rename(element, project, nameSuggestionContext, editor)
   }
 
-  def afterElementSubstitution(
-      elementToRename: PsiElement, editor: Editor, dataContext: DataContext)(
+  def afterElementSubstitution(elementToRename: PsiElement,
+                               editor: Editor,
+                               dataContext: DataContext)(
       inplaceRename: PsiElement => InplaceRefactoring): InplaceRefactoring = {
-    def showSubstitutePopup(
-        title: String, positive: String, subst: => PsiNamedElement): Unit = {
+    def showSubstitutePopup(title: String,
+                            positive: String,
+                            subst: => PsiNamedElement): Unit = {
       val cancel = ScalaBundle.message("rename.cancel")
       val list = JListCompatibility.createJBListFromListData(positive, cancel)
       JBPopupFactory.getInstance
@@ -105,8 +107,9 @@ trait ScalaInplaceRenameHandler {
     }
 
     val atCaret = PsiUtilBase.getElementAtCaret(editor)
-    val selected = ScalaPsiUtil.getParentOfType(
-        atCaret, classOf[ScReferenceElement], classOf[ScNamedElement])
+    val selected = ScalaPsiUtil.getParentOfType(atCaret,
+                                                classOf[ScReferenceElement],
+                                                classOf[ScNamedElement])
     val nameId = selected match {
       case ref: ScReferenceElement => ref.nameId
       case named: ScNamedElement => named.nameId
@@ -115,7 +118,7 @@ trait ScalaInplaceRenameHandler {
     elementToRename match {
       case Both(`selected`, fun: ScFunction)
           if Seq("apply", "unapply", "unapplySeq").contains(fun.name) ||
-          fun.isConstructor =>
+            fun.isConstructor =>
         specialMethodPopup(fun)
         null
       case elem =>

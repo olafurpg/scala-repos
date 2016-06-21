@@ -58,8 +58,8 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
     case registration: ChannelRegistration ⇒
       reportConnectFailure {
         if (remoteAddress.isUnresolved) {
-          log.debug(
-              "Resolving {} before connecting", remoteAddress.getHostName)
+          log.debug("Resolving {} before connecting",
+                    remoteAddress.getHostName)
           Dns.resolve(remoteAddress.getHostName)(system, self) match {
             case None ⇒
               context.become(resolving(registration))
@@ -82,8 +82,8 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
       }
   }
 
-  def register(
-      address: InetSocketAddress, registration: ChannelRegistration): Unit = {
+  def register(address: InetSocketAddress,
+               registration: ChannelRegistration): Unit = {
     reportConnectFailure {
       log.debug("Attempting connection to [{}]", address)
       if (channel.connect(address))
@@ -116,7 +116,7 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
             } else {
               log.debug(
                   "Could not establish connection because finishConnect " +
-                  "never returned true (consider increasing akka.io.tcp.finish-connect-retries)")
+                    "never returned true (consider increasing akka.io.tcp.finish-connect-retries)")
               stop()
             }
           }

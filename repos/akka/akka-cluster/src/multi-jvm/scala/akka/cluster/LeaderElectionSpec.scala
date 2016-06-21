@@ -110,7 +110,7 @@ abstract class LeaderElectionSpec(
           // removed
           awaitAssert(
               clusterView.unreachableMembers.map(_.address) should not contain
-              (leaderAddress))
+                (leaderAddress))
           enterBarrier("after-down" + n, "completed" + n)
 
         case _ if remainingRoles.contains(myself) ⇒

@@ -24,8 +24,8 @@ class ChangesConfirmationDialog private (
     val project: IJProject,
     private val changes: List[BuildFileChange],
     var myChangesBrowser: BuildFileChangeBrowser,
-    val fileStatusMap: mutable.Map[
-        VirtualFile, (BuildFileModifiedStatus, Long)],
+    val fileStatusMap: mutable.Map[VirtualFile,
+                                   (BuildFileModifiedStatus, Long)],
     val canExcludeChanges: Boolean = false)
     extends DialogWrapper(project) {
 
@@ -45,8 +45,10 @@ class ChangesConfirmationDialog private (
     val swappedChanges: java.util.ArrayList[Change] =
       new java.util.ArrayList[Change]()
     swappedChanges.addAll(changes.map(BuildFileChange.swap))
-    val changesBrowser = new BuildFileChangeBrowser(
-        project, swappedChanges, canExcludeChanges, fileStatusMap)
+    val changesBrowser = new BuildFileChangeBrowser(project,
+                                                    swappedChanges,
+                                                    canExcludeChanges,
+                                                    fileStatusMap)
     myChangesBrowser = changesBrowser
     changesBrowser.setChangesToDisplay(swappedChanges)
     changesBrowser.addToolbarAction(
@@ -68,8 +70,8 @@ class ChangesConfirmationDialog private (
 object ChangesConfirmationDialog {
   def apply(project: IJProject,
             changes: List[BuildFileChange],
-            fileChangesMap: mutable.Map[
-                VirtualFile, (BuildFileModifiedStatus, Long)])
+            fileChangesMap: mutable.Map[VirtualFile,
+                                        (BuildFileModifiedStatus, Long)])
     : ChangesConfirmationDialog =
     new ChangesConfirmationDialog(project, changes, null, fileChangesMap)
 }

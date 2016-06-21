@@ -49,8 +49,8 @@ trait MarshallingDirectives {
     * Uses the marshaller for the given type to produce a completion function that is passed to its inner function.
     * You can use it do decouple marshaller resolution from request completion.
     */
-  def completeWith[T](
-      marshaller: ToResponseMarshaller[T])(inner: (T ⇒ Unit) ⇒ Unit): Route =
+  def completeWith[T](marshaller: ToResponseMarshaller[T])(
+      inner: (T ⇒ Unit) ⇒ Unit): Route =
     extractRequestContext { ctx ⇒
       implicit val m = marshaller
       complete {

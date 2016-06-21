@@ -110,8 +110,8 @@ package object vec {
     * @param n number of repetitions
     * @tparam T type of elements in array
     */
-  def repeat[@spec(Boolean, Int, Long, Double) T: ST](
-      v: Array[T], n: Int): Array[T] = {
+  def repeat[@spec(Boolean, Int, Long, Double) T: ST](v: Array[T],
+                                                      n: Int): Array[T] = {
     array.flatten(for (i <- 1 to n) yield v)
   }
 }

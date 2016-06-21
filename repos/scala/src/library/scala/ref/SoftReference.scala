@@ -37,7 +37,9 @@ object SoftReference {
   *  @author Philipp Haller
   */
 private class SoftReferenceWithWrapper[T <: AnyRef](
-    value: T, queue: ReferenceQueue[T], val wrapper: SoftReference[T])
+    value: T,
+    queue: ReferenceQueue[T],
+    val wrapper: SoftReference[T])
     extends java.lang.ref.SoftReference[T](
         value,
         if (queue == null) null

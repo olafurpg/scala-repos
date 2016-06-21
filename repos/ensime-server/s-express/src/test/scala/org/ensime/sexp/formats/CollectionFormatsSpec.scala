@@ -67,8 +67,8 @@ class CollectionFormatsSpec
 
   it should "support SortedMap" in {
     assertFormat(collection.SortedMap[String, String](), SexpNil)
-    assertFormat(
-        collection.SortedMap("foo" -> "foo"), SexpList(SexpList(foo, foo)))
+    assertFormat(collection.SortedMap("foo" -> "foo"),
+                 SexpList(SexpList(foo, foo)))
   }
 
   "CollectionFormats immutable variants of the traits" should "support Traversable" in {

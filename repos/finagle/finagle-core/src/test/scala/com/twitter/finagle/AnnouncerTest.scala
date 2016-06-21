@@ -26,8 +26,7 @@ class AnnouncerTest extends FunSuite {
   }
 
   test("reject unknown announcers") {
-    assert(
-        Await
+    assert(Await
           .ready(Announcer.announce(addr, "unkown!foobar"))
           .poll
           .get

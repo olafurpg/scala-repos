@@ -26,7 +26,8 @@ import akka.http.scaladsl.model._
 import akka.testkit.AkkaSpec
 
 class ConnectionPoolSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+        """
     akka.loggers = []
     akka.loglevel = OFF
     akka.io.tcp.windows-connection-abort-workaround-enabled = auto
@@ -38,8 +39,9 @@ class ConnectionPoolSpec
     val serverSocket = ServerSocketChannel.open()
     serverSocket.socket.bind(new InetSocketAddress("127.0.0.1", 0))
     try {
-      val clientSocket = SocketChannel.open(new InetSocketAddress(
-              "127.0.0.1", serverSocket.socket().getLocalPort))
+      val clientSocket = SocketChannel.open(
+          new InetSocketAddress("127.0.0.1",
+                                serverSocket.socket().getLocalPort))
       @volatile var serverSideChannel: SocketChannel = null
       awaitCond {
         serverSideChannel = serverSocket.accept()
@@ -142,8 +144,9 @@ class ConnectionPoolSpec
       val settings = ConnectionPoolSettings(system)
         .withMaxConnections(4)
         .withPipeliningLimit(2)
-      val poolFlow = Http().cachedHostConnectionPool[Int](
-          serverHostName, serverPort, settings = settings)
+      val poolFlow = Http().cachedHostConnectionPool[Int](serverHostName,
+                                                          serverPort,
+                                                          settings = settings)
 
       val N = 500
       val requestIds = Source.fromIterator(() ⇒ Iterator.from(1)).take(N)
@@ -325,8 +328,8 @@ class ConnectionPoolSpec
         autoAccept = true) {
       val (serverEndpoint2, serverHostName2, serverPort2) =
         TestUtils.temporaryServerHostnameAndPort()
-      Http().bindAndHandleSync(
-          testServerHandler(0), serverHostName2, serverPort2)
+      Http()
+        .bindAndHandleSync(testServerHandler(0), serverHostName2, serverPort2)
 
       val (requestIn, responseOut, responseOutSub, hcp) = superPool[Int]()
 

@@ -157,8 +157,8 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     buffer.result().unzip._1
   }
 
-  protected override def getStatementAtCaret(
-      editor: Editor, psiFile: PsiFile): PsiElement = {
+  protected override def getStatementAtCaret(editor: Editor,
+                                             psiFile: PsiFile): PsiElement = {
     val atCaret: PsiElement = super.getStatementAtCaret(editor, psiFile)
     if (atCaret.isInstanceOf[PsiWhiteSpace] || atCaret == null) return null
     if (("}" == atCaret.getText) &&

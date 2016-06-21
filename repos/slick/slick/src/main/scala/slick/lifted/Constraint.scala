@@ -75,8 +75,7 @@ class ForeignKeyQuery[E <: AbstractTable[_], U](
     targetBaseQuery: Query[E, U, Seq],
     generator: AnonSymbol,
     aliasedValue: E
-)
-    extends WrappingQuery[E, U, Seq](nodeDelegate, base)
+) extends WrappingQuery[E, U, Seq](nodeDelegate, base)
     with Constraint {
 
   /** Combine the constraints of this `ForeignKeyQuery` with another one with the
@@ -92,8 +91,12 @@ class ForeignKeyQuery[E <: AbstractTable[_], U](
     }.reduceLeft[Node]((a, b) => Library.And.typed[Boolean](a, b))
     val newDelegate =
       Filter.ifRefutable(generator, targetBaseQuery.toNode, conditions)
-    new ForeignKeyQuery[E, U](
-        newDelegate, base, newFKs, targetBaseQuery, generator, aliasedValue)
+    new ForeignKeyQuery[E, U](newDelegate,
+                              base,
+                              newFKs,
+                              targetBaseQuery,
+                              generator,
+                              aliasedValue)
   }
 }
 

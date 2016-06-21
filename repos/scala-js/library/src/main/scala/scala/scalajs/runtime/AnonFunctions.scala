@@ -49,8 +49,12 @@ final class AnonFunction5[-T1, -T2, -T3, -T4, -T5, +R](
 final class AnonFunction6[-T1, -T2, -T3, -T4, -T5, -T6, +R](
     f: js.Function6[T1, T2, T3, T4, T5, T6, R])
     extends AbstractFunction6[T1, T2, T3, T4, T5, T6, R] {
-  override def apply(
-      arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6): R =
+  override def apply(arg1: T1,
+                     arg2: T2,
+                     arg3: T3,
+                     arg4: T4,
+                     arg5: T5,
+                     arg6: T6): R =
     f(arg1, arg2, arg3, arg4, arg5, arg6)
 }
 
@@ -138,8 +142,19 @@ final class AnonFunction11[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
 final class AnonFunction12[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
     -T11, -T12, +R](
     f: js.Function12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R])
-    extends AbstractFunction12[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R] {
+    extends AbstractFunction12[T1,
+                               T2,
+                               T3,
+                               T4,
+                               T5,
+                               T6,
+                               T7,
+                               T8,
+                               T9,
+                               T10,
+                               T11,
+                               T12,
+                               R] {
   override def apply(arg1: T1,
                      arg2: T2,
                      arg3: T3,
@@ -169,10 +184,34 @@ final class AnonFunction12[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
 @inline
 final class AnonFunction13[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
     -T11, -T12, -T13, +R](
-    f: js.Function13[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R])
-    extends AbstractFunction13[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R] {
+    f: js.Function13[T1,
+                     T2,
+                     T3,
+                     T4,
+                     T5,
+                     T6,
+                     T7,
+                     T8,
+                     T9,
+                     T10,
+                     T11,
+                     T12,
+                     T13,
+                     R])
+    extends AbstractFunction13[T1,
+                               T2,
+                               T3,
+                               T4,
+                               T5,
+                               T6,
+                               T7,
+                               T8,
+                               T9,
+                               T10,
+                               T11,
+                               T12,
+                               T13,
+                               R] {
   override def apply(arg1: T1,
                      arg2: T2,
                      arg3: T3,
@@ -203,10 +242,37 @@ final class AnonFunction13[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
 
 @inline
 final class AnonFunction14[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
-    -T11, -T12, -T13, -T14, +R](f: js.Function14[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, R])
-    extends AbstractFunction14[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, R] {
+    -T11, -T12, -T13, -T14, +R](
+    f: js.Function14[T1,
+                     T2,
+                     T3,
+                     T4,
+                     T5,
+                     T6,
+                     T7,
+                     T8,
+                     T9,
+                     T10,
+                     T11,
+                     T12,
+                     T13,
+                     T14,
+                     R])
+    extends AbstractFunction14[T1,
+                               T2,
+                               T3,
+                               T4,
+                               T5,
+                               T6,
+                               T7,
+                               T8,
+                               T9,
+                               T10,
+                               T11,
+                               T12,
+                               T13,
+                               T14,
+                               R] {
   override def apply(arg1: T1,
                      arg2: T2,
                      arg3: T3,
@@ -239,10 +305,39 @@ final class AnonFunction14[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
 
 @inline
 final class AnonFunction15[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10,
-    -T11, -T12, -T13, -T14, -T15, +R](f: js.Function15[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, R])
-    extends AbstractFunction15[
-        T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, R] {
+    -T11, -T12, -T13, -T14, -T15, +R](
+    f: js.Function15[T1,
+                     T2,
+                     T3,
+                     T4,
+                     T5,
+                     T6,
+                     T7,
+                     T8,
+                     T9,
+                     T10,
+                     T11,
+                     T12,
+                     T13,
+                     T14,
+                     T15,
+                     R])
+    extends AbstractFunction15[T1,
+                               T2,
+                               T3,
+                               T4,
+                               T5,
+                               T6,
+                               T7,
+                               T8,
+                               T9,
+                               T10,
+                               T11,
+                               T12,
+                               T13,
+                               T14,
+                               T15,
+                               R] {
   override def apply(arg1: T1,
                      arg2: T2,
                      arg3: T3,

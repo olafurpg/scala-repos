@@ -16,8 +16,9 @@ final class Hobby(var name: String,
 
 class NonPublicJointTest extends FunSuite {
   test("main") {
-    val e = new Person(
-        "Eugene", 25, new Hobby("hacking", "mostly Scala", "loving it"))
+    val e = new Person("Eugene",
+                       25,
+                       new Hobby("hacking", "mostly Scala", "loving it"))
     val pickle = e.pickle
     assert(
         pickle.toString === """

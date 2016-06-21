@@ -65,8 +65,8 @@ object Transform {
              mzy: Double,
              mzz: Double,
              tz: Double): Affine =
-    jfxst.Transform.affine(
-        mxx, mxy, mxz, tx, myx, myy, myz, ty, mzx, mzy, mzz, tz)
+    jfxst.Transform
+      .affine(mxx, mxy, mxz, tx, myx, myy, myz, ty, mzx, mzy, mzz, tz)
 
   /**
     * Returns a Rotate object that rotates coordinates around a pivot point.
@@ -122,7 +122,8 @@ abstract class Transform(override val delegate: jfxst.Transform)
       v: jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]](
-        this.onTransformChanged, v)
+          this.onTransformChanged,
+          v)
   }
 
   /** Determines if this is currently a 2D transform. */

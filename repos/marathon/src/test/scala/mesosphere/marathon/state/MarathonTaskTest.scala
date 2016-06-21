@@ -50,8 +50,10 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
     merged.toProto shouldEqual proto
   }
 
-  private[this] def makeTask(
-      id: String, host: String, port: Int, version: Option[String]) = {
+  private[this] def makeTask(id: String,
+                             host: String,
+                             port: Int,
+                             version: Option[String]) = {
     val builder = MarathonTask
       .newBuilder()
       .setHost(host)

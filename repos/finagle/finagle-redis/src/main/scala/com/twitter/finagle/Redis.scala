@@ -36,8 +36,8 @@ object Redis extends Client[Command, Reply] {
       * A default client stack which supports the pipelined redis client.
       */
     def newStack: Stack[ServiceFactory[Command, Reply]] =
-      StackClient.newStack.replace(
-          DefaultPool.Role, SingletonPool.module[Command, Reply])
+      StackClient.newStack
+        .replace(DefaultPool.Role, SingletonPool.module[Command, Reply])
   }
 
   case class Client(

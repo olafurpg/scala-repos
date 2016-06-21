@@ -34,7 +34,7 @@ object IdentitiesComparator {
   def apply(ascending: Boolean) = new IdentitiesComparator(ascending)
 }
 
-class IdentitiesComparator private[jdbm3](val ascending: Boolean)
+class IdentitiesComparator private[jdbm3] (val ascending: Boolean)
     extends Comparator[Identities]
     with Serializable {
   def compare(a: Identities, b: Identities) = {

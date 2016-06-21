@@ -52,8 +52,8 @@ class HiveResolutionSuite extends HiveComparisonTest {
 
   createQueryTest("table.attr", "SELECT src.key FROM src ORDER BY key LIMIT 1")
 
-  createQueryTest(
-      "database.table", "SELECT key FROM default.src ORDER BY key LIMIT 1")
+  createQueryTest("database.table",
+                  "SELECT key FROM default.src ORDER BY key LIMIT 1")
 
   createQueryTest("database.table table.attr",
                   "SELECT src.key FROM default.src ORDER BY key LIMIT 1")
@@ -67,8 +67,8 @@ class HiveResolutionSuite extends HiveComparisonTest {
       "subquery-alias.attr",
       "SELECT a.key FROM (SELECT * FROM src ORDER BY key LIMIT 1) a")
 
-  createQueryTest(
-      "quoted alias.attr", "SELECT `a`.`key` FROM src a ORDER BY key LIMIT 1")
+  createQueryTest("quoted alias.attr",
+                  "SELECT `a`.`key` FROM src a ORDER BY key LIMIT 1")
 
   createQueryTest("attr", "SELECT key FROM src a ORDER BY key LIMIT 1")
 
@@ -83,8 +83,14 @@ class HiveResolutionSuite extends HiveComparisonTest {
 
     val query =
       sql("SELECT a, b, A, B, n.a, n.b, n.A, n.B FROM caseSensitivityTest")
-    assert(query.schema.fields.map(_.name) === Seq(
-               "a", "b", "A", "B", "a", "b", "A", "B"),
+    assert(query.schema.fields.map(_.name) === Seq("a",
+                                                   "b",
+                                                   "A",
+                                                   "B",
+                                                   "a",
+                                                   "b",
+                                                   "A",
+                                                   "B"),
            "The output schema did not preserve the case of the query.")
     query.collect()
   }

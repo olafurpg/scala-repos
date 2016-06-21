@@ -74,8 +74,7 @@ class SinkForeachParallelSpec extends AkkaSpec {
       val probe = TestProbe()
       val latch = TestLatch(1)
 
-      val p = Source(1 to 5).runWith(
-          Sink
+      val p = Source(1 to 5).runWith(Sink
             .foreachParallel(4)((n: Int) ⇒ {
           if (n == 3) throw new RuntimeException("err1") with NoStackTrace
           else {
@@ -96,8 +95,7 @@ class SinkForeachParallelSpec extends AkkaSpec {
       val latch = TestLatch(1)
 
       implicit val ec = system.dispatcher
-      val p = Source(1 to 5).runWith(
-          Sink
+      val p = Source(1 to 5).runWith(Sink
             .foreachParallel(3)((n: Int) ⇒ {
           if (n == 3) throw new RuntimeException("err2") with NoStackTrace
           else {

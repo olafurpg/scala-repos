@@ -49,19 +49,22 @@ class CoreModuleImpl @Inject()(
 
   private[this] lazy val random = Random
   private[this] lazy val shutdownHookModule = ShutdownHooks()
-  private[this] lazy val actorsModule = new ActorsModule(
-      shutdownHookModule, actorSystem)
+  private[this] lazy val actorsModule =
+    new ActorsModule(shutdownHookModule, actorSystem)
 
-  override lazy val leadershipModule = LeadershipModule(
-      actorsModule.actorRefFactory, zk, leader)
+  override lazy val leadershipModule =
+    LeadershipModule(actorsModule.actorRefFactory, zk, leader)
 
   // TASKS
 
   override lazy val taskBusModule = new TaskBusModule()
-  override lazy val taskTrackerModule = new TaskTrackerModule(
-      clock, metrics, marathonConf, leadershipModule, taskRepository)
-  override lazy val taskJobsModule = new TaskJobsModule(
-      marathonConf, leadershipModule, clock)
+  override lazy val taskTrackerModule = new TaskTrackerModule(clock,
+                                                              metrics,
+                                                              marathonConf,
+                                                              leadershipModule,
+                                                              taskRepository)
+  override lazy val taskJobsModule =
+    new TaskJobsModule(marathonConf, leadershipModule, clock)
 
   // OFFER MATCHING AND LAUNCHING TASKS
 
@@ -156,8 +159,8 @@ class CoreModuleImpl @Inject()(
   // is created. Changing the wiring order for this feels wrong since it is nicer if it
   // follows architectural logic. Therefore we instantiate them here explicitly.
 
-  taskJobsModule.killOverdueTasks(
-      taskTrackerModule.taskTracker, marathonSchedulerDriverHolder)
+  taskJobsModule.killOverdueTasks(taskTrackerModule.taskTracker,
+                                  marathonSchedulerDriverHolder)
   maybeOfferReviver
   offerMatcherManagerModule
   launcherModule

@@ -129,8 +129,8 @@ case class OffsetRequest(
         (topicAndPartition,
          PartitionOffsetsResponse(Errors.forException(e).code, Nil))
     }
-    val errorResponse = OffsetResponse(
-        correlationId, partitionOffsetResponseMap)
+    val errorResponse =
+      OffsetResponse(correlationId, partitionOffsetResponseMap)
     requestChannel.sendResponse(
         new Response(
             request,

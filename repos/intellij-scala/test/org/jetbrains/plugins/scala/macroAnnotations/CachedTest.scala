@@ -58,12 +58,10 @@ class CachedTest extends CachedTestBase {
 
     def setUpThreads(): (Thread, Thread) = {
       Foo.allThreadsStartedLock.lock()
-      val thread1 = new Thread(
-          new Runnable {
+      val thread1 = new Thread(new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
-      val thread2 = new Thread(
-          new Runnable {
+      val thread2 = new Thread(new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
 
@@ -109,7 +107,8 @@ class CachedTest extends CachedTestBase {
     val firstRes = Foo.currentTime
     Thread.sleep(1)
     Assert.assertEquals(firstRes, Foo.currentTime)
-    Foo.getManager.getModificationTracker.incOutOfCodeBlockModificationCounter()
+    Foo.getManager.getModificationTracker
+      .incOutOfCodeBlockModificationCounter()
     Assert.assertTrue(firstRes < Foo.currentTime)
   }
 

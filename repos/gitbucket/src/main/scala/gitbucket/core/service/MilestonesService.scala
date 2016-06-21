@@ -8,12 +8,12 @@ import gitbucket.core.model.Profile.dateColumnType
 
 trait MilestonesService {
 
-  def createMilestone(owner: String,
-                      repository: String,
-                      title: String,
-                      description: Option[String],
-                      dueDate: Option[java.util.Date])(
-      implicit s: Session): Unit =
+  def createMilestone(
+      owner: String,
+      repository: String,
+      title: String,
+      description: Option[String],
+      dueDate: Option[java.util.Date])(implicit s: Session): Unit =
     Milestones insert Milestone(
         userName = owner,
         repositoryName = repository,
@@ -71,8 +71,8 @@ trait MilestonesService {
     }
   }
 
-  def getMilestones(owner: String, repository: String)(
-      implicit s: Session): List[Milestone] =
+  def getMilestones(owner: String,
+                    repository: String)(implicit s: Session): List[Milestone] =
     Milestones
       .filter(_.byRepository(owner, repository))
       .sortBy(_.milestoneId asc)

@@ -97,7 +97,8 @@ object LiftJavaScript {
     }
 
     JsCrVar("lift_settings", JsObj()) & extendJsHelpersCmd & Call(
-        "window.lift.extend", JsVar("lift_settings"), settings) & Call(
-        "window.lift.init", JsVar("lift_settings"))
+        "window.lift.extend",
+        JsVar("lift_settings"),
+        settings) & Call("window.lift.init", JsVar("lift_settings"))
   }
 }

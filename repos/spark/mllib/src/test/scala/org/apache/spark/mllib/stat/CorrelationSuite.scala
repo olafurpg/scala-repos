@@ -144,13 +144,14 @@ class CorrelationSuite
     }
   }
 
-  def matrixApproxEqual(
-      A: BM[Double], B: BM[Double], threshold: Double = 1e-6): Boolean = {
+  def matrixApproxEqual(A: BM[Double],
+                        B: BM[Double],
+                        threshold: Double = 1e-6): Boolean = {
     for (i <- 0 until A.rows; j <- 0 until A.cols) {
       if (!approxEqual(A(i, j), B(i, j), threshold)) {
         logInfo(
             "i, j = " + i + ", " + j + " actual: " + A(i, j) + " expected:" +
-            B(i, j))
+              B(i, j))
         return false
       }
     }

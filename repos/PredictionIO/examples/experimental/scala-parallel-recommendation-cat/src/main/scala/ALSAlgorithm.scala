@@ -22,8 +22,7 @@ case class ALSAlgorithmParams(
     numIterations: Int,
     lambda: Double,
     seed: Option[Long]
-)
-    extends Params
+) extends Params
 
 class ALSModel(
     val rank: Int,
@@ -31,8 +30,7 @@ class ALSModel(
     val productFeatures: Map[Int, (Item, Option[Array[Double]])],
     val userStringIntMap: BiMap[String, Int],
     val itemStringIntMap: BiMap[String, Int]
-)
-    extends Serializable {
+) extends Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
@@ -59,16 +57,16 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   def train(data: PreparedData): ALSModel = {
     require(!data.viewEvents.take(1).isEmpty,
             s"viewEvents in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.users.take(1).isEmpty,
             s"users in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.items.take(1).isEmpty,
             s"items in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
@@ -80,11 +78,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-            " to Int index.")
+              " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+              " to Int index.")
 
       ((uindex, iindex), 1)
     }.filter {
@@ -102,7 +100,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
             s"mllibRatings cannot be empty." +
-            " Please check if your events contain valid user and item ID.")
+              " Please check if your events contain valid user and item ID.")
 
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)
@@ -161,40 +159,39 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       // flatten Option[Option[Array[Double]]] to Option[Array[Double]]
       .flatten
 
-    val topScores =
-      if (userFeature.isDefined) {
-        // the user has feature vector
-        val uf = userFeature.get
-        val indexScores: Map[Int, Double] =
-          productFeatures.par // convert to parallel collection
-          .filter {
-            case (i, (item, feature)) =>
-              feature.isDefined && isCandidateItem(
-                  i = i,
-                  item = item,
-                  categories = query.categories,
-                  whiteList = whiteList,
-                  blackList = finalBlackList
-              )
-          }.map {
-            case (i, (item, feature)) =>
-              // NOTE: feature must be defined, so can call .get
-              val s = dotProduct(uf, feature.get)
-              // Can adjust score here
-              (i, s)
-          }.filter(_._2 > 0) // only keep items with score > 0
-            .seq // convert back to sequential collection
+    val topScores = if (userFeature.isDefined) {
+      // the user has feature vector
+      val uf = userFeature.get
+      val indexScores: Map[Int, Double] =
+        productFeatures.par // convert to parallel collection
+        .filter {
+          case (i, (item, feature)) =>
+            feature.isDefined && isCandidateItem(
+                i = i,
+                item = item,
+                categories = query.categories,
+                whiteList = whiteList,
+                blackList = finalBlackList
+            )
+        }.map {
+          case (i, (item, feature)) =>
+            // NOTE: feature must be defined, so can call .get
+            val s = dotProduct(uf, feature.get)
+            // Can adjust score here
+            (i, s)
+        }.filter(_._2 > 0) // only keep items with score > 0
+          .seq // convert back to sequential collection
 
-        val ord = Ordering.by[(Int, Double), Double](_._2).reverse
-        val topScores = getTopN(indexScores, query.num)(ord).toArray
+      val ord = Ordering.by[(Int, Double), Double](_._2).reverse
+      val topScores = getTopN(indexScores, query.num)(ord).toArray
 
-        topScores
-      } else {
-        // the user doesn't have feature vector.
-        // For example, new user is created after model is trained.
-        logger.info(s"No userFeature found for user ${query.user}.")
-        Array[(Int, Double)]()
-      }
+      topScores
+    } else {
+      // the user doesn't have feature vector.
+      // For example, new user is created after model is trained.
+      logger.info(s"No userFeature found for user ${query.user}.")
+      Array[(Int, Double)]()
+    }
 
     val itemScores = topScores.map {
       case (i, s) =>

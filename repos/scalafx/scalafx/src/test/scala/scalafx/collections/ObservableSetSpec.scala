@@ -46,7 +46,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableSetSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.ObservableSet[T], ObservableSet[T]](
-        classOf[jfxc.ObservableSet[T]], classOf[ObservableSet[T]]) {
+        classOf[jfxc.ObservableSet[T]],
+        classOf[ObservableSet[T]]) {
 
   /**
     * Verifies if a generated Set is the same instance than a original Set. If it should not be,

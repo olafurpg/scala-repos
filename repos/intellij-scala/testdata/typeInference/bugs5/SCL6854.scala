@@ -46,13 +46,11 @@ object SCL6854 {
 
     // Implicits guided type inference does not work in IntelliJ IDEA:
 
-    val anyRef =
-      Foo("hello, world!") // <-- ERROR HERE (View -> Type Info shows "Nothing", when it should be FooAny)
+    val anyRef = Foo("hello, world!") // <-- ERROR HERE (View -> Type Info shows "Nothing", when it should be FooAny)
     log("anyRef", anyRef, anyRef.value)
     // <-- manifested here (syntax highlighting error)
 
-    val anyRefExp: FooAny[String] =
-      Foo("hello, world! (explicit)") // <-- specifying the type explicitly works
+    val anyRefExp: FooAny[String] = Foo("hello, world! (explicit)") // <-- specifying the type explicitly works
     log("anyRefExp", anyRefExp, anyRefExp.value)
 
     val someBoolean = Foo(true) // <-- ERROR here too

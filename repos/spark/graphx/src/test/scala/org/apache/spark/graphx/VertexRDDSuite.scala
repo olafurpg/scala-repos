@@ -40,8 +40,7 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
     withSpark { sc =>
       val n = 100
       val verts = vertices(sc, n)
-      val negatives =
-        verts.mapValues(x => -x).cache() // Allow joining b with a derived RDD of b
+      val negatives = verts.mapValues(x => -x).cache() // Allow joining b with a derived RDD of b
       assert(negatives.count === n + 1)
     }
   }
@@ -128,24 +127,22 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
       val verts = vertices(sc, n).cache()
       val evens = verts.filter(q => ((q._2 % 2) == 0)).cache()
       // leftJoin with another VertexRDD
-      assert(
-          verts
+      assert(verts
             .leftJoin(evens) { (id, a, bOpt) =>
           a - bOpt.getOrElse(0)
         }
             .collect()
             .toSet === (0 to n by 2).map(x => (x.toLong, 0)).toSet ++
-          (1 to n by 2).map(x => (x.toLong, x)).toSet)
+            (1 to n by 2).map(x => (x.toLong, x)).toSet)
       // leftJoin with an RDD
       val evensRDD = evens.map(identity)
-      assert(
-          verts
+      assert(verts
             .leftJoin(evensRDD) { (id, a, bOpt) =>
           a - bOpt.getOrElse(0)
         }
             .collect()
             .toSet === (0 to n by 2).map(x => (x.toLong, 0)).toSet ++
-          (1 to n by 2).map(x => (x.toLong, x)).toSet)
+            (1 to n by 2).map(x => (x.toLong, x)).toSet)
     }
   }
 
@@ -161,7 +158,7 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
         old - newOpt.getOrElse(0)
       }
       assert(vertexC.filter(v => v._2 != 0).map(_._1).collect().toSet ==
-          (1 to 99 by 2).toSet)
+            (1 to 99 by 2).toSet)
     }
   }
 
@@ -171,8 +168,7 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
       val verts = vertices(sc, n).cache()
       val evens = verts.filter(q => ((q._2 % 2) == 0)).cache()
       // innerJoin with another VertexRDD
-      assert(
-          verts
+      assert(verts
             .innerJoin(evens) { (id, a, b) =>
           a - b
         }
@@ -180,8 +176,7 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
             .toSet === (0 to n by 2).map(x => (x.toLong, 0)).toSet)
       // innerJoin with an RDD
       val evensRDD = evens.map(identity)
-      assert(
-          verts
+      assert(verts
             .innerJoin(evensRDD) { (id, a, b) =>
           a - b
         }
@@ -202,7 +197,7 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
         old - newVal
       }
       assert(vertexC.filter(v => v._2 == 0).map(_._1).collect().toSet ==
-          (0 to 98 by 2).toSet)
+            (0 to 98 by 2).toSet)
     }
   }
 
@@ -214,7 +209,7 @@ class VertexRDDSuite extends SparkFunSuite with LocalSparkContext {
       val messages = sc.parallelize(messageTargets.map(x => (x.toLong, 1)))
       assert(
           verts.aggregateUsingIndex[Int](messages, _ + _).collect().toSet ===
-          (0 to n).map(x => (x.toLong, if (x % 2 == 0) 2 else 1)).toSet)
+            (0 to n).map(x => (x.toLong, if (x % 2 == 0) 2 else 1)).toSet)
     }
   }
 

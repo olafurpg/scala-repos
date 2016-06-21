@@ -19,8 +19,8 @@ class FileUploadSupportSpecServlet
   def fileParamsToHeaders() {
     fileParams.foreach(fileParam => {
       response.setHeader("File-" + fileParam._1 + "-Name", fileParam._2.name)
-      response.setHeader(
-          "File-" + fileParam._1 + "-Size", fileParam._2.size.toString)
+      response.setHeader("File-" + fileParam._1 + "-Size",
+                         fileParam._2.size.toString)
       response.setHeader("File-" + fileParam._1 + "-SHA",
                          DigestUtils.shaHex(fileParam._2.get()))
     })
@@ -105,10 +105,10 @@ class FileUploadSupportMaxSizeTestServlet
 
   error {
     case e: SizeConstraintExceededException => {
-        status = 413
+      status = 413
 
-        "too much!"
-      }
+      "too much!"
+    }
   }
 
   post("/upload") {
@@ -246,9 +246,9 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
     "use default charset (UTF-8) for decoding form params if not excplicitly set to something else" in {
       val boundary = "XyXyXy"
       val reqBody = ("--{boundary}\r\n" +
-          "Content-Disposition: form-data; name=\"utf8-string\"\r\n" +
-          "Content-Type: text/plain\r\n" +
-          "\r\n" + "föo\r\n" + "--{boundary}--\r\n")
+            "Content-Disposition: form-data; name=\"utf8-string\"\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" + "föo\r\n" + "--{boundary}--\r\n")
         .replace("{boundary}", boundary)
         .getBytes("UTF-8")
 
@@ -259,10 +259,10 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
 
     "use the charset specified in Content-Type header of a part for decoding form params" in {
       val reqBody = ("--XyXyXy\r\n" +
-          "Content-Disposition: form-data; name=\"latin1-string\"\r\n" +
-          "Content-Type: text/plain; charset=ISO-8859-1\r\n" + "\r\n" +
-          "äöööölfldflfldfdföödfödfödfåååååå\r\n" +
-          "--XyXyXy--").getBytes("ISO-8859-1")
+            "Content-Disposition: form-data; name=\"latin1-string\"\r\n" +
+            "Content-Type: text/plain; charset=ISO-8859-1\r\n" + "\r\n" +
+            "äöööölfldflfldfdföödfödfödfåååååå\r\n" +
+            "--XyXyXy--").getBytes("ISO-8859-1")
 
       post("/params", headers = multipartHeaders, body = reqBody) {
         header("latin1-string") must_== "äöööölfldflfldfdföödfödfödfåååååå"

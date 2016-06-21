@@ -57,7 +57,8 @@ class MessageCompressionTest extends JUnitSuite {
         new Message("I am fine".getBytes),
         new Message("I am not so well today".getBytes))
     val messageSet = new ByteBufferMessageSet(
-        compressionCodec = compressionCodec, messages = messages: _*)
+        compressionCodec = compressionCodec,
+        messages = messages: _*)
     assertEquals(compressionCodec,
                  messageSet.shallowIterator.next().message.compressionCodec)
     val decompressed = messageSet.iterator.map(_.message).toList
@@ -68,7 +69,8 @@ class MessageCompressionTest extends JUnitSuite {
                        messages: List[Message],
                        expectedSize: Int) {
     val messageSet = new ByteBufferMessageSet(
-        compressionCodec = compressionCodec, messages = messages: _*)
+        compressionCodec = compressionCodec,
+        messages = messages: _*)
     assertEquals(s"$compressionCodec size has changed.",
                  expectedSize,
                  messageSet.sizeInBytes)

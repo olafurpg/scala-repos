@@ -54,12 +54,14 @@ class FlagTest extends FunSuite {
 
   test("Flaggable: parse maps with comma-separated values") {
     assert(Flaggable.ofMap[String, Seq[Int]].parse("a=1,2,3,3,b=4,5") == Map(
-            "a" -> Seq(1, 2, 3, 3), "b" -> Seq(4, 5)))
+            "a" -> Seq(1, 2, 3, 3),
+            "b" -> Seq(4, 5)))
   }
 
   test("Flaggable: parse maps of sets with comma-separated values") {
     assert(Flaggable.ofMap[String, Set[Int]].parse("a=1,2,3,3,b=4,5") == Map(
-            "a" -> Set(1, 2, 3), "b" -> Set(4, 5)))
+            "a" -> Set(1, 2, 3),
+            "b" -> Set(4, 5)))
   }
 
   test("Flaggable: parse tuples") {
@@ -366,15 +368,17 @@ class FlagTest extends FunSuite {
     val flagWithGlobal = new Flags("my", includeGlobal = true)
     flagWithGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithGlobal(
-        "flag.with.single.quote", "i'm so cool", "why would you do this?")
+    flagWithGlobal("flag.with.single.quote",
+                   "i'm so cool",
+                   "why would you do this?")
     flagWithGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val flagWithoutGlobal = new Flags("my", includeGlobal = false)
     flagWithoutGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithoutGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithoutGlobal(
-        "flag.with.single.quote", "i'm so cool", "why would you do this?")
+    flagWithoutGlobal("flag.with.single.quote",
+                      "i'm so cool",
+                      "why would you do this?")
     flagWithoutGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val localOnly = """|Set flags:

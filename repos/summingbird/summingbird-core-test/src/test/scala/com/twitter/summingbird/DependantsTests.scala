@@ -66,10 +66,9 @@ object DependantsTest extends Properties("Dependants") {
         implies(tdepth == 0, t.isInstanceOf[Source[_, _]]) && implies(
             tdepth > 0,
             (Producer.dependenciesOf(t).map { deps.depth(_).get }.max) < tdepth) &&
-        implies(tdepth > 0,
-                Producer
-                  .dependenciesOf(t)
-                  .exists { deps.depth(_) == Some(tdepth - 1) })
+        implies(tdepth > 0, Producer.dependenciesOf(t).exists {
+          deps.depth(_) == Some(tdepth - 1)
+        })
       }
   }
 
@@ -247,7 +246,8 @@ object DependantsTest extends Properties("Dependants") {
         val nonMergeDeps = nonMergeDependencies(n)
         nonMergeDeps.forall { parent =>
           val parentTargets = cache.getOrElseUpdate(
-              parent, dependants.dependantsAfterMerge(parent).toSet)
+              parent,
+              dependants.dependantsAfterMerge(parent).toSet)
           parentTargets(n)
         }
       }

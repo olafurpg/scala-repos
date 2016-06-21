@@ -408,7 +408,7 @@ class SparkListenerSuite
       .setAppName("test")
       .set("spark.extraListeners",
            classOf[ListenerThatAcceptsSparkConf].getName + "," +
-           classOf[BasicJobCounter].getName)
+             classOf[BasicJobCounter].getName)
     sc = new SparkContext(conf)
     sc.listenerBus.listeners.asScala.count(_.isInstanceOf[BasicJobCounter]) should be(
         1)

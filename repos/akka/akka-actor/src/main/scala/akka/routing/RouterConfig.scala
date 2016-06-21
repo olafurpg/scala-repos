@@ -192,8 +192,8 @@ abstract class PoolBase extends Pool
   */
 trait Pool extends RouterConfig {
 
-  @deprecated(
-      "Implement nrOfInstances with ActorSystem parameter instead", "2.4")
+  @deprecated("Implement nrOfInstances with ActorSystem parameter instead",
+              "2.4")
   def nrOfInstances: Int = -1
 
   /**
@@ -211,22 +211,21 @@ trait Pool extends RouterConfig {
   /**
     * INTERNAL API
     */
-  private[akka] def newRoutee(
-      routeeProps: Props, context: ActorContext): Routee =
+  private[akka] def newRoutee(routeeProps: Props,
+                              context: ActorContext): Routee =
     ActorRefRoutee(
         context.actorOf(enrichWithPoolDispatcher(routeeProps, context)))
 
   /**
     * INTERNAL API
     */
-  private[akka] def enrichWithPoolDispatcher(
-      routeeProps: Props, context: ActorContext): Props =
+  private[akka] def enrichWithPoolDispatcher(routeeProps: Props,
+                                             context: ActorContext): Props =
     if (usePoolDispatcher &&
         routeeProps.dispatcher == Dispatchers.DefaultDispatcherId)
-      routeeProps.withDispatcher(
-          "akka.actor.deployment." +
-          context.self.path.elements.drop(1).mkString("/", "/", "") +
-          ".pool-dispatcher")
+      routeeProps.withDispatcher("akka.actor.deployment." +
+            context.self.path.elements.drop(1).mkString("/", "/", "") +
+            ".pool-dispatcher")
     else routeeProps
 
   /**

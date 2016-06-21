@@ -91,8 +91,12 @@ object Sample {
 
   private implicit class RichLoadedDefinitions(ld: LoadedDefinitions) {
     def copy(projects: Seq[Project]) =
-      new LoadedDefinitions(
-          ld.base, ld.target, ld.loader, ld.builds, projects, ld.buildNames)
+      new LoadedDefinitions(ld.base,
+                            ld.target,
+                            ld.loader,
+                            ld.builds,
+                            projects,
+                            ld.buildNames)
   }
 
   private implicit class RichBuildUnit(bu: BuildUnit) {

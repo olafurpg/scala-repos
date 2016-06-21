@@ -18,8 +18,9 @@ import org.jetbrains.sbt.resolvers.{ResolverException, SbtResolverIndexesManager
   */
 class SbtDependencyAnnotator extends Annotator {
 
-  private case class ArtifactInfo(
-      group: String, artifact: String, version: String)
+  private case class ArtifactInfo(group: String,
+                                  artifact: String,
+                                  version: String)
 
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit =
     try {
@@ -51,7 +52,8 @@ class SbtDependencyAnnotator extends Annotator {
       }
       if (!isInRepo) {
         val annotation = holder.createErrorAnnotation(
-            element, SbtBundle("sbt.annotation.unresolvedDependency"))
+            element,
+            SbtBundle("sbt.annotation.unresolvedDependency"))
         annotation.registerFix(new SbtUpdateResolverIndexesQuickFix)
         annotation.registerFix(new SbtRefreshProjectQuickFix)
       }
@@ -94,5 +96,5 @@ class SbtDependencyAnnotator extends Annotator {
 
   private def isDynamicVersion(version: String): Boolean =
     version.startsWith("latest") || version.endsWith("+") ||
-    "[]()".exists(version.contains(_))
+      "[]()".exists(version.contains(_))
 }

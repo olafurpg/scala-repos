@@ -92,8 +92,10 @@ class Scene(
     * @param height The height of the scene
     * @param depthBuffer The depth buffer flag
     */
-  def this(
-      parent: Parent, width: Double, height: Double, depthBuffer: Boolean) =
+  def this(parent: Parent,
+           width: Double,
+           height: Double,
+           depthBuffer: Boolean) =
     this(new jfxs.Scene(parent, width, height, depthBuffer))
 
   /**
@@ -140,8 +142,11 @@ class Scene(
            depthBuffer: Boolean,
            antiAliasing: SceneAntialiasing) =
     this(
-        new jfxs.Scene(
-            new jfxs.Group(), width, height, depthBuffer, antiAliasing))
+        new jfxs.Scene(new jfxs.Group(),
+                       width,
+                       height,
+                       depthBuffer,
+                       antiAliasing))
 
   /**
     * Creates a Scene for a specific root Node with a specific size and fill.
@@ -181,7 +186,7 @@ class Scene(
     case _ =>
       throw new IllegalStateException(
           "Cannot access children of root: " + root + "\n" +
-          "Use a class that extends Group or Pane, or override the getChildren method.")
+            "Use a class that extends Group or Pane, or override the getChildren method.")
   }
 
   /**
@@ -550,8 +555,8 @@ class Scene(
   /**
     * Gets the list of mnemonics for this `Scene`.
     */
-  def getMnemonics: jfxc.ObservableMap[
-      jfxsi.KeyCombination, jfxc.ObservableList[jfxsi.Mnemonic]] =
+  def getMnemonics: jfxc.ObservableMap[jfxsi.KeyCombination,
+                                       jfxc.ObservableList[jfxsi.Mnemonic]] =
     delegate.getMnemonics
 
   /**

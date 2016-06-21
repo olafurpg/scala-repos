@@ -8,7 +8,7 @@ trait B extends AnyRef {
 }
 
 trait C extends AnyRef with A with B {
-  override def f = super [B].f;
+  override def f = super[B].f;
   val a: A;
   val x: a.type = a;
 }

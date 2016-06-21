@@ -31,8 +31,8 @@ case class AiConfig(variant: chess.variant.Variant,
                                     aiLevel = creatorColor.white option level),
           mode = Mode.Casual,
           variant = realVariant,
-          source = (realVariant == chess.variant.FromPosition).fold(
-              Source.Position, Source.Ai),
+          source = (realVariant == chess.variant.FromPosition)
+            .fold(Source.Position, Source.Ai),
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None)
     } start

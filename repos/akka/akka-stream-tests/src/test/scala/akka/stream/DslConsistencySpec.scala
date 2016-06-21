@@ -68,8 +68,10 @@ class DslConsistencySpec extends WordSpec with Matchers {
         "andThenMat",
         "isIdentity",
         "withAttributes",
-        "transformMaterializing") ++ Set(
-        "asScala", "asJava", "deprecatedAndThen", "deprecatedAndThenMat")
+        "transformMaterializing") ++ Set("asScala",
+                                         "asJava",
+                                         "deprecatedAndThen",
+                                         "deprecatedAndThenMat")
 
   val graphHelpers = Set("zipGraph",
                          "zipWithGraph",
@@ -84,9 +86,9 @@ class DslConsistencySpec extends WordSpec with Matchers {
       jSourceClass -> graphHelpers,
       // Java subflows can only be nested using .via and .to (due to type system restrictions)
       jSubFlowClass ->
-      (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
+        (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
       jSubSourceClass ->
-      (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
+        (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
       sFlowClass -> Set("of"),
       sSourceClass -> Set("adapt", "from"),
       sSinkClass -> Set("adapt"),

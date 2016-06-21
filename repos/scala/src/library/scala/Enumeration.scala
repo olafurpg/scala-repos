@@ -160,15 +160,15 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     val fields: Array[JField] = getClass.getDeclaredFields
     def isValDef(m: JMethod): Boolean =
       fields exists
-      (fd => fd.getName == m.getName && fd.getType == m.getReturnType)
+        (fd => fd.getName == m.getName && fd.getType == m.getReturnType)
 
     // The list of possible Value methods: 0-args which return a conforming type
     val methods: Array[JMethod] =
       getClass.getMethods filter
-      (m =>
-            m.getParameterTypes.isEmpty &&
-            classOf[Value].isAssignableFrom(m.getReturnType) &&
-            m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
+        (m =>
+              m.getParameterTypes.isEmpty &&
+                classOf[Value].isAssignableFrom(m.getReturnType) &&
+                m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
     methods foreach { m =>
       val name = m.getName
       // invoke method to obtain actual `Value` instance
@@ -257,7 +257,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     *    not fall below zero), organized as a `BitSet`.
     *  @define Coll `collection.immutable.SortedSet`
     */
-  class ValueSet private[ValueSet](private[this] var nnIds: immutable.BitSet)
+  class ValueSet private[ValueSet] (private[this] var nnIds: immutable.BitSet)
       extends AbstractSet[Value]
       with immutable.SortedSet[Value]
       with SortedSetLike[Value, ValueSet]
@@ -266,8 +266,8 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     implicit def ordering: Ordering[Value] = ValueOrdering
     def rangeImpl(from: Option[Value], until: Option[Value]): ValueSet =
       new ValueSet(
-          nnIds.rangeImpl(
-              from.map(_.id - bottomId), until.map(_.id - bottomId)))
+          nnIds.rangeImpl(from.map(_.id - bottomId),
+                          until.map(_.id - bottomId)))
 
     override def empty = ValueSet.empty
     def contains(v: Value) = nnIds contains (v.id - bottomId)

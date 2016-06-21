@@ -84,7 +84,8 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
   def testNamedDuplicates() {
     assertMatches(messages("new A(a = null, a = Unit)")) {
       case Error("a", "Parameter specified multiple times") :: Error(
-          "a", "Parameter specified multiple times") :: Nil =>
+          "a",
+          "Parameter specified multiple times") :: Nil =>
     }
   }
 

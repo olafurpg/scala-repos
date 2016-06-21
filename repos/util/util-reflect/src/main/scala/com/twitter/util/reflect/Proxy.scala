@@ -55,8 +55,8 @@ class AbstractProxyFactory[I <: AnyRef: Manifest] {
       .asInstanceOf[I]
   }
 
-  protected final def newWithCallback[T <: I](
-      target: T, f: MethodCall[I] => AnyRef) = {
+  protected final def newWithCallback[T <: I](target: T,
+                                              f: MethodCall[I] => AnyRef) = {
     proto
       .newInstance(
           Array(new MethodInterceptor(Some(target), f), NoOp.INSTANCE))
@@ -71,21 +71,24 @@ class ProxyFactory[I <: AnyRef: Manifest](f: MethodCall[I] => AnyRef)
 }
 
 private[reflect] class MethodInterceptor[I <: AnyRef](
-    target: Option[I], callback: MethodCall[I] => AnyRef)
+    target: Option[I],
+    callback: MethodCall[I] => AnyRef)
     extends CGMethodInterceptor
     with Serializable {
   val targetRef = target.getOrElse(null).asInstanceOf[I]
 
-  final def intercept(
-      p: AnyRef, m: Method, args: Array[AnyRef], methodProxy: MethodProxy) = {
+  final def intercept(p: AnyRef,
+                      m: Method,
+                      args: Array[AnyRef],
+                      methodProxy: MethodProxy) = {
     callback(new MethodCall(targetRef, m, args, methodProxy))
   }
 }
 
-final class MethodCall[T <: AnyRef] private[reflect](targetRef: T,
-                                                     val method: Method,
-                                                     val args: Array[AnyRef],
-                                                     methodProxy: MethodProxy)
+final class MethodCall[T <: AnyRef] private[reflect] (targetRef: T,
+                                                      val method: Method,
+                                                      val args: Array[AnyRef],
+                                                      methodProxy: MethodProxy)
     extends (() => AnyRef) {
 
   lazy val target = if (targetRef ne null) Some(targetRef) else None

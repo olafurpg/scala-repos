@@ -38,8 +38,8 @@ class ClusterDomainEventPublisherSpec
   val aRemoved = aExiting.copy(status = Removed)
   val bExiting = TestMember(Address("akka.tcp", "sys", "b", 2552), Exiting)
   val bRemoved = bExiting.copy(status = Removed)
-  val cJoining = TestMember(
-      Address("akka.tcp", "sys", "c", 2552), Joining, Set("GRP"))
+  val cJoining =
+    TestMember(Address("akka.tcp", "sys", "c", 2552), Joining, Set("GRP"))
   val cUp = cJoining.copy(status = Up)
   val cRemoved = cUp.copy(status = Removed)
   val a51Up = TestMember(Address("akka.tcp", "sys", "a", 2551), Up)
@@ -63,10 +63,10 @@ class ClusterDomainEventPublisherSpec
     .seen(aUp.uniqueAddress)
   val g7 = Gossip(members = SortedSet(aExiting, bExiting, cUp))
     .seen(aUp.uniqueAddress)
-  val g8 = Gossip(
-      members = SortedSet(aUp, bExiting, cUp, dUp),
-      overview = GossipOverview(reachability = Reachability.empty.unreachable(
-              aUp.uniqueAddress, dUp.uniqueAddress))).seen(aUp.uniqueAddress)
+  val g8 = Gossip(members = SortedSet(aUp, bExiting, cUp, dUp),
+                  overview = GossipOverview(reachability = Reachability.empty
+                        .unreachable(aUp.uniqueAddress, dUp.uniqueAddress)))
+    .seen(aUp.uniqueAddress)
 
   // created in beforeEach
   var memberSubscriber: TestProbe = _
@@ -75,8 +75,8 @@ class ClusterDomainEventPublisherSpec
     memberSubscriber = TestProbe()
     system.eventStream.subscribe(memberSubscriber.ref, classOf[MemberEvent])
     system.eventStream.subscribe(memberSubscriber.ref, classOf[LeaderChanged])
-    system.eventStream.subscribe(
-        memberSubscriber.ref, ClusterShuttingDown.getClass)
+    system.eventStream
+      .subscribe(memberSubscriber.ref, ClusterShuttingDown.getClass)
 
     publisher = system.actorOf(Props[ClusterDomainEventPublisher])
     publisher ! PublishChanges(g0)

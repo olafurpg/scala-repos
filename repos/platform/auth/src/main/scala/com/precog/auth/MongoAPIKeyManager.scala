@@ -101,8 +101,9 @@ object MongoAPIKeyManager extends Logging {
      dbStop)
   }
 
-  def createRootAPIKey(
-      db: Database, keyCollection: String, grantCollection: String)(
+  def createRootAPIKey(db: Database,
+                       keyCollection: String,
+                       grantCollection: String)(
       implicit timeout: Timeout): Future[APIKeyRecord] = {
     import Permission._
     logger.info("Creating new root key")
@@ -189,8 +190,12 @@ class MongoAPIKeyManager(
                    description: Option[String],
                    issuerKey: APIKey,
                    grants: Set[GrantId]): Future[APIKeyRecord] = {
-    val apiKey = APIKeyRecord(
-        APIKeyManager.newAPIKey(), name, description, issuerKey, grants, false)
+    val apiKey = APIKeyRecord(APIKeyManager.newAPIKey(),
+                              name,
+                              description,
+                              issuerKey,
+                              grants,
+                              false)
     database(insert(apiKey.serialize.asInstanceOf[JObject])
           .into(settings.apiKeys)) map { _ =>
       apiKey
@@ -218,8 +223,9 @@ class MongoAPIKeyManager(
     }
   }
 
-  private def findOneMatching[A](
-      keyName: String, keyValue: MongoPrimitive, collection: String)(
+  private def findOneMatching[A](keyName: String,
+                                 keyValue: MongoPrimitive,
+                                 collection: String)(
       implicit extractor: Extractor[A]): Future[Option[A]] = {
     database {
       selectOne().from(collection).where(keyName === keyValue)
@@ -229,8 +235,9 @@ class MongoAPIKeyManager(
   }
 
   private def findAllMatching[A](
-      keyName: String, keyValue: MongoPrimitive, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
+      keyName: String,
+      keyValue: MongoPrimitive,
+      collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database {
       selectAll.from(collection).where(keyName === keyValue)
     } map {
@@ -239,8 +246,9 @@ class MongoAPIKeyManager(
   }
 
   private def findAllIncluding[A](
-      keyName: String, keyValue: MongoPrimitive, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
+      keyName: String,
+      keyValue: MongoPrimitive,
+      collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database {
       selectAll
         .from(collection)
@@ -283,7 +291,9 @@ class MongoAPIKeyManager(
             "apiKey",
             apiKey,
             settings.deletedAPIKeys)) <+> findOneMatching[APIKeyRecord](
-        "tid", apiKey, settings.deletedAPIKeys)
+        "tid",
+        apiKey,
+        settings.deletedAPIKeys)
 
   def findDeletedGrant(gid: GrantId) =
     ToPlusOps[({ type λ[α] = Future[Option[α]] })#λ, Grant](findOneMatching[
@@ -297,7 +307,9 @@ class MongoAPIKeyManager(
   private def findGrantChildren(gid: GrantId, collection: String) =
     ToPlusOps[({ type λ[α] = Future[Set[α]] })#λ, Grant](findAllIncluding[
             Grant]("parentIds", gid, collection)) <+> findAllMatching[Grant](
-        "issuer", gid, collection)
+        "issuer",
+        gid,
+        collection)
 
   def addGrants(apiKey: APIKey, add: Set[GrantId]) = updateAPIKey(apiKey) {
     r =>

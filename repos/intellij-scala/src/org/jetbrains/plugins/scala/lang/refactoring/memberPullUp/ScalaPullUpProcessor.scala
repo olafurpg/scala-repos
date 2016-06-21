@@ -67,15 +67,15 @@ class ScalaPullUpProcessor(project: Project,
       } {
         handleOldMember(info)
 
-        templateBody.addBefore(
-            ScalaPsiElementFactory.createNewLine(manager), anchor)
+        templateBody.addBefore(ScalaPsiElementFactory.createNewLine(manager),
+                               anchor)
         val added =
           templateBody.addBefore(memberCopy, anchor).asInstanceOf[ScMember]
         if (info.isToAbstract) TypeAdjuster.markToAdjust(added)
         else movedDefinitions += added
       }
-      templateBody.addBefore(
-          ScalaPsiElementFactory.createNewLine(manager), anchor)
+      templateBody.addBefore(ScalaPsiElementFactory.createNewLine(manager),
+                             anchor)
 
       ScalaChangeContextUtil.decodeContextInfo(movedDefinitions)
     }
@@ -97,8 +97,8 @@ class ScalaPullUpProcessor(project: Project,
     val sourceDocument =
       documentManager.getDocument(sourceClass.getContainingFile)
     documentManager.doPostponedOperationsAndUnblockDocument(sourceDocument)
-    csManager.adjustLineIndent(
-        sourceClass.getContainingFile, sourceClass.getTextRange)
+    csManager.adjustLineIndent(sourceClass.getContainingFile,
+                               sourceClass.getTextRange)
   }
 
   private def memberCopiesToExtract(
@@ -148,8 +148,8 @@ class ScalaPullUpProcessor(project: Project,
         copy.accept(new ScalaRecursiveElementVisitor() {
           override def visitSimpleTypeElement(te: ScSimpleTypeElement) = {
             val tpe = te.calcType
-            te.replace(ScalaPsiElementFactory.createTypeElementFromText(
-                    tpe.canonicalText, te.getManager))
+            te.replace(ScalaPsiElementFactory
+                  .createTypeElementFromText(tpe.canonicalText, te.getManager))
           }
         })
         Seq(copy.getText)

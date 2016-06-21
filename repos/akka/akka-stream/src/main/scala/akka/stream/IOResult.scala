@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
   * @param count Numeric value depending on context, for example IO operations performed or bytes processed.
   * @param status Status of the result. Can be either [[akka.Done]] or an exception.
   */
-final case class IOResult private[stream](count: Long, status: Try[Done]) {
+final case class IOResult private[stream] (count: Long, status: Try[Done]) {
 
   /**
     * Java API: Numeric value depending on context, for example IO operations performed or bytes processed.

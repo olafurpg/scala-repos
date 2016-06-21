@@ -25,10 +25,10 @@ private[controllers] trait TheftPrevention { self: LilaController =>
           playerId != userId && !(ctx.me ?? Granter.superAdmin)
         case (None, _) =>
           lila.api.Mobile.Api.requestVersion(ctx.req).isEmpty &&
-          !ctx.req.cookies
-            .get(AnonCookie.name)
-            .map(_.value)
-            .contains(pov.playerId)
+            !ctx.req.cookies
+              .get(AnonCookie.name)
+              .map(_.value)
+              .contains(pov.playerId)
       }
     }
 

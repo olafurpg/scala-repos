@@ -47,8 +47,11 @@ object Platform {
     *                after `srcPos` or `destPos` in `src` and `dest` respectively.
     */
   @inline
-  def arraycopy(
-      src: AnyRef, srcPos: Int, dest: AnyRef, destPos: Int, length: Int) {
+  def arraycopy(src: AnyRef,
+                srcPos: Int,
+                dest: AnyRef,
+                destPos: Int,
+                length: Int) {
     System.arraycopy(src, srcPos, dest, destPos, length)
   }
 

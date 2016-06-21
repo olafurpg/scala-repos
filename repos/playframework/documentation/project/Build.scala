@@ -26,11 +26,11 @@ object ApplicationBuild extends Build {
           Some((packageBin in (playDocs, Compile)).value),
         PlayDocsKeys.playDocsValidationConfig :=
           PlayDocsValidation.ValidationConfig(downstreamWikiPages = Set(
-                "ScalaAnorm",
-                "PlaySlickMigrationGuide",
-                "ScalaTestingWithScalaTest",
-                "ScalaFunctionalTestingWithScalaTest"
-            )),
+                  "ScalaAnorm",
+                  "PlaySlickMigrationGuide",
+                  "ScalaTestingWithScalaTest",
+                  "ScalaFunctionalTestingWithScalaTest"
+              )),
         PlayDocsKeys.javaManualSourceDirectories :=
           (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
         PlayDocsKeys.scalaManualSourceDirectories :=

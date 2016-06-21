@@ -211,8 +211,8 @@ trait AESCrypter {
   * @param message The error message.
   * @param throwable The Throwable associated with the exception.
   */
-class CryptoException(
-    val message: String = null, val throwable: Throwable = null)
+class CryptoException(val message: String = null,
+                      val throwable: Throwable = null)
     extends RuntimeException(message, throwable)
 
 @Singleton
@@ -261,8 +261,8 @@ class HMACSHA1CookieSigner @Inject()(config: CryptoConfig)
 @Singleton
 class CSRFTokenSignerProvider @Inject()(signer: CookieSigner)
     extends Provider[CSRFTokenSigner] {
-  lazy val get: CSRFTokenSigner = new DefaultCSRFTokenSigner(
-      signer, Clock.systemUTC())
+  lazy val get: CSRFTokenSigner =
+    new DefaultCSRFTokenSigner(signer, Clock.systemUTC())
 }
 
 /**
@@ -430,14 +430,14 @@ class AESCTRCrypter @Inject()(config: CryptoConfig) extends AESCrypter {
       val data = value.substring(sepIndex + 1, value.length())
       version match {
         case "1" => {
-            decryptAESVersion1(data, privateKey)
-          }
+          decryptAESVersion1(data, privateKey)
+        }
         case "2" => {
-            decryptAESVersion2(data, privateKey)
-          }
+          decryptAESVersion2(data, privateKey)
+        }
         case _ => {
-            throw new CryptoException("Unknown version")
-          }
+          throw new CryptoException("Unknown version")
+        }
       }
     }
   }
@@ -488,8 +488,8 @@ case class CryptoConfig(
         "2.5.0") aesTransformation: String = "AES/CTR/NoPadding")
 
 @Singleton
-class CryptoConfigParser @Inject()(
-    environment: Environment, configuration: Configuration)
+class CryptoConfigParser @Inject()(environment: Environment,
+                                   configuration: Configuration)
     extends Provider[CryptoConfig] {
 
   lazy val get = {
@@ -522,15 +522,16 @@ class CryptoConfigParser @Inject()(
      * To achieve 4, using the location of application.conf to generate the secret should ensure this.
      */
     val secret = config.getDeprecated[Option[String]](
-        "play.crypto.secret", "application.secret") match {
+        "play.crypto.secret",
+        "application.secret") match {
       case (Some("changeme") | Some(Blank()) | None)
           if environment.mode == Mode.Prod =>
         logger.error(
             "The application secret has not been set, and we are in prod mode. Your application is not secure.")
         logger.error(
             "To set the application secret, please read http://playframework.com/documentation/latest/ApplicationSecret")
-        throw new PlayException(
-            "Configuration error", "Application secret not set")
+        throw new PlayException("Configuration error",
+                                "Application secret not set")
       case Some("changeme") | Some(Blank()) | None =>
         val appConfLocation = environment.resource("application.conf")
         // Try to generate a stable secret. Security is not the issue here, since this is just for tests and dev mode.

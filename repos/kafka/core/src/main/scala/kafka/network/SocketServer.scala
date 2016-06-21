@@ -48,8 +48,9 @@ import scala.util.control.{NonFatal, ControlThrowable}
   *   Acceptor has N Processor threads that each have their own selector and read requests from sockets
   *   M Handler threads that handle requests and produce responses back to the processor threads for writing.
   */
-class SocketServer(
-    val config: KafkaConfig, val metrics: Metrics, val time: Time)
+class SocketServer(val config: KafkaConfig,
+                   val metrics: Metrics,
+                   val time: Time)
     extends Logging
     with KafkaMetricsGroup {
 
@@ -64,8 +65,8 @@ class SocketServer(
 
   this.logIdent = "[Socket Server on Broker " + config.brokerId + "], "
 
-  val requestChannel = new RequestChannel(
-      totalProcessorThreads, maxQueuedRequests)
+  val requestChannel =
+    new RequestChannel(totalProcessorThreads, maxQueuedRequests)
   private val processors = new Array[Processor](totalProcessorThreads)
 
   private[network] val acceptors = mutable.Map[EndPoint, Acceptor]()
@@ -260,10 +261,11 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
   this.synchronized {
     processors.foreach { processor =>
       Utils
-        .newThread("kafka-network-thread-%d-%s-%d".format(
-                       brokerId, endPoint.protocolType.toString, processor.id),
-                   processor,
-                   false)
+        .newThread(
+            "kafka-network-thread-%d-%s-%d"
+              .format(brokerId, endPoint.protocolType.toString, processor.id),
+            processor,
+            false)
         .start()
     }
   }
@@ -329,12 +331,13 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
       serverChannel.socket.bind(socketAddress)
       info(
           "Awaiting socket connections on %s:%d.".format(
-              socketAddress.getHostString, serverChannel.socket.getLocalPort))
+              socketAddress.getHostString,
+              serverChannel.socket.getLocalPort))
     } catch {
       case e: SocketException =>
         throw new KafkaException(
-            "Socket server failed to bind to %s:%d: %s.".format(
-                socketAddress.getHostString, port, e.getMessage),
+            "Socket server failed to bind to %s:%d: %s."
+              .format(socketAddress.getHostString, port, e.getMessage),
             e)
     }
     serverChannel
@@ -409,8 +412,10 @@ private[kafka] class Processor(val id: Int,
     }
   }
 
-  private case class ConnectionId(
-      localHost: String, localPort: Int, remoteHost: String, remotePort: Int) {
+  private case class ConnectionId(localHost: String,
+                                  localPort: Int,
+                                  remoteHost: String,
+                                  remotePort: Int) {
     override def toString: String =
       s"$localHost:$localPort-$remoteHost:$remotePort"
   }
@@ -418,8 +423,8 @@ private[kafka] class Processor(val id: Int,
   private val newConnections = new ConcurrentLinkedQueue[SocketChannel]()
   private val inflightResponses =
     mutable.Map[String, RequestChannel.Response]()
-  private val channelBuilder = ChannelBuilders.create(
-      protocol, Mode.SERVER, LoginType.SERVER, channelConfigs)
+  private val channelBuilder = ChannelBuilders
+    .create(protocol, Mode.SERVER, LoginType.SERVER, channelConfigs)
   private val metricTags = new util.HashMap[String, String]()
   metricTags.put("networkProcessor", id.toString)
 
@@ -427,8 +432,9 @@ private[kafka] class Processor(val id: Int,
     def value = {
       metrics
         .metrics()
-        .get(metrics.metricName(
-                "io-wait-ratio", "socket-server-metrics", metricTags))
+        .get(metrics.metricName("io-wait-ratio",
+                                "socket-server-metrics",
+                                metricTags))
         .value()
     }
   }, metricTags.asScala)
@@ -534,12 +540,12 @@ private[kafka] class Processor(val id: Int,
             curr.request.updateRequestMetrics
             trace(
                 "Socket server received empty response to send, registering for read: " +
-                curr)
+                  curr)
             selector.unmute(curr.request.connectionId)
           case RequestChannel.SendAction =>
             trace(
                 "Socket server received response to send, registering for write and sending data: " +
-                curr)
+                  curr)
             selector.send(curr.responseSend)
             inflightResponses += (curr.request.connectionId -> curr)
           case RequestChannel.CloseConnectionAction =>
@@ -569,15 +575,14 @@ private[kafka] class Processor(val id: Int,
     while (!newConnections.isEmpty) {
       val channel = newConnections.poll()
       try {
-        debug(
-            "Processor " + id + " listening to new connection from " +
-            channel.socket.getRemoteSocketAddress)
+        debug("Processor " + id + " listening to new connection from " +
+              channel.socket.getRemoteSocketAddress)
         val localHost = channel.socket().getLocalAddress.getHostAddress
         val localPort = channel.socket().getLocalPort
         val remoteHost = channel.socket().getInetAddress.getHostAddress
         val remotePort = channel.socket().getPort
-        val connectionId = ConnectionId(
-            localHost, localPort, remoteHost, remotePort).toString
+        val connectionId =
+          ConnectionId(localHost, localPort, remoteHost, remotePort).toString
         selector.register(connectionId, channel)
       } catch {
         // We explicitly catch all non fatal exceptions and close the socket to avoid socket leak. The other
@@ -586,7 +591,7 @@ private[kafka] class Processor(val id: Int,
           // need to close the channel here to avoid socket leak.
           close(channel)
           error("Processor " + id + " closed connection from " +
-                channel.getRemoteAddress,
+                  channel.getRemoteAddress,
                 e)
       }
     }

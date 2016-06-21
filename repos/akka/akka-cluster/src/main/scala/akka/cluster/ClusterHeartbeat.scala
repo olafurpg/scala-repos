@@ -162,8 +162,9 @@ private[cluster] final class ClusterHeartbeatSender
     state.activeReceivers foreach { to ⇒
       if (cluster.failureDetector.isMonitoring(to.address)) {
         if (verboseHeartbeat)
-          log.debug(
-              "Cluster Node [{}] - Heartbeat to [{}]", selfAddress, to.address)
+          log.debug("Cluster Node [{}] - Heartbeat to [{}]",
+                    selfAddress,
+                    to.address)
       } else {
         if (verboseHeartbeat)
           log.debug("Cluster Node [{}] - First Heartbeat to [{}]",
@@ -171,8 +172,9 @@ private[cluster] final class ClusterHeartbeatSender
                     to.address)
         // schedule the expected first heartbeat for later, which will give the
         // other side a chance to reply, and also trigger some resends if needed
-        scheduler.scheduleOnce(
-            HeartbeatExpectedResponseAfter, self, ExpectedFirstHeartbeat(to))
+        scheduler.scheduleOnce(HeartbeatExpectedResponseAfter,
+                               self,
+                               ExpectedFirstHeartbeat(to))
       }
       heartbeatReceiver(to.address) ! selfHeartbeat
     }

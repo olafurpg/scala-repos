@@ -25,8 +25,8 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
   private def addGoToSourceTest(testName: String) =
     addFileToProject(testName + ".scala",
                      "import org.scalatest._\n\n" + "class " + testName +
-                     " extends FlatSpec with GivenWhenThen {" +
-                     """
+                       " extends FlatSpec with GivenWhenThen {" +
+                       """
           | "Successful test" should "run fine" in {
           | }
           |

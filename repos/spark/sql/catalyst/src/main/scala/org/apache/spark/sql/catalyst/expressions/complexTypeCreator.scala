@@ -32,8 +32,8 @@ case class CreateArray(children: Seq[Expression]) extends Expression {
   override def foldable: Boolean = children.forall(_.foldable)
 
   override def checkInputDataTypes(): TypeCheckResult =
-    TypeUtils.checkForSameTypeInputExpr(
-        children.map(_.dataType), "function array")
+    TypeUtils
+      .checkForSameTypeInputExpr(children.map(_.dataType), "function array")
 
   override def dataType: DataType = {
     ArrayType(children.headOption.map(_.dataType).getOrElse(NullType),
@@ -169,7 +169,7 @@ case class CreateNamedStruct(children: Seq[Expression]) extends Expression {
       if (invalidNames.nonEmpty) {
         TypeCheckResult.TypeCheckFailure(
             s"Only foldable StringType expressions are allowed to appear at odd position , got :" +
-            s" ${invalidNames.mkString(",")}")
+              s" ${invalidNames.mkString(",")}")
       } else if (!names.contains(null)) {
         TypeCheckResult.TypeCheckSuccess
       } else {

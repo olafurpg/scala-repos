@@ -118,9 +118,9 @@ class BrowseSupport[M[+ _]: Bind](vfs: VFSMetadata[M]) {
   }
 }
 
-class BrowseServiceHandler[A](vfs0: VFSMetadata[Future],
-                              legacy: Boolean =
-                                false /* Enterprise software! */ )(
+class BrowseServiceHandler[A](
+    vfs0: VFSMetadata[Future],
+    legacy: Boolean = false /* Enterprise software! */ )(
     implicit M: Monad[Future])
     extends BrowseSupport[Future](vfs0)
     with CustomHttpService[A, (APIKey, Path) => Future[HttpResponse[JValue]]]
@@ -150,8 +150,8 @@ class BrowseServiceHandler[A](vfs0: VFSMetadata[Future],
             JObject("structure" -> detail)
           }
       } getOrElse {
-        logger.debug("Retrieving all available metadata for %s as %s".format(
-                path.path, apiKey))
+        logger.debug("Retrieving all available metadata for %s as %s"
+              .format(path.path, apiKey))
         for {
           sz <- size(apiKey, path)
           children <- if (legacy) children(apiKey, path)

@@ -43,18 +43,17 @@ object AccessKey extends Logging {
   }
 
   def list(ca: ConsoleArgs): Int = {
-    val keys =
-      if (ca.app.name == "") {
-        storage.Storage.getMetaDataAccessKeys.getAll
-      } else {
-        val apps = storage.Storage.getMetaDataApps
-        apps.getByName(ca.app.name) map { app =>
-          storage.Storage.getMetaDataAccessKeys.getByAppid(app.id)
-        } getOrElse {
-          error(s"App ${ca.app.name} does not exist. Aborting.")
-          return 1
-        }
+    val keys = if (ca.app.name == "") {
+      storage.Storage.getMetaDataAccessKeys.getAll
+    } else {
+      val apps = storage.Storage.getMetaDataApps
+      apps.getByName(ca.app.name) map { app =>
+        storage.Storage.getMetaDataAccessKeys.getByAppid(app.id)
+      } getOrElse {
+        error(s"App ${ca.app.name} does not exist. Aborting.")
+        return 1
       }
+    }
     val title = "Access Key(s)"
     info(f"$title%64s | App ID | Allowed Event(s)")
     keys.sortBy(k => k.appid) foreach { k =>

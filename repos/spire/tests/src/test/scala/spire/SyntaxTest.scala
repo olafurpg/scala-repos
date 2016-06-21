@@ -40,8 +40,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   }
 
   implicit def ArbVector[A: Arbitrary]: Arbitrary[Vector[A]] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       x <- arbitrary[A]
       y <- arbitrary[A]
       z <- arbitrary[A]
@@ -88,9 +87,9 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("MultiplicativeMonoid syntax")(check(forAll { (a: Int, b: Int) =>
     testMultiplicativeMonoidSyntax(a, b)
   }))
-  test("MultiplicativeGroup syntax")(
-      check(forAll { (a: Double, b: NonZero[Double]) =>
-    testMultiplicativeGroupSyntax(a, b.x)
+  test("MultiplicativeGroup syntax")(check(forAll {
+    (a: Double, b: NonZero[Double]) =>
+      testMultiplicativeGroupSyntax(a, b.x)
   }))
   test("Semiring syntax")(check(forAll { (a: Int, b: Int) =>
     testSemiringSyntax(a, b)
@@ -107,17 +106,16 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("EuclideanRing syntax")(check(forAll { (a: Int, b: NonZero[Int]) =>
     testEuclideanRingSyntax(a, b.x)
   }))
-  test("Field syntax")(
-      check(forAll { (a: Double, b: NonZero[Double]) =>
+  test("Field syntax")(check(forAll { (a: Double, b: NonZero[Double]) =>
     testFieldSyntax(a, b.x)(implicitly,
                             spire.optional.totalfloat.TotalDoubleOrder)
   }))
   test("NRoot syntax")(check(forAll { (a: Positive[Double]) =>
     testNRootSyntax(a.x)
   }))
-  test("Module syntax")(
-      check(forAll { (v: Vector[Int], w: Vector[Int], a: Int) =>
-    testModuleSyntax(v, w, a)
+  test("Module syntax")(check(forAll {
+    (v: Vector[Int], w: Vector[Int], a: Int) =>
+      testModuleSyntax(v, w, a)
   }))
   test("VectorSpace syntax")(check(forAll {
     (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
@@ -131,8 +129,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
     (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
       testInnerProductSpaceSyntax(v, w, a.x)
   }))
-  test("CoordinateSpace syntax")(
-      check(forAll {
+  test("CoordinateSpace syntax")(check(forAll {
     (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
       testCoordinateSpaceSyntax(v, w, a.x)(
           CoordinateSpace.seq[Rational, Vector](3))
@@ -222,8 +219,8 @@ trait BaseSyntaxTest {
     (-a == implicitly[AdditiveGroup[A]].negate(a))
   }
 
-  def testMultiplicativeSemigroupSyntax[A: MultiplicativeSemigroup](
-      a: A, b: A) = {
+  def testMultiplicativeSemigroupSyntax[A: MultiplicativeSemigroup](a: A,
+                                                                    b: A) = {
     import spire.syntax.multiplicativeSemigroup._
     ((a * b) == implicitly[MultiplicativeSemigroup[A]].times(a, b))
   }
@@ -337,8 +334,8 @@ trait BaseSyntaxTest {
     ((a ** 0.5) == NRoot[A].fpow(a, half))
   }
 
-  def testModuleSyntax[V, A](v: V, w: V, a: A)(
-      implicit V: Module[V, A], A: Ring[A]) = {
+  def testModuleSyntax[V, A](v: V, w: V, a: A)(implicit V: Module[V, A],
+                                               A: Ring[A]) = {
     import spire.syntax.module._
     ((v + w) == V.plus(v, w)) && ((v - w) == V.minus(v, w)) &&
     (-v == V.negate(v)) && ((a *: v) == V.timesl(a, v)) &&

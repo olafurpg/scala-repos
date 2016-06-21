@@ -96,8 +96,10 @@ trait Imports { self: IMain =>
     * (3) It imports multiple same-named implicits, but only the
     * last one imported is actually usable.
     */
-  case class ComputedImports(
-      header: String, prepend: String, append: String, access: String)
+  case class ComputedImports(header: String,
+                             prepend: String,
+                             append: String,
+                             access: String)
 
   protected def importsCode(wanted: Set[Name],
                             wrapper: Request#Wrapper,
@@ -105,8 +107,7 @@ trait Imports { self: IMain =>
                             generousImports: Boolean): ComputedImports = {
     val header, code, trailingBraces, accessPath = new StringBuilder
     val currentImps = mutable.HashSet[Name]()
-    var predefEscapes =
-      false // only emit predef import header if name not resolved in history, loosely
+    var predefEscapes = false // only emit predef import header if name not resolved in history, loosely
 
     /** Narrow down the list of requests from which imports
       *  should be taken.  Removes requests which cannot contribute
@@ -130,7 +131,8 @@ trait Imports { self: IMain =>
           case _: ImportHandler => true
           case x if generousImports =>
             x.definesImplicit ||
-            (x.definedNames exists (d => wanted.exists(w => d.startsWith(w))))
+              (x.definedNames exists (d =>
+                        wanted.exists(w => d.startsWith(w))))
           case x => x.definesImplicit || (x.definedNames exists wanted)
         }
 
@@ -196,7 +198,7 @@ trait Imports { self: IMain =>
                 x match {
                   case _: ClassHandler =>
                     code.append("import " + objName + req.accessPath + ".`" +
-                        imv + "`\n")
+                          imv + "`\n")
                   case _ =>
                     val valName =
                       req.lineRep.packageName + req.lineRep.readName

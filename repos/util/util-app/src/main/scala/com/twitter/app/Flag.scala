@@ -269,10 +269,10 @@ object Flag {
   *
   * @see [[com.twitter.app.Flags]]
   */
-class Flag[T: Flaggable] private[app](val name: String,
-                                      val help: String,
-                                      defaultOrUsage: Either[() => T, String],
-                                      failFastUntilParsed: Boolean) {
+class Flag[T: Flaggable] private[app] (val name: String,
+                                       val help: String,
+                                       defaultOrUsage: Either[() => T, String],
+                                       failFastUntilParsed: Boolean) {
   import com.twitter.app.Flag._
   import java.util.logging._
 
@@ -347,7 +347,8 @@ class Flag[T: Flaggable] private[app](val name: String,
       } catch {
         case e: Throwable =>
           throw new RuntimeException(
-              s"Could not run default function for flag $name", e)
+              s"Could not run default function for flag $name",
+              e)
       }
   }
 
@@ -533,8 +534,9 @@ object Flags {
   * be included during flag parsing. If false, only flags defined in the
   * application itself will be consulted.
   */
-class Flags(
-    argv0: String, includeGlobal: Boolean, failFastUntilParsed: Boolean) {
+class Flags(argv0: String,
+            includeGlobal: Boolean,
+            failFastUntilParsed: Boolean) {
   import com.twitter.app.Flags._
 
   def this(argv0: String, includeGlobal: Boolean) =
@@ -598,8 +600,8 @@ class Flags(
             if (allowUndefinedFlags) remaining += a
             else
               return Error(
-                  "Error parsing flag \"%s\": %s\n%s".format(
-                      k, FlagUndefinedMessage, usage)
+                  "Error parsing flag \"%s\": %s\n%s"
+                    .format(k, FlagUndefinedMessage, usage)
               )
 
           // Flag isn't defined
@@ -607,8 +609,8 @@ class Flags(
             if (allowUndefinedFlags) remaining += a
             else
               return Error(
-                  "Error parsing flag \"%s\": %s\n%s".format(
-                      k, FlagUndefinedMessage, usage)
+                  "Error parsing flag \"%s\": %s\n%s"
+                    .format(k, FlagUndefinedMessage, usage)
               )
 
           // Optional argument without a value
@@ -618,8 +620,8 @@ class Flags(
           // Mandatory argument without a value and with no more arguments.
           case Array(k) if i == args.size =>
             return Error(
-                "Error parsing flag \"%s\": %s\n%s".format(
-                    k, FlagValueRequiredMessage, usage)
+                "Error parsing flag \"%s\": %s\n%s"
+                  .format(k, FlagValueRequiredMessage, usage)
             )
 
           // Mandatory argument with another argument
@@ -628,8 +630,9 @@ class Flags(
             try flag(k).parse(args(i - 1)) catch {
               case NonFatal(e) =>
                 return Error(
-                    "Error parsing flag \"%s\": %s\n%s".format(
-                        k, e.getMessage, usage)
+                    "Error parsing flag \"%s\": %s\n%s".format(k,
+                                                               e.getMessage,
+                                                               usage)
                 )
             }
 
@@ -638,8 +641,9 @@ class Flags(
             try flag(k).parse(v) catch {
               case e: Throwable =>
                 return Error(
-                    "Error parsing flag \"%s\": %s\n%s".format(
-                        k, e.getMessage, usage)
+                    "Error parsing flag \"%s\": %s\n%s".format(k,
+                                                               e.getMessage,
+                                                               usage)
                 )
             }
         }
@@ -731,8 +735,8 @@ class Flags(
     * @param name The name of the flag.
     * @param help The help string of the flag.
     */
-  def apply[T](name: String, help: String)(
-      implicit _f: Flaggable[T], m: Manifest[T]) = {
+  def apply[T](name: String, help: String)(implicit _f: Flaggable[T],
+                                           m: Manifest[T]) = {
     val f = new Flag[T](name, help, m.toString, failFastUntilParsed)
     add(f)
     f
@@ -892,7 +896,7 @@ class Flags(
   * those supplied by system properties.
   */
 @GlobalFlagVisible
-class GlobalFlag[T] private[app](
+class GlobalFlag[T] private[app] (
     defaultOrUsage: Either[() => T, String],
     help: String
 )(implicit _f: Flaggable[T])

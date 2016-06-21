@@ -48,7 +48,7 @@ trait DocFinding { self: RichPresentationCompiler =>
 
   private def isRoot(s: Symbol) =
     (s eq NoSymbol) || s.isRootSymbol || s.isEmptyPackage ||
-    s.isEmptyPackageClass
+      s.isEmptyPackageClass
 
   private def fullPackage(sym: Symbol): String =
     sym.ownerChain.reverse
@@ -72,12 +72,11 @@ trait DocFinding { self: RichPresentationCompiler =>
   private def javaFqn(tpe: Type): DocFqn = {
     def nameString(sym: Symbol) = sym.nameString.replace("$", "")
     val sym = tpe.typeSymbol
-    val s =
-      if (sym.hasPackageFlag) {
-        DocFqn(fullPackage(sym), "package")
-      } else {
-        DocFqn(fullPackage(sym), fullTypeName(sym, ".", nameString))
-      }
+    val s = if (sym.hasPackageFlag) {
+      DocFqn(fullPackage(sym), "package")
+    } else {
+      DocFqn(fullPackage(sym), fullTypeName(sym, ".", nameString))
+    }
     s match {
       case DocFqn("scala", ScalaPrim(datatype)) =>
         DocFqn("", datatype.toLowerCase)
@@ -94,7 +93,7 @@ trait DocFinding { self: RichPresentationCompiler =>
   protected def scalaFqn(sym: Symbol): DocFqn = {
     def nameString(s: Symbol) =
       s.nameString +
-      (if ((s.isModule || s.isModuleClass) && !s.hasPackageFlag) "$" else "")
+        (if ((s.isModule || s.isModuleClass) && !s.hasPackageFlag) "$" else "")
     if (sym.isPackageObjectOrClass) {
       DocFqn(fullPackage(sym.owner), "package")
     } else if (sym.hasPackageFlag) {

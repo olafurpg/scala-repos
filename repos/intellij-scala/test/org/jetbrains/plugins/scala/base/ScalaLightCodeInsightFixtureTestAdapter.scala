@@ -32,8 +32,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     super.setUp()
 
     myFixture.allowTreeAccessForAllFiles()
-    libLoader = ScalaLibraryLoader.withMockJdk(
-        myFixture.getProject, myFixture.getModule, rootPath = null)
+    libLoader = ScalaLibraryLoader
+      .withMockJdk(myFixture.getProject, myFixture.getModule, rootPath = null)
     libLoader.loadScala(libVersion)
   }
 
@@ -77,8 +77,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       .getInstance(getProject)
       .buildInitialFoldings(myFixture.getEditor)
 
-    myFixture.testHighlighting(
-        false, false, false, myFixture.getFile.getVirtualFile)
+    myFixture
+      .testHighlighting(false, false, false, myFixture.getFile.getVirtualFile)
   }
 
   protected def checkTextHasNoErrors(
@@ -94,7 +94,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val highlights: mutable.Buffer[HighlightInfo] = for {
       info <- myFixture.doHighlighting() if info.getDescription == annotation
       if caretIndex == -1 || new TextRange(
-          info.getStartOffset, info.getEndOffset).contains(caretIndex)
+          info.getStartOffset,
+          info.getEndOffset).contains(caretIndex)
     } yield info
     val ranges = highlights.map(info => (info.startOffset, info.endOffset))
     assert(highlights.isEmpty,
@@ -106,8 +107,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val cleanedText = text.replace("\r", "")
     val cleanedAssumed = assumedText.replace("\r", "")
     val caretIndex = cleanedText.indexOf(CARET_MARKER)
-    myFixture.configureByText(
-        "dummy.scala", cleanedText.replace(CARET_MARKER, ""))
+    myFixture
+      .configureByText("dummy.scala", cleanedText.replace(CARET_MARKER, ""))
     myFixture.getEditor.getCaretModel.moveToOffset(caretIndex)
 
     testBody()
@@ -122,27 +123,28 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     * @param assumedText     Reference text. May not contain CARET_MARKER (in this case caret position won't be checked)
     * @param charTyped       Char typed
     */
-  protected def checkGeneratedTextAfterTyping(
-      text: String, assumedText: String, charTyped: Char) {
+  protected def checkGeneratedTextAfterTyping(text: String,
+                                              assumedText: String,
+                                              charTyped: Char) {
     performTest(text, assumedText) { () =>
       myFixture.`type`(charTyped)
     }
   }
 
-  protected def checkGeneratedTextAfterBackspace(
-      text: String, assumedText: String) {
+  protected def checkGeneratedTextAfterBackspace(text: String,
+                                                 assumedText: String) {
     performTest(text, assumedText) { () =>
-      CommandProcessor.getInstance.executeCommand(
-          myFixture.getProject, new Runnable {
-        def run() {
-          myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
-        }
-      }, "", null)
+      CommandProcessor.getInstance
+        .executeCommand(myFixture.getProject, new Runnable {
+          def run() {
+            myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
+          }
+        }, "", null)
     }
   }
 
-  protected def checkGeneratedTextAfterEnter(
-      text: String, assumedText: String) {
+  protected def checkGeneratedTextAfterEnter(text: String,
+                                             assumedText: String) {
     performTest(text, assumedText) { () =>
       CommandProcessor
         .getInstance()
@@ -183,10 +185,10 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
           (info.getStartOffset, info.getEndOffset))
     val message =
       "Highlights with this description are at " + ranges.mkString(" ") +
-      ", but has to be at " + (selectionStart, selectionEnd)
+        ", but has to be at " + (selectionStart, selectionEnd)
     assert(withRightDescription.exists(info =>
                  info.getStartOffset == selectionStart &&
-                 info.getEndOffset == selectionEnd),
+                   info.getEndOffset == selectionEnd),
            message)
   }
 
@@ -220,8 +222,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
             if (info != null && info.quickFixActionRanges != null &&
                 checkCaret(info.getStartOffset, info.getEndOffset))
               actions ++=
-                (for (pair <- info.quickFixActionRanges if pair != null) yield
-                    pair.getFirst.getAction))
+              (for (pair <- info.quickFixActionRanges if pair != null)
+                    yield pair.getFirst.getAction))
 
     assert(actions.nonEmpty, "There is no available fixes.")
 

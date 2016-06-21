@@ -102,9 +102,9 @@ class LongOverflowArithTest extends WordSpec {
           test(a, b)
         } catch {
           case x: Throwable => {
-              println(a + " * " + b + " failed")
-              throw x
-            }
+            println(a + " * " + b + " failed")
+            throw x
+          }
         }
       }
     }

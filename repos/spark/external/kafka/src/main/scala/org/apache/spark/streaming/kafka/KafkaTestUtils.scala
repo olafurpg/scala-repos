@@ -176,8 +176,8 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Java-friendly function for sending messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: JMap[String, JInt]): Unit = {
-    sendMessages(
-        topic, Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
+    sendMessages(topic,
+                 Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
   }
 
   /** Send the messages to the Kafka broker */
@@ -250,8 +250,8 @@ private[kafka] class KafkaTestUtils extends Logging {
     tryAgain(1)
   }
 
-  private def waitUntilMetadataIsPropagated(
-      topic: String, partition: Int): Unit = {
+  private def waitUntilMetadataIsPropagated(topic: String,
+                                            partition: Int): Unit = {
     def isPropagated =
       server.apis.metadataCache.getPartitionInfo(topic, partition) match {
         case Some(partitionState) =>

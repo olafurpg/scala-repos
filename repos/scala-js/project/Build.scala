@@ -49,13 +49,13 @@ object Build extends sbt.Build {
   val previousBinaryCrossVersion =
     CrossVersion.binaryMapped(v => s"sjs${previousSJSBinaryVersion}_$v")
 
-  val scalaVersionsUsedForPublishing: Set[String] = Set(
-      "2.10.6", "2.11.8", "2.12.0-M3")
+  val scalaVersionsUsedForPublishing: Set[String] =
+    Set("2.10.6", "2.11.8", "2.12.0-M3")
   val newScalaBinaryVersionsInThisRelease: Set[String] = Set()
 
   val javaVersion = settingKey[Int](
       "The major Java SDK version that should be assumed for compatibility. " +
-      "Defaults to what sbt is running with.")
+        "Defaults to what sbt is running with.")
 
   val javaDocBaseURL: String = "http://docs.oracle.com/javase/8/docs/api/"
 
@@ -328,8 +328,8 @@ object Build extends sbt.Build {
             Seq(
                 // Link source maps to github sources
                 "-P:scalajs:mapSourceURI:" + root.base.toURI +
-                "->https://raw.githubusercontent.com/scala-js/scala-js/v" +
-                scalaJSVersion + "/"
+                  "->https://raw.githubusercontent.com/scala-js/scala-js/v" +
+                  scalaJSVersion + "/"
             )
         }
     )
@@ -506,7 +506,7 @@ object Build extends sbt.Build {
                 lib.map(_.data.getAbsolutePath).getOrElse {
                   streams.value.log.error(
                       "Couldn't find Scala library on the classpath. CP: " +
-                      (managedClasspath in Test).value); ""
+                        (managedClasspath in Test).value); ""
                 }
               }
             },
@@ -537,7 +537,7 @@ object Build extends sbt.Build {
             libraryDependencies ++= Seq(
                 "com.google.javascript" % "closure-compiler" % "v20130603",
                 "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-                ("junit", "junit"),
+                  ("junit", "junit"),
                 "com.novocode" % "junit-interface" % "0.9" % "test"
             )
         )
@@ -567,8 +567,8 @@ object Build extends sbt.Build {
             val irFiles = dirs.flatMap(dir => (dir ** "*.sjsir").get)
 
             val irPaths = {
-              for (f <- jars ++ irFiles) yield
-                s""""${escapeJS(f.getAbsolutePath)}""""
+              for (f <- jars ++ irFiles)
+                yield s""""${escapeJS(f.getAbsolutePath)}""""
             }
 
             val code = {
@@ -821,7 +821,7 @@ object Build extends sbt.Build {
                 val path = normSrc.substring(normSrcDir.length)
                 val useless =
                   path.contains("/scala/collection/parallel/") ||
-                  path.contains("/scala/util/parsing/")
+                    path.contains("/scala/util/parsing/")
                 if (!useless) {
                   if (paths.add(path)) sources += src
                   else streams.value.log.debug(s"not including $src")
@@ -835,7 +835,8 @@ object Build extends sbt.Build {
             libraryDependencies ++= {
               val ver = scalaVersion.value
               if (ver.startsWith("2.10."))
-                Seq(compilerPlugin("org.scala-lang.plugins" % "continuations" % ver))
+                Seq(compilerPlugin(
+                        "org.scala-lang.plugins" % "continuations" % ver))
               else Nil
             },
             scalacOptions ++= {
@@ -882,7 +883,8 @@ object Build extends sbt.Build {
                */
               val superMappings = (mappings in packageBin).value
               val libraryMappings = superMappings.filter(_._2.replace(
-                      '\\', '/') != "scala/scalajs/js/typedarray/TypedArrayBufferBridge$.sjsir")
+                      '\\',
+                      '/') != "scala/scalajs/js/typedarray/TypedArrayBufferBridge$.sjsir")
 
               val filter = ("*.sjsir": NameFilter)
 
@@ -894,7 +896,7 @@ object Build extends sbt.Build {
 
               val otherProducts =
                 ((products in javalanglib).value ++ (products in scalalib).value ++
-                    (products in libraryAux).value)
+                      (products in libraryAux).value)
               val otherMappings = otherProducts.flatMap(base =>
                     Path.selectSubpaths(base, filter))
 
@@ -1066,11 +1068,12 @@ object Build extends sbt.Build {
               val baseArgs = Seq("nodejs", "typedarray")
               if (env.sourceMap) {
                 if (!env.hasSourceMapSupport) {
-                  sys.error("You must install Node.js source map support to " +
-                      "run the full Scala.js test suite (npm install " +
-                      "source-map-support). To deactivate source map " +
-                      "tests, do: set jsEnv in " + thisProject.value.id +
-                      " := NodeJSEnv().value.withSourceMap(false)")
+                  sys.error(
+                      "You must install Node.js source map support to " +
+                        "run the full Scala.js test suite (npm install " +
+                        "source-map-support). To deactivate source map " +
+                        "tests, do: set jsEnv in " + thisProject.value.id +
+                        " := NodeJSEnv().value.withSourceMap(false)")
                 }
                 baseArgs :+ "source-maps"
               } else {
@@ -1086,7 +1089,7 @@ object Build extends sbt.Build {
             case _ =>
               throw new AssertionError(
                   s"Unknown JSEnv of class ${env.getClass.getName}: " +
-                  "don't know what tags to specify for the test suite")
+                    "don't know what tags to specify for the test suite")
           }
 
           val envTags = envTagsFor((resolvedJSEnv in Test).value)
@@ -1102,13 +1105,13 @@ object Build extends sbt.Build {
             (if (sems.asInstanceOfs == CheckedBehavior.Compliant)
                Seq("compliant-asinstanceofs")
              else Seq()) ++
-            (if (sems.moduleInit == CheckedBehavior.Compliant)
-               Seq("compliant-moduleinit")
-             else Seq()) ++
-            (if (sems.strictFloats) Seq("strict-floats")
-             else Seq()) ++
-            (if (sems.productionMode) Seq("production-mode")
-             else Seq("development-mode"))
+              (if (sems.moduleInit == CheckedBehavior.Compliant)
+                 Seq("compliant-moduleinit")
+               else Seq()) ++
+              (if (sems.strictFloats) Seq("strict-floats")
+               else Seq()) ++
+              (if (sems.productionMode) Seq("production-mode")
+               else Seq("development-mode"))
 
           val stageTag = stage match {
             case FastOptStage => "fastopt-stage"
@@ -1151,7 +1154,8 @@ object Build extends sbt.Build {
         List(sharedTestDir / "scala") ++ includeIf(
             sharedTestDir / "require-jdk7",
             javaVersion.value >= 7) ++ includeIf(
-            sharedTestDir / "require-jdk8", javaVersion.value >= 8)
+            sharedTestDir / "require-jdk8",
+            javaVersion.value >= 8)
       },
       sources in Test ++= {
         /* Can't add require-sam as unmanagedSourceDirectories because of the use
@@ -1325,7 +1329,7 @@ object Build extends sbt.Build {
                     "com.google.javascript" % "closure-compiler" % "v20130603",
                     "io.apigee" % "rhino" % "1.7R5pre4",
                     "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-                    ("junit", "junit")
+                      ("junit", "junit")
                 )
               else Seq()
             },
@@ -1343,8 +1347,8 @@ object Build extends sbt.Build {
                   val scalaFilter: FileFilter = "*.scala"
                   val files =
                     ((jsenvBase * scalaFilter) +++
-                        (jsenvBase / "nodejs" ** scalaFilter) +++
-                        (jsenvBase / "rhino" ** scalaFilter))
+                          (jsenvBase / "nodejs" ** scalaFilter) +++
+                          (jsenvBase / "rhino" ** scalaFilter))
 
                   files.get
                 }

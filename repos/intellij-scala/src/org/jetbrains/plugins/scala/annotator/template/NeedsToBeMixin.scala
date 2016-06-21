@@ -42,16 +42,16 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
                     node.info.namedElement match {
                       case f: ScFunctionDefinition =>
                         !f.hasModifierPropertyScala("abstract") ||
-                        !f.hasModifierProperty("override")
+                          !f.hasModifierProperty("override")
                       case v: ScBindingPattern =>
                         v.nameContext match {
                           case v: ScVariableDefinition
                               if !f.hasModifierPropertyScala("abstract") ||
-                              !f.hasModifierPropertyScala("override") =>
+                                !f.hasModifierPropertyScala("override") =>
                             true
                           case v: ScPatternDefinition
                               if !f.hasModifierPropertyScala("abstract") ||
-                              !f.hasModifierPropertyScala("override") =>
+                                !f.hasModifierPropertyScala("override") =>
                             true
                           case _ => false
                         }

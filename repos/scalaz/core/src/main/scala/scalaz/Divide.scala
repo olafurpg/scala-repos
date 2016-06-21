@@ -18,8 +18,8 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
   final def divide2[A1, A2, Z](a1: F[A1], a2: F[A2])(f: Z => (A1, A2)): F[Z] =
     divide(a1, a2)(f)
 
-  def divide3[A1, A2, A3, Z](
-      a1: F[A1], a2: F[A2], a3: F[A3])(f: Z => (A1, A2, A3)): F[Z] =
+  def divide3[A1, A2, A3, Z](a1: F[A1], a2: F[A2], a3: F[A3])(
+      f: Z => (A1, A2, A3)): F[Z] =
     divide2(tuple2(a1, a2), a3) { z =>
       val t = f(z)
       ((t._1, t._2), t._3)
@@ -33,16 +33,23 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     }
 
   def divide5[A1, A2, A3, A4, A5, Z](
-      a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4], a5: F[A5])(
-      f: Z => (A1, A2, A3, A4, A5)): F[Z] =
+      a1: F[A1],
+      a2: F[A2],
+      a3: F[A3],
+      a4: F[A4],
+      a5: F[A5])(f: Z => (A1, A2, A3, A4, A5)): F[Z] =
     divide3(tuple2(a1, a2), tuple2(a3, a4), a5) { z =>
       val t = f(z)
       ((t._1, t._2), (t._3, t._4), t._5)
     }
 
   def divide6[A1, A2, A3, A4, A5, A6, Z](
-      a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4], a5: F[A5], a6: F[A6])(
-      f: Z => (A1, A2, A3, A4, A5, A6)): F[Z] =
+      a1: F[A1],
+      a2: F[A2],
+      a3: F[A3],
+      a4: F[A4],
+      a5: F[A5],
+      a6: F[A6])(f: Z => (A1, A2, A3, A4, A5, A6)): F[Z] =
     divide3(tuple2(a1, a2), tuple2(a3, a4), tuple2(a5, a6)) { z =>
       val t = f(z)
       ((t._1, t._2), (t._3, t._4), (t._5, t._6))
@@ -209,37 +216,50 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
        (t._13, t._14))
     }
 
-  def divide15[
-      A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Z](
-      a1: F[A1],
-      a2: F[A2],
-      a3: F[A3],
-      a4: F[A4],
-      a5: F[A5],
-      a6: F[A6],
-      a7: F[A7],
-      a8: F[A8],
-      a9: F[A9],
-      a10: F[A10],
-      a11: F[A11],
-      a12: F[A12],
-      a13: F[A13],
-      a14: F[A14],
-      a15: F[A15])(f: Z => (A1,
-                            A2,
-                            A3,
-                            A4,
-                            A5,
-                            A6,
-                            A7,
-                            A8,
-                            A9,
-                            A10,
-                            A11,
-                            A12,
-                            A13,
-                            A14,
-                            A15)): F[Z] =
+  def divide15[A1,
+               A2,
+               A3,
+               A4,
+               A5,
+               A6,
+               A7,
+               A8,
+               A9,
+               A10,
+               A11,
+               A12,
+               A13,
+               A14,
+               A15,
+               Z](a1: F[A1],
+                  a2: F[A2],
+                  a3: F[A3],
+                  a4: F[A4],
+                  a5: F[A5],
+                  a6: F[A6],
+                  a7: F[A7],
+                  a8: F[A8],
+                  a9: F[A9],
+                  a10: F[A10],
+                  a11: F[A11],
+                  a12: F[A12],
+                  a13: F[A13],
+                  a14: F[A14],
+                  a15: F[A15])(f: Z => (A1,
+                                        A2,
+                                        A3,
+                                        A4,
+                                        A5,
+                                        A6,
+                                        A7,
+                                        A8,
+                                        A9,
+                                        A10,
+                                        A11,
+                                        A12,
+                                        A13,
+                                        A14,
+                                        A15)): F[Z] =
     divide4(tuple4(a1, a2, a3, a4),
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
@@ -738,8 +758,10 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
   def tuple3[A1, A2, A3](a1: F[A1], a2: F[A2], a3: F[A3]): F[(A1, A2, A3)] =
     divide3(a1, a2, a3)(identity)
 
-  def tuple4[A1, A2, A3, A4](
-      a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[(A1, A2, A3, A4)] =
+  def tuple4[A1, A2, A3, A4](a1: F[A1],
+                             a2: F[A2],
+                             a3: F[A3],
+                             a4: F[A4]): F[(A1, A2, A3, A4)] =
     divide4(a1, a2, a3, a4)(identity)
 
   def tuple5[A1, A2, A3, A4, A5](a1: F[A1],
@@ -868,63 +890,101 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide14(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14)(
         identity)
 
-  def tuple15[
-      A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15](
-      a1: F[A1],
-      a2: F[A2],
-      a3: F[A3],
-      a4: F[A4],
-      a5: F[A5],
-      a6: F[A6],
-      a7: F[A7],
-      a8: F[A8],
-      a9: F[A9],
-      a10: F[A10],
-      a11: F[A11],
-      a12: F[A12],
-      a13: F[A13],
-      a14: F[A14],
-      a15: F[A15])
+  def tuple15[A1,
+              A2,
+              A3,
+              A4,
+              A5,
+              A6,
+              A7,
+              A8,
+              A9,
+              A10,
+              A11,
+              A12,
+              A13,
+              A14,
+              A15](a1: F[A1],
+                   a2: F[A2],
+                   a3: F[A3],
+                   a4: F[A4],
+                   a5: F[A5],
+                   a6: F[A6],
+                   a7: F[A7],
+                   a8: F[A8],
+                   a9: F[A9],
+                   a10: F[A10],
+                   a11: F[A11],
+                   a12: F[A12],
+                   a13: F[A13],
+                   a14: F[A14],
+                   a15: F[A15])
     : F[(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15)] =
     divide15(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15)(
         identity)
 
-  def tuple16[
-      A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16](
-      a1: F[A1],
-      a2: F[A2],
-      a3: F[A3],
-      a4: F[A4],
-      a5: F[A5],
-      a6: F[A6],
-      a7: F[A7],
-      a8: F[A8],
-      a9: F[A9],
-      a10: F[A10],
-      a11: F[A11],
-      a12: F[A12],
-      a13: F[A13],
-      a14: F[A14],
-      a15: F[A15],
-      a16: F[A16]): F[(A1,
-                       A2,
-                       A3,
-                       A4,
-                       A5,
-                       A6,
-                       A7,
-                       A8,
-                       A9,
-                       A10,
-                       A11,
-                       A12,
-                       A13,
-                       A14,
-                       A15,
-                       A16)] =
-    divide16(
-        a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16)(
-        identity)
+  def tuple16[A1,
+              A2,
+              A3,
+              A4,
+              A5,
+              A6,
+              A7,
+              A8,
+              A9,
+              A10,
+              A11,
+              A12,
+              A13,
+              A14,
+              A15,
+              A16](a1: F[A1],
+                   a2: F[A2],
+                   a3: F[A3],
+                   a4: F[A4],
+                   a5: F[A5],
+                   a6: F[A6],
+                   a7: F[A7],
+                   a8: F[A8],
+                   a9: F[A9],
+                   a10: F[A10],
+                   a11: F[A11],
+                   a12: F[A12],
+                   a13: F[A13],
+                   a14: F[A14],
+                   a15: F[A15],
+                   a16: F[A16]): F[(A1,
+                                    A2,
+                                    A3,
+                                    A4,
+                                    A5,
+                                    A6,
+                                    A7,
+                                    A8,
+                                    A9,
+                                    A10,
+                                    A11,
+                                    A12,
+                                    A13,
+                                    A14,
+                                    A15,
+                                    A16)] =
+    divide16(a1,
+             a2,
+             a3,
+             a4,
+             a5,
+             a6,
+             a7,
+             a8,
+             a9,
+             a10,
+             a11,
+             a12,
+             a13,
+             a14,
+             a15,
+             a16)(identity)
 
   def tuple17[A1,
               A2,
@@ -1388,29 +1448,36 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
              a21,
              a22)(identity)
 
-  def deriving2[A1, A2, Z](f: Z => (A1, A2))(
-      implicit a1: F[A1], a2: F[A2]): F[Z] =
+  def deriving2[A1, A2, Z](f: Z => (A1, A2))(implicit a1: F[A1],
+                                             a2: F[A2]): F[Z] =
     divide2(a1, a2)(f)
 
-  def deriving3[A1, A2, A3, Z](f: Z => (A1, A2, A3))(
-      implicit a1: F[A1], a2: F[A2], a3: F[A3]): F[Z] =
+  def deriving3[A1, A2, A3, Z](
+      f: Z => (A1, A2, A3))(implicit a1: F[A1], a2: F[A2], a3: F[A3]): F[Z] =
     divide3(a1, a2, a3)(f)
 
   def deriving4[A1, A2, A3, A4, Z](f: Z => (A1, A2, A3, A4))(
-      implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] =
+      implicit a1: F[A1],
+      a2: F[A2],
+      a3: F[A3],
+      a4: F[A4]): F[Z] =
     divide4(a1, a2, a3, a4)(f)
 
   def deriving5[A1, A2, A3, A4, A5, Z](f: Z => (A1, A2, A3, A4, A5))(
-      implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4], a5: F[A5]): F[Z] =
+      implicit a1: F[A1],
+      a2: F[A2],
+      a3: F[A3],
+      a4: F[A4],
+      a5: F[A5]): F[Z] =
     divide5(a1, a2, a3, a4, a5)(f)
 
-  def deriving6[A1, A2, A3, A4, A5, A6, Z](
-      f: Z => (A1, A2, A3, A4, A5, A6))(implicit a1: F[A1],
-                                        a2: F[A2],
-                                        a3: F[A3],
-                                        a4: F[A4],
-                                        a5: F[A5],
-                                        a6: F[A6]): F[Z] =
+  def deriving6[A1, A2, A3, A4, A5, A6, Z](f: Z => (A1, A2, A3, A4, A5, A6))(
+      implicit a1: F[A1],
+      a2: F[A2],
+      a3: F[A3],
+      a4: F[A4],
+      a5: F[A5],
+      a6: F[A6]): F[Z] =
     divide6(a1, a2, a3, a4, a5, a6)(f)
 
   def deriving7[A1, A2, A3, A4, A5, A6, A7, Z](
@@ -1507,8 +1574,21 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
       a13: F[A13]): F[Z] =
     divide13(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13)(f)
 
-  def deriving14[
-      A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, Z](
+  def deriving14[A1,
+                 A2,
+                 A3,
+                 A4,
+                 A5,
+                 A6,
+                 A7,
+                 A8,
+                 A9,
+                 A10,
+                 A11,
+                 A12,
+                 A13,
+                 A14,
+                 Z](
       f: Z => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14))(
       implicit a1: F[A1],
       a2: F[A2],
@@ -1526,37 +1606,50 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
       a14: F[A14]): F[Z] =
     divide14(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14)(f)
 
-  def deriving15[
-      A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Z](
-      f: Z => (A1,
-               A2,
-               A3,
-               A4,
-               A5,
-               A6,
-               A7,
-               A8,
-               A9,
-               A10,
-               A11,
-               A12,
-               A13,
-               A14,
-               A15))(implicit a1: F[A1],
-                     a2: F[A2],
-                     a3: F[A3],
-                     a4: F[A4],
-                     a5: F[A5],
-                     a6: F[A6],
-                     a7: F[A7],
-                     a8: F[A8],
-                     a9: F[A9],
-                     a10: F[A10],
-                     a11: F[A11],
-                     a12: F[A12],
-                     a13: F[A13],
-                     a14: F[A14],
-                     a15: F[A15]): F[Z] =
+  def deriving15[A1,
+                 A2,
+                 A3,
+                 A4,
+                 A5,
+                 A6,
+                 A7,
+                 A8,
+                 A9,
+                 A10,
+                 A11,
+                 A12,
+                 A13,
+                 A14,
+                 A15,
+                 Z](f: Z => (A1,
+                             A2,
+                             A3,
+                             A4,
+                             A5,
+                             A6,
+                             A7,
+                             A8,
+                             A9,
+                             A10,
+                             A11,
+                             A12,
+                             A13,
+                             A14,
+                             A15))(implicit a1: F[A1],
+                                   a2: F[A2],
+                                   a3: F[A3],
+                                   a4: F[A4],
+                                   a5: F[A5],
+                                   a6: F[A6],
+                                   a7: F[A7],
+                                   a8: F[A8],
+                                   a9: F[A9],
+                                   a10: F[A10],
+                                   a11: F[A11],
+                                   a12: F[A12],
+                                   a13: F[A13],
+                                   a14: F[A14],
+                                   a15: F[A15]): F[Z] =
     divide15(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15)(
         f)
 
@@ -1607,9 +1700,22 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
                                    a14: F[A14],
                                    a15: F[A15],
                                    a16: F[A16]): F[Z] =
-    divide16(
-        a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16)(
-        f)
+    divide16(a1,
+             a2,
+             a3,
+             a4,
+             a5,
+             a6,
+             a7,
+             a8,
+             a9,
+             a10,
+             a11,
+             a12,
+             a13,
+             a14,
+             a15,
+             a16)(f)
 
   def deriving17[A1,
                  A2,

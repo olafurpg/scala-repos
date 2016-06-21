@@ -18,8 +18,9 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/18/15.
   */
-class Cached(
-    synchronized: Boolean, modificationCount: ModCount, psiElement: Any)
+class Cached(synchronized: Boolean,
+             modificationCount: ModCount,
+             psiElement: Any)
     extends StaticAnnotation {
   def macroTransform(annottees: Any*) = macro Cached.cachedImpl
 }
@@ -81,16 +82,15 @@ object Cached {
           if (analyzeCaches)
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           else EmptyTree
-        val fields =
-          if (hasParameters) {
-            q"""
+        val fields = if (hasParameters) {
+          q"""
             private val $mapName = _root_.com.intellij.util.containers.ContainerUtil.
                 newConcurrentMap[(..${flatParams.map(_.tpt)}), ($retTp, _root_.scala.Long)]()
 
             ..$analyzeCachesField
           """
-          } else {
-            q"""
+        } else {
+          q"""
             new _root_.scala.volatile()
             private var $cacheVarName: _root_.scala.Option[$retTp] = _root_.scala.None
             new _root_.scala.volatile()
@@ -98,7 +98,7 @@ object Cached {
 
             ..$analyzeCachesField
           """
-          }
+        }
 
         def getValuesFromMap: c.universe.Tree = q"""
             var ($cacheVarName, $modCountVarName) = _root_.scala.Option($mapName.get(..$paramNames)) match {
@@ -109,12 +109,11 @@ object Cached {
         def putValuesIntoMap: c.universe.Tree =
           q"$mapName.put((..$paramNames), ($cacheVarName.get, $modCountVarName))"
 
-        val getValuesIfHasParams =
-          if (hasParameters) {
-            q"""
+        val getValuesIfHasParams = if (hasParameters) {
+          q"""
               ..$getValuesFromMap
             """
-          } else q""
+        } else q""
 
         val functionContents = q"""
             ..$getValuesIfHasParams
@@ -126,10 +125,9 @@ object Cached {
             }
             $cacheVarName.get
           """
-        val functionContentsInSynchronizedBlock =
-          if (synchronized) {
-            //double checked locking
-            q"""
+        val functionContentsInSynchronizedBlock = if (synchronized) {
+          //double checked locking
+          q"""
               ..$getValuesIfHasParams
               if (!cacheHasExpired($cacheVarName, $modCountVarName)) {
                 return $cacheVarName.get
@@ -138,11 +136,11 @@ object Cached {
                 $functionContents
               }
             """
-          } else {
-            q"""
+        } else {
+          q"""
               $functionContents
             """
-          }
+        }
 
         val actualCalculation =
           transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
@@ -166,8 +164,8 @@ object Cached {
         else EmptyTree}
           $functionContentsInSynchronizedBlock
         """
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           ..$fields
           $updatedDef

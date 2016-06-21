@@ -93,8 +93,15 @@ object Workflow {
     )
   }
 
-  def runEvaluationTypeless[
-      EI, Q, P, A, EEI, EQ, EP, EA, ER <: BaseEvaluatorResult](
+  def runEvaluationTypeless[EI,
+                            Q,
+                            P,
+                            A,
+                            EEI,
+                            EQ,
+                            EP,
+                            EA,
+                            ER <: BaseEvaluatorResult](
       evaluation: Evaluation,
       engine: BaseEngine[EI, Q, P, A],
       engineParamsList: Seq[EngineParams],

@@ -48,10 +48,15 @@ class SyncProducerTest extends KafkaServerTestHarness {
       acks: Int,
       timeout: Int = SyncProducerConfig.DefaultAckTimeoutMs,
       correlationId: Int = 0,
-      clientId: String =
-        SyncProducerConfig.DefaultClientId): ProducerRequest = {
-    TestUtils.produceRequest(
-        topic, partition, message, acks, timeout, correlationId, clientId)
+      clientId: String = SyncProducerConfig.DefaultClientId)
+    : ProducerRequest = {
+    TestUtils.produceRequest(topic,
+                             partition,
+                             message,
+                             acks,
+                             timeout,
+                             correlationId,
+                             clientId)
   }
 
   @Test
@@ -147,7 +152,8 @@ class SyncProducerTest extends KafkaServerTestHarness {
 
     val message1 = new Message(new Array[Byte](configs(0).messageMaxBytes + 1))
     val messageSet1 = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec, messages = message1)
+        compressionCodec = NoCompressionCodec,
+        messages = message1)
     val response1 =
       producer.send(produceRequest("test", 0, messageSet1, acks = 1))
 
@@ -158,16 +164,17 @@ class SyncProducerTest extends KafkaServerTestHarness {
 
     val safeSize =
       configs(0).messageMaxBytes - Message.MinMessageOverhead -
-      Message.TimestampLength - MessageSet.LogOverhead - 1
+        Message.TimestampLength - MessageSet.LogOverhead - 1
     val message2 = new Message(new Array[Byte](safeSize))
     val messageSet2 = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec, messages = message2)
+        compressionCodec = NoCompressionCodec,
+        messages = message2)
     val response2 =
       producer.send(produceRequest("test", 0, messageSet2, acks = 1))
 
     assertEquals(1, response1.status.count(_._2.error != Errors.NONE.code))
-    assertEquals(
-        Errors.NONE.code, response2.status(TopicAndPartition("test", 0)).error)
+    assertEquals(Errors.NONE.code,
+                 response2.status(TopicAndPartition("test", 0)).error)
     assertEquals(0, response2.status(TopicAndPartition("test", 0)).offset)
   }
 
@@ -188,10 +195,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
         produceRequest(
             "test",
             0,
-            new ByteBufferMessageSet(
-                compressionCodec = NoCompressionCodec,
-                messages = new Message(
-                    new Array[Byte](configs(0).messageMaxBytes + 1))),
+            new ByteBufferMessageSet(compressionCodec = NoCompressionCodec,
+                                     messages = new Message(new Array[Byte](
+                                             configs(0).messageMaxBytes + 1))),
             acks = 0))
 
     // Send another message whose size is large enough to exceed the buffer size so
@@ -220,8 +226,8 @@ class SyncProducerTest extends KafkaServerTestHarness {
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
 
     val producer = new SyncProducer(new SyncProducerConfig(props))
-    val messages = new ByteBufferMessageSet(
-        NoCompressionCodec, new Message(messageBytes))
+    val messages =
+      new ByteBufferMessageSet(NoCompressionCodec, new Message(messageBytes))
 
     // #1 - test that we get an error when partition does not belong to broker in response
     val request = TestUtils.produceRequestWithAcks(
@@ -277,8 +283,8 @@ class SyncProducerTest extends KafkaServerTestHarness {
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
     val producer = new SyncProducer(new SyncProducerConfig(props))
 
-    val messages = new ByteBufferMessageSet(
-        NoCompressionCodec, new Message(messageBytes))
+    val messages =
+      new ByteBufferMessageSet(NoCompressionCodec, new Message(messageBytes))
     val request = produceRequest("topic1", 0, messages, acks = 1)
 
     // stop IO threads and request handling, but leave networking operational

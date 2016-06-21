@@ -110,16 +110,16 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
     else
       initiallySubscribedOrUnsubscriber.get match {
         case value @ Left(subscribers) ⇒
-          if (initiallySubscribedOrUnsubscriber.compareAndSet(
-                  value, Right(unsubscriber))) {
+          if (initiallySubscribedOrUnsubscriber
+                .compareAndSet(value, Right(unsubscriber))) {
             if (debug)
               publish(
                   Logging.Debug(
                       simpleName(this),
                       this.getClass,
                       "initialized unsubscriber to: " +
-                      unsubscriber + ", registering " + subscribers.size +
-                      " initial subscribers with it"))
+                        unsubscriber + ", registering " + subscribers.size +
+                        " initial subscribers with it"))
             subscribers foreach registerWithUnsubscriber
             true
           } else {
@@ -148,8 +148,8 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
     if (sys ne null)
       initiallySubscribedOrUnsubscriber.get match {
         case value @ Left(subscribers) ⇒
-          if (!initiallySubscribedOrUnsubscriber.compareAndSet(
-                  value, Left(subscribers + subscriber)))
+          if (!initiallySubscribedOrUnsubscriber
+                .compareAndSet(value, Left(subscribers + subscriber)))
             registerWithUnsubscriber(subscriber)
 
         case Right(unsubscriber) ⇒
@@ -171,8 +171,8 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
     if (sys ne null)
       initiallySubscribedOrUnsubscriber.get match {
         case value @ Left(subscribers) ⇒
-          if (!initiallySubscribedOrUnsubscriber.compareAndSet(
-                  value, Left(subscribers - subscriber)))
+          if (!initiallySubscribedOrUnsubscriber
+                .compareAndSet(value, Left(subscribers - subscriber)))
             unregisterIfNoMoreSubscribedChannels(subscriber)
 
         case Right(unsubscriber) ⇒

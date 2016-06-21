@@ -129,8 +129,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       }
 
       sub.request(demandAllButOneChunks)
-      for (i ← 1 to demandAllButOneChunks) c.expectNext().utf8String should ===(
-          nextChunk())
+      for (i ← 1 to demandAllButOneChunks)
+        c.expectNext().utf8String should ===(nextChunk())
       c.expectNoMsg(300.millis)
 
       sub.request(1)

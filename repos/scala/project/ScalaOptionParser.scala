@@ -31,8 +31,8 @@ object ScalaOptionParser {
     def ChoiceSetting(name: String, choices: List[String]): Parser[String] =
       concat(token(concat(name ~ ":")) ~ token(
               StringBasic.examples(choices: _*)).map(_.mkString))
-    def MultiChoiceSetting(
-        name: String, choices: List[String]): Parser[String] =
+    def MultiChoiceSetting(name: String,
+                           choices: List[String]): Parser[String] =
       concat(
           token(concat(name ~ ":")) ~ rep1sep(
               token(StringBasic.examples(choices: _*)),
@@ -54,8 +54,10 @@ object ScalaOptionParser {
       MultiChoiceSetting(name, phases)
     }
     def ScalaVersionSetting(name: String): Parser[String] = {
-      concat(concat(token(name ~ Space.string)) ~ token(
-              StringBasic, TokenCompletions.displayOnly("<scala version>")))
+      concat(
+          concat(token(name ~ Space.string)) ~ token(
+              StringBasic,
+              TokenCompletions.displayOnly("<scala version>")))
     }
     val Property: Parser[String] = {
       val PropName = concat(
@@ -111,8 +113,10 @@ object ScalaOptionParser {
                               TokenCompletions.displayOnly("<arg>")),
                         Space).map(_.mkString(" ")))))
         val options = rep1sep(ScalaOpt, Space).map(_.mkString(" "))
-        Opt(Space ~>
-            (options | concat(concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
+        Opt(
+            Space ~>
+              (options | concat(
+                      concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
       case "scaladoc" =>
         Opt(Space ~> Opt(repsep(ScalaDocOpt, Space).map(_.mkString(" "))))
       case "scalac" =>
@@ -273,8 +277,10 @@ object ScalaOptionParser {
                                    "-Ycheck",
                                    "-Xprint")
   private def multiStringSettingNames =
-    List(
-        "-Xmacro-settings", "-Xplugin", "-Xplugin-disable", "-Xplugin-require")
+    List("-Xmacro-settings",
+         "-Xplugin",
+         "-Xplugin-disable",
+         "-Xplugin-require")
   private def intSettingNames =
     List("-Xmax-classfile-name",
          "-Xelide-below",
@@ -329,8 +335,12 @@ object ScalaOptionParser {
                       "closure-elimination",
                       "inline-project",
                       "inline-global"),
-      "-Ystatistics" -> List(
-          "parser", "typer", "patmat", "erasure", "cleanup", "jvm")
+      "-Ystatistics" -> List("parser",
+                             "typer",
+                             "patmat",
+                             "erasure",
+                             "cleanup",
+                             "jvm")
   )
   private def scalaVersionSettings = List("-Xmigration", "-Xsource")
 

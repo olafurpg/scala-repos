@@ -34,29 +34,29 @@ object VarDcl {
         //Look for :
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON => {
-              builder.advanceLexer //Ate :
-              if (Type.parse(builder)) {
-                returnMarker.drop
-              } else {
-                builder error ScalaBundle.message("wrong.type")
-                returnMarker.drop
-              }
-            }
-          case _ => {
-              builder error ScalaBundle.message("wrong.var.declaration")
+            builder.advanceLexer //Ate :
+            if (Type.parse(builder)) {
+              returnMarker.drop
+            } else {
+              builder error ScalaBundle.message("wrong.type")
               returnMarker.drop
             }
+          }
+          case _ => {
+            builder error ScalaBundle.message("wrong.var.declaration")
+            returnMarker.drop
+          }
         }
 
         builder.getTokenType match {
           case ScalaTokenTypes.tASSIGN => {
-              builder.advanceLexer
-              builder.error("Expected expression")
-              return true
-            }
+            builder.advanceLexer
+            builder.error("Expected expression")
+            return true
+          }
           case _ => {
-              return true
-            }
+            return true
+          }
         }
       case _ =>
         builder error ScalaBundle.message("identifier.expected")

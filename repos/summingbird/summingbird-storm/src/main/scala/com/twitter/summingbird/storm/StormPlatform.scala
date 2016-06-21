@@ -52,8 +52,8 @@ import scala.reflect.ClassTag
 
 sealed trait StormSource[+T]
 
-case class SpoutSource[+T](
-    spout: Spout[(Timestamp, T)], parallelism: Option[SourceParallelism])
+case class SpoutSource[+T](spout: Spout[(Timestamp, T)],
+                           parallelism: Option[SourceParallelism])
     extends StormSource[T]
 
 object Storm {
@@ -90,8 +90,8 @@ object Storm {
     * The values used for the service are from the online store only.
     * Uses ClientStore internally to create ReadableStore[K, V]
     */
-  def storeServiceOnlineOnly[K, V](
-      store: => MergeableStore[(K, BatchID), V], batchesToKeep: Int)(
+  def storeServiceOnlineOnly[K, V](store: => MergeableStore[(K, BatchID), V],
+                                   batchesToKeep: Int)(
       implicit batcher: Batcher): CombinedServiceStoreFactory[K, V] =
     CombinedServiceStoreFactory(store, batchesToKeep)(batcher)
 
@@ -125,8 +125,8 @@ object Storm {
     source(spout, None)(timeOf)
 }
 
-case class PlannedTopology(
-    config: BacktypeStormConfig, topology: StormTopology)
+case class PlannedTopology(config: BacktypeStormConfig,
+                           topology: StormTopology)
 
 abstract class Storm(options: Map[String, Options],
                      transformConfig: SummingbirdConfig => SummingbirdConfig,
@@ -143,13 +143,15 @@ abstract class Storm(options: Map[String, Options],
   private type Prod[T] = Producer[Storm, T]
 
   private[storm] def get[T <: AnyRef: ClassTag](
-      dag: Dag[Storm], node: StormNode): Option[(String, T)] = {
+      dag: Dag[Storm],
+      node: StormNode): Option[(String, T)] = {
     val producer = node.members.last
     Options.getFirst[T](options, dag.producerToPriorityNames(producer))
   }
 
-  private[storm] def getOrElse[T <: AnyRef: ClassTag](
-      dag: Dag[Storm], node: StormNode, default: T): T =
+  private[storm] def getOrElse[T <: AnyRef: ClassTag](dag: Dag[Storm],
+                                                      node: StormNode,
+                                                      default: T): T =
     get[T](dag, node) match {
       case None =>
         logger.debug(
@@ -172,16 +174,17 @@ abstract class Storm(options: Map[String, Options],
   }
 
   private def scheduleFlatMapper(
-      jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-      implicit topologyBuilder: TopologyBuilder) = {
+      jobID: JobId,
+      stormDag: Dag[Storm],
+      node: StormNode)(implicit topologyBuilder: TopologyBuilder) = {
     val nodeName = stormDag.getNodeName(node)
-    val usePreferLocalDependency = getOrElse(
-        stormDag, node, DEFAULT_FM_PREFER_LOCAL_DEPENDENCY)
+    val usePreferLocalDependency =
+      getOrElse(stormDag, node, DEFAULT_FM_PREFER_LOCAL_DEPENDENCY)
     logger.info(
         s"[$nodeName] usePreferLocalDependency: ${usePreferLocalDependency.get}")
 
-    val bolt: BaseBolt[Any, Any] = FlatMapBoltProvider(
-        this, jobID, stormDag, node).apply
+    val bolt: BaseBolt[Any, Any] =
+      FlatMapBoltProvider(this, jobID, stormDag, node).apply
 
     val parallelism = getOrElse(stormDag, node, DEFAULT_FM_PARALLELISM).parHint
     val declarer = topologyBuilder
@@ -199,8 +202,9 @@ abstract class Storm(options: Map[String, Options],
   }
 
   private def scheduleSpout[K](
-      jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-      implicit topologyBuilder: TopologyBuilder) = {
+      jobID: JobId,
+      stormDag: Dag[Storm],
+      node: StormNode)(implicit topologyBuilder: TopologyBuilder) = {
     val (spout, parOpt) = node.members.collect {
       case Source(SpoutSource(s, parOpt)) => (s, parOpt)
     }.head
@@ -208,23 +212,23 @@ abstract class Storm(options: Map[String, Options],
 
     val tormentaSpout = node.members.reverse
       .foldLeft(spout.asInstanceOf[Spout[(Timestamp, Any)]]) { (spout, p) =>
-      p match {
-        case Source(_) =>
-          spout // The source is still in the members list so drop it
-        case OptionMappedProducer(_, op) =>
-          spout.flatMap {
-            case (time, t) =>
-              op.apply(t).map { x =>
-                (time, x)
-              }
-          }
-        case NamedProducer(_, _) => spout
-        case IdentityKeyedProducer(_) => spout
-        case AlsoProducer(_, _) => spout
-        case _ =>
-          sys.error("not possible, given the above call to span.\n" + p)
+        p match {
+          case Source(_) =>
+            spout // The source is still in the members list so drop it
+          case OptionMappedProducer(_, op) =>
+            spout.flatMap {
+              case (time, t) =>
+                op.apply(t).map { x =>
+                  (time, x)
+                }
+            }
+          case NamedProducer(_, _) => spout
+          case IdentityKeyedProducer(_) => spout
+          case AlsoProducer(_, _) => spout
+          case _ =>
+            sys.error("not possible, given the above call to span.\n" + p)
+        }
       }
-    }
 
     val countersForSpout: Seq[(Group, Name)] =
       JobCounters.getCountersForJob(jobID).getOrElse(Nil)
@@ -244,13 +248,16 @@ abstract class Storm(options: Map[String, Options],
     }
     val stormSpout = tormentaSpout.openHook(registerAllMetrics).getSpout
     val parallelism = getOrElse(
-        stormDag, node, parOpt.getOrElse(DEFAULT_SOURCE_PARALLELISM)).parHint
+        stormDag,
+        node,
+        parOpt.getOrElse(DEFAULT_SOURCE_PARALLELISM)).parHint
     topologyBuilder.setSpout(nodeName, stormSpout, parallelism)
   }
 
   private def scheduleSummerBolt[K, V](
-      jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-      implicit topologyBuilder: TopologyBuilder) = {
+      jobID: JobId,
+      stormDag: Dag[Storm],
+      node: StormNode)(implicit topologyBuilder: TopologyBuilder) = {
     val summer: Summer[Storm, K, V] = node.members.collect {
       case c: Summer[Storm, K, V] => c
     }.head
@@ -283,12 +290,12 @@ abstract class Storm(options: Map[String, Options],
     val ackOnEntry = getOrElse(stormDag, node, DEFAULT_ACK_ON_ENTRY)
     logger.info(s"[$nodeName] ackOnEntry : ${ackOnEntry.get}")
 
-    val maxEmitPerExecute = getOrElse(
-        stormDag, node, DEFAULT_MAX_EMIT_PER_EXECUTE)
+    val maxEmitPerExecute =
+      getOrElse(stormDag, node, DEFAULT_MAX_EMIT_PER_EXECUTE)
     logger.info(s"[$nodeName] maxEmitPerExecute : ${maxEmitPerExecute.get}")
 
-    val maxExecutePerSec = getOrElse(
-        stormDag, node, DEFAULT_MAX_EXECUTE_PER_SEC)
+    val maxExecutePerSec =
+      getOrElse(stormDag, node, DEFAULT_MAX_EXECUTE_PER_SEC)
     logger.info(s"[$nodeName] maxExecutePerSec : $maxExecutePerSec")
 
     val storeBaseFMOp = {
@@ -409,7 +416,7 @@ abstract class Storm(options: Map[String, Options],
       val stormJobId = config.get("storm.job.uniqueId").asInstanceOf[String]
       if (stormJobId == null) {
         JobId(java.util.UUID.randomUUID().toString +
-            "-AutoGenerated-ForInbuiltStats-UserStatsWillFail.")
+              "-AutoGenerated-ForInbuiltStats-UserStatsWillFail.")
       } else {
         JobId(stormJobId)
       }
@@ -439,8 +446,9 @@ class RemoteStorm(options: Map[String, Options],
 
   override def run(plannedTopology: PlannedTopology, jobName: String): Unit = {
     val topologyName = "summingbird_" + jobName
-    StormSubmitter.submitTopology(
-        topologyName, plannedTopology.config, plannedTopology.topology)
+    StormSubmitter.submitTopology(topologyName,
+                                  plannedTopology.config,
+                                  plannedTopology.topology)
   }
 
   override def withRegistrars(registrars: List[IKryoRegistrar]) =
@@ -458,8 +466,9 @@ class LocalStorm(options: Map[String, Options],
 
   override def run(plannedTopology: PlannedTopology, jobName: String): Unit = {
     val topologyName = "summingbird_" + jobName
-    localCluster.submitTopology(
-        topologyName, plannedTopology.config, plannedTopology.topology)
+    localCluster.submitTopology(topologyName,
+                                plannedTopology.config,
+                                plannedTopology.topology)
   }
 
   override def withRegistrars(registrars: List[IKryoRegistrar]) =

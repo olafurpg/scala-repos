@@ -133,33 +133,38 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
       var result: Option[PsiFile] = None
 
       FilenameIndex.processFilesByName(
-          sourceFile, false, new Processor[PsiFileSystemItem] {
-        override def process(t: PsiFileSystemItem): Boolean = {
-          val source = t.getVirtualFile
-          getManager.findFile(source) match {
-            case o: ScalaFile =>
-              val clazzIterator = o.typeDefinitions.iterator
-              while (clazzIterator.hasNext) {
-                val clazz = clazzIterator.next()
-                if (qual == clazz.qualifiedName) {
-                  result = Some(o)
-                  return false
-                }
+          sourceFile,
+          false,
+          new Processor[PsiFileSystemItem] {
+            override def process(t: PsiFileSystemItem): Boolean = {
+              val source = t.getVirtualFile
+              getManager.findFile(source) match {
+                case o: ScalaFile =>
+                  val clazzIterator = o.typeDefinitions.iterator
+                  while (clazzIterator.hasNext) {
+                    val clazz = clazzIterator.next()
+                    if (qual == clazz.qualifiedName) {
+                      result = Some(o)
+                      return false
+                    }
+                  }
+                case o: PsiClassOwner =>
+                  val clazzIterator = o.getClasses.iterator
+                  while (clazzIterator.hasNext) {
+                    val clazz = clazzIterator.next()
+                    if (qual == clazz.qualifiedName) {
+                      result = Some(o)
+                      return false
+                    }
+                  }
+                case _ =>
               }
-            case o: PsiClassOwner =>
-              val clazzIterator = o.getClasses.iterator
-              while (clazzIterator.hasNext) {
-                val clazz = clazzIterator.next()
-                if (qual == clazz.qualifiedName) {
-                  result = Some(o)
-                  return false
-                }
-              }
-            case _ =>
-          }
-          true
-        }
-      }, GlobalSearchScope.allScope(getProject), getProject, null)
+              true
+            }
+          },
+          GlobalSearchScope.allScope(getProject),
+          getProject,
+          null)
 
       result match {
         case Some(o) => o
@@ -318,7 +323,7 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
     }
   }
 
-  override def getStub: ScFileStub = super [PsiFileBase].getStub match {
+  override def getStub: ScFileStub = super[PsiFileBase].getStub match {
     case null => null
     case s: ScFileStub => s
     case _ =>
@@ -334,8 +339,8 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
   def getPackagings: Array[ScPackaging] = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(
-          ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
+      stub.getChildrenByType(ScalaElementTypes.PACKAGING,
+                             JavaArrayFactoryUtil.ScPackagingFactory)
     } else findChildrenByClass(classOf[ScPackaging])
   }
 
@@ -412,7 +417,8 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
   def icon = Icons.FILE_TYPE_LOGO
 
   @CachedInsidePsiElement(
-      this, ScalaPsiManager.instance(getProject).modificationTracker)
+      this,
+      ScalaPsiManager.instance(getProject).modificationTracker)
   protected def isScalaPredefinedClass: Boolean = {
     typeDefinitions.length == 1 &&
     Set("scala", "scala.Predef").contains(typeDefinitions.head.qualifiedName)
@@ -420,7 +426,7 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
 
   def isScalaPredefinedClassInner =
     typeDefinitions.length == 1 &&
-    Set("scala", "scala.Predef").contains(typeDefinitions.head.qualifiedName)
+      Set("scala", "scala.Predef").contains(typeDefinitions.head.qualifiedName)
 
   override def findReferenceAt(offset: Int): PsiReference =
     super.findReferenceAt(offset)
@@ -494,8 +500,8 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
     }
   }
 
-  override protected def insertFirstImport(
-      importSt: ScImportStmt, first: PsiElement): PsiElement = {
+  override protected def insertFirstImport(importSt: ScImportStmt,
+                                           first: PsiElement): PsiElement = {
     if (isScriptFile) {
       first match {
         case c: PsiComment
@@ -519,8 +525,8 @@ object ScalaFileImpl {
 
   val DefaultImplicitlyImportedPackages = Seq("scala", "java.lang")
 
-  val DefaultImplicitlyImportedObjects = Seq(
-      "scala.Predef", "scala" /* package object*/ )
+  val DefaultImplicitlyImportedObjects =
+    Seq("scala.Predef", "scala" /* package object*/ )
 
   /**
     * @param _place actual place, can be null, if null => false
@@ -542,7 +548,7 @@ object ScalaFileImpl {
         val index =
           ProjectRootManager.getInstance(place.getProject).getFileIndex
         !(index.isInSourceContent(file) || index.isInLibraryClasses(file) ||
-            index.isInLibrarySource(file))
+              index.isInLibrarySource(file))
       case _ => false
     }
   }
@@ -560,8 +566,8 @@ object ScalaFileImpl {
   def splitsIn(path: List[List[String]]): List[List[String]] =
     path.scanLeft(List[String]())((vs, v) => vs ::: v).tail.dropRight(1)
 
-  def splitAt(
-      path: List[List[String]], vector: List[String]): List[List[String]] = {
+  def splitAt(path: List[List[String]],
+              vector: List[String]): List[List[String]] = {
     if (vector.isEmpty) path
     else
       path match {

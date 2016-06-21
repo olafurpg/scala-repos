@@ -125,8 +125,8 @@ package docs.serialization {
     }
 
     "demonstrate configuration of serializers" in {
-      val config =
-        ConfigFactory.parseString("""
+      val config = ConfigFactory.parseString(
+          """
       #//#serialize-serializers-config
       akka {
         actor {
@@ -144,8 +144,8 @@ package docs.serialization {
     }
 
     "demonstrate configuration of serialization-bindings" in {
-      val config =
-        ConfigFactory.parseString("""
+      val config = ConfigFactory.parseString(
+          """
       #//#serialization-bindings-config
       akka {
         actor {
@@ -228,8 +228,8 @@ package docs.serialization {
       class ExternalAddressExt(system: ExtendedActorSystem) extends Extension {
         def addressFor(remoteAddr: Address): Address =
           system.provider.getExternalAddressFor(remoteAddr) getOrElse
-          (throw new UnsupportedOperationException(
-                  "cannot send to " + remoteAddr))
+            (throw new UnsupportedOperationException(
+                    "cannot send to " + remoteAddr))
       }
 
       def serializeTo(ref: ActorRef, remote: Address): String =

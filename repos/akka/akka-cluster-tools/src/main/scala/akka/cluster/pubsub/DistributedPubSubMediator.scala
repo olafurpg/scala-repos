@@ -145,8 +145,9 @@ object DistributedPubSubMediator {
   @SerialVersionUID(1L)
   final case class Remove(path: String)
   @SerialVersionUID(1L)
-  final case class Subscribe(
-      topic: String, group: Option[String], ref: ActorRef) {
+  final case class Subscribe(topic: String,
+                             group: Option[String],
+                             ref: ActorRef) {
     require(topic != null && topic != "", "topic must be defined")
 
     /**
@@ -164,8 +165,9 @@ object DistributedPubSubMediator {
     def apply(topic: String, ref: ActorRef) = new Subscribe(topic, ref)
   }
   @SerialVersionUID(1L)
-  final case class Unsubscribe(
-      topic: String, group: Option[String], ref: ActorRef) {
+  final case class Unsubscribe(topic: String,
+                               group: Option[String],
+                               ref: ActorRef) {
     require(topic != null && topic != "", "topic must be defined")
     def this(topic: String, ref: ActorRef) = this(topic, None, ref)
     def this(topic: String, group: String, ref: ActorRef) =
@@ -180,8 +182,9 @@ object DistributedPubSubMediator {
   @SerialVersionUID(1L)
   final case class UnsubscribeAck(unsubscribe: Unsubscribe)
   @SerialVersionUID(1L)
-  final case class Publish(
-      topic: String, msg: Any, sendOneMessageToEachGroup: Boolean)
+  final case class Publish(topic: String,
+                           msg: Any,
+                           sendOneMessageToEachGroup: Boolean)
       extends DistributedPubSubMessage {
     def this(topic: String, msg: Any) =
       this(topic, msg, sendOneMessageToEachGroup = false)
@@ -199,8 +202,9 @@ object DistributedPubSubMediator {
     def this(path: String, msg: Any) = this(path, msg, localAffinity = false)
   }
   @SerialVersionUID(1L)
-  final case class SendToAll(
-      path: String, msg: Any, allButSelf: Boolean = false)
+  final case class SendToAll(path: String,
+                             msg: Any,
+                             allButSelf: Boolean = false)
       extends DistributedPubSubMessage {
     def this(path: String, msg: Any) = this(path, msg, allButSelf = false)
   }
@@ -371,8 +375,8 @@ object DistributedPubSubMediator {
       }
     }
 
-    class Topic(
-        val emptyTimeToLive: FiniteDuration, routingLogic: RoutingLogic)
+    class Topic(val emptyTimeToLive: FiniteDuration,
+                routingLogic: RoutingLogic)
         extends TopicLike
         with PerGroupingBuffer {
       def business = {
@@ -419,8 +423,8 @@ object DistributedPubSubMediator {
       }
     }
 
-    class Group(
-        val emptyTimeToLive: FiniteDuration, routingLogic: RoutingLogic)
+    class Group(val emptyTimeToLive: FiniteDuration,
+                routingLogic: RoutingLogic)
         extends TopicLike {
       def business = {
         case SendToOneSubscriber(msg) ⇒
@@ -646,8 +650,8 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
       forwardMessages(key, sender())
 
     case GetTopics ⇒ {
-        sender ! CurrentTopics(getCurrentTopics())
-      }
+      sender ! CurrentTopics(getCurrentTopics())
+    }
 
     case msg @ Subscribed(ack, ref) ⇒
       ref ! ack
@@ -682,9 +686,9 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
             val myBucket = registry(b.owner)
             if (b.version > myBucket.version) {
               registry +=
-                (b.owner -> myBucket.copy(version = b.version,
-                                          content =
-                                            myBucket.content ++ b.content))
+              (b.owner -> myBucket.copy(version = b.version,
+                                        content =
+                                          myBucket.content ++ b.content))
             }
           }
         }
@@ -738,7 +742,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
   def publish(path: String, msg: Any, allButSelf: Boolean = false): Unit = {
     for {
       (address, bucket) ← registry if !(allButSelf &&
-          address == selfAddress) // if we should skip sender() node and current address == self address => skip
+            address == selfAddress) // if we should skip sender() node and current address == self address => skip
       valueHolder ← bucket.content.get(path)
       ref ← valueHolder.ref
     } ref forward msg
@@ -850,7 +854,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
         }
         if (oldRemoved.nonEmpty)
           registry +=
-            owner -> bucket.copy(content = bucket.content -- oldRemoved)
+          owner -> bucket.copy(content = bucket.content -- oldRemoved)
     }
   }
 
@@ -889,7 +893,7 @@ class DistributedPubSub(system: ExtendedActorSystem) extends Extension {
     */
   def isTerminated: Boolean =
     Cluster(system).isTerminated ||
-    !settings.role.forall(Cluster(system).selfRoles.contains)
+      !settings.role.forall(Cluster(system).selfRoles.contains)
 
   /**
     * The [[DistributedPubSubMediator]]

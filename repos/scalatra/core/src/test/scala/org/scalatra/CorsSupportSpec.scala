@@ -9,13 +9,13 @@ class CorsSupportSpec extends ScalatraSpec {
     get("/") { "OK" }
 
     override def initialize(config: ConfigT) {
-      config.context.setInitParameter(
-          CorsSupport.AllowedOriginsKey, "http://www.example.com")
+      config.context.setInitParameter(CorsSupport.AllowedOriginsKey,
+                                      "http://www.example.com")
       config.context.setInitParameter(
           CorsSupport.AllowedHeadersKey,
           "X-Requested-With,Authorization,Content-Type,Accept,Origin")
-      config.context.setInitParameter(
-          CorsSupport.AllowedMethodsKey, "GET,HEAD,POST")
+      config.context
+        .setInitParameter(CorsSupport.AllowedMethodsKey, "GET,HEAD,POST")
       super.initialize(config)
     }
   }, "/*")
@@ -26,8 +26,7 @@ class CorsSupportSpec extends ScalatraSpec {
   object context {
     def validSimpleRequest = {
       get("/",
-          headers =
-            Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
+          headers = Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
         response.getHeader(CorsSupport.AccessControlAllowOriginHeader) must_== "http://www.example.com"
       }
     }
@@ -68,13 +67,13 @@ class DisabledCorsSupportSpec extends ScalatraSpec {
     get("/") { "OK" }
 
     override def initialize(config: ConfigT) {
-      config.context.setInitParameter(
-          CorsSupport.AllowedOriginsKey, "http://www.example.com")
+      config.context.setInitParameter(CorsSupport.AllowedOriginsKey,
+                                      "http://www.example.com")
       config.context.setInitParameter(
           CorsSupport.AllowedHeadersKey,
           "X-Requested-With,Authorization,Content-Type,Accept,Origin")
-      config.context.setInitParameter(
-          CorsSupport.AllowedMethodsKey, "GET,HEAD,POST")
+      config.context
+        .setInitParameter(CorsSupport.AllowedMethodsKey, "GET,HEAD,POST")
       config.context.setInitParameter(CorsSupport.EnableKey, "false")
       super.initialize(config)
     }
@@ -86,8 +85,7 @@ class DisabledCorsSupportSpec extends ScalatraSpec {
   object context {
     def simpleRequestToDisabledCors = {
       get("/disabled/",
-          headers =
-            Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
+          headers = Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
         response.getHeader(CorsSupport.AccessControlAllowOriginHeader) must_== null
       }
     }

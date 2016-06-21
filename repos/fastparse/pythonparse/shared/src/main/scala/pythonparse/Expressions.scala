@@ -108,7 +108,7 @@ object Expressions {
     val empty_dict = ("{" ~ "}").map(_ => Ast.expr.Dict(Nil, Nil))
     P(
         empty_tuple | empty_list | empty_dict | "(" ~ (yield_expr | generator | tuple) ~ ")" | "[" ~
-        (list_comp | list) ~ "]" | "{" ~ dictorsetmaker ~ "}" | "`" ~ testlist1
+          (list_comp | list) ~ "]" | "{" ~ dictorsetmaker ~ "}" | "`" ~ testlist1
           .map(x => Ast.expr.Repr(Ast.expr.Tuple(x, Ast.expr_context.Load))) ~ "`" | STRING
           .rep(1)
           .map(_.mkString)
@@ -180,7 +180,7 @@ object Expressions {
   val arglist = {
     val inits = P((plain_argument ~ !"=").rep(0, ","))
     val later = P(named_argument.rep(0, ",") ~ ",".? ~ ("*" ~ test).? ~ ",".? ~
-        ("**" ~ test).?)
+          ("**" ~ test).?)
     P(inits ~ ",".? ~ later)
   }
 
@@ -208,7 +208,7 @@ object Expressions {
   val varargslist: P[Ast.arguments] = {
     val named_arg = P(fpdef ~ ("=" ~ test).?)
     val x = P(named_arg.rep(sep = ",") ~ ",".? ~ ("*" ~ NAME).? ~ ",".? ~
-        ("**" ~ NAME).?).map {
+          ("**" ~ NAME).?).map {
       case (normal_args, starargs, kwargs) =>
         val (args, defaults) = normal_args.unzip
         Ast.arguments(args, starargs, kwargs, defaults.flatten)

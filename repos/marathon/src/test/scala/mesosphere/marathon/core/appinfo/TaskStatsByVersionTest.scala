@@ -111,9 +111,10 @@ class TaskStatsByVersionTest
     s"task$taskIdCounter"
   }
   private[this] def runningTaskStartedAt(
-      version: Timestamp, startingDelay: FiniteDuration): Task = {
+      version: Timestamp,
+      startingDelay: FiniteDuration): Task = {
     val startedAt = (version + startingDelay).toDateTime.getMillis
-    MarathonTestHelper.runningTask(
-        newTaskId(), appVersion = version, startedAt = startedAt)
+    MarathonTestHelper
+      .runningTask(newTaskId(), appVersion = version, startedAt = startedAt)
   }
 }

@@ -18,8 +18,8 @@ trait LilaSocket { self: LilaController =>
   private val logger = lila.log("ratelimit")
 
   def rateLimitedSocket[A: FrameFormatter](
-      consumer: TokenBucket.Consumer, name: String)(
-      f: AcceptType[A]): WebSocket[A, A] =
+      consumer: TokenBucket.Consumer,
+      name: String)(f: AcceptType[A]): WebSocket[A, A] =
     WebSocket[A, A] { req =>
       reqToCtx(req) flatMap { ctx =>
         val ip = HTTPRequest lastRemoteAddress req

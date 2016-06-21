@@ -50,14 +50,17 @@ class ErrorPositionSuite
     }
   }
 
-  positionTest(
-      "ambiguous attribute reference 1", "SELECT a from dupAttributes", "a")
+  positionTest("ambiguous attribute reference 1",
+               "SELECT a from dupAttributes",
+               "a")
 
-  positionTest(
-      "ambiguous attribute reference 2", "SELECT a, b from dupAttributes", "a")
+  positionTest("ambiguous attribute reference 2",
+               "SELECT a, b from dupAttributes",
+               "a")
 
-  positionTest(
-      "ambiguous attribute reference 3", "SELECT b, a from dupAttributes", "a")
+  positionTest("ambiguous attribute reference 3",
+               "SELECT b, a from dupAttributes",
+               "a")
 
   positionTest("unresolved attribute 1", "SELECT x FROM src", "x")
 

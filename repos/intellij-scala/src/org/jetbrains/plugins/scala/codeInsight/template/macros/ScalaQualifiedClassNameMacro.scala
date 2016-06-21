@@ -23,8 +23,8 @@ class ScalaQualifiedClassNameMacro extends Macro {
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]
 
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
                                        classOf[PsiClass]))
       .map(_.getQualifiedName)

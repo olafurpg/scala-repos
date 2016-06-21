@@ -17,8 +17,9 @@ object ByteIterator {
     protected[akka] def apply(array: Array[Byte]): ByteArrayIterator =
       new ByteArrayIterator(array, 0, array.length)
 
-    protected[akka] def apply(
-        array: Array[Byte], from: Int, until: Int): ByteArrayIterator =
+    protected[akka] def apply(array: Array[Byte],
+                              from: Int,
+                              until: Int): ByteArrayIterator =
       new ByteArrayIterator(array, from, until)
 
     val empty: ByteArrayIterator = apply(emptyArray)
@@ -96,8 +97,9 @@ object ByteIterator {
       this
     }
 
-    final override def copyToArray[B >: Byte](
-        xs: Array[B], start: Int, len: Int): Unit = {
+    final override def copyToArray[B >: Byte](xs: Array[B],
+                                              start: Int,
+                                              len: Int): Unit = {
       val n = 0 max ((xs.length - start) min this.len min len)
       Array.copy(this.array, from, xs, start, n)
       this.drop(n)
@@ -317,8 +319,9 @@ object ByteIterator {
         if (dropMore) dropWhile(p) else this
       } else this
 
-    final override def copyToArray[B >: Byte](
-        xs: Array[B], start: Int, len: Int): Unit = {
+    final override def copyToArray[B >: Byte](xs: Array[B],
+                                              start: Int,
+                                              len: Int): Unit = {
       var pos = start
       var rest = len
       while ((rest > 0) && !iterators.isEmpty) {
@@ -347,21 +350,22 @@ object ByteIterator {
       }
     }
 
-    @tailrec protected final def getToArray[A](
-        xs: Array[A], offset: Int, n: Int, elemSize: Int)(
+    @tailrec protected final def getToArray[A](xs: Array[A],
+                                               offset: Int,
+                                               n: Int,
+                                               elemSize: Int)(
         getSingle: ⇒ A)(getMult: (Array[A], Int, Int) ⇒ Unit): this.type =
       if (n <= 0) this
       else {
         if (isEmpty) Iterator.empty.next
-        val nDone =
-          if (current.len >= elemSize) {
-            val nCurrent = math.min(n, current.len / elemSize)
-            getMult(xs, offset, nCurrent)
-            nCurrent
-          } else {
-            xs(offset) = getSingle
-            1
-          }
+        val nDone = if (current.len >= elemSize) {
+          val nCurrent = math.min(n, current.len / elemSize)
+          getMult(xs, offset, nCurrent)
+          nCurrent
+        } else {
+          xs(offset) = getSingle
+          1
+        }
         normalize()
         getToArray(xs, offset + nDone, n - nDone, elemSize)(getSingle)(getMult)
       }

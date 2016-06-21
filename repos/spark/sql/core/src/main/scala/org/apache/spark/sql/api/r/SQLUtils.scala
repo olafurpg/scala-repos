@@ -92,8 +92,9 @@ private[r] object SQLUtils {
     }
   }
 
-  def createStructField(
-      name: String, dataType: String, nullable: Boolean): StructField = {
+  def createStructField(name: String,
+                        dataType: String,
+                        nullable: Boolean): StructField = {
     val dtObj = getSQLDataType(dataType)
     StructField(name, dtObj, nullable)
   }

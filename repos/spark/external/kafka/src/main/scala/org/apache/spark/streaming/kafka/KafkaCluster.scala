@@ -62,8 +62,8 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
                        config.socketReceiveBufferBytes,
                        config.clientId)
 
-  def connectLeader(
-      topic: String, partition: Int): Either[Err, SimpleConsumer] =
+  def connectLeader(topic: String,
+                    partition: Int): Either[Err, SimpleConsumer] =
     findLeader(topic, partition).right.map(hp => connect(hp._1, hp._2))
 
   // Metadata api
@@ -72,8 +72,10 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   // scalastyle:on
 
   def findLeader(topic: String, partition: Int): Either[Err, (String, Int)] = {
-    val req = TopicMetadataRequest(
-        TopicMetadataRequest.CurrentVersion, 0, config.clientId, Seq(topic))
+    val req = TopicMetadataRequest(TopicMetadataRequest.CurrentVersion,
+                                   0,
+                                   config.clientId,
+                                   Seq(topic))
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp: TopicMetadataResponse = consumer.send(req)
@@ -134,8 +136,10 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
 
   def getPartitionMetadata(
       topics: Set[String]): Either[Err, Set[TopicMetadata]] = {
-    val req = TopicMetadataRequest(
-        TopicMetadataRequest.CurrentVersion, 0, config.clientId, topics.toSeq)
+    val req = TopicMetadataRequest(TopicMetadataRequest.CurrentVersion,
+                                   0,
+                                   config.clientId,
+                                   topics.toSeq)
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp: TopicMetadataResponse = consumer.send(req)
@@ -268,8 +272,9 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       groupId: String,
       topicAndPartitions: Set[TopicAndPartition]
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] =
-    getConsumerOffsetMetadata(
-        groupId, topicAndPartitions, defaultConsumerApiVersion)
+    getConsumerOffsetMetadata(groupId,
+                              topicAndPartitions,
+                              defaultConsumerApiVersion)
 
   def getConsumerOffsetMetadata(
       groupId: String,
@@ -277,8 +282,8 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       consumerApiVersion: Short
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] = {
     var result = Map[TopicAndPartition, OffsetMetadataAndError]()
-    val req = OffsetFetchRequest(
-        groupId, topicAndPartitions.toSeq, consumerApiVersion)
+    val req =
+      OffsetFetchRequest(groupId, topicAndPartitions.toSeq, consumerApiVersion)
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp = consumer.fetchOffsets(req)
@@ -360,8 +365,8 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   }
 
   // Try a call against potentially multiple brokers, accumulating errors
-  private def withBrokers(brokers: Iterable[(String, Int)], errs: Err)(
-      fn: SimpleConsumer => Any): Unit = {
+  private def withBrokers(brokers: Iterable[(String, Int)],
+                          errs: Err)(fn: SimpleConsumer => Any): Unit = {
     brokers.foreach { hp =>
       var consumer: SimpleConsumer = null
       try {
@@ -398,8 +403,8 @@ object KafkaCluster {
     * Simple consumers connect directly to brokers, but need many of the same configs.
     * This subclass won't warn about missing ZK params, or presence of broker params.
     */
-  class SimpleConsumerConfig private (
-      brokers: String, originalProps: Properties)
+  class SimpleConsumerConfig private (brokers: String,
+                                      originalProps: Properties)
       extends ConsumerConfig(originalProps) {
     val seedBrokers: Array[(String, Int)] = brokers.split(",").map { hp =>
       val hpa = hp.split(":")

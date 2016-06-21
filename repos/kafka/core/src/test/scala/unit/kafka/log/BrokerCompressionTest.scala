@@ -31,8 +31,8 @@ import org.apache.kafka.common.record.CompressionType
 import scala.collection.JavaConversions._
 
 @RunWith(value = classOf[Parameterized])
-class BrokerCompressionTest(
-    messageCompression: String, brokerCompression: String)
+class BrokerCompressionTest(messageCompression: String,
+                            brokerCompression: String)
     extends JUnitSuite {
 
   val tmpDir = TestUtils.tempDir()
@@ -74,12 +74,12 @@ class BrokerCompressionTest(
       val brokerCompressionCode =
         BrokerCompressionCodec.getCompressionCodec(brokerCompression)
       assertEquals("Compression at offset 0 should produce " +
-                   brokerCompressionCode.name,
+                     brokerCompressionCode.name,
                    brokerCompressionCode,
                    readMessage(0).compressionCodec)
     } else
       assertEquals("Compression at offset 0 should produce " +
-                   messageCompressionCode.name,
+                     messageCompressionCode.name,
                    messageCompressionCode,
                    readMessage(0).compressionCodec)
   }
@@ -89,7 +89,7 @@ object BrokerCompressionTest {
   @Parameters
   def parameters: Collection[Array[String]] = {
     for (brokerCompression <- BrokerCompressionCodec.brokerCompressionOptions;
-         messageCompression <- CompressionType.values) yield
-      Array(messageCompression.name, brokerCompression)
+         messageCompression <- CompressionType.values)
+      yield Array(messageCompression.name, brokerCompression)
   }
 }

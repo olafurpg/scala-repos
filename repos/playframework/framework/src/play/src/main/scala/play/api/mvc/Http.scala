@@ -263,7 +263,8 @@ package play.api.mvc {
       * @return The items of an Accept* header, with their q-value.
       */
     private[play] def acceptHeader(
-        headers: Headers, headerName: String): Seq[(Double, String)] = {
+        headers: Headers,
+        headerName: String): Seq[(Double, String)] = {
       for {
         header <- headers.get(headerName).toList
         value0 <- header.split(',')
@@ -411,7 +412,7 @@ package play.api.mvc {
       */
     def absoluteURL(secure: Boolean)(implicit request: RequestHeader): String =
       "http" + (if (secure) "s" else "") + "://" + request.host + this.url +
-      this.appendFragment
+        this.appendFragment
 
     /**
       * Transform this call to an WebSocket URL.
@@ -972,7 +973,8 @@ package play.api.mvc {
         val decoder = config.clientDecoder
         SetCookieHeaderSeparatorRegex.split(cookieHeader).toSeq.flatMap {
           cookieString =>
-            Option(decoder.decode(cookieString.trim)).map(cookie =>
+            Option(decoder.decode(cookieString.trim)).map(
+                cookie =>
                   Cookie(
                       cookie.name,
                       cookie.value,
@@ -1024,8 +1026,8 @@ package play.api.mvc {
       * @param cookies the new cookies to encode
       * @return a valid Set-Cookie header value
       */
-    def mergeSetCookieHeader(
-        cookieHeader: String, cookies: Seq[Cookie]): String = {
+    def mergeSetCookieHeader(cookieHeader: String,
+                             cookies: Seq[Cookie]): String = {
       val tupledCookies =
         (decodeSetCookieHeader(cookieHeader) ++ cookies).map { c =>
           // See rfc6265#section-4.1.2

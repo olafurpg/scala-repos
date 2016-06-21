@@ -33,8 +33,8 @@ class AggregateFlatClassPathTest {
     override def asURLs: Seq[URL] = unsupported
   }
 
-  private case class TestClassPath(
-      virtualPath: String, classesInPackage: EntryNamesInPackage*)
+  private case class TestClassPath(virtualPath: String,
+                                   classesInPackage: EntryNamesInPackage*)
       extends TestFlatClassPath {
 
     override def classes(inPackage: String): Seq[ClassFileEntry] =
@@ -51,8 +51,8 @@ class AggregateFlatClassPathTest {
       FlatClassPathEntries(Nil, classes(inPackage))
   }
 
-  private case class TestSourcePath(
-      virtualPath: String, sourcesInPackage: EntryNamesInPackage*)
+  private case class TestSourcePath(virtualPath: String,
+                                    sourcesInPackage: EntryNamesInPackage*)
       extends TestFlatClassPath {
 
     override def sources(inPackage: String): Seq[SourceFileEntry] =
@@ -83,20 +83,24 @@ class AggregateFlatClassPathTest {
 
   private def unsupported = throw new UnsupportedOperationException
 
-  private def classFileEntry(
-      pathPrefix: String, inPackage: String, fileName: String) =
+  private def classFileEntry(pathPrefix: String,
+                             inPackage: String,
+                             fileName: String) =
     ClassFileEntryImpl(classFile(pathPrefix, inPackage, fileName))
 
-  private def sourceFileEntry(
-      pathPrefix: String, inPackage: String, fileName: String) =
+  private def sourceFileEntry(pathPrefix: String,
+                              inPackage: String,
+                              fileName: String) =
     SourceFileEntryImpl(sourceFile(pathPrefix, inPackage, fileName))
 
-  private def classFile(
-      pathPrefix: String, inPackage: String, fileName: String) =
+  private def classFile(pathPrefix: String,
+                        inPackage: String,
+                        fileName: String) =
     virtualFile(pathPrefix, inPackage, fileName, ".class")
 
-  private def sourceFile(
-      pathPrefix: String, inPackage: String, fileName: String) =
+  private def sourceFile(pathPrefix: String,
+                         inPackage: String,
+                         fileName: String) =
     virtualFile(pathPrefix, inPackage, fileName, ".scala")
 
   private def virtualFile(pathPrefix: String,
@@ -106,8 +110,8 @@ class AggregateFlatClassPathTest {
     val packageDirs =
       if (inPackage == FlatClassPath.RootPackage) ""
       else inPackage.split('.').mkString("/", "/", "")
-    new VirtualFile(
-        fileName + extension, s"$pathPrefix$packageDirs/$fileName$extension")
+    new VirtualFile(fileName + extension,
+                    s"$pathPrefix$packageDirs/$fileName$extension")
   }
 
   private def createDefaultTestClasspath() = {
@@ -206,10 +210,10 @@ class AggregateFlatClassPathTest {
     val cp = createDefaultTestClasspath()
 
     val classesAndSourcesInPkg1 = Seq(
-        ClassAndSourceFilesEntry(
-            classFile(dir3, pkg1, "F"), sourceFile(dir1, pkg1, "F")),
-        ClassAndSourceFilesEntry(
-            classFile(dir2, pkg1, "A"), sourceFile(dir1, pkg1, "A")),
+        ClassAndSourceFilesEntry(classFile(dir3, pkg1, "F"),
+                                 sourceFile(dir1, pkg1, "F")),
+        ClassAndSourceFilesEntry(classFile(dir2, pkg1, "A"),
+                                 sourceFile(dir1, pkg1, "A")),
         sourceFileEntry(dir1, pkg1, "G"),
         classFileEntry(dir2, pkg1, "C"),
         classFileEntry(dir2, pkg1, "B"),
@@ -229,10 +233,10 @@ class AggregateFlatClassPathTest {
                                       sourceFile(dir1, pkg1, "A"))),
         cp.findClass(s"$pkg1.A")
     )
-    assertEquals(
-        Some(classFileEntry(dir3, pkg1, "D")), cp.findClass(s"$pkg1.D"))
-    assertEquals(
-        Some(sourceFileEntry(dir2, pkg3, "L")), cp.findClass(s"$pkg3.L"))
+    assertEquals(Some(classFileEntry(dir3, pkg1, "D")),
+                 cp.findClass(s"$pkg1.D"))
+    assertEquals(Some(sourceFileEntry(dir2, pkg3, "L")),
+                 cp.findClass(s"$pkg3.L"))
     assertEquals(None, cp.findClass("Nonexisting"))
   }
 }

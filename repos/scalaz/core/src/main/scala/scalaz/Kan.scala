@@ -49,8 +49,8 @@ object Ran {
       implicit A: Adjunction[F, G]): F[A] =
     r(a => A.unit(a))
 
-  def composedAdjointToRan[F[_], G[_], H[_], A](h: H[F[A]])(
-      implicit A: Adjunction[F, G], H: Functor[H]): Ran[G, H, A] =
+  def composedAdjointToRan[F[_], G[_], H[_], A](
+      h: H[F[A]])(implicit A: Adjunction[F, G], H: Functor[H]): Ran[G, H, A] =
     new Ran[G, H, A] {
       def apply[B](f: A => G[B]) = H.map(h)(A.rightAdjunct(_)(f))
     }

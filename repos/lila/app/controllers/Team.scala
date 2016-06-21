@@ -190,14 +190,14 @@ object Team extends LilaController {
       teamOption ← requestOption.??(req => TeamRepo.owned(req.team, me.id))
     } yield (teamOption |@| requestOption).tupled) {
       case (team, request) => {
-          implicit val req = ctx.body
-          forms.processRequest.bindFromRequest.fold(
-              _ => fuccess(routes.Team.show(team.id).toString), {
-                case (decision, url) =>
-                  api.processRequest(team, request, (decision === "accept")) inject url
-              }
-          )
-        }
+        implicit val req = ctx.body
+        forms.processRequest.bindFromRequest.fold(
+            _ => fuccess(routes.Team.show(team.id).toString), {
+              case (decision, url) =>
+                api.processRequest(team, request, (decision === "accept")) inject url
+            }
+        )
+      }
     }
   }
 
@@ -207,8 +207,8 @@ object Team extends LilaController {
     }
   }
 
-  private def OnePerWeek[A <: Result](me: UserModel)(
-      a: => Fu[A])(implicit ctx: Context): Fu[Result] =
+  private def OnePerWeek[A <: Result](
+      me: UserModel)(a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     api.hasCreatedRecently(me) flatMap { did =>
       (did && !Granter.superAdmin(me)) fold
       (Forbidden(views.html.team.createLimit()).fuccess, a)

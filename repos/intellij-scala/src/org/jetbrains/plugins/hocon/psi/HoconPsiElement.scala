@@ -140,8 +140,8 @@ sealed trait HKeyedField
     extends HoconPsiElement
     with HInnerElement
     with HScope {
-  def forParent[T](
-      forKeyedParent: HKeyedField => T, forObjectField: HObjectField => T): T =
+  def forParent[T](forKeyedParent: HKeyedField => T,
+                   forObjectField: HObjectField => T): T =
     parent match {
       case Some(kf: HKeyedField) => forKeyedParent(kf)
       case Some(of: HObjectField) => forObjectField(of)
@@ -177,8 +177,8 @@ sealed trait HKeyedField
     * from this field is at the end) and ensures that all keys are valid. If not, [[None]] is returned.
     */
   def keysInAllPaths: Option[List[HKey]] = {
-    def iterate(
-        str: Stream[HKeyedField], acc: List[HKey]): Option[List[HKey]] =
+    def iterate(str: Stream[HKeyedField],
+                acc: List[HKey]): Option[List[HKey]] =
       str match {
         case head #:: tail =>
           head.validKey.flatMap(key => iterate(tail, key :: acc))
@@ -303,8 +303,10 @@ final class HIncluded(ast: ASTNode)
         // - relative unqualified includes in non-classpath files
         if (!absolute || fromClasspath)
           Some(
-              new IncludedFileReferenceSet(
-                  strVal, hs, forcedAbsolute, fromClasspath))
+              new IncludedFileReferenceSet(strVal,
+                                           hs,
+                                           forcedAbsolute,
+                                           fromClasspath))
         else None
       }
     } yield rs
@@ -347,8 +349,8 @@ final class HKey(ast: ASTNode)
 final class HPath(ast: ASTNode)
     extends HoconPsiElement(ast)
     with HInnerElement {
-  def forParent[T](
-      forPath: HPath => T, forSubstitution: HSubstitution => T): T =
+  def forParent[T](forPath: HPath => T,
+                   forSubstitution: HSubstitution => T): T =
     parent match {
       case Some(path: HPath) => forPath(path)
       case Some(subst: HSubstitution) => forSubstitution(subst)

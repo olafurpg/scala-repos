@@ -16,20 +16,20 @@ object Binding {
 
   def apply[I, A](fieldName: String,
                   cv: TypeConverter[I, A],
-                  tcf: TypeConverterFactory[_])(
-      implicit mf: Manifest[I], mt: Manifest[A]): Binding = {
+                  tcf: TypeConverterFactory[_])(implicit mf: Manifest[I],
+                                                mt: Manifest[A]): Binding = {
     new DefaultBinding(FieldDescriptor[A](fieldName), tcf)(mf, mt, cv)
   }
 
   def apply[I, A](prev: FieldDescriptor[A],
                   cv: TypeConverter[I, A],
-                  tcf: TypeConverterFactory[_])(
-      implicit mf: Manifest[I], mt: Manifest[A]): Binding = {
+                  tcf: TypeConverterFactory[_])(implicit mf: Manifest[I],
+                                                mt: Manifest[A]): Binding = {
     new DefaultBinding(prev, tcf)(mf, mt, cv)
   }
 
-  def apply[A](initial: String)(
-      implicit ma: Manifest[A], tcFactory: TypeConverterFactory[A]): Binding =
+  def apply[A](initial: String)(implicit ma: Manifest[A],
+                                tcFactory: TypeConverterFactory[A]): Binding =
     apply(FieldDescriptor[A](initial))
   def apply[A](initial: FieldDescriptor[A])(
       implicit ma: Manifest[A],
@@ -79,7 +79,9 @@ object Binding {
 
     def transform(transformer: (T) => T): Binding =
       new DefaultBinding(field.transform(transformer), typeConverterFactory)(
-          sourceManifest, valueManifest, typeConverter)
+          sourceManifest,
+          valueManifest,
+          typeConverter)
 
     def validateWith(validators: BindingValidator[T]*): Binding =
       new DefaultBinding(
@@ -87,13 +89,15 @@ object Binding {
           typeConverterFactory)(sourceManifest, valueManifest, typeConverter)
 
     def apply(toBind: Either[String, Option[S]]): Binding =
-      new DefaultBinding(field(toBind), typeConverterFactory)(
-          sourceManifest, valueManifest, typeConverter)
+      new DefaultBinding(field(toBind), typeConverterFactory)(sourceManifest,
+                                                              valueManifest,
+                                                              typeConverter)
 
     def validate: Binding = {
       val nwFld = field.asInstanceOf[DataboundFieldDescriptor[S, T]].validate
-      new DefaultBinding(nwFld, typeConverterFactory)(
-          sourceManifest, valueManifest, typeConverter)
+      new DefaultBinding(nwFld, typeConverterFactory)(sourceManifest,
+                                                      valueManifest,
+                                                      typeConverter)
     }
   }
 }
@@ -140,8 +144,8 @@ sealed trait Binding {
   def apply(toBind: Either[String, Option[S]]): Binding
 
   override def toString() =
-    "BindingContainer[%s](name: %s, value: %s, original: %s)".format(
-        valueManifest.erasure.getSimpleName, name, validation, original)
+    "BindingContainer[%s](name: %s, value: %s, original: %s)"
+      .format(valueManifest.erasure.getSimpleName, name, validation, original)
 }
 
 trait BindingSyntax extends BindingValidatorImplicits {
@@ -182,21 +186,20 @@ trait BindingImplicits
     extends DefaultImplicitConversions
     with BindingValidatorImplicits {
 
-  implicit def stringToDateTime(implicit df: DateParser =
-        JodaDateFormats.Web): TypeConverter[String, DateTime] =
+  implicit def stringToDateTime(implicit df: DateParser = JodaDateFormats.Web)
+    : TypeConverter[String, DateTime] =
     safeOption(df.parse)
 
-  implicit def stringToDate(implicit df: DateParser =
-        JodaDateFormats.Web): TypeConverter[String, Date] =
+  implicit def stringToDate(implicit df: DateParser = JodaDateFormats.Web)
+    : TypeConverter[String, Date] =
     safeOption(df.parse(_).map(_.toDate))
 
-  implicit def stringToSeqDateTime(
-      implicit df: DateParser =
+  implicit def stringToSeqDateTime(implicit df: DateParser =
         JodaDateFormats.Web): TypeConverter[String, Seq[DateTime]] =
     stringToSeq(stringToDateTime)
 
-  implicit def stringToSeqDate(implicit df: DateParser =
-        JodaDateFormats.Web): TypeConverter[String, Seq[Date]] =
+  implicit def stringToSeqDate(implicit df: DateParser = JodaDateFormats.Web)
+    : TypeConverter[String, Seq[Date]] =
     stringToSeq(stringToDate)
 }
 

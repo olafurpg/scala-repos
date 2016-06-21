@@ -182,19 +182,19 @@ class StringTest {
   }
 
   @Test def split(): Unit = {
-    assertArrayEquals(
-        Array[AnyRef]("Sc", "l", ".js"), erased("Scala.js".split("a")))
+    assertArrayEquals(Array[AnyRef]("Sc", "l", ".js"),
+                      erased("Scala.js".split("a")))
     if (!executingInJVM) {
-      assertArrayEquals(
-          Array[AnyRef]("", "a", "s", "d", "f"), erased("asdf".split("")))
+      assertArrayEquals(Array[AnyRef]("", "a", "s", "d", "f"),
+                        erased("asdf".split("")))
       assertArrayEquals(Array[AnyRef]("", "a", "s", "d", "f", ""),
                         erased("asdf".split("", -1)))
     }
   }
 
   @Test def split_with_char_as_argument(): Unit = {
-    assertArrayEquals(
-        Array[AnyRef]("Scala", "js"), erased("Scala.js".split('.')))
+    assertArrayEquals(Array[AnyRef]("Scala", "js"),
+                      erased("Scala.js".split('.')))
     for (i <- 0 to 32) {
       val c = i.toChar
       assertArrayEquals(Array[AnyRef]("blah", "blah", "blah", "blah"),
@@ -244,8 +244,8 @@ class StringTest {
   }
 
   @Test def constructors(): Unit = {
-    val charArray = Array(
-        'a', 'b', 'c', 'd', '\uD834', '\uDF06', 'e', 'f', 'g', 'h', 'i')
+    val charArray =
+      Array('a', 'b', 'c', 'd', '\uD834', '\uDF06', 'e', 'f', 'g', 'h', 'i')
     val codePointArray = Array(65, 0x1D306, 67, 68, 0xD834, 69, 72, 0xDF06)
 
     assertEquals("", new String())
@@ -254,8 +254,8 @@ class StringTest {
     assertEquals("\uD834\uDF06CD\uD834E", new String(codePointArray, 1, 5))
     assertEquals("foo", new String("foo"))
     assertEquals("buffer-foo", new String(new StringBuffer("buffer-foo")))
-    assertEquals(
-        new String(new java.lang.StringBuilder("builder-foo")), "builder-foo")
+    assertEquals(new String(new java.lang.StringBuilder("builder-foo")),
+                 "builder-foo")
   }
 
   @Test def format(): Unit = {
@@ -268,8 +268,8 @@ class StringTest {
     assertEquals("-0010", String.format("%05d", new Integer(-10)))
     assertEquals("fffffffd", String.format("%x", new Integer(-3)))
     if (!executingInJVM)
-      assertEquals(
-          "fffffffc", String.format("%x", new java.lang.Byte(-4.toByte)))
+      assertEquals("fffffffc",
+                   String.format("%x", new java.lang.Byte(-4.toByte)))
   }
 
   @Test def getBytes(): Unit = {
@@ -366,8 +366,8 @@ class StringTest {
     assertFalse(testU.regionMatches(true, 1, "bCdx", 1, 3))
     assertTrue(testU.regionMatches(true, 0, "xaBcd", 1, 4))
 
-    expectThrows(
-        classOf[NullPointerException], test.regionMatches(-1, null, -1, -1))
+    expectThrows(classOf[NullPointerException],
+                 test.regionMatches(-1, null, -1, -1))
     expectThrows(classOf[NullPointerException],
                  test.regionMatches(true, -1, null, -1, -1))
 

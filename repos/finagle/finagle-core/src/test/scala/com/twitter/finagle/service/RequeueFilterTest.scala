@@ -83,8 +83,7 @@ class RequeueFilterTest extends FunSuite {
                                      DefaultTimer.twitter)
 
     var numNos = 0
-    val svc = filter.andThen(
-        Service.mk { s: String =>
+    val svc = filter.andThen(Service.mk { s: String =>
       if (s == "no" && numNos == 0) {
         numNos += 1
         Future.exception(new FailedFastException(s))

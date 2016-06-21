@@ -75,7 +75,7 @@ case class ImportInfo(prefixQualifier: String,
 
   def isSimpleWildcard =
     hasWildcard && singleNames.isEmpty && renames.isEmpty &&
-    hiddenNames.isEmpty
+      hiddenNames.isEmpty
 
   def namesFromWildcard: Set[String] = {
     if (hasWildcard) allNames -- singleNames -- renames.keySet
@@ -129,16 +129,17 @@ object ImportInfo {
       }
     }
 
-    def addAllNames(
-        ref: ScStableCodeReferenceElement, nameToAdd: String): Unit = {
+    def addAllNames(ref: ScStableCodeReferenceElement,
+                    nameToAdd: String): Unit = {
       if (ref.multiResolve(false).exists(shouldAddName)) allNames += nameToAdd
     }
 
     def collectAllNamesForWildcard(): Unit = {
       val refText = imp.qualifier.getText + ".someIdentifier"
       val reference = ScalaPsiElementFactory
-        .createReferenceFromText(
-            refText, imp.qualifier.getContext, imp.qualifier)
+        .createReferenceFromText(refText,
+                                 imp.qualifier.getContext,
+                                 imp.qualifier)
         .asInstanceOf[ScStableCodeReferenceElementImpl]
       val processor = new CompletionProcessor(StdKinds.stableImportSelector,
                                               reference,

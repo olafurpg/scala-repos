@@ -103,8 +103,9 @@ object Searching {
     }
 
     private def linearSearch[B >: A](
-        c: SeqView[A, Repr], elem: B, offset: Int)(
-        implicit ord: Ordering[B]): SearchResult = {
+        c: SeqView[A, Repr],
+        elem: B,
+        offset: Int)(implicit ord: Ordering[B]): SearchResult = {
       var idx = offset
       val it = c.iterator
       while (it.hasNext) {

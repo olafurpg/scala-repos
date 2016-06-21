@@ -28,10 +28,10 @@ object Test extends ScaladocModelTest {
       ._package("links")
     val TEST = base._object("TEST")
 
-    val memberLinks = countLinks(
-        TEST.comment.get, _.link.isInstanceOf[LinkToMember[_, _]])
-    val templateLinks = countLinks(
-        TEST.comment.get, _.link.isInstanceOf[LinkToTpl[_]])
+    val memberLinks =
+      countLinks(TEST.comment.get, _.link.isInstanceOf[LinkToMember[_, _]])
+    val templateLinks =
+      countLinks(TEST.comment.get, _.link.isInstanceOf[LinkToTpl[_]])
     assert(memberLinks == 18,
            memberLinks + " == 18 (the member links in object TEST)")
     assert(templateLinks == 6,

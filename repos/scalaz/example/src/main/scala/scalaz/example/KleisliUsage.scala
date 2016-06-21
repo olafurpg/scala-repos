@@ -12,8 +12,9 @@ object KleisliUsage extends App {
   // Continents contain countries. Countries contain cities.
   case class Continent(name: String, countries: List[Country] = List.empty)
   case class Country(name: String, cities: List[City] = List.empty)
-  case class City(
-      name: String, isCapital: Boolean = false, inhabitants: Int = 20)
+  case class City(name: String,
+                  isCapital: Boolean = false,
+                  inhabitants: Int = 20)
 
   val data: List[Continent] = List(
       Continent("Europe"),

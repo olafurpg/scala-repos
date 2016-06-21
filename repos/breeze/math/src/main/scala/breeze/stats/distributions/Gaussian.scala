@@ -122,14 +122,14 @@ object Gaussian
         else {
           val objective =
             n *
-            ((variance + mean * mean) / sigma2 / 2 - mean * mu / sigma2 +
-                mu * mu / sigma2 / 2 + .5 * (math.log(sigma2) + normPiece))
+              ((variance + mean * mean) / sigma2 / 2 - mean * mu / sigma2 +
+                    mu * mu / sigma2 / 2 + .5 * (math.log(sigma2) + normPiece))
           val gradientMu = n * (-mean / sigma2 + mu / sigma2)
           val gradientSig =
             n *
-            (-(variance + mean * mean) / sigma2 / sigma2 / 2 +
-                mean * mu / sigma2 / sigma2 - mu * mu / sigma2 / sigma2 / 2 +
-                .5 / (sigma2))
+              (-(variance + mean * mean) / sigma2 / sigma2 / 2 +
+                    mean * mu / sigma2 / sigma2 - mu * mu / sigma2 / sigma2 / 2 +
+                    .5 / (sigma2))
           (objective, (gradientMu, gradientSig))
         }
       }

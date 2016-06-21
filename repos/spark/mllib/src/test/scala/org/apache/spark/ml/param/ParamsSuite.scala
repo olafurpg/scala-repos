@@ -350,21 +350,21 @@ class ParamsSuite extends SparkFunSuite {
 
     val inRange02IntInclusive = ParamValidators.inRange[Int](0, 2)
     assert(inRange02IntInclusive(0) && inRange02IntInclusive(1) &&
-        inRange02IntInclusive(2) && !inRange02IntInclusive(-1) &&
-        !inRange02IntInclusive(3))
-    val inRange02IntExclusive = ParamValidators.inRange[Int](
-        0, 2, lowerInclusive = false, upperInclusive = false)
+          inRange02IntInclusive(2) && !inRange02IntInclusive(-1) &&
+          !inRange02IntInclusive(3))
+    val inRange02IntExclusive = ParamValidators
+      .inRange[Int](0, 2, lowerInclusive = false, upperInclusive = false)
     assert(!inRange02IntExclusive(0) && inRange02IntExclusive(1) &&
-        !inRange02IntExclusive(2))
+          !inRange02IntExclusive(2))
 
     val inRange02DoubleInclusive = ParamValidators.inRange[Double](0, 2)
     assert(inRange02DoubleInclusive(0) && inRange02DoubleInclusive(1) &&
-        inRange02DoubleInclusive(2) && !inRange02DoubleInclusive(-0.1) &&
-        !inRange02DoubleInclusive(2.1))
-    val inRange02DoubleExclusive = ParamValidators.inRange[Double](
-        0, 2, lowerInclusive = false, upperInclusive = false)
+          inRange02DoubleInclusive(2) && !inRange02DoubleInclusive(-0.1) &&
+          !inRange02DoubleInclusive(2.1))
+    val inRange02DoubleExclusive = ParamValidators
+      .inRange[Double](0, 2, lowerInclusive = false, upperInclusive = false)
     assert(!inRange02DoubleExclusive(0) && inRange02DoubleExclusive(1) &&
-        !inRange02DoubleExclusive(2))
+          !inRange02DoubleExclusive(2))
 
     val inArray = ParamValidators.inArray[Int](Array(1, 2))
     assert(inArray(1) && inArray(2) && !inArray(0))
@@ -420,8 +420,8 @@ object ParamsSuite extends SparkFunSuite {
 
     val params = obj.params
     val paramNames = params.map(_.name)
-    require(
-        paramNames === paramNames.sorted, "params must be ordered by names")
+    require(paramNames === paramNames.sorted,
+            "params must be ordered by names")
     params.foreach { p =>
       assert(p.parent === obj.uid)
       assert(obj.getParam(p.name) === p)

@@ -101,8 +101,8 @@ object EndToEndEventAdapterSpec {
   }
 }
 
-abstract class EndToEndEventAdapterSpec(
-    journalName: String, journalConfig: Config)
+abstract class EndToEndEventAdapterSpec(journalName: String,
+                                        journalConfig: Config)
     extends WordSpecLike
     with Matchers
     with BeforeAndAfterAll {
@@ -160,8 +160,8 @@ abstract class EndToEndEventAdapterSpec(
     |}
     """.stripMargin)
 
-  def persister(name: String, probe: Option[ActorRef] = None)(
-      implicit system: ActorSystem) =
+  def persister(name: String,
+                probe: Option[ActorRef] = None)(implicit system: ActorSystem) =
     system.actorOf(Props(classOf[EndToEndAdapterActor],
                          name,
                          "akka.persistence.journal." + journalName,
@@ -177,7 +177,8 @@ abstract class EndToEndEventAdapterSpec(
   "EventAdapters in end-to-end scenarios" must {
 
     "use the same adapter when reading as was used when writing to the journal" in withActorSystem(
-        "SimpleSystem", adaptersConfig) { implicit system ⇒
+        "SimpleSystem",
+        adaptersConfig) { implicit system ⇒
       val p = TestProbe()
       implicit val ref = p.ref
 

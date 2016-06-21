@@ -57,24 +57,25 @@ object ConsoleConsumer extends Logging {
 
   def run(conf: ConsumerConfig) {
 
-    val consumer =
-      if (conf.useNewConsumer) {
-        val timeoutMs =
-          if (conf.timeoutMs >= 0) conf.timeoutMs else Long.MaxValue
-        new NewShinyConsumer(Option(conf.topicArg),
-                             Option(conf.whitelistArg),
-                             getNewConsumerProps(conf),
-                             timeoutMs)
-      } else {
-        checkZk(conf)
-        new OldConsumer(conf.filterSpec, getOldConsumerProps(conf))
-      }
+    val consumer = if (conf.useNewConsumer) {
+      val timeoutMs =
+        if (conf.timeoutMs >= 0) conf.timeoutMs else Long.MaxValue
+      new NewShinyConsumer(Option(conf.topicArg),
+                           Option(conf.whitelistArg),
+                           getNewConsumerProps(conf),
+                           timeoutMs)
+    } else {
+      checkZk(conf)
+      new OldConsumer(conf.filterSpec, getOldConsumerProps(conf))
+    }
 
     addShutdownHook(consumer, conf)
 
     try {
-      process(
-          conf.maxMessages, conf.formatter, consumer, conf.skipMessageOnError)
+      process(conf.maxMessages,
+              conf.formatter,
+              consumer,
+              conf.skipMessageOnError)
     } finally {
       consumer.cleanup()
       reportRecordCount()
@@ -90,8 +91,8 @@ object ConsoleConsumer extends Logging {
   }
 
   def checkZk(config: ConsumerConfig) {
-    if (!checkZkPathExists(
-            config.options.valueOf(config.zkConnectOpt), "/brokers/ids")) {
+    if (!checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
+                           "/brokers/ids")) {
       System.err.println("No brokers found in ZK.")
       System.exit(1)
     }
@@ -102,15 +103,14 @@ object ConsoleConsumer extends Logging {
                           "/consumers/" + config.consumerProps.getProperty(
                               "group.id") + "/offsets")) {
       System.err.println("Found previous offset information for this group " +
-          config.consumerProps.getProperty("group.id") +
-          ". Please use --delete-consumer-offsets to delete previous offsets metadata")
+            config.consumerProps.getProperty("group.id") +
+            ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
     }
   }
 
   def addShutdownHook(consumer: BaseConsumer, conf: ConsumerConfig) {
-    Runtime.getRuntime.addShutdownHook(
-        new Thread() {
+    Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() {
         consumer.stop()
 
@@ -194,8 +194,8 @@ object ConsoleConsumer extends Logging {
             config.options.valueOf(config.zkConnectOpt),
             "/consumers/" + props.getProperty("group.id") + "/offsets")) {
       System.err.println("Found previous offset information for this group " +
-          props.getProperty("group.id") +
-          ". Please use --delete-consumer-offsets to delete previous offsets metadata")
+            props.getProperty("group.id") +
+            ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
     }
 
@@ -250,7 +250,7 @@ object ConsoleConsumer extends Logging {
       .accepts(
           "zookeeper",
           "REQUIRED: The connection string for the zookeeper connection in the form host:port. " +
-          "Multiple URLS can be given to allow fail-over.")
+            "Multiple URLS can be given to allow fail-over.")
       .withRequiredArg
       .describedAs("urls")
       .ofType(classOf[String])
@@ -268,8 +268,8 @@ object ConsoleConsumer extends Logging {
       .ofType(classOf[String])
       .defaultsTo(classOf[DefaultMessageFormatter].getName)
     val messageFormatterArgOpt = parser
-      .accepts(
-          "property", "The properties to initialize the message formatter.")
+      .accepts("property",
+               "The properties to initialize the message formatter.")
       .withRequiredArg
       .describedAs("prop")
       .ofType(classOf[String])
@@ -279,7 +279,7 @@ object ConsoleConsumer extends Logging {
     val resetBeginningOpt = parser.accepts(
         "from-beginning",
         "If the consumer does not already have an established offset to consume from, " +
-        "start with the earliest message present in the log rather than the latest message.")
+          "start with the earliest message present in the log rather than the latest message.")
     val maxMessagesOpt = parser
       .accepts(
           "max-messages",
@@ -297,14 +297,14 @@ object ConsoleConsumer extends Logging {
     val skipMessageOnErrorOpt = parser.accepts(
         "skip-message-on-error",
         "If there is an error when processing a message, " +
-        "skip it instead of halt.")
+          "skip it instead of halt.")
     val csvMetricsReporterEnabledOpt = parser.accepts(
         "csv-reporter-enabled",
         "If set, the CSV metrics reporter will be enabled")
     val metricsDirectoryOpt = parser
       .accepts("metrics-dir",
                "If csv-reporter-enable is set, and this parameter is" +
-               "set, the csv metrics will be outputed here")
+                 "set, the csv metrics will be outputed here")
       .withRequiredArg
       .describedAs("metrics directory")
       .ofType(classOf[java.lang.String])
@@ -344,7 +344,8 @@ object ConsoleConsumer extends Logging {
       val topicOrFilterOpt = List(topicIdOpt, whitelistOpt).filter(options.has)
       if (topicOrFilterOpt.size != 1)
         CommandLineUtils.printUsageAndDie(
-            parser, "Exactly one of whitelist/topic is required.")
+            parser,
+            "Exactly one of whitelist/topic is required.")
       topicArg = options.valueOf(topicIdOpt)
       whitelistArg = options.valueOf(whitelistOpt)
     } else {
@@ -352,7 +353,8 @@ object ConsoleConsumer extends Logging {
         List(topicIdOpt, whitelistOpt, blacklistOpt).filter(options.has)
       if (topicOrFilterOpt.size != 1)
         CommandLineUtils.printUsageAndDie(
-            parser, "Exactly one of whitelist/blacklist/topic is required.")
+            parser,
+            "Exactly one of whitelist/blacklist/topic is required.")
       topicArg = options.valueOf(topicOrFilterOpt.head)
       filterSpec =
         if (options.has(blacklistOpt)) new Blacklist(topicArg)
@@ -391,11 +393,11 @@ object ConsoleConsumer extends Logging {
     if (options.has(csvMetricsReporterEnabledOpt)) {
       val csvReporterProps = new Properties()
       csvReporterProps.put("kafka.metrics.polling.interval.secs", "5")
-      csvReporterProps.put(
-          "kafka.metrics.reporters", "kafka.metrics.KafkaCSVMetricsReporter")
+      csvReporterProps.put("kafka.metrics.reporters",
+                           "kafka.metrics.KafkaCSVMetricsReporter")
       if (options.has(metricsDirectoryOpt))
-        csvReporterProps.put(
-            "kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
+        csvReporterProps
+          .put("kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
       else csvReporterProps.put("kafka.csv.metrics.dir", "kafka_metrics")
       csvReporterProps.put("kafka.csv.metrics.reporter.enabled", "true")
       val verifiableProps = new VerifiableProperties(csvReporterProps)
@@ -506,7 +508,7 @@ class LoggingMessageFormatter extends MessageFormatter {
           s"$timestampType:$timestamp, "
         else ""
       } + s"key:${if (key == null) "null" else new String(key)}, " +
-      s"value:${if (value == null) "null" else new String(value)}")
+            s"value:${if (value == null) "null" else new String(value)}")
   }
 }
 

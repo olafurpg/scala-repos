@@ -86,7 +86,8 @@ final class SeekApi(coll: Coll,
   def archive(seek: Seek, gameId: String) = {
     val archiveDoc =
       Seek.seekBSONHandler.write(seek) ++ BSONDocument(
-          "gameId" -> gameId, "archivedAt" -> DateTime.now)
+          "gameId" -> gameId,
+          "archivedAt" -> DateTime.now)
     coll.remove(BSONDocument("_id" -> seek.id)).void >> cache.clear >> archiveColl
       .insert(archiveDoc)
   }

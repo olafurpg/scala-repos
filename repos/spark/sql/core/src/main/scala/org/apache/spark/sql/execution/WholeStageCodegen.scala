@@ -175,25 +175,23 @@ trait CodegenSupport extends SparkPlan {
                    input: Seq[ExprCode],
                    row: String = null): String = {
     ctx.freshNamePrefix = variablePrefix
-    val inputVars =
-      if (row != null) {
-        ctx.currentVars = null
-        ctx.INPUT_ROW = row
-        child.output.zipWithIndex.map {
-          case (attr, i) =>
-            BoundReference(i, attr.dataType, attr.nullable).gen(ctx)
-        }
-      } else {
-        input
+    val inputVars = if (row != null) {
+      ctx.currentVars = null
+      ctx.INPUT_ROW = row
+      child.output.zipWithIndex.map {
+        case (attr, i) =>
+          BoundReference(i, attr.dataType, attr.nullable).gen(ctx)
       }
+    } else {
+      input
+    }
 
-    val evaluated =
-      if (row != null && preferUnsafeRow) {
-        // Current plan can consume UnsafeRows directly.
-        ""
-      } else {
-        evaluateRequiredVariables(child.output, inputVars, usedInputs)
-      }
+    val evaluated = if (row != null && preferUnsafeRow) {
+      // Current plan can consume UnsafeRows directly.
+      ""
+    } else {
+      evaluateRequiredVariables(child.output, inputVars, usedInputs)
+    }
 
     s"""
        |
@@ -214,8 +212,9 @@ trait CodegenSupport extends SparkPlan {
     *   if (isNull1 || !value2) continue;
     *   # call consume(), which will call parent.doConsume()
     */
-  protected def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  protected def doConsume(ctx: CodegenContext,
+                          input: Seq[ExprCode],
+                          row: String): String = {
     throw new UnsupportedOperationException
   }
 }
@@ -249,8 +248,9 @@ case class InputAdapter(child: SparkPlan)
   override def doProduce(ctx: CodegenContext): String = {
     val input = ctx.freshName("input")
     // Right now, InputAdapter is only used when there is one upstream.
-    ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        input,
+                        s"$input = inputs[0];")
 
     val exprs = output.zipWithIndex.map(x =>
           new BoundReference(x._2, x._1.dataType, true))
@@ -389,12 +389,11 @@ case class WholeStageCodegen(child: SparkPlan)
                             input: Seq[ExprCode],
                             row: String = null): String = {
 
-    val doCopy =
-      if (ctx.copyResult) {
-        ".copy()"
-      } else {
-        ""
-      }
+    val doCopy = if (ctx.copyResult) {
+      ".copy()"
+    } else {
+      ""
+    }
     if (row != null) {
       // There is an UnsafeRow already
       s"""

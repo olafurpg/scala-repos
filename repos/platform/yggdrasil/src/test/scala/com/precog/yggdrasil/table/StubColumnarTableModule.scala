@@ -50,12 +50,9 @@ trait StubColumnarTableModule[M[+ _]]
 
   implicit def M: Monad[M] with Comonad[M]
 
-  private var initialIndices =
-    collection.mutable.Map[Path, Int]() // if we were doing this for real: j.u.c.HashMap
-  private var currentIndex =
-    0 // if we were doing this for real: j.u.c.a.AtomicInteger
-  private val indexLock =
-    new AnyRef // if we were doing this for real: DIE IN A FIRE!!!
+  private var initialIndices = collection.mutable.Map[Path, Int]() // if we were doing this for real: j.u.c.HashMap
+  private var currentIndex = 0 // if we were doing this for real: j.u.c.a.AtomicInteger
+  private val indexLock = new AnyRef // if we were doing this for real: DIE IN A FIRE!!!
 
   trait TableCompanion extends ColumnarTableCompanion {
     def apply(slices: StreamT[M, Slice], size: TableSize): Table =
@@ -77,12 +74,11 @@ trait StubColumnarTableModule[M[+ _]]
           InnerObjectConcat(WrapObject(sortKey, "0"),
                             WrapObject(Leaf(Source), "1")))
 
-      implicit val jValueOrdering =
-        if (sortOrder.isAscending) {
-          JValue.order.toScalaOrdering
-        } else {
-          JValue.order.toScalaOrdering.reverse
-        }
+      implicit val jValueOrdering = if (sortOrder.isAscending) {
+        JValue.order.toScalaOrdering
+      } else {
+        JValue.order.toScalaOrdering.reverse
+      }
 
       tableWithSortKey.toJson.map { jvals =>
         fromJson(jvals.toList.sortBy(_ \ "0").toStream)
@@ -119,7 +115,8 @@ trait StubColumnarTableModule[M[+ _]]
                 parsed zip (Stream from index) map {
                   case (value, id) =>
                     JObject(JField("key", JArray(JNum(id) :: Nil)) :: JField(
-                            "value", value) :: Nil)
+                            "value",
+                            value) :: Nil)
                 }
               }
             }
@@ -127,7 +124,7 @@ trait StubColumnarTableModule[M[+ _]]
           case x =>
             failure(ResourceError.corrupt(
                     "Attempted to load JSON as a table from something that wasn't a string: " +
-                    x))
+                      x))
         }
 
         parsedV.map(_.flatten).disjunction.map(fromJson(_))

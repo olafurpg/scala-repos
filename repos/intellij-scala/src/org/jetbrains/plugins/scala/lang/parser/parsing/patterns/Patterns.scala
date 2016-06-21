@@ -23,10 +23,10 @@ object Patterns {
           builder.advanceLexer()
           builder.getTokenText match {
             case "*" => {
-                builder.advanceLexer
-                patternsMarker.done(ScalaElementTypes.SEQ_WILDCARD)
-                return true
-              }
+              builder.advanceLexer
+              patternsMarker.done(ScalaElementTypes.SEQ_WILDCARD)
+              return true
+            }
             case _ =>
           }
         case _ =>
@@ -41,14 +41,14 @@ object Patterns {
         while ((!end || !underParams) && Pattern.parse(builder)) {
           builder.getTokenType match {
             case ScalaTokenTypes.tCOMMA => {
-                builder.advanceLexer //Ate ,
-                if (ParserUtils.eatSeqWildcardNext(builder) && underParams)
-                  end = true
-              }
+              builder.advanceLexer //Ate ,
+              if (ParserUtils.eatSeqWildcardNext(builder) && underParams)
+                end = true
+            }
             case _ => {
-                patternsMarker.done(ScalaElementTypes.PATTERNS)
-                return true
-              }
+              patternsMarker.done(ScalaElementTypes.PATTERNS)
+              return true
+            }
           }
         }
         if (underParams) {
@@ -68,7 +68,7 @@ object XmlPatterns extends ParserNode {
     def isVarId =
       builder.getTokenText.substring(0, 1).toLowerCase == builder.getTokenText
         .substring(0, 1) && !(builder.getTokenText.apply(0) == '`' &&
-          builder.getTokenText.apply(builder.getTokenText.length - 1) == '`')
+            builder.getTokenText.apply(builder.getTokenText.length - 1) == '`')
     val args = builder.mark
     def parseSeqWildcard(withComma: Boolean): Boolean = {
       if (if (withComma)

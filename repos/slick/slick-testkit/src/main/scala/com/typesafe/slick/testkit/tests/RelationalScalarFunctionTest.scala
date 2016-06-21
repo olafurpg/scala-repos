@@ -53,7 +53,7 @@ class RelationalScalarFunctionTest extends AsyncTest[RelationalTestDB] {
         Functions.pi.toDegrees.result.map(_.should(r =>
                   r > 179.9999 && r < 180.0001)),
         (Functions.pi.toDegrees.toRadians -
-            Functions.pi).abs.result.map(_.should(_ <= 0.00001)),
+              Functions.pi).abs.result.map(_.should(_ <= 0.00001)),
         check(LiteralColumn(s).substring(3, 5), s.substring(3, 5)),
         check(LiteralColumn(s).substring(3), s.substring(3)),
         check(LiteralColumn(s).take(3), s.take(3)),

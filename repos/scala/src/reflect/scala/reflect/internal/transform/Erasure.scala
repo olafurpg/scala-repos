@@ -25,7 +25,7 @@ trait Erasure {
        */
       case TypeRef(_, sym, _)
           if sym.isAbstractType &&
-          (!sym.owner.isJavaDefined || sym.hasFlag(Flags.EXISTENTIAL)) =>
+            (!sym.owner.isJavaDefined || sym.hasFlag(Flags.EXISTENTIAL)) =>
         tp
       case ExistentialType(tparams, restp) =>
         genericCore(restp)
@@ -282,7 +282,7 @@ trait Erasure {
       val old = scalaErasure(tp)
       if (!(res =:= old))
         log("Identified divergence between java/scala erasure:\n  scala: " +
-            old + "\n   java: " + res)
+              old + "\n   java: " + res)
       res
     }
   }
@@ -323,12 +323,12 @@ trait Erasure {
       if (psyms contains ArrayClass) {
         // treat arrays specially
         arrayType(intersectionDominator(parents filter
-                (_.typeSymbol == ArrayClass) map (_.typeArgs.head)))
+                  (_.typeSymbol == ArrayClass) map (_.typeArgs.head)))
       } else {
         // implement new spec for erasure of refined types.
         def isUnshadowed(psym: Symbol) =
           !(psyms exists
-              (qsym => (psym ne qsym) && (qsym isNonBottomSubClass psym)))
+                (qsym => (psym ne qsym) && (qsym isNonBottomSubClass psym)))
         val cs = parents.iterator.filter { p =>
           // isUnshadowed is a bit expensive, so try classes first
           val psym = p.typeSymbol

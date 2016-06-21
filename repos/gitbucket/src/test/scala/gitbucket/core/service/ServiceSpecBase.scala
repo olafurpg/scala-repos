@@ -35,8 +35,8 @@ trait ServiceSpecBase {
   }
 
   def generateNewAccount(name: String)(implicit s: Session): Account = {
-    AccountService.createAccount(
-        name, name, name, s"${name}@example.com", false, None)
+    AccountService
+      .createAccount(name, name, name, s"${name}@example.com", false, None)
     user(name)
   }
 
@@ -47,9 +47,9 @@ trait ServiceSpecBase {
   with IssuesService with PullRequestService with CommitStatusService
   with LabelsService() {}
 
-  def generateNewUserWithDBRepository(userName: String,
-                                      repositoryName: String)(
-      implicit s: Session): Account = {
+  def generateNewUserWithDBRepository(
+      userName: String,
+      repositoryName: String)(implicit s: Session): Account = {
     val ac = AccountService
       .getAccountByUserName(userName)
       .getOrElse(generateNewAccount(userName))
@@ -58,8 +58,9 @@ trait ServiceSpecBase {
   }
 
   def generateNewIssue(
-      userName: String, repositoryName: String, loginUser: String = "root")(
-      implicit s: Session): Int = {
+      userName: String,
+      repositoryName: String,
+      loginUser: String = "root")(implicit s: Session): Int = {
     dummyService.createIssue(owner = userName,
                              repository = repositoryName,
                              loginUser = loginUser,
@@ -71,8 +72,9 @@ trait ServiceSpecBase {
   }
 
   def generateNewPullRequest(
-      base: String, request: String, loginUser: String = null)(
-      implicit s: Session): (Issue, PullRequest) = {
+      base: String,
+      request: String,
+      loginUser: String = null)(implicit s: Session): (Issue, PullRequest) = {
     val Array(baseUserName, baseRepositoryName, baesBranch) = base.split("/")
     val Array(requestUserName, requestRepositoryName, requestBranch) =
       request.split("/")

@@ -23,10 +23,10 @@ object ActorRefSpec {
 
     def receive = {
       case "complexRequest" ⇒ {
-          replyTo = sender()
-          val worker = context.actorOf(Props[WorkerActor])
-          worker ! "work"
-        }
+        replyTo = sender()
+        val worker = context.actorOf(Props[WorkerActor])
+        worker ! "work"
+      }
       case "complexRequest2" ⇒
         val worker = context.actorOf(Props[WorkerActor])
         worker ! ReplyTo(sender())
@@ -39,14 +39,14 @@ object ActorRefSpec {
     import context.system
     def receive = {
       case "work" ⇒ {
-          work()
-          sender() ! "workDone"
-          context.stop(self)
-        }
+        work()
+        sender() ! "workDone"
+        context.stop(self)
+      }
       case ReplyTo(replyTo) ⇒ {
-          work()
-          replyTo ! "complexReply"
-        }
+        work()
+        replyTo ! "complexReply"
+      }
     }
 
     private def work(): Unit = Thread.sleep(1.second.dilated.toMillis)
@@ -59,11 +59,11 @@ object ActorRefSpec {
       case "complex2" ⇒ replyActor ! "complexRequest2"
       case "simple" ⇒ replyActor ! "simpleRequest"
       case "complexReply" ⇒ {
-          latch.countDown()
-        }
+        latch.countDown()
+      }
       case "simpleReply" ⇒ {
-          latch.countDown()
-        }
+        latch.countDown()
+      }
     }
   }
 
@@ -146,8 +146,9 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
         intercept[akka.actor.ActorInitializationException] {
           wrap(result ⇒
                 actorOf(Props(new Actor {
-              val nested = promiseIntercept(
-                  new Actor { def receive = { case _ ⇒ } })(result)
+              val nested = promiseIntercept(new Actor {
+                def receive = { case _ ⇒ }
+              })(result)
               def receive = { case _ ⇒ }
             })))
         }
@@ -246,10 +247,8 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
       EventFilter[ActorInitializationException](occurrences = 1) intercept {
         intercept[akka.actor.ActorInitializationException] {
           wrap(result ⇒
-                actorOf(
-                    Props(new OuterActor(
-                            actorOf(Props(
-                                    promiseIntercept(new FailingInheritingInnerActor)(
+                actorOf(Props(new OuterActor(actorOf(Props(promiseIntercept(
+                                        new FailingInheritingInnerActor)(
                                         result)))))))
         }
 
@@ -331,7 +330,7 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
         in.readObject
       }).getMessage should ===(
           "Trying to deserialize a serialized ActorRef without an ActorSystem in scope." +
-          " Use 'akka.serialization.Serialization.currentSystem.withValue(system) { ... }'")
+            " Use 'akka.serialization.Serialization.currentSystem.withValue(system) { ... }'")
     }
 
     "return EmptyLocalActorRef on deserialize if not present in actor hierarchy (and remoting is not enabled)" in {
@@ -357,16 +356,17 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
       JavaSerializer.currentSystem.withValue(sysImpl) {
         val in =
           new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray))
-        in.readObject should ===(new EmptyLocalActorRef(
-                sysImpl.provider, ref.path, system.eventStream))
+        in.readObject should ===(new EmptyLocalActorRef(sysImpl.provider,
+                                                        ref.path,
+                                                        system.eventStream))
       }
     }
 
     "support nested actorOfs" in {
-      val a = system.actorOf(
-          Props(new Actor {
-        val nested =
-          system.actorOf(Props(new Actor { def receive = { case _ ⇒ } }))
+      val a = system.actorOf(Props(new Actor {
+        val nested = system.actorOf(Props(new Actor {
+          def receive = { case _ ⇒ }
+        }))
         def receive = { case _ ⇒ sender() ! nested }
       }))
 
@@ -422,8 +422,7 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
 
     "stop when sent a poison pill" in {
       val timeout = Timeout(20.seconds)
-      val ref = system.actorOf(
-          Props(new Actor {
+      val ref = system.actorOf(Props(new Actor {
         def receive = {
           case 5 ⇒ sender() ! "five"
           case 0 ⇒ sender() ! "null"
@@ -447,9 +446,9 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
 
         val boss = system.actorOf(Props(new Actor {
 
-          override val supervisorStrategy = OneForOneStrategy(
-              maxNrOfRetries = 2,
-              withinTimeRange = 1 second)(List(classOf[Throwable]))
+          override val supervisorStrategy =
+            OneForOneStrategy(maxNrOfRetries = 2, withinTimeRange = 1 second)(
+                List(classOf[Throwable]))
 
           val ref = context.actorOf(Props(new Actor {
             def receive = { case _ ⇒ }

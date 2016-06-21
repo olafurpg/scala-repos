@@ -64,8 +64,9 @@ private[forum] final class CategApi(env: Env) {
            page: Int,
            troll: Boolean): Fu[Option[(Categ, Paginator[TopicView])]] =
     optionT(CategRepo bySlug slug) flatMap { categ =>
-      optionT(
-          env.topicApi.paginator(categ, page, troll) map { (categ, _).some })
+      optionT(env.topicApi.paginator(categ, page, troll) map {
+        (categ, _).some
+      })
     }
 
   def denormalize(categ: Categ): Funit =

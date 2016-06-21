@@ -57,8 +57,9 @@ private[http] class HttpResponseRendererFactory(
   // split out so we can stabilize by overriding in tests
   protected def currentTimeMillis(): Long = System.currentTimeMillis()
 
-  def renderer: Flow[
-      ResponseRenderingContext, ResponseRenderingOutput, NotUsed] =
+  def renderer: Flow[ResponseRenderingContext,
+                     ResponseRenderingOutput,
+                     NotUsed] =
     Flow.fromGraph(HttpResponseRenderer)
 
   object HttpResponseRenderer
@@ -71,8 +72,7 @@ private[http] class HttpResponseRendererFactory(
 
     def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
-        var closeMode: CloseMode =
-          DontClose // signals what to do after the current response
+        var closeMode: CloseMode = DontClose // signals what to do after the current response
         def close: Boolean = closeMode != DontClose
         def closeIf(cond: Boolean): Unit =
           if (cond) closeMode = CloseConnection
@@ -139,8 +139,8 @@ private[http] class HttpResponseRendererFactory(
 
           def mustRenderTransferEncodingChunkedHeader =
             entity.isChunked &&
-            (!entity.isKnownEmpty || ctx.requestMethod == HttpMethods.HEAD) &&
-            (ctx.requestProtocol == `HTTP/1.1`)
+              (!entity.isKnownEmpty || ctx.requestMethod == HttpMethods.HEAD) &&
+              (ctx.requestProtocol == `HTTP/1.1`)
 
           @tailrec
           def renderHeaders(remaining: List[HttpHeader],
@@ -240,8 +240,8 @@ private[http] class HttpResponseRendererFactory(
 
                   case x: RawHeader
                       if (x is "content-type") || (x is "content-length") ||
-                      (x is "transfer-encoding") || (x is "date") ||
-                      (x is "server") || (x is "connection") ⇒
+                        (x is "transfer-encoding") || (x is "date") ||
+                        (x is "server") || (x is "connection") ⇒
                     suppressionWarning(log, x, "illegal RawHeader")
                     renderHeaders(tail,
                                   alwaysClose,
@@ -254,7 +254,8 @@ private[http] class HttpResponseRendererFactory(
                     if (x.renderInResponses) render(x)
                     else
                       log.warning(
-                          "HTTP header '{}' is not allowed in responses", x)
+                          "HTTP header '{}' is not allowed in responses",
+                          x)
                     renderHeaders(tail,
                                   alwaysClose,
                                   connHeader,
@@ -288,10 +289,10 @@ private[http] class HttpResponseRendererFactory(
                 // Do we render an explicit Connection header?
                 val renderConnectionHeader =
                   protocol == `HTTP/1.0` && !close || protocol == `HTTP/1.1` &&
-                  close || // if we don't follow the default behavior
-                  close != ctx.closeRequested ||
-                  // if we override the client's closing request
-                  protocol != ctx.requestProtocol // if we reply with a mismatching protocol (let's be very explicit in this case)
+                    close || // if we don't follow the default behavior
+                    close != ctx.closeRequested ||
+                    // if we override the client's closing request
+                    protocol != ctx.requestProtocol // if we reply with a mismatching protocol (let's be very explicit in this case)
 
                 if (renderConnectionHeader)
                   r ~~ Connection ~~
@@ -355,8 +356,8 @@ private[http] class HttpResponseRendererFactory(
               case HttpEntity.Chunked(contentType, chunks) ⇒
                 if (ctx.requestProtocol == `HTTP/1.0`)
                   completeResponseRendering(
-                      HttpEntity.CloseDelimited(
-                          contentType, chunks.map(_.data)))
+                      HttpEntity.CloseDelimited(contentType,
+                                                chunks.map(_.data)))
                 else {
                   renderHeaders(headers.toList)
                   renderEntityContentType(r, entity) ~~ CrLf

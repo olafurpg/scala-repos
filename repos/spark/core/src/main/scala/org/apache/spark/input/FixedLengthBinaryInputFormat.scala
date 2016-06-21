@@ -67,8 +67,9 @@ private[spark] class FixedLengthBinaryInputFormat
     * only contains full records. Each InputSplit passed to FixedLengthBinaryRecordReader
     * will start at the first byte of a record, and the last byte will the last byte of a record.
     */
-  override def computeSplitSize(
-      blockSize: Long, minSize: Long, maxSize: Long): Long = {
+  override def computeSplitSize(blockSize: Long,
+                                minSize: Long,
+                                maxSize: Long): Long = {
     val defaultSize = super.computeSplitSize(blockSize, minSize, maxSize)
     // If the default size is less than the length of a record, make it equal to it
     // Otherwise, make sure the split size is as close to possible as the default size,
@@ -84,8 +85,8 @@ private[spark] class FixedLengthBinaryInputFormat
   /**
     * Create a FixedLengthBinaryRecordReader
     */
-  override def createRecordReader(
-      split: InputSplit, context: TaskAttemptContext)
+  override def createRecordReader(split: InputSplit,
+                                  context: TaskAttemptContext)
     : RecordReader[LongWritable, BytesWritable] = {
     new FixedLengthBinaryRecordReader
   }

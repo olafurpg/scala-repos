@@ -19,8 +19,9 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 case class CompressionConf(enabled: Boolean, sizeLimit: Long)
 
-class ZKStore(
-    val client: ZkClient, root: ZNode, compressionConf: CompressionConf)
+class ZKStore(val client: ZkClient,
+              root: ZNode,
+              compressionConf: CompressionConf)
     extends PersistentStore
     with PersistentStoreManagement {
 
@@ -152,8 +153,9 @@ case class ZKEntity(node: ZNode, data: ZKData, version: Option[Int] = None)
   override def bytes: IndexedSeq[Byte] = data.bytes
 }
 
-case class ZKData(
-    name: String, uuid: UUID, bytes: IndexedSeq[Byte] = Vector.empty) {
+case class ZKData(name: String,
+                  uuid: UUID,
+                  bytes: IndexedSeq[Byte] = Vector.empty) {
   def toProto(compression: CompressionConf): Protos.ZKStoreEntry = {
     val (data, compressed) =
       if (compression.enabled && bytes.length > compression.sizeLimit)
@@ -176,12 +178,14 @@ object ZKData {
       val content =
         if (proto.getCompressed) uncompress(proto.getValue.toByteArray)
         else proto.getValue.toByteArray
-      new ZKData(
-          proto.getName, UUIDUtil.uuid(proto.getUuid.toByteArray), content)
+      new ZKData(proto.getName,
+                 UUIDUtil.uuid(proto.getUuid.toByteArray),
+                 content)
     } catch {
       case ex: InvalidProtocolBufferException =>
         throw new StoreCommandFailedException(
-            s"Can not deserialize Protobuf from ${bytes.length}", ex)
+            s"Can not deserialize Protobuf from ${bytes.length}",
+            ex)
     }
   }
 }

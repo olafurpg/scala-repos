@@ -82,12 +82,12 @@ abstract class DriverType(val name: String) {
     * @param setter A function that will set the parameters on the prepared statement
     * @param pkName Zero or more generated column names that need to be returned
     */
-  def performInsert[T](conn: SuperConnection,
-                       query: String,
-                       setter: PreparedStatement => Unit,
-                       tableName: String,
-                       genKeyNames: List[String])(
-      handler: Either[ResultSet, Int] => T): T =
+  def performInsert[T](
+      conn: SuperConnection,
+      query: String,
+      setter: PreparedStatement => Unit,
+      tableName: String,
+      genKeyNames: List[String])(handler: Either[ResultSet, Int] => T): T =
     genKeyNames match {
       case Nil =>
         DB.prepareStatement(query, conn) { stmt =>
@@ -148,7 +148,7 @@ abstract class DriverType(val name: String) {
     */
   def primaryKeySetup(tableName: String, columnName: String): List[String] = {
     List("ALTER TABLE " + tableName + " ADD CONSTRAINT " + tableName +
-        "_PK PRIMARY KEY(" + columnName + ")")
+          "_PK PRIMARY KEY(" + columnName + ")")
   }
 
   /** This defines the syntax for adding a column in an alter. This is
@@ -180,7 +180,7 @@ object DriverType {
       case x =>
         throw new Exception(
             "Lift mapper does not support JDBC driver %s.\n".format(x) +
-            "See http://wiki.liftweb.net/index.php/Category:Database for a list of supported databases.")
+              "See http://wiki.liftweb.net/index.php/Category:Database for a list of supported databases.")
     }
   }
 }
@@ -327,8 +327,8 @@ object PostgreSqlDriver extends BasePostgreSQLDriver {
       tableName: String,
       genKeyNames: List[String],
       handler: Either[ResultSet, Int] => T): T =
-    DB.prepareStatement(
-        query + " RETURNING " + genKeyNames.mkString(","), conn) { stmt =>
+    DB.prepareStatement(query + " RETURNING " + genKeyNames.mkString(","),
+                        conn) { stmt =>
       setter(stmt)
       handler(Left(stmt.executeQuery))
     }
@@ -472,19 +472,19 @@ object OracleDriver extends DriverType("Oracle") {
     case Types.BOOLEAN => Types.INTEGER
   }
 
-  override def primaryKeySetup(
-      tableName: String, columnName: String): List[String] = {
+  override def primaryKeySetup(tableName: String,
+                               columnName: String): List[String] = {
     /*
      * This trigger and sequence setup is taken from http://www.databaseanswers.org/sql_scripts/ora_sequence.htm
      */
     super.primaryKeySetup(tableName, columnName) ::: List(
         "CREATE SEQUENCE " + tableName +
-        "_sequence START WITH 1 INCREMENT BY 1",
+          "_sequence START WITH 1 INCREMENT BY 1",
         "CREATE OR REPLACE TRIGGER " + tableName +
-        "_trigger BEFORE INSERT ON " + tableName + " " + "FOR EACH ROW " +
-        "WHEN (new." + columnName + " is null) " + "BEGIN " +
-        "SELECT " + tableName + "_sequence.nextval INTO :new." + columnName +
-        " FROM DUAL; " + "END;")
+          "_trigger BEFORE INSERT ON " + tableName + " " + "FOR EACH ROW " +
+          "WHEN (new." + columnName + " is null) " + "BEGIN " +
+          "SELECT " + tableName + "_sequence.nextval INTO :new." + columnName +
+          " FROM DUAL; " + "END;")
   }
 
   // Oracle supports returning generated keys only if we specify the names of the column(s) to return.

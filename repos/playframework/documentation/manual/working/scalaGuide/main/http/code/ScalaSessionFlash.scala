@@ -120,14 +120,16 @@ package scalaguide.http.scalasessionflash {
       }
     }
 
-    def testFlash(
-        results: Future[Result], key: String, value: Option[String]) = {
+    def testFlash(results: Future[Result],
+                  key: String,
+                  value: Option[String]) = {
       val flash = Helpers.flash(results)
       flash.get(key) === value
     }
 
-    def testSession(
-        results: Future[Result], key: String, value: Option[String]) = {
+    def testSession(results: Future[Result],
+                    key: String,
+                    value: Option[String]) = {
       val session = Helpers.session(results)
       session.get(key) === value
     }

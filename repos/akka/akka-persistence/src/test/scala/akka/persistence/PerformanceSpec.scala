@@ -106,10 +106,10 @@ object PerformanceSpec {
 
     val receiveCommand: Receive =
       printProgress andThen
-      (controlBehavior orElse {
-            case "a" ⇒ persist("a")(_ ⇒ context.become(processC))
-            case "b" ⇒ persist("b")(_ ⇒ ())
-          })
+        (controlBehavior orElse {
+              case "a" ⇒ persist("a")(_ ⇒ context.become(processC))
+              case "b" ⇒ persist("b")(_ ⇒ ())
+            })
 
     val processC: Receive =
       printProgress andThen {
@@ -159,8 +159,9 @@ class PerformanceSpec
 
   def stressMixedPersistentActor(failAt: Option[Long]): Unit = {
     val persistentActor = namedPersistentActor[MixedTestPersistentActor]
-    stressPersistentActor(
-        persistentActor, failAt, "persistent events & commands")
+    stressPersistentActor(persistentActor,
+                          failAt,
+                          "persistent events & commands")
   }
 
   def stressStashingPersistentActor(): Unit = {

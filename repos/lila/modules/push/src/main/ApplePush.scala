@@ -64,7 +64,8 @@ private final class ApnsActor(certificate: InputStream, password: String)
     m.registerFailedConnectionListener(
         new FailedConnectionListener[SimpleApnsPushNotification] {
       override def handleFailedConnection(
-          m: PushManager[_ <: SimpleApnsPushNotification], cause: Throwable) {
+          m: PushManager[_ <: SimpleApnsPushNotification],
+          cause: Throwable) {
         logger.error(s"Can't connect because $cause")
         cause match {
           case ssl: javax.net.ssl.SSLHandshakeException =>

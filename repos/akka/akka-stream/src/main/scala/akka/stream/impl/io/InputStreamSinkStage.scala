@@ -174,8 +174,7 @@ private[akka] class InputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   override def close(): Unit = {
-    executeIfNotClosed(
-        () ⇒ {
+    executeIfNotClosed(() ⇒ {
       // at this point Subscriber may be already terminated
       if (isStageAlive) sendToStage(Close)
       isActive = false

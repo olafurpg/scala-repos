@@ -153,7 +153,7 @@ object SimpleConsumerPerformance {
     val resetBeginningOffsetOpt = parser.accepts(
         "from-latest",
         "If the consumer does not already have an established " +
-        "offset to consume from, start with the latest message present in the log rather than the earliest message.")
+          "offset to consume from, start with the latest message present in the log rather than the earliest message.")
     val partitionOpt = parser
       .accepts("partition", "The topic partition to consume from.")
       .withRequiredArg
@@ -176,8 +176,8 @@ object SimpleConsumerPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, topicOpt, urlOpt, numMessagesOpt)
+    CommandLineUtils
+      .checkRequiredArgs(parser, options, topicOpt, urlOpt, numMessagesOpt)
 
     val url = new URI(options.valueOf(urlOpt))
     val fetchSize = options.valueOf(fetchSizeOpt).intValue

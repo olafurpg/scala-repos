@@ -253,8 +253,7 @@ private[math] trait ConvertableToNumber extends ConvertableTo[Number] {
   def fromBigDecimal(a: BigDecimal): Number = Number(a)
   def fromRational(a: Rational): Number = Number(a)
   def fromAlgebraic(a: Algebraic): Number =
-    Number(
-        a.toRational.getOrElse(
+    Number(a.toRational.getOrElse(
             Rational(a.toBigDecimal(MathContext.DECIMAL64))))
   def fromReal(a: Real): Number = Number(a.toRational)
 

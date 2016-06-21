@@ -17,8 +17,7 @@ class Test {
       (cs.settings map { s =>
             // cs.settings: Seq[Compiled[$1]] in trunk, Seq[Compiled[$1]] forSome $1 in 2.9.1
             // s: Pair[$1] in trunk, Pair[$1] in 2.9.1
-            val t =
-              transform(s.v) // t: ScopedKey[_] in trunk, ScopedKey[$1] in 2.9.1
+            val t = transform(s.v) // t: ScopedKey[_] in trunk, ScopedKey[$1] in 2.9.1
             foo(s.k, t)
             t
           }): Seq[ScopedKey[_]]

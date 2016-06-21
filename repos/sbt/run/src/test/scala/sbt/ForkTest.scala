@@ -17,8 +17,8 @@ object ForkTest extends Properties("Fork") {
     */
   final val MaximumClasspathLength = 100000
 
-  lazy val genOptionName = frequency(
-      (9, Some("-cp")), (9, Some("-classpath")), (1, None))
+  lazy val genOptionName =
+    frequency((9, Some("-cp")), (9, Some("-classpath")), (1, None))
   lazy val pathElement = nonEmptyListOf(alphaNumChar).map(_.mkString)
   lazy val path = nonEmptyListOf(pathElement).map(_.mkString(File.separator))
   lazy val genRelClasspath = nonEmptyListOf(path)

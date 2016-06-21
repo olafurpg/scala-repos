@@ -14,8 +14,9 @@ object MesosFacade {
   /**
     * Corresponds to parts of `state.json`.
     */
-  case class ITMesosState(
-      version: String, gitTag: String, agents: Iterable[ITAgent])
+  case class ITMesosState(version: String,
+                          gitTag: String,
+                          agents: Iterable[ITAgent])
 
   case class ITAgent(id: String,
                      resources: ITResources,

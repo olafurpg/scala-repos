@@ -71,8 +71,8 @@ private[pickling] sealed trait UnpicklerAst extends IrAst
   * @param constructor
   *               The method symbol for which constructor to call.
   */
-private[pickling] case class CallConstructor(
-    fieldNames: Seq[String], constructor: IrConstructor)
+private[pickling] case class CallConstructor(fieldNames: Seq[String],
+                                             constructor: IrConstructor)
     extends UnpicklerAst {
   def requiresReflection: Boolean =
     !(constructor.isPublic)
@@ -88,8 +88,9 @@ private[pickling] case class CallConstructor(
   * @param factoryMethod
   *          The method to call which will construct an instance of the class.  This must be defined on a Scala module.
   */
-private[pickling] case class CallModuleFactory(
-    fields: Seq[String], module: IrClass, factoryMethod: IrMethod)
+private[pickling] case class CallModuleFactory(fields: Seq[String],
+                                               module: IrClass,
+                                               factoryMethod: IrMethod)
     extends UnpicklerAst {
   assert(module.isScalaModule)
   assert(!factoryMethod.isStatic)
@@ -135,8 +136,8 @@ private[pickling] case class SubclassUnpicklerDelegation(
     val cases =
       (parentBehavior.toList.map(b => s"case thisClass =>\n  $b") ++ subClasses
             .map(c => s" case $c => lookup implicit unpickler $c") ++
-          (if (lookupRuntime) List("case _ => lookup runtime")
-           else List("case _ => error")))
+            (if (lookupRuntime) List("case _ => lookup runtime")
+             else List("case _ => error")))
     s"clazz match {${cases.mkString("\n", "\n", "\n")}}"
   }
 }
@@ -205,8 +206,8 @@ private[pickling] case class SubclassDispatch(
     val cases: Seq[String] =
       (subClasses.map(c => s"case $c => implicitly pickle") ++ parentBehavior.toList
             .map(b => s"case thisClass =>\n$b") ++
-          (if (lookupRuntime) List("case _ => lookup runtime")
-           else List("case _ => error")))
+            (if (lookupRuntime) List("case _ => lookup runtime")
+             else List("case _ => error")))
     s"class match {${cases.mkString("\n", "\n", "\n")}"
   }
 }
@@ -240,7 +241,8 @@ private[pickling] case class PickleBehavior(operations: Seq[PicklerAst])
 }
 
 private[pickling] case class PickleUnpickleImplementation(
-    pickle: PicklerAst, unpickle: UnpicklerAst)
+    pickle: PicklerAst,
+    unpickle: UnpicklerAst)
     extends IrAst {
   override def requiresReflection: Boolean =
     pickle.requiresReflection || unpickle.requiresReflection

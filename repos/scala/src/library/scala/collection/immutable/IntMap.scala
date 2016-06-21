@@ -27,8 +27,10 @@ private[immutable] object IntMapUtils extends BitOperations.Int {
     else IntMap.Bin(p, m, t2, t1)
   }
 
-  def bin[T](
-      prefix: Int, mask: Int, left: IntMap[T], right: IntMap[T]): IntMap[T] =
+  def bin[T](prefix: Int,
+             mask: Int,
+             left: IntMap[T],
+             right: IntMap[T]): IntMap[T] =
     (left, right) match {
       case (left, IntMap.Nil) => left
       case (IntMap.Nil, right) => right
@@ -81,8 +83,10 @@ object IntMap {
         this.asInstanceOf[IntMap.Tip[S]]
       else IntMap.Tip(key, s)
   }
-  private[immutable] case class Bin[+T](
-      prefix: Int, mask: Int, left: IntMap[T], right: IntMap[T])
+  private[immutable] case class Bin[+T](prefix: Int,
+                                        mask: Int,
+                                        left: IntMap[T],
+                                        right: IntMap[T])
       extends IntMap[T] {
     def bin[S](left: IntMap[S], right: IntMap[S]): IntMap[S] = {
       if ((this.left eq left) && (this.right eq right))
@@ -125,14 +129,14 @@ private[immutable] abstract class IntMapIterator[V, T](it: IntMap[V])
   final def next: T =
     pop match {
       case IntMap.Bin(_, _, t @ IntMap.Tip(_, _), right) => {
-          push(right)
-          valueOf(t)
-        }
+        push(right)
+        valueOf(t)
+      }
       case IntMap.Bin(_, _, left, right) => {
-          push(right)
-          push(left)
-          next
-        }
+        push(right)
+        push(left)
+        next
+      }
       case t @ IntMap.Tip(_, _) => valueOf(t)
       // This should never happen. We don't allow IntMap.Nil in subtrees of the IntMap
       // and don't return an IntMapIterator for IntMap.Nil.
@@ -216,8 +220,8 @@ sealed abstract class IntMap[+T]
     */
   final def foreachKey(f: Int => Unit): Unit = this match {
     case IntMap.Bin(_, _, left, right) => {
-        left.foreachKey(f); right.foreachKey(f)
-      }
+      left.foreachKey(f); right.foreachKey(f)
+    }
     case IntMap.Tip(key, _) => f(key)
     case IntMap.Nil =>
   }
@@ -235,8 +239,8 @@ sealed abstract class IntMap[+T]
     */
   final def foreachValue(f: T => Unit): Unit = this match {
     case IntMap.Bin(_, _, left, right) => {
-        left.foreachValue(f); right.foreachValue(f)
-      }
+      left.foreachValue(f); right.foreachValue(f)
+    }
     case IntMap.Tip(_, value) => f(value)
     case IntMap.Nil =>
   }
@@ -247,10 +251,10 @@ sealed abstract class IntMap[+T]
 
   override def filter(f: ((Int, T)) => Boolean): IntMap[T] = this match {
     case IntMap.Bin(prefix, mask, left, right) => {
-        val (newleft, newright) = (left.filter(f), right.filter(f))
-        if ((left eq newleft) && (right eq newright)) this
-        else bin(prefix, mask, newleft, newright)
-      }
+      val (newleft, newright) = (left.filter(f), right.filter(f))
+      if ((left eq newleft) && (right eq newright)) this
+      else bin(prefix, mask, newleft, newright)
+    }
     case IntMap.Tip(key, value) =>
       if (f((key, value))) this
       else IntMap.Nil

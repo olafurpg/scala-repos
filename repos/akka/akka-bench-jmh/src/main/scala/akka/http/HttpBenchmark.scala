@@ -50,7 +50,8 @@ class HttpBenchmark {
     request = HttpRequest(uri =
           s"http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}/test")
     pool = Http().cachedHostConnectionPool[Int](
-        binding.localAddress.getHostString, binding.localAddress.getPort)
+        binding.localAddress.getHostString,
+        binding.localAddress.getPort)
   }
 
   @TearDown

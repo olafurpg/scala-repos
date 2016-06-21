@@ -91,9 +91,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   /** @since 7.0.1 */
   def mapM[B](f: A => M[B])(implicit m: Monad[M]): StreamT[M, B] = stepBind {
-    _ (yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) },
-       skip = s => m.point(Skip(s mapM f)),
-       done = m.point(Done))
+    _ (yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) }, skip = s =>
+          m.point(Skip(s mapM f)), done = m.point(Done))
   }
 
   /**Don't use iteratively! */
@@ -205,11 +204,11 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
     new StreamTMonadPlus[F] {
       implicit def F: Applicative[F] = F0
     }
-  implicit def StreamTEqual[F[_], A](
-      implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] =
+  implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]],
+                                     F: Monad[F]): Equal[StreamT[F, A]] =
     E.contramap((_: StreamT[F, A]).toStream)
-  implicit def StreamTShow[F[_], A](
-      implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] =
+  implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]],
+                                    F: Monad[F]): Show[StreamT[F, A]] =
     Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
   implicit val StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
   implicit def StreamTFoldable[F[_]: Foldable]: Foldable[StreamT[F, ?]] =
@@ -238,8 +237,7 @@ object StreamT extends StreamTInstances {
 
   def unfoldM[M[_], A, B](start: B)(f: B => M[Option[(A, B)]])(
       implicit M: Functor[M]): StreamT[M, A] =
-    StreamT[M, A](
-        M.map(f(start)) {
+    StreamT[M, A](M.map(f(start)) {
       case Some((a, b)) => Yield(a, unfoldM(b)(f))
       case None => Done
     })
@@ -260,8 +258,8 @@ object StreamT extends StreamTInstances {
     def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z): Z
   }
 
-  def runStreamT[S, A](
-      stream: StreamT[State[S, ?], A], s0: S): StreamT[Id, A] =
+  def runStreamT[S, A](stream: StreamT[State[S, ?], A],
+                       s0: S): StreamT[Id, A] =
     StreamT[Id, A]({
       val (s1, sa) = stream.step(s0)
       sa((a, as) => Yield(a, runStreamT(as, s1)),
@@ -282,8 +280,9 @@ object StreamT extends StreamTInstances {
   object Skip {
     def apply[S](s: => S): Step[Nothing, S] =
       new Step[Nothing, S] {
-        def apply[Z](
-            yieldd: (Nothing, => S) => Z, skip: => S => Z, done: => Z) =
+        def apply[Z](yieldd: (Nothing, => S) => Z,
+                     skip: => S => Z,
+                     done: => Z) =
           skip(s)
       }
     def unapply[A, S](s: Step[A, S]): Option[(() => S)] =
@@ -350,8 +349,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] =
     StreamT[G, A](G.map(a)(Yield(_, empty)))
 
-  def hoist[M[_], N[_]](f: M ~> N)(
-      implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
+  def hoist[M[_], N[_]](
+      f: M ~> N)(implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
     new (StreamT[M, ?] ~> StreamT[N, ?]) {
       def apply[A](a: StreamT[M, A]): StreamT[N, A] =
         StreamT[N, A](

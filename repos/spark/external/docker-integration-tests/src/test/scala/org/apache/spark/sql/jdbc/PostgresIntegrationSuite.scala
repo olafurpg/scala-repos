@@ -46,14 +46,14 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
     conn
       .prepareStatement(
           "CREATE TABLE bar (c0 text, c1 integer, c2 double precision, c3 bigint, " +
-          "c4 bit(1), c5 bit(10), c6 bytea, c7 boolean, c8 inet, c9 cidr, " +
-          "c10 integer[], c11 text[], c12 real[], c13 numeric(2,2)[], c14 enum_type)")
+            "c4 bit(1), c5 bit(10), c6 bytea, c7 boolean, c8 inet, c9 cidr, " +
+            "c10 integer[], c11 text[], c12 real[], c13 numeric(2,2)[], c14 enum_type)")
       .executeUpdate()
     conn
       .prepareStatement(
           "INSERT INTO bar VALUES ('hello', 42, 1.25, 123456789012345, B'0', " +
-          "B'1000100101', E'\\\\xDEADBEEF', true, '172.16.0.42', '192.168.0.0/16', " +
-          """'{1, 2}', '{"a", null, "b"}', '{0.11, 0.22}', '{0.11, 0.22}', 'd1')""")
+            "B'1000100101', E'\\\\xDEADBEEF', true, '172.16.0.42', '192.168.0.0/16', " +
+            """'{1, 2}', '{"a", null, "b"}', '{0.11, 0.22}', '{0.11, 0.22}', 'd1')""")
       .executeUpdate()
   }
 
@@ -84,8 +84,7 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
     assert(rows(0).getLong(3) == 123456789012345L)
     assert(!rows(0).getBoolean(4))
     // BIT(10)'s come back as ASCII strings of ten ASCII 0's and 1's...
-    assert(
-        java.util.Arrays.equals(
+    assert(java.util.Arrays.equals(
             rows(0).getAs[Array[Byte]](5),
             Array[Byte](49, 48, 48, 48, 49, 48, 48, 49, 48, 49)))
     assert(

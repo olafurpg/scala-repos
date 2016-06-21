@@ -130,7 +130,7 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
           validateVersion(path, Some(103))
         }
       assert(thrown.getMessage === "Version 103 does not exist. " +
-          "Currently available versions are: [102, 101, 100]")
+            "Currently available versions are: [102, 101, 100]")
 
       // should not throw
       validateVersion(path, Some(101))

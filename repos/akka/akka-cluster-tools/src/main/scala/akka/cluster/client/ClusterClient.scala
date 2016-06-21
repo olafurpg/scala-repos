@@ -191,8 +191,8 @@ final class ClusterClientSettings(
       heartbeatInterval: FiniteDuration = heartbeatInterval,
       acceptableHeartbeatPause: FiniteDuration = acceptableHeartbeatPause,
       bufferSize: Int = bufferSize,
-      reconnectTimeout: Option[FiniteDuration] =
-        reconnectTimeout): ClusterClientSettings =
+      reconnectTimeout: Option[FiniteDuration] = reconnectTimeout)
+    : ClusterClientSettings =
     new ClusterClientSettings(initialContacts,
                               establishingGetContactsInterval,
                               refreshContactsInterval,
@@ -286,8 +286,8 @@ final class ClusterClient(settings: ClusterClientSettings)
 
   require(initialContacts.nonEmpty, "initialContacts must be defined")
 
-  val failureDetector = new DeadlineFailureDetector(
-      acceptableHeartbeatPause, heartbeatInterval)
+  val failureDetector =
+    new DeadlineFailureDetector(acceptableHeartbeatPause, heartbeatInterval)
 
   val initialContactsSel: immutable.IndexedSeq[ActorSelection] =
     initialContacts.map(context.actorSelection).toVector
@@ -356,16 +356,16 @@ final class ClusterClient(settings: ClusterClientSettings)
 
   def active(receptionist: ActorRef): Actor.Receive = {
     case Send(path, msg, localAffinity) ⇒
-      receptionist forward DistributedPubSubMediator.Send(
-          path, msg, localAffinity)
+      receptionist forward DistributedPubSubMediator
+        .Send(path, msg, localAffinity)
     case SendToAll(path, msg) ⇒
       receptionist forward DistributedPubSubMediator.SendToAll(path, msg)
     case Publish(topic, msg) ⇒
       receptionist forward DistributedPubSubMediator.Publish(topic, msg)
     case HeartbeatTick ⇒
       if (!failureDetector.isAvailable) {
-        log.info(
-            "Lost contact with [{}], restablishing connection", receptionist)
+        log.info("Lost contact with [{}], restablishing connection",
+                 receptionist)
         sendGetContacts()
         scheduleRefreshContactsTick(establishingGetContactsInterval)
         context.become(establishing)
@@ -452,7 +452,7 @@ final class ClusterClientReceptionist(system: ExtendedActorSystem)
     */
   def isTerminated: Boolean =
     Cluster(system).isTerminated ||
-    !role.forall(Cluster(system).selfRoles.contains)
+      !role.forall(Cluster(system).selfRoles.contains)
 
   /**
     * Register the actors that should be reachable for the clients in this [[DistributedPubSubMediator]].
@@ -586,8 +586,9 @@ final class ClusterReceptionistSettings(
       numberOfContacts: Int = numberOfContacts,
       responseTunnelReceiveTimeout: FiniteDuration =
         responseTunnelReceiveTimeout): ClusterReceptionistSettings =
-    new ClusterReceptionistSettings(
-        role, numberOfContacts, responseTunnelReceiveTimeout)
+    new ClusterReceptionistSettings(role,
+                                    numberOfContacts,
+                                    responseTunnelReceiveTimeout)
 }
 
 /**
@@ -600,8 +601,8 @@ object ClusterReceptionist {
   /**
     * Scala API: Factory method for `ClusterReceptionist` [[akka.actor.Props]].
     */
-  def props(
-      pubSubMediator: ActorRef, settings: ClusterReceptionistSettings): Props =
+  def props(pubSubMediator: ActorRef,
+            settings: ClusterReceptionistSettings): Props =
     Props(new ClusterReceptionist(pubSubMediator, settings))
       .withDeploy(Deploy.local)
 
@@ -670,8 +671,8 @@ object ClusterReceptionist {
   * the client is supposed to communicate directly to the actor in the cluster.
   *
   */
-final class ClusterReceptionist(
-    pubSubMediator: ActorRef, settings: ClusterReceptionistSettings)
+final class ClusterReceptionist(pubSubMediator: ActorRef,
+                                settings: ClusterReceptionistSettings)
     extends Actor
     with ActorLogging {
 
@@ -706,8 +707,8 @@ final class ClusterReceptionist(
     immutable.SortedSet()
   }
   val virtualNodesFactor = 10
-  var consistentHash: ConsistentHash[Address] = ConsistentHash(
-      nodes, virtualNodesFactor)
+  var consistentHash: ConsistentHash[Address] =
+    ConsistentHash(nodes, virtualNodesFactor)
 
   override def preStart(): Unit = {
     super.preStart()

@@ -54,7 +54,7 @@ abstract class RestartNodeSpec
       system.name,
       ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" +
-            secondUniqueAddress.address.port.get)
+              secondUniqueAddress.address.port.get)
         .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {

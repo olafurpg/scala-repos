@@ -83,7 +83,7 @@ package scala.collection.immutable.redblacktree {
     def areRedNodeChildrenBlack[A](t: Tree[String, A]): Boolean = t match {
       case RedTree(_, _, left, right) =>
         List(left, right) forall
-        (t => isBlack(t) && areRedNodeChildrenBlack(t))
+          (t => isBlack(t) && areRedNodeChildrenBlack(t))
       case BlackTree(_, _, left, right) =>
         List(left, right) forall areRedNodeChildrenBlack
       case null => true
@@ -101,8 +101,8 @@ package scala.collection.immutable.redblacktree {
       case null => true
       case ne =>
         (blackNodesToLeaves(ne).distinct.size == 1 &&
-            areBlackNodesToLeavesEqual(ne.left) &&
-            areBlackNodesToLeavesEqual(ne.right))
+              areBlackNodesToLeavesEqual(ne.left) &&
+              areBlackNodesToLeavesEqual(ne.right))
     }
 
     def orderIsPreserved[A](t: Tree[String, A]): Boolean =
@@ -131,8 +131,8 @@ package scala.collection.immutable.redblacktree {
     override type ModifyParm = Int
     override def genParm(tree: Tree[String, Int]): Gen[ModifyParm] =
       choose(0, iterator(tree).size + 1)
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] =
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] =
       update(tree, generateKey(tree, parm), 0, true)
 
     def generateKey(tree: Tree[String, Int], parm: ModifyParm): String =
@@ -159,8 +159,8 @@ package scala.collection.immutable.redblacktree {
     override type ModifyParm = Int
     override def genParm(tree: Tree[String, Int]): Gen[ModifyParm] =
       choose(0, iterator(tree).size)
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] =
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] =
       nodeAt(tree, parm) map {
         case (key, _) => update(tree, key, newValue, true)
       } getOrElse tree
@@ -181,8 +181,8 @@ package scala.collection.immutable.redblacktree {
     override type ModifyParm = Int
     override def genParm(tree: Tree[String, Int]): Gen[ModifyParm] =
       choose(0, iterator(tree).size)
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] =
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] =
       nodeAt(tree, parm) map {
         case (key, _) => delete(tree, key)
       } getOrElse tree
@@ -208,8 +208,8 @@ package scala.collection.immutable.redblacktree {
         optionalTo <- oneOf(Some(to), None, Some(to)) // Double Some(n) to get around a bug
       } yield (optionalFrom, optionalTo)
 
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] = {
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] = {
       val from = parm._1 flatMap (nodeAt(tree, _) map (_._1))
       val to = parm._2 flatMap (nodeAt(tree, _) map (_._1))
       rangeImpl(tree, from, to)
@@ -243,8 +243,8 @@ package scala.collection.immutable.redblacktree {
     override type ModifyParm = Int
     override def genParm(tree: Tree[String, Int]): Gen[ModifyParm] =
       choose(0, iterator(tree).size)
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] =
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] =
       drop(tree, parm)
 
     property("drop") = forAll(genInput) {
@@ -259,8 +259,8 @@ package scala.collection.immutable.redblacktree {
     override type ModifyParm = Int
     override def genParm(tree: Tree[String, Int]): Gen[ModifyParm] =
       choose(0, iterator(tree).size)
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] =
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] =
       take(tree, parm)
 
     property("take") = forAll(genInput) {
@@ -278,8 +278,8 @@ package scala.collection.immutable.redblacktree {
         from <- choose(0, iterator(tree).size)
         to <- choose(from, iterator(tree).size)
       } yield (from, to)
-    override def modify(
-        tree: Tree[String, Int], parm: ModifyParm): Tree[String, Int] =
+    override def modify(tree: Tree[String, Int],
+                        parm: ModifyParm): Tree[String, Int] =
       slice(tree, parm._1, parm._2)
 
     property("slice") = forAll(genInput) {

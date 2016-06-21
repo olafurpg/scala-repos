@@ -41,27 +41,27 @@ class MetricsCollectorSpec
         val sample2 = collector.sample.metrics
         val merged12 =
           sample2 flatMap
-          (latest ⇒
-                sample1 collect {
-                  case peer if latest sameAs peer ⇒
-                    val m = peer :+ latest
-                    m.value should ===(latest.value)
-                    m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                    m
-              })
+            (latest ⇒
+                  sample1 collect {
+                    case peer if latest sameAs peer ⇒
+                      val m = peer :+ latest
+                      m.value should ===(latest.value)
+                      m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                      m
+                })
 
         val sample3 = collector.sample.metrics
         val sample4 = collector.sample.metrics
         val merged34 =
           sample4 flatMap
-          (latest ⇒
-                sample3 collect {
-                  case peer if latest sameAs peer ⇒
-                    val m = peer :+ latest
-                    m.value should ===(latest.value)
-                    m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                    m
-              })
+            (latest ⇒
+                  sample3 collect {
+                    case peer if latest sameAs peer ⇒
+                      val m = peer :+ latest
+                      m.value should ===(latest.value)
+                      m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                      m
+                })
       }
     }
   }
@@ -133,11 +133,12 @@ trait MetricsCollectorFactory {
             selfAddress,
             defaultDecayFactor,
             extendedActorSystem.dynamicAccess.createInstanceFor[AnyRef](
-                "org.hyperic.sigar.Sigar", Nil))).recover {
+                "org.hyperic.sigar.Sigar",
+                Nil))).recover {
       case e ⇒
         log.debug(
             "Metrics will be retreived from MBeans, Sigar failed to load. Reason: " +
-            e)
+              e)
         new JmxMetricsCollector(selfAddress, defaultDecayFactor)
     }.get
 

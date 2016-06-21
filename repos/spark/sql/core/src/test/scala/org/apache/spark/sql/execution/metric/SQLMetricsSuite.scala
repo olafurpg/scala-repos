@@ -56,8 +56,8 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     val cl = BoxingFinder.getClassReader(f.getClass)
     val boxingFinder = new BoxingFinder()
     cl.accept(boxingFinder, 0)
-    assert(
-        boxingFinder.boxingInvokes.nonEmpty, "Found find boxing in this test")
+    assert(boxingFinder.boxingInvokes.nonEmpty,
+           "Found find boxing in this test")
   }
 
   /**
@@ -166,8 +166,7 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
   test("SortMergeJoin metrics") {
     // Because SortMergeJoin may skip different rows if the number of partitions is different, this
     // test should use the deterministic number of partitions.
-    val testDataForJoin =
-      testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
+    val testDataForJoin = testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
     testDataForJoin.registerTempTable("testDataForJoin")
     withTempTable("testDataForJoin") {
       // Assume the execution plan is
@@ -177,17 +176,16 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
       testSparkPlanMetrics(df,
                            1,
                            Map(0L ->
-                               ("SortMergeJoin", Map(
-                                       // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                       "number of output rows" -> 4L))))
+                                 ("SortMergeJoin", Map(
+                                         // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+                                         "number of output rows" -> 4L))))
     }
   }
 
   test("SortMergeJoin(outer) metrics") {
     // Because SortMergeJoin may skip different rows if the number of partitions is different,
     // this test should use the deterministic number of partitions.
-    val testDataForJoin =
-      testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
+    val testDataForJoin = testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
     testDataForJoin.registerTempTable("testDataForJoin")
     withTempTable("testDataForJoin") {
       // Assume the execution plan is
@@ -197,18 +195,18 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
       testSparkPlanMetrics(df,
                            1,
                            Map(0L ->
-                               ("SortMergeJoin", Map(
-                                       // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                       "number of output rows" -> 8L))))
+                                 ("SortMergeJoin", Map(
+                                         // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+                                         "number of output rows" -> 8L))))
 
       val df2 = sqlContext.sql(
           "SELECT * FROM testDataForJoin right JOIN testData2 ON testData2.a = testDataForJoin.a")
       testSparkPlanMetrics(df2,
                            1,
                            Map(0L ->
-                               ("SortMergeJoin", Map(
-                                       // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                       "number of output rows" -> 8L))))
+                                 ("SortMergeJoin", Map(
+                                         // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+                                         "number of output rows" -> 8L))))
     }
   }
 
@@ -243,20 +241,19 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
   }
 
   test("BroadcastNestedLoopJoin metrics") {
-    val testDataForJoin =
-      testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
+    val testDataForJoin = testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
     testDataForJoin.registerTempTable("testDataForJoin")
     withTempTable("testDataForJoin") {
       // Assume the execution plan is
       // ... -> BroadcastNestedLoopJoin(nodeId = 1) -> TungstenProject(nodeId = 0)
       val df = sqlContext.sql(
           "SELECT * FROM testData2 left JOIN testDataForJoin ON " +
-          "testData2.a * testDataForJoin.a != testData2.a + testDataForJoin.a")
+            "testData2.a * testDataForJoin.a != testData2.a + testDataForJoin.a")
       testSparkPlanMetrics(df,
                            3,
                            Map(1L ->
-                               ("BroadcastNestedLoopJoin",
-                                   Map("number of output rows" -> 12L))))
+                                 ("BroadcastNestedLoopJoin",
+                                     Map("number of output rows" -> 12L))))
     }
   }
 
@@ -266,11 +263,11 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     // Assume the execution plan is
     // ... -> BroadcastLeftSemiJoinHash(nodeId = 0)
     val df = df1.join(broadcast(df2), $"key" === $"key2", "leftsemi")
-    testSparkPlanMetrics(
-        df,
-        2,
-        Map(0L ->
-            ("BroadcastLeftSemiJoinHash", Map("number of output rows" -> 2L))))
+    testSparkPlanMetrics(df,
+                         2,
+                         Map(0L ->
+                               ("BroadcastLeftSemiJoinHash", Map(
+                                       "number of output rows" -> 2L))))
   }
 
   test("ShuffledHashJoin metrics") {
@@ -289,8 +286,7 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
   }
 
   test("CartesianProduct metrics") {
-    val testDataForJoin =
-      testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
+    val testDataForJoin = testData2.filter('a < 2) // TestData2(1, 1) :: TestData2(1, 2)
     testDataForJoin.registerTempTable("testDataForJoin")
     withTempTable("testDataForJoin") {
       // Assume the execution plan is
@@ -352,8 +348,9 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
   }
 }
 
-private case class MethodIdentifier[T](
-    cls: Class[T], name: String, desc: String)
+private case class MethodIdentifier[T](cls: Class[T],
+                                       name: String,
+                                       desc: String)
 
 /**
   * If `method` is null, search all methods of this class recursively to find if they do some boxing.
@@ -387,8 +384,11 @@ private class BoxingFinder(
     }
 
     new MethodVisitor(ASM5) {
-      override def visitMethodInsn(
-          op: Int, owner: String, name: String, desc: String, itf: Boolean) {
+      override def visitMethodInsn(op: Int,
+                                   owner: String,
+                                   name: String,
+                                   desc: String,
+                                   itf: Boolean) {
         if (op == INVOKESPECIAL && name == "<init>" || op == INVOKESTATIC &&
             name == "valueOf") {
           if (primitiveBoxingClassName.contains(owner)) {

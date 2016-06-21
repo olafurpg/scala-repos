@@ -107,11 +107,12 @@ object expand {
             if (typesLeftAbstract.nonEmpty)
               c.error(tree.pos,
                       "Can't valify: Not all types were grounded: " +
-                      typesLeftAbstract.mkString(", "))
+                        typesLeftAbstract.mkString(", "))
             if (newvargs.exists(_.nonEmpty))
-              c.error(tree.pos,
-                      "Can't valify: Not all arguments were grounded: " +
-                      newvargs.map(_.mkString(", ")).mkString("(", ")(", ")"))
+              c.error(
+                  tree.pos,
+                  "Can't valify: Not all arguments were grounded: " +
+                    newvargs.map(_.mkString(", ")).mkString("(", ")(", ")"))
             ValDef(mods, newName, newtpt, grounded)
           } else {
             val newTargs = typesLeftAbstract
@@ -126,8 +127,8 @@ object expand {
     }
   }
 
-  private def mkName(c: Context)(
-      name: c.Name, typeMap: Map[c.Name, c.Type]): String = {
+  private def mkName(c: Context)(name: c.Name,
+                                 typeMap: Map[c.Name, c.Type]): String = {
     name.toString + "_" + typeMap.map {
       case (k, v) => v.toString.reverse.takeWhile(_ != '.').reverse
     }.mkString("_")
@@ -179,9 +180,9 @@ object expand {
   }
 
   /** for a valdef with a [[breeze.macros.expand.sequence]] annotation, converts the sequence of associations to a Map */
-  private def solveSequence(
-      context: Context)(v: context.mirror.universe.ValDef,
-                        typeMappings: Map[context.Name, List[context.Type]])
+  private def solveSequence(context: Context)(
+      v: context.mirror.universe.ValDef,
+      typeMappings: Map[context.Name, List[context.Type]])
     : (context.Name, Map[context.Type, context.Tree]) = {
     import context.mirror.universe._
     val x = v.mods.annotations.collectFirst {
@@ -235,14 +236,16 @@ object expand {
   }
 
   private def getExclusions(c: Context)(
-      mods: c.Modifiers, targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] = {
+      mods: c.Modifiers,
+      targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] = {
     import c.mirror.universe._
     mods.annotations.collect {
       case t @ q"new expand.exclude(...$args)" =>
-        for (aa <- args) if (aa.length != targs.length)
-          c.error(
-              t.pos,
-              "arguments to @exclude does not have the same arity as the type symbols!")
+        for (aa <- args)
+          if (aa.length != targs.length)
+            c.error(
+                t.pos,
+                "arguments to @exclude does not have the same arity as the type symbols!")
         args.map(aa =>
               (targs zip aa
                     .map(c.typeCheck(_))

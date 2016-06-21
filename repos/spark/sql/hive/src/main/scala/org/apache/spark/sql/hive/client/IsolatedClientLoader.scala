@@ -71,15 +71,15 @@ private[hive] object IsolatedClientLoader extends Logging {
               // is used just because we used to hard code it as the hadoop artifact to download.
               logWarning(
                   s"Failed to resolve Hadoop artifacts for the version ${hadoopVersion}. " +
-                  s"We will change the hadoop version from ${hadoopVersion} to 2.4.0 and try again. " +
-                  "Hadoop classes will not be shared between Spark and Hive metastore client. " +
-                  "It is recommended to set jars used by Hive metastore client through " +
-                  "spark.sql.hive.metastore.jars in the production environment.")
+                    s"We will change the hadoop version from ${hadoopVersion} to 2.4.0 and try again. " +
+                    "Hadoop classes will not be shared between Spark and Hive metastore client. " +
+                    "It is recommended to set jars used by Hive metastore client through " +
+                    "spark.sql.hive.metastore.jars in the production environment.")
               sharesHadoopClasses = false
               (downloadVersion(resolvedVersion, "2.4.0", ivyPath), "2.4.0")
           }
-          resolvedVersions.put(
-              (resolvedVersion, actualHadoopVersion), downloadedFiles)
+          resolvedVersions.put((resolvedVersion, actualHadoopVersion),
+                               downloadedFiles)
           resolvedVersions((resolvedVersion, actualHadoopVersion))
         }
 
@@ -183,7 +183,7 @@ private[hive] class IsolatedClientLoader(
   protected def isSharedClass(name: String): Boolean = {
     val isHadoopClass =
       name.startsWith("org.apache.hadoop.") &&
-      !name.startsWith("org.apache.hadoop.hive.")
+        !name.startsWith("org.apache.hadoop.hive.")
 
     name.contains("slf4j") || name.contains("log4j") ||
     name.startsWith("org.apache.spark.") ||
@@ -196,8 +196,8 @@ private[hive] class IsolatedClientLoader(
   /** True if `name` refers to a spark class that must see specific version of Hive. */
   protected def isBarrierClass(name: String): Boolean =
     name.startsWith(classOf[HiveClientImpl].getName) ||
-    name.startsWith(classOf[Shim].getName) ||
-    barrierPrefixes.exists(name.startsWith)
+      name.startsWith(classOf[Shim].getName) ||
+      barrierPrefixes.exists(name.startsWith)
 
   protected def classToPath(name: String): String =
     name.replaceAll("\\.", "/") + ".class"
@@ -209,36 +209,34 @@ private[hive] class IsolatedClientLoader(
     * instead of stacking a new URLClassLoader on top of it.
     */
   private[hive] val classLoader: MutableURLClassLoader = {
-    val isolatedClassLoader =
-      if (isolationOn) {
-        new URLClassLoader(allJars, rootClassLoader) {
-          override def loadClass(name: String, resolve: Boolean): Class[_] = {
-            val loaded = findLoadedClass(name)
-            if (loaded == null) doLoadClass(name, resolve) else loaded
-          }
-          def doLoadClass(name: String, resolve: Boolean): Class[_] = {
-            val classFileName = name.replaceAll("\\.", "/") + ".class"
-            if (isBarrierClass(name)) {
-              // For barrier classes, we construct a new copy of the class.
-              val bytes = IOUtils.toByteArray(
-                  baseClassLoader.getResourceAsStream(classFileName))
-              logDebug(
-                  s"custom defining: $name - ${util.Arrays.hashCode(bytes)}")
-              defineClass(name, bytes, 0, bytes.length)
-            } else if (!isSharedClass(name)) {
-              logDebug(
-                  s"hive class: $name - ${getResource(classToPath(name))}")
-              super.loadClass(name, resolve)
-            } else {
-              // For shared classes, we delegate to baseClassLoader.
-              logDebug(s"shared class: $name")
-              baseClassLoader.loadClass(name)
-            }
+    val isolatedClassLoader = if (isolationOn) {
+      new URLClassLoader(allJars, rootClassLoader) {
+        override def loadClass(name: String, resolve: Boolean): Class[_] = {
+          val loaded = findLoadedClass(name)
+          if (loaded == null) doLoadClass(name, resolve) else loaded
+        }
+        def doLoadClass(name: String, resolve: Boolean): Class[_] = {
+          val classFileName = name.replaceAll("\\.", "/") + ".class"
+          if (isBarrierClass(name)) {
+            // For barrier classes, we construct a new copy of the class.
+            val bytes = IOUtils.toByteArray(
+                baseClassLoader.getResourceAsStream(classFileName))
+            logDebug(
+                s"custom defining: $name - ${util.Arrays.hashCode(bytes)}")
+            defineClass(name, bytes, 0, bytes.length)
+          } else if (!isSharedClass(name)) {
+            logDebug(s"hive class: $name - ${getResource(classToPath(name))}")
+            super.loadClass(name, resolve)
+          } else {
+            // For shared classes, we delegate to baseClassLoader.
+            logDebug(s"shared class: $name")
+            baseClassLoader.loadClass(name)
           }
         }
-      } else {
-        baseClassLoader
       }
+    } else {
+      baseClassLoader
+    }
     // Right now, we create a URLClassLoader that gives preference to isolatedClassLoader
     // over its own URLs when it loads classes and resources.
     // We may want to use ChildFirstURLClassLoader based on
@@ -254,8 +252,12 @@ private[hive] class IsolatedClientLoader(
   /** The isolated client interface to Hive. */
   private[hive] def createClient(): HiveClient = {
     if (!isolationOn) {
-      return new HiveClientImpl(
-          version, sparkConf, hadoopConf, config, baseClassLoader, this)
+      return new HiveClientImpl(version,
+                                sparkConf,
+                                hadoopConf,
+                                config,
+                                baseClassLoader,
+                                this)
     }
     // Pre-reflective instantiation setup.
     logDebug("Initializing the logger to avoid disaster...")
@@ -275,8 +277,8 @@ private[hive] class IsolatedClientLoader(
           val cnf = e.getCause().asInstanceOf[NoClassDefFoundError]
           throw new ClassNotFoundException(
               s"$cnf when creating Hive client using classpath: ${execJars.mkString(", ")}\n" +
-              "Please make sure that jars for your version of hive and hadoop are included in the " +
-              s"paths passed to ${HiveContext.HIVE_METASTORE_JARS}.")
+                "Please make sure that jars for your version of hive and hadoop are included in the " +
+                s"paths passed to ${HiveContext.HIVE_METASTORE_JARS}.")
         } else {
           throw e
         }

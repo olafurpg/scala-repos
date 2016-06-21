@@ -130,8 +130,8 @@ sealed abstract class TaskKey[T]
     make(vs, source)(r.removeValues)
 
   private[this] def make[S](
-      other: Initialize[Task[S]], source: SourcePosition)(
-      f: (T, S) => T): Setting[Task[T]] =
+      other: Initialize[Task[S]],
+      source: SourcePosition)(f: (T, S) => T): Setting[Task[T]] =
     set((this, other) { (a, b) =>
       (a, b) map f.tupled
     }, source)
@@ -158,8 +158,8 @@ sealed trait InputKey[T]
     .inputTaskAssignMacroImpl[T]
   final def ~=(f: T => T): Setting[InputTask[T]] = macro std.TaskMacro
     .itaskTransformPosition[T]
-  final def transform(
-      f: T => T, source: SourcePosition): Setting[InputTask[T]] =
+  final def transform(f: T => T,
+                      source: SourcePosition): Setting[InputTask[T]] =
     set(scopedKey(_ mapTask { _ map f }), source)
 }
 
@@ -280,8 +280,8 @@ object Scoped {
 
     def <<=(app: Initialize[Task[S]]): Setting[Task[S]] = macro std.TaskMacro
       .itaskAssignPosition[S]
-    def set(
-        app: Initialize[Task[S]], source: SourcePosition): Setting[Task[S]] =
+    def set(app: Initialize[Task[S]],
+            source: SourcePosition): Setting[Task[S]] =
       Def.setting(scopedKey, app, source)
     def transform(f: S => S, source: SourcePosition): Setting[Task[S]] =
       set(scopedKey(_ map f), source)
@@ -511,7 +511,7 @@ object Scoped {
   sealed abstract class RichTaskables[K[L[x]]](
       final val keys: K[ScopedTaskable])(implicit a: AList[K]) {
     type App[T] = Initialize[Task[T]]
-    type Fun [M[_], Ret]
+    type Fun[M[_], Ret]
     protected def convert[M[_], Ret](f: Fun[M, Ret]): K[M] => Ret
     private[this] val inputs: K[App] =
       a.transform(keys, new (ScopedTaskable ~> App) {
@@ -907,8 +907,8 @@ object Scoped {
         def identity = apply(mkTuple15)
     }
    */
-  private[sbt] def extendScoped(
-      s1: Scoped, ss: Seq[Scoped]): Seq[AttributeKey[_]] =
+  private[sbt] def extendScoped(s1: Scoped,
+                                ss: Seq[Scoped]): Seq[AttributeKey[_]] =
     s1.key +: ss.map(_.key)
 }
 
@@ -933,8 +933,10 @@ object InputKey {
                          extend1: Scoped,
                          extendN: Scoped*): InputKey[T] =
     apply(
-        AttributeKey[InputTask[T]](
-            label, description, extendScoped(extend1, extendN), rank))
+        AttributeKey[InputTask[T]](label,
+                                   description,
+                                   extendScoped(extend1, extendN),
+                                   rank))
 
   def apply[T](akey: AttributeKey[InputTask[T]]): InputKey[T] =
     new InputKey[T] { val key = akey; def scope = Scope.ThisScope }
@@ -952,8 +954,9 @@ object TaskKey {
                          extend1: Scoped,
                          extendN: Scoped*): TaskKey[T] =
     apply(
-        AttributeKey[Task[T]](
-            label, description, extendScoped(extend1, extendN)))
+        AttributeKey[Task[T]](label,
+                              description,
+                              extendScoped(extend1, extendN)))
 
   def apply[T: Manifest](label: String,
                          description: String,
@@ -961,8 +964,10 @@ object TaskKey {
                          extend1: Scoped,
                          extendN: Scoped*): TaskKey[T] =
     apply(
-        AttributeKey[Task[T]](
-            label, description, extendScoped(extend1, extendN), rank))
+        AttributeKey[Task[T]](label,
+                              description,
+                              extendScoped(extend1, extendN),
+                              rank))
 
   def apply[T](akey: AttributeKey[Task[T]]): TaskKey[T] =
     new TaskKey[T] { val key = akey; def scope = Scope.ThisScope }
@@ -990,8 +995,10 @@ object SettingKey {
                          extend1: Scoped,
                          extendN: Scoped*): SettingKey[T] =
     apply(
-        AttributeKey[T](
-            label, description, extendScoped(extend1, extendN), rank))
+        AttributeKey[T](label,
+                        description,
+                        extendScoped(extend1, extendN),
+                        rank))
 
   def apply[T](akey: AttributeKey[T]): SettingKey[T] =
     new SettingKey[T] { val key = akey; def scope = Scope.ThisScope }

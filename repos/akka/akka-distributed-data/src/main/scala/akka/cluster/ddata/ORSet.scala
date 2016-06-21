@@ -82,8 +82,9 @@ object ORSet {
     * INTERNAL API
     * @see [[ORSet#merge]]
     */
-  private[akka] def mergeCommonKeys[A](
-      commonKeys: Set[A], lhs: ORSet[A], rhs: ORSet[A]): Map[A, ORSet.Dot] =
+  private[akka] def mergeCommonKeys[A](commonKeys: Set[A],
+                                       lhs: ORSet[A],
+                                       rhs: ORSet[A]): Map[A, ORSet.Dot] =
     mergeCommonKeys(commonKeys.iterator, lhs, rhs)
 
   private def mergeCommonKeys[A](commonKeys: Iterator[A],
@@ -218,7 +219,7 @@ object ORSet {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class ORSet[A] private[akka](
+final class ORSet[A] private[akka] (
     private[akka] val elementsMap: Map[A, ORSet.Dot],
     private[akka] val vvector: VersionVector)
     extends ReplicatedData
@@ -323,12 +324,16 @@ final class ORSet[A] private[akka](
       val entries00 = ORSet.mergeCommonKeys(commonKeys, this, that)
       val thisUniqueKeys =
         this.elementsMap.keysIterator.filterNot(that.elementsMap.contains)
-      val entries0 = ORSet.mergeDisjointKeys(
-          thisUniqueKeys, this.elementsMap, that.vvector, entries00)
+      val entries0 = ORSet.mergeDisjointKeys(thisUniqueKeys,
+                                             this.elementsMap,
+                                             that.vvector,
+                                             entries00)
       val thatUniqueKeys =
         that.elementsMap.keysIterator.filterNot(this.elementsMap.contains)
-      val entries = ORSet.mergeDisjointKeys(
-          thatUniqueKeys, that.elementsMap, this.vvector, entries0)
+      val entries = ORSet.mergeDisjointKeys(thatUniqueKeys,
+                                            that.elementsMap,
+                                            this.vvector,
+                                            entries0)
       val mergedVvector = this.vvector.merge(that.vvector)
 
       clearAncestor()
@@ -339,8 +344,8 @@ final class ORSet[A] private[akka](
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     vvector.needPruningFrom(removedNode)
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): ORSet[A] = {
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): ORSet[A] = {
     val pruned = elementsMap.foldLeft(Map.empty[A, ORSet.Dot]) {
       case (acc, (elem, dot)) ⇒
         if (dot.needPruningFrom(removedNode))
@@ -351,9 +356,9 @@ final class ORSet[A] private[akka](
       copy(vvector = vvector.prune(removedNode, collapseInto))
     else {
       // re-add elements that were pruned, to bump dots to right vvector
-      val newSet = new ORSet(elementsMap = elementsMap ++ pruned,
-                             vvector =
-                               vvector.prune(removedNode, collapseInto))
+      val newSet = new ORSet(
+          elementsMap = elementsMap ++ pruned,
+          vvector = vvector.prune(removedNode, collapseInto))
       pruned.keys.foldLeft(newSet) {
         case (s, elem) ⇒ s.add(collapseInto, elem)
       }

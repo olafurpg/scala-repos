@@ -140,9 +140,8 @@ object Analytics extends Logging {
           partitionStrategy.foldLeft(unpartitionedGraph)(_.partitionBy(_))
 
         val cc = ConnectedComponents.run(graph)
-        println(
-            "Components: " +
-            cc.vertices.map { case (vid, data) => data }.distinct())
+        println("Components: " +
+              cc.vertices.map { case (vid, data) => data }.distinct())
         sc.stop()
 
       case "triangles" =>
@@ -168,8 +167,7 @@ object Analytics extends Logging {
           .partitionBy(partitionStrategy.getOrElse(RandomVertexCut))
           .cache()
         val triangles = TriangleCount.run(graph)
-        println(
-            "Triangles: " + triangles.vertices.map {
+        println("Triangles: " + triangles.vertices.map {
           case (vid, data) => data.toLong
         }.reduce(_ + _) / 3)
         sc.stop()

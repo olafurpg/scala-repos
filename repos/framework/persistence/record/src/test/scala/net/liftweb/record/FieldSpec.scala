@@ -118,11 +118,11 @@ object FieldSpec extends Specification {
       if (canCheckDefaultValues) {
         "which correctly clear back to the default box value" in S
           .initIfUninitted(session) {
-          in.setBox(Full(example))
-          in.valueBox.isDefined must_== true
-          in.clear
-          in.valueBox must_== in.defaultValueBox
-        }
+            in.setBox(Full(example))
+            in.valueBox.isDefined must_== true
+            in.clear
+            in.valueBox must_== in.defaultValueBox
+          }
       }
 
       "which capture error conditions set in" in {
@@ -288,13 +288,13 @@ object FieldSpec extends Specification {
           formXml must beLike {
             case Full(fprime) =>
               val f = ("* [name]" #> ".*" & "select *" #>
-                  (((ns: NodeSeq) =>
-                      ns.filter {
-                        case e: Elem =>
-                          e.attribute("selected").map(_.text) == Some(
-                              "selected")
-                        case _ => false
-                      }) andThen "* [value]" #> ".*"))(fprime)
+                    (((ns: NodeSeq) =>
+                        ns.filter {
+                          case e: Elem =>
+                            e.attribute("selected").map(_.text) == Some(
+                                "selected")
+                          case _ => false
+                        }) andThen "* [value]" #> ".*"))(fprime)
               val ret: Boolean = Helpers.compareXml(f, fp)
               ret must_== true
           }
@@ -590,7 +590,7 @@ object FieldSpec extends Specification {
       val rec = PasswordTestRecord.createRecord.password("")
 
       rec.validate must_==
-        (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
+      (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
     }
 
     "correctly validate the unencrypted value" in S.initIfUninitted(session) {
@@ -599,7 +599,7 @@ object FieldSpec extends Specification {
 
       rec.password("1234")
       rec.validate must_==
-        (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
+      (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
     }
 
     "match with encrypted value" in {

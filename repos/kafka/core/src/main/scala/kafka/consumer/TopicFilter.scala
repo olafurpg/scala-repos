@@ -45,8 +45,8 @@ case class Whitelist(rawRegex: String) extends TopicFilter(rawRegex) {
   override def isTopicAllowed(topic: String, excludeInternalTopics: Boolean) = {
     val allowed =
       topic.matches(regex) &&
-      !(TopicConstants.INTERNAL_TOPICS.contains(topic) &&
-          excludeInternalTopics)
+        !(TopicConstants.INTERNAL_TOPICS.contains(topic) &&
+              excludeInternalTopics)
 
     debug("%s %s".format(topic, if (allowed) "allowed" else "filtered"))
 
@@ -58,8 +58,8 @@ case class Blacklist(rawRegex: String) extends TopicFilter(rawRegex) {
   override def isTopicAllowed(topic: String, excludeInternalTopics: Boolean) = {
     val allowed =
       (!topic.matches(regex)) &&
-      !(TopicConstants.INTERNAL_TOPICS.contains(topic) &&
-          excludeInternalTopics)
+        !(TopicConstants.INTERNAL_TOPICS.contains(topic) &&
+              excludeInternalTopics)
 
     debug("%s %s".format(topic, if (allowed) "allowed" else "filtered"))
 

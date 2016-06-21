@@ -74,8 +74,8 @@ object TestServer {
     val serverProvider: ServerProvider = {
       testServerProvider
     } getOrElse {
-      ServerProvider.fromConfiguration(
-          process.classLoader, config.configuration)
+      ServerProvider.fromConfiguration(process.classLoader,
+                                       config.configuration)
     }
     Play.start(application)
     val server = serverProvider.createServer(config, application)
@@ -115,5 +115,7 @@ private[play] class TestServerProcess extends ServerProcess {
 }
 
 private[play] case class TestServerExitException(
-    message: String, cause: Option[Throwable] = None, returnCode: Int = -1)
+    message: String,
+    cause: Option[Throwable] = None,
+    returnCode: Int = -1)
     extends Exception(s"Exit with $message, $cause, $returnCode", cause.orNull)

@@ -15,16 +15,15 @@ class StatsFormatterTest extends FunSuite {
   private val histo1 = sr.stat("histo1")
   (0 to 100).foreach(histo1.add(_))
 
-  private val values = SampledValues(
-      Map.empty, Map.empty, metrics.sampleHistograms().asScala)
+  private val values =
+    SampledValues(Map.empty, Map.empty, metrics.sampleHistograms().asScala)
 
   test("CommonsMetrics is formatted the same as Metrics.sample") {
     val formatter = StatsFormatter.CommonsMetrics
     val formatted = formatter(values)
 
     // remove stddev as it is not supported
-    assert(
-        formatted == metrics
+    assert(formatted == metrics
           .sample()
           .asScala
           .filterKeys(!_.endsWith("stddev")))

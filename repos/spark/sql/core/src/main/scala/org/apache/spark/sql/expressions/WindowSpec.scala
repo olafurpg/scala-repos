@@ -30,9 +30,9 @@ import org.apache.spark.sql.catalyst.expressions._
   * @since 1.4.0
   */
 @Experimental
-class WindowSpec private[sql](partitionSpec: Seq[Expression],
-                              orderSpec: Seq[SortOrder],
-                              frame: catalyst.expressions.WindowFrame) {
+class WindowSpec private[sql] (partitionSpec: Seq[Expression],
+                               orderSpec: Seq[SortOrder],
+                               frame: catalyst.expressions.WindowFrame) {
 
   /**
     * Defines the partitioning columns in a [[WindowSpec]].

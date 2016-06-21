@@ -26,8 +26,9 @@ object InspectionsUtil {
     conformsToTypeFromClass(exprType, className, expr.getProject)
   }
 
-  def conformsToTypeFromClass(
-      scType: ScType, className: String, project: Project): Boolean = {
+  def conformsToTypeFromClass(scType: ScType,
+                              className: String,
+                              project: Project): Boolean = {
     def typeFromClassName(fqn: String, project: Project): Option[ScType] = {
       val clazz = JavaPsiFacade
         .getInstance(project)

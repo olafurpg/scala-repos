@@ -21,12 +21,13 @@ final class ScalaUsageTypeProvider extends UsageTypeProviderEx {
   def getUsageType(element: PsiElement): UsageType =
     getUsageType(element, null)
 
-  def getUsageType(
-      element: PsiElement, targets: Array[UsageTarget]): UsageType = {
+  def getUsageType(element: PsiElement,
+                   targets: Array[UsageTarget]): UsageType = {
     import com.intellij.psi.util.PsiTreeUtil._
     def parentOfType[T <: PsiElement: ClassTag]: Option[T] = {
-      Option(getParentOfType[T](
-              element, classTag[T].runtimeClass.asInstanceOf[Class[T]]))
+      Option(
+          getParentOfType[T](element,
+                             classTag[T].runtimeClass.asInstanceOf[Class[T]]))
     }
 
     if (element.containingScalaFile.isDefined) {
@@ -93,8 +94,8 @@ final class ScalaUsageTypeProvider extends UsageTypeProviderEx {
       }
 
       for (typedPattern <- parentOfType[ScTypedPattern];
-           tp <- typedPattern.typePattern if isAncestor(
-               tp.typeElement, element, false)) {
+           tp <- typedPattern.typePattern
+           if isAncestor(tp.typeElement, element, false)) {
         return ScalaUsageTypeProvider.ClassTypedPattern
       }
 

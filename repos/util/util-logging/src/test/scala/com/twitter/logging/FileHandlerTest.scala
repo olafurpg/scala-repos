@@ -37,7 +37,8 @@ class FileHandlerTest extends WordSpec with TempFolder {
 
   def writer(filename: String) = {
     new OutputStreamWriter(
-        new FileOutputStream(new File(folderName, filename)), "UTF-8")
+        new FileOutputStream(new File(folderName, filename)),
+        "UTF-8")
   }
 
   "FileHandler" should {

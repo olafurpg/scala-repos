@@ -37,8 +37,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 /** Tests for [[scalafx.PathTransition.PathTransition.OrientationType]]. */
 @RunWith(classOf[JUnitRunner])
 class PathTransitionOrientationTypeSpec
-    extends SFXEnumDelegateSpec[
-        jfxa.PathTransition.OrientationType, PathTransition.OrientationType](
+    extends SFXEnumDelegateSpec[jfxa.PathTransition.OrientationType,
+                                PathTransition.OrientationType](
         classOf[jfxa.PathTransition.OrientationType],
         classOf[PathTransition.OrientationType],
         PathTransition.OrientationType)

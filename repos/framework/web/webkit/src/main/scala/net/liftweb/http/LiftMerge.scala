@@ -35,10 +35,8 @@ private[this] case class HtmlState(
     htmlDescendant: Boolean = false, // any descendant of HTML
     headChild: Boolean = false, // direct child of a HEAD in its proper place
     bodyDescendant: Boolean = false, // any descendant of BODY
-    headInBodyChild: Boolean =
-      false, // direct child of a HEAD/HEAD_* somewhere in BODY
-    tailInBodyChild: Boolean =
-      false, // direct child of a TAIL somewhere in BODY
+    headInBodyChild: Boolean = false, // direct child of a HEAD/HEAD_* somewhere in BODY
+    tailInBodyChild: Boolean = false, // direct child of a TAIL somewhere in BODY
     bodyChild: Boolean = false, // direct child of body
     mergeHeadAndTail: Boolean // false if we're not doing head/tail merging
 )
@@ -126,7 +124,8 @@ private[http] trait LiftMerge { self: LiftSession =>
     val contextPath: String = S.contextPath
 
     def normalizeMergeAndExtractEvents(
-        nodes: NodeSeq, startingState: HtmlState): NodesAndEventJs = {
+        nodes: NodeSeq,
+        startingState: HtmlState): NodesAndEventJs = {
       val HtmlState(htmlDescendant,
                     headChild,
                     bodyDescendant,
@@ -145,20 +144,20 @@ private[http] trait LiftMerge { self: LiftSession =>
 
             case element: Elem
                 if element.label == "head" && htmlDescendant &&
-                !bodyDescendant =>
+                  !bodyDescendant =>
               headElement = element
 
               startingState.copy(headChild = true && mergeHeadAndTail)
 
             case element: Elem
                 if mergeHeadAndTail && (element.label == "head" ||
-                    element.label.startsWith("head_")) && htmlDescendant &&
-                bodyDescendant =>
+                      element.label.startsWith("head_")) && htmlDescendant &&
+                  bodyDescendant =>
               startingState.copy(headInBodyChild = true)
 
             case element: Elem
                 if mergeHeadAndTail && element.label == "tail" &&
-                htmlDescendant && bodyDescendant =>
+                  htmlDescendant && bodyDescendant =>
               startingState.copy(tailInBodyChild = true)
 
             case element: Elem if element.label == "body" && htmlDescendant =>
@@ -181,8 +180,9 @@ private[http] trait LiftMerge { self: LiftSession =>
             .normalizeNode(node, contextPath, stripComments)
             .map {
               case normalized @ NodeAndEventJs(normalizedElement: Elem, _) =>
-                val normalizedChildren = normalizeMergeAndExtractEvents(
-                    normalizedElement.child, childInfo)
+                val normalizedChildren =
+                  normalizeMergeAndExtractEvents(normalizedElement.child,
+                                                 childInfo)
 
                 normalized.copy(
                     normalizedElement.copy(child = normalizedChildren.nodes),
@@ -232,7 +232,8 @@ private[http] trait LiftMerge { self: LiftSession =>
 
     if (!hasHtmlHeadAndBody) {
       val fixedHtml = normalizeMergeAndExtractEvents(
-          xhtml, HtmlState(mergeHeadAndTail = false)).nodes
+          xhtml,
+          HtmlState(mergeHeadAndTail = false)).nodes
 
       fixedHtml.find {
         case e: Elem => true
@@ -240,7 +241,8 @@ private[http] trait LiftMerge { self: LiftSession =>
       } getOrElse Text("")
     } else {
       val eventJs = normalizeMergeAndExtractEvents(
-          xhtml, HtmlState(mergeHeadAndTail = true)).js
+          xhtml,
+          HtmlState(mergeHeadAndTail = true)).js
 
       val htmlKids = new ListBuffer[Node]
 
@@ -256,7 +258,7 @@ private[http] trait LiftMerge { self: LiftSession =>
       // Appends ajax script to body
       if (LiftRules.autoIncludeAjaxCalc.vend().apply(this)) {
         bodyChildren +=
-          <script src={S.encodeURL(contextPath + "/"+LiftRules.resourceServerPath+"/lift.js")}
+        <script src={S.encodeURL(contextPath + "/"+LiftRules.resourceServerPath+"/lift.js")}
                 type="text/javascript"/>
         bodyChildren += nl
       }
@@ -302,27 +304,26 @@ private[http] trait LiftMerge { self: LiftSession =>
                         htmlElement.minimizeEmpty,
                         htmlKids.toList: _*)
 
-      val ret: Node =
-        if (Props.devMode) {
-          LiftRules.xhtmlValidator.toList.flatMap(_ (tmpRet)) match {
-            case Nil => tmpRet
-            case xs =>
-              import scala.xml.transform._
+      val ret: Node = if (Props.devMode) {
+        LiftRules.xhtmlValidator.toList.flatMap(_ (tmpRet)) match {
+          case Nil => tmpRet
+          case xs =>
+            import scala.xml.transform._
 
-              val errors: NodeSeq = xs.map(e =>
-                    <div style="border: red solid 2px">XHTML Validation error:{e.msg}at line{e.line + 1}and column{e.col}</div>)
+            val errors: NodeSeq = xs.map(e =>
+                  <div style="border: red solid 2px">XHTML Validation error:{e.msg}at line{e.line + 1}and column{e.col}</div>)
 
-              val rule = new RewriteRule {
-                override def transform(n: Node) = n match {
-                  case e: Elem if e.label == "body" =>
-                    e.copy(child = e.child ++ errors)
+            val rule = new RewriteRule {
+              override def transform(n: Node) = n match {
+                case e: Elem if e.label == "body" =>
+                  e.copy(child = e.child ++ errors)
 
-                  case x => super.transform(x)
-                }
+                case x => super.transform(x)
               }
-              (new RuleTransformer(rule)).transform(tmpRet)(0)
-          }
-        } else tmpRet
+            }
+            (new RuleTransformer(rule)).transform(tmpRet)(0)
+        }
+      } else tmpRet
 
       ret
     }

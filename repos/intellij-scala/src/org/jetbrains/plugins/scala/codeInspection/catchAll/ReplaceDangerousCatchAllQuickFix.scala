@@ -12,7 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScR
   */
 class ReplaceDangerousCatchAllQuickFix(caseClause: ScCaseClause)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("specify.type.of.exception"), caseClause) {
+        ScalaBundle.message("specify.type.of.exception"),
+        caseClause) {
   def doApplyFix(project: Project) {
     val cc = getElement
     if (!cc.isValid) return

@@ -41,16 +41,17 @@ class RenameScalaMethodProcessor
   override def findReferences(element: PsiElement) =
     ScalaRenameUtil.findReferences(element)
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor): PsiElement = {
     val guess = ScalaRenameUtil.findSubstituteElement(element)
     if (guess != element) guess
     else
       RenameSuperMembersUtil.chooseSuper(element.asInstanceOf[ScNamedElement])
   }
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement]) {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor,
+                                         renameCallback: Pass[PsiElement]) {
     val named = element match {
       case named: ScNamedElement => named; case _ => return
     }
@@ -58,12 +59,14 @@ class RenameScalaMethodProcessor
     if (guess != element) renameCallback.pass(guess)
     else
       RenameSuperMembersUtil.chooseAndProcessSuper(
-          named, new PsiElementProcessor[PsiNamedElement] {
-        def execute(named: PsiNamedElement): Boolean = {
-          renameCallback.pass(named)
-          false
-        }
-      }, editor)
+          named,
+          new PsiElementProcessor[PsiNamedElement] {
+            def execute(named: PsiNamedElement): Boolean = {
+              renameCallback.pass(named)
+              false
+            }
+          },
+          editor)
   }
 
   def capitalize(text: String): String =
@@ -73,8 +76,8 @@ class RenameScalaMethodProcessor
                              newName: String,
                              usages: Array[UsageInfo],
                              listener: RefactoringElementListener) {
-    ScalaRenameUtil.doRenameGenericNamedElement(
-        psiElement, newName, usages, listener)
+    ScalaRenameUtil
+      .doRenameGenericNamedElement(psiElement, newName, usages, listener)
   }
 }
 

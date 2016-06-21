@@ -75,8 +75,8 @@ class ScalaGoToSuperActionHandler extends LanguageCodeInsightActionHandler {
 private object ScalaGoToSuperActionHandler {
   val empty = Array[PsiElement]()
 
-  def findSuperElements(
-      file: PsiFile, offset: Int): (Seq[PsiElement], Seq[PsiElement]) = {
+  def findSuperElements(file: PsiFile,
+                        offset: Int): (Seq[PsiElement], Seq[PsiElement]) = {
     var element = file.findElementAt(offset)
     def test(e: PsiElement): Boolean = e match {
       case _: ScTemplateDefinition | _: ScFunction |

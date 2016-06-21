@@ -32,26 +32,31 @@ trait FunSpecFileStructureViewTest extends ScalaTestTestCase {
 
   def testFunSpecNormal() {
     addFunSpecViewTest()
-    runFileStructureViewTest(
-        className, normalStatusId, "describe(\"parent\")", "it (\"child1\")")
+    runFileStructureViewTest(className,
+                             normalStatusId,
+                             "describe(\"parent\")",
+                             "it (\"child1\")")
   }
 
   def testFunSpecHierarchy(): Unit = {
     addFunSpecViewTest()
-    runFileStructureViewTest(
-        className, "it (\"child1\")", Some("describe(\"parent\")"))
+    runFileStructureViewTest(className,
+                             "it (\"child1\")",
+                             Some("describe(\"parent\")"))
   }
 
   def testFunSpecIgnored(): Unit = {
     addFunSpecViewTest()
-    runFileStructureViewTest(
-        className, ignoredStatusId, "ignore (\"ignore1\")")
+    runFileStructureViewTest(className,
+                             ignoredStatusId,
+                             "ignore (\"ignore1\")")
   }
 
   def testFunSpecIgnoredAndPending(): Unit = {
     addFunSpecViewTest()
-    runFileStructureViewTest(
-        className, ignoredStatusId, "ignore(\"pending_and_ignore\")")
+    runFileStructureViewTest(className,
+                             ignoredStatusId,
+                             "ignore(\"pending_and_ignore\")")
   }
 
   def testFunSpecPending(): Unit = {

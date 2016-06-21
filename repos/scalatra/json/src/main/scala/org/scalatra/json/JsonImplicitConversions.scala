@@ -75,7 +75,8 @@ object JsonConversions {
   }
 
   class JsonDateConversion[JValue](
-      source: JValue, jsonToDate: String => TypeConverter[JValue, Date]) {
+      source: JValue,
+      jsonToDate: String => TypeConverter[JValue, Date]) {
     def asDate(format: String): Option[Date] = jsonToDate(format).apply(source)
   }
 }

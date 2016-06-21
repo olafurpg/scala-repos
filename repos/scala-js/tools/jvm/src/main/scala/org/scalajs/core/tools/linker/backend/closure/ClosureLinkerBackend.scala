@@ -31,8 +31,7 @@ final class ClosureLinkerBackend(
     semantics: Semantics,
     withSourceMap: Boolean,
     config: LinkerBackend.Config
-)
-    extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
+) extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
 
   private[this] val emitter = {
     new Emitter(semantics, OutputMode.ECMAScript51Isolated)
@@ -77,8 +76,9 @@ final class ClosureLinkerBackend(
     val compiler = closureCompiler(logger)
 
     val result = logger.time("Closure: Compiler pass") {
-      compiler.compileModules(
-          List(closureExterns).asJava, List(module).asJava, options)
+      compiler.compileModules(List(closureExterns).asJava,
+                              List(module).asJava,
+                              options)
     }
 
     logger.time("Closure: Write result") {

@@ -57,7 +57,8 @@ class ALSSuite
       val maxLocalIndex = Int.MaxValue / numBlocks
       val tests =
         Seq.fill(5)((random.nextInt(numBlocks), random.nextInt(maxLocalIndex))) ++ Seq(
-            (0, 0), (numBlocks - 1, maxLocalIndex))
+            (0, 0),
+            (numBlocks - 1, maxLocalIndex))
       tests.foreach {
         case (blockId, localIndex) =>
           val err =
@@ -251,7 +252,7 @@ class ALSSuite
     }
     logInfo(
         s"Generated an explicit feedback dataset with ${training.size} ratings for training " +
-        s"and ${test.size} for test.")
+          s"and ${test.size} for test.")
     (sc.parallelize(training, 2), sc.parallelize(test, 2))
   }
 
@@ -301,7 +302,7 @@ class ALSSuite
     }
     logInfo(
         s"Generated an implicit feedback dataset with ${training.size} ratings for training " +
-        s"and ${test.size} for test.")
+          s"and ${test.size} for test.")
     (sc.parallelize(training, 2), sc.parallelize(test, 2))
   }
 
@@ -367,31 +368,30 @@ class ALSSuite
         case Row(rating: Float, prediction: Float) =>
           (rating.toDouble, prediction.toDouble)
       }
-    val rmse =
-      if (implicitPrefs) {
-        // TODO: Use a better (rank-based?) evaluation metric for implicit feedback.
-        // We limit the ratings and the predictions to interval [0, 1] and compute the weighted RMSE
-        // with the confidence scores as weights.
-        val (totalWeight, weightedSumSq) = predictions.map {
-          case (rating, prediction) =>
-            val confidence = 1.0 + alpha * math.abs(rating)
-            val rating01 = math.max(math.min(rating, 1.0), 0.0)
-            val prediction01 = math.max(math.min(prediction, 1.0), 0.0)
-            val err = prediction01 - rating01
-            (confidence, confidence * err * err)
-        }.reduce {
-          case ((c0, e0), (c1, e1)) =>
-            (c0 + c1, e0 + e1)
-        }
-        math.sqrt(weightedSumSq / totalWeight)
-      } else {
-        val mse = predictions.map {
-          case (rating, prediction) =>
-            val err = rating - prediction
-            err * err
-        }.mean()
-        math.sqrt(mse)
+    val rmse = if (implicitPrefs) {
+      // TODO: Use a better (rank-based?) evaluation metric for implicit feedback.
+      // We limit the ratings and the predictions to interval [0, 1] and compute the weighted RMSE
+      // with the confidence scores as weights.
+      val (totalWeight, weightedSumSq) = predictions.map {
+        case (rating, prediction) =>
+          val confidence = 1.0 + alpha * math.abs(rating)
+          val rating01 = math.max(math.min(rating, 1.0), 0.0)
+          val prediction01 = math.max(math.min(prediction, 1.0), 0.0)
+          val err = prediction01 - rating01
+          (confidence, confidence * err * err)
+      }.reduce {
+        case ((c0, e0), (c1, e1)) =>
+          (c0 + c1, e0 + e1)
       }
+      math.sqrt(weightedSumSq / totalWeight)
+    } else {
+      val mse = predictions.map {
+        case (rating, prediction) =>
+          val err = rating - prediction
+          err * err
+      }.mean()
+      math.sqrt(mse)
+    }
     logInfo(s"Test RMSE is $rmse.")
     assert(rmse < targetRMSE)
 
@@ -417,8 +417,10 @@ class ALSSuite
   }
 
   test("approximate rank-1 matrix") {
-    val (training, test) = genExplicitTestData(
-        numUsers = 20, numItems = 40, rank = 1, noiseStd = 0.01)
+    val (training, test) = genExplicitTestData(numUsers = 20,
+                                               numItems = 40,
+                                               rank = 1,
+                                               noiseStd = 0.01)
     testALS(training,
             test,
             maxIter = 2,
@@ -434,8 +436,10 @@ class ALSSuite
   }
 
   test("approximate rank-2 matrix") {
-    val (training, test) = genExplicitTestData(
-        numUsers = 20, numItems = 40, rank = 2, noiseStd = 0.01)
+    val (training, test) = genExplicitTestData(numUsers = 20,
+                                               numItems = 40,
+                                               rank = 2,
+                                               noiseStd = 0.01)
     testALS(training,
             test,
             maxIter = 4,
@@ -451,8 +455,10 @@ class ALSSuite
   }
 
   test("different block settings") {
-    val (training, test) = genExplicitTestData(
-        numUsers = 20, numItems = 40, rank = 2, noiseStd = 0.01)
+    val (training, test) = genExplicitTestData(numUsers = 20,
+                                               numItems = 40,
+                                               rank = 2,
+                                               noiseStd = 0.01)
     for ((numUserBlocks, numItemBlocks) <- Seq((1, 1), (1, 2), (2, 1), (2, 2))) {
       testALS(training,
               test,
@@ -479,8 +485,10 @@ class ALSSuite
   }
 
   test("implicit feedback") {
-    val (training, test) = genImplicitTestData(
-        numUsers = 20, numItems = 40, rank = 2, noiseStd = 0.01)
+    val (training, test) = genImplicitTestData(numUsers = 20,
+                                               numItems = 40,
+                                               rank = 2,
+                                               noiseStd = 0.01)
     testALS(training,
             test,
             maxIter = 4,
@@ -491,8 +499,10 @@ class ALSSuite
   }
 
   test("using generic ID types") {
-    val (ratings, _) = genImplicitTestData(
-        numUsers = 20, numItems = 40, rank = 2, noiseStd = 0.01)
+    val (ratings, _) = genImplicitTestData(numUsers = 20,
+                                           numItems = 40,
+                                           rank = 2,
+                                           noiseStd = 0.01)
 
     val longRatings =
       ratings.map(r => Rating(r.user.toLong, r.item.toLong, r.rating))
@@ -508,8 +518,10 @@ class ALSSuite
   }
 
   test("nonnegative constraint") {
-    val (ratings, _) = genImplicitTestData(
-        numUsers = 20, numItems = 40, rank = 2, noiseStd = 0.01)
+    val (ratings, _) = genImplicitTestData(numUsers = 20,
+                                           numItems = 40,
+                                           rank = 2,
+                                           noiseStd = 0.01)
     val (userFactors, itemFactors) =
       ALS.train(ratings, rank = 2, maxIter = 4, nonnegative = true, seed = 0)
     def isNonnegative(factors: RDD[(Int, Array[Float])]): Boolean = {
@@ -533,8 +545,10 @@ class ALSSuite
   }
 
   test("partitioner in returned factors") {
-    val (ratings, _) = genImplicitTestData(
-        numUsers = 20, numItems = 40, rank = 2, noiseStd = 0.01)
+    val (ratings, _) = genImplicitTestData(numUsers = 20,
+                                           numItems = 40,
+                                           rank = 2,
+                                           noiseStd = 0.01)
     val (userFactors, itemFactors) = ALS.train(ratings,
                                                rank = 2,
                                                maxIter = 4,

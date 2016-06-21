@@ -31,8 +31,8 @@ class ResponseParserSpec
     extends FreeSpec
     with Matchers
     with BeforeAndAfterAll {
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING
     akka.http.parsing.max-response-reason-length = 21""")
@@ -285,8 +285,8 @@ class ResponseParserSpec
       override def equals(other: scala.Any): Boolean = other match {
         case other: StrictEqualHttpResponse ⇒
           this.resp.copy(entity = HttpEntity.Empty) == other.resp.copy(
-              entity = HttpEntity.Empty) && Await.result(
-              this.resp.entity.toStrict(250.millis), 250.millis) == Await
+              entity = HttpEntity.Empty) && Await
+            .result(this.resp.entity.toStrict(250.millis), 250.millis) == Await
             .result(other.resp.entity.toStrict(250.millis), 250.millis)
       }
 
@@ -299,8 +299,8 @@ class ResponseParserSpec
 
     def parseTo(expected: HttpResponse*): Matcher[String] =
       parseTo(GET, expected: _*)
-    def parseTo(
-        requestMethod: HttpMethod, expected: HttpResponse*): Matcher[String] =
+    def parseTo(requestMethod: HttpMethod,
+                expected: HttpResponse*): Matcher[String] =
       multiParseTo(requestMethod, expected: _*).compose(_ :: Nil)
 
     def multiParseTo(expected: HttpResponse*): Matcher[Seq[String]] =
@@ -349,15 +349,20 @@ class ResponseParserSpec
         .named("parser")
         .splitWhen(x ⇒
               x.isInstanceOf[MessageStart] ||
-              x.isInstanceOf[EntityStreamError])
+                x.isInstanceOf[EntityStreamError])
         .prefixAndTail(1)
         .collect {
-          case (Seq(ResponseStart(
-                statusCode, protocol, headers, createEntity, close)),
+          case (Seq(ResponseStart(statusCode,
+                                  protocol,
+                                  headers,
+                                  createEntity,
+                                  close)),
                 entityParts) ⇒
             closeAfterResponseCompletion :+= close
-            Right(HttpResponse(
-                    statusCode, headers, createEntity(entityParts), protocol))
+            Right(HttpResponse(statusCode,
+                               headers,
+                               createEntity(entityParts),
+                               protocol))
           case (Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
                 tail) ⇒
             tail.runWith(Sink.ignore)
@@ -371,8 +376,8 @@ class ResponseParserSpec
     protected def parserSettings: ParserSettings = ParserSettings(system)
 
     def newParserStage(requestMethod: HttpMethod = GET) = {
-      val parser = new HttpResponseParser(
-          parserSettings, HttpHeaderParser(parserSettings)())
+      val parser = new HttpResponseParser(parserSettings,
+                                          HttpHeaderParser(parserSettings)())
       parser.setContextForNextResponse(
           HttpResponseParser.ResponseContext(requestMethod, None))
       parser.stage

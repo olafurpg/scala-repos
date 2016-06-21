@@ -61,11 +61,13 @@ sealed trait Multipart extends jm.Multipart {
       implicit log: LoggingAdapter = NoLogging): MessageEntity = {
     val chunks = parts
       .transform(() ⇒
-            BodyPartRenderer.streamed(
-                boundary, charset.nioCharset, partHeadersSizeHint = 128, log))
+            BodyPartRenderer.streamed(boundary,
+                                      charset.nioCharset,
+                                      partHeadersSizeHint = 128,
+                                      log))
       .flatMapConcat(ConstantFun.scalaIdentityFunction)
-    HttpEntity.Chunked(
-        mediaType withBoundary boundary withCharset charset, chunks)
+    HttpEntity
+      .Chunked(mediaType withBoundary boundary withCharset charset, chunks)
   }
 
   /** Java API */
@@ -123,8 +125,8 @@ object Multipart {
       (strictParts: immutable.Seq[jm.Multipart.BodyPart.Strict]).asJava
 
     /** Java API */
-    override def toEntity(
-        charset: jm.HttpCharset, boundary: String): jm.HttpEntity.Strict =
+    override def toEntity(charset: jm.HttpCharset,
+                          boundary: String): jm.HttpEntity.Strict =
       super.toEntity(charset, boundary).asInstanceOf[jm.HttpEntity.Strict]
   }
 
@@ -209,8 +211,8 @@ object Multipart {
     }
   }
 
-  private def strictify[
-      BP <: Multipart.BodyPart, BPS <: Multipart.BodyPart.Strict](
+  private def strictify[BP <: Multipart.BodyPart,
+                        BPS <: Multipart.BodyPart.Strict](
       parts: Source[BP, Any])(f: BP ⇒ Future[BPS])(
       implicit fm: Materializer): Future[Vector[BPS]] = {
     import fm.executionContext
@@ -246,8 +248,8 @@ object Multipart {
         .toJava
   }
   object General {
-    def apply(
-        mediaType: MediaType.Multipart, parts: BodyPart.Strict*): Strict =
+    def apply(mediaType: MediaType.Multipart,
+              parts: BodyPart.Strict*): Strict =
       Strict(mediaType, parts.toVector)
 
     def apply(
@@ -279,10 +281,11 @@ object Multipart {
       override def productPrefix = "General.Strict"
 
       /** Java API */
-      override def getParts: JSource[
-          jm.Multipart.General.BodyPart.Strict, AnyRef] =
-        super.getParts.asInstanceOf[JSource[
-                _ <: jm.Multipart.General.BodyPart.Strict, AnyRef]]
+      override def getParts: JSource[jm.Multipart.General.BodyPart.Strict,
+                                     AnyRef] =
+        super.getParts
+          .asInstanceOf[JSource[_ <: jm.Multipart.General.BodyPart.Strict,
+                                AnyRef]]
 
       /** Java API */
       override def getStrictParts: java.lang.Iterable[
@@ -343,8 +346,8 @@ object Multipart {
     }
     object BodyPart {
       def apply(_entity: BodyPartEntity,
-                _headers: immutable.Seq[HttpHeader] =
-                  Nil): Multipart.General.BodyPart =
+                _headers: immutable.Seq[HttpHeader] = Nil)
+        : Multipart.General.BodyPart =
         new Multipart.General.BodyPart {
           def entity = _entity
           def headers: immutable.Seq[HttpHeader] = _headers
@@ -362,13 +365,13 @@ object Multipart {
       /**
         * Strict [[General.BodyPart]].
         */
-      case class Strict(
-          entity: HttpEntity.Strict, headers: immutable.Seq[HttpHeader] = Nil)
+      case class Strict(entity: HttpEntity.Strict,
+                        headers: immutable.Seq[HttpHeader] = Nil)
           extends BodyPart
           with Multipart.BodyPart.Strict
           with jm.Multipart.General.BodyPart.Strict {
-        override def toStrict(
-            timeout: FiniteDuration)(implicit fm: Materializer)
+        override def toStrict(timeout: FiniteDuration)(
+            implicit fm: Materializer)
           : Future[Multipart.General.BodyPart.Strict] =
           FastFuture.successful(this)
         override def toFormDataBodyPart: Try[
@@ -465,8 +468,8 @@ object Multipart {
       override def productPrefix = "FormData.Strict"
 
       /** Java API */
-      override def getParts: JSource[
-          jm.Multipart.FormData.BodyPart.Strict, AnyRef] =
+      override def getParts: JSource[jm.Multipart.FormData.BodyPart.Strict,
+                                     AnyRef] =
         super.getParts
           .asInstanceOf[JSource[jm.Multipart.FormData.BodyPart.Strict, AnyRef]]
 
@@ -517,8 +520,10 @@ object Multipart {
         import fm.executionContext
         entity
           .toStrict(timeout)
-          .map(Multipart.FormData.BodyPart.Strict(
-                  name, _, additionalDispositionParams, additionalHeaders))
+          .map(Multipart.FormData.BodyPart.Strict(name,
+                                                  _,
+                                                  additionalDispositionParams,
+                                                  additionalHeaders))
       }
 
       /** Java API */
@@ -547,8 +552,8 @@ object Multipart {
       def apply(_name: String,
                 _entity: BodyPartEntity,
                 _additionalDispositionParams: Map[String, String] = Map.empty,
-                _additionalHeaders: immutable.Seq[HttpHeader] =
-                  Nil): Multipart.FormData.BodyPart =
+                _additionalHeaders: immutable.Seq[HttpHeader] = Nil)
+        : Multipart.FormData.BodyPart =
         new Multipart.FormData.BodyPart {
           def name = _name
           def additionalDispositionParams = _additionalDispositionParams
@@ -590,8 +595,8 @@ object Multipart {
           extends Multipart.FormData.BodyPart
           with Multipart.BodyPart.Strict
           with jm.Multipart.FormData.BodyPart.Strict {
-        override def toStrict(
-            timeout: FiniteDuration)(implicit fm: Materializer)
+        override def toStrict(timeout: FiniteDuration)(
+            implicit fm: Materializer)
           : Future[Multipart.FormData.BodyPart.Strict] =
           FastFuture.successful(this)
         override def productPrefix = "FormData.BodyPart.Strict"
@@ -615,8 +620,8 @@ object Multipart {
     }
 
     /** Java API */
-    override def getParts: JSource[
-        _ <: jm.Multipart.ByteRanges.BodyPart, AnyRef] =
+    override def getParts: JSource[_ <: jm.Multipart.ByteRanges.BodyPart,
+                                   AnyRef] =
       super.getParts
         .asInstanceOf[JSource[_ <: jm.Multipart.ByteRanges.BodyPart, AnyRef]]
 
@@ -654,10 +659,11 @@ object Multipart {
       override def productPrefix = "ByteRanges.Strict"
 
       /** Java API */
-      override def getParts: JSource[
-          jm.Multipart.ByteRanges.BodyPart.Strict, AnyRef] =
-        super.getParts.asInstanceOf[JSource[
-                jm.Multipart.ByteRanges.BodyPart.Strict, AnyRef]]
+      override def getParts: JSource[jm.Multipart.ByteRanges.BodyPart.Strict,
+                                     AnyRef] =
+        super.getParts
+          .asInstanceOf[JSource[jm.Multipart.ByteRanges.BodyPart.Strict,
+                                AnyRef]]
 
       /** Java API */
       override def getStrictParts: java.lang.Iterable[
@@ -728,8 +734,8 @@ object Multipart {
       def apply(_contentRange: ContentRange,
                 _entity: BodyPartEntity,
                 _rangeUnit: RangeUnit = RangeUnits.Bytes,
-                _additionalHeaders: immutable.Seq[HttpHeader] =
-                  Nil): Multipart.ByteRanges.BodyPart =
+                _additionalHeaders: immutable.Seq[HttpHeader] = Nil)
+        : Multipart.ByteRanges.BodyPart =
         new Multipart.ByteRanges.BodyPart {
           def contentRange = _contentRange
           def entity = _entity
@@ -760,8 +766,8 @@ object Multipart {
           extends Multipart.ByteRanges.BodyPart
           with Multipart.BodyPart.Strict
           with jm.Multipart.ByteRanges.BodyPart.Strict {
-        override def toStrict(
-            timeout: FiniteDuration)(implicit fm: Materializer)
+        override def toStrict(timeout: FiniteDuration)(
+            implicit fm: Materializer)
           : Future[Multipart.ByteRanges.BodyPart.Strict] =
           FastFuture.successful(this)
         override def productPrefix = "ByteRanges.BodyPart.Strict"

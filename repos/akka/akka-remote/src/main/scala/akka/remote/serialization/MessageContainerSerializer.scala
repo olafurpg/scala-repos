@@ -72,8 +72,8 @@ class MessageContainerSerializer(val system: ExtendedActorSystem)
     builder.build().toByteArray
   }
 
-  private def buildPattern(
-      matcher: Option[String], tpe: ContainerFormats.PatternType)
+  private def buildPattern(matcher: Option[String],
+                           tpe: ContainerFormats.PatternType)
     : ContainerFormats.Selection.Builder = {
     val builder = ContainerFormats.Selection.newBuilder().setType(tpe)
     matcher foreach builder.setMatcher

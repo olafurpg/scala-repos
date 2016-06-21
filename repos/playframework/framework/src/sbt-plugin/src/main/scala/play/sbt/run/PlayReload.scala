@@ -50,8 +50,8 @@ object PlayReload {
     CompileFailure(taskFailureHandler(incomplete, streams))
   }
 
-  def taskFailureHandler(
-      incomplete: Incomplete, streams: Option[Streams]): PlayException = {
+  def taskFailureHandler(incomplete: Incomplete,
+                         streams: Option[Streams]): PlayException = {
     Incomplete
       .allExceptions(incomplete)
       .headOption
@@ -79,8 +79,8 @@ object PlayReload {
       case task: Task[_] => task.info.attributes get taskDefinitionKey
     }
 
-  def getProblems(
-      incomplete: Incomplete, streams: Option[Streams]): Seq[xsbti.Problem] = {
+  def getProblems(incomplete: Incomplete,
+                  streams: Option[Streams]): Seq[xsbti.Problem] = {
     allProblems(incomplete) ++ {
       Incomplete.linearize(incomplete).flatMap(getScopedKey).flatMap {
         scopedKey =>
@@ -106,7 +106,7 @@ object PlayReload {
                       Some((parsed._1.get._1,
                             parsed._1.get._2,
                             parsed._1.get._3 + " [" +
-                            key.trim + ": " + message.trim + "]")) -> None
+                              key.trim + ": " + message.trim + "]")) -> None
                   }
                 case JavacErrorPosition(pos) =>
                   parsed = parsed._1 -> Some(pos.size)

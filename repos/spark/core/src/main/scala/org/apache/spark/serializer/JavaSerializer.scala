@@ -26,8 +26,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.util.{ByteBufferInputStream, ByteBufferOutputStream, Utils}
 
-private[spark] class JavaSerializationStream(
-    out: OutputStream, counterReset: Int, extraDebugInfo: Boolean)
+private[spark] class JavaSerializationStream(out: OutputStream,
+                                             counterReset: Int,
+                                             extraDebugInfo: Boolean)
     extends SerializationStream {
   private val objOut = new ObjectOutputStream(out)
   private var counter = 0
@@ -57,8 +58,8 @@ private[spark] class JavaSerializationStream(
   def close() { objOut.close() }
 }
 
-private[spark] class JavaDeserializationStream(
-    in: InputStream, loader: ClassLoader)
+private[spark] class JavaDeserializationStream(in: InputStream,
+                                               loader: ClassLoader)
     extends DeserializationStream {
 
   private val objIn = new ObjectInputStream(in) {
@@ -69,8 +70,8 @@ private[spark] class JavaDeserializationStream(
         // scalastyle:on classforname
       } catch {
         case e: ClassNotFoundException =>
-          JavaDeserializationStream.primitiveMappings.getOrElse(
-              desc.getName, throw e)
+          JavaDeserializationStream.primitiveMappings
+            .getOrElse(desc.getName, throw e)
       }
   }
 
@@ -111,8 +112,8 @@ private[spark] class JavaSerializerInstance(counterReset: Int,
     in.readObject()
   }
 
-  override def deserialize[T: ClassTag](
-      bytes: ByteBuffer, loader: ClassLoader): T = {
+  override def deserialize[T: ClassTag](bytes: ByteBuffer,
+                                        loader: ClassLoader): T = {
     val bis = new ByteBufferInputStream(bytes)
     val in = deserializeStream(bis, loader)
     in.readObject()
@@ -126,8 +127,8 @@ private[spark] class JavaSerializerInstance(counterReset: Int,
     new JavaDeserializationStream(s, defaultClassLoader)
   }
 
-  def deserializeStream(
-      s: InputStream, loader: ClassLoader): DeserializationStream = {
+  def deserializeStream(s: InputStream,
+                        loader: ClassLoader): DeserializationStream = {
     new JavaDeserializationStream(s, loader)
   }
 }

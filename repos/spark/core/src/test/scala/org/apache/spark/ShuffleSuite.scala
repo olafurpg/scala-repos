@@ -65,7 +65,8 @@ abstract class ShuffleSuite
     // default Java serializer cannot handle the non serializable class.
     val c =
       new ShuffledRDD[Int, NonJavaSerializableClass, NonJavaSerializableClass](
-          b, new HashPartitioner(NUM_BLOCKS))
+          b,
+          new HashPartitioner(NUM_BLOCKS))
     c.setSerializer(new KryoSerializer(conf))
     val shuffleId =
       c.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]].shuffleId
@@ -92,7 +93,8 @@ abstract class ShuffleSuite
     // default Java serializer cannot handle the non serializable class.
     val c =
       new ShuffledRDD[Int, NonJavaSerializableClass, NonJavaSerializableClass](
-          b, new HashPartitioner(3))
+          b,
+          new HashPartitioner(3))
     c.setSerializer(new KryoSerializer(conf))
     assert(c.count === 10)
   }
@@ -277,7 +279,7 @@ abstract class ShuffleSuite
         case e: Exception =>
           val errMsg =
             s"Failed with spark.shuffle.spill.compress=$shuffleSpillCompress," +
-            s" spark.shuffle.compress=$shuffleCompress"
+              s" spark.shuffle.compress=$shuffleCompress"
           throw new Exception(errMsg, e)
       }
     }
@@ -394,8 +396,10 @@ abstract class ShuffleSuite
       val files = writer.write(iter)
       writer.stop(true)
     }
-    val interleaver = new InterleaveIterators(
-        data1, writeAndClose(writer1), data2, writeAndClose(writer2))
+    val interleaver = new InterleaveIterators(data1,
+                                              writeAndClose(writer1),
+                                              data2,
+                                              writeAndClose(writer2))
     val (mapOutput1, mapOutput2) = interleaver.run()
 
     // check that we can read the map output and it has the right data
@@ -435,8 +439,10 @@ abstract class ShuffleSuite
   * f1 before processing data2 with f2 (or vice versa).  It adds a barrier so that the functions only
   * process one element, before pausing to wait for the other function to "catch up".
   */
-class InterleaveIterators[T, R](
-    data1: Seq[T], f1: Iterator[T] => R, data2: Seq[T], f2: Iterator[T] => R) {
+class InterleaveIterators[T, R](data1: Seq[T],
+                                f1: Iterator[T] => R,
+                                data2: Seq[T],
+                                f2: Iterator[T] => R) {
 
   require(data1.size == data2.size)
 
@@ -510,7 +516,9 @@ object ShuffleSuite {
     job
 
     sc.listenerBus.waitUntilEmpty(500)
-    AggregatedShuffleMetrics(
-        recordsWritten, recordsRead, bytesWritten, bytesRead)
+    AggregatedShuffleMetrics(recordsWritten,
+                             recordsRead,
+                             bytesWritten,
+                             bytesRead)
   }
 }

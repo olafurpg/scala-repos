@@ -27,8 +27,8 @@ class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
   override def getStepRequestDepth(context: SuspendContext): Int =
     StepRequest.STEP_INTO
 
-  private def isSynthetic(
-      location: Location, debugProcess: DebugProcess): Boolean = {
+  private def isSynthetic(location: Location,
+                          debugProcess: DebugProcess): Boolean = {
     val positionManager = ScalaPositionManager.instance(debugProcess) match {
       case Some(m) => m
       case None => return true
@@ -50,7 +50,7 @@ class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
       positionManager.findElementByReferenceType(location.declaringType()) match {
         case Some(td: ScTemplateDefinition) =>
           td.functions.forall(f => !nameMatches(name, f.name)) &&
-          !hasLocalFun(name, td)
+            !hasLocalFun(name, td)
         case _ => false
       }
     }

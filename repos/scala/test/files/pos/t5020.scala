@@ -1,6 +1,6 @@
 package a {
   sealed trait GenericList[U, M[_ <: U]] {
-    type Transformed [N[MMA <: U]] <: GenericList[U, N]
+    type Transformed[N[MMA <: U]] <: GenericList[U, N]
   }
 
   trait GenericCons[U, M[_ <: U], T <: GenericList[U, M]]
@@ -12,7 +12,7 @@ package a {
 
 package b {
   sealed trait GenericList[L, M[_ >: L]] {
-    type Transformed [N[MMA >: L]] <: GenericList[L, N]
+    type Transformed[N[MMA >: L]] <: GenericList[L, N]
   }
 
   trait GenericCons[L, M[_ >: L], T <: GenericList[L, M]]

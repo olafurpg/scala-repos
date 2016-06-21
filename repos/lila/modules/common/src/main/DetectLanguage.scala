@@ -8,8 +8,9 @@ import play.api.Play.current
 // http://detectlanguage.com
 final class DetectLanguage(url: String, key: String) {
 
-  private case class Detection(
-      language: String, confidence: Float, isReliable: Boolean)
+  private case class Detection(language: String,
+                               confidence: Float,
+                               isReliable: Boolean)
 
   private implicit val DetectionReads = Json.reads[Detection]
 
@@ -29,7 +30,7 @@ final class DetectLanguage(url: String, key: String) {
           None
         case Some(res) =>
           res.filter(_.isReliable).sortBy(-_.confidence).headOption map
-          (_.language) flatMap Lang.get
+            (_.language) flatMap Lang.get
       }
     } recover {
       case e: Exception =>
@@ -42,6 +43,6 @@ object DetectLanguage {
 
   import com.typesafe.config.Config
   def apply(config: Config): DetectLanguage =
-    new DetectLanguage(
-        url = config getString "api.url", key = config getString "api.key")
+    new DetectLanguage(url = config getString "api.url",
+                       key = config getString "api.key")
 }

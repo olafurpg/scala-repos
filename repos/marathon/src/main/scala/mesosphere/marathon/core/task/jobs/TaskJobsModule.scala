@@ -9,14 +9,15 @@ import mesosphere.marathon.{MarathonConf, MarathonSchedulerDriverHolder}
 /**
   * This module contains periodically running jobs interacting with the task tracker.
   */
-class TaskJobsModule(
-    config: MarathonConf, leadershipModule: LeadershipModule, clock: Clock) {
+class TaskJobsModule(config: MarathonConf,
+                     leadershipModule: LeadershipModule,
+                     clock: Clock) {
   def killOverdueTasks(
       taskTracker: TaskTracker,
       marathonSchedulerDriverHolder: MarathonSchedulerDriverHolder): Unit = {
     leadershipModule.startWhenLeader(
-        KillOverdueTasksActor.props(
-            config, taskTracker, marathonSchedulerDriverHolder, clock),
+        KillOverdueTasksActor
+          .props(config, taskTracker, marathonSchedulerDriverHolder, clock),
         "killOverdueStagedTasks")
   }
 }

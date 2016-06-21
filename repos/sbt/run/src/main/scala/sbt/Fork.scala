@@ -108,8 +108,8 @@ sealed class Fork(val commandName: String, val runnerClass: Option[String]) {
     val environment = builder.environment
     for ((key, value) <- env) environment.put(key, value)
     for (cpenv <- classpathEnv)
-    // overriding, not appending, is correct due to the specified priorities of -classpath and CLASSPATH
-    environment.put(Fork.ClasspathEnvKey, cpenv)
+      // overriding, not appending, is correct due to the specified priorities of -classpath and CLASSPATH
+      environment.put(Fork.ClasspathEnvKey, cpenv)
     outputStrategy.getOrElse(StdoutOutput) match {
       case StdoutOutput => Process(builder).run(connectInput)
       case BufferedOutput(logger) =>
@@ -126,7 +126,7 @@ sealed class Fork(val commandName: String, val runnerClass: Option[String]) {
       if (bootJars.isEmpty) None
       else
         Some("-Xbootclasspath/a:" +
-            bootJars.map(_.getAbsolutePath).mkString(File.pathSeparator))
+              bootJars.map(_.getAbsolutePath).mkString(File.pathSeparator))
     jvmOptions ++ boot.toList ++ runnerClass.toList ++ arguments
   }
 }
@@ -306,7 +306,7 @@ object Fork {
       if (scalaJars.isEmpty) sys.error("Scala jars not specified")
       val scalaClasspathString =
         "-Xbootclasspath/a:" +
-        scalaJars.map(_.getAbsolutePath).mkString(File.pathSeparator)
+          scalaJars.map(_.getAbsolutePath).mkString(File.pathSeparator)
       val mainClass = if (mainClassName.isEmpty) Nil else mainClassName :: Nil
       val options =
         jvmOptions ++ (scalaClasspathString :: mainClass ::: arguments.toList)

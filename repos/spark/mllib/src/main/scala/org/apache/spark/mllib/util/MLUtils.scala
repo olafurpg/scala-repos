@@ -93,7 +93,7 @@ object MLUtils {
           require(
               current > previous,
               s"indices should be one-based and in ascending order;" +
-              " found current=$current, previous=$previous; line=\"$line\"")
+                " found current=$current, previous=$previous; line=\"$line\"")
           previous = current
           i += 1
         }
@@ -102,16 +102,15 @@ object MLUtils {
       }
 
     // Determine number of features.
-    val d =
-      if (numFeatures > 0) {
-        numFeatures
-      } else {
-        parsed.persist(StorageLevel.MEMORY_ONLY)
-        parsed.map {
-          case (label, indices, values) =>
-            indices.lastOption.getOrElse(0)
-        }.reduce(math.max) + 1
-      }
+    val d = if (numFeatures > 0) {
+      numFeatures
+    } else {
+      parsed.persist(StorageLevel.MEMORY_ONLY)
+      parsed.map {
+        case (label, indices, values) =>
+          indices.lastOption.getOrElse(0)
+      }.reduce(math.max) + 1
+    }
 
     parsed.map {
       case (label, indices, values) =>
@@ -137,8 +136,9 @@ object MLUtils {
     * partitions.
     */
   @Since("1.0.0")
-  def loadLibSVMFile(
-      sc: SparkContext, path: String, numFeatures: Int): RDD[LabeledPoint] =
+  def loadLibSVMFile(sc: SparkContext,
+                     path: String,
+                     numFeatures: Int): RDD[LabeledPoint] =
     loadLibSVMFile(sc, path, numFeatures, sc.defaultMinPartitions)
 
   @Since("1.0.0")
@@ -155,8 +155,9 @@ object MLUtils {
   @deprecated(
       "use method without multiclass argument, which no longer has effect",
       "1.1.0")
-  def loadLibSVMFile(
-      sc: SparkContext, path: String, multiclass: Boolean): RDD[LabeledPoint] =
+  def loadLibSVMFile(sc: SparkContext,
+                     path: String,
+                     multiclass: Boolean): RDD[LabeledPoint] =
     loadLibSVMFile(sc, path)
 
   /**
@@ -198,8 +199,9 @@ object MLUtils {
     * @return vectors stored as an RDD[Vector]
     */
   @Since("1.1.0")
-  def loadVectors(
-      sc: SparkContext, path: String, minPartitions: Int): RDD[Vector] =
+  def loadVectors(sc: SparkContext,
+                  path: String,
+                  minPartitions: Int): RDD[Vector] =
     sc.textFile(path, minPartitions).map(Vectors.parse)
 
   /**
@@ -217,8 +219,9 @@ object MLUtils {
     * @return labeled points stored as an RDD[LabeledPoint]
     */
   @Since("1.1.0")
-  def loadLabeledPoints(
-      sc: SparkContext, path: String, minPartitions: Int): RDD[LabeledPoint] =
+  def loadLabeledPoints(sc: SparkContext,
+                        path: String,
+                        minPartitions: Int): RDD[LabeledPoint] =
     sc.textFile(path, minPartitions).map(LabeledPoint.parse)
 
   /**
@@ -278,8 +281,9 @@ object MLUtils {
     * element, the validation data, containing a unique 1/kth of the data. Where k=numFolds.
     */
   @Since("1.0.0")
-  def kFold[T: ClassTag](
-      rdd: RDD[T], numFolds: Int, seed: Int): Array[(RDD[T], RDD[T])] = {
+  def kFold[T: ClassTag](rdd: RDD[T],
+                         numFolds: Int,
+                         seed: Int): Array[(RDD[T], RDD[T])] = {
     kFold(rdd, numFolds, seed.toLong)
   }
 
@@ -287,12 +291,14 @@ object MLUtils {
     * Version of [[kFold()]] taking a Long seed.
     */
   @Since("2.0.0")
-  def kFold[T: ClassTag](
-      rdd: RDD[T], numFolds: Int, seed: Long): Array[(RDD[T], RDD[T])] = {
+  def kFold[T: ClassTag](rdd: RDD[T],
+                         numFolds: Int,
+                         seed: Long): Array[(RDD[T], RDD[T])] = {
     val numFoldsF = numFolds.toFloat
     (1 to numFolds).map { fold =>
-      val sampler = new BernoulliCellSampler[T](
-          (fold - 1) / numFoldsF, fold / numFoldsF, complement = false)
+      val sampler = new BernoulliCellSampler[T]((fold - 1) / numFoldsF,
+                                                fold / numFoldsF,
+                                                complement = false)
       val validation = new PartitionwiseSampledRDD(rdd, sampler, true, seed)
       val training =
         new PartitionwiseSampledRDD(rdd, sampler.cloneComplement(), true, seed)
@@ -380,7 +386,7 @@ object MLUtils {
       sqDist = math.max(sumSquaredNorm - 2.0 * dotValue, 0.0)
       val precisionBound2 =
         EPSILON * (sumSquaredNorm + 2.0 * math.abs(dotValue)) /
-        (sqDist + EPSILON)
+          (sqDist + EPSILON)
       if (precisionBound2 > precision) {
         sqDist = Vectors.sqdist(v1, v2)
       }

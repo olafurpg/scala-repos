@@ -36,17 +36,18 @@ abstract class ParallelSeqCheck[T](collName: String)
     for (inst <- instances(values)) yield (inst, fromSeq(inst))
 
   override def collectionPairsWithLengths: Gen[(Seq[T], CollType, Int)] =
-    for (inst <- instances(values); s <- choose(0, inst.size)) yield
-      (inst, fromSeq(inst), s);
+    for (inst <- instances(values); s <- choose(0, inst.size))
+      yield (inst, fromSeq(inst), s);
 
   def collectionPairsWithModifiedWithLengths: Gen[
       (Seq[T], CollType, ParSeq[T], Int)] =
     for (inst <- instances(values); s <- choose(0, inst.size);
-         updateStart <- choose(0, inst.size); howMany <- choose(0, inst.size)) yield {
-      val parcoll = fromSeq(inst)
-      val parcollmodif = fromSeq(modifySlightly(inst, updateStart, howMany))
-      (inst, parcoll, parcollmodif, s)
-    }
+         updateStart <- choose(0, inst.size); howMany <- choose(0, inst.size))
+      yield {
+        val parcoll = fromSeq(inst)
+        val parcollmodif = fromSeq(modifySlightly(inst, updateStart, howMany))
+        (inst, parcoll, parcollmodif, s)
+      }
 
   def collectionPairsWithModified: Gen[(Seq[T], CollType, ParSeq[T])] =
     for (inst <- instances(values); updateStart <- choose(0, inst.size);
@@ -162,8 +163,7 @@ abstract class ParallelSeqCheck[T](collName: String)
           println(ccm)
         }
         ("Nil" |: s.sameElements(Nil) == coll.sameElements(Nil)) &&
-        ("toList" |: s.sameElements(s.toList) == coll.sameElements(
-                coll.toList)) &&
+        ("toList" |: s.sameElements(s.toList) == coll.sameElements(coll.toList)) &&
         ("identity" |: s.sameElements(s.map(e => e)) == coll.sameElements(
                 coll.map(e => e))) &&
         ("vice-versa" |: s.sameElements(coll) == coll.sameElements(s)) &&
@@ -192,8 +192,8 @@ abstract class ParallelSeqCheck[T](collName: String)
                 s.startsWith(s.tail, 1) == coll.startsWith(coll.tail, 1))) &&
         ("with each other" |: coll.startsWith(s)) && ("modified" |: s
               .startsWith(collmodif) == coll.startsWith(collmodif)) &&
-        ("modified2" |: s.startsWith(collmodif, pos) == coll.startsWith(
-                collmodif, pos)) && (for (sq <- startEndSeqs) yield {
+        ("modified2" |: s.startsWith(collmodif, pos) == coll
+              .startsWith(collmodif, pos)) && (for (sq <- startEndSeqs) yield {
           val ss = s.startsWith(sq, pos)
           val cs = coll.startsWith(fromSeq(sq), pos)
           if (ss != cs) {
@@ -212,27 +212,27 @@ abstract class ParallelSeqCheck[T](collName: String)
   property("endsWiths must be equal") = forAll(collectionPairsWithModified) {
     case (s, coll, collmodif) =>
       ("ends with self" |: s.endsWith(s) == coll.endsWith(s)) &&
-      ("ends with tail" |:
-          (s.length == 0 || s.endsWith(s.tail) == coll.endsWith(coll.tail))) &&
-      ("with each other" |: coll.endsWith(s)) &&
-      ("modified" |: s.startsWith(collmodif) == coll.endsWith(collmodif)) &&
-      (for (sq <- startEndSeqs) yield {
-        val sew = s.endsWith(sq)
-        val cew = coll.endsWith(fromSeq(sq))
-        if (sew != cew) {
-          println("from: " + s)
-          println("and: " + coll)
-          println(sew)
-          println(cew)
-        }
-        ("seq " + sq) |: sew == cew
-      }).reduceLeft(_ && _)
+        ("ends with tail" |:
+              (s.length == 0 || s.endsWith(s.tail) == coll.endsWith(coll.tail))) &&
+        ("with each other" |: coll.endsWith(s)) &&
+        ("modified" |: s.startsWith(collmodif) == coll.endsWith(collmodif)) &&
+        (for (sq <- startEndSeqs) yield {
+          val sew = s.endsWith(sq)
+          val cew = coll.endsWith(fromSeq(sq))
+          if (sew != cew) {
+            println("from: " + s)
+            println("and: " + coll)
+            println(sew)
+            println(cew)
+          }
+          ("seq " + sq) |: sew == cew
+        }).reduceLeft(_ && _)
   }
 
   property("unions must be equal") = forAll(collectionPairsWithModified) {
     case (s, coll, collmodif) =>
       ("modified" |: s.union(collmodif.seq) == coll.union(collmodif)) &&
-      ("empty" |: s.union(Nil) == coll.union(fromSeq(Nil)))
+        ("empty" |: s.union(Nil) == coll.union(fromSeq(Nil)))
   }
 
   // This is failing with my views patch: array index out of bounds in the array iterator.
@@ -248,15 +248,16 @@ abstract class ParallelSeqCheck[T](collName: String)
           ("with seq" |: s.patch(from, pat, repl) == coll.patch(from,
                                                                 pat,
                                                                 repl)) &&
-          ("with par" |: s.patch(from, pat, repl) == coll.patch(from,
-                                                                fromSeq(pat),
-                                                                repl)) &&
-          ("with empty" |: s.patch(from, Nil, repl) == coll.patch(from,
-                                                                  fromSeq(Nil),
+            ("with par" |: s.patch(from, pat, repl) == coll.patch(from,
+                                                                  fromSeq(pat),
                                                                   repl)) &&
-          ("with one" |:
-              (s.length == 0 || s.patch(from, List(s(0)), 1) == coll.patch(
-                      from, fromSeq(List(coll(0))), 1)))
+            ("with empty" |: s.patch(from, Nil, repl) == coll.patch(
+                    from,
+                    fromSeq(Nil),
+                    repl)) &&
+            ("with one" |:
+                  (s.length == 0 || s.patch(from, List(s(0)), 1) == coll
+                        .patch(from, fromSeq(List(coll(0))), 1)))
       }
 
   if (!isCheckingViews)

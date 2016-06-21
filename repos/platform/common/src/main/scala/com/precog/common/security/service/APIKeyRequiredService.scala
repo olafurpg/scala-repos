@@ -82,8 +82,10 @@ trait APIKeyServiceCombinators extends HttpRequestHandlerCombinators {
 class APIKeyValidService[A, B](
     val delegate: HttpService[A, APIKey => Future[B]],
     error: String => Future[B])
-    extends DelegatingService[
-        A, Validation[String, APIKey] => Future[B], A, APIKey => Future[B]] {
+    extends DelegatingService[A,
+                              Validation[String, APIKey] => Future[B],
+                              A,
+                              APIKey => Future[B]] {
   val service = { (request: HttpRequest[A]) =>
     delegate.service(request) map { (f: APIKey => Future[B]) =>
       { (apiKeyV: Validation[String, APIKey]) =>
@@ -102,8 +104,10 @@ class APIKeyValidService[A, B](
 class APIKeyRequiredService[A, B](
     keyFinder: APIKey => Future[Option[APIKey]],
     val delegate: HttpService[A, Validation[String, APIKey] => Future[B]])
-    extends DelegatingService[
-        A, Future[B], A, Validation[String, APIKey] => Future[B]]
+    extends DelegatingService[A,
+                              Future[B],
+                              A,
+                              Validation[String, APIKey] => Future[B]]
     with Logging {
   val service = (request: HttpRequest[A]) => {
     request.parameters.get('apiKey).toSuccess[NotServed] {

@@ -168,7 +168,8 @@ class PatmatBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val c = compileClasses(optCompiler)(
-        code, allowMessage = _.msg.contains("may not be exhaustive")).head
+        code,
+        allowMessage = _.msg.contains("may not be exhaustive")).head
 
     val expected = List(ALOAD /*1*/,
                         INSTANCEOF /*::*/,
@@ -212,8 +213,8 @@ class PatmatBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c, cMod) = compileClasses(optCompiler)(code)
-    assertSameSummary(
-        getSingleMethod(c, "t1"), List(ICONST_1, ICONST_2, IADD, IRETURN))
+    assertSameSummary(getSingleMethod(c, "t1"),
+                      List(ICONST_1, ICONST_2, IADD, IRETURN))
     assertSameSummary(getSingleMethod(c, "t2"), List(ICONST_1, IRETURN))
     assertInvokedMethods(getSingleMethod(c, "t3"),
                          List("C.tplCall",

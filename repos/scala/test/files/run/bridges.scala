@@ -6136,10 +6136,10 @@ object Test {
       }
     } catch {
       case exception: Throwable => {
-          Console.print(name + " raised exception " + exception);
-          Console.println;
-          errors = errors + 1;
-        }
+        Console.print(name + " raised exception " + exception);
+        Console.println;
+        errors = errors + 1;
+      }
     }
   }
 

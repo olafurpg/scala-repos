@@ -19,7 +19,8 @@ final case class SingletonClusterMultiNodeConfig(
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(
+            ConfigFactory.parseString("""
       akka.cluster {
         auto-down-unreachable-after = 0s
         failure-detector.threshold = 4

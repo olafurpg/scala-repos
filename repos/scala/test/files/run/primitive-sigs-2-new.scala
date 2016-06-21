@@ -22,10 +22,10 @@ object Test {
 
   val c1m =
     c1.getMethods.toList filter (_.getName == "f") map
-    (_.getGenericReturnType.toString)
+      (_.getGenericReturnType.toString)
   val c2m =
     c2.getMethods.toList filter (_.getName == "f") map
-    (_.getGenericReturnType.toString)
+      (_.getGenericReturnType.toString)
   val c3m = c3.getDeclaredMethods.toList map (_.toGenericString)
 
   def main(args: Array[String]): Unit = {

@@ -219,7 +219,7 @@ class KMeans private (private var k: Int,
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data is not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     // Compute squared norms and cache them.
@@ -236,7 +236,7 @@ class KMeans private (private var k: Int,
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data was not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
     model
   }
@@ -251,31 +251,30 @@ class KMeans private (private var k: Int,
     val initStartTime = System.nanoTime()
 
     // Only one run is allowed when initialModel is given
-    val numRuns =
-      if (initialModel.nonEmpty) {
-        if (runs > 1)
-          logWarning(
-              "Ignoring runs; one run is allowed when initialModel is given.")
-        1
-      } else {
-        runs
-      }
+    val numRuns = if (initialModel.nonEmpty) {
+      if (runs > 1)
+        logWarning(
+            "Ignoring runs; one run is allowed when initialModel is given.")
+      1
+    } else {
+      runs
+    }
 
     val centers = initialModel match {
       case Some(kMeansCenters) => {
-          Array(kMeansCenters.clusterCenters.map(s => new VectorWithNorm(s)))
-        }
+        Array(kMeansCenters.clusterCenters.map(s => new VectorWithNorm(s)))
+      }
       case None => {
-          if (initializationMode == KMeans.RANDOM) {
-            initRandom(data)
-          } else {
-            initKMeansParallel(data)
-          }
+        if (initializationMode == KMeans.RANDOM) {
+          initRandom(data)
+        } else {
+          initKMeansParallel(data)
         }
+      }
     }
     val initTimeInSeconds = (System.nanoTime() - initStartTime) / 1e9
     logInfo(s"Initialization with $initializationMode took " +
-        "%.3f".format(initTimeInSeconds) + " seconds.")
+          "%.3f".format(initTimeInSeconds) + " seconds.")
 
     val active = Array.fill(numRuns)(true)
     val costs = Array.fill(numRuns)(0.0)
@@ -357,7 +356,7 @@ class KMeans private (private var k: Int,
 
     val iterationTimeInSeconds = (System.nanoTime() - iterationStartTime) / 1e9
     logInfo(s"Iterations took " + "%.3f".format(iterationTimeInSeconds) +
-        " seconds.")
+          " seconds.")
 
     if (iteration == maxIterations) {
       logInfo(s"KMeans reached the max number of iterations: $maxIterations.")
@@ -381,8 +380,7 @@ class KMeans private (private var k: Int,
     val sample = data
       .takeSample(true, runs * k, new XORShiftRandom(this.seed).nextInt())
       .toSeq
-    Array.tabulate(runs)(
-        r =>
+    Array.tabulate(runs)(r =>
           sample
             .slice(r * k, (r + 1) * k)
             .map { v =>
@@ -630,8 +628,8 @@ object KMeans {
     * Returns the squared Euclidean distance between two vectors computed by
     * [[org.apache.spark.mllib.util.MLUtils#fastSquaredDistance]].
     */
-  private[clustering] def fastSquaredDistance(
-      v1: VectorWithNorm, v2: VectorWithNorm): Double = {
+  private[clustering] def fastSquaredDistance(v1: VectorWithNorm,
+                                              v2: VectorWithNorm): Double = {
     MLUtils.fastSquaredDistance(v1.vector, v1.norm, v2.vector, v2.norm)
   }
 

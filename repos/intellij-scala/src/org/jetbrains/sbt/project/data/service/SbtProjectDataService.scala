@@ -29,8 +29,10 @@ class SbtProjectDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[SbtProjectData] =
-    new SbtProjectDataService.Importer(
-        toImport, projectData, project, modelsProvider)
+    new SbtProjectDataService.Importer(toImport,
+                                       projectData,
+                                       project,
+                                       modelsProvider)
 }
 
 object SbtProjectDataService {
@@ -39,8 +41,10 @@ object SbtProjectDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[SbtProjectData](
-          dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[SbtProjectData](dataToImport,
+                                               projectData,
+                                               project,
+                                               modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(node => doImport(node.getData))
@@ -68,8 +72,8 @@ object SbtProjectDataService {
             ProjectRootManager.getInstance(project).setProjectSdk)
       }
 
-    private def setLanguageLevel(
-        project: Project, data: SbtProjectData): Unit =
+    private def setLanguageLevel(project: Project,
+                                 data: SbtProjectData): Unit =
       executeProjectChangeAction {
         val projectJdk =
           Option(ProjectRootManager.getInstance(project).getProjectSdk)
@@ -96,8 +100,8 @@ object SbtProjectDataService {
           IncrementalityType.SBT
     }
 
-    private def updateJavaCompilerOptionsIn(
-        project: Project, options: Seq[String]): Unit =
+    private def updateJavaCompilerOptionsIn(project: Project,
+                                            options: Seq[String]): Unit =
       executeProjectChangeAction {
         val settings =
           JavacConfiguration.getOptions(project, classOf[JavacConfiguration])

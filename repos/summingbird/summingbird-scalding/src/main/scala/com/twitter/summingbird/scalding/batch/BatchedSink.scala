@@ -36,14 +36,15 @@ trait BatchedSink[T] extends Sink[T] {
     * by implementing this. This is what readStream returns.
     */
   def writeStream(batchID: BatchID, stream: TimedPipe[T])(
-      implicit flowDef: FlowDef, mode: Mode): Unit
+      implicit flowDef: FlowDef,
+      mode: Mode): Unit
 
   /**
     * in will completely cover these batches
     * Return a new FlowToPipe with the write as a side effect
     */
-  protected def writeBatches(
-      inter: Interval[BatchID], in: FlowToPipe[T]): FlowToPipe[T] =
+  protected def writeBatches(inter: Interval[BatchID],
+                             in: FlowToPipe[T]): FlowToPipe[T] =
     Reader[FlowInput, TimedPipe[T]] { (flowMode: (FlowDef, Mode)) =>
       val iter = BatchID.toIterable(inter)
       val inPipe = in(flowMode)
@@ -101,13 +102,13 @@ trait BatchedSink[T] extends Sink[T] {
         val flows = aFlows ++ (optBuilt.map { _._2 })
         val batches =
           aBatches ++
-          (optBuilt.map { pair =>
-                BatchID.toIterable(pair._1)
-              }.getOrElse(Iterable.empty))
+            (optBuilt.map { pair =>
+                  BatchID.toIterable(pair._1)
+                }.getOrElse(Iterable.empty))
 
         if (flows.isEmpty)
           Left(List("Zero batches requested, should never occur: " +
-                  timeSpan.toString))
+                    timeSpan.toString))
         else {
           // it is a static (i.e. independent from input) bug if this get ever throws
           val available = batchOps.intersect(batches, timeSpan).get

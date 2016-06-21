@@ -22,8 +22,9 @@ object NegateComparisonIntention {
 class NegateComparisonIntention extends PsiElementBaseIntentionAction {
   def getFamilyName = NegateComparisonIntention.familyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -64,7 +65,7 @@ class NegateComparisonIntention extends PsiElementBaseIntentionAction {
     val start = infixExpr.getTextRange.getStartOffset
     val diff =
       editor.getCaretModel.getOffset -
-      infixExpr.operation.nameId.getTextRange.getStartOffset
+        infixExpr.operation.nameId.getTextRange.getStartOffset
 
     val buf = new StringBuilder
 
@@ -75,8 +76,8 @@ class NegateComparisonIntention extends PsiElementBaseIntentionAction {
       .append(" ")
       .append(infixExpr.getArgExpr.getText)
 
-    val res = IntentionUtils.negateAndValidateExpression(
-        infixExpr, element.getManager, buf)
+    val res = IntentionUtils
+      .negateAndValidateExpression(infixExpr, element.getManager, buf)
 
     inWriteAction {
       res._1.replaceExpression(res._2, true)

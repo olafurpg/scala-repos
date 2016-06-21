@@ -7,8 +7,8 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
   */
 trait ContentEncodingSupport extends Handler { self: ScalatraBase =>
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse): Unit = {
     withRequestResponse(req, res) {
       super.handle(decodedRequest(req), encodedResponse(req, res))
     }

@@ -79,8 +79,8 @@ object Arguments {
              PathsToFiles(outputDirs),
              StringToSequence(worksheetClass),
              sbtIncOptionsString) =>
-      val sbtData = SbtData(
-          interfaceJar, sourceJar, interfacesHome, javaClassVersion)
+      val sbtData =
+        SbtData(interfaceJar, sourceJar, interfacesHome, javaClassVersion)
 
       val compilerJars = compilerJarPaths.map {
         case PathsToFiles(Seq(libraryJar, compilerJar, extraJars @ _ *)) =>

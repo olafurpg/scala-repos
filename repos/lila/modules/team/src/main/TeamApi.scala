@@ -157,7 +157,7 @@ final class TeamApi(cached: Cached,
   // delete for ever, with members but not forums
   def delete(team: Team): Funit =
     $remove(team) >> MemberRepo.removeByteam(team.id) >>-
-    (indexer ! RemoveTeam(team.id))
+      (indexer ! RemoveTeam(team.id))
 
   def belongsTo(teamId: String, userId: String): Boolean =
     cached.teamIds(userId) contains teamId

@@ -44,8 +44,7 @@ abstract class ScalaTestingTestCase(
   override protected def isRunInEdt = false
 
   override protected def addFileToProject(fileName: String, fileText: String) = {
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit = {
         ScalaTestingTestCase. super.addFileToProject(fileName, fileText)
       }
@@ -53,8 +52,7 @@ abstract class ScalaTestingTestCase(
   }
 
   override protected def tearDown() = {
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit = ScalaTestingTestCase. super.tearDown()
     })
   }
@@ -63,8 +61,9 @@ abstract class ScalaTestingTestCase(
 
   protected val useDynamicClassPath = false
 
-  override protected def runFileStructureViewTest(
-      testClassName: String, status: Int, tests: String*) = {
+  override protected def runFileStructureViewTest(testClassName: String,
+                                                  status: Int,
+                                                  tests: String*) = {
     val structureViewRoot = buildFileStructure(testClassName + ".scala")
     for (test <- tests) {
       assert(
@@ -78,8 +77,11 @@ abstract class ScalaTestingTestCase(
       parentTestName: Option[String],
       testStatus: Int = TestStructureViewElement.normalStatusId) = {
     val structureViewRoot = buildFileStructure(testClassName + ".scala")
-    assert(checkTestNodeInFileStructure(
-            structureViewRoot, testName, parentTestName, testStatus))
+    assert(
+        checkTestNodeInFileStructure(structureViewRoot,
+                                     testName,
+                                     parentTestName,
+                                     testStatus))
   }
 
   override protected def buildFileStructure(
@@ -97,7 +99,9 @@ abstract class ScalaTestingTestCase(
               provider.isInstanceOf[TestNodeProvider]
           }
         wrapper = new StructureViewComponent.StructureViewTreeElementWrapper(
-            getProject, treeViewModel.getRoot, treeViewModel)
+            getProject,
+            treeViewModel.getRoot,
+            treeViewModel)
 
         def initTree(
             wrapper: StructureViewComponent.StructureViewTreeElementWrapper) {
@@ -131,7 +135,8 @@ abstract class ScalaTestingTestCase(
       override def run(): Unit = {
         val psiFile =
           myManager.findViewProvider(file).getPsi(ScalaFileType.SCALA_LANGUAGE)
-        psiElement = psiFile.findElementAt(FileDocumentManager
+        psiElement = psiFile.findElementAt(
+            FileDocumentManager
               .getInstance()
               .getDocument(file)
               .getLineStartOffset(lineNumber) + offset)
@@ -141,10 +146,11 @@ abstract class ScalaTestingTestCase(
     new PsiLocation(project, myModule, psiElement)
   }
 
-  private def failedConfigMessage(
-      fileName: String, lineNumber: Int, offset: Int) =
+  private def failedConfigMessage(fileName: String,
+                                  lineNumber: Int,
+                                  offset: Int) =
     "Failed to create run configuration for test from file " + fileName +
-    " from line " + lineNumber + " at offset " + offset
+      " from line " + lineNumber + " at offset " + offset
 
   private def failedConfigMessage(packageName: String) =
     "Failed to create run configuration for test from package " + packageName
@@ -183,8 +189,7 @@ abstract class ScalaTestingTestCase(
   override protected def createTestFromModule(
       moduleName: String): RunnerAndConfigurationSettings = {
     var module: Module = null
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit =
         module = ModuleManager
           .getInstance(ScalaTestingTestCase.this.getProject)
@@ -229,14 +234,17 @@ abstract class ScalaTestingTestCase(
         val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions.find {
           _.getClass == classOf[DefaultJavaProgramRunner]
         }.get
-        val (handler, runContentDescriptor) = runProcess(
-            runConfig, classOf[DefaultRunExecutor], new ProcessAdapter {
-          override def onTextAvailable(event: ProcessEvent,
-                                       outputType: Key[_]) {
-            val text = event.getText
-            if (debug) print(text)
-          }
-        }, runner)
+        val (handler, runContentDescriptor) =
+          runProcess(runConfig,
+                     classOf[DefaultRunExecutor],
+                     new ProcessAdapter {
+                       override def onTextAvailable(event: ProcessEvent,
+                                                    outputType: Key[_]) {
+                         val text = event.getText
+                         if (debug) print(text)
+                       }
+                     },
+                     runner)
 
         runContentDescriptor.getExecutionConsole match {
           case descriptor: SMTRunnerConsoleView =>
@@ -267,24 +275,24 @@ abstract class ScalaTestingTestCase(
       new AtomicReference[ProcessHandler]
     val contentDescriptor: AtomicReference[RunContentDescriptor] =
       new AtomicReference[RunContentDescriptor]
-    runner.execute(
-        executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-      def processStarted(descriptor: RunContentDescriptor) {
-        System.setProperty(
-            "idea.dynamic.classpath", useDynamicClassPath.toString)
-        disposeOnTearDown(new Disposable {
-          def dispose() {
-            descriptor.dispose()
-          }
-        })
-        val handler: ProcessHandler = descriptor.getProcessHandler
-        assert(handler != null)
-        handler.addProcessListener(listener)
-        processHandler.set(handler)
-        contentDescriptor.set(descriptor)
-        semaphore.up()
-      }
-    })
+    runner
+      .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
+        def processStarted(descriptor: RunContentDescriptor) {
+          System.setProperty("idea.dynamic.classpath",
+                             useDynamicClassPath.toString)
+          disposeOnTearDown(new Disposable {
+            def dispose() {
+              descriptor.dispose()
+            }
+          })
+          val handler: ProcessHandler = descriptor.getProcessHandler
+          assert(handler != null)
+          handler.addProcessListener(listener)
+          processHandler.set(handler)
+          contentDescriptor.set(descriptor)
+          semaphore.up()
+        }
+      })
     semaphore.waitFor()
     (processHandler.get, contentDescriptor.get)
   }

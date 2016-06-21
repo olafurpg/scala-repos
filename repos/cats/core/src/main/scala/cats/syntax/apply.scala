@@ -2,8 +2,8 @@ package cats
 package syntax
 
 trait ApplySyntax1 {
-  implicit def applySyntaxU[FA](fa: FA)(
-      implicit U: Unapply[Apply, FA]): Apply.Ops[U.M, U.A] =
+  implicit def applySyntaxU[FA](
+      fa: FA)(implicit U: Unapply[Apply, FA]): Apply.Ops[U.M, U.A] =
     new Apply.Ops[U.M, U.A] {
       val self = U.subst(fa)
       val typeClassInstance = U.TC

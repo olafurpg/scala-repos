@@ -169,14 +169,14 @@ trait UserAgentCalculator {
     */
   lazy val isIPhone: Boolean =
     UserAgentCalculator.iPhoneCalcFunction.vend.map(_.apply(userAgent)) openOr isSafari &&
-    (userAgent.map(s => s.indexOf("(iPhone") >= 0) openOr false)
+      (userAgent.map(s => s.indexOf("(iPhone") >= 0) openOr false)
 
   /**
     * Is the Req coming from an iPad
     */
   lazy val isIPad: Boolean =
     UserAgentCalculator.iPadCalcFunction.vend.map(_.apply(userAgent)) openOr isSafari &&
-    (userAgent.map(s => s.indexOf("(iPad") >= 0) openOr false)
+      (userAgent.map(s => s.indexOf("(iPad") >= 0) openOr false)
 
   lazy val firefoxVersion: Box[Double] =
     UserAgentCalculator.firefoxCalcFunction.vend.apply(userAgent)
@@ -343,8 +343,10 @@ object OnDiskFileParamHolder {
 }
 
 object FileParamHolder {
-  def apply(
-      n: String, mt: String, fn: String, file: Array[Byte]): FileParamHolder =
+  def apply(n: String,
+            mt: String,
+            fn: String,
+            file: Array[Byte]): FileParamHolder =
     new InMemFileParamHolder(n, mt, fn, file)
 
   def unapply(in: Any): Option[(String, String, String, Array[Byte])] =
@@ -388,8 +390,8 @@ object Req {
             statelessTest: List[LiftRules.StatelessTestPF],
             otherStatelessTest: List[LiftRules.StatelessReqTestPF]): Req = {
 
-    def processRewrite(
-        path: ParsePath, params: Map[String, String]): RewriteResponse =
+    def processRewrite(path: ParsePath,
+                       params: Map[String, String]): RewriteResponse =
       NamedPF.applyBox(
           RewriteRequest(path, original.requestType, original.request),
           rewrite) match {
@@ -440,8 +442,8 @@ object Req {
 
     val tmpPath = parsePath(tmpUri)
 
-    def processRewrite(
-        path: ParsePath, params: Map[String, String]): RewriteResponse =
+    def processRewrite(path: ParsePath,
+                       params: Map[String, String]): RewriteResponse =
       NamedPF.applyBox(RewriteRequest(path, reqType, request), rewrite) match {
         case Full(resp @ RewriteResponse(_, _, true)) => resp
         case _: EmptyBox => RewriteResponse(path, params)
@@ -498,7 +500,7 @@ object Req {
             _.toLowerCase match {
               case x =>
                 x.startsWith("text/xml") || x.startsWith("application/xml") ||
-                x.startsWith("text/json") || x.startsWith("application/json")
+                  x.startsWith("text/json") || x.startsWith("application/json")
             }
           }) {
         ParamCalcInfo(queryStringParam._1,
@@ -593,8 +595,7 @@ object Req {
     }
 
   def parsePath(in: String): ParsePath = {
-    val p1 = fixURI(
-        (in match {
+    val p1 = fixURI((in match {
       case null => "/"; case s if s.length == 0 => "/"; case s => s
     }).replaceAll("/+", "/"))
     val front = p1.startsWith("/")
@@ -786,7 +787,7 @@ final case class ContentType(theType: String,
     */
   def matches(contentType: (String, String)): Boolean =
     (theType == "*" || (theType == contentType._1)) &&
-    (subtype == "*" || subtype == contentType._2)
+      (subtype == "*" || subtype == contentType._2)
 
   /**
     * Is it a wildcard
@@ -834,13 +835,13 @@ object ContentType {
   private def parseIt(content: String, index: Int): Box[ContentType] =
     content.roboSplit(";") match {
       case TwoType(typ, subType) :: xs => {
-          val kv = xs.flatMap(EqualsSplit.unapply) // get the key/value pairs
-          val q: Box[Double] = first(kv) {
-            case (k, v) if k == "q" => Helpers.asDouble(v)
-            case _ => Empty
-          }
-          Full(ContentType(typ, subType, index, q, kv.filter { _._1 != "q" }))
+        val kv = xs.flatMap(EqualsSplit.unapply) // get the key/value pairs
+        val q: Box[Double] = first(kv) {
+          case (k, v) if k == "q" => Helpers.asDouble(v)
+          case _ => Empty
         }
+        Full(ContentType(typ, subType, index, q, kv.filter { _._1 != "q" }))
+      }
 
       case _ => Empty
     }
@@ -863,7 +864,7 @@ class Req(val path: ParsePath,
     with UserAgentCalculator {
   override def toString =
     "Req(" + paramNames + ", " + params + ", " + path + ", " + contextPath +
-    ", " + requestType + ", " + contentType + ")"
+      ", " + requestType + ", " + contentType + ")"
 
   def this(_path: ParsePath,
            _contextPath: String,
@@ -1038,8 +1039,8 @@ class Req(val path: ParsePath,
     }
 
   lazy val headers: List[(String, String)] = for (h <- request.headers;
-                                                  p <- h.values) yield
-    (h.name, p)
+                                                  p <- h.values)
+    yield (h.name, p)
 
   def headers(name: String): List[String] =
     headers.filter(_._1.equalsIgnoreCase(name)).map(_._2)
@@ -1353,10 +1354,10 @@ class Req(val path: ParsePath,
 
   def testIfModifiedSince(when: Long): Boolean =
     (when == 0L) ||
-    ((when / 1000L) > ((ifModifiedSince.map(_.getTime) openOr 0L) / 1000L))
+      ((when / 1000L) > ((ifModifiedSince.map(_.getTime) openOr 0L) / 1000L))
 
-  def testFor304(
-      lastModified: Long, headers: (String, String)*): Box[LiftResponse] =
+  def testFor304(lastModified: Long,
+                 headers: (String, String)*): Box[LiftResponse] =
     if (!testIfModifiedSince(lastModified))
       Full(InMemoryResponse(new Array[Byte](0), headers.toList, Nil, 304))
     else Empty
@@ -1365,8 +1366,8 @@ class Req(val path: ParsePath,
     * The user agent of the browser that sent the request
     */
   lazy val userAgent: Box[String] = for (r <- Box.legacyNullTest(request);
-                                         uah <- request.header("User-Agent")) yield
-    uah
+                                         uah <- request.header("User-Agent"))
+    yield uah
 
   /**
     * the accept header
@@ -1422,8 +1423,9 @@ class Req(val path: ParsePath,
 /**
   * This case class is used for pattern matching.  See LiftRules.statelessRewrite and LiftRules.statefulRewrite
   */
-final case class RewriteRequest(
-    path: ParsePath, requestType: RequestType, httpRequest: HTTPRequest)
+final case class RewriteRequest(path: ParsePath,
+                                requestType: RequestType,
+                                httpRequest: HTTPRequest)
 
 /**
   * The representation of an URI path
@@ -1435,16 +1437,14 @@ case class ParsePath(partPath: List[String],
   def drop(cnt: Int) =
     ParsePath(partPath.drop(cnt), suffix, absolute, endSlash)
 
-  lazy val wholePath =
-    if (suffix.length > 0) {
-      partPath.dropRight(1) ::: List(
-          (partPath match {
-        case Nil => ""
-        case xs => xs.last
-      }) + "." + suffix)
-    } else {
-      partPath
-    }
+  lazy val wholePath = if (suffix.length > 0) {
+    partPath.dropRight(1) ::: List((partPath match {
+      case Nil => ""
+      case xs => xs.last
+    }) + "." + suffix)
+  } else {
+    partPath
+  }
 }
 
 final case class RewriteResponse(path: ParsePath,
@@ -1464,8 +1464,9 @@ object RewriteResponse {
     new RewriteResponse(ParsePath(path, "", true, false), Map.empty, false)
 
   def apply(path: List[String], stopRewriting: Boolean) =
-    new RewriteResponse(
-        ParsePath(path, "", true, false), Map.empty, stopRewriting)
+    new RewriteResponse(ParsePath(path, "", true, false),
+                        Map.empty,
+                        stopRewriting)
 
   def apply(path: List[String], suffix: String) =
     new RewriteResponse(ParsePath(path, suffix, true, false), Map.empty, false)

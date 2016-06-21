@@ -88,8 +88,9 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
   @Since("1.2.0")
   override def evaluate(dataset: DataFrame): Double = {
     val schema = dataset.schema
-    SchemaUtils.checkColumnTypes(
-        schema, $(rawPredictionCol), Seq(DoubleType, new VectorUDT))
+    SchemaUtils.checkColumnTypes(schema,
+                                 $(rawPredictionCol),
+                                 Seq(DoubleType, new VectorUDT))
     SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
 
     // TODO: When dataset metadata has been implemented, check rawPredictionCol vector length = 2.

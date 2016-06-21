@@ -43,7 +43,7 @@ package object metadata {
             val newMmap: MetadataMap = mmap.foldLeft(currentMmap) {
               case (macc, (mtype, m)) =>
                 macc +
-                (mtype -> macc.get(mtype).flatMap(_.merge(m)).getOrElse(m))
+                  (mtype -> macc.get(mtype).flatMap(_.merge(m)).getOrElse(m))
             }
 
             acc + (descriptor -> newMmap)

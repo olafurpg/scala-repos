@@ -27,7 +27,8 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
 
   import LoggingReceiveSpec._
   val config = ConfigFactory
-    .parseString("""
+    .parseString(
+        """
     akka.loglevel=DEBUG
     akka.actor.serialize-messages = off # debug noise from serialization
     """)
@@ -48,8 +49,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
         .parseMap(Map("akka.actor.debug.lifecycle" -> true).asJava)
         .withFallback(config))
 
-  val filter = TestEvent.Mute(
-      EventFilter.custom {
+  val filter = TestEvent.Mute(EventFilter.custom {
     case _: Logging.Debug ⇒ true
     case _: Logging.Info ⇒ true
     case _ ⇒ false
@@ -87,7 +87,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
                   Logging.Debug("funky",
                                 classOf[DummyClassForStringSources],
                                 "received unhandled message hallo from " +
-                                system.deadLetters))
+                                  system.deadLetters))
         expectMsgType[UnhandledMessage](1 second)
       }
     }
@@ -102,8 +102,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
           case null ⇒
         }
 
-        val actor = TestActorRef(
-            new Actor {
+        val actor = TestActorRef(new Actor {
           def switch: Actor.Receive = {
             case "becomenull" ⇒ context.become(r, false)
           }
@@ -135,8 +134,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
     "not duplicate logging" in {
       new TestKit(appLogging) with ImplicitSender {
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
-        val actor = TestActorRef(
-            new Actor {
+        val actor = TestActorRef(new Actor {
           def receive =
             LoggingReceive(LoggingReceive {
               case _ ⇒ sender() ! "x"
@@ -158,8 +156,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
     "log AutoReceiveMessages if requested" in {
       new TestKit(appAuto) {
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
-        val actor = TestActorRef(
-            new Actor {
+        val actor = TestActorRef(new Actor {
           def receive = {
             case _ ⇒
           }

@@ -50,8 +50,8 @@ private[kinesis] class KPLDataGenerator(regionName: String)
     new KPLProducer(conf)
   }
 
-  override def sendData(
-      streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
+  override def sendData(streamName: String,
+                        data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
     val shardIdToSeqNumbers =
       new mutable.HashMap[String, ArrayBuffer[(Int, String)]]()
     data.foreach { num =>
@@ -64,8 +64,8 @@ private[kinesis] class KPLDataGenerator(regionName: String)
         override def onSuccess(result: UserRecordResult): Unit = {
           val shardId = result.getShardId
           val seqNumber = result.getSequenceNumber()
-          val sentSeqNumbers = shardIdToSeqNumbers.getOrElseUpdate(
-              shardId, new ArrayBuffer[(Int, String)]())
+          val sentSeqNumbers = shardIdToSeqNumbers
+            .getOrElseUpdate(shardId, new ArrayBuffer[(Int, String)]())
           sentSeqNumbers += ((num, seqNumber))
         }
       }

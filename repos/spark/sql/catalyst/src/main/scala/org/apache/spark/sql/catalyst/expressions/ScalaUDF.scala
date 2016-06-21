@@ -1251,8 +1251,8 @@ case class ScalaUDF(function: AnyRef,
   // scalastyle:on line.size.limit
 
   // Generate codes used to convert the arguments to Scala type for user-defined functions
-  private[this] def genCodeForConverter(
-      ctx: CodegenContext, index: Int): String = {
+  private[this] def genCodeForConverter(ctx: CodegenContext,
+                                        index: Int): String = {
     val converterClassName = classOf[Any => Any].getName
     val typeConvertersClassName =
       CatalystTypeConverters.getClass.getName + ".MODULE$"
@@ -1265,8 +1265,8 @@ case class ScalaUDF(function: AnyRef,
         converterClassName,
         converterTerm,
         s"this.$converterTerm = ($converterClassName)$typeConvertersClassName" +
-        s".createToScalaConverter(((${expressionClassName})((($scalaUDFClassName)" +
-        s"references[$expressionIdx]).getChildren().apply($index))).dataType());")
+          s".createToScalaConverter(((${expressionClassName})((($scalaUDFClassName)" +
+          s"references[$expressionIdx]).getChildren().apply($index))).dataType());")
     converterTerm
   }
 
@@ -1287,8 +1287,8 @@ case class ScalaUDF(function: AnyRef,
         converterClassName,
         catalystConverterTerm,
         s"this.$catalystConverterTerm = ($converterClassName)$typeConvertersClassName" +
-        s".createToCatalystConverter((($scalaUDFClassName)references" +
-        s"[$catalystConverterTermIdx]).dataType());")
+          s".createToCatalystConverter((($scalaUDFClassName)references" +
+          s"[$catalystConverterTermIdx]).dataType());")
 
     val resultTerm = ctx.freshName("result")
 
@@ -1305,7 +1305,7 @@ case class ScalaUDF(function: AnyRef,
         funcClassName,
         funcTerm,
         s"this.$funcTerm = ($funcClassName)((($scalaUDFClassName)references" +
-        s"[$funcExpressionIdx]).userDefinedFunc());")
+          s"[$funcExpressionIdx]).userDefinedFunc());")
 
     // codegen for children expressions
     val evals = children.map(_.gen(ctx))
@@ -1326,8 +1326,8 @@ case class ScalaUDF(function: AnyRef,
 
     val callFunc =
       s"${ctx.boxedType(dataType)} $resultTerm = " +
-      s"(${ctx.boxedType(dataType)})${catalystConverterTerm}" +
-      s".apply($funcTerm.apply(${funcArguments.mkString(", ")}));"
+        s"(${ctx.boxedType(dataType)})${catalystConverterTerm}" +
+        s".apply($funcTerm.apply(${funcArguments.mkString(", ")}));"
 
     s"""
       $evalCode

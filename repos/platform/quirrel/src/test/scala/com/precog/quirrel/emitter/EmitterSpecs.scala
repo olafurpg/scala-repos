@@ -53,13 +53,13 @@ object EmitterSpecs
     emit(tree)
   }
 
-  def testEmit(v: String)(
-      head: Vector[Instruction], streams: Vector[Instruction]*) =
+  def testEmit(
+      v: String)(head: Vector[Instruction], streams: Vector[Instruction]*) =
     compileEmit(v).filter { case _: Line => false; case _ => true } must beOneOf(
         (head +: streams): _*)
 
-  def testEmitLine(v: String)(
-      head: Vector[Instruction], streams: Vector[Instruction]*) =
+  def testEmitLine(v: String)(head: Vector[Instruction],
+                              streams: Vector[Instruction]*) =
     compileEmit(v) must beOneOf((head +: streams): _*)
 
   "emitter" should {
@@ -916,7 +916,8 @@ object EmitterSpecs
     }
 
     "emit body of a fully applied characteristic function with two variables" in {
-      testEmit("""
+      testEmit(
+          """
         | fun(a, b) := 
         |   //campaigns where (//campaigns).ageRange = a & (//campaigns).gender = b
         | fun([25,36],
@@ -1129,7 +1130,8 @@ object EmitterSpecs
     }
 
     "emit split and merge for cf example with paired tic variables in critical condition" in {
-      testEmit("""
+      testEmit(
+          """
         | clicks := //clicks
         | solve 'a, 'b
         |   clicks' := clicks where clicks.time = 'a & clicks.pageId = 'b
@@ -1156,7 +1158,8 @@ object EmitterSpecs
     }
 
     "emit split and merge for cf example with consecutively-constrained paired tic variables on a single set" in {
-      testEmit("""
+      testEmit(
+          """
         | organizations := //organizations
         | 
         | hist := solve 'revenue, 'campaign 
@@ -1321,7 +1324,8 @@ object EmitterSpecs
     }
 
     "emit split and merge for rr cf example" in {
-      testEmit("""
+      testEmit(
+          """
         | clicks := //clicks
         | 
         | totalPairs(sessionId) :=
@@ -1332,7 +1336,8 @@ object EmitterSpecs
     }.pendingUntilFixed // TODO this *really* should be working
 
     "emit split and merge for ctr example" in {
-      testEmit("""
+      testEmit(
+          """
         | clicks := //clicks
         | imps := //impressions
         | solve 'day
@@ -1441,7 +1446,8 @@ object EmitterSpecs
     }
 
     "determine a histogram of a composite key of revenue and campaign" >> {
-      testEmit("""
+      testEmit(
+          """
         | campaigns := //campaigns
         | organizations := //organizations
         | 
@@ -1741,7 +1747,8 @@ object EmitterSpecs
       }
 
       "histogram.qrl" >> {
-        testEmit("""
+        testEmit(
+            """
           | clicks := //clicks
           | 
           | histogram := solve 'value

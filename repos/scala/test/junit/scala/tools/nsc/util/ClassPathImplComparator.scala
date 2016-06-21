@@ -74,10 +74,10 @@ object ClassPathImplComparator {
 
     if (args contains "-help") usage()
     else {
-      val oldCpSettings = loadSettings(
-          args.toList, ClassPathRepresentationType.Recursive)
-      val flatCpSettings = loadSettings(
-          args.toList, ClassPathRepresentationType.Flat)
+      val oldCpSettings =
+        loadSettings(args.toList, ClassPathRepresentationType.Recursive)
+      val flatCpSettings =
+        loadSettings(args.toList, ClassPathRepresentationType.Flat)
 
       val classesToCheck = oldCpSettings.checkClasses.value
       val classesToFind =
@@ -97,8 +97,9 @@ object ClassPathImplComparator {
             case (a, _) => a && checkExistenceOfClasses(classesToFind)(cp)
           }
 
-        val cp = withMeasuredTime(
-            "Creating classpath", createClassPaths(), cpCreationStats)
+        val cp = withMeasuredTime("Creating classpath",
+                                  createClassPaths(),
+                                  cpCreationStats)
         val result = withMeasuredTime("Searching for specified classes",
                                       testClassLookup(cp),
                                       cpSearchingStats)
@@ -141,7 +142,8 @@ object ClassPathImplComparator {
     * Prints usage information
     */
   private def usage(): Unit =
-    println("""Use classpath and sourcepath options like in the case of e.g. 'scala' command.
+    println(
+        """Use classpath and sourcepath options like in the case of e.g. 'scala' command.
               | There are also two additional options:
               | -checkClasses <semicolon separated class names> Specify names of classes which should be found
               | -requiredIterations <int value>                 Repeat tests specified count of times (to check e.g. impact of caches)
@@ -157,8 +159,9 @@ object ClassPathImplComparator {
     settings
   }
 
-  private def withMeasuredTime[T](
-      operationName: String, f: => T, durationStats: DurationStats): T = {
+  private def withMeasuredTime[T](operationName: String,
+                                  f: => T,
+                                  durationStats: DurationStats): T = {
     val startTime = System.currentTimeMillis()
     val res = f
     val elapsed = System.currentTimeMillis() - startTime

@@ -27,8 +27,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     * Behaves just like traverse, but uses [[Unapply]] to find the
     * Applicative instance for G.
     */
-  def traverseU[A, GB](fa: F[A])(f: A => GB)(
-      implicit U: Unapply[Applicative, GB]): U.M[F[U.A]] =
+  def traverseU[A, GB](fa: F[A])(
+      f: A => GB)(implicit U: Unapply[Applicative, GB]): U.M[F[U.A]] =
     U.TC.traverse(fa)(a => U.subst(f(a)))(this)
 
   /**

@@ -49,8 +49,7 @@ object TraverseUsage extends App {
 
   // when we hit the 30, we get a None, which "fails" the whole computation
   assert(bigNumbers.traverse(doubleSmall) === none[List[Int]])
-  assert(
-      bigNumbers.traverse(doubleSmall) === bigNumbers
+  assert(bigNumbers.traverse(doubleSmall) === bigNumbers
         .map(doubleSmall)
         .sequence)
 
@@ -62,8 +61,8 @@ object TraverseUsage extends App {
   // instead of the expected * -> * kind of an Applicative, since the
   // Validation type constructor takes two arguments instead of one.
 
-  val validations: Vector[ValidationNel[String, Int]] = Vector(
-      1.success, "failure2".failureNel, 3.success, "failure4".failureNel)
+  val validations: Vector[ValidationNel[String, Int]] =
+    Vector(1.success, "failure2".failureNel, 3.success, "failure4".failureNel)
 
   // this would not compile:
   // val result = validations.sequence
@@ -82,8 +81,10 @@ object TraverseUsage extends App {
   val notAllEvens = List(1, 2, 3, 4)
 
   assert(evens.traverseU(onlyEvenAllowed) === IList(2, 4, 6, 8).success)
-  assert(notAllEvens.traverseU(onlyEvenAllowed) === NonEmptyList(
-          "1 is not even", "3 is not even").failure)
+  assert(
+      notAllEvens.traverseU(onlyEvenAllowed) === NonEmptyList(
+          "1 is not even",
+          "3 is not even").failure)
 
   // there is a traverseS method which allows us to traverse a
   // structure with a function while carrying a state through the

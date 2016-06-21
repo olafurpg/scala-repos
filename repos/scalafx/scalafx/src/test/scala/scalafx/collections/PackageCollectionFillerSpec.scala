@@ -92,8 +92,8 @@ class PackageCollectionFillerSpec
     analyzer.secondChange should be(false)
   }
 
-  private def executeAndTestChanges[T](
-      originalList: jfxc.ObservableList[T], newContent: Iterable[T]) {
+  private def executeAndTestChanges[T](originalList: jfxc.ObservableList[T],
+                                       newContent: Iterable[T]) {
     val analyzer = Analyzer(originalList)
 
     fillCollection(originalList, newContent)
@@ -120,8 +120,10 @@ class PackageCollectionFillerSpec
     if (newContent == null || newContent.isEmpty) {
       this.emptyEvaluation(analyzer, originalList)
     } else {
-      this.filledEvaluation(
-          analyzer, originalList, newContent.map(_.delegate), (an, li) => ())
+      this.filledEvaluation(analyzer,
+                            originalList,
+                            newContent.map(_.delegate),
+                            (an, li) => ())
       analyzer.addedElements.toList should be(
           newContent.map(_.delegate).toList)
     }
@@ -141,8 +143,8 @@ class PackageCollectionFillerSpec
   }
 
   it should "clean originalCollection if receives a empty Iterable" in {
-    executeAndTestChanges(
-        getOriginalStringObservableList, Iterable.empty[String])
+    executeAndTestChanges(getOriginalStringObservableList,
+                          Iterable.empty[String])
   }
 
   it should "replace new content" in {
@@ -178,13 +180,13 @@ class PackageCollectionFillerSpec
   }
 
   it should "clean originalCollection if receives a empty Iterable" in {
-    executeAndTestChangesFX(
-        getOriginalNodeObservableList, Iterable.empty[Node])
+    executeAndTestChangesFX(getOriginalNodeObservableList,
+                            Iterable.empty[Node])
   }
 
   it should "replace new content" in {
-    executeAndTestChangesFX(
-        getOriginalNodeObservableList, List(new ChoiceBox, new Slider))
+    executeAndTestChangesFX(getOriginalNodeObservableList,
+                            List(new ChoiceBox, new Slider))
   }
 
   "fillSFXCollectionWithOne" should "clean originalCollection if receives null" in {

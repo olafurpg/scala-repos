@@ -261,8 +261,9 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * underlying futures complete. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C](
-      a: Future[A], b: Future[B], c: Future[C]): Future[(A, B, C)] =
+  def join[A, B, C](a: Future[A],
+                    b: Future[B],
+                    c: Future[C]): Future[(A, B, C)] =
     join(Seq(a, b, c)) map { _ =>
       (Await.result(a), Await.result(b), Await.result(c))
     }
@@ -968,8 +969,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * @param `as` a sequence of `A` that will have `f` applied to each item sequentially
     * @return a `Future[Seq[B]]` containing the results of `f` being applied to every item in `as`
     */
-  def traverseSequentially[A, B](
-      as: Seq[A])(f: A => Future[B]): Future[Seq[B]] =
+  def traverseSequentially[A, B](as: Seq[A])(
+      f: A => Future[B]): Future[Seq[B]] =
     as.foldLeft(Future.value(Vector.empty[B])) { (resultsFuture, nextItem) =>
       for {
         results <- resultsFuture
@@ -1237,8 +1238,11 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
   )(
       implicit timer: Timer
   ): Batcher[In, Out] = {
-    new Batcher[In, Out](new BatchExecutor[In, Out](
-            sizeThreshold, timeThreshold, sizePercentile, f))
+    new Batcher[In, Out](
+        new BatchExecutor[In, Out](sizeThreshold,
+                                   timeThreshold,
+                                   sizePercentile,
+                                   f))
   }
 }
 
@@ -1944,8 +1948,7 @@ abstract class Future[+A] extends Awaitable[A] {
 class ConstFuture[A](result: Try[A]) extends Future[A] {
   def respond(k: Try[A] => Unit): Future[A] = {
     val saved = Local.save()
-    Scheduler.submit(
-        new Runnable {
+    Scheduler.submit(new Runnable {
       def run() {
         val current = Local.save()
         Local.restore(saved)
@@ -2040,8 +2043,9 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * underlying futures complete. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C](
-      a: Future[A], b: Future[B], c: Future[C]): Future[(A, B, C)] =
+  def join[A, B, C](a: Future[A],
+                    b: Future[B],
+                    c: Future[C]): Future[(A, B, C)] =
     Future.join(Seq(a, b, c)) map { _ =>
       (Await.result(a), Await.result(b), Await.result(c))
     }

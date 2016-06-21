@@ -66,8 +66,12 @@ trait StatsLibModule[M[+ _]]
     val EmptyNamespace = Vector()
 
     override def _libMorphism1 =
-      super._libMorphism1 ++ Set(
-          Median, Mode, Rank, DenseRank, IndexedRank, Dummy)
+      super._libMorphism1 ++ Set(Median,
+                                 Mode,
+                                 Rank,
+                                 DenseRank,
+                                 IndexedRank,
+                                 Dummy)
     override def _libMorphism2 =
       super._libMorphism2 ++ Set(Covariance,
                                  LinearCorrelation,
@@ -83,7 +87,8 @@ trait StatsLibModule[M[+ _]]
 
       def apply(table: Table, ctx: MorphContext) = {
         //TODO write tests for the empty table case
-        val compactedTable = table.compact(WrapObject(
+        val compactedTable = table.compact(
+            WrapObject(
                 Typed(DerefObjectStatic(Leaf(Source), paths.Value), JNumberT),
                 paths.Value.name))
 
@@ -122,8 +127,7 @@ trait StatsLibModule[M[+ _]]
 
     object Mode extends Morphism1(EmptyNamespace, "mode") {
 
-      type Result =
-        Set[BigDecimal] //(currentRunValue, curentCount, listOfModes, maxCount)
+      type Result = Set[BigDecimal] //(currentRunValue, curentCount, listOfModes, maxCount)
 
       val tpe = UnaryOperationType(JNumberT, JNumberT)
 
@@ -161,21 +165,21 @@ trait StatsLibModule[M[+ _]]
                     case ((None, count, modes, maxCount), sv) =>
                       ((Some(sv), count + 1, Set(sv), maxCount + 1))
                     case ((Some(currentRun), count, modes, maxCount), sv) => {
-                        if (currentRun == sv) {
-                          if (count >= maxCount)
-                            (Some(sv), count + 1, Set(sv), maxCount + 1)
-                          else if (count + 1 == maxCount)
-                            (Some(sv),
-                             count + 1,
-                             modes + BigDecimal(sv),
-                             maxCount)
-                          else (Some(sv), count + 1, modes, maxCount)
-                        } else {
-                          if (maxCount == 1)
-                            (Some(sv), 1, modes + BigDecimal(sv), maxCount)
-                          else (Some(sv), 1, modes, maxCount)
-                        }
+                      if (currentRun == sv) {
+                        if (count >= maxCount)
+                          (Some(sv), count + 1, Set(sv), maxCount + 1)
+                        else if (count + 1 == maxCount)
+                          (Some(sv),
+                           count + 1,
+                           modes + BigDecimal(sv),
+                           maxCount)
+                        else (Some(sv), count + 1, modes, maxCount)
+                      } else {
+                        if (maxCount == 1)
+                          (Some(sv), 1, modes + BigDecimal(sv), maxCount)
+                        else (Some(sv), 1, modes, maxCount)
                       }
+                    }
                   }
 
                 val (_, _, result, _) = foldedMapped
@@ -231,12 +235,12 @@ trait StatsLibModule[M[+ _]]
 
       val keySpec = DerefObjectStatic(TransSpec1.Id, paths.Key)
       val sortSpec = DerefObjectStatic(
-          DerefArrayStatic(
-              DerefObjectStatic(TransSpec1.Id, paths.Value), CPathIndex(0)),
+          DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
+                           CPathIndex(0)),
           CPathField(smoother))
       val valueSpec = DerefObjectStatic(
-          DerefArrayStatic(
-              DerefObjectStatic(TransSpec1.Id, paths.Value), CPathIndex(0)),
+          DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
+                           CPathIndex(0)),
           CPathField(smoothee))
 
       def smoothSpec: TransSpec1
@@ -281,10 +285,12 @@ trait StatsLibModule[M[+ _]]
             init: Option[BigDecimal],
             cols: Map[ColumnRef, Column],
             range: Range): (Option[BigDecimal], Map[ColumnRef, Column]) = {
-          val values = unifyNumColumns(
-              cols.collect { case (ColumnRef(ValuePath, _), col) => col })
-          val alphas = unifyNumColumns(
-              cols.collect { case (ColumnRef(AlphaPath, _), col) => col })
+          val values = unifyNumColumns(cols.collect {
+            case (ColumnRef(ValuePath, _), col) => col
+          })
+          val alphas = unifyNumColumns(cols.collect {
+            case (ColumnRef(AlphaPath, _), col) => col
+          })
 
           init orElse findFirst(values, range.start, range.end) map { init0 =>
             val smoothed = new Array[BigDecimal](range.end)
@@ -312,7 +318,8 @@ trait StatsLibModule[M[+ _]]
       }
 
       val alphaSpec = DerefArrayStatic(
-          DerefObjectStatic(TransSpec1.Id, paths.Value), CPathIndex(1))
+          DerefObjectStatic(TransSpec1.Id, paths.Value),
+          CPathIndex(1))
       def smoothSpec =
         Scan(InnerArrayConcat(WrapArray(valueSpec), WrapArray(alphaSpec)),
              ExpSmoothingScanner)
@@ -334,8 +341,9 @@ trait StatsLibModule[M[+ _]]
       private sealed trait ScannerState
       private case object FindFirst extends ScannerState
       private case class FindSecond(x0: BigDecimal) extends ScannerState
-      private case class Continue(
-          s0: BigDecimal, b0: BigDecimal, first: Boolean = false)
+      private case class Continue(s0: BigDecimal,
+                                  b0: BigDecimal,
+                                  first: Boolean = false)
           extends ScannerState
 
       private object DoubleExpSmoothingScanner extends CScanner {
@@ -343,8 +351,9 @@ trait StatsLibModule[M[+ _]]
         def init = FindFirst
 
         @tailrec
-        def findFirst(
-            col: NumColumn, row: Int, end: Int): Option[(Int, BigDecimal)] = {
+        def findFirst(col: NumColumn,
+                      row: Int,
+                      end: Int): Option[(Int, BigDecimal)] = {
           if (row < end) {
             if (col.isDefinedAt(row)) Some(row -> col(row))
             else findFirst(col, row + 1, end)
@@ -356,12 +365,15 @@ trait StatsLibModule[M[+ _]]
         def scan(state0: ScannerState,
                  cols: Map[ColumnRef, Column],
                  range: Range): (ScannerState, Map[ColumnRef, Column]) = {
-          val values = unifyNumColumns(
-              cols.collect { case (ColumnRef(ValuePath, _), col) => col })
-          val alphas = unifyNumColumns(
-              cols.collect { case (ColumnRef(AlphaPath, _), col) => col })
-          val betas = unifyNumColumns(
-              cols.collect { case (ColumnRef(BetaPath, _), col) => col })
+          val values = unifyNumColumns(cols.collect {
+            case (ColumnRef(ValuePath, _), col) => col
+          })
+          val alphas = unifyNumColumns(cols.collect {
+            case (ColumnRef(AlphaPath, _), col) => col
+          })
+          val betas = unifyNumColumns(cols.collect {
+            case (ColumnRef(BetaPath, _), col) => col
+          })
 
           // This is a bit messy, but it's because we need the first 2 values
           // in order to initialize s_1 and b_1. Since a slice may have 0 or
@@ -396,7 +408,8 @@ trait StatsLibModule[M[+ _]]
                       smoothed(row) = x0
                       (FindSecond(x0),
                        Map(ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(
-                               defined, smoothed)))
+                               defined,
+                               smoothed)))
                     } getOrElse {
                       (FindSecond(x0), Map.empty)
                     }
@@ -431,8 +444,10 @@ trait StatsLibModule[M[+ _]]
                   row += 1
                 }
                 (Continue(s0, b0),
-                 Map(ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(
-                         defined, smoothed)))
+                 Map(
+                     ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(
+                         defined,
+                         smoothed)))
             }
 
           loop(state0, None)
@@ -440,12 +455,12 @@ trait StatsLibModule[M[+ _]]
       }
 
       val alphaSpec = DerefObjectStatic(
-          DerefArrayStatic(
-              DerefObjectStatic(TransSpec1.Id, paths.Value), CPathIndex(1)),
+          DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
+                           CPathIndex(1)),
           CPathField(alpha))
       val betaSpec = DerefObjectStatic(
-          DerefArrayStatic(
-              DerefObjectStatic(TransSpec1.Id, paths.Value), CPathIndex(1)),
+          DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
+                           CPathIndex(1)),
           CPathField(beta))
       def smoothSpec =
         Scan(InnerArrayConcat(WrapArray(valueSpec),
@@ -764,8 +779,7 @@ trait StatsLibModule[M[+ _]]
               val stdDev2 = sqrt(unscaledVar2) / count
               val correlation = cov / (stdDev1 * stdDev2)
 
-              val resultTable =
-                Table.constDecimal(Set(correlation)) //TODO the following lines are used throughout. refactor!
+              val resultTable = Table.constDecimal(Set(correlation)) //TODO the following lines are used throughout. refactor!
               val valueTable = resultTable.transform(
                   trans.WrapObject(Leaf(Source), paths.Value.name))
               val keyTable = Table.constEmptyArray.transform(
@@ -792,8 +806,7 @@ trait StatsLibModule[M[+ _]]
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
-      type InitialResult =
-        (BigDecimal, BigDecimal, BigDecimal, BigDecimal) // (count, sum1, sum2, productSum)
+      type InitialResult = (BigDecimal, BigDecimal, BigDecimal, BigDecimal) // (count, sum1, sum2, productSum)
       type Result = Option[(BigDecimal, BigDecimal, BigDecimal, BigDecimal)]
 
       implicit def monoid = implicitly[Monoid[Result]]
@@ -1005,17 +1018,17 @@ trait StatsLibModule[M[+ _]]
 
         res2 map {
           case (count, sum1, sum2, productSum) => {
-              val cov = (productSum - ((sum1 * sum2) / count)) / count
+            val cov = (productSum - ((sum1 * sum2) / count)) / count
 
-              val resultTable = Table.constDecimal(Set(cov))
-              val valueTable = resultTable.transform(
-                  trans.WrapObject(Leaf(Source), paths.Value.name))
-              val keyTable = Table.constEmptyArray.transform(
-                  trans.WrapObject(Leaf(Source), paths.Key.name))
+            val resultTable = Table.constDecimal(Set(cov))
+            val valueTable = resultTable.transform(
+                trans.WrapObject(Leaf(Source), paths.Value.name))
+            val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-              valueTable.cross(keyTable)(
-                  InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
-            }
+            valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          }
         } getOrElse Table.empty
       }
 
@@ -1032,11 +1045,12 @@ trait StatsLibModule[M[+ _]]
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
-      type InitialResult = (BigDecimal,
-                            BigDecimal,
-                            BigDecimal,
-                            BigDecimal,
-                            BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
+      type InitialResult =
+        (BigDecimal,
+         BigDecimal,
+         BigDecimal,
+         BigDecimal,
+         BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
       type Result =
         Option[(BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal)]
 
@@ -1294,27 +1308,27 @@ trait StatsLibModule[M[+ _]]
 
         res2 map {
           case (count, sum1, sum2, sumsq1, productSum) => {
-              val cov = (productSum - ((sum1 * sum2) / count)) / count
-              val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
+            val cov = (productSum - ((sum1 * sum2) / count)) / count
+            val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
 
-              val slope = cov / vari
-              val yint = (sum2 / count) - (slope * (sum1 / count))
+            val slope = cov / vari
+            val yint = (sum2 / count) - (slope * (sum1 / count))
 
-              val constSlope = Table.constDecimal(Set(slope))
-              val constIntercept = Table.constDecimal(Set(yint))
+            val constSlope = Table.constDecimal(Set(slope))
+            val constIntercept = Table.constDecimal(Set(yint))
 
-              val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
-              val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
-              val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
+            val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
+            val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
+            val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
 
-              val valueTable = constSlope.cross(constIntercept)(
-                  trans.WrapObject(concatSpec, paths.Value.name))
-              val keyTable = Table.constEmptyArray.transform(
-                  trans.WrapObject(Leaf(Source), paths.Key.name))
+            val valueTable = constSlope.cross(constIntercept)(
+                trans.WrapObject(concatSpec, paths.Value.name))
+            val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-              valueTable.cross(keyTable)(
-                  InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
-            }
+            valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          }
         } getOrElse Table.empty
       }
 
@@ -1331,11 +1345,12 @@ trait StatsLibModule[M[+ _]]
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
-      type InitialResult = (BigDecimal,
-                            BigDecimal,
-                            BigDecimal,
-                            BigDecimal,
-                            BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
+      type InitialResult =
+        (BigDecimal,
+         BigDecimal,
+         BigDecimal,
+         BigDecimal,
+         BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
       type Result =
         Option[(BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal)]
 
@@ -1366,19 +1381,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1397,19 +1411,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1428,19 +1441,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1459,19 +1471,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1490,19 +1501,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1521,19 +1531,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1552,19 +1561,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1583,19 +1591,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1614,19 +1621,18 @@ trait StatsLibModule[M[+ _]]
                        BigDecimal(0),
                        BigDecimal(0),
                        BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) =>
-                      {
-                        if (v1 > 0) {
-                          (count + 1,
-                           sum1 + math.log(v1.toDouble),
-                           sum2 + v2,
-                           sumsq1 +
+                    case ((count, sum1, sum2, sumsq1, productSum), (v1, v2)) => {
+                      if (v1 > 0) {
+                        (count + 1,
+                         sum1 + math.log(v1.toDouble),
+                         sum2 + v2,
+                         sumsq1 +
                            (math.log(v1.toDouble) * math.log(v1.toDouble)),
-                           productSum + (math.log(v1.toDouble) * v2))
-                        } else {
-                          (count, sum1, sum2, sumsq1, productSum)
-                        }
+                         productSum + (math.log(v1.toDouble) * v2))
+                      } else {
+                        (count, sum1, sum2, sumsq1, productSum)
                       }
+                    }
                   }
                   Some(foldedMapped)
                 }
@@ -1647,27 +1653,27 @@ trait StatsLibModule[M[+ _]]
 
         res2 map {
           case (count, sum1, sum2, sumsq1, productSum) => {
-              val cov = (productSum - ((sum1 * sum2) / count)) / count
-              val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
+            val cov = (productSum - ((sum1 * sum2) / count)) / count
+            val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
 
-              val slope = cov / vari
-              val yint = (sum2 / count) - (slope * (sum1 / count))
+            val slope = cov / vari
+            val yint = (sum2 / count) - (slope * (sum1 / count))
 
-              val constSlope = Table.constDecimal(Set(slope))
-              val constIntercept = Table.constDecimal(Set(yint))
+            val constSlope = Table.constDecimal(Set(slope))
+            val constIntercept = Table.constDecimal(Set(yint))
 
-              val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
-              val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
-              val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
+            val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
+            val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
+            val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
 
-              val valueTable = constSlope.cross(constIntercept)(
-                  trans.WrapObject(concatSpec, paths.Value.name))
-              val keyTable = Table.constEmptyArray.transform(
-                  trans.WrapObject(Leaf(Source), paths.Key.name))
+            val valueTable = constSlope.cross(constIntercept)(
+                trans.WrapObject(concatSpec, paths.Value.name))
+            val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-              valueTable.cross(keyTable)(
-                  InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
-            }
+            valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          }
         } getOrElse Table.empty
       }
 
@@ -1692,8 +1698,8 @@ trait StatsLibModule[M[+ _]]
       // TODO: it would be nice to avoid doing this, but its not clear that
       // decimals are going to be a significant performance problem for rank
       // (compared to sorting) and this simplifies the algorithm a lot.
-      protected def decimalize(
-          m: Map[ColumnRef, Column], r: Range): Map[ColumnRef, Column] = {
+      protected def decimalize(m: Map[ColumnRef, Column],
+                               r: Range): Map[ColumnRef, Column] = {
         val m2 = mutable.Map.empty[ColumnRef, Column]
         val nums = mutable.Map.empty[CPath, List[Column]]
 
@@ -1747,8 +1753,9 @@ trait StatsLibModule[M[+ _]]
         * The iterable items are the refs/cvalues defined by that row (which
         * will only be empty when we haven't started).
         */
-      case class RankContext(
-          curr: Long, next: Long, items: Iterable[(ColumnRef, CValue)])
+      case class RankContext(curr: Long,
+                             next: Long,
+                             items: Iterable[(ColumnRef, CValue)])
 
       type A = RankContext
 
@@ -1863,24 +1870,23 @@ trait StatsLibModule[M[+ _]]
         val row = findFirstDefined(defined, range)
 
         // if none of our rows are defined let's short-circuit out of here!
-        val back =
-          if (row == end) {
-            (ctxt, Map.empty[ColumnRef, Column])
-          } else {
-            // build the actual rank array
-            val (values, curr, lastRow) = buildRankArrayIndexed(
-                defined, range, ctxt)
+        val back = if (row == end) {
+          (ctxt, Map.empty[ColumnRef, Column])
+        } else {
+          // build the actual rank array
+          val (values, curr, lastRow) =
+            buildRankArrayIndexed(defined, range, ctxt)
 
-            // build the context to be used for the next slice
-            val ctxt2 = buildRankContext(m, lastRow, curr, curr + 1L)
+          // build the context to be used for the next slice
+          val ctxt2 = buildRankContext(m, lastRow, curr, curr + 1L)
 
-            // construct the column ref and column to return
-            val col2: Column = shiftColumn(
-                ArrayLongColumn(defined, values), start)
-            val data = Map(ColumnRef(CPath.Identity, CLong) -> col2)
+          // construct the column ref and column to return
+          val col2: Column =
+            shiftColumn(ArrayLongColumn(defined, values), start)
+          val data = Map(ColumnRef(CPath.Identity, CLong) -> col2)
 
-            (ctxt2, data)
-          }
+          (ctxt2, data)
+        }
 
         back
       }
@@ -2019,27 +2025,26 @@ trait StatsLibModule[M[+ _]]
         val row = findFirstDefined(defined, range)
 
         // if none of our rows are defined let's short-circuit out of here!
-        val back =
-          if (row == end) {
-            (ctxt, Map.empty[ColumnRef, Column])
-          } else {
-            // find a bitset of duplicate rows and the last defined row
-            val (duplicateRows, lastRow) = findDuplicates(
-                defined, definedCols, cols, range, row)
+        val back = if (row == end) {
+          (ctxt, Map.empty[ColumnRef, Column])
+        } else {
+          // find a bitset of duplicate rows and the last defined row
+          val (duplicateRows, lastRow) =
+            findDuplicates(defined, definedCols, cols, range, row)
 
-            // build the actual rank array
-            val (values, curr, next) = buildRankArrayUnique(
-                defined, duplicateRows, range, ctxt)
+          // build the actual rank array
+          val (values, curr, next) =
+            buildRankArrayUnique(defined, duplicateRows, range, ctxt)
 
-            // build the context to be used for the next slice
-            val ctxt2 = buildRankContext(m, lastRow, curr, next)
+          // build the context to be used for the next slice
+          val ctxt2 = buildRankContext(m, lastRow, curr, next)
 
-            // construct the column ref and column to return
-            val col2 = shiftColumn(ArrayLongColumn(defined, values), start)
-            val data = Map(ColumnRef(CPath.Identity, CLong) -> col2)
+          // construct the column ref and column to return
+          val col2 = shiftColumn(ArrayLongColumn(defined, values), start)
+          val data = Map(ColumnRef(CPath.Identity, CLong) -> col2)
 
-            (ctxt2, data)
-          }
+          (ctxt2, data)
+        }
 
         back
       }

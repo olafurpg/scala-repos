@@ -55,8 +55,7 @@ trait TypedSink[-T] extends java.io.Serializable {
     * Transform this sink into another type by applying a function first
     */
   def contraMap[U](fn: U => T): TypedSink[U] = {
-    val self =
-      this // compiler generated self can cause problems with serialization
+    val self = this // compiler generated self can cause problems with serialization
     new TypedSink[U] {
       override def sinkFields = self.sinkFields
       def setter[V <: U]: TupleSetter[V] = self.setter.contraMap(fn)

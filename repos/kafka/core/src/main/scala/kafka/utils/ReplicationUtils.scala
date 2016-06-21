@@ -34,25 +34,26 @@ object ReplicationUtils extends Logging {
                          newLeaderAndIsr: LeaderAndIsr,
                          controllerEpoch: Int,
                          zkVersion: Int): (Boolean, Int) = {
-    debug(
-        "Updated ISR for partition [%s,%d] to %s".format(
-            topic, partitionId, newLeaderAndIsr.isr.mkString(",")))
+    debug("Updated ISR for partition [%s,%d] to %s"
+          .format(topic, partitionId, newLeaderAndIsr.isr.mkString(",")))
     val path = getTopicPartitionLeaderAndIsrPath(topic, partitionId)
     val newLeaderData =
       zkUtils.leaderAndIsrZkData(newLeaderAndIsr, controllerEpoch)
     // use the epoch of the controller that made the leadership decision, instead of the current controller epoch
     val updatePersistentPath: (Boolean, Int) =
-      zkUtils.conditionalUpdatePersistentPath(
-          path, newLeaderData, zkVersion, Some(checkLeaderAndIsrZkData))
+      zkUtils.conditionalUpdatePersistentPath(path,
+                                              newLeaderData,
+                                              zkVersion,
+                                              Some(checkLeaderAndIsrZkData))
     updatePersistentPath
   }
 
-  def propagateIsrChanges(
-      zkUtils: ZkUtils, isrChangeSet: Set[TopicAndPartition]): Unit = {
-    val isrChangeNotificationPath: String = zkUtils
-      .createSequentialPersistentPath(
-        ZkUtils.IsrChangeNotificationPath + "/" + IsrChangeNotificationPrefix,
-        generateIsrChangeJson(isrChangeSet))
+  def propagateIsrChanges(zkUtils: ZkUtils,
+                          isrChangeSet: Set[TopicAndPartition]): Unit = {
+    val isrChangeNotificationPath: String =
+      zkUtils.createSequentialPersistentPath(
+          ZkUtils.IsrChangeNotificationPath + "/" + IsrChangeNotificationPrefix,
+          generateIsrChangeJson(isrChangeSet))
     debug("Added " + isrChangeNotificationPath + " for " + isrChangeSet)
   }
 
@@ -64,8 +65,8 @@ object ReplicationUtils extends Logging {
       val writtenLeaderAndIsrInfo = zkUtils.readDataMaybeNull(path)
       val writtenLeaderOpt = writtenLeaderAndIsrInfo._1
       val writtenStat = writtenLeaderAndIsrInfo._2
-      val expectedLeader = parseLeaderAndIsr(
-          expectedLeaderAndIsrInfo, path, writtenStat)
+      val expectedLeader =
+        parseLeaderAndIsr(expectedLeaderAndIsrInfo, path, writtenStat)
       writtenLeaderOpt match {
         case Some(writtenData) =>
           val writtenLeader = parseLeaderAndIsr(writtenData, path, writtenStat)

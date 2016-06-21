@@ -82,8 +82,11 @@ class Image(override val delegate: jfxsi.Image)
            preserveRatio: Boolean,
            smooth: Boolean) =
     this(
-        new jfxsi.Image(
-            url, requestedWidth, requestedWidth, preserveRatio, smooth))
+        new jfxsi.Image(url,
+                        requestedWidth,
+                        requestedWidth,
+                        preserveRatio,
+                        smooth))
 
   /**
     * Construct a new Image with the specified parameters.

@@ -29,13 +29,13 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
 
   override def handleEvent(event: CallbackEvent): Unit = events.add(event)
 
-  def waitForEvent(
-      kind: String, maxWait: FiniteDuration = 30.seconds): CallbackEvent =
+  def waitForEvent(kind: String,
+                   maxWait: FiniteDuration = 30.seconds): CallbackEvent =
     waitForEventWith(kind, _ => true, maxWait)
 
-  def waitForDeploymentId(deploymentId: String,
-                          maxWait: FiniteDuration =
-                            30.seconds): CallbackEvent = {
+  def waitForDeploymentId(
+      deploymentId: String,
+      maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
     waitForEventWith("deployment_success",
                      _.info.getOrElse("id", "") == deploymentId,
                      maxWait)
@@ -46,8 +46,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
     waitForDeploymentId(change.value.deploymentId, maxWait)
   }
 
-  def waitForEventMatching(
-      description: String, maxWait: FiniteDuration = 30.seconds)(
+  def waitForEventMatching(description: String,
+                           maxWait: FiniteDuration = 30.seconds)(
       fn: CallbackEvent => Boolean): CallbackEvent = {
     @tailrec
     def nextEvent: Option[CallbackEvent] =
@@ -74,9 +74,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
   /**
     * Wait for the events of the given kinds (=types).
     */
-  def waitForEvents(
-      kinds: String*)(maxWait: FiniteDuration =
-                        30.seconds): Map[String, Seq[CallbackEvent]] = {
+  def waitForEvents(kinds: String*)(maxWait: FiniteDuration = 30.seconds)
+    : Map[String, Seq[CallbackEvent]] = {
 
     val deadline = maxWait.fromNow
 
@@ -86,8 +85,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
       val receivedEvents = Vector.newBuilder[CallbackEvent]
 
       while (eventsToWaitFor.nonEmpty) {
-        val event = waitForEventMatching(
-            s"event $eventsToWaitFor to arrive", deadline.timeLeft) { event =>
+        val event = waitForEventMatching(s"event $eventsToWaitFor to arrive",
+                                         deadline.timeLeft) { event =>
           eventsToWaitFor.contains(event.eventType)
         }
         receivedEvents += event

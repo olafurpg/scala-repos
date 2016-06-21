@@ -13,8 +13,11 @@ object Test extends StoreReporterDirectTest {
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
-    compileString(newCompiler(
-            "-cp", classpath, "-d", s"${testOutput.path}/$jarFileName"))(code)
+    compileString(
+        newCompiler("-cp",
+                    classpath,
+                    "-d",
+                    s"${testOutput.path}/$jarFileName"))(code)
   }
 
   // TODO flat classpath doesn't support the classpath invalidation yet so we force using the recursive one

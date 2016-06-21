@@ -66,14 +66,14 @@ class ProducerFeatureTest
       val supervisor = system.actorOf(Props(new Actor {
         def receive = {
           case p: Props ⇒ {
-              val producer = context.actorOf(p)
-              context.watch(producer)
-              sender() ! producer
-            }
+            val producer = context.actorOf(p)
+            context.watch(producer)
+            sender() ! producer
+          }
           case Terminated(actorRef) ⇒ {
-              deadActor = Some(actorRef)
-              latch.countDown()
-            }
+            deadActor = Some(actorRef)
+            latch.countDown()
+          }
         }
         override val supervisorStrategy =
           OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
@@ -398,9 +398,9 @@ object ProducerFeatureTest {
                 new AkkaCamelException(new Exception("failure"), msg.headers))
           case _ ⇒
             context.sender() !
-            (msg.mapBody { body: String ⇒
-                  "received %s" format body
-                })
+              (msg.mapBody { body: String ⇒
+                    "received %s" format body
+                  })
         }
     }
   }
@@ -409,7 +409,7 @@ object ProducerFeatureTest {
     def receive = {
       case msg: CamelMessage ⇒
         context.sender() !
-        (msg.copy(headers = msg.headers + ("test" -> "result")))
+          (msg.copy(headers = msg.headers + ("test" -> "result")))
       case msg: akka.actor.Status.Failure ⇒
         msg.cause match {
           case e: AkkaCamelException ⇒

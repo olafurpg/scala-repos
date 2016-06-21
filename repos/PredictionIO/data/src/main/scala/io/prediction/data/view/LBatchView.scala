@@ -69,19 +69,19 @@ object ViewAggregators {
       {
         e.event match {
           case "$set" => {
-              if (p == None) {
-                Some(e.properties)
-              } else {
-                p.map(_ ++ e.properties)
-              }
+            if (p == None) {
+              Some(e.properties)
+            } else {
+              p.map(_ ++ e.properties)
             }
+          }
           case "$unset" => {
-              if (p == None) {
-                None
-              } else {
-                p.map(_ -- e.properties.keySet)
-              }
+            if (p == None) {
+              None
+            } else {
+              p.map(_ -- e.properties.keySet)
             }
+          }
           case "$delete" => None
           case _ => p // do nothing for others
         }
@@ -115,8 +115,8 @@ class EventSeq(val events: List[Event]) {
 
   def filter(p: (Event => Boolean)): EventSeq = events.filter(p)
 
-  def aggregateByEntityOrdered[T](
-      init: T, op: (T, Event) => T): Map[String, T] = {
+  def aggregateByEntityOrdered[T](init: T,
+                                  op: (T, Event) => T): Map[String, T] = {
     events
       .groupBy(_.entityId)
       .mapValues(_.sortBy(_.eventTime.getMillis).foldLeft[T](init)(op))

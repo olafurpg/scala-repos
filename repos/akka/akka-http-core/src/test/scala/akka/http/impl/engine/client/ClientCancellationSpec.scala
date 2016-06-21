@@ -24,11 +24,14 @@ class ClientCancellationSpec
     }, address.getHostName, address.getPort)(noncheckedMaterializer)
 
     val addressTls = TestUtils.temporaryServerAddress()
-    Http().bindAndHandleSync({ req ⇒
-      HttpResponse()
-    }, // TLS client does full-close, no need for the connection:close header
-    addressTls.getHostName, addressTls.getPort, connectionContext =
-      ConnectionContext.https(SSLContext.getDefault))(noncheckedMaterializer)
+    Http().bindAndHandleSync(
+        { req ⇒
+          HttpResponse()
+        }, // TLS client does full-close, no need for the connection:close header
+        addressTls.getHostName,
+        addressTls.getPort,
+        connectionContext = ConnectionContext.https(SSLContext.getDefault))(
+        noncheckedMaterializer)
 
     def testCase(connection: Flow[HttpRequest, HttpResponse, Any]): Unit =
       Utils.assertAllStagesStopped {

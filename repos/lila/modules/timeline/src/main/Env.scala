@@ -17,8 +17,8 @@ final class Env(config: Config,
   private val UserDisplayMax = config getInt "user.display_max"
   private val UserActorName = config getString "user.actor.name"
 
-  lazy val entryRepo = new EntryRepo(
-      coll = entryColl, userMax = UserDisplayMax)
+  lazy val entryRepo =
+    new EntryRepo(coll = entryColl, userMax = UserDisplayMax)
 
   system.actorOf(Props(
                      new Push(

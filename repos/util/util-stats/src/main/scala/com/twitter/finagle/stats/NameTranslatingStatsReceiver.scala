@@ -8,8 +8,8 @@ package com.twitter.finagle.stats
   *
   * @param namespacePrefix the namespace used for translations
   */
-abstract class NameTranslatingStatsReceiver(
-    val self: StatsReceiver, namespacePrefix: String)
+abstract class NameTranslatingStatsReceiver(val self: StatsReceiver,
+                                            namespacePrefix: String)
     extends StatsReceiver {
   def this(self: StatsReceiver) = this(self, "<namespacePrefix>")
 

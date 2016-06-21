@@ -48,7 +48,8 @@ class EventLoggingListenerSuite
   import EventLoggingListenerSuite._
 
   private val fileSystem = Utils.getHadoopFileSystem(
-      "/", SparkHadoopUtil.get.newConfiguration(new SparkConf()))
+      "/",
+      SparkHadoopUtil.get.newConfiguration(new SparkConf()))
   private var testDir: File = _
   private var testDirPath: Path = _
 
@@ -116,11 +117,15 @@ class EventLoggingListenerSuite
 
   test("Event log name") {
     // without compression
-    assert(s"file:/base-dir/app1" === EventLoggingListener.getLogPath(
-            Utils.resolveURI("/base-dir"), "app1", None))
+    assert(s"file:/base-dir/app1" === EventLoggingListener
+          .getLogPath(Utils.resolveURI("/base-dir"), "app1", None))
     // with compression
-    assert(s"file:/base-dir/app1.lzf" === EventLoggingListener.getLogPath(
-            Utils.resolveURI("/base-dir"), "app1", None, Some("lzf")))
+    assert(
+        s"file:/base-dir/app1.lzf" === EventLoggingListener.getLogPath(
+            Utils.resolveURI("/base-dir"),
+            "app1",
+            None,
+            Some("lzf")))
     // illegal characters in app ID
     assert(
         s"file:/base-dir/a-fine-mind_dollar_bills__1" === EventLoggingListener
@@ -153,11 +158,15 @@ class EventLoggingListenerSuite
     val conf = getLoggingConf(testDirPath, compressionCodec)
     extraConf.foreach { case (k, v) => conf.set(k, v) }
     val logName = compressionCodec.map("test-" + _).getOrElse("test")
-    val eventLogger = new EventLoggingListener(
-        logName, None, testDirPath.toUri(), conf)
+    val eventLogger =
+      new EventLoggingListener(logName, None, testDirPath.toUri(), conf)
     val listenerBus = new LiveListenerBus
     val applicationStart = SparkListenerApplicationStart(
-        "Greatest App (N)ever", None, 125L, "Mickey", None)
+        "Greatest App (N)ever",
+        None,
+        125L,
+        "Mickey",
+        None)
     val applicationEnd = SparkListenerApplicationEnd(1000L)
 
     // A comprehensive test on JSON de/serialization of all events is in JsonProtocolSuite
@@ -169,8 +178,8 @@ class EventLoggingListenerSuite
     eventLogger.stop()
 
     // Verify file contains exactly the two events logged
-    val logData = EventLoggingListener.openEventLog(
-        new Path(eventLogger.logPath), fileSystem)
+    val logData = EventLoggingListener
+      .openEventLog(new Path(eventLogger.logPath), fileSystem)
     try {
       val lines = readLines(logData)
       val logStart = SparkListenerLogStart(SPARK_VERSION)
@@ -196,8 +205,8 @@ class EventLoggingListenerSuite
       compressionCodec: Option[String] = None) {
     // Set defaultFS to something that would cause an exception, to make sure we don't run
     // into SPARK-6688.
-    val conf = getLoggingConf(testDirPath, compressionCodec).set(
-        "spark.hadoop.fs.defaultFS", "unsupported://example.com")
+    val conf = getLoggingConf(testDirPath, compressionCodec)
+      .set("spark.hadoop.fs.defaultFS", "unsupported://example.com")
     val sc = new SparkContext("local-cluster[2,2,1024]", "test", conf)
     assert(sc.eventLogger.isDefined)
     val eventLogger = sc.eventLogger.get
@@ -222,8 +231,8 @@ class EventLoggingListenerSuite
     eventExistenceListener.assertAllCallbacksInvoked()
 
     // Make sure expected events exist in the log file.
-    val logData = EventLoggingListener.openEventLog(
-        new Path(eventLogger.logPath), fileSystem)
+    val logData = EventLoggingListener
+      .openEventLog(new Path(eventLogger.logPath), fileSystem)
     val logStart = SparkListenerLogStart(SPARK_VERSION)
     val lines = readLines(logData)
     val eventSet = mutable
@@ -293,8 +302,8 @@ class EventLoggingListenerSuite
 object EventLoggingListenerSuite {
 
   /** Get a SparkConf with event logging enabled. */
-  def getLoggingConf(
-      logDir: Path, compressionCodec: Option[String] = None): SparkConf = {
+  def getLoggingConf(logDir: Path,
+                     compressionCodec: Option[String] = None): SparkConf = {
     val conf = new SparkConf
     conf.set("spark.eventLog.enabled", "true")
     conf.set("spark.eventLog.testing", "true")

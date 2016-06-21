@@ -13,8 +13,8 @@ trait Granter {
   protected def userOwnsTeam(teamId: String, userId: String): Fu[Boolean]
 
   def isGrantedRead(categSlug: String)(implicit ctx: UserContext): Boolean =
-    (categSlug == StaffSlug).fold(
-        ctx.me exists Master(Permission.StaffForum), true)
+    (categSlug == StaffSlug)
+      .fold(ctx.me exists Master(Permission.StaffForum), true)
 
   def isGrantedWrite(categSlug: String)(implicit ctx: UserContext): Boolean =
     isOldEnoughToForum && {

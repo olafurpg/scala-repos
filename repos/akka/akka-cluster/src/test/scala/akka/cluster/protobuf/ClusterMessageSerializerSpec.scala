@@ -34,16 +34,16 @@ class ClusterMessageSerializerSpec
 
   import MemberStatus._
 
-  val a1 = TestMember(
-      Address("akka.tcp", "sys", "a", 2552), Joining, Set.empty)
+  val a1 =
+    TestMember(Address("akka.tcp", "sys", "a", 2552), Joining, Set.empty)
   val b1 = TestMember(Address("akka.tcp", "sys", "b", 2552), Up, Set("r1"))
-  val c1 = TestMember(
-      Address("akka.tcp", "sys", "c", 2552), Leaving, Set("r2"))
-  val d1 = TestMember(
-      Address("akka.tcp", "sys", "d", 2552), Exiting, Set("r1", "r2"))
+  val c1 =
+    TestMember(Address("akka.tcp", "sys", "c", 2552), Leaving, Set("r2"))
+  val d1 =
+    TestMember(Address("akka.tcp", "sys", "d", 2552), Exiting, Set("r1", "r2"))
   val e1 = TestMember(Address("akka.tcp", "sys", "e", 2552), Down, Set("r3"))
-  val f1 = TestMember(
-      Address("akka.tcp", "sys", "f", 2552), Removed, Set("r2", "r3"))
+  val f1 =
+    TestMember(Address("akka.tcp", "sys", "f", 2552), Removed, Set("r2", "r3"))
 
   "ClusterMessages" must {
 

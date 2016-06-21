@@ -61,8 +61,8 @@ trait OracleProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.foreignKeyActions -
-        JdbcCapabilities.insertOrUpdate - JdbcCapabilities.booleanMetaData -
-        JdbcCapabilities.distinguishesIntTypes - JdbcCapabilities.supportsByte)
+          JdbcCapabilities.insertOrUpdate - JdbcCapabilities.booleanMetaData -
+          JdbcCapabilities.distinguishesIntTypes - JdbcCapabilities.supportsByte)
 
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
@@ -79,8 +79,8 @@ trait OracleProfile extends JdbcProfile {
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
       extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
-    override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+    override def createColumnBuilder(tableBuilder: TableBuilder,
+                                     meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
         override def tpe = meta.sqlType match {
           case 101 => "Double"
@@ -94,8 +94,8 @@ trait OracleProfile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
@@ -116,15 +116,16 @@ trait OracleProfile extends JdbcProfile {
     (super.computeQueryCompiler
           .addAfter(Phase.removeTakeDrop, Phase.expandSums)
           .replace(Phase.resolveZipJoinsRownumStyle) -
-        Phase.fixRowNumberOrdering + Phase.rewriteBooleans +
-        new RemoveSubqueryOrdering)
+          Phase.fixRowNumberOrdering + Phase.rewriteBooleans +
+          new RemoveSubqueryOrdering)
 
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createSequenceDDLBuilder(
       seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
@@ -133,7 +134,8 @@ trait OracleProfile extends JdbcProfile {
   val blobBufferSize = 4096
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_],
+      sym: Option[FieldSymbol]): String = tmd.sqlType match {
     case java.sql.Types.VARCHAR =>
       val size =
         sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length])
@@ -177,7 +179,7 @@ trait OracleProfile extends JdbcProfile {
         b"\)"
       case Library.==(l, r)
           if (l.nodeType != UnassignedType) &&
-          jdbcTypeFor(l.nodeType).sqlType == Types.BLOB =>
+            jdbcTypeFor(l.nodeType).sqlType == Types.BLOB =>
         b"\(dbms_lob.compare($l, $r) = 0\)"
       case _ => super.expr(c, skipParens)
     }
@@ -276,7 +278,7 @@ trait OracleProfile extends JdbcProfile {
         Seq(
             s"create sequence $seq start with 1 increment by 1",
             s"create or replace trigger $trg before insert on $tab referencing new as new for each row" +
-            s" when (new.$col is null) begin select $seq.nextval into :new.$col from sys.dual; end;"
+              s" when (new.$col is null) begin select $seq.nextval into :new.$col from sys.dual; end;"
         )
       }
 
@@ -404,14 +406,14 @@ trait OracleProfile extends JdbcProfile {
   class SchemaActionExtensionMethodsImpl(schema: SchemaDescription)
       extends super.SchemaActionExtensionMethodsImpl(schema) {
     override def create: ProfileAction[Unit, NoStream, Effect.Schema] =
-      new SimpleJdbcProfileAction[Unit](
-          "schema.create", schema.createStatements.toVector) {
+      new SimpleJdbcProfileAction[Unit]("schema.create",
+                                        schema.createStatements.toVector) {
         def run(ctx: Backend#Context, sql: Vector[String]): Unit =
           for (s <- sql) ctx.session.withStatement()(_.execute(s))
       }
     override def drop: ProfileAction[Unit, NoStream, Effect.Schema] =
-      new SimpleJdbcProfileAction[Unit](
-          "schema.drop", schema.dropStatements.toVector) {
+      new SimpleJdbcProfileAction[Unit]("schema.drop",
+                                        schema.dropStatements.toVector) {
         def run(ctx: Backend#Context, sql: Vector[String]): Unit =
           for (s <- sql) ctx.session.withStatement()(_.execute(s))
       }
@@ -421,8 +423,8 @@ trait OracleProfile extends JdbcProfile {
       ti: JdbcType[T],
       idx: Int): ResultConverter[JdbcResultConverterDomain, Option[T]] =
     if (ti.scalaType == ScalaBaseType.stringType)
-      (new OptionResultConverter[String](
-          ti.asInstanceOf[JdbcType[String]], idx) {
+      (new OptionResultConverter[String](ti.asInstanceOf[JdbcType[String]],
+                                         idx) {
         override def read(pr: ResultSet) = {
           val v = ti.getValue(pr, idx)
           if ((v eq null) || v.length == 0) None else Some(v)

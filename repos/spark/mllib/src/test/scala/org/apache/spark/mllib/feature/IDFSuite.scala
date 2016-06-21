@@ -76,8 +76,7 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
     val termFrequencies = sc.parallelize(localTermFrequencies, 2)
     val idf = new IDF(minDocFreq = 1)
     val model = idf.fit(termFrequencies)
-    val expected = Vectors.dense(
-        Array(0, 3, 1, 2).map { x =>
+    val expected = Vectors.dense(Array(0, 3, 1, 2).map { x =>
       if (x > 0) {
         math.log((m + 1.0) / (x + 1.0))
       } else {

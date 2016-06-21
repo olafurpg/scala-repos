@@ -11,10 +11,10 @@ import org.junit.runner.RunWith
 class SamplerTest extends FunSuite with MockitoSugar {
 
   class SamplerHelper {
-    val traceId = TraceId(
-        Some(SpanId(123)), Some(SpanId(123)), SpanId(123), None)
-    val traceIdSampled = TraceId(
-        Some(SpanId(123)), Some(SpanId(123)), SpanId(123), Some(true))
+    val traceId =
+      TraceId(Some(SpanId(123)), Some(SpanId(123)), SpanId(123), None)
+    val traceIdSampled =
+      TraceId(Some(SpanId(123)), Some(SpanId(123)), SpanId(123), Some(true))
   }
 
   test("Sampler should throw exception if illegal sample rate") {

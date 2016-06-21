@@ -125,8 +125,8 @@ object ScalatraBuild extends Build {
               )
           )
     ) dependsOn
-    (scalatraSpecs2 % "test->compile", scalatraScalatest % "test->compile",
-        scalatraCommon % "compile;test->test")
+      (scalatraSpecs2 % "test->compile", scalatraScalatest % "test->compile",
+          scalatraCommon % "compile;test->test")
 
   lazy val scalatraAuth =
     Project(
@@ -287,8 +287,8 @@ object ScalatraBuild extends Build {
               description := "Scalatra integration with Swagger"
           )
     ) dependsOn
-    (scalatraCore % "compile;test->test;provided->provided",
-        scalatraJson % "compile;test->test;provided->provided")
+      (scalatraCore % "compile;test->test;provided->provided",
+          scalatraJson % "compile;test->test;provided->provided")
 
   lazy val scalatraSwaggerExt =
     Project(
@@ -299,9 +299,9 @@ object ScalatraBuild extends Build {
               description := "Deeper Swagger integration for scalatra"
           )
     ) dependsOn
-    (scalatraSwagger % "compile;test->test;provided->provided",
-        scalatraCommands % "compile;test->test;provided->provided",
-        scalatraAuth % "compile;test->test")
+      (scalatraSwagger % "compile;test->test;provided->provided",
+          scalatraCommands % "compile;test->test;provided->provided",
+          scalatraAuth % "compile;test->test")
 
   lazy val scalatraSlf4j =
     Project(
@@ -359,8 +359,8 @@ object ScalatraBuild extends Build {
               description := "Scalatra Cache integration with Google Guava"
           )
     ) dependsOn
-    (scalatraCore % "compile;test->test;provided->provided",
-        scalatraCache % "compile;test->test;provided->provided")
+      (scalatraCore % "compile;test->test;provided->provided",
+          scalatraCache % "compile;test->test;provided->provided")
 
   lazy val scalatraExample =
     Project(
@@ -380,9 +380,9 @@ object ScalatraBuild extends Build {
               previousArtifacts := Set.empty
           )
     ) dependsOn
-    (scalatraCore % "compile;test->test;provided->provided", scalatraScalate,
-        scalatraAuth, scalatraFileupload, scalatraJetty, scalatraCommands,
-        scalatraAtmosphere)
+      (scalatraCore % "compile;test->test;provided->provided", scalatraScalate,
+          scalatraAuth, scalatraFileupload, scalatraJetty, scalatraCommands,
+          scalatraAtmosphere)
 
   object Dependencies {
     lazy val parserCombinators =
@@ -395,7 +395,7 @@ object ScalatraBuild extends Build {
       "org.atmosphere" % "atmosphere-runtime" % "2.2.9"
     lazy val atmosphereJQuery =
       "org.atmosphere.client" % "jquery" % "2.2.13" artifacts
-      (Artifact("jquery", "war", "war"))
+        (Artifact("jquery", "war", "war"))
     lazy val atmosphereClient = "org.atmosphere" % "wasync" % "2.1.2"
     lazy val atmosphereRedis = "org.atmosphere" % "atmosphere-redis" % "2.3.2"
     lazy val atmosphereCompatJbossweb =
@@ -435,7 +435,7 @@ object ScalatraBuild extends Build {
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.1.3"
     lazy val mimeUtil =
       "eu.medsea.mimeutil" % "mime-util" % "2.1.3" exclude
-      ("org.slf4j", "slf4j-log4j12") exclude ("log4j", "log4j")
+        ("org.slf4j", "slf4j-log4j12") exclude ("log4j", "log4j")
     lazy val mockitoAll = "org.mockito" % "mockito-all" % "1.10.19"
     lazy val rl = "org.scalatra.rl" %% "rl" % "0.4.10"
     lazy val scalajCollection = "org.scalaj" %% "scalaj-collection" % "1.2"

@@ -29,7 +29,7 @@ class SimulacrumInjection extends SyntheticMembersInjector {
         obj.fakeCompanionClassOrCompanionClass match {
           case clazz: ScTypeDefinition
               if clazz.findAnnotationNoAliases("simulacrum.typeclass") != null &&
-              clazz.typeParameters.length == 1 =>
+                clazz.typeParameters.length == 1 =>
             val tpName = clazz.typeParameters.head.name
 
             val tpText =
@@ -47,7 +47,7 @@ class SimulacrumInjection extends SyntheticMembersInjector {
         ScalaPsiUtil.getCompanionModule(obj) match {
           case Some(clazz)
               if clazz.findAnnotationNoAliases("simulacrum.typeclass") != null &&
-              clazz.typeParameters.length == 1 =>
+                clazz.typeParameters.length == 1 =>
             val clazzTypeParam = clazz.typeParameters.head
             val tpName = clazzTypeParam.name
             val tpText = ScalaPsiUtil.typeParamString(clazzTypeParam)
@@ -119,7 +119,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                                 new ScTypeParameterType(
                                     ScalaPsiElementFactory
                                       .createTypeParameterFromText(
-                                        tpAdditional.get, source.getManager),
+                                          tpAdditional.get,
+                                          source.getManager),
                                     ScSubstitutor.empty
                                 ))
                             Some(subst)
@@ -182,8 +183,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                       case Success(ScParameterizedType(classType, Seq(tp)), _)
                           if isProperTpt(tp).isDefined =>
                         def fromType: Seq[String] = {
-                          ScType.extractClass(
-                              classType, Some(clazz.getProject)) match {
+                          ScType.extractClass(classType,
+                                              Some(clazz.getProject)) match {
                             case Some(cl: ScTypeDefinition) =>
                               Seq(s" with ${cl.qualifiedName}.AllOps[$tpName$additionalWithComma]")
                             case _ => Seq.empty

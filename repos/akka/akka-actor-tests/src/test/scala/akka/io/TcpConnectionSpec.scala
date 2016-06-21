@@ -49,8 +49,9 @@ class TcpConnectionSpec extends AkkaSpec("""
     val serverSocket = ServerSocketChannel.open()
     serverSocket.socket.bind(new InetSocketAddress("127.0.0.1", 0))
     try {
-      val clientSocket = SocketChannel.open(new InetSocketAddress(
-              "127.0.0.1", serverSocket.socket().getLocalPort))
+      val clientSocket = SocketChannel.open(
+          new InetSocketAddress("127.0.0.1",
+                                serverSocket.socket().getLocalPort))
       val clientSocketOnServer = acceptServerSideConnection(serverSocket)
       clientSocketOnServer.socket.setSoLinger(true, 0)
       clientSocketOnServer.close()
@@ -66,8 +67,9 @@ class TcpConnectionSpec extends AkkaSpec("""
     serverSocket.socket.bind(new InetSocketAddress("127.0.0.1", 0))
     try {
       serverSocket.close()
-      val clientSocket = SocketChannel.open(new InetSocketAddress(
-              "127.0.0.1", serverSocket.socket().getLocalPort))
+      val clientSocket = SocketChannel.open(
+          new InetSocketAddress("127.0.0.1",
+                                serverSocket.socket().getLocalPort))
       clientSocket.finishConnect()
       clientSocket.write(ByteBuffer.allocate(1))
       null
@@ -78,9 +80,9 @@ class TcpConnectionSpec extends AkkaSpec("""
 
   "An outgoing connection" must {
     info("Connection reset by peer message expected is " +
-        ConnectionResetByPeerMessage)
+          ConnectionResetByPeerMessage)
     info("Connection refused message prefix expected is " +
-        ConnectionRefusedMessagePrefix)
+          ConnectionRefusedMessagePrefix)
     // common behavior
 
     "set socket options before connecting" in new LocalServerTest() {
@@ -269,7 +271,8 @@ class TcpConnectionSpec extends AkkaSpec("""
         val writer = TestProbe()
         val compoundWrite =
           Write(ByteString("test1"), Ack(1)) +: Write(ByteString("test2")) +: Write(
-              ByteString.empty, Ack(3)) +: Write(ByteString("test4"), Ack(4))
+              ByteString.empty,
+              Ack(3)) +: Write(ByteString("test4"), Ack(4))
 
         // reply to write commander with Ack
         val buffer = ByteBuffer.allocate(100)
@@ -302,7 +305,7 @@ class TcpConnectionSpec extends AkkaSpec("""
           options = List(Inet.SO.ReceiveBufferSize(1000000)))
       run {
         info("Currently ignored as SO_SNDBUF is usually a lower bound on the send buffer so the test fails as no real " +
-            "backpressure present.")
+              "backpressure present.")
         pending
         ignoreIfWindows()
         object Ack1 extends Event
@@ -633,8 +636,8 @@ class TcpConnectionSpec extends AkkaSpec("""
       run {
         val sel = SelectorProvider.provider().openSelector()
         try {
-          val key = clientSideChannel.register(
-              sel, SelectionKey.OP_CONNECT | SelectionKey.OP_READ)
+          val key = clientSideChannel
+            .register(sel, SelectionKey.OP_CONNECT | SelectionKey.OP_READ)
           // This timeout should be large enough to work on Windows
           sel.select(3000)
 
@@ -661,8 +664,9 @@ class TcpConnectionSpec extends AkkaSpec("""
     }
 
     "report failed connection attempt when timing out" in new UnacceptedConnectionTest() {
-      override lazy val connectionActor = createConnectionActor(
-          serverAddress = UnboundAddress, timeout = Option(100.millis))
+      override lazy val connectionActor =
+        createConnectionActor(serverAddress = UnboundAddress,
+                              timeout = Option(100.millis))
       run {
         connectionActor.toString should not be ("")
         userHandler.expectMsg(CommandFailed(
@@ -909,8 +913,8 @@ class TcpConnectionSpec extends AkkaSpec("""
 
     def register(channel: SelectableChannel, initialOps: Int)(
         implicit channelActor: ActorRef): Unit =
-      registerCallReceiver.ref.tell(
-          Registration(channel, initialOps), channelActor)
+      registerCallReceiver.ref
+        .tell(Registration(channel, initialOps), channelActor)
 
     def setServerSocketOptions() = ()
 
@@ -919,8 +923,10 @@ class TcpConnectionSpec extends AkkaSpec("""
         options: immutable.Seq[SocketOption] = Nil,
         timeout: Option[FiniteDuration] = None,
         pullMode: Boolean = false): TestActorRef[TcpOutgoingConnection] = {
-      val ref = createConnectionActorWithoutRegistration(
-          serverAddress, options, timeout, pullMode)
+      val ref = createConnectionActorWithoutRegistration(serverAddress,
+                                                         options,
+                                                         timeout,
+                                                         pullMode)
       ref ! newChannelRegistration
       ref
     }
@@ -958,8 +964,8 @@ class TcpConnectionSpec extends AkkaSpec("""
   abstract class UnacceptedConnectionTest(pullMode: Boolean = false)
       extends LocalServerTest {
     // lazy init since potential exceptions should not be triggered in the constructor but during execution of `run`
-    private[io] lazy val connectionActor = createConnectionActor(
-        serverAddress, pullMode = pullMode)
+    private[io] lazy val connectionActor =
+      createConnectionActor(serverAddress, pullMode = pullMode)
     // calling .underlyingActor ensures that the actor is actually created at this point
     lazy val clientSideChannel = connectionActor.underlyingActor.channel
 
@@ -1044,8 +1050,9 @@ class TcpConnectionSpec extends AkkaSpec("""
       res
     }
 
-    def checkFor(
-        key: SelectionKey, interest: Int, millis: Int = 100): Boolean =
+    def checkFor(key: SelectionKey,
+                 interest: Int,
+                 millis: Int = 100): Boolean =
       if (key.isValid) {
         key.interestOps(interest)
         nioSelector.selectedKeys().clear()
@@ -1056,8 +1063,8 @@ class TcpConnectionSpec extends AkkaSpec("""
         (key.readyOps() & interest) != 0
       } else false
 
-    def openSelectorFor(
-        channel: SocketChannel, interests: Int): (Selector, SelectionKey) = {
+    def openSelectorFor(channel: SocketChannel,
+                        interests: Int): (Selector, SelectionKey) = {
       val sel = SelectorProvider.provider().openSelector()
       val key = channel.register(sel, interests)
       (sel, key)
@@ -1093,7 +1100,7 @@ class TcpConnectionSpec extends AkkaSpec("""
               case -1 ⇒
                 throw new IllegalStateException(
                     "Connection was closed unexpectedly with remaining bytes " +
-                    remaining)
+                      remaining)
               case 0 ⇒ throw new IllegalStateException("Made no progress")
               case other ⇒ other
             }
@@ -1122,15 +1129,15 @@ class TcpConnectionSpec extends AkkaSpec("""
       clientSideChannel should not be ('open)
     }
 
-    def selectedAs(
-        interest: Int, duration: Duration): BeMatcher[SelectionKey] =
+    def selectedAs(interest: Int,
+                   duration: Duration): BeMatcher[SelectionKey] =
       new BeMatcher[SelectionKey] {
         def apply(key: SelectionKey) =
           MatchResult(checkFor(key, interest, duration.toMillis.toInt),
                       "%s key was not selected for %s after %s" format
-                      (key.attachment(), interestsDesc(interest), duration),
+                        (key.attachment(), interestsDesc(interest), duration),
                       "%s key was selected for %s after %s" format
-                      (key.attachment(), interestsDesc(interest), duration))
+                        (key.attachment(), interestsDesc(interest), duration))
       }
 
     val interestsNames = Seq(OP_ACCEPT -> "accepting",

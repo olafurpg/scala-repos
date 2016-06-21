@@ -48,8 +48,8 @@ class ScalaImportOptimizer extends ImportOptimizer {
 
   def processFile(file: PsiFile): Runnable = processFile(file, null)
 
-  def processFile(
-      file: PsiFile, progressIndicator: ProgressIndicator = null): Runnable = {
+  def processFile(file: PsiFile,
+                  progressIndicator: ProgressIndicator = null): Runnable = {
     val scalaFile = file match {
       case scFile: ScalaFile => scFile
       case multiRootFile: PsiFile
@@ -135,13 +135,13 @@ class ScalaImportOptimizer extends ImportOptimizer {
         case ImportSelectorUsed(sel) if sel.isAliasedImport => true
         case _ =>
           usedImports.contains(importUsed) ||
-          isLanguageFeatureImport(importUsed) ||
-          importUsed.qualName.exists(isAlwaysUsedImport)
+            isLanguageFeatureImport(importUsed) ||
+            importUsed.qualName.exists(isAlwaysUsedImport)
       }
     }
 
-    val importsInfo = collectRanges(
-        namesAtRangeStart, createInfo(_, isImportUsed))
+    val importsInfo =
+      collectRanges(namesAtRangeStart, createInfo(_, isImportUsed))
 
     val optimized = importsInfo.map {
       case (range, rangeInfo) =>
@@ -224,17 +224,16 @@ class ScalaImportOptimizer extends ImportOptimizer {
       blankLines + textCreator.getImportText(info, settings)
     }.mkString(newLineWithIndent).replaceAll("""\n[ \t]+\n""", "\n\n")
 
-    val newRange: TextRange =
-      if (text.isEmpty) {
-        var start = range.getStartOffset
-        while (start > 0 && documentText(start - 1).isWhitespace) start =
-          start - 1
-        val end = range.getEndOffset
-        new TextRange(start, end)
-      } else range
+    val newRange: TextRange = if (text.isEmpty) {
+      var start = range.getStartOffset
+      while (start > 0 && documentText(start - 1).isWhitespace) start =
+        start - 1
+      val end = range.getEndOffset
+      new TextRange(start, end)
+    } else range
 
-    document.replaceString(
-        newRange.getStartOffset, newRange.getEndOffset, text)
+    document
+      .replaceString(newRange.getStartOffset, newRange.getEndOffset, text)
   }
 
   def collectImportRanges(holder: ScImportsHolder,
@@ -256,8 +255,10 @@ class ScalaImportOptimizer extends ImportOptimizer {
       if (rangeStart != -1) {
         val usedImportedNames =
           allUsedImportedNames.dropWhile(_._2 < rangeStart).map(_._1).toSet
-        val rangeInfo = RangeInfo(
-            namesAtStart, infos.to[Seq], usedImportedNames, isLocalRange)
+        val rangeInfo = RangeInfo(namesAtStart,
+                                  infos.to[Seq],
+                                  usedImportedNames,
+                                  isLocalRange)
         result += (new TextRange(rangeStart, rangeEnd) -> rangeInfo)
         rangeStart = -1
         rangeEnd = -1
@@ -352,7 +353,7 @@ object ScalaImportOptimizer {
     expr.qualifier.resolve() match {
       case o: ScObject =>
         o.qualifiedName.startsWith("scala.language") ||
-        o.qualifiedName.startsWith("scala.languageFeature")
+          o.qualifiedName.startsWith("scala.languageFeature")
       case _ => false
     }
   }
@@ -388,8 +389,8 @@ object ScalaImportOptimizer {
       s"import $root${relative.getOrElse(prefixQualifier)}.$postfix"
     }
 
-    def getImportText(
-        importInfo: ImportInfo, settings: OptimizeImportSettings): String =
+    def getImportText(importInfo: ImportInfo,
+                      settings: OptimizeImportSettings): String =
       getImportText(importInfo,
                     settings.isUnicodeArrow,
                     settings.spacesInImports,
@@ -400,9 +401,10 @@ object ScalaImportOptimizer {
       rangeInfo: RangeInfo,
       settings: OptimizeImportSettings): Seq[ImportInfo] = {
     import settings._
-    val RangeInfo(
-    namesAtRangeStart, importInfos, usedImportedNames, isLocalRange) =
-      rangeInfo
+    val RangeInfo(namesAtRangeStart,
+                  importInfos,
+                  usedImportedNames,
+                  isLocalRange) = rangeInfo
 
     val buffer = new ArrayBuffer[ImportInfo]()
 
@@ -419,8 +421,10 @@ object ScalaImportOptimizer {
       if (collectImports) mergeImportInfos(buffer)
       else buffer.flatMap(_.split)
 
-    updateToWildcardImports(
-        result, namesAtRangeStart, usedImportedNames, settings)
+    updateToWildcardImports(result,
+                            namesAtRangeStart,
+                            usedImportedNames,
+                            settings)
     updateRootPrefix(result, namesAtRangeStart)
 
     result.to[immutable.Seq]
@@ -469,7 +473,7 @@ object ScalaImportOptimizer {
         info.singleNames.size >= settings.classCountToUseImportOnDemand
       val mayUpdate =
         info.hiddenNames.isEmpty && info.renames.isEmpty &&
-        !info.wildcardHasUnusedImplicit
+          !info.wildcardHasUnusedImplicit
       if (needUpdate && mayUpdate) {
         val explicitNames = infos.flatMap {
           case `info` => Seq.empty
@@ -481,7 +485,7 @@ object ScalaImportOptimizer {
             case other => other.allNames
           }.toSet -- explicitNames
         (info.allNamesForWildcard & usedImportedNames &
-            (namesFromOtherWildcards ++ namesAtRangeStart)).isEmpty
+              (namesFromOtherWildcards ++ namesAtRangeStart)).isEmpty
       } else false
     }
 
@@ -758,8 +762,8 @@ object ScalaImportOptimizer {
 
   def namesAtRangeStart(imp: ScImportStmt): Set[String] = {
     val refText = "someIdentifier"
-    val reference = ScalaPsiElementFactory.createReferenceFromText(
-        refText, imp.getContext, imp)
+    val reference = ScalaPsiElementFactory
+      .createReferenceFromText(refText, imp.getContext, imp)
     val rangeNamesSet = new mutable.HashSet[String]()
     def addName(name: String): Unit =
       rangeNamesSet += ScalaNamesUtil.changeKeyword(name)
@@ -795,7 +799,7 @@ object ScalaImportOptimizer {
           qName == s"scala.$name" || qName == s"java.lang.$name"
         case ContainingClass(o: ScObject) =>
           o.isPackageObject &&
-          Set("scala", "scala.Predef").contains(o.qualifiedName)
+            Set("scala", "scala.Predef").contains(o.qualifiedName)
         case _ => false
       }
     }
@@ -819,9 +823,8 @@ object ScalaImportOptimizer {
     collectUsedImportedNamesSorted(holder).map(_._1).toSet
   }
 
-  def createInfo(imp: ScImportStmt,
-                 isImportUsed: ImportUsed => Boolean = _ =>
-                   true): Seq[ImportInfo] =
+  def createInfo(imp: ScImportStmt, isImportUsed: ImportUsed => Boolean = _ =>
+        true): Seq[ImportInfo] =
     imp.importExprs.flatMap(ImportInfo(_, isImportUsed))
 
   private def allElementsIn(

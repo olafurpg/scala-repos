@@ -111,7 +111,7 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
         !canUseSerializedShuffle(shuffleDep(
                 partitioner = new HashPartitioner(
                     SortShuffleManager.MAX_SHUFFLE_OUTPUT_PARTITIONS_FOR_SERIALIZED_MODE +
-                    1),
+                      1),
                 serializer = kryo,
                 keyOrdering = None,
                 aggregator = None,

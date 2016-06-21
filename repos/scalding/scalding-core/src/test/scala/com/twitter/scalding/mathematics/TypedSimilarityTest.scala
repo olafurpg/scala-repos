@@ -96,8 +96,9 @@ class TypedSimilarityTest extends WordSpec with Matchers {
         seq.map { case (from, to) => (from, 1.0) }.toMap
     }
     for ((k1, v1) <- matrix if (k1 % 2 == 0);
-         (k2, v2) <- matrix if (k2 % 2 == 1)) yield
-      ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
+         (k2, v2) <- matrix if (k2 % 2 == 1))
+      yield
+        ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
   }
 
   def weightedCosineOf(es: Seq[(Int, Int, Double)]): Map[(Int, Int), Double] = {
@@ -107,8 +108,9 @@ class TypedSimilarityTest extends WordSpec with Matchers {
         seq.map { case (from, to, weight) => (from, weight) }.toMap
     }
     for ((k1, v1) <- matrix if (k1 % 2 == 0);
-         (k2, v2) <- matrix if (k2 % 2 == 1)) yield
-      ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
+         (k2, v2) <- matrix if (k2 % 2 == 1))
+      yield
+        ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
   }
 
   "A TypedCosineJob" should {

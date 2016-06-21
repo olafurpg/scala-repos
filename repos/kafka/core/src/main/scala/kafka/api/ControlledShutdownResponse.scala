@@ -34,8 +34,9 @@ object ControlledShutdownResponse {
       val partition = buffer.getInt
       partitionsRemaining += new TopicAndPartition(topic, partition)
     }
-    new ControlledShutdownResponse(
-        correlationId, errorCode, partitionsRemaining)
+    new ControlledShutdownResponse(correlationId,
+                                   errorCode,
+                                   partitionsRemaining)
   }
 }
 

@@ -39,8 +39,13 @@ case class SampleClassC(a: SampleClassA,
                         d: SampleClassB,
                         e: SampleClassB)
 case class SampleClassD(a: Option[SampleClassC])
-case class SampleClassE(
-    a: String, b: Boolean, c: Short, d: Int, e: Long, f: Float, g: Double)
+case class SampleClassE(a: String,
+                        b: Boolean,
+                        c: Short,
+                        d: Int,
+                        e: Long,
+                        f: Float,
+                        g: Double)
 case class SampleClassF(a: Option[Int])
 case class SampleClassG(a: java.util.Date)
 
@@ -102,7 +107,8 @@ class MacrosUnitTests extends WordSpec with Matchers {
   }
 
   def shouldRoundTripOther[T: IsCaseClass: TupleSetter: TupleConverter](
-      te: TupleEntry, t: T) {
+      te: TupleEntry,
+      t: T) {
     val inter = mgConv(te)
     inter shouldBe t
     mgSet(inter) shouldBe te

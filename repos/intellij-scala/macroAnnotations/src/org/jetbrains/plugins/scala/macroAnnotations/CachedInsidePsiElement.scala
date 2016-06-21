@@ -64,8 +64,8 @@ object CachedInsidePsiElement {
           ..$analyzeCachesEnterCacheArea
           $cachesUtilFQN.get($elem, $key, new $cachesUtilFQN.$provider[Any, $retTp]($elem, _ => $cachedFunName())($dependencyItem))
           """
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
           ${if (analyzeCaches)

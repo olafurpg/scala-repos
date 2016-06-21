@@ -24,11 +24,12 @@ class ServerMediator(project: Project) extends ProjectComponent {
 
   private val connection = project.getMessageBus.connect
   private val serverLauncher = new BuildManagerListener {
-    override def beforeBuildProcessStarted(
-        project: Project, uuid: UUID): Unit = {}
+    override def beforeBuildProcessStarted(project: Project,
+                                           uuid: UUID): Unit = {}
 
-    override def buildStarted(
-        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {
+    override def buildStarted(project: Project,
+                              sessionId: UUID,
+                              isAutomake: Boolean): Unit = {
       if (settings.COMPILE_SERVER_ENABLED && isScalaProject) {
         invokeAndWait {
           CompileServerManager.instance(project).configureWidget()
@@ -46,8 +47,9 @@ class ServerMediator(project: Project) extends ProjectComponent {
       }
     }
 
-    override def buildFinished(
-        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {}
+    override def buildFinished(project: Project,
+                               sessionId: UUID,
+                               isAutomake: Boolean): Unit = {}
   }
 
   connection.subscribe(BuildManagerListener.TOPIC, serverLauncher)
@@ -77,17 +79,16 @@ class ServerMediator(project: Project) extends ProjectComponent {
 
     if (modulesWithClashes.nonEmpty) {
       invokeAndWait {
-        val choice =
-          if (!ApplicationManager.getApplication.isUnitTestMode) {
-            Messages.showYesNoDialog(
-                project,
-                "Production and test output paths are shared in: " +
+        val choice = if (!ApplicationManager.getApplication.isUnitTestMode) {
+          Messages.showYesNoDialog(
+              project,
+              "Production and test output paths are shared in: " +
                 modulesWithClashes.map(_.getName).mkString(" "),
-                "Shared compile output paths in Scala module(s)",
-                "Split output path(s) automatically",
-                "Cancel compilation",
-                Messages.getErrorIcon)
-          } else Messages.YES
+              "Shared compile output paths in Scala module(s)",
+              "Split output path(s) automatically",
+              "Cancel compilation",
+              Messages.getErrorIcon)
+        } else Messages.YES
 
         val splitAutomatically = choice == Messages.YES
 

@@ -39,9 +39,10 @@ import java.nio.charset.Charset
 import scalaz._
 
 class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
-    implicit executor: ExecutionContext, M: Monad[Future])
-    extends CustomHttpService[
-        ByteChunk, APIKey => Future[HttpResponse[ByteChunk]]] {
+    implicit executor: ExecutionContext,
+    M: Monad[Future])
+    extends CustomHttpService[ByteChunk,
+                              APIKey => Future[HttpResponse[ByteChunk]]] {
   import JobManager._
   import JobState._
   import scalaz.syntax.monad._
@@ -73,7 +74,7 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
                       case (mimeType0, data0) =>
                         val mimeType =
                           mimeType0 getOrElse
-                          (MimeTypes.application / MimeTypes.json)
+                            (MimeTypes.application / MimeTypes.json)
                         if (mimeType !=
                             (MimeTypes.application / MimeTypes.json)) {
                           HttpResponse[ByteChunk](HttpStatus(
@@ -85,8 +86,8 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
                           val data = data0
                           val prefix =
                             ("""{ "errors": %s, "warnings": %s, "data": """ format
-                                (JArray(errors.toList map (_.value)).renderCompact,
-                                    JArray(warnings.toList map (_.value)).renderCompact))
+                                  (JArray(errors.toList map (_.value)).renderCompact,
+                                      JArray(warnings.toList map (_.value)).renderCompact))
                               .getBytes(Utf8)
                           val suffix =
                             " }".getBytes(Utf8) :: StreamT

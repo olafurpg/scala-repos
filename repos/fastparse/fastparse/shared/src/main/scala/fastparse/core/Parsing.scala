@@ -34,8 +34,9 @@ sealed trait Parsed[+T] {
 
 case class ParseError(failure: Parsed.Failure)
     extends Exception(
-        ParseError.msg0(
-            failure.extra.input, failure.extra.traced.expected, failure.index)
+        ParseError.msg0(failure.extra.input,
+                        failure.extra.traced.expected,
+                        failure.index)
     )
 
 object ParseError {
@@ -130,8 +131,8 @@ object Parsed {
                  index: Int)
           extends Extra {
 
-        lazy val traced = TracedFailure(
-            input, index, lastParser, (startIndex, startParser))
+        lazy val traced =
+          TracedFailure(input, index, lastParser, (startIndex, startParser))
 
         lazy val pos = Position.computeFrom(input, index)
 
@@ -151,8 +152,8 @@ object Parsed {
                          input: String,
                          index: Int,
                          last: String) = {
-      val body = for (Frame(index, p) <- stack) yield
-        formatParser(p, input, index)
+      val body = for (Frame(index, p) <- stack)
+        yield formatParser(p, input, index)
       (body :+ last).mkString(" / ") + " ..." + literalize(
           input.slice(index, index + 10))
     }
@@ -205,8 +206,10 @@ object Parsed {
       * the default error message isn't to your liking.
       */
     lazy val trace = {
-      Failure.formatStackTrace(
-          stack, input, index, Failure.formatParser(expected0, input, index))
+      Failure.formatStackTrace(stack,
+                               input,
+                               index,
+                               Failure.formatParser(expected0, input, index))
     }
   }
   object TracedFailure {
@@ -314,8 +317,11 @@ object Mutable {
                      var cut: Boolean)
       extends Mutable[Nothing] {
     def toResult = {
-      val extra = new Parsed.Failure.Extra.Impl(
-          input, originalParser, originalIndex, lastParser, index)
+      val extra = new Parsed.Failure.Extra.Impl(input,
+                                                originalParser,
+                                                originalIndex,
+                                                lastParser,
+                                                index)
       Parsed.Failure(lastParser, index, extra)
     }
   }

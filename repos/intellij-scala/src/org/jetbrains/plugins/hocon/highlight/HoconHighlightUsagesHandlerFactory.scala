@@ -11,8 +11,9 @@ import scala.annotation.tailrec
 
 class HoconHighlightUsagesHandlerFactory
     extends HighlightUsagesHandlerFactoryBase {
-  def createHighlightUsagesHandler(
-      editor: Editor, file: PsiFile, target: PsiElement) =
+  def createHighlightUsagesHandler(editor: Editor,
+                                   file: PsiFile,
+                                   target: PsiElement) =
     Iterator
       .iterate(target)(_.getParent)
       .takeWhile {
@@ -26,8 +27,9 @@ class HoconHighlightUsagesHandlerFactory
       .orNull
 }
 
-class HoconHighlightKeyUsagesHandler(
-    editor: Editor, psiFile: PsiFile, hkey: HKey)
+class HoconHighlightKeyUsagesHandler(editor: Editor,
+                                     psiFile: PsiFile,
+                                     hkey: HKey)
     extends HighlightUsagesHandlerBase[HKey](editor, psiFile) {
 
   def computeUsages(targets: JList[HKey]): Unit = {
@@ -94,7 +96,7 @@ class HoconHighlightKeyUsagesHandler(
 
   def getTargets = JList(hkey)
 
-  def selectTargets(
-      targets: JList[HKey], selectionConsumer: Consumer[JList[HKey]]) =
+  def selectTargets(targets: JList[HKey],
+                    selectionConsumer: Consumer[JList[HKey]]) =
     selectionConsumer.consume(targets)
 }

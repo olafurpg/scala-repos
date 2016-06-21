@@ -92,8 +92,7 @@ object Memo extends MemoInstances {
   def immutableMapMemo[K, V](m: immutable.Map[K, V]): Memo[K, V] = {
     var a = m
 
-    memo[K, V](
-        f =>
+    memo[K, V](f =>
           k => {
         a get k getOrElse {
           val v = f(k)

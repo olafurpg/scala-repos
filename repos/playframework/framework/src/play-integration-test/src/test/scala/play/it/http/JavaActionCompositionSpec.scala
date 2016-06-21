@@ -32,17 +32,19 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
   "When action composition is configured to invoke controller first" should {
     "execute controller composition before action composition" in makeRequest(
         new ComposedController {
-      @ActionAnnotation
-      override def action: Result = Results.ok()
-    }, Map("play.http.actionComposition.controllerAnnotationsFirst" -> "true")) {
+          @ActionAnnotation
+          override def action: Result = Results.ok()
+        },
+        Map("play.http.actionComposition.controllerAnnotationsFirst" -> "true")) {
       response =>
         response.body must beEqualTo("controlleraction")
     }
 
     "execute controller composition when action is not annotated" in makeRequest(
         new ComposedController {
-      override def action: Result = Results.ok()
-    }, Map("play.http.actionComposition.controllerAnnotationsFirst" -> "true")) {
+          override def action: Result = Results.ok()
+        },
+        Map("play.http.actionComposition.controllerAnnotationsFirst" -> "true")) {
       response =>
         response.body must beEqualTo("controller")
     }
@@ -51,18 +53,20 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
   "When action composition is configured to invoke action first" should {
     "execute action composition before controller composition" in makeRequest(
         new ComposedController {
-      @ActionAnnotation
-      override def action: Result = Results.ok()
-    }, Map("play.http.actionComposition.controllerAnnotationsFirst" -> "false")) {
+          @ActionAnnotation
+          override def action: Result = Results.ok()
+        },
+        Map("play.http.actionComposition.controllerAnnotationsFirst" -> "false")) {
       response =>
         response.body must beEqualTo("actioncontroller")
     }
 
     "execute action composition when controller is not annotated" in makeRequest(
         new MockController {
-      @ActionAnnotation
-      override def action: Result = Results.ok()
-    }, Map("play.http.actionComposition.controllerAnnotationsFirst" -> "false")) {
+          @ActionAnnotation
+          override def action: Result = Results.ok()
+        },
+        Map("play.http.actionComposition.controllerAnnotationsFirst" -> "false")) {
       response =>
         response.body must beEqualTo("action")
     }

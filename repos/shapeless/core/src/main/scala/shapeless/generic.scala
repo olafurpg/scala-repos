@@ -231,8 +231,10 @@ object LabelledGeneric {
     }
 
   /** Handles the Coproduct case (specifying subclasses derive from a sealed trait) */
-  implicit def materializeCoproduct[
-      T, K <: HList, V <: Coproduct, R <: Coproduct](
+  implicit def materializeCoproduct[T,
+                                    K <: HList,
+                                    V <: Coproduct,
+                                    R <: Coproduct](
       implicit lab: DefaultSymbolicLabelling.Aux[T, K],
       gen: Generic.Aux[T, V],
       zip: coproduct.ZipWithKeys.Aux[K, V, R],
@@ -309,14 +311,14 @@ trait CaseClassMacros extends ReprTypes {
 
   def isProductAux(tpe: Type): Boolean =
     tpe.typeSymbol.isClass && (isCaseClassLike(classSym(tpe)) ||
-        HasApplyUnapply(tpe) || HasCtorUnapply(tpe))
+          HasApplyUnapply(tpe) || HasCtorUnapply(tpe))
 
   def isProduct(tpe: Type): Boolean =
     tpe =:= typeOf[Unit] || (!(tpe =:= typeOf[AnyRef]) && isProductAux(tpe))
 
   def isProduct1(tpe: Type): Boolean =
     lowerKind(tpe) =:= typeOf[Unit] ||
-    (!(lowerKind(tpe) =:= typeOf[AnyRef]) && isProductAux(tpe))
+      (!(lowerKind(tpe) =:= typeOf[AnyRef]) && isProductAux(tpe))
 
   def isCoproduct(tpe: Type): Boolean = {
     val sym = tpe.typeSymbol
@@ -424,29 +426,28 @@ trait CaseClassMacros extends ReprTypes {
           }
 
           val suffix = ownerChain(sym).dropWhile(_ != basePre.typeSymbol)
-          val ctor =
-            if (suffix.isEmpty) {
-              if (sym.isModuleClass) {
-                val moduleSym = sym.asClass.module
-                val modulePre = prefix(moduleSym.typeSignature)
-                c.internal.singleType(modulePre, moduleSym)
-              } else appliedType(sym.toTypeIn(basePre), substituteArgs)
+          val ctor = if (suffix.isEmpty) {
+            if (sym.isModuleClass) {
+              val moduleSym = sym.asClass.module
+              val modulePre = prefix(moduleSym.typeSignature)
+              c.internal.singleType(modulePre, moduleSym)
+            } else appliedType(sym.toTypeIn(basePre), substituteArgs)
+          } else {
+            if (sym.isModuleClass) {
+              val path = suffix.tail.map(_.name.toTermName)
+              val (modulePre, moduleSym) = mkDependentRef(basePre, path)
+              c.internal.singleType(modulePre, moduleSym)
+            } else if (isAnonOrRefinement(sym)) {
+              val path = suffix.tail.init.map(_.name.toTermName)
+              val (valPre, valSym) = mkDependentRef(basePre, path)
+              c.internal.singleType(valPre, valSym)
             } else {
-              if (sym.isModuleClass) {
-                val path = suffix.tail.map(_.name.toTermName)
-                val (modulePre, moduleSym) = mkDependentRef(basePre, path)
-                c.internal.singleType(modulePre, moduleSym)
-              } else if (isAnonOrRefinement(sym)) {
-                val path = suffix.tail.init.map(_.name.toTermName)
-                val (valPre, valSym) = mkDependentRef(basePre, path)
-                c.internal.singleType(valPre, valSym)
-              } else {
-                val path =
-                  suffix.tail.init.map(_.name.toTermName) :+ suffix.last.name.toTypeName
-                val (subTpePre, subTpeSym) = mkDependentRef(basePre, path)
-                c.internal.typeRef(subTpePre, subTpeSym, substituteArgs)
-              }
+              val path =
+                suffix.tail.init.map(_.name.toTermName) :+ suffix.last.name.toTypeName
+              val (subTpePre, subTpeSym) = mkDependentRef(basePre, path)
+              c.internal.typeRef(subTpePre, subTpeSym, substituteArgs)
             }
+          }
           if (!isAccessible(ctor))
             abort(s"$tpe has an inaccessible subtype $ctor")
           if (ctor <:< baseTpe) Some(ctor) else None
@@ -475,8 +476,8 @@ trait CaseClassMacros extends ReprTypes {
     }
 
   def mkLabelTpe(name: Name): Type =
-    appliedType(
-        atatTpe, List(typeOf[scala.Symbol], constantType(nameAsValue(name))))
+    appliedType(atatTpe,
+                List(typeOf[scala.Symbol], constantType(nameAsValue(name))))
 
   def mkFieldTpe(name: Name, valueTpe: Type): Type = {
     appliedType(fieldTypeTpe, List(mkLabelTpe(name), valueTpe))
@@ -567,8 +568,8 @@ trait CaseClassMacros extends ReprTypes {
                          arg: TypeName): Tree =
     items.foldRight(mkAttributedRef(nil): Tree) {
       case (tpe, acc) =>
-        AppliedTypeTree(
-            mkAttributedRef(cons), List(appliedTypTree1(tpe, param, arg), acc))
+        AppliedTypeTree(mkAttributedRef(cons),
+                        List(appliedTypTree1(tpe, param, arg), acc))
     }
 
   def mkHListTypTree(items: List[Type]): Tree =
@@ -580,8 +581,9 @@ trait CaseClassMacros extends ReprTypes {
   def mkCoproductTypTree(items: List[Type]): Tree =
     mkCompoundTypTree(cnilTpe, cconsTpe, items)
 
-  def mkCoproductTypTree1(
-      items: List[Type], param: Type, arg: TypeName): Tree =
+  def mkCoproductTypTree1(items: List[Type],
+                          param: Type,
+                          arg: TypeName): Tree =
     mkCompoundTypTree1(cnilTpe, cconsTpe, items, param, arg)
 
   def unfoldCompoundTpe(compoundTpe: Type, nil: Type, cons: Type): List[Type] = {
@@ -647,7 +649,8 @@ trait CaseClassMacros extends ReprTypes {
 
   def isCaseAccessorLike(sym: TermSymbol): Boolean =
     !isNonGeneric(sym) && sym.isPublic &&
-    (if (sym.owner.asClass.isCaseClass) sym.isCaseAccessor else sym.isAccessor)
+      (if (sym.owner.asClass.isCaseClass) sym.isCaseAccessor
+       else sym.isAccessor)
 
   def isSealedHierarchyClassSymbol(symbol: ClassSymbol): Boolean = {
     def helper(classSym: ClassSymbol): Boolean = {
@@ -754,7 +757,7 @@ trait CaseClassMacros extends ReprTypes {
                        owner.asInstanceOf[global.Symbol])
         .suchThat(sym =>
               (original.isTerm || sym.hasModuleFlag) &&
-              (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
+                (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
         .asInstanceOf[c.universe.Symbol]
     }
   }
@@ -890,8 +893,8 @@ trait CaseClassMacros extends ReprTypes {
         case Some(ctorSym) if !isNonGeneric(ctorSym) =>
           val ctorParamss = ctorSym.asMethod.infoIn(tpe).paramLists
           if (ctorParamss.length == 1)
-            alignFields(
-                tpe, ctorParamss.head.map(param => unByName(param.info)))
+            alignFields(tpe, ctorParamss.head.map(param =>
+                      unByName(param.info)))
           else None
         case _ => None
       }
@@ -929,8 +932,7 @@ trait CaseClassMacros extends ReprTypes {
       val sym = tpe.typeSymbol
       val isCaseClass = sym.asClass.isCaseClass
 
-      val repWCard =
-        Star(Ident(termNames.WILDCARD)) // like pq"_*" except that it does work
+      val repWCard = Star(Ident(termNames.WILDCARD)) // like pq"_*" except that it does work
 
       def narrow(tree: Tree, tpe: Type): Tree =
         tpe match {

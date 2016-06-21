@@ -78,7 +78,7 @@ object HttpSpec extends Specification {
 
     "add headers" in {
       headers.add("a" -> "a3", "a" -> "a4").getAll("a") must_==
-        Seq("a1", "a2", "a3", "a4")
+      Seq("a1", "a2", "a3", "a4")
     }
 
     "remove headers by case insensitive" in {
@@ -88,7 +88,7 @@ object HttpSpec extends Specification {
 
     "replace headers by case insensitive" in {
       headers.replace("a" -> "a3", "A" -> "a4").getAll("a") must_==
-        Seq("a3", "a4")
+      Seq("a3", "a4")
     }
 
     "equal other Headers by case insensitive" in {
@@ -140,9 +140,9 @@ object HttpSpec extends Specification {
 
       Cookies.mergeSetCookieHeader("", cookies) must ===(
           "foo=baz; Path=/; Domain=FoO; HTTPOnly" + ";;" +
-          // Cookie("foo", "baz", domain=Some("FoO"))
-          "foo=baz; Path=/" + ";;" + // Cookie("foo", "baz", httpOnly=false)
-          "foo=baz; Path=/blah; HTTPOnly" // Cookie("foo", "baz", path="/blah")
+            // Cookie("foo", "baz", domain=Some("FoO"))
+            "foo=baz; Path=/" + ";;" + // Cookie("foo", "baz", httpOnly=false)
+            "foo=baz; Path=/blah; HTTPOnly" // Cookie("foo", "baz", path="/blah")
       )
     }
   }

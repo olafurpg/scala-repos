@@ -44,9 +44,8 @@ object SecurityHeadersFilter {
     *
     * @return a configured SecurityHeadersFilter.
     */
-  def apply(
-      config: SecurityHeadersConfig =
-        SecurityHeadersConfig()): SecurityHeadersFilter = {
+  def apply(config: SecurityHeadersConfig = SecurityHeadersConfig())
+    : SecurityHeadersFilter = {
     new SecurityHeadersFilter(config)
   }
 

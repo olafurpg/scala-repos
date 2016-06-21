@@ -35,8 +35,8 @@ private[finagle] trait StringServer {
     protected type Out = String
 
     protected def newListener() = Netty3Listener(StringServerPipeline, params)
-    protected def newDispatcher(
-        transport: Transport[In, Out], service: Service[String, String]) =
+    protected def newDispatcher(transport: Transport[In, Out],
+                                service: Service[String, String]) =
       new SerialServerDispatcher(transport, service)
   }
 

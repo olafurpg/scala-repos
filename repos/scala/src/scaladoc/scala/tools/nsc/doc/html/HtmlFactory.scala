@@ -109,8 +109,8 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
 
     def writeTemplate(tpl: DocTemplateEntity) {
       if (!(written contains tpl)) {
-        val diagramGenerator: DiagramGenerator = new DotDiagramGenerator(
-            universe.settings, universe.dotRunner)
+        val diagramGenerator: DiagramGenerator =
+          new DotDiagramGenerator(universe.settings, universe.dotRunner)
         writeForThis(
             page.EntityPage(universe, diagramGenerator, tpl, reporter))
         written += tpl

@@ -55,8 +55,10 @@ object CanTraverseValues {
     def visit(a: A)
     def visitArray(arr: Array[A]): Unit = visitArray(arr, 0, arr.length, 1)
 
-    def visitArray(
-        arr: Array[A], offset: Int, length: Int, stride: Int): Unit = {
+    def visitArray(arr: Array[A],
+                   offset: Int,
+                   length: Int,
+                   stride: Int): Unit = {
       import spire.syntax.cfor._
       // Standard array bounds check stuff
       if (stride == 1) {
@@ -106,8 +108,8 @@ object CanTraverseValues {
     new CanTraverseValues[X, V] {
 
       /** Traverses all values from the given collection. */
-      override def traverse(
-          from: X, fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
+      override def traverse(from: X,
+                            fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
         for (v <- from) {
           fn.visit(v)
         }
@@ -124,8 +126,8 @@ trait LowPrioCanTraverseValues {
     new CanTraverseValues[V, V] {
 
       /** Traverses all values from the given collection. */
-      override def traverse(
-          from: V, fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
+      override def traverse(from: V,
+                            fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
         fn.visit(from)
       }
 

@@ -32,7 +32,7 @@ object SessionSerializingListener extends HttpSessionAttributeListener {
     } catch {
       case e: NotSerializableException =>
         sys.error("Can't serialize session key '" + event.getName +
-            "' value of type " + e.getMessage)
+              "' value of type " + e.getMessage)
     }
   }
 }

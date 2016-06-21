@@ -103,16 +103,16 @@ case class SparseHint(sparsity: Double, rows: BigInt, cols: BigInt)
       case NoClue => NoClue
       case FiniteHint(r, c) => (this * SparseHint(1.0, r, c))
       case SparseHint(sp, r, c) => {
-          // if I occupy a bin with probability p, and you q, then both: pq
-          // There are cols samples of the, above, so the probability one is present:
-          // 1-(1-pq)^cols ~ (cols * p * q) min 1.0
-          val newSp = (BigDecimal(cols) * sp * sparsity)
-          if (newSp >= 1.0) {
-            FiniteHint(rows, c)
-          } else {
-            SparseHint(newSp.toDouble, rows, c)
-          }
+        // if I occupy a bin with probability p, and you q, then both: pq
+        // There are cols samples of the, above, so the probability one is present:
+        // 1-(1-pq)^cols ~ (cols * p * q) min 1.0
+        val newSp = (BigDecimal(cols) * sp * sparsity)
+        if (newSp >= 1.0) {
+          FiniteHint(rows, c)
+        } else {
+          SparseHint(newSp.toDouble, rows, c)
         }
+      }
     }
   }
   def +(other: SizeHint): SizeHint = {
@@ -120,14 +120,14 @@ case class SparseHint(sparsity: Double, rows: BigInt, cols: BigInt)
       case NoClue => NoClue
       case FiniteHint(r, c) => (this + SparseHint(1.0, r, c))
       case SparseHint(sp, r, c) => {
-          // if I occupy a bin with probability p, and you q, then either: p + q - pq
-          if ((sparsity == 1.0) || (sp == 1.0)) {
-            FiniteHint(rows max r, cols max c)
-          } else {
-            val newSp = sparsity + sp - sp * sparsity
-            SparseHint(newSp, rows max r, cols max c)
-          }
+        // if I occupy a bin with probability p, and you q, then either: p + q - pq
+        if ((sparsity == 1.0) || (sp == 1.0)) {
+          FiniteHint(rows max r, cols max c)
+        } else {
+          val newSp = sparsity + sp - sp * sparsity
+          SparseHint(newSp, rows max r, cols max c)
         }
+      }
     }
   }
   def #*#(other: SizeHint): SizeHint = {
@@ -135,9 +135,9 @@ case class SparseHint(sparsity: Double, rows: BigInt, cols: BigInt)
       case NoClue => NoClue
       case FiniteHint(r, c) => (this #*# SparseHint(1.0, r, c))
       case SparseHint(sp, r, c) => {
-          val newSp = sp min sparsity
-          SparseHint(newSp, rows min r, cols min c)
-        }
+        val newSp = sp min sparsity
+        SparseHint(newSp, rows min r, cols min c)
+      }
     }
   }
   def total: Option[BigInt] = {

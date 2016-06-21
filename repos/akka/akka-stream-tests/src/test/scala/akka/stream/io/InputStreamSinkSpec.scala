@@ -146,8 +146,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val inputStream =
         Source.single(bytes).runWith(StreamConverters.asInputStream())
 
-      for (expect ← bytes.sliding(3, 3)) readN(inputStream, 3) should ===(
-          (expect.size, expect))
+      for (expect ← bytes.sliding(3, 3))
+        readN(inputStream, 3) should ===((expect.size, expect))
 
       inputStream.close()
     }
@@ -177,8 +177,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         sinkProbe.expectMsg(GraphStageMessages.Push)
       }
 
-      for (i ← 0 to 1) readN(inputStream, 8) should ===(
-          (8, bytes(i * 2) ++ bytes(i * 2 + 1)))
+      for (i ← 0 to 1)
+        readN(inputStream, 8) should ===((8, bytes(i * 2) ++ bytes(i * 2 + 1)))
 
       inputStream.close()
     }

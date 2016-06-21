@@ -31,8 +31,8 @@ import org.apache.spark.rdd.RDD
   * @param gradient Gradient function to be used.
   * @param updater Updater to be used to update weights after every iteration.
   */
-class GradientDescent private[spark](
-    private var gradient: Gradient, private var updater: Updater)
+class GradientDescent private[spark] (private var gradient: Gradient,
+                                      private var updater: Updater)
     extends Optimizer
     with Logging {
 
@@ -184,7 +184,7 @@ object GradientDescent extends Logging {
     if (miniBatchFraction < 1.0 && convergenceTol > 0.0) {
       logWarning(
           "Testing against a convergenceTol when using miniBatchFraction " +
-          "< 1.0 can be unstable because of the stochasticity in sampling.")
+            "< 1.0 can be unstable because of the stochasticity in sampling.")
     }
 
     val stochasticLossHistory = new ArrayBuffer[Double](numIterations)
@@ -217,8 +217,7 @@ object GradientDescent extends Logging {
     var regVal =
       updater.compute(weights, Vectors.zeros(weights.size), 0, 1, regParam)._2
 
-    var converged =
-      false // indicates whether converged based on convergenceTol
+    var converged = false // indicates whether converged based on convergenceTol
     var i = 1
     while (!converged && i <= numIterations) {
       val bcWeights = data.context.broadcast(weights)
@@ -228,8 +227,8 @@ object GradientDescent extends Logging {
         .sample(false, miniBatchFraction, 42 + i)
         .treeAggregate((BDV.zeros[Double](n), 0.0, 0L))(seqOp = (c, v) => {
           // c: (grad, loss, count), v: (label, features)
-          val l = gradient.compute(
-              v._2, v._1, bcWeights.value, Vectors.fromBreeze(c._1))
+          val l = gradient
+            .compute(v._2, v._1, bcWeights.value, Vectors.fromBreeze(c._1))
           (c._1, c._2 + l, c._3 + 1)
         }, combOp = (c1, c2) => {
           // c: (grad, loss, count)
@@ -255,8 +254,9 @@ object GradientDescent extends Logging {
         previousWeights = currentWeights
         currentWeights = Some(weights)
         if (previousWeights != None && currentWeights != None) {
-          converged = isConverged(
-              previousWeights.get, currentWeights.get, convergenceTol)
+          converged = isConverged(previousWeights.get,
+                                  currentWeights.get,
+                                  convergenceTol)
         }
       } else {
         logWarning(

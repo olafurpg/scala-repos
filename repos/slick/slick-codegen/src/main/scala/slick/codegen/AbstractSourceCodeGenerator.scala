@@ -114,14 +114,13 @@ def $name($args): $name = {
                   if (hlistEnabled) s"r($i)" else tuple(i)))
         def result(args: String) =
           if (mappingEnabled) s"$factory($args)" else args
-        val body =
-          if (autoIncLastAsOption && columns.size > 1) {
-            s"""
+        val body = if (autoIncLastAsOption && columns.size > 1) {
+          s"""
 val r = $positional
 import r._
 ${result(rearranged)} // putting AutoInc last
             """.trim
-          } else result(positional)
+        } else result(positional)
         s"""
 implicit def ${name}(implicit $dependencies): GR[${TableClass.elementType}] = GR{
   prs => import prs._

@@ -19,8 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger
   * subscribe calls * because of the need of linearizing the history message sequence and the possibility of sometimes
   * watching a few actors too much - we opt for the 2nd choice here.
   */
-private[akka] class EventStreamUnsubscriber(
-    eventStream: EventStream, debug: Boolean = false)
+private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
+                                            debug: Boolean = false)
     extends Actor {
 
   import EventStreamUnsubscriber._
@@ -103,7 +103,8 @@ private[akka] object EventStreamUnsubscriber {
   * Watches all actors which subscribe on the given event stream, and unsubscribes them from it when they are Terminated.
   */
 private[akka] class ActorClassificationUnsubscriber(
-    bus: ManagedActorClassification, debug: Boolean)
+    bus: ManagedActorClassification,
+    debug: Boolean)
     extends Actor
     with Stash {
 
@@ -179,7 +180,7 @@ private[akka] object ActorClassificationUnsubscriber {
       .asInstanceOf[ExtendedActorSystem]
       .systemActorOf(props(bus, debug),
                      "actorClassificationUnsubscriber-" +
-                     unsubscribersCount.incrementAndGet())
+                       unsubscribersCount.incrementAndGet())
   }
 
   private def props(eventBus: ManagedActorClassification, debug: Boolean) =

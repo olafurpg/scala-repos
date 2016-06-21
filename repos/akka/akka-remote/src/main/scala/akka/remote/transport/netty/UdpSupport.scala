@@ -77,8 +77,8 @@ private[remote] class UdpServerHandler(
 /**
   * INTERNAL API
   */
-private[remote] class UdpClientHandler(
-    _transport: NettyTransport, remoteAddress: Address)
+private[remote] class UdpClientHandler(_transport: NettyTransport,
+                                       remoteAddress: Address)
     extends ClientHandler(_transport, remoteAddress)
     with UdpHandlers {
 

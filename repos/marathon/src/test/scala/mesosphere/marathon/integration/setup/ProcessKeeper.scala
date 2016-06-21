@@ -39,8 +39,9 @@ object ProcessKeeper {
           Array("--http_port", port.toString, "--assets_path", assetPath))
       with HttpConf
       conf.afterInit()
-      val injector = Guice.createInjector(
-          new MetricsModule, new HttpModule(conf), new HttpServiceTestModule)
+      val injector = Guice.createInjector(new MetricsModule,
+                                          new HttpModule(conf),
+                                          new HttpServiceTestModule)
       injector.getInstance(classOf[HttpService])
     }
   }
@@ -102,11 +103,11 @@ object ProcessKeeper {
                        "MESOS_ROLES" -> "public,foo",
                        "MESOS_ACLS" -> s"file://$aclsPath",
                        "MESOS_CREDENTIALS" -> s"file://$credentialsPath")
-    startProcess(
-        "mesos",
-        Process(
-            Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),
-        upWhen = _.toLowerCase.contains("registered with master"))
+    startProcess("mesos",
+                 Process(Seq("mesos-local", "--ip=127.0.0.1"),
+                         cwd = None,
+                         mesosEnv: _*),
+                 upWhen = _.toLowerCase.contains("registered with master"))
   }
 
   def startMarathon(cwd: File,
@@ -128,8 +129,9 @@ object ProcessKeeper {
     FileUtils.deleteDirectory(marathonWorkDirFile)
     FileUtils.forceMkdir(marathonWorkDirFile)
 
-    val secretPath = write(
-        marathonWorkDirFile, fileName = "marathon-secret", content = "secret1")
+    val secretPath = write(marathonWorkDirFile,
+                           fileName = "marathon-secret",
+                           content = "secret1")
     val authSettings = List(
         "--mesos_authentication_principal",
         "principal1",
@@ -148,8 +150,9 @@ object ProcessKeeper {
                      upWhen = _.contains(startupLine))
   }
 
-  private[this] def write(
-      dir: File, fileName: String, content: String): String = {
+  private[this] def write(dir: File,
+                          fileName: String,
+                          content: String): String = {
     val file = File.createTempFile(fileName, "", dir)
     file.deleteOnExit()
     FileUtils.write(file, content)

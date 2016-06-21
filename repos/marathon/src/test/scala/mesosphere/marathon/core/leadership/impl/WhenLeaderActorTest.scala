@@ -44,8 +44,8 @@ class WhenLeaderActorTest extends MarathonSpec {
   test("when starting, stop") {
     val probe = TestProbe()
     val ref = whenLeaderRef()
-    ref.underlying.become(ref.underlyingActor.starting(
-            coordinatorRef = probe.ref, childRef = childProbe.ref))
+    ref.underlying.become(ref.underlyingActor
+          .starting(coordinatorRef = probe.ref, childRef = childProbe.ref))
     probe.send(ref, WhenLeaderActor.Stop)
     val failure = probe.expectMsgClass(classOf[Status.Failure])
     assert(failure.cause.getMessage.contains("starting aborted due to stop"))

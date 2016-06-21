@@ -67,9 +67,11 @@ object TermConstructionProps
   property("unquote list and non-list fun arguments") = forAll {
     (fun: Tree, arg1: Tree, arg2: Tree, args: List[Tree]) =>
       q"$fun(..$args, $arg1, $arg2)" ≈ Apply(
-          fun, args ++ List(arg1) ++ List(arg2)) &&
+          fun,
+          args ++ List(arg1) ++ List(arg2)) &&
       q"$fun($arg1, ..$args, $arg2)" ≈ Apply(
-          fun, List(arg1) ++ args ++ List(arg2)) &&
+          fun,
+          List(arg1) ++ args ++ List(arg2)) &&
       q"$fun($arg1, $arg2, ..$args)" ≈ Apply(fun,
                                              List(arg1) ++ List(arg2) ++ args)
   }
@@ -118,12 +120,12 @@ object TermConstructionProps
 
   def blockInvariant(quote: Tree, trees: List[Tree]) =
     quote ≈
-    (trees match {
-          case Nil => q"{}"
-          case _ :+ last if !last.isTerm => Block(trees, q"()")
-          case head :: Nil => head
-          case init :+ last => Block(init, last)
-        })
+      (trees match {
+            case Nil => q"{}"
+            case _ :+ last if !last.isTerm => Block(trees, q"()")
+            case head :: Nil => head
+            case init :+ last => Block(init, last)
+          })
 
   property("unquote list of trees into block (1)") = forAll {
     (trees: List[Tree]) =>
@@ -228,8 +230,8 @@ object TermConstructionProps
 
   property("SI-6842") = test {
     val cases: List[Tree] = cq"a => b" :: cq"_ => c" :: Nil
-    assertEqAst(
-        q"1 match { case ..$cases }", "1 match { case a => b case _ => c }")
+    assertEqAst(q"1 match { case ..$cases }",
+                "1 match { case a => b case _ => c }")
     assertEqAst(q"try 1 catch { case ..$cases }",
                 "try 1 catch { case a => b case _ => c }")
   }
@@ -320,7 +322,7 @@ object TermConstructionProps
     val q"$a = $b = $c = $d = $e = $f = $g = $h = $k = $l" =
       q"a = b = c = d = e = f = g = h = k = l"
     assert(a ≈ q"a" && b ≈ q"b" && c ≈ q"c" && d ≈ q"d" && e ≈ q"e" &&
-        g ≈ q"g" && h ≈ q"h" && k ≈ q"k" && l ≈ q"l")
+          g ≈ q"g" && h ≈ q"h" && k ≈ q"k" && l ≈ q"l")
   }
 
   property("SI-8385 a") = test {

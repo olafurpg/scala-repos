@@ -44,8 +44,8 @@ trait Config extends Serializable {
   def +(kv: (String, String)): Config = Config(toMap + kv)
   def ++(that: Config): Config = Config(toMap ++ that.toMap)
   def -(k: String): Config = Config(toMap - k)
-  def update[R](
-      k: String)(fn: Option[String] => (Option[String], R)): (R, Config) =
+  def update[R](k: String)(
+      fn: Option[String] => (Option[String], R)): (R, Config) =
     fn(get(k)) match {
       case (Some(v), r) => (r, this + (k -> v))
       case (None, r) => (r, this - k)
@@ -83,8 +83,9 @@ trait Config extends Serializable {
       try {
         Success(
             // Make sure we are using the class-loader for the current thread
-            Class.forName(
-                str, true, Thread.currentThread().getContextClassLoader))
+            Class.forName(str,
+                          true,
+                          Thread.currentThread().getContextClassLoader))
       } catch { case err: Throwable => Failure(err) }
     }
 
@@ -173,8 +174,7 @@ trait Config extends Serializable {
     // this must come last
     val last: Seq[Class[_ <: HSerialization[_]]] = Seq(
         classOf[com.twitter.chill.hadoop.KryoSerialization])
-    val required =
-      (first ++ last).toSet[AnyRef] // Class is invariant, but we use it as a function
+    val required = (first ++ last).toSet[AnyRef] // Class is invariant, but we use it as a function
     // Make sure we keep the order correct and don't add the required fields twice
     val hadoopSer = first ++ (userHadoop.filterNot(required)) ++ last
 
@@ -224,7 +224,7 @@ trait Config extends Serializable {
       .+(
           // This is setting a property for cascading/driven
           (AppProps.APP_FRAMEWORKS -> ("scalding:" +
-                  scaldingVersion.toString)))
+                    scaldingVersion.toString)))
 
   def getUniqueIds: Set[UniqueID] =
     get(UniqueID.UNIQUE_JOB_ID).map { str =>
@@ -465,11 +465,11 @@ object Config {
     */
   def defaultFrom(mode: Mode): Config =
     default ++
-    (mode match {
-          case m: HadoopMode =>
-            Config.fromHadoop(m.jobConf) - IoSerializationsKey
-          case _ => empty
-        })
+      (mode match {
+            case m: HadoopMode =>
+              Config.fromHadoop(m.jobConf) - IoSerializationsKey
+            case _ => empty
+          })
 
   def apply(m: Map[String, String]): Config = new Config { def toMap = m }
   /*
@@ -523,7 +523,8 @@ object Config {
     * Either union these two, or return the keys that overlap
     */
   def disjointUnion[K >: String, V >: String](
-      m: Map[K, V], conf: Config): Either[Set[String], Map[K, V]] = {
+      m: Map[K, V],
+      conf: Config): Either[Set[String], Map[K, V]] = {
     val asMap = conf.toMap.toMap[K, V]
     val duplicateKeys = (m.keySet & asMap.keySet)
     if (duplicateKeys.isEmpty) Right(m ++ asMap)
@@ -534,8 +535,8 @@ object Config {
   /**
     * This overwrites any keys in m that exist in config.
     */
-  def overwrite[K >: String, V >: String](
-      m: Map[K, V], conf: Config): Map[K, V] =
+  def overwrite[K >: String, V >: String](m: Map[K, V],
+                                          conf: Config): Map[K, V] =
     m ++ (conf.toMap.toMap[K, V])
 
   /*

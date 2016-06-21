@@ -48,7 +48,8 @@ object SwaggerCommandSupport {
   }
 
   private[this] def addModelFromCommand[T <: Command](
-      obj: T, pars: List[Parameter])(implicit mf: Manifest[T]) = {
+      obj: T,
+      pars: List[Parameter])(implicit mf: Manifest[T]) = {
     val (fields, parameters) = pars.partition(_.paramType == ParamType.Body)
     if (fields.nonEmpty) {
       val model = modelFromCommand(obj, fields)
@@ -62,8 +63,8 @@ object SwaggerCommandSupport {
     } else (parameters, None)
   }
 
-  private[this] def modelFromCommand[T <: Command](
-      cmd: T, fields: List[Parameter]) = {
+  private[this] def modelFromCommand[T <: Command](cmd: T,
+                                                   fields: List[Parameter]) = {
     val modelFields =
       fields map { f =>
         f.name -> ModelProperty(f.`type`,
@@ -79,7 +80,8 @@ object SwaggerCommandSupport {
   }
 
   class CommandOperationBuilder[B <: SwaggerOperationBuilder[_]](
-      registerModel: Model => Unit, underlying: B) {
+      registerModel: Model => Unit,
+      underlying: B) {
     def parametersFromCommand[C <: Command: Manifest]: B =
       parametersFromCommand(manifest[C].erasure.newInstance().asInstanceOf[C])
 

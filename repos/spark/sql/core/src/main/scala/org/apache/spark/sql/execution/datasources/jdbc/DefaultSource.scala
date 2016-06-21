@@ -32,8 +32,8 @@ class DefaultSource extends RelationProvider with DataSourceRegister {
       parameters: Map[String, String]): BaseRelation = {
     val url =
       parameters.getOrElse("url", sys.error("Option 'url' not specified"))
-    val table = parameters.getOrElse(
-        "dbtable", sys.error("Option 'dbtable' not specified"))
+    val table = parameters
+      .getOrElse("dbtable", sys.error("Option 'dbtable' not specified"))
     val partitionColumn = parameters.getOrElse("partitionColumn", null)
     val lowerBound = parameters.getOrElse("lowerBound", null)
     val upperBound = parameters.getOrElse("upperBound", null)
@@ -44,18 +44,16 @@ class DefaultSource extends RelationProvider with DataSourceRegister {
       sys.error("Partitioning incompletely specified")
     }
 
-    val partitionInfo =
-      if (partitionColumn == null) {
-        null
-      } else {
-        JDBCPartitioningInfo(partitionColumn,
-                             lowerBound.toLong,
-                             upperBound.toLong,
-                             numPartitions.toInt)
-      }
+    val partitionInfo = if (partitionColumn == null) {
+      null
+    } else {
+      JDBCPartitioningInfo(partitionColumn,
+                           lowerBound.toLong,
+                           upperBound.toLong,
+                           numPartitions.toInt)
+    }
     val parts = JDBCRelation.columnPartition(partitionInfo)
-    val properties =
-      new Properties() // Additional properties that we will pass to getConnection
+    val properties = new Properties() // Additional properties that we will pass to getConnection
     parameters.foreach(kv => properties.setProperty(kv._1, kv._2))
     JDBCRelation(url, table, parts, properties)(sqlContext)
   }

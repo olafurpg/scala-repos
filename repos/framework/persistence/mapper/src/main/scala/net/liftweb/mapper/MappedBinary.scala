@@ -111,8 +111,7 @@ abstract class MappedBinary[T <: Mapper[T]](val fieldOwner: T)
   def asJsExp: JsExp = throw new NullPointerException("No way")
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(
-        get match {
+    Full(get match {
       case null => JsonAST.JNull
       case value => JsonAST.JString(base64Encode(value))
     })
@@ -143,14 +142,14 @@ abstract class MappedBinary[T <: Mapper[T]](val fieldOwner: T)
           f.orgData() = toSet
       })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit = null
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit = null
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit = null
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit = null
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit = null
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit = null
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     null
 
   /**
@@ -236,8 +235,7 @@ abstract class MappedText[T <: Mapper[T]](val fieldOwner: T)
   def asJsExp: JsExp = JE.Str(get)
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(
-        get match {
+    Full(get match {
       case null => JsonAST.JNull
       case str => JsonAST.JString(str)
     })
@@ -285,10 +283,10 @@ abstract class MappedText[T <: Mapper[T]](val fieldOwner: T)
           f.orgData() = toSet
       })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit = null
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit = null
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedText[T] =>
@@ -299,10 +297,10 @@ abstract class MappedText[T <: Mapper[T]](val fieldOwner: T)
           f.data() = toSet
           f.orgData() = toSet
       })
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit = null
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit = null
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     null
 
   /**
@@ -390,8 +388,7 @@ abstract class MappedFakeClob[T <: Mapper[T]](val fieldOwner: T)
   def asJsExp: JsExp = JE.Str(get)
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(
-        get match {
+    Full(get match {
       case null => JsonAST.JNull
       case str => JsonAST.JString(str)
     })
@@ -436,10 +433,10 @@ abstract class MappedFakeClob[T <: Mapper[T]](val fieldOwner: T)
           f.orgData() = toSet
       })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit = null
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit = null
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedFakeClob[T] =>
@@ -450,10 +447,10 @@ abstract class MappedFakeClob[T <: Mapper[T]](val fieldOwner: T)
           f.data() = toSet
           f.orgData() = toSet
       })
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit = null
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit = null
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     null
 
   /**

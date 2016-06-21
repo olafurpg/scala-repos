@@ -20,12 +20,24 @@ class padTest extends FunSuite {
     import breeze.linalg.Options._
 
     assert(padRight(testDVI, dimensions = 3) == DenseVector(1, 2, 3))
-    assert(padRight(testDVD, dimensions = 7, mode = 11d) == DenseVector(
-            1d, 2d, 3d, 4d, 5d, 11d, 11d))
+    assert(
+        padRight(testDVD, dimensions = 7, mode = 11d) == DenseVector(1d,
+                                                                     2d,
+                                                                     3d,
+                                                                     4d,
+                                                                     5d,
+                                                                     11d,
+                                                                     11d))
     assert(
         padRight(testDVD, 7, 10d) == DenseVector(1d, 2d, 3d, 4d, 5d, 10d, 10d))
-    assert(padRight(testDVD, 7, Value(10d)) == DenseVector(
-            1d, 2d, 3d, 4d, 5d, 10d, 10d))
+    assert(
+        padRight(testDVD, 7, Value(10d)) == DenseVector(1d,
+                                                        2d,
+                                                        3d,
+                                                        4d,
+                                                        5d,
+                                                        10d,
+                                                        10d))
     assert(padRight(testDVI, 7, Min) == DenseVector(1, 2, 3, 4, 5, 1, 1))
     assert(padRight(testDVI, 7, Max) == DenseVector(1, 2, 3, 4, 5, 5, 5))
     assert(padRight(testDVI + 1, 7, Mean) == DenseVector(2, 3, 4, 5, 6, 4, 4))
@@ -41,16 +53,30 @@ class padTest extends FunSuite {
                                                                  (5, 0, 0),
                                                                  (0, 0, 0),
                                                                  (0, 0, 0)))
-    assert(padRight(testDMI, dimensions = (3, 3), 0) == DenseMatrix(
-            (1, 0, 0), (2, 0, 0), (3, 0, 0)))
+    assert(
+        padRight(testDMI, dimensions = (3, 3), 0) == DenseMatrix((1, 0, 0),
+                                                                 (2, 0, 0),
+                                                                 (3, 0, 0)))
 
     assert(padLeft(testDVI, dimensions = 3) == DenseVector(3, 4, 5))
-    assert(padLeft(testDVD, dimensions = 7, mode = 11d) == DenseVector(
-            11d, 11d, 1d, 2d, 3d, 4d, 5d))
+    assert(
+        padLeft(testDVD, dimensions = 7, mode = 11d) == DenseVector(11d,
+                                                                    11d,
+                                                                    1d,
+                                                                    2d,
+                                                                    3d,
+                                                                    4d,
+                                                                    5d))
     assert(
         padLeft(testDVD, 7, 10d) == DenseVector(10d, 10d, 1d, 2d, 3d, 4d, 5d))
-    assert(padLeft(testDVD, 7, Value(10d)) == DenseVector(
-            10d, 10d, 1d, 2d, 3d, 4d, 5d))
+    assert(
+        padLeft(testDVD, 7, Value(10d)) == DenseVector(10d,
+                                                       10d,
+                                                       1d,
+                                                       2d,
+                                                       3d,
+                                                       4d,
+                                                       5d))
     assert(padLeft(testDVI, 7, Min) == DenseVector(1, 1, 1, 2, 3, 4, 5))
     assert(padLeft(testDVI, 7, Max) == DenseVector(5, 5, 1, 2, 3, 4, 5))
     assert(padLeft(testDVI + 1, 7, Mean) == DenseVector(4, 4, 2, 3, 4, 5, 6))
@@ -66,7 +92,9 @@ class padTest extends FunSuite {
                                                                 (0, 0, 3),
                                                                 (0, 0, 4),
                                                                 (0, 0, 5)))
-    assert(padLeft(testDMI, dimensions = (3, 3), 0) == DenseMatrix(
-            (0, 0, 3), (0, 0, 4), (0, 0, 5)))
+    assert(
+        padLeft(testDMI, dimensions = (3, 3), 0) == DenseMatrix((0, 0, 3),
+                                                                (0, 0, 4),
+                                                                (0, 0, 5)))
   }
 }

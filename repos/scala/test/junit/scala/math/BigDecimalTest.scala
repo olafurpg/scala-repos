@@ -58,9 +58,9 @@ class BigDecimalTest {
     val reasonableInt = reasonable.toBigInt
     assert(
         reasonable.hashCode == reasonableInt.hashCode &&
-        reasonable == reasonableInt && reasonableInt == reasonable &&
-        troublemaker.hashCode != reasonable.hashCode &&
-        !(troublemaker == reasonableInt) && !(reasonableInt == troublemaker)
+          reasonable == reasonableInt && reasonableInt == reasonable &&
+          troublemaker.hashCode != reasonable.hashCode &&
+          !(troublemaker == reasonableInt) && !(reasonableInt == troublemaker)
     )
   }
 
@@ -75,9 +75,9 @@ class BigDecimalTest {
     }
     assert(
         isIAE(new BigDecimal(null: BD, new MC(2))) &&
-        isIAE(new BigDecimal(new BD("5.7"), null: MC)) &&
-        isNPE(BigDecimal(null: BigInt)) && isNPE(BigDecimal(null: String)) &&
-        isNPE(BigDecimal(null: Array[Char]))
+          isIAE(new BigDecimal(new BD("5.7"), null: MC)) &&
+          isNPE(BigDecimal(null: BigInt)) && isNPE(BigDecimal(null: String)) &&
+          isNPE(BigDecimal(null: Array[Char]))
     )
   }
 
@@ -90,8 +90,8 @@ class BigDecimalTest {
     val d: Double = 100000
     assert(
         d.## == l.## && l.## == bd.## &&
-        bd.## == bi.## && (bd pow 4).hashCode == (bi pow 4).hashCode &&
-        BigDecimal("1e150000").hashCode != BigDecimal("1e150000").toBigInt.hashCode
+          bd.## == bi.## && (bd pow 4).hashCode == (bi pow 4).hashCode &&
+          BigDecimal("1e150000").hashCode != BigDecimal("1e150000").toBigInt.hashCode
     )
   }
 
@@ -110,8 +110,8 @@ class BigDecimalTest {
         BigDecimal(1) / BigDecimal(10),
         BigDecimal(10).pow(-1)
     )
-    for (a <- tenths; b <- tenths) assert(
-        a == b, s"$a != $b but both should be 0.1")
+    for (a <- tenths; b <- tenths)
+      assert(a == b, s"$a != $b but both should be 0.1")
   }
 
   // Motivated by noticing BigDecimal(123456789, mc6) != BigDecimal(123456789L, mc6)
@@ -128,8 +128,8 @@ class BigDecimalTest {
             BigDecimal(123456789L, mc6),
             BigDecimal(123456789d, mc6),
             BigDecimal("123456789", mc6),
-            BigDecimal(
-                Array('1', '2', '3', '4', '5', '6', '7', '8', '9'), mc6),
+            BigDecimal(Array('1', '2', '3', '4', '5', '6', '7', '8', '9'),
+                       mc6),
             BigDecimal(BigInt(123456789), mc6),
             BigDecimal(BigInt(1234567890), 1, mc6),
             BigDecimal.decimal(123456789, mc6),
@@ -163,8 +163,8 @@ class BigDecimalTest {
         }
     }
     val List(xs, ys) = sameRounding.map(_.zipWithIndex)
-    for ((a, i) <- xs; (b, j) <- ys) assert(
-        a != b, s"$a == $b (#$i == #$j) but should be different")
+    for ((a, i) <- xs; (b, j) <- ys)
+      assert(a != b, s"$a == $b (#$i == #$j) but should be different")
   }
 
   // This was unexpectedly truncated in 2.10
@@ -177,8 +177,8 @@ class BigDecimalTest {
         BigDecimal(text),
         BigDecimal(new BD(text))
     )
-    for (a <- same; b <- same) assert(
-        a == b, s"$a != $b but should be the same")
+    for (a <- same; b <- same)
+      assert(a == b, s"$a != $b but should be the same")
   }
 
   // Tests attempts to make sane the representation of IEEE binary32 and binary64
@@ -210,8 +210,8 @@ class BigDecimalTest {
       val bd = BigDecimal(bi)
       val bd2 = BigDecimal.decimal(d)
       assert(!bi.isValidLong || bi == l, s"Should be invalid or equal: $bi $l")
-      assert(
-          !bi.isValidDouble || bi == d, s"Should be invalid or equal: $bi $d")
+      assert(!bi.isValidDouble || bi == d,
+             s"Should be invalid or equal: $bi $d")
       assert(bd == bi, s"Should be equal $bi $bd")
       assert(bd.## == bi.##, s"Hash codes for $bi, $bd should be equal")
       assert(bd == bd2 || bd2 != BigDecimal.exact(d) || !bi.isValidDouble,
@@ -226,8 +226,9 @@ class BigDecimalTest {
         BigDecimal.exact(0.1f),
         BigDecimal.decimal((0.1f).toDouble)
     )
-    for (a <- different; b <- different if (a ne b)) assert(
-        a != b, "BigDecimal representations of Double mistakenly conflated")
+    for (a <- different; b <- different if (a ne b))
+      assert(a != b,
+             "BigDecimal representations of Double mistakenly conflated")
   }
 
   // Make sure hash code agrees with decimal representation of Double
@@ -244,8 +245,10 @@ class BigDecimalTest {
       val n = BigDecimal("1.1", MC.UNLIMITED).pow(p)
 
       // BigDecimal(x: Float, mc: MC), which may not do what you want, is deprecated
-      assert(BigDecimal(1.1f, MC.UNLIMITED).pow(p) == BigDecimal(
-              java.lang.Double.toString(1.1f.toDouble), MC.UNLIMITED).pow(p))
+      assert(
+          BigDecimal(1.1f, MC.UNLIMITED).pow(p) == BigDecimal(
+              java.lang.Double.toString(1.1f.toDouble),
+              MC.UNLIMITED).pow(p))
       assert(BigDecimal(1.1d, MC.UNLIMITED).pow(p) == n)
       assert(BigDecimal(new BD("1.1"), MC.UNLIMITED).pow(p) == n)
 
@@ -259,18 +262,14 @@ class BigDecimalTest {
 
     def testRounded() {
       // the default rounding mode is HALF_UP
-      assert(
-          (BigDecimal(1.23f, new MC(3)) +
-              BigDecimal("0.005")).rounded == BigDecimal("1.24")) // deprecated api
-      assert(
-          (BigDecimal(1.23d, new MC(3)) +
-              BigDecimal("0.005")).rounded == BigDecimal("1.24"))
-      assert(
-          (BigDecimal.decimal(1.23f, new MC(3)) +
-              BigDecimal("0.005")).rounded == BigDecimal("1.24"))
-      assert(
-          (BigDecimal.decimal(1.23d, new MC(3)) +
-              BigDecimal("0.005")).rounded == BigDecimal("1.24"))
+      assert((BigDecimal(1.23f, new MC(3)) +
+                BigDecimal("0.005")).rounded == BigDecimal("1.24")) // deprecated api
+      assert((BigDecimal(1.23d, new MC(3)) +
+                BigDecimal("0.005")).rounded == BigDecimal("1.24"))
+      assert((BigDecimal.decimal(1.23f, new MC(3)) +
+                BigDecimal("0.005")).rounded == BigDecimal("1.24"))
+      assert((BigDecimal.decimal(1.23d, new MC(3)) +
+                BigDecimal("0.005")).rounded == BigDecimal("1.24"))
     }
 
     testPrecision()

@@ -121,7 +121,7 @@ object Constants {
   //
   val CANVAS_WIDTH =
     (NUMBER_OF_STONES + 1) * STONE_TOTAL_WIDTH +
-    (NUMBER_OF_STONES - 1) * STONE_GAP
+      (NUMBER_OF_STONES - 1) * STONE_GAP
   //
 }
 
@@ -196,14 +196,14 @@ class Model(var optionalFrogMap: Map[Int, Option[Frog]]) {
 
   private val canMoveTwoRightAt = (i: Int) =>
     !isAtRightOrOneButRight(i) && optionalFrogMap(i + 1).get.movesToLeft &&
-    optionalFrogMap(i + 2) == None
+      optionalFrogMap(i + 2) == None
 
   private val canMoveOneLeftAt = (i: Int) =>
     !isAtLeft(i) && optionalFrogMap(i - 1) == None
 
   private val canMoveTwoLeftAt = (i: Int) =>
     !isAtLeftOrOneButLeft(i) && optionalFrogMap(i - 1).get.movesToRight &&
-    optionalFrogMap(i - 2) == None
+      optionalFrogMap(i - 2) == None
 
   private def positionSingleton(frog: Frog) =
     for {
@@ -394,8 +394,8 @@ class Control {
 object theModel extends Model(theModelValues.optionalFrogMap)
 
 object theView
-    extends View(
-        theModel.position compose (_.getFrog), theViewValues.frogShapes) {
+    extends View(theModel.position compose (_.getFrog),
+                 theViewValues.frogShapes) {
   theControl.update(theModel, this)
 }
 

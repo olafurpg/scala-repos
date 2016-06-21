@@ -48,15 +48,15 @@ private[columnar] trait CompressibleColumnBuilder[T <: AtomicType]
 
   var compressionEncoders: Seq[Encoder[T]] = _
 
-  abstract override def initialize(
-      initialSize: Int, columnName: String, useCompression: Boolean): Unit = {
+  abstract override def initialize(initialSize: Int,
+                                   columnName: String,
+                                   useCompression: Boolean): Unit = {
 
-    compressionEncoders =
-      if (useCompression) {
-        schemes.filter(_.supports(columnType)).map(_.encoder[T](columnType))
-      } else {
-        Seq(PassThrough.encoder(columnType))
-      }
+    compressionEncoders = if (useCompression) {
+      schemes.filter(_.supports(columnType)).map(_.encoder[T](columnType))
+    } else {
+      Seq(PassThrough.encoder(columnType))
+    }
     super.initialize(initialSize, columnName, useCompression)
   }
 
@@ -64,8 +64,8 @@ private[columnar] trait CompressibleColumnBuilder[T <: AtomicType]
     encoder.compressionRatio < 0.8
   }
 
-  private def gatherCompressibilityStats(
-      row: InternalRow, ordinal: Int): Unit = {
+  private def gatherCompressibilityStats(row: InternalRow,
+                                         ordinal: Int): Unit = {
     var i = 0
     while (i < compressionEncoders.length) {
       compressionEncoders(i).gatherCompressibilityStats(row, ordinal)
@@ -90,12 +90,11 @@ private[columnar] trait CompressibleColumnBuilder[T <: AtomicType]
 
     // Header = null count + null positions
     val headerSize = 4 + nulls.limit()
-    val compressedSize =
-      if (encoder.compressedSize == 0) {
-        nonNullBuffer.remaining()
-      } else {
-        encoder.compressedSize
-      }
+    val compressedSize = if (encoder.compressedSize == 0) {
+      nonNullBuffer.remaining()
+    } else {
+      encoder.compressedSize
+    }
 
     val compressedBuffer = ByteBuffer
     // Reserves 4 bytes for compression scheme ID

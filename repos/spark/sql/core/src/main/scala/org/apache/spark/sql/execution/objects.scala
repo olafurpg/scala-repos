@@ -28,8 +28,8 @@ import org.apache.spark.sql.types.ObjectType
   * Helper functions for physical operators that work with user defined objects.
   */
 trait ObjectOperator extends SparkPlan {
-  def generateToObject(
-      objExpr: Expression, inputSchema: Seq[Attribute]): InternalRow => Any = {
+  def generateToObject(objExpr: Expression,
+                       inputSchema: Seq[Attribute]): InternalRow => Any = {
     val objectProjection =
       GenerateSafeProjection.generate(objExpr :: Nil, inputSchema)
     (i: InternalRow) =>

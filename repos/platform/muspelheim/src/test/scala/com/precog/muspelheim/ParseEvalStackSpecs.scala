@@ -105,8 +105,7 @@ trait TestStackLike[M[+ _]]
     val memoizationWorkDir = scratchDir
 
     val flatMapTimeout = Duration(100, "seconds")
-    val maxEvalDuration =
-      Duration(5, "minutes") // it's just unreasonable to run tests longer than this
+    val maxEvalDuration = Duration(5, "minutes") // it's just unreasonable to run tests longer than this
     val clock = blueeyes.util.Clock.System
 
     val maxSliceSize = 10
@@ -122,8 +121,11 @@ trait TestStackLike[M[+ _]]
                                             Path.Root,
                                             AccountPlan.Free)
   private def dummyEvaluationContext =
-    EvaluationContext(
-        "dummyAPIKey", dummyAccount, Path.Root, Path.Root, new DateTime)
+    EvaluationContext("dummyAPIKey",
+                      dummyAccount,
+                      Path.Root,
+                      Path.Root,
+                      new DateTime)
 
   def eval(str: String, debug: Boolean = false): Set[SValue] =
     evalE(str, debug) map { _._2 }
@@ -135,7 +137,7 @@ trait TestStackLike[M[+ _]]
     val forest = preForest filter { _.errors filterNot isWarning isEmpty }
 
     assert(forest.size == 1 ||
-        preForest.forall(_.errors filterNot isWarning isEmpty))
+          preForest.forall(_.errors filterNot isWarning isEmpty))
     val tree = forest.head
 
     val Right(dag) = decorate(emit(tree))

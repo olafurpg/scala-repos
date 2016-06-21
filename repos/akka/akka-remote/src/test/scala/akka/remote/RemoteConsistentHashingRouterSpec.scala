@@ -11,7 +11,8 @@ import akka.routing.ConsistentHash
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteConsistentHashingRouterSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+        """
     akka.actor.provider = "akka.remote.RemoteActorRefProvider" """) {
 
   "ConsistentHashingGroup" must {

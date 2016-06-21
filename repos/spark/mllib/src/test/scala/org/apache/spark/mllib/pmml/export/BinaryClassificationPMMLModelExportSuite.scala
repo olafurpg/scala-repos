@@ -30,8 +30,9 @@ class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite {
   test("logistic regression PMML export") {
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
-    val logisticRegressionModel = new LogisticRegressionModel(
-        linearInput(0).features, linearInput(0).label)
+    val logisticRegressionModel =
+      new LogisticRegressionModel(linearInput(0).features,
+                                  linearInput(0).label)
 
     val logisticModelExport =
       PMMLModelExportFactory.createPMMLModelExport(logisticRegressionModel)
@@ -43,7 +44,7 @@ class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite {
     // check that the number of fields match the weights size
     assert(
         pmml.getDataDictionary.getNumberOfFields === logisticRegressionModel.weights.size +
-        1)
+          1)
     // This verify that there is a model attached to the pmml object and the model is a regression
     // one.  It also verifies that the pmml model has a regression table (for target category 1)
     // with the same number of predictors of the model weights.

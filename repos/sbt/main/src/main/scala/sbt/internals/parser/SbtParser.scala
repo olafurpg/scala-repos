@@ -83,9 +83,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
         }
         val errorMessage = seq.mkString(EOL)
 
-        val error =
-          if (errorMessage.contains(XML_ERROR)) {
-            s"""
+        val error = if (errorMessage.contains(XML_ERROR)) {
+          s"""
                |$errorMessage
                |Probably problem with parsing xml group, please add parens or semicolons:
                |Replace:
@@ -96,9 +95,9 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
                |val xmlGroup = <a/><b/>;
                |
              """.stripMargin
-          } else {
-            errorMessage
-          }
+        } else {
+          errorMessage
+        }
         throw new MessageOnlyException(error)
     }
     val parsedTrees = parsed match {
@@ -139,8 +138,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     def parseStatementAgain(t: Tree, originalStatement: String): String = {
       val statement = scala.util.Try(toolbox.parse(originalStatement)) match {
         case scala.util.Failure(th) =>
-          val missingText = findMissingText(
-              content, t.pos.end, t.pos.line, fileName, th)
+          val missingText =
+            findMissingText(content, t.pos.end, t.pos.line, fileName, th)
           originalStatement + missingText
         case _ =>
           originalStatement
@@ -175,8 +174,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     * @param imports - trees
     * @return imports per line
     */
-  private def importsToLineRanges(
-      modifiedContent: String, imports: Seq[Tree]): Seq[(String, Int)] = {
+  private def importsToLineRanges(modifiedContent: String,
+                                  imports: Seq[Tree]): Seq[(String, Int)] = {
     val toLineRange = imports map convertImport(modifiedContent)
     val groupedByLineNumber = toLineRange.groupBy {
       case (_, lineNumber) => lineNumber
@@ -247,8 +246,11 @@ private[sbt] object MissingBracketHandler {
           case scala.util.Success(_) =>
             text
           case scala.util.Failure(th) =>
-            findMissingText(
-                content, index + 1, positionLine, fileName, originalException)
+            findMissingText(content,
+                            index + 1,
+                            positionLine,
+                            fileName,
+                            originalException)
         }
       case _ =>
         throw new MessageOnlyException(
@@ -262,8 +264,8 @@ private[sbt] object MissingBracketHandler {
     * @param from - start index
     * @return first not commented index or None
     */
-  private[sbt] def findClosingBracketIndex(
-      content: String, from: Int): Option[Int] = {
+  private[sbt] def findClosingBracketIndex(content: String,
+                                           from: Int): Option[Int] = {
     val index = content.indexWhere(c => c == '}' || c == ')', from)
     if (index == NOT_FOUND_INDEX) {
       None

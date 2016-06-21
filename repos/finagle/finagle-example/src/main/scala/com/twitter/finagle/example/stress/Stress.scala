@@ -60,8 +60,8 @@ object Stress {
 
       val duration = elapsed()
       println("%20s\t%s".format("Status", "Count"))
-      for ((status, count) <- responses.asMap.asScala) println(
-          "%20s\t%d".format(status, count))
+      for ((status, count) <- responses.asMap.asScala)
+        println("%20s\t%d".format(status, count))
       println("================")
       println(
           "%d requests completed in %dms (%f requests per second)".format(

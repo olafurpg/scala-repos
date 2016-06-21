@@ -30,7 +30,8 @@ private[http] class RequestContextImpl(
            log: LoggingAdapter,
            settings: RoutingSettings,
            parserSettings: ParserSettings)(
-      implicit ec: ExecutionContextExecutor, materializer: Materializer) =
+      implicit ec: ExecutionContextExecutor,
+      materializer: Materializer) =
     this(request,
          request.uri.path,
          ec,
@@ -39,9 +40,10 @@ private[http] class RequestContextImpl(
          settings,
          parserSettings)
 
-  def this(
-      request: HttpRequest, log: LoggingAdapter, settings: RoutingSettings)(
-      implicit ec: ExecutionContextExecutor, materializer: Materializer) =
+  def this(request: HttpRequest,
+           log: LoggingAdapter,
+           settings: RoutingSettings)(implicit ec: ExecutionContextExecutor,
+                                      materializer: Materializer) =
     this(request,
          request.uri.path,
          ec,
@@ -66,7 +68,8 @@ private[http] class RequestContextImpl(
       .recoverWith {
         case Marshal.UnacceptableResponseContentTypeException(supported) ⇒
           attemptRecoveryFromUnacceptableResponseContentTypeException(
-              trm, supported)
+              trm,
+              supported)
         case RejectionError(rej) ⇒
           Future.successful(RouteResult.Rejected(rej :: Nil))
       }(executionContext)
@@ -142,14 +145,14 @@ private[http] class RequestContextImpl(
                 UnacceptedResponseContentTypeRejection(supported) :: Nil))
     }
 
-  private def copy(request: HttpRequest = request,
-                   unmatchedPath: Uri.Path = unmatchedPath,
-                   executionContext: ExecutionContextExecutor =
-                     executionContext,
-                   materializer: Materializer = materializer,
-                   log: LoggingAdapter = log,
-                   routingSettings: RoutingSettings = settings,
-                   parserSettings: ParserSettings = parserSettings) =
+  private def copy(
+      request: HttpRequest = request,
+      unmatchedPath: Uri.Path = unmatchedPath,
+      executionContext: ExecutionContextExecutor = executionContext,
+      materializer: Materializer = materializer,
+      log: LoggingAdapter = log,
+      routingSettings: RoutingSettings = settings,
+      parserSettings: ParserSettings = parserSettings) =
     new RequestContextImpl(request,
                            unmatchedPath,
                            executionContext,

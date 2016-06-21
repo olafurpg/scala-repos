@@ -27,7 +27,7 @@ trait ScaladocAnalyzer extends Analyzer {
     override protected def macroImplementationNotFoundMessage(
         name: Name): String =
       (super.macroImplementationNotFoundMessage(name) +
-          "\nWhen generating scaladocs for multiple projects at once, consider using -Ymacro-no-expand to disable macro expansions altogether.")
+            "\nWhen generating scaladocs for multiple projects at once, consider using -Ymacro-no-expand to disable macro expansions altogether.")
 
     override def typedDocDef(docDef: DocDef, mode: Mode, pt: Type): Tree = {
       val sym = docDef.symbol
@@ -48,7 +48,7 @@ trait ScaladocAnalyzer extends Analyzer {
               reporter.warning(
                   useCase.pos,
                   "@usecase " + useCaseSym.name.decode +
-                  " does not match commented symbol: " + sym.name.decode)
+                    " does not match commented symbol: " + sym.name.decode)
           }
         }
       }
@@ -79,8 +79,9 @@ trait ScaladocAnalyzer extends Analyzer {
                      enclClass.newAliasType(name.toTypeName, useCase.pos)
                    val tparams =
                      cloneSymbolsAtOwner(tpt.tpe.typeSymbol.typeParams, alias)
-                   val newInfo = genPolyType(
-                       tparams, appliedType(tpt.tpe, tparams map (_.tpe)))
+                   val newInfo =
+                     genPolyType(tparams,
+                                 appliedType(tpt.tpe, tparams map (_.tpe)))
                    alias setInfo newInfo
                    context.scope.enter(alias)
                }
@@ -97,7 +98,7 @@ trait ScaladocAnalyzer extends Analyzer {
       typedStats(trees, NoSymbol)
       useCase.defined =
         context.scope.toList filterNot
-        (useCase.aliases contains _)
+          (useCase.aliases contains _)
 
       if (settings.debug)
         useCase.defined foreach
@@ -162,12 +163,9 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
   class ScaladocUnitScanner(unit0: CompilationUnit, patches0: List[BracePatch])
       extends UnitScanner(unit0, patches0) {
 
-    private var docBuffer: StringBuilder =
-      null // buffer for comments (non-null while scanning)
-    private var inDocComment =
-      false // if buffer contains double-star doc comment
-    private var lastDoc: DocComment =
-      null // last comment if it was double-star doc
+    private var docBuffer: StringBuilder = null // buffer for comments (non-null while scanning)
+    private var inDocComment = false // if buffer contains double-star doc comment
+    private var lastDoc: DocComment = null // last comment if it was double-star doc
 
     private object unmooredParser extends {
       // minimalist comment parser
@@ -186,8 +184,9 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       override def chooseLink(links: List[LinkTo]): LinkTo =
         links.headOption.orNull
       override def toString(link: LinkTo): String = "No link"
-      override def findExternalLink(
-          sym: Symbol, name: String): Option[LinkToExternal] = None
+      override def findExternalLink(sym: Symbol,
+                                    name: String): Option[LinkToExternal] =
+        None
       override def warnNoLink: Boolean = false
     }
 
@@ -227,8 +226,7 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       super.skipDocComment()
     }
     override def skipBlockComment(): Unit = {
-      inDocComment =
-        false // ??? this means docBuffer won't receive contents of this comment???
+      inDocComment = false // ??? this means docBuffer won't receive contents of this comment???
       docBuffer = new StringBuilder("/*")
       super.skipBlockComment()
     }

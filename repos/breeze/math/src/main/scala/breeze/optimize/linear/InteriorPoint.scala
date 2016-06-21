@@ -49,8 +49,8 @@ object InteriorPoint {
         val scaleZ = lineSearch(z, zAff)
         val sigma =
           math.pow((s + sAff * scaleX).dot(z + zAff * scaleZ) / (s dot z), 3)
-        val (zCC, xCC, sCC) = computeCenteringCorrectorDir(
-            A, b, c, x, s, z, sAff, zAff, sigma)
+        val (zCC, xCC, sCC) =
+          computeCenteringCorrectorDir(A, b, c, x, s, z, sAff, zAff, sigma)
 
         val dz = zAff += zCC
         val dx = xAff += xCC

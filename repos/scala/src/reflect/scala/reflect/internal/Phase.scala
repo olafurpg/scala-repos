@@ -41,17 +41,17 @@ abstract class Phase(val prev: Phase) {
   // NOTE: sbt injects its own phases which extend this class, and not GlobalPhase, so we must implement this logic here
   private val _erasedTypes =
     ((prev ne null) && (prev ne NoPhase)) &&
-    (prev.name == "erasure" || prev.erasedTypes)
+      (prev.name == "erasure" || prev.erasedTypes)
   def erasedTypes: Boolean = _erasedTypes // overridden in back-end
   final val flatClasses: Boolean =
     ((prev ne null) && (prev ne NoPhase)) &&
-    (prev.name == "flatten" || prev.flatClasses)
+      (prev.name == "flatten" || prev.flatClasses)
   final val specialized: Boolean =
     ((prev ne null) && (prev ne NoPhase)) &&
-    (prev.name == "specialize" || prev.specialized)
+      (prev.name == "specialize" || prev.specialized)
   final val refChecked: Boolean =
     ((prev ne null) && (prev ne NoPhase)) &&
-    (prev.name == "refchecks" || prev.refChecked)
+      (prev.name == "refchecks" || prev.refChecked)
 
   /** This is used only in unsafeTypeParams, and at this writing is
     *  overridden to false in parser, namer, typer, and erasure. (And NoPhase.)

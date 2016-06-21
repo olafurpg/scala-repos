@@ -43,5 +43,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class FileChooserSpec
     extends SimpleSFXDelegateSpec[jfxs.FileChooser, FileChooser](
-        classOf[jfxs.FileChooser], classOf[FileChooser])
+        classOf[jfxs.FileChooser],
+        classOf[FileChooser])
     with RunOnApplicationThread

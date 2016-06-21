@@ -145,10 +145,12 @@ trait TimePeriodSpecs[M[+ _]]
     }
 
     "compute correct range given different timezones" in {
-      val start = createObject(
-          "start", ParseDateTimeFuzzy, "1987-12-09T18:33:02.037+01:00")
-      val end = createObject(
-          "end", ParseDateTimeFuzzy, "1987-12-09T20:33:02.037+03:00")
+      val start = createObject("start",
+                               ParseDateTimeFuzzy,
+                               "1987-12-09T18:33:02.037+01:00")
+      val end = createObject("end",
+                             ParseDateTimeFuzzy,
+                             "1987-12-09T20:33:02.037+03:00")
       val step = createObject("step", ParsePeriod, "PT2H")
 
       val obj = joinObject(start, end, step)

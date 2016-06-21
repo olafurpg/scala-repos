@@ -45,8 +45,7 @@ object IndexService extends SLF4JLogging {
   abstract class AFqnIndexS[T <: FqnIndex](
       clazz: Class[T],
       cons: (String, Option[FileCheck]) => T
-  )
-      extends EntityS(clazz) {
+  ) extends EntityS(clazz) {
     def addFields(doc: Document, i: T): Unit = {
       doc.add(new TextField("file", i.file.get.filename, Store.NO))
       doc.add(new TextField("fqn", i.fqn, Store.YES))
@@ -91,8 +90,9 @@ class IndexService(path: File) {
 
   private val lucene = new SimpleLucene(path, analyzers)
 
-  def persist(
-      check: FileCheck, symbols: List[FqnSymbol], commit: Boolean): Unit = {
+  def persist(check: FileCheck,
+              symbols: List[FqnSymbol],
+              commit: Boolean): Unit = {
     val f = Some(check)
     val fqns: List[Document] = symbols.map {
       case FqnSymbol(_, _, _, fqn, Some(_), _, _, _, _) =>

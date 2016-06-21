@@ -57,11 +57,11 @@ object KafkaMetricsReporter {
               CoreUtils.createObject[KafkaMetricsReporter](reporterType)
             reporter.init(verifiableProps)
             if (reporter.isInstanceOf[KafkaMetricsReporterMBean])
-              CoreUtils.registerMBean(
-                  reporter,
-                  reporter
-                    .asInstanceOf[KafkaMetricsReporterMBean]
-                    .getMBeanName)
+              CoreUtils
+                .registerMBean(reporter,
+                               reporter
+                                 .asInstanceOf[KafkaMetricsReporterMBean]
+                                 .getMBeanName)
           })
           ReporterStarted.set(true)
         }

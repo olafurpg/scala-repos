@@ -89,8 +89,8 @@ private[cluster] class Reachability private (
           else if (r.status == Terminated) terminatedBuilder += r.subject
         }
 
-        val observerRowsMap: Map[
-            UniqueAddress, Map[UniqueAddress, Reachability.Record]] =
+        val observerRowsMap: Map[UniqueAddress,
+                                 Map[UniqueAddress, Reachability.Record]] =
           mapBuilder.toMap
         val allTerminated: Set[UniqueAddress] = terminatedBuilder.result()
         val allUnreachable: Set[UniqueAddress] =
@@ -111,16 +111,16 @@ private[cluster] class Reachability private (
     : Option[Map[UniqueAddress, Reachability.Record]] =
     cache.observerRowsMap.get(observer)
 
-  def unreachable(
-      observer: UniqueAddress, subject: UniqueAddress): Reachability =
+  def unreachable(observer: UniqueAddress,
+                  subject: UniqueAddress): Reachability =
     change(observer, subject, Unreachable)
 
-  def reachable(
-      observer: UniqueAddress, subject: UniqueAddress): Reachability =
+  def reachable(observer: UniqueAddress,
+                subject: UniqueAddress): Reachability =
     change(observer, subject, Reachable)
 
-  def terminated(
-      observer: UniqueAddress, subject: UniqueAddress): Reachability =
+  def terminated(observer: UniqueAddress,
+                 subject: UniqueAddress): Reachability =
     change(observer, subject, Terminated)
 
   private def currentVersion(observer: UniqueAddress): Long =
@@ -150,8 +150,8 @@ private[cluster] class Reachability private (
                   case (_, r) ⇒ r.status == Reachable
                 }) {
               // all Reachable, prune by removing the records of the observer, and bump the version
-              new Reachability(
-                  records.filterNot(_.observer == observer), newVersions)
+              new Reachability(records.filterNot(_.observer == observer),
+                               newVersions)
             } else new Reachability(records :+ newRecord, newVersions)
           case Some(oldRecord) ⇒
             if (oldRecord.status == Terminated || oldRecord.status == status)
@@ -161,8 +161,8 @@ private[cluster] class Reachability private (
                     case (_, r) ⇒ r.status == Reachable || r.subject == subject
                   }) {
                 // all Reachable, prune by removing the records of the observer, and bump the version
-                new Reachability(
-                    records.filterNot(_.observer == observer), newVersions)
+                new Reachability(records.filterNot(_.observer == observer),
+                                 newVersions)
               } else {
                 val newRecords =
                   records.updated(records.indexOf(oldRecord), newRecord)
@@ -232,8 +232,8 @@ private[cluster] class Reachability private (
       }
     }
 
-  def status(
-      observer: UniqueAddress, subject: UniqueAddress): ReachabilityStatus =
+  def status(observer: UniqueAddress,
+             subject: UniqueAddress): ReachabilityStatus =
     observerRows(observer) match {
       case None ⇒ Reachable
       case Some(observerRows) ⇒
@@ -302,7 +302,7 @@ private[cluster] class Reachability private (
   override def equals(obj: Any): Boolean = obj match {
     case other: Reachability ⇒
       records.size == other.records.size && versions == versions &&
-      cache.observerRowsMap == other.cache.observerRowsMap
+        cache.observerRowsMap == other.cache.observerRowsMap
     case _ ⇒ false
   }
 

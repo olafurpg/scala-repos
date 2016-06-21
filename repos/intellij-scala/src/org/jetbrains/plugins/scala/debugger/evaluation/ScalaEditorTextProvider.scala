@@ -21,7 +21,8 @@ import scala.util.Try
 class ScalaEditorTextProvider extends EditorTextProvider {
   def getEditorText(elementAtCaret: PsiElement): TextWithImports = {
     val result: String = findExpressionInner(
-        elementAtCaret, allowMethodCalls = true).map(_.getText).getOrElse("")
+        elementAtCaret,
+        allowMethodCalls = true).map(_.getText).getOrElse("")
     new TextWithImportsImpl(CodeFragmentKind.EXPRESSION, result)
   }
 
@@ -34,14 +35,17 @@ class ScalaEditorTextProvider extends EditorTextProvider {
         Try {
           val expressionCopy =
             ScalaPsiElementFactory.createExpressionWithContextFromText(
-                elem.getText, elem.getContext, elem)
+                elem.getText,
+                elem.getContext,
+                elem)
           new Pair[PsiElement, TextRange](expressionCopy, elem.getTextRange)
         }.toOption.orNull
     }
   }
 
   private def findExpressionInner(
-      element: PsiElement, allowMethodCalls: Boolean): Option[PsiElement] = {
+      element: PsiElement,
+      allowMethodCalls: Boolean): Option[PsiElement] = {
     def allowed(expr: ScExpression) =
       if (SideEffectsUtil.hasNoSideEffects(expr) || allowMethodCalls)
         Some(expr)

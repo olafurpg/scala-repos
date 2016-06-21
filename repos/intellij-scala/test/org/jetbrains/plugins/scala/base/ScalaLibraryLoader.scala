@@ -87,22 +87,24 @@ class ScalaLibraryLoader(project: Project,
     }
   }
 
-  def addScalaSdk(
-      module: Module, sdkVersion: ScalaSdkVersion, loadReflect: Boolean) = {
+  def addScalaSdk(module: Module,
+                  sdkVersion: ScalaSdkVersion,
+                  loadReflect: Boolean) = {
     val compilerPath = TestUtils.getScalaCompilerPath(sdkVersion)
     val libraryPath = TestUtils.getScalaLibraryPath(sdkVersion)
     val reflectPath = TestUtils.getScalaReflectPath(sdkVersion)
 
     val scalaSdkJars =
       Seq(libraryPath, compilerPath) ++
-      (if (loadReflect) Seq(reflectPath) else Seq.empty)
+        (if (loadReflect) Seq(reflectPath) else Seq.empty)
     val classRoots = scalaSdkJars
       .map(path =>
             JarFileSystem.getInstance.refreshAndFindFileByPath(path + "!/"))
       .asJava
 
     val scalaLibrarySrc = TestUtils.getScalaLibrarySrc(sdkVersion)
-    val srcsRoots = Seq(JarFileSystem.getInstance.refreshAndFindFileByPath(
+    val srcsRoots = Seq(
+        JarFileSystem.getInstance.refreshAndFindFileByPath(
             scalaLibrarySrc + "!/")).asJava
     val scalaSdkLib =
       PsiTestUtil.addProjectLibrary(module, "scala-sdk", classRoots, srcsRoots)
@@ -112,8 +114,8 @@ class ScalaLibraryLoader(project: Project,
       .getOrElse(ScalaLanguageLevel.Default)
 
     inWriteAction {
-      scalaSdkLib.convertToScalaSdkWith(
-          languageLevel, scalaSdkJars.map(new File(_)))
+      scalaSdkLib.convertToScalaSdkWith(languageLevel,
+                                        scalaSdkJars.map(new File(_)))
       module.attach(scalaSdkLib)
       addedLibraries += scalaSdkLib
     }
@@ -126,8 +128,9 @@ class ScalaLibraryLoader(project: Project,
   private def addLibrary(module: Module, lib: CommonLibrary): Unit =
     addLibrary(module, lib.name, lib.path)
 
-  private def addLibrary(
-      module: Module, libraryName: String, mockLib: String): Unit = {
+  private def addLibrary(module: Module,
+                         libraryName: String,
+                         mockLib: String): Unit = {
     if (module.libraries.exists(_.getName == libraryName)) return
 
     VfsRootAccess.allowRootAccess(mockLib)
@@ -139,8 +142,8 @@ class ScalaLibraryLoader(project: Project,
 
     val libRoot: File = new File(mockLib)
     assert(libRoot.exists)
-    libModel.addRoot(
-        VfsUtil.getUrlForLibraryRoot(libRoot), OrderRootType.CLASSES)
+    libModel
+      .addRoot(VfsUtil.getUrlForLibraryRoot(libRoot), OrderRootType.CLASSES)
 
     inWriteAction {
       libModel.commit()

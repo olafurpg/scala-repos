@@ -348,8 +348,7 @@ class BufTest
     ae(Buf.Utf8(string), Buf.ByteArray.Owned(shifted, 3, 3 + bytes.length))
   }
 
-  check(
-      Prop.forAll { (in: Int) =>
+  check(Prop.forAll { (in: Int) =>
     val buf = Buf.U32BE(in)
     val Buf.U32BE(out, _) = buf
 
@@ -359,8 +358,7 @@ class BufTest
     out == in && outByteBuf.getInt == in
   })
 
-  check(
-      Prop.forAll { (in: Int) =>
+  check(Prop.forAll { (in: Int) =>
     val buf = Buf.U32LE(in)
     val Buf.U32LE(out, _) = buf
 
@@ -370,8 +368,7 @@ class BufTest
     out == in && outByteBuf.getInt == in
   })
 
-  check(
-      Prop.forAll { (in: Long) =>
+  check(Prop.forAll { (in: Long) =>
     val buf = Buf.U64BE(in)
     val Buf.U64BE(out, _) = buf
 
@@ -381,8 +378,7 @@ class BufTest
     out == in && outByteBuf.getLong == in
   })
 
-  check(
-      Prop.forAll { (in: Long) =>
+  check(Prop.forAll { (in: Long) =>
     val buf = Buf.U64LE(in)
     val Buf.U64LE(out, _) = buf
 
@@ -470,8 +466,7 @@ class BufTest
         s => Buf.ByteArray.Owned(s.getBytes("UTF-8")),
         s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s))))
 
-    Arbitrary(
-        for {
+    Arbitrary(for {
       s <- Arbitrary.arbitrary[String]
       c <- Gen.oneOf(ctors)
     } yield c.apply(s))

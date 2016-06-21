@@ -83,8 +83,8 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
   }
 
   def removeFromPattern(pattern: ScTypedPattern) {
-    val newPattern = ScalaPsiElementFactory.createPatternFromText(
-        pattern.name, pattern.getManager)
+    val newPattern = ScalaPsiElementFactory
+      .createPatternFromText(pattern.name, pattern.getManager)
     pattern.replace(newPattern)
   }
 
@@ -102,7 +102,8 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
                   val clause: PsiElement = x.replace(
                       ScalaPsiElementFactory
                         .createClauseForFunctionExprFromText(
-                          "(" + param.getText + ")", param.getManager))
+                            "(" + param.getText + ")",
+                            param.getManager))
                   clause.asInstanceOf[ScParameterClause].parameters.head
                 case _ => param
               }
@@ -115,10 +116,10 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
   }
 
   def removeFromParameter(param: ScParameter) {
-    val newParam = ScalaPsiElementFactory.createParameterFromText(
-        param.name, param.getManager)
-    val newClause = ScalaPsiElementFactory.createClauseForFunctionExprFromText(
-        newParam.getText, param.getManager)
+    val newParam = ScalaPsiElementFactory
+      .createParameterFromText(param.name, param.getManager)
+    val newClause = ScalaPsiElementFactory
+      .createClauseForFunctionExprFromText(newParam.getText, param.getManager)
     val expr: ScFunctionExpr =
       PsiTreeUtil.getParentOfType(param, classOf[ScFunctionExpr], false)
     if (expr != null) {

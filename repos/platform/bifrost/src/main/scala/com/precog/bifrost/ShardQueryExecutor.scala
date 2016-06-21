@@ -96,8 +96,8 @@ trait ShardQueryExecutorPlatform[M[+ _]]
   case class StackException(error: StackError)
       extends Exception(error.toString)
 
-  abstract class ShardQueryExecutor[N[+ _]](N0: Monad[N])(
-      implicit mn: M ~> N, nm: N ~> M)
+  abstract class ShardQueryExecutor[N[+ _]](
+      N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M)
       extends Evaluator[N](N0)
       with QueryExecutor[N, (Set[Fault], StreamT[N, Slice])] {
 
@@ -133,62 +133,62 @@ trait ShardQueryExecutorPlatform[M[+ _]]
       val qid = yggConfig.queryId.getAndIncrement()
       queryLogger.info(
           "[QID:%d] Executing query for %s: %s, context: %s" format
-          (qid, evaluationContext.apiKey, query, evaluationContext))
+            (qid, evaluationContext.apiKey, query, evaluationContext))
 
       import EvaluationError._
 
       val solution = EitherT
         .fromTryCatch[N, EitherT[N, EvaluationError, (Set[Fault], Table)]] {
-        N point {
-          val (faults, bytecode) = asBytecode(query)
+          N point {
+            val (faults, bytecode) = asBytecode(query)
 
-          val resultVN: N[EvaluationError \/ Table] = {
-            bytecode map { instrs =>
-              ((systemError _) <-: (StackException(_)) <-: decorate(instrs).disjunction) traverse {
-                dag =>
-                  applyQueryOptions(opts) {
-                    logger.debug("[QID:%d] Evaluating query".format(qid))
+            val resultVN: N[EvaluationError \/ Table] = {
+              bytecode map { instrs =>
+                ((systemError _) <-: (StackException(_)) <-: decorate(instrs).disjunction) traverse {
+                  dag =>
+                    applyQueryOptions(opts) {
+                      logger.debug("[QID:%d] Evaluating query".format(qid))
 
-                    if (queryLogger.isDebugEnabled) {
-                      eval(dag, evaluationContext, true) map {
-                        _.logged(queryLogger,
-                                 "[QID:" + qid + "]",
-                                 "begin result stream",
-                                 "end result stream") { slice =>
-                          "size: " + slice.size
+                      if (queryLogger.isDebugEnabled) {
+                        eval(dag, evaluationContext, true) map {
+                          _.logged(queryLogger,
+                                   "[QID:" + qid + "]",
+                                   "begin result stream",
+                                   "end result stream") { slice =>
+                            "size: " + slice.size
+                          }
                         }
+                      } else {
+                        eval(dag, evaluationContext, true)
                       }
-                    } else {
-                      eval(dag, evaluationContext, true)
                     }
-                  }
+                }
+              } getOrElse {
+                // compilation errors will be reported as warnings, but there are no results so
+                // we just return an empty stream as the success
+                N.point(\/.right(Table.empty))
               }
-            } getOrElse {
-              // compilation errors will be reported as warnings, but there are no results so
-              // we just return an empty stream as the success
-              N.point(\/.right(Table.empty))
             }
-          }
 
-          EitherT(resultVN) flatMap { table =>
-            EitherT.right {
-              faults.toStream traverse {
-                case Fault.Error(pos, msg) =>
-                  queryReport.error(pos, msg) map { _ =>
-                    true
-                  }
-                case Fault.Warning(pos, msg) =>
-                  queryReport.warn(pos, msg) map { _ =>
-                    false
-                  }
-              } map { errors =>
-                faults ->
-                (if (errors.exists(_ == true)) Table.empty else table)
+            EitherT(resultVN) flatMap { table =>
+              EitherT.right {
+                faults.toStream traverse {
+                  case Fault.Error(pos, msg) =>
+                    queryReport.error(pos, msg) map { _ =>
+                      true
+                    }
+                  case Fault.Warning(pos, msg) =>
+                    queryReport.warn(pos, msg) map { _ =>
+                      false
+                    }
+                } map { errors =>
+                  faults ->
+                  (if (errors.exists(_ == true)) Table.empty else table)
+                }
               }
             }
           }
         }
-      }
 
       for {
         solutionResult <- solution.leftMap(systemError).join
@@ -205,10 +205,9 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
       def sort(table: N[Table]): N[Table] =
         if (!opts.sortOn.isEmpty) {
-          val sortKey = InnerArrayConcat(
-              opts.sortOn map { cpath =>
-            WrapArray(cpath.nodes
-                  .foldLeft(constants.SourceValue.Single: TransSpec1) {
+          val sortKey = InnerArrayConcat(opts.sortOn map { cpath =>
+            WrapArray(cpath.nodes.foldLeft(
+                    constants.SourceValue.Single: TransSpec1) {
               case (inner, f @ CPathField(_)) =>
                 DerefObjectStatic(inner, f)
               case (inner, i @ CPathIndex(_)) =>

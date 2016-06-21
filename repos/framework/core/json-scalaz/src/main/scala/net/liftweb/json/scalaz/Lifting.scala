@@ -23,8 +23,8 @@ import net.liftweb.json._
 trait Lifting {
   this: Types =>
   implicit def Func2ToJSON[A: JSONR, B: JSONR, R](z: (A, B) => R) = new {
-    def applyJSON(
-        a: JValue => Result[A], b: JValue => Result[B]): JValue => Result[R] =
+    def applyJSON(a: JValue => Result[A],
+                  b: JValue => Result[B]): JValue => Result[R] =
       (json: JValue) => (a(json) |@| b(json))(z)
   }
 
@@ -45,9 +45,12 @@ trait Lifting {
       (json: JValue) => (a(json) |@| b(json) |@| c(json) |@| d(json))(z)
   }
 
-  implicit def Func5ToJSON[
-      A: JSONR, B: JSONR, C: JSONR, D: JSONR, E: JSONR, R](
-      z: (A, B, C, D, E) => R) = new {
+  implicit def Func5ToJSON[A: JSONR,
+                           B: JSONR,
+                           C: JSONR,
+                           D: JSONR,
+                           E: JSONR,
+                           R](z: (A, B, C, D, E) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
                   c: JValue => Result[C],
@@ -57,9 +60,13 @@ trait Lifting {
         (a(json) |@| b(json) |@| c(json) |@| d(json) |@| e(json))(z)
   }
 
-  implicit def Func6ToJSON[
-      A: JSONR, B: JSONR, C: JSONR, D: JSONR, E: JSONR, F: JSONR, R](
-      z: (A, B, C, D, E, F) => R) = new {
+  implicit def Func6ToJSON[A: JSONR,
+                           B: JSONR,
+                           C: JSONR,
+                           D: JSONR,
+                           E: JSONR,
+                           F: JSONR,
+                           R](z: (A, B, C, D, E, F) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
                   c: JValue => Result[C],

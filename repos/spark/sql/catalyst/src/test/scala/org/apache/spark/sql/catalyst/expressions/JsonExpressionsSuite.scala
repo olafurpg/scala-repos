@@ -69,8 +69,8 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("$") {
-    checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$")), json.replace("\n", ""))
+    checkEvaluation(GetJsonObject(Literal(json), Literal("$")),
+                    json.replace("\n", ""))
   }
 
   test("$.store.book[0].category") {
@@ -99,7 +99,8 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("$.store.basket[0][1]") {
     checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$.store.basket[0][1]")), "2")
+        GetJsonObject(Literal(json), Literal("$.store.basket[0][1]")),
+        "2")
   }
 
   test("$.store.basket[*]") {
@@ -127,7 +128,8 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("$.store.basket[0][2].b") {
     checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$.store.basket[0][2].b")), "y")
+        GetJsonObject(Literal(json), Literal("$.store.basket[0][2].b")),
+        "y")
   }
 
   test("$.store.basket[0][*].b") {
@@ -137,38 +139,38 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("$.zip code") {
-    checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$.zip code")), "94025")
+    checkEvaluation(GetJsonObject(Literal(json), Literal("$.zip code")),
+                    "94025")
   }
 
   test("$.fb:testid") {
-    checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$.fb:testid")), "1234")
+    checkEvaluation(GetJsonObject(Literal(json), Literal("$.fb:testid")),
+                    "1234")
   }
 
   test("preserve newlines") {
-    checkEvaluation(
-        GetJsonObject(Literal("""{"a":"b\nc"}"""), Literal("$.a")), "b\nc")
+    checkEvaluation(GetJsonObject(Literal("""{"a":"b\nc"}"""), Literal("$.a")),
+                    "b\nc")
   }
 
   test("escape") {
-    checkEvaluation(
-        GetJsonObject(Literal("""{"a":"b\"c"}"""), Literal("$.a")), "b\"c")
+    checkEvaluation(GetJsonObject(Literal("""{"a":"b\"c"}"""), Literal("$.a")),
+                    "b\"c")
   }
 
   test("$.non_exist_key") {
-    checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$.non_exist_key")), null)
+    checkEvaluation(GetJsonObject(Literal(json), Literal("$.non_exist_key")),
+                    null)
   }
 
   test("$..no_recursive") {
-    checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$..no_recursive")), null)
+    checkEvaluation(GetJsonObject(Literal(json), Literal("$..no_recursive")),
+                    null)
   }
 
   test("$.store.book[10]") {
-    checkEvaluation(
-        GetJsonObject(Literal(json), Literal("$.store.book[10]")), null)
+    checkEvaluation(GetJsonObject(Literal(json), Literal("$.store.book[10]")),
+                    null)
   }
 
   test("$.store.book[0].non_exist_key") {

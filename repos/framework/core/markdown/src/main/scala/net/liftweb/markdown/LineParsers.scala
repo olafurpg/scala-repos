@@ -179,7 +179,7 @@ trait LineParsers extends InlineParsers {
     */
   def linkDefinitionUrl: Parser[String] =
     (elem('<') ~> markdownText(Set('>'), true) <~ '>' ^^ { _.mkString.trim }) |
-    (markdownText(Set(' ', '\t'), true) ^^ { _.mkString })
+      (markdownText(Set(' ', '\t'), true) ^^ { _.mkString })
 
   /** The title in a link definition.
     */

@@ -213,7 +213,8 @@ private final case class BackoffOptionsImpl(
   def withSupervisorStrategy(supervisorStrategy: OneForOneStrategy) =
     copy(supervisorStrategy = supervisorStrategy)
   def withDefaultStoppingStrategy =
-    copy(supervisorStrategy =
+    copy(
+        supervisorStrategy =
           OneForOneStrategy()(SupervisorStrategy.stoppingStrategy.decider))
 
   def props = {

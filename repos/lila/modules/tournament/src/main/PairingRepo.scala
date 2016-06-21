@@ -69,8 +69,9 @@ object PairingRepo {
         }.toSet
       }
 
-  def recentIdsByTourAndUserId(
-      tourId: String, userId: String, nb: Int): Fu[List[String]] =
+  def recentIdsByTourAndUserId(tourId: String,
+                               userId: String,
+                               nb: Int): Fu[List[String]] =
     coll
       .find(
           selectTourUser(tourId, userId),
@@ -83,8 +84,9 @@ object PairingRepo {
         _.flatMap(_.getAs[String]("_id"))
       }
 
-  def byTourUserNb(
-      tourId: String, userId: String, nb: Int): Fu[Option[Pairing]] =
+  def byTourUserNb(tourId: String,
+                   userId: String,
+                   nb: Int): Fu[Option[Pairing]] =
     (nb > 0) ?? coll
       .find(
           selectTourUser(tourId, userId)
@@ -131,8 +133,8 @@ object PairingRepo {
   def findPlaying(tourId: String, userId: String): Fu[Option[Pairing]] =
     coll.find(selectTourUser(tourId, userId) ++ selectPlaying).one[Pairing]
 
-  def finishedByPlayerChronological(
-      tourId: String, userId: String): Fu[Pairings] =
+  def finishedByPlayerChronological(tourId: String,
+                                    userId: String): Fu[Pairings] =
     coll
       .find(
           selectTourUser(tourId, userId) ++ selectFinished

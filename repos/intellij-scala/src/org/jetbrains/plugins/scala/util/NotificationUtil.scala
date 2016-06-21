@@ -14,8 +14,8 @@ object NotificationUtil {
   def builder(project: Project, message: String) =
     new NotificationBuilder(project, message)
 
-  class NotificationBuilder protected[NotificationUtil](
-      project: Project, message: String) {
+  class NotificationBuilder protected[NotificationUtil] (project: Project,
+                                                         message: String) {
     private var group: String = "scala"
     private var title: String = "Warning"
     private var notificationType: NotificationType = NotificationType.WARNING

@@ -10,8 +10,10 @@ import mesosphere.marathon.io.IO
   * @param file the underlying file
   * @param path the relative path, this item is identified with.
   */
-case class FileStorageItem(
-    file: File, basePath: File, path: String, baseUrl: String)
+case class FileStorageItem(file: File,
+                           basePath: File,
+                           path: String,
+                           baseUrl: String)
     extends StorageItem {
 
   def store(fn: OutputStream => Unit): FileStorageItem = {

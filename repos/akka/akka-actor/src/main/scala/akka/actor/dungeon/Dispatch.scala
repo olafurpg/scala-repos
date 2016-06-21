@@ -20,8 +20,7 @@ import akka.dispatch.UnboundedMailbox
 private[akka] trait Dispatch {
   this: ActorCell ⇒
 
-  @volatile private var _mailboxDoNotCallMeDirectly: Mailbox =
-    _ //This must be volatile since it isn't protected by the mailbox status
+  @volatile private var _mailboxDoNotCallMeDirectly: Mailbox = _ //This must be volatile since it isn't protected by the mailbox status
 
   @inline final def mailbox: Mailbox =
     Unsafe.instance
@@ -30,8 +29,10 @@ private[akka] trait Dispatch {
 
   @tailrec final def swapMailbox(newMailbox: Mailbox): Mailbox = {
     val oldMailbox = mailbox
-    if (!Unsafe.instance.compareAndSwapObject(
-            this, AbstractActorCell.mailboxOffset, oldMailbox, newMailbox))
+    if (!Unsafe.instance.compareAndSwapObject(this,
+                                              AbstractActorCell.mailboxOffset,
+                                              oldMailbox,
+                                              newMailbox))
       swapMailbox(newMailbox)
     else oldMailbox
   }
@@ -98,8 +99,10 @@ private[akka] trait Dispatch {
     swapMailbox(mbox)
     mailbox.setActor(this)
     // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
-    val createMessage = Create(Some(ActorInitializationException(
-                self, "failure while creating ActorCell", failure)))
+    val createMessage = Create(
+        Some(ActorInitializationException(self,
+                                          "failure while creating ActorCell",
+                                          failure)))
     mailbox.systemEnqueue(self, createMessage)
     this
   }

@@ -273,8 +273,8 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
     val context = system
     //#defining-dispatcher-in-code
     import akka.actor.Props
-    val myActor = context.actorOf(
-        Props[MyActor].withDispatcher("my-dispatcher"), "myactor1")
+    val myActor = context
+      .actorOf(Props[MyActor].withDispatcher("my-dispatcher"), "myactor1")
     //#defining-dispatcher-in-code
   }
 
@@ -285,16 +285,18 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
   "defining fixed-pool-size dispatcher" in {
     val context = system
     //#defining-fixed-pool-size-dispatcher
-    val myActor = context.actorOf(
-        Props[MyActor].withDispatcher("blocking-io-dispatcher"), "myactor2")
+    val myActor =
+      context.actorOf(Props[MyActor].withDispatcher("blocking-io-dispatcher"),
+                      "myactor2")
     //#defining-fixed-pool-size-dispatcher
   }
 
   "defining pinned dispatcher" in {
     val context = system
     //#defining-pinned-dispatcher
-    val myActor = context.actorOf(
-        Props[MyActor].withDispatcher("my-pinned-dispatcher"), "myactor3")
+    val myActor =
+      context.actorOf(Props[MyActor].withDispatcher("my-pinned-dispatcher"),
+                      "myactor3")
     //#defining-pinned-dispatcher
   }
 

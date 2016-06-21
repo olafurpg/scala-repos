@@ -36,8 +36,10 @@ class ScalaQualifiedNameProvider extends QualifiedNameProvider {
     new JavaQualifiedNameProvider().qualifiedNameToElement(fqn, project) //todo:
   }
 
-  def insertQualifiedName(
-      fqn: String, element: PsiElement, editor: Editor, project: Project) {
+  def insertQualifiedName(fqn: String,
+                          element: PsiElement,
+                          editor: Editor,
+                          project: Project) {
     new JavaQualifiedNameProvider()
       .insertQualifiedName(fqn, element, editor, project) //todo:
   }

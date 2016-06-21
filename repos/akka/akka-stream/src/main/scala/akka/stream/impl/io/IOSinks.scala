@@ -32,8 +32,8 @@ private[akka] final class FileSink(f: File,
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
 
     val ioResultPromise = Promise[IOResult]()
-    val props = FileSubscriber.props(
-        f, ioResultPromise, settings.maxInputBufferSize, options)
+    val props = FileSubscriber
+      .props(f, ioResultPromise, settings.maxInputBufferSize, options)
     val dispatcher =
       context.effectiveAttributes.get[Dispatcher](IODispatcher).dispatcher
 
@@ -68,8 +68,8 @@ private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
 
     val os = createOutput() // if it fails, we fail the materialization
 
-    val props = OutputStreamSubscriber.props(
-        os, ioResultPromise, settings.maxInputBufferSize, autoFlush)
+    val props = OutputStreamSubscriber
+      .props(os, ioResultPromise, settings.maxInputBufferSize, autoFlush)
 
     val ref = materializer.actorOf(context, props)
     (akka.stream.actor.ActorSubscriber[ByteString](ref),

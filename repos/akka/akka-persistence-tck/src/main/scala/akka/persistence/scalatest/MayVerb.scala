@@ -56,8 +56,8 @@ trait MayVerb {
 }
 
 object MayVerb {
-  case class TestCanceledByFailure(
-      msg: String, specialStackTrace: Array[StackTraceElement])
+  case class TestCanceledByFailure(msg: String,
+                                   specialStackTrace: Array[StackTraceElement])
       extends TestCanceledException(Some(msg), None, 2) {
     override def getStackTrace = specialStackTrace
   }

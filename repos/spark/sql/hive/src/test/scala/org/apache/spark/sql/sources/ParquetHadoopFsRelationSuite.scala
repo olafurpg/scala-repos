@@ -183,7 +183,11 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
         // in the lexicographic order.
         assert(
             sqlContext.read.parquet(dir.getCanonicalPath).schema.map(_.name) === Seq(
-                "a", "b", "c", "d", "part"))
+                "a",
+                "b",
+                "c",
+                "d",
+                "part"))
       }
     }
   }

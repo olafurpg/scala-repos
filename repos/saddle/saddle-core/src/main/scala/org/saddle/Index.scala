@@ -136,8 +136,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * @tparam B Type of other index
     * @tparam C Result of promoting types A, B
     */
-  def concat[B, C](other: Index[B])(
-      implicit p: Promoter[T, B, C], mc: ST[C], oc: ORD[C]): Index[C]
+  def concat[B, C](other: Index[B])(implicit p: Promoter[T, B, C],
+                                    mc: ST[C],
+                                    oc: ORD[C]): Index[C]
 
   /**
     * Find the first location whereby inserting a key would maintain a sorted index. Index
@@ -348,8 +349,8 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     */
   def getIndexer(other: Index[T]): Option[Array[Int]] = {
     val ixer = this.join(other, index.RightJoin)
-    require(
-        ixer.index.length == other.length, "Could not reindex unambiguously")
+    require(ixer.index.length == other.length,
+            "Could not reindex unambiguously")
     ixer.lTake
   }
 
@@ -511,8 +512,8 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
       buf.append("[Index %d x 1]\n" format (length))
 
       def createRow(r: Int) = {
-        val lst = for ((l, v) <- (vlens zip sm.strList(raw(r)))) yield
-          v.formatted("%" + l + "s")
+        val lst = for ((l, v) <- (vlens zip sm.strList(raw(r))))
+          yield v.formatted("%" + l + "s")
         lst.mkString(" ") + "\n"
       }
 

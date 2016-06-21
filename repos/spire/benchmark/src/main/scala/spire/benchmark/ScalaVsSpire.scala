@@ -65,16 +65,18 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseGeneric[A: ScalaN](
-      as: Array[A], bs: Array[A], cs: Array[A]): Unit = {
+  def doPairwiseGeneric[A: ScalaN](as: Array[A],
+                                   bs: Array[A],
+                                   cs: Array[A]): Unit = {
     import ScalaN.Implicits._
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseSpire[@sp(Int) A: Ring](
-      as: Array[A], bs: Array[A], cs: Array[A]): Unit = {
+  def doPairwiseSpire[@sp(Int) A: Ring](as: Array[A],
+                                        bs: Array[A],
+                                        cs: Array[A]): Unit = {
     import spire.implicits._
     var i = 0
     val len = as.length
@@ -185,13 +187,15 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   }
 
   @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(
-      implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
+      implicit ev1: EuclideanRing[A],
+      ev2: Eq[A]): A = {
     import spire.implicits._
     if (a % b === ev1.zero) b else gcdSpire(b, a % b)
   }
 
-  def doGcdSpire[@sp(Int) A: EuclideanRing: Eq](
-      as: Array[A], bs: Array[A], cs: Array[A]) = {
+  def doGcdSpire[@sp(Int) A: EuclideanRing: Eq](as: Array[A],
+                                                bs: Array[A],
+                                                cs: Array[A]) = {
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = gcdSpire(as(i), bs(i)); i += 1 }
@@ -213,8 +217,10 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) * n / d; i += 1 }
   }
 
-  def doScaleSpire[@sp(Int) A: EuclideanRing](
-      as: Array[A], n: A, d: A, cs: Array[A]) = {
+  def doScaleSpire[@sp(Int) A: EuclideanRing](as: Array[A],
+                                              n: A,
+                                              d: A,
+                                              cs: Array[A]) = {
     import spire.implicits._
     var i = 0
     val len = as.length

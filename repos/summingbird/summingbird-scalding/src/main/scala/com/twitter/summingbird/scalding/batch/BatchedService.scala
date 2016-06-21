@@ -42,8 +42,8 @@ trait BatchedService[K, V] extends ExternalService[K, V] {
     * to. This is an associative operation and sufficient to scedule the service.
     * This only has the keys that changed value during this batch.
     */
-  def readStream(
-      batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]]
+  def readStream(batchID: BatchID,
+                 mode: Mode): Option[FlowToPipe[(K, Option[V])]]
 
   def reducers: Option[Int]
 
@@ -111,13 +111,11 @@ trait BatchedService[K, V] extends ExternalService[K, V] {
 
           if (existing.isEmpty) {
             Left(List("[ERROR] Could not load any batches of the service stream in: " +
-                    toString + " for: " + timeSpan.toString))
+                      toString + " for: " + timeSpan.toString))
           } else {
             val inBatches = List(startingBatch) ++ existing.map { _._1 }
-            val bInt =
-              BatchID.toInterval(inBatches).get // by construction this is an interval, so this can't throw
-            val toRead =
-              batchOps.intersect(bInt, timeSpan) // No need to read more than this
+            val bInt = BatchID.toInterval(inBatches).get // by construction this is an interval, so this can't throw
+            val toRead = batchOps.intersect(bInt, timeSpan) // No need to read more than this
             getKeys((toRead, mode)).right.map {
               case ((available, outM), getFlow) =>
                 /*
@@ -144,10 +142,10 @@ object BatchedService extends java.io.Serializable {
     * a BatchedService
     * Assumes the batcher is the same for both
     */
-  def fromStoreAndSink[K, V](store: BatchedStore[K, V],
-                             sink: BatchedSink[(K, Option[V])],
-                             reducerOption: Option[Int] =
-                               None): BatchedService[K, V] =
+  def fromStoreAndSink[K, V](
+      store: BatchedStore[K, V],
+      sink: BatchedSink[(K, Option[V])],
+      reducerOption: Option[Int] = None): BatchedService[K, V] =
     new BatchedService[K, V] {
       override def ordering = store.ordering
       override def batcher = {
@@ -166,10 +164,9 @@ object BatchedService extends java.io.Serializable {
     * a BatchedService
     * Assumes the batcher is the same for both
     */
-  def fromStoreAndDeltaSink[K, V: Semigroup](
-      store: BatchedStore[K, V],
-      sink: BatchedSink[(K, V)],
-      reducerOption: Option[Int] =
-        None): scalding.service.BatchedDeltaService[K, V] =
+  def fromStoreAndDeltaSink[K, V: Semigroup](store: BatchedStore[K, V],
+                                             sink: BatchedSink[(K, V)],
+                                             reducerOption: Option[Int] = None)
+    : scalding.service.BatchedDeltaService[K, V] =
     new scalding.service.BatchedDeltaService[K, V](store, sink, reducerOption)
 }

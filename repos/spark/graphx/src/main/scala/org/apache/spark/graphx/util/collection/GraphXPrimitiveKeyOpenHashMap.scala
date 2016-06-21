@@ -30,8 +30,8 @@ import org.apache.spark.util.collection.OpenHashSet
   */
 private[graphx] class GraphXPrimitiveKeyOpenHashMap[
     @specialized(Long, Int) K: ClassTag,
-    @specialized(Long, Int, Double) V: ClassTag](
-    val keySet: OpenHashSet[K], var _values: Array[V])
+    @specialized(Long, Int, Double) V: ClassTag](val keySet: OpenHashSet[K],
+                                                 var _values: Array[V])
     extends Iterable[(K, V)]
     with Serializable {
 

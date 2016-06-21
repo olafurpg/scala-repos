@@ -47,8 +47,8 @@ object QueueingHandler {
   ): () => QueueingHandler =
     () => new QueueingHandler(handler(), maxQueueSize, inferClassNames)
 
-  def apply(
-      handler: HandlerFactory, maxQueueSize: Int): () => QueueingHandler =
+  def apply(handler: HandlerFactory,
+            maxQueueSize: Int): () => QueueingHandler =
     apply(handler, maxQueueSize, false)
 
   // java interop
@@ -77,8 +77,9 @@ object QueueingHandler {
   * because it loses some of the latency improvements of deferring
   * logging by getting the stack trace synchronously.
   */
-class QueueingHandler(
-    handler: Handler, val maxQueueSize: Int, inferClassNames: Boolean)
+class QueueingHandler(handler: Handler,
+                      val maxQueueSize: Int,
+                      inferClassNames: Boolean)
     extends ProxyHandler(handler) {
 
   import QueueingHandler._
@@ -152,7 +153,8 @@ class QueueingHandler(
     * Called when record dropped.  Default is to log to console.
     */
   protected def onOverflow(record: javalog.LogRecord): Unit = {
-    Console.err.println(String.format(
-            "[%s] log queue overflow - record dropped", Time.now.toString))
+    Console.err.println(
+        String.format("[%s] log queue overflow - record dropped",
+                      Time.now.toString))
   }
 }

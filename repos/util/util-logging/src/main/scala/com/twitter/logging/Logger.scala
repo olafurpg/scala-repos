@@ -40,8 +40,8 @@ object Level {
   case object TRACE extends Level("TRACE", 400)
   case object ALL extends Level("ALL", Int.MinValue)
 
-  private[logging] val AllLevels: Seq[Level] = Seq(
-      OFF, FATAL, CRITICAL, ERROR, WARNING, INFO, DEBUG, TRACE, ALL)
+  private[logging] val AllLevels: Seq[Level] =
+    Seq(OFF, FATAL, CRITICAL, ERROR, WARNING, INFO, DEBUG, TRACE, ALL)
 
   /**
     * Associate [[java.util.logging.Level]] and `Level` by their integer
@@ -108,8 +108,10 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
     * formatting is required.
     */
   @varargs
-  final def log(
-      level: Level, thrown: Throwable, message: String, items: Any*) {
+  final def log(level: Level,
+                thrown: Throwable,
+                message: String,
+                items: Any*) {
     val myLevel = getLevel
     if ((myLevel eq null) || (level.intValue >= myLevel.intValue)) {
 
@@ -128,8 +130,10 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
   final def apply(level: Level, message: String, items: Any*) =
     log(level, message, items: _*)
 
-  final def apply(
-      level: Level, thrown: Throwable, message: String, items: Any*) =
+  final def apply(level: Level,
+                  thrown: Throwable,
+                  message: String,
+                  items: Any*) =
     log(level, thrown, message, items)
 
   // convenience methods:

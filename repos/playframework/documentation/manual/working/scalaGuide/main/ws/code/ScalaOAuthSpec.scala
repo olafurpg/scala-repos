@@ -64,20 +64,20 @@ object ScalaOAuthSpec extends PlaySpecification {
         // We got the verifier; now get the access token, store it and back to index
         oauth.retrieveAccessToken(tokenPair, verifier) match {
           case Right(t) => {
-              // We received the authorized tokens in the OAuth object - store it before we proceed
-              Redirect(routes.Application.index)
-                .withSession("token" -> t.token, "secret" -> t.secret)
-            }
+            // We received the authorized tokens in the OAuth object - store it before we proceed
+            Redirect(routes.Application.index)
+              .withSession("token" -> t.token, "secret" -> t.secret)
+          }
           case Left(e) => throw e
         }
       }
       .getOrElse(
           oauth.retrieveRequestToken("https://localhost:9000/auth") match {
         case Right(t) => {
-            // We received the unauthorized tokens in the OAuth object - store it before we proceed
-            Redirect(oauth.redirectUrl(t.token))
-              .withSession("token" -> t.token, "secret" -> t.secret)
-          }
+          // We received the unauthorized tokens in the OAuth object - store it before we proceed
+          Redirect(oauth.redirectUrl(t.token))
+            .withSession("token" -> t.token, "secret" -> t.secret)
+        }
         case Left(e) => throw e
       })
   }
@@ -87,12 +87,12 @@ object ScalaOAuthSpec extends PlaySpecification {
   def timeline = Action.async { implicit request =>
     sessionTokenPair match {
       case Some(credentials) => {
-          wsClient
-            .url("https://api.twitter.com/1.1/statuses/home_timeline.json")
-            .sign(OAuthCalculator(KEY, credentials))
-            .get
-            .map(result => Ok(result.json))
-        }
+        wsClient
+          .url("https://api.twitter.com/1.1/statuses/home_timeline.json")
+          .sign(OAuthCalculator(KEY, credentials))
+          .get
+          .map(result => Ok(result.json))
+      }
       case _ => Future.successful(Redirect(routes.Application.authenticate))
     }
   }

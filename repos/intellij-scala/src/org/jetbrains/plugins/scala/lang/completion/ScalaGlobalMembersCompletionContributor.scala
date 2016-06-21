@@ -82,8 +82,8 @@ class ScalaGlobalMembersCompletionContributor
     }
   }
 
-  private def isStatic(
-      member: PsiNamedElement, containingClass: PsiClass): Boolean = {
+  private def isStatic(member: PsiNamedElement,
+                       containingClass: PsiClass): Boolean = {
     ScalaPsiUtil.nameContext(member) match {
       case memb: PsiMember =>
         if (containingClass == null) return false
@@ -278,8 +278,7 @@ class ScalaGlobalMembersCompletionContributor
     def isAccessible(member: PsiMember, containingClass: PsiClass): Boolean = {
       invocationCount >= 3 ||
       (ResolveUtils.isAccessible(member, ref, forCompletion = true) &&
-          ResolveUtils.isAccessible(
-              containingClass, ref, forCompletion = true))
+          ResolveUtils.isAccessible(containingClass, ref, forCompletion = true))
     }
 
     while (methodNamesIterator.hasNext) {
@@ -301,8 +300,8 @@ class ScalaGlobalMembersCompletionContributor
             }
             val currentAndInheritors = Iterator(cClass) ++ inheritors.iterator
             for {
-              containingClass <- currentAndInheritors if isStatic(
-                  method, containingClass)
+              containingClass <- currentAndInheritors
+              if isStatic(method, containingClass)
             } {
               assert(containingClass != null)
               if (classes.add(containingClass) &&
@@ -317,8 +316,10 @@ class ScalaGlobalMembersCompletionContributor
                           m.name == methodName)
                 }
                 if (overloads.size == 1) {
-                  result.addElement(createLookupElement(
-                          method, containingClass, shouldImport))
+                  result.addElement(
+                      createLookupElement(method,
+                                          containingClass,
+                                          shouldImport))
                 } else if (overloads.size > 1) {
                   val lookup = createLookupElement(
                       if (overloads.head.getParameterList.getParametersCount == 0)
@@ -389,15 +390,17 @@ class ScalaGlobalMembersCompletionContributor
             for {
               containingClass <- currentAndInheritors
               if namedElement != null &&
-              isStatic(namedElement, containingClass)
+                isStatic(namedElement, containingClass)
             } {
               assert(containingClass != null)
               if (isAccessible(field, containingClass)) {
                 val shouldImport = !elemsSetContains(namedElement)
                 showHint(shouldImport)
 
-                result.addElement(createLookupElement(
-                        namedElement, containingClass, shouldImport))
+                result.addElement(
+                    createLookupElement(namedElement,
+                                        containingClass,
+                                        shouldImport))
               }
             }
           }
@@ -406,11 +409,11 @@ class ScalaGlobalMembersCompletionContributor
     }
   }
 
-  private def createLookupElement(member: PsiNamedElement,
-                                  clazz: PsiClass,
-                                  shouldImport: Boolean,
-                                  overloaded: Boolean =
-                                    false): LookupElement = {
+  private def createLookupElement(
+      member: PsiNamedElement,
+      clazz: PsiClass,
+      shouldImport: Boolean,
+      overloaded: Boolean = false): LookupElement = {
     LookupElementManager
       .getLookupElement(new ScalaResolveResult(member),
                         isClassName = true,

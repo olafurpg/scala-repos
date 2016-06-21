@@ -57,8 +57,8 @@ class NewShinyConsumer(topic: Option[String],
   val consumer = new KafkaConsumer[Array[Byte], Array[Byte]](consumerProps)
   if (topic.isDefined) consumer.subscribe(List(topic.get))
   else if (whitelist.isDefined)
-    consumer.subscribe(
-        Pattern.compile(whitelist.get), new NoOpConsumerRebalanceListener())
+    consumer.subscribe(Pattern.compile(whitelist.get),
+                       new NoOpConsumerRebalanceListener())
   else
     throw new IllegalArgumentException(
         "Exactly one of topic or whitelist has to be provided.")
@@ -100,8 +100,10 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
 
   val consumerConnector = Consumer.create(new ConsumerConfig(consumerProps))
   val stream: KafkaStream[Array[Byte], Array[Byte]] = consumerConnector
-    .createMessageStreamsByFilter(
-        topicFilter, 1, new DefaultDecoder(), new DefaultDecoder())
+    .createMessageStreamsByFilter(topicFilter,
+                                  1,
+                                  new DefaultDecoder(),
+                                  new DefaultDecoder())
     .head
   val iter = stream.iterator
 

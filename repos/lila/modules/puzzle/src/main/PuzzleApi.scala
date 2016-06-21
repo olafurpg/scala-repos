@@ -10,8 +10,9 @@ import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSON
 import lila.db.Types.Coll
 import lila.user.{User, UserRepo}
 
-private[puzzle] final class PuzzleApi(
-    puzzleColl: Coll, attemptColl: Coll, apiToken: String) {
+private[puzzle] final class PuzzleApi(puzzleColl: Coll,
+                                      attemptColl: Coll,
+                                      apiToken: String) {
 
   import Puzzle.puzzleBSONHandler
 
@@ -55,7 +56,7 @@ private[puzzle] final class PuzzleApi(
                 }
               case _ =>
                 insertPuzzles(rest) map
-                (Failure(new Exception("Duplicate puzzle")) :: _)
+                  (Failure(new Exception("Duplicate puzzle")) :: _)
             }
           }
       }

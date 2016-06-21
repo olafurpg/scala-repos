@@ -26,8 +26,9 @@ class RateLimiterTest
 
   test("addDelay for existing delay") {
     val limiter = new RateLimiter(clock)
-    val app = AppDefinition(
-        id = "test".toPath, backoff = 10.seconds, backoffFactor = 2.0)
+    val app = AppDefinition(id = "test".toPath,
+                            backoff = 10.seconds,
+                            backoffFactor = 2.0)
 
     limiter.addDelay(app)
     limiter.addDelay(app)

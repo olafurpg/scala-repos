@@ -30,8 +30,9 @@ object SnapshotSpec {
     }
   }
 
-  class LoadSnapshotTestPersistentActor(
-      name: String, _recovery: Recovery, probe: ActorRef)
+  class LoadSnapshotTestPersistentActor(name: String,
+                                        _recovery: Recovery,
+                                        probe: ActorRef)
       extends NamedPersistentActor(name) {
     override def recovery: Recovery = _recovery
 
@@ -55,8 +56,9 @@ object SnapshotSpec {
   final case class Delete1(metadata: SnapshotMetadata)
   final case class DeleteN(criteria: SnapshotSelectionCriteria)
 
-  class DeleteSnapshotTestPersistentActor(
-      name: String, _recovery: Recovery, probe: ActorRef)
+  class DeleteSnapshotTestPersistentActor(name: String,
+                                          _recovery: Recovery,
+                                          probe: ActorRef)
       extends LoadSnapshotTestPersistentActor(name, _recovery, probe) {
     override def receiveCommand = receiveDelete orElse super.receiveCommand
     def receiveDelete: Receive = {
@@ -241,7 +243,7 @@ class SnapshotSpec
 
       expectMsgPF(hint =
             "" +
-            SnapshotOffer(SnapshotMetadata(`persistenceId`, 2, 0), null)) {
+              SnapshotOffer(SnapshotMetadata(`persistenceId`, 2, 0), null)) {
         case SnapshotOffer(md @ SnapshotMetadata(`persistenceId`, 2, _),
                            state) ⇒
           state should ===(List("a-1", "b-2").reverse)

@@ -80,8 +80,9 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
           def getScopeType: Option[ScType] = {
             if (operator.getText != "in") return None
             val manager = ScalaPsiManager.instance(place.getProject)
-            val scopeClass = manager.getCachedClass(
-                "sbt.Scope", place.getResolveScope, ClassCategory.TYPE)
+            val scopeClass = manager.getCachedClass("sbt.Scope",
+                                                    place.getResolveScope,
+                                                    ClassCategory.TYPE)
             if (scopeClass != null) Some(ScDesignatorType(scopeClass))
             else None
           }
@@ -143,7 +144,7 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
                   if typed.getType().getOrAny.conforms(expectedType) =>
                 variant.isLocalVariable =
                   (typed.isVar || typed.isVal) && (typed.containingFile exists
-                      (_.getName == parameters.getOriginalFile.getName))
+                        (_.getName == parameters.getOriginalFile.getName))
                 apply(variant)
               case _ => // do nothing
             }
@@ -153,8 +154,9 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
           ScType.extractClass(expectedType) match {
             case Some(clazz: ScTypeDefinition) =>
               expectedType match {
-                case ScProjectionType(
-                    proj, _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
+                case ScProjectionType(proj,
+                                      _: ScTypeAlias | _: ScClass | _: ScTrait,
+                                      _) =>
                   ScType.extractClass(proj) foreach collectAndApplyVariants
                 case _ => // do nothing
               }

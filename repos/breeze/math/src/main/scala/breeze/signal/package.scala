@@ -61,22 +61,21 @@ package object signal {
           "If fs and dt are both specified, fs == 1.0/dt must be true. Otherwise, they are incompatible")
     val realFs = if (fs < 0 && dt > 0) 1d / dt else fs
 
-    val shiftedFreq =
-      if (isEven(windowLength)) {
-        DenseVector.vertcat(
-            DenseVector.tabulate(0 to windowLength / 2 - 1)((i: Int) =>
-                  i.toDouble * realFs / windowLength.toDouble),
-            DenseVector.tabulate(-windowLength / 2 to -1)((i: Int) =>
-                  i.toDouble * realFs / windowLength.toDouble)
-        )
-      } else {
-        DenseVector.vertcat(
-            DenseVector.tabulate(0 to (windowLength - 1) / 2)((i: Int) =>
-                  i.toDouble * realFs / windowLength.toDouble),
-            DenseVector.tabulate(-(windowLength - 1) / 2 to -1)((i: Int) =>
-                  i.toDouble * realFs / windowLength.toDouble)
-        )
-      }
+    val shiftedFreq = if (isEven(windowLength)) {
+      DenseVector.vertcat(
+          DenseVector.tabulate(0 to windowLength / 2 - 1)((i: Int) =>
+                i.toDouble * realFs / windowLength.toDouble),
+          DenseVector.tabulate(-windowLength / 2 to -1)((i: Int) =>
+                i.toDouble * realFs / windowLength.toDouble)
+      )
+    } else {
+      DenseVector.vertcat(
+          DenseVector.tabulate(0 to (windowLength - 1) / 2)((i: Int) =>
+                i.toDouble * realFs / windowLength.toDouble),
+          DenseVector.tabulate(-(windowLength - 1) / 2 to -1)((i: Int) =>
+                i.toDouble * realFs / windowLength.toDouble)
+      )
+    }
     if (shifted) fourierShift(shiftedFreq) else shiftedFreq
   }
 
@@ -99,8 +98,13 @@ package object signal {
       padding: OptPadding = OptPadding.Zero,
       method: OptMethod = OptMethod.Automatic
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
-    canConvolve(
-        data, kernel, range, correlate = false, overhang, padding, method)
+    canConvolve(data,
+                kernel,
+                range,
+                correlate = false,
+                overhang,
+                padding,
+                method)
 
   /**Correlates DenseVectors.</p>
     * Implementation is via the implicit trait CanConvolve[ InputType,  OutputType ],
@@ -115,8 +119,13 @@ package object signal {
       padding: OptPadding = OptPadding.Zero,
       method: OptMethod = OptMethod.Automatic
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
-    canConvolve(
-        data, kernel, range, correlate = true, overhang, padding, method)
+    canConvolve(data,
+                kernel,
+                range,
+                correlate = true,
+                overhang,
+                padding,
+                method)
 
   // </editor-fold>
 
@@ -155,14 +164,14 @@ package object signal {
     * @param canFilterBPBS (implicit delegate to perform filtering on specific Input data types)
     * @return
     */
-  def filterBP[Input, Output](
-      data: Input,
-      omegas: (Double, Double),
-      sampleRate: Double = 2d,
-      taps: Int = 512,
-      kernelDesign: OptDesignMethod = OptDesignMethod.Firwin,
-      overhang: OptOverhang = OptOverhang.None,
-      padding: OptPadding = OptPadding.Boundary)(
+  def filterBP[Input, Output](data: Input,
+                              omegas: (Double, Double),
+                              sampleRate: Double = 2d,
+                              taps: Int = 512,
+                              kernelDesign: OptDesignMethod =
+                                OptDesignMethod.Firwin,
+                              overhang: OptOverhang = OptOverhang.None,
+                              padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterBPBS: CanFilterBPBS[Input, Output]): Output =
     canFilterBPBS(data,
                   omegas,
@@ -186,14 +195,14 @@ package object signal {
     * @param canFilterBPBS (implicit delegate to perform filtering on specific Input data types)
     * @return
     */
-  def filterBS[Input, Output](
-      data: Input,
-      omegas: (Double, Double),
-      sampleRate: Double = 2d,
-      taps: Int = 512,
-      kernelDesign: OptDesignMethod = OptDesignMethod.Firwin,
-      overhang: OptOverhang = OptOverhang.None,
-      padding: OptPadding = OptPadding.Boundary)(
+  def filterBS[Input, Output](data: Input,
+                              omegas: (Double, Double),
+                              sampleRate: Double = 2d,
+                              taps: Int = 512,
+                              kernelDesign: OptDesignMethod =
+                                OptDesignMethod.Firwin,
+                              overhang: OptOverhang = OptOverhang.None,
+                              padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterBPBS: CanFilterBPBS[Input, Output]): Output =
     canFilterBPBS(data,
                   omegas,
@@ -221,14 +230,14 @@ package object signal {
     * @param canFilterLPHP (implicit delegate to perform filtering on specific Input data types)
     * @return
     */
-  def filterLP[Input, Output](
-      data: Input,
-      omega: Double,
-      sampleRate: Double = 2d,
-      taps: Int = 512,
-      kernelDesign: OptDesignMethod = OptDesignMethod.Firwin,
-      overhang: OptOverhang = OptOverhang.None,
-      padding: OptPadding = OptPadding.Boundary)(
+  def filterLP[Input, Output](data: Input,
+                              omega: Double,
+                              sampleRate: Double = 2d,
+                              taps: Int = 512,
+                              kernelDesign: OptDesignMethod =
+                                OptDesignMethod.Firwin,
+                              overhang: OptOverhang = OptOverhang.None,
+                              padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterLPHP: CanFilterLPHP[Input, Output]): Output =
     canFilterLPHP(data,
                   omega,
@@ -252,14 +261,14 @@ package object signal {
     * @param canFilterLPHP (implicit delegate to perform filtering on specific Input data types)
     * @return
     */
-  def filterHP[Input, Output](
-      data: Input,
-      omega: Double,
-      sampleRate: Double = 2d,
-      taps: Int = 512,
-      kernelDesign: OptDesignMethod = OptDesignMethod.Firwin,
-      overhang: OptOverhang = OptOverhang.None,
-      padding: OptPadding = OptPadding.Boundary)(
+  def filterHP[Input, Output](data: Input,
+                              omega: Double,
+                              sampleRate: Double = 2d,
+                              taps: Int = 512,
+                              kernelDesign: OptDesignMethod =
+                                OptDesignMethod.Firwin,
+                              overhang: OptOverhang = OptOverhang.None,
+                              padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterLPHP: CanFilterLPHP[Input, Output]): Output =
     canFilterLPHP(data,
                   omega,
@@ -299,14 +308,14 @@ package object signal {
     *              or (B) at nyquist if the first passband ends at nyquist, or (C) the center of the first passband. Default is true.
     * @param nyquist The nyquist frequency, default is 1.
     */
-  def designFilterFirwin[Output](taps: Int,
-                                 omegas: DenseVector[Double],
-                                 nyquist: Double = 1d,
-                                 zeroPass: Boolean = true,
-                                 scale: Boolean = true,
-                                 multiplier: Double = 1d,
-                                 optWindow: OptWindowFunction =
-                                   OptWindowFunction.Hamming())(
+  def designFilterFirwin[Output](
+      taps: Int,
+      omegas: DenseVector[Double],
+      nyquist: Double = 1d,
+      zeroPass: Boolean = true,
+      scale: Boolean = true,
+      multiplier: Double = 1d,
+      optWindow: OptWindowFunction = OptWindowFunction.Hamming())(
       implicit canFirwin: CanFirwin[Output]): FIRKernel1D[Output] =
     canFirwin(taps, omegas, nyquist, zeroPass, scale, multiplier, optWindow)
 
@@ -318,8 +327,11 @@ package object signal {
       optFilterOrder: OptFilterTaps = OptFilterTaps.Automatic)(
       implicit canDesignFilterDecimation: CanDesignFilterDecimation[Output])
     : Output =
-    canDesignFilterDecimation(
-        factor, multiplier, optDesignMethod, optWindow, optFilterOrder)
+    canDesignFilterDecimation(factor,
+                              multiplier,
+                              optDesignMethod,
+                              optWindow,
+                              optFilterOrder)
 
   // </editor-fold>
 

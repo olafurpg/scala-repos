@@ -119,8 +119,11 @@ object SpinnerValueFactory {
       *                     else the min value will be used.
       */
     def this(min: Int, max: Int, initialValue: Int) {
-      this(new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(
-              min, max, initialValue))
+      this(
+          new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(
+              min,
+              max,
+              initialValue))
     }
 
     /**
@@ -134,8 +137,12 @@ object SpinnerValueFactory {
       * @param amountToStepBy The amount to increment or decrement by, per step.
       */
     def this(min: Int, max: Int, initialValue: Int, amountToStepBy: Int) {
-      this(new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(
-              min, max, initialValue, amountToStepBy))
+      this(
+          new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(
+              min,
+              max,
+              initialValue,
+              amountToStepBy))
     }
 
     /**
@@ -202,8 +209,11 @@ object SpinnerValueFactory {
       *                     else the min value will be used.
       */
     def this(min: Double, max: Double, initialValue: Double) {
-      this(new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(
-              min, max, initialValue))
+      this(
+          new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(
+              min,
+              max,
+              initialValue))
     }
 
     /**
@@ -220,8 +230,12 @@ object SpinnerValueFactory {
              max: Double,
              initialValue: Double,
              amountToStepBy: Double) {
-      this(new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(
-              min, max, initialValue, amountToStepBy))
+      this(
+          new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(
+              min,
+              max,
+              initialValue,
+              amountToStepBy))
     }
 
     /**

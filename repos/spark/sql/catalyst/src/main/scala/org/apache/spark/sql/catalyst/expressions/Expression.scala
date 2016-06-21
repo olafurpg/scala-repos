@@ -171,7 +171,7 @@ abstract class Expression extends TreeNode[Expression] {
     */
   def semanticEquals(other: Expression): Boolean =
     deterministic && other.deterministic &&
-    canonicalized == other.canonicalized
+      canonicalized == other.canonicalized
 
   /**
     * Returns a `hashCode` for the calculation performed by this expression. Unlike the standard
@@ -224,8 +224,8 @@ trait Unevaluable extends Expression {
     throw new UnsupportedOperationException(
         s"Cannot evaluate expression: $this")
 
-  final override protected def genCode(
-      ctx: CodegenContext, ev: ExprCode): String =
+  final override protected def genCode(ctx: CodegenContext,
+                                       ev: ExprCode): String =
     throw new UnsupportedOperationException(
         s"Cannot evaluate expression: $this")
 }
@@ -321,8 +321,9 @@ abstract class UnaryExpression extends Expression {
     *
     * @param f function that accepts a variable name and returns Java code to compute the output.
     */
-  protected def defineCodeGen(
-      ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
+  protected def defineCodeGen(ctx: CodegenContext,
+                              ev: ExprCode,
+                              f: String => String): String = {
     nullSafeCodeGen(ctx, ev, eval => {
       s"${ev.value} = ${f(eval)};"
     })
@@ -335,8 +336,9 @@ abstract class UnaryExpression extends Expression {
     * @param f function that accepts the non-null evaluation result name of child and returns Java
     *          code to compute the output.
     */
-  protected def nullSafeCodeGen(
-      ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
+  protected def nullSafeCodeGen(ctx: CodegenContext,
+                                ev: ExprCode,
+                                f: String => String): String = {
     val childGen = child.gen(ctx)
     val resultCode = f(childGen.value)
 
@@ -486,11 +488,11 @@ abstract class BinaryOperator extends BinaryExpression with ExpectsInputTypes {
     // First check whether left and right have the same type, then check if the type is acceptable.
     if (left.dataType != right.dataType) {
       TypeCheckResult.TypeCheckFailure(s"differing types in '$sql' " +
-          s"(${left.dataType.simpleString} and ${right.dataType.simpleString}).")
+            s"(${left.dataType.simpleString} and ${right.dataType.simpleString}).")
     } else if (!inputType.acceptsType(left.dataType)) {
       TypeCheckResult.TypeCheckFailure(
           s"'$sql' requires ${inputType.simpleString} type," +
-          s" not ${left.dataType.simpleString}")
+            s" not ${left.dataType.simpleString}")
     } else {
       TypeCheckResult.TypeCheckSuccess
     }

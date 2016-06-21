@@ -62,8 +62,8 @@ class MarathonHealthCheckManagerTest
     taskUpdater = taskTrackerModule.taskUpdater
 
     appRepository = new AppRepository(
-        new MarathonStore[AppDefinition](
-            new InMemoryStore, metrics, () => AppDefinition(), "app:"),
+        new MarathonStore[AppDefinition](new InMemoryStore, metrics, () =>
+              AppDefinition(), "app:"),
         None,
         metrics)
 
@@ -99,8 +99,9 @@ class MarathonHealthCheckManagerTest
     taskId
   }
 
-  def updateTaskHealth(
-      taskId: Task.Id, version: Timestamp, healthy: Boolean): Unit = {
+  def updateTaskHealth(taskId: Task.Id,
+                       version: Timestamp,
+                       healthy: Boolean): Unit = {
     val taskStatus = mesos.TaskStatus.newBuilder
       .setTaskId(taskId.mesosTaskId)
       .setState(mesos.TaskState.TASK_RUNNING)

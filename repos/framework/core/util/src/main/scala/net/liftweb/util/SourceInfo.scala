@@ -26,10 +26,11 @@ trait SourceInfo {
   def allFieldNames(): Seq[(String, SourceFieldMetadata)]
 }
 
-case class SourceFieldMetadataRep[A](
-    name: String, manifest: TypeTag[A], converter: FieldConverter {
-  type T = A
-})
+case class SourceFieldMetadataRep[A](name: String,
+                                     manifest: TypeTag[A],
+                                     converter: FieldConverter {
+                                       type T = A
+                                     })
     extends SourceFieldMetadata {
   type ST = A
 }
@@ -72,8 +73,7 @@ trait SourceFieldMetadata {
   */
 case class SourceFieldInfoRep[A](value: A, metaData: SourceFieldMetadata {
   type ST = A
-})
-    extends SourceFieldInfo {
+}) extends SourceFieldInfo {
   type T = A
 }
 

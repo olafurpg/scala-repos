@@ -97,7 +97,7 @@ private[spark] object BLAS extends Serializable with Logging {
     require(
         X.numRows == Y.numRows && X.numCols == Y.numCols,
         "Dimension mismatch: " +
-        s"size(X) = ${(X.numRows, X.numCols)} but size(Y) = ${(Y.numRows, Y.numCols)}.")
+          s"size(X) = ${(X.numRows, X.numCols)} but size(Y) = ${(Y.numRows, Y.numCols)}.")
     f2jBLAS.daxpy(X.numRows * X.numCols, a, X.values, 1, Y.values, 1)
   }
 
@@ -108,7 +108,7 @@ private[spark] object BLAS extends Serializable with Logging {
     require(
         x.size == y.size,
         "BLAS.dot(x: Vector, y:Vector) was given Vectors with non-matching sizes:" +
-        " x.size = " + x.size + ", y.size = " + y.size)
+          " x.size = " + x.size + ", y.size = " + y.size)
     (x, y) match {
       case (dx: DenseVector, dy: DenseVector) =>
         dot(dx, dy)
@@ -501,8 +501,7 @@ private[spark] object BLAS extends Serializable with Logging {
       if (!B.isTransposed) {
         // Expensive to put the check inside the loop
         while (colCounterForB < nB) {
-          var colCounterForA =
-            0 // The column of A to multiply with the row of B
+          var colCounterForA = 0 // The column of A to multiply with the row of B
           val Bstart = colCounterForB * kB
           val Cstart = colCounterForB * mA
           while (colCounterForA < kA) {
@@ -519,8 +518,7 @@ private[spark] object BLAS extends Serializable with Logging {
         }
       } else {
         while (colCounterForB < nB) {
-          var colCounterForA =
-            0 // The column of A to multiply with the row of B
+          var colCounterForA = 0 // The column of A to multiply with the row of B
           val Cstart = colCounterForB * mA
           while (colCounterForA < kA) {
             var i = AcolPtrs(colCounterForA)
@@ -575,7 +573,7 @@ private[spark] object BLAS extends Serializable with Logging {
         case _ =>
           throw new IllegalArgumentException(
               s"gemv doesn't support running on matrix type " +
-              s"${A.getClass} and vector type ${x.getClass}.")
+                s"${A.getClass} and vector type ${x.getClass}.")
       }
     }
   }
@@ -592,8 +590,17 @@ private[spark] object BLAS extends Serializable with Logging {
     val tStrA = if (A.isTransposed) "T" else "N"
     val mA = if (!A.isTransposed) A.numRows else A.numCols
     val nA = if (!A.isTransposed) A.numCols else A.numRows
-    nativeBLAS.dgemv(
-        tStrA, mA, nA, alpha, A.values, mA, x.values, 1, beta, y.values, 1)
+    nativeBLAS.dgemv(tStrA,
+                     mA,
+                     nA,
+                     alpha,
+                     A.values,
+                     mA,
+                     x.values,
+                     1,
+                     beta,
+                     y.values,
+                     1)
   }
 
   /**

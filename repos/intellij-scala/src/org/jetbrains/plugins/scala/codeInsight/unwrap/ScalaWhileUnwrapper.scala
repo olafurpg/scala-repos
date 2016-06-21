@@ -16,7 +16,8 @@ class ScalaWhileUnwrapper extends ScalaUnwrapper {
     CodeInsightBundle.message("unwrap.while")
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e match {
+      e: PsiElement,
+      toExtract: util.List[PsiElement]) = e match {
     case _: ScWhileStmt | _: ScDoStmt =>
       super.collectAffectedElements(e, toExtract)
       e

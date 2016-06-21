@@ -78,32 +78,35 @@ case class AddScheduledQueryRequest(schedule: CronExpression,
 object AddScheduledQueryRequest {
   import CronExpressionSerialization._
 
-  implicit val iso = Iso.hlist(
-      AddScheduledQueryRequest.apply _, AddScheduledQueryRequest.unapply _)
+  implicit val iso = Iso.hlist(AddScheduledQueryRequest.apply _,
+                               AddScheduledQueryRequest.unapply _)
 
   val schemaV1 =
     "schedule" :: "owners" :: "context" :: "source" :: "sink" :: "timeout" :: HNil
 
-  implicit val decomposer: Decomposer[AddScheduledQueryRequest] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val extractor: Extractor[AddScheduledQueryRequest] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val decomposer: Decomposer[AddScheduledQueryRequest] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val extractor: Extractor[AddScheduledQueryRequest] =
+    extractorV(schemaV1, Some("1.0".v))
 }
 
 class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                       apiKeyFinder: APIKeyFinder[Future],
                                       accountFinder: AccountFinder[Future],
-                                      clock: Clock)(
-    implicit M: Monad[Future], executor: ExecutionContext, addTimeout: Timeout)
-    extends CustomHttpService[
-        Future[JValue], APIKey => Future[HttpResponse[JValue]]]
+                                      clock: Clock)(implicit M: Monad[Future],
+                                                    executor: ExecutionContext,
+                                                    addTimeout: Timeout)
+    extends CustomHttpService[Future[JValue],
+                              APIKey => Future[HttpResponse[JValue]]]
     with Logging {
   val service: HttpRequest[Future[JValue]] => Validation[
-      NotServed, APIKey => Future[HttpResponse[JValue]]] =
+      NotServed,
+      APIKey => Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) =>
       Success({ apiKey: APIKey =>
-        val permissionsFinder = new PermissionsFinder[Future](
-            apiKeyFinder, accountFinder, clock.instant)
+        val permissionsFinder = new PermissionsFinder[Future](apiKeyFinder,
+                                                              accountFinder,
+                                                              clock.instant)
         request.content map { contentFuture =>
           val responseVF = for {
             sreq <- EitherT {
@@ -126,17 +129,21 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                           }
 
             okToReads <- EitherT.right {
-                          authorities.accountIds.toStream traverse { acctId =>
-                            permissionsFinder.apiKeyFinder.hasCapability(
-                                apiKey,
-                                Set(ExecutePermission(sreq.source,
-                                                      WrittenBy(acctId))),
-                                None)
+                          authorities.accountIds.toStream traverse {
+                            acctId =>
+                              permissionsFinder.apiKeyFinder.hasCapability(
+                                  apiKey,
+                                  Set(ExecutePermission(sreq.source,
+                                                        WrittenBy(acctId))),
+                                  None)
                           }
                         }
             okToRead = okToReads.exists(_ == true)
             okToWrite <- EitherT.right(permissionsFinder.checkWriteAuthorities(
-                                authorities, apiKey, sreq.sink, clock.instant))
+                                authorities,
+                                apiKey,
+                                sreq.sink,
+                                clock.instant))
 
             readError = (!okToRead).option(
                 nels("The API Key does not have permission to execute %s"
@@ -157,7 +164,7 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                            error =>
                              logger.error(
                                  "Failure adding scheduled execution: " +
-                                 error)
+                                   error)
                              HttpResponse(
                                  status = HttpStatus(InternalServerError),
                                  content = Some(
@@ -183,7 +190,8 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
 }
 
 class DeleteScheduledQueryServiceHandler[A](scheduler: Scheduler[Future])(
-    implicit executor: ExecutionContext, deleteTimeout: Timeout)
+    implicit executor: ExecutionContext,
+    deleteTimeout: Timeout)
     extends CustomHttpService[A, Future[HttpResponse[JValue]]]
     with Logging {
   import com.precog.util._
@@ -195,8 +203,8 @@ class DeleteScheduledQueryServiceHandler[A](scheduler: Scheduler[Future])(
                     DispatchError(BadRequest, "scheduleId parameter required"))
       id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap {
              error =>
-               DispatchError(
-                   BadRequest, "Invalid schedule Id \"%s\"".format(idStr))
+               DispatchError(BadRequest,
+                             "Invalid schedule Id \"%s\"".format(idStr))
            }
     } yield {
       scheduler.deleteTask(id) map { _ =>
@@ -212,7 +220,8 @@ class DeleteScheduledQueryServiceHandler[A](scheduler: Scheduler[Future])(
 }
 
 class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
-    implicit executor: ExecutionContext, addTimeout: Timeout)
+    implicit executor: ExecutionContext,
+    addTimeout: Timeout)
     extends CustomHttpService[A, Future[HttpResponse[JValue]]]
     with Logging {
   import com.precog.util._
@@ -220,8 +229,8 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
     for {
       idStr <- request.parameters
                 .get('scheduleId)
-                .toSuccess(DispatchError(
-                        BadRequest, "Missing schedule Id for status."))
+                .toSuccess(DispatchError(BadRequest,
+                                         "Missing schedule Id for status."))
       id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap { ex =>
              DispatchError(BadRequest,
                            "Invalid schedule Id \"%s\"".format(idStr),
@@ -231,8 +240,8 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
                 request.parameters.get('last) map (_.toInt)
               } leftMap {
                 case ex: NumberFormatException =>
-                  DispatchError(
-                      BadRequest, "Invalid last limit: " + ex.getMessage)
+                  DispatchError(BadRequest,
+                                "Invalid last limit: " + ex.getMessage)
               }
     } yield {
       scheduler.statusForTask(id, limit) map {
@@ -247,7 +256,7 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
           val body: JValue = JObject(
               "task" -> task.serialize,
               "nextRun" ->
-              (nextTime.map(_.serialize) getOrElse { JString("never") }),
+                (nextTime.map(_.serialize) getOrElse { JString("never") }),
               "history" -> reports.toList.serialize
           )
 

@@ -77,8 +77,7 @@ case class Multinomial[T, I](params: T)(
     val nOutcomes = params.iterator.length
     val aliases = DenseVector.zeros[Int](nOutcomes)
 
-    val probs = DenseVector(
-        params.iterator.map {
+    val probs = DenseVector(params.iterator.map {
       case (label, param) => param / sum * nOutcomes
     }.toArray)
     val (iSmaller, iLarger) = (0 until nOutcomes).partition(probs(_) < 1d)
@@ -140,8 +139,8 @@ case class AliasTable[I](probs: DenseVector[Double],
   */
 object Multinomial {
 
-  class ExpFam[T, I](
-      exemplar: T)(implicit space: MutableFiniteCoordinateField[T, I, Double])
+  class ExpFam[T, I](exemplar: T)(
+      implicit space: MutableFiniteCoordinateField[T, I, Double])
       extends ExponentialFamily[Multinomial[T, I], I]
       with HasConjugatePrior[Multinomial[T, I], I] {
 
@@ -151,8 +150,8 @@ object Multinomial {
 
     def predictive(parameter: conjugateFamily.Parameter) = new Polya(parameter)
 
-    def posterior(
-        prior: conjugateFamily.Parameter, evidence: TraversableOnce[I]) = {
+    def posterior(prior: conjugateFamily.Parameter,
+                  evidence: TraversableOnce[I]) = {
       val localCopy: T = space.copy(prior)
       for (e <- evidence) {
         localCopy(e) += 1.0

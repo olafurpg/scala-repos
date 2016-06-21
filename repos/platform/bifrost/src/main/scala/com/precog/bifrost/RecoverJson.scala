@@ -40,8 +40,9 @@ object RecoverJson {
                                      offset: Int): Option[(Int, Int)] = {
     if (bufferIndex >= buffers.length) None
     else if (offset >= buffers(bufferIndex).limit)
-      findEndString(
-          buffers, bufferIndex + 1, offset % buffers(bufferIndex).limit)
+      findEndString(buffers,
+                    bufferIndex + 1,
+                    offset % buffers(bufferIndex).limit)
     else {
       val char = buffers(bufferIndex).get(offset)
 
@@ -51,8 +52,9 @@ object RecoverJson {
     }
   }
 
-  private case class BalancedStackState(
-      bufferIndex: Int, offset: Int, stack: Stack[Balanced]) {
+  private case class BalancedStackState(bufferIndex: Int,
+                                        offset: Int,
+                                        stack: Stack[Balanced]) {
     def increment(balanced: Balanced) = BalancedStackState(
         bufferIndex,
         offset + 1,

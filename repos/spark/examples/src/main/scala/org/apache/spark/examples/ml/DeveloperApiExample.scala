@@ -103,8 +103,8 @@ private trait MyLogisticRegressionParams extends ClassifierParams {
     * and MyLogisticRegressionModel).  We place the setter (setMaxIter) method in the Estimator
     * class since the maxIter parameter is only used during training (not in the Model).
     */
-  val maxIter: IntParam = new IntParam(
-      this, "maxIter", "max number of iterations")
+  val maxIter: IntParam =
+    new IntParam(this, "maxIter", "max number of iterations")
   def getMaxIter: Int = $(maxIter)
 }
 
@@ -131,8 +131,7 @@ private class MyLogisticRegression(override val uid: String)
 
     // Do learning to estimate the coefficients vector.
     val numFeatures = oldDataset.take(1)(0).features.size
-    val coefficients =
-      Vectors.zeros(numFeatures) // Learning would happen here.
+    val coefficients = Vectors.zeros(numFeatures) // Learning would happen here.
 
     // Create a model, and return it.
     new MyLogisticRegressionModel(uid, coefficients).setParent(this)
@@ -146,8 +145,8 @@ private class MyLogisticRegression(override val uid: String)
   *
   * NOTE: This is private since it is an example.  In practice, you may not want it to be private.
   */
-private class MyLogisticRegressionModel(
-    override val uid: String, val coefficients: Vector)
+private class MyLogisticRegressionModel(override val uid: String,
+                                        val coefficients: Vector)
     extends ClassificationModel[Vector, MyLogisticRegressionModel]
     with MyLogisticRegressionParams {
 

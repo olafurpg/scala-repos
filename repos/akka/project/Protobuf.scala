@@ -11,15 +11,17 @@ import com.typesafe.sbt.preprocess.Preprocess._
 import java.io.File
 
 object Protobuf {
-  val paths = SettingKey[Seq[File]](
-      "protobuf-paths", "The paths that contain *.proto files.")
+  val paths = SettingKey[Seq[File]]("protobuf-paths",
+                                    "The paths that contain *.proto files.")
   val outputPaths = SettingKey[Seq[File]](
       "protobuf-output-paths",
       "The paths where to save the generated *.java files.")
   val protoc = SettingKey[String](
-      "protobuf-protoc", "The path and name of the protoc executable.")
+      "protobuf-protoc",
+      "The path and name of the protoc executable.")
   val protocVersion = SettingKey[String](
-      "protobuf-protoc-version", "The version of the protoc executable.")
+      "protobuf-protoc-version",
+      "The version of the protoc executable.")
   val generate = TaskKey[Unit](
       "protobuf-generate",
       "Compile the protobuf sources and do all processing.")
@@ -83,24 +85,27 @@ object Protobuf {
       case e: Exception =>
         throw new RuntimeException(
             "error while executing '%s' with args: %s" format
-            (protoc, args.mkString(" ")),
+              (protoc, args.mkString(" ")),
             e)
     }
 
-  private def checkProtocVersion(
-      protoc: String, protocVersion: String, log: Logger): Unit = {
+  private def checkProtocVersion(protoc: String,
+                                 protocVersion: String,
+                                 log: Logger): Unit = {
     val res = callProtoc(protoc, Seq("--version"), log, { (p, l) =>
       p !! l
     })
     val version = res.split(" ").last.trim
     if (version != protocVersion) {
       sys.error("Wrong protoc version! Expected %s but got %s" format
-          (protocVersion, version))
+            (protocVersion, version))
     }
   }
 
-  private def generate(
-      protoc: String, srcDir: File, targetDir: File, log: Logger): Unit = {
+  private def generate(protoc: String,
+                       srcDir: File,
+                       targetDir: File,
+                       log: Logger): Unit = {
     val protoFiles = (srcDir ** "*.proto").get
     if (srcDir.exists)
       if (protoFiles.isEmpty)
@@ -108,8 +113,8 @@ object Protobuf {
       else {
         targetDir.mkdirs()
 
-        log.info("Generating %d protobuf files from %s to %s".format(
-                protoFiles.size, srcDir, targetDir))
+        log.info("Generating %d protobuf files from %s to %s"
+              .format(protoFiles.size, srcDir, targetDir))
         protoFiles.foreach { proto =>
           log.info("Compiling %s" format proto)
         }

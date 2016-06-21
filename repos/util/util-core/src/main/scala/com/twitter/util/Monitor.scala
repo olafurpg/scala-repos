@@ -9,11 +9,10 @@ import java.util.logging.{Level, Logger}
 case class MonitorException(
     handlingExc: Throwable,
     monitorExc: Throwable
-)
-    extends Exception(monitorExc) {
+) extends Exception(monitorExc) {
   override def getMessage =
     "threw exception \"" + monitorExc + "\" while handling " +
-    "another exception \"" + handlingExc + "\""
+      "another exception \"" + handlingExc + "\""
 }
 
 /**
@@ -194,8 +193,9 @@ object RootMonitor extends Monitor {
       true /*NOTREACHED*/
 
     case e: Throwable =>
-      log.log(
-          Level.SEVERE, "Fatal exception propagated to the root monitor!", e)
+      log.log(Level.SEVERE,
+              "Fatal exception propagated to the root monitor!",
+              e)
       false
   }
 

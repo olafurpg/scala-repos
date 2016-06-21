@@ -36,8 +36,9 @@ class ReflectArrayTest {
   }
 
   @inline
-  def testNewInstance(
-      clazz: Class[_], expectedClazz: Class[_], sampleElem: Any): Unit = {
+  def testNewInstance(clazz: Class[_],
+                      expectedClazz: Class[_],
+                      sampleElem: Any): Unit = {
     testNewInstanceNoInline(clazz, length = 2, expectedClazz, sampleElem)
     testBase(clazz, length = 2, expectedClazz, sampleElem)
 
@@ -56,15 +57,19 @@ class ReflectArrayTest {
     testNewInstance(classOf[Object], classOf[Array[Object]], null)
     testNewInstance(classOf[String], classOf[Array[String]], null)
 
-    testNewInstance(
-        classOf[java.lang.Integer], classOf[Array[java.lang.Integer]], null)
-    testNewInstance(
-        classOf[java.lang.Long], classOf[Array[java.lang.Long]], null)
+    testNewInstance(classOf[java.lang.Integer],
+                    classOf[Array[java.lang.Integer]],
+                    null)
+    testNewInstance(classOf[java.lang.Long],
+                    classOf[Array[java.lang.Long]],
+                    null)
 
-    testNewInstance(
-        classOf[Array[Object]], classOf[Array[Array[Object]]], null)
+    testNewInstance(classOf[Array[Object]],
+                    classOf[Array[Array[Object]]],
+                    null)
     testNewInstance(classOf[Array[Int]], classOf[Array[Array[Int]]], null)
-    testNewInstance(
-        classOf[Array[String]], classOf[Array[Array[String]]], null)
+    testNewInstance(classOf[Array[String]],
+                    classOf[Array[Array[String]]],
+                    null)
   }
 }

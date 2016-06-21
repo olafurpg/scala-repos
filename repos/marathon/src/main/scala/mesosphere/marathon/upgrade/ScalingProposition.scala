@@ -3,8 +3,8 @@ package mesosphere.marathon.upgrade
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.Timestamp
 
-case class ScalingProposition(
-    tasksToKill: Option[Seq[Task]], tasksToStart: Option[Int])
+case class ScalingProposition(tasksToKill: Option[Seq[Task]],
+                              tasksToStart: Option[Int])
 
 object ScalingProposition {
   def propose(runningTasks: Iterable[Task],

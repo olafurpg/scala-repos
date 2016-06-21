@@ -164,8 +164,8 @@ abstract class Flatten extends InfoTransform {
     }
 
     /** Transform statements and add lifted definitions to them. */
-    override def transformStats(
-        stats: List[Tree], exprOwner: Symbol): List[Tree] = {
+    override def transformStats(stats: List[Tree],
+                                exprOwner: Symbol): List[Tree] = {
       val stats1 = super.transformStats(stats, exprOwner)
       if (currentOwner.isPackageClass) {
         val lifted = liftedDefs.remove(currentOwner).toList.flatten

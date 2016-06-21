@@ -41,8 +41,8 @@ object CompressionFactory {
     }
   }
 
-  def apply(
-      compressionCodec: CompressionCodec, stream: InputStream): InputStream = {
+  def apply(compressionCodec: CompressionCodec,
+            stream: InputStream): InputStream = {
     compressionCodec match {
       case DefaultCompressionCodec => new GZIPInputStream(stream)
       case GZIPCompressionCodec => new GZIPInputStream(stream)

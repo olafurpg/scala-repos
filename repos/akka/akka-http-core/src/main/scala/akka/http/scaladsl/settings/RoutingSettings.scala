@@ -9,7 +9,7 @@ import com.typesafe.config.Config
 /**
   * Public API but not intended for subclassing
   */
-abstract class RoutingSettings private[akka]()
+abstract class RoutingSettings private[akka] ()
     extends akka.http.javadsl.settings.RoutingSettings {
   self: RoutingSettingsImpl ⇒
   def verboseErrorMessages: Boolean

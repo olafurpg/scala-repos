@@ -70,8 +70,8 @@ trait SQLServerProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - JdbcCapabilities.forceInsert -
-        JdbcCapabilities.returnInsertOther - JdbcCapabilities.insertOrUpdate -
-        SqlCapabilities.sequence - JdbcCapabilities.supportsByte)
+          JdbcCapabilities.returnInsertOther - JdbcCapabilities.insertOrUpdate -
+          SqlCapabilities.sequence - JdbcCapabilities.supportsByte)
 
   override protected def computeQueryCompiler =
     (super.computeQueryCompiler
@@ -79,27 +79,28 @@ trait SQLServerProfile extends JdbcProfile {
                     Phase.expandSums)
           .addBefore(new ProtectGroupBy, Phase.mergeToComprehensions)
           .replace(new RemoveFieldNames(alwaysKeepSubqueryNames = true)) +
-        Phase.rewriteBooleans)
+          Phase.rewriteBooleans)
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createInsertBuilder(node: Insert): super.InsertBuilder =
     new InsertBuilder(node)
   override def createUpsertBuilder(node: Insert): super.InsertBuilder =
     new UpsertBuilder(node)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
       extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
-    override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+    override def createColumnBuilder(tableBuilder: TableBuilder,
+                                     meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
         override def tpe = dbType match {
           case Some("date") => "java.sql.Date"
@@ -123,8 +124,8 @@ trait SQLServerProfile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
@@ -133,7 +134,8 @@ trait SQLServerProfile extends JdbcProfile {
     MTable.getTables(None, None, None, Some(Seq("TABLE")))
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_],
+      sym: Option[FieldSymbol]): String = tmd.sqlType match {
     case java.sql.Types.VARCHAR =>
       sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length]) match {
         case Some(l) =>
@@ -171,8 +173,8 @@ trait SQLServerProfile extends JdbcProfile {
       }
     }
 
-    override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = ()
+    override protected def buildFetchOffsetClause(fetch: Option[Node],
+                                                  offset: Option[Node]) = ()
 
     override protected def buildOrdering(n: Node, o: Ordering) {
       if (o.nulls.last && !o.direction.desc)
@@ -187,7 +189,7 @@ trait SQLServerProfile extends JdbcProfile {
       // Cast bind variables of type TIME to TIME (otherwise they're treated as TIMESTAMP)
       case c @ LiteralNode(v)
           if c.volatileHint &&
-          jdbcTypeFor(c.nodeType) == columnTypes.timeJdbcType =>
+            jdbcTypeFor(c.nodeType) == columnTypes.timeJdbcType =>
         b"cast("
         super.expr(n, skipParens)
         b" as ${columnTypes.timeJdbcType.sqlTypeName(None)})"
@@ -197,8 +199,8 @@ trait SQLServerProfile extends JdbcProfile {
         super.expr(n, skipParens)
         b" as ${columnTypes.timeJdbcType.sqlTypeName(None)})"
       case Library.Substring(n, start) =>
-        b"\({fn substring($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())}, ${Int.MaxValue})}\)"
+        b"\({fn substring($n, ${QueryParameter
+          .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())}, ${Int.MaxValue})}\)"
       case Library.Repeat(str, count) =>
         b"replicate($str, $count)"
       case n => super.expr(n, skipParens)
@@ -221,8 +223,9 @@ trait SQLServerProfile extends JdbcProfile {
       val updateAction = fk.onUpdate.action
       val deleteAction = fk.onDelete.action
       sb append "constraint " append quoteIdentifier(fk.name) append " foreign key("
-      addForeignKeyColumnList(
-          fk.linearizedSourceColumns, sb, tableNode.tableName)
+      addForeignKeyColumnList(fk.linearizedSourceColumns,
+                              sb,
+                              tableNode.tableName)
       sb append ") references " append quoteTableName(fk.targetTable) append "("
       addForeignKeyColumnList(fk.linearizedTargetColumnsForOriginalTargetTable,
                               sb,

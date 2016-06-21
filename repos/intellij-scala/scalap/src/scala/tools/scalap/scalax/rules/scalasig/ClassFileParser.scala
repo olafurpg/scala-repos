@@ -99,10 +99,10 @@ trait ByteCodeReader extends RulesWithState {
 
   val u1 =
     byte ^^
-    (b => {
-          if (b >= 0) b.toInt
-          else b.toInt + 256
-        })
+      (b => {
+            if (b >= 0) b.toInt
+            else b.toInt + 256
+          })
   val u2 = bytes(2) ^^ (_.toInt)
   val u4 = bytes(4) ^^ (_.toInt) // should map to Long??
 
@@ -206,14 +206,14 @@ object ClassFileParser extends ByteCodeReader {
 
   // parse runtime-visible annotations
   abstract class ElementValue
-  case class AnnotationElement(
-      elementNameIndex: Int, elementValue: ElementValue)
+  case class AnnotationElement(elementNameIndex: Int,
+                               elementValue: ElementValue)
   case class ConstValueIndex(index: Int) extends ElementValue
   case class EnumConstValue(typeNameIndex: Int, constNameIndex: Int)
       extends ElementValue
   case class ClassInfoIndex(index: Int) extends ElementValue
-  case class Annotation(
-      typeIndex: Int, elementValuePairs: Seq[AnnotationElement])
+  case class Annotation(typeIndex: Int,
+                        elementValuePairs: Seq[AnnotationElement])
       extends ElementValue
   case class ArrayValue(values: Seq[ElementValue]) extends ElementValue
 

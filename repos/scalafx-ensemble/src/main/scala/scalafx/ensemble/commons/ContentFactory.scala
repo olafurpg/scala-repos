@@ -53,17 +53,16 @@ object ContentFactory {
     // Construct content of the samples dynamically
     val fullClassName = ExampleInfo.className(exampleName, groupName)
     var cache = Map[String, EnsembleExample]()
-    val sampleNode =
-      if (cache.get(fullClassName).isDefined) {
-        cache(fullClassName).getContent
-      } else {
-        val inst = Class
-          .forName(fullClassName)
-          .newInstance()
-          .asInstanceOf[EnsembleExample]
-        cache = cache.+((fullClassName, inst))
-        inst.getContent
-      }
+    val sampleNode = if (cache.get(fullClassName).isDefined) {
+      cache(fullClassName).getContent
+    } else {
+      val inst = Class
+        .forName(fullClassName)
+        .newInstance()
+        .asInstanceOf[EnsembleExample]
+      cache = cache.+((fullClassName, inst))
+      inst.getContent
+    }
 
     val header = new Label(exampleName) {
       styleClass += "page-header"
@@ -91,11 +90,14 @@ object ContentFactory {
     // Load syntax highlighter
     val shCoreJs =
       loadResourceAsString(
-          this, "/scalafx/ensemble/syntaxhighlighter/shCore.js") + ";"
+          this,
+          "/scalafx/ensemble/syntaxhighlighter/shCore.js") + ";"
     val shBrushScala = loadResourceAsString(
-        this, "/scalafx/ensemble/syntaxhighlighter/shBrushScala.js")
+        this,
+        "/scalafx/ensemble/syntaxhighlighter/shBrushScala.js")
     val shCoreDefaultCss = loadResourceAsString(
-        this, "/scalafx/ensemble/syntaxhighlighter/shCoreDefault.css")
+        this,
+        "/scalafx/ensemble/syntaxhighlighter/shCoreDefault.css")
 
     val exampleInfo = new ExampleInfo(exampleName, exampleGroupName)
 
@@ -155,8 +157,8 @@ object ContentFactory {
                     Option(fileChooser.showDialog(thisButton.scene.window()))
                   result match {
                     case Some(projectDir) =>
-                      SBTProjectBuilder.createSampleProject(
-                          projectDir, exampleInfo)
+                      SBTProjectBuilder.createSampleProject(projectDir,
+                                                            exampleInfo)
                       SBTProjectBuilder.parentDir =
                         projectDir.getCanonicalFile.getParentFile
                     case _ =>

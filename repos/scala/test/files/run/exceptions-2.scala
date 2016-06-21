@@ -342,8 +342,7 @@ object Test {
     Console.println("Return inside body and return in finally:");
     execute(returnInBodyAndInFinally);
 
-    Console.println(
-        "Return inside body and return in finally inside finally:");
+    Console.println("Return inside body and return in finally inside finally:");
     execute(returnInBodyAndInFinally2);
 
     Console.println("Throw in catch and finally:");

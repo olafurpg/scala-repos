@@ -19,15 +19,15 @@ trait RepositoryService { self: AccountService =>
     * @param originRepositoryName specify for the forked repository. (default is None)
     * @param originUserName specify for the forked repository. (default is None)
     */
-  def insertRepository(repositoryName: String,
-                       userName: String,
-                       description: Option[String],
-                       isPrivate: Boolean,
-                       originRepositoryName: Option[String] = None,
-                       originUserName: Option[String] = None,
-                       parentRepositoryName: Option[String] = None,
-                       parentUserName: Option[String] = None)(
-      implicit s: Session): Unit = {
+  def insertRepository(
+      repositoryName: String,
+      userName: String,
+      description: Option[String],
+      isPrivate: Boolean,
+      originRepositoryName: Option[String] = None,
+      originUserName: Option[String] = None,
+      parentRepositoryName: Option[String] = None,
+      parentUserName: Option[String] = None)(implicit s: Session): Unit = {
     Repositories insert Repository(userName = userName,
                                    repositoryName = repositoryName,
                                    isPrivate = isPrivate,
@@ -138,21 +138,19 @@ trait RepositoryService { self: AccountService =>
         val newMilestones = Milestones
           .filter(_.byRepository(newUserName, newRepositoryName))
           .list
-        Issues.insertAll(
-            issues.map { x =>
+        Issues.insertAll(issues.map { x =>
           x.copy(
               userName = newUserName,
               repositoryName = newRepositoryName,
-              milestoneId =
-                x.milestoneId.map { id =>
-                  newMilestones
-                    .find(_.title == milestones
-                          .find(_.milestoneId == id)
-                          .get
-                          .title)
-                    .get
-                    .milestoneId
-                }
+              milestoneId = x.milestoneId.map { id =>
+                newMilestones
+                  .find(_.title == milestones
+                        .find(_.milestoneId == id)
+                        .get
+                        .title)
+                  .get
+                  .milestoneId
+              }
           )
         }: _*)
 
@@ -193,7 +191,8 @@ trait RepositoryService { self: AccountService =>
           .map(x => (x.labelName, x.labelId))
           .list
           .toMap
-        IssueLabels.insertAll(issueLabels.map(x =>
+        IssueLabels.insertAll(
+            issueLabels.map(x =>
                   x.copy(
                       labelId = newLabelMap(oldLabelMap(x.labelId)),
                       userName = newUserName,
@@ -202,7 +201,9 @@ trait RepositoryService { self: AccountService =>
 
         if (account.isGroupAccount) {
           Collaborators.insertAll(getGroupMembers(newUserName).map(m =>
-                    Collaborator(newUserName, newRepositoryName, m.userName)): _*)
+                    Collaborator(newUserName,
+                                 newRepositoryName,
+                                 m.userName)): _*)
         } else {
           Collaborators.insertAll(collaborators.map(
                   _.copy(userName = newUserName,
@@ -315,8 +316,8 @@ trait RepositoryService { self: AccountService =>
       }.map(_.pullRequest).list
 
       new RepositoryInfo(
-          JGitUtil.getRepositoryInfo(
-              repository.userName, repository.repositoryName),
+          JGitUtil.getRepositoryInfo(repository.userName,
+                                     repository.repositoryName),
           repository,
           issues.count(_ == false),
           issues.count(_ == true),
@@ -351,8 +352,8 @@ trait RepositoryService { self: AccountService =>
       .list
   }
 
-  def getUserRepositories(
-      userName: String, withoutPhysicalInfo: Boolean = false)(
+  def getUserRepositories(userName: String,
+                          withoutPhysicalInfo: Boolean = false)(
       implicit s: Session): List[RepositoryInfo] = {
     Repositories.filter { t1 =>
       (t1.userName === userName.bind) || (Collaborators.filter { t2 =>
@@ -464,8 +465,9 @@ trait RepositoryService { self: AccountService =>
       .update(description, isPrivate, currentDate)
 
   def saveRepositoryDefaultBranch(
-      userName: String, repositoryName: String, defaultBranch: String)(
-      implicit s: Session): Unit =
+      userName: String,
+      repositoryName: String,
+      defaultBranch: String)(implicit s: Session): Unit =
     Repositories
       .filter(_.byRepository(userName, repositoryName))
       .map { r =>
@@ -480,11 +482,12 @@ trait RepositoryService { self: AccountService =>
     * @param repositoryName the repository name
     * @param collaboratorName the collaborator name
     */
-  def addCollaborator(
-      userName: String, repositoryName: String, collaboratorName: String)(
-      implicit s: Session): Unit =
-    Collaborators insert Collaborator(
-        userName, repositoryName, collaboratorName)
+  def addCollaborator(userName: String,
+                      repositoryName: String,
+                      collaboratorName: String)(implicit s: Session): Unit =
+    Collaborators insert Collaborator(userName,
+                                      repositoryName,
+                                      collaboratorName)
 
   /**
     * Remove collaborator from the repository.
@@ -493,9 +496,9 @@ trait RepositoryService { self: AccountService =>
     * @param repositoryName the repository name
     * @param collaboratorName the collaborator name
     */
-  def removeCollaborator(
-      userName: String, repositoryName: String, collaboratorName: String)(
-      implicit s: Session): Unit =
+  def removeCollaborator(userName: String,
+                         repositoryName: String,
+                         collaboratorName: String)(implicit s: Session): Unit =
     Collaborators
       .filter(_.byPrimaryKey(userName, repositoryName, collaboratorName))
       .delete
@@ -526,8 +529,9 @@ trait RepositoryService { self: AccountService =>
       .list
 
   def hasWritePermission(
-      owner: String, repository: String, loginAccount: Option[Account])(
-      implicit s: Session): Boolean = {
+      owner: String,
+      repository: String,
+      loginAccount: Option[Account])(implicit s: Session): Boolean = {
     loginAccount match {
       case Some(a) if (a.isAdmin) => true
       case Some(a) if (a.userName == owner) => true
@@ -540,8 +544,7 @@ trait RepositoryService { self: AccountService =>
 
   private def getForkedCount(userName: String, repositoryName: String)(
       implicit s: Session): Int =
-    Query(
-        Repositories.filter { t =>
+    Query(Repositories.filter { t =>
       (t.originUserName === userName.bind) &&
       (t.originRepositoryName === repositoryName.bind)
     }.length).first
@@ -613,8 +616,8 @@ object RepositoryService {
 
   def httpUrl(owner: String, name: String)(implicit context: Context): String =
     s"${context.baseUrl}/git/${owner}/${name}.git"
-  def sshUrl(
-      owner: String, name: String)(implicit context: Context): Option[String] =
+  def sshUrl(owner: String, name: String)(
+      implicit context: Context): Option[String] =
     if (context.settings.ssh) {
       context.loginAccount.flatMap { loginAccount =>
         context.settings.sshAddress.map { x =>

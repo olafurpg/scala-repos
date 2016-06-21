@@ -197,7 +197,8 @@ package object plot {
 
   /** Plots a histogram of the given data into the given number of bins */
   def hist[D, K, V](data: D, bins: HistogramBins = 10, name: String = null)(
-      implicit xv: DomainFunction[D, Int, V], vv: V => Double): Series =
+      implicit xv: DomainFunction[D, Int, V],
+      vv: V => Double): Series =
     new Series {
       val values = xv.domain(data).map(xv(data, _)).map(vv)
       val (min, max) = (values.min, values.max)

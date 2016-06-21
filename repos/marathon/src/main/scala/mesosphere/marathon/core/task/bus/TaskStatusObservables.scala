@@ -6,8 +6,9 @@ import mesosphere.marathon.state.{PathId, Timestamp}
 import rx.lang.scala.Observable
 
 object TaskStatusObservables {
-  case class TaskStatusUpdate(
-      timestamp: Timestamp, taskId: Task.Id, status: MarathonTaskStatus) {
+  case class TaskStatusUpdate(timestamp: Timestamp,
+                              taskId: Task.Id,
+                              status: MarathonTaskStatus) {
     def appId: PathId = taskId.appId
   }
 }

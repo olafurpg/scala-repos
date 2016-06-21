@@ -16,8 +16,7 @@ class SourceResolver(
     config: EnsimeConfig
 )(
     implicit vfs: EnsimeVFS
-)
-    extends FileChangeListener
+) extends FileChangeListener
     with SLF4JLogging {
 
   // it's not worth doing incremental updates - this is cheap

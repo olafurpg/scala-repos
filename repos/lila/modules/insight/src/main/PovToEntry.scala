@@ -38,8 +38,9 @@ object PovToEntry {
     false
   }
 
-  private def enrich(
-      game: Game, userId: String, provisional: Boolean): Fu[Option[RichPov]] =
+  private def enrich(game: Game,
+                     userId: String,
+                     provisional: Boolean): Fu[Option[RichPov]] =
     if (removeWrongAnalysis(game)) fuccess(none)
     else
       lila.game.Pov.ofUserId(game, userId) ?? { pov =>

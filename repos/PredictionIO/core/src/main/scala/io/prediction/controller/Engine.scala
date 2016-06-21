@@ -77,8 +77,8 @@ import scala.language.implicitConversions
   * @group Engine
   */
 class Engine[TD, EI, PD, Q, P, A](
-    val dataSourceClassMap: Map[
-        String, Class[_ <: BaseDataSource[TD, EI, Q, A]]],
+    val dataSourceClassMap: Map[String,
+                                Class[_ <: BaseDataSource[TD, EI, Q, A]]],
     val preparatorClassMap: Map[String, Class[_ <: BasePreparator[TD, PD]]],
     val algorithmClassMap: Map[String, Class[_ <: BaseAlgorithm[PD, _, Q, P]]],
     val servingClassMap: Map[String, Class[_ <: BaseServing[Q, P]]])
@@ -117,7 +117,8 @@ class Engine[TD, EI, PD, Q, P, A](
   def this(dataSourceClass: Class[_ <: BaseDataSource[TD, EI, Q, A]],
            preparatorClass: Class[_ <: BasePreparator[TD, PD]],
            algorithmClassMap: _root_.java.util.Map[
-               String, Class[_ <: BaseAlgorithm[PD, _, Q, P]]],
+               String,
+               Class[_ <: BaseAlgorithm[PD, _, Q, P]]],
            servingClass: Class[_ <: BaseServing[Q, P]]) = this(
       Map("" -> dataSourceClass),
       Map("" -> preparatorClass),
@@ -201,63 +202,62 @@ class Engine[TD, EI, PD, Q, P, A](
         Doer(algorithmClassMap(algoName), algoParams)
     }
 
-    val models =
-      if (persistedModels.exists(m => m.isInstanceOf[Unit.type])) {
-        // If any of persistedModels is Unit, we need to re-train the model.
-        logger.info("Some persisted models are Unit, need to re-train.")
-        val (dataSourceName, dataSourceParams) = engineParams.dataSourceParams
-        val dataSource = Doer(
-            dataSourceClassMap(dataSourceName), dataSourceParams)
+    val models = if (persistedModels.exists(m => m.isInstanceOf[Unit.type])) {
+      // If any of persistedModels is Unit, we need to re-train the model.
+      logger.info("Some persisted models are Unit, need to re-train.")
+      val (dataSourceName, dataSourceParams) = engineParams.dataSourceParams
+      val dataSource =
+        Doer(dataSourceClassMap(dataSourceName), dataSourceParams)
 
-        val (preparatorName, preparatorParams) = engineParams.preparatorParams
-        val preparator = Doer(
-            preparatorClassMap(preparatorName), preparatorParams)
+      val (preparatorName, preparatorParams) = engineParams.preparatorParams
+      val preparator =
+        Doer(preparatorClassMap(preparatorName), preparatorParams)
 
-        val td = dataSource.readTrainingBase(sc)
-        val pd = preparator.prepareBase(sc, td)
+      val td = dataSource.readTrainingBase(sc)
+      val pd = preparator.prepareBase(sc, td)
 
-        val models = algorithms.zip(persistedModels).map {
-          case (algo, m) =>
-            m match {
-              case Unit => algo.trainBase(sc, pd)
-              case _ => m
-            }
-        }
-        models
-      } else {
-        logger.info("Using persisted model")
-        persistedModels
+      val models = algorithms.zip(persistedModels).map {
+        case (algo, m) =>
+          m match {
+            case Unit => algo.trainBase(sc, pd)
+            case _ => m
+          }
       }
+      models
+    } else {
+      logger.info("Using persisted model")
+      persistedModels
+    }
 
     models.zip(algorithms).zip(algoParamsList).zipWithIndex.map {
       case (((model, algo), (algoName, algoParams)), ax) => {
-          model match {
-            case modelManifest: PersistentModelManifest => {
-                logger.info("Custom-persisted model detected for algorithm " +
-                    algo.getClass.getName)
-                SparkWorkflowUtils.getPersistentModel(
-                    modelManifest,
-                    Seq(engineInstanceId, ax, algoName).mkString("-"),
-                    algoParams,
-                    Some(sc),
-                    getClass.getClassLoader)
-              }
-            case m => {
-                try {
-                  logger.info(
-                      s"Loaded model ${m.getClass.getName} for algorithm " +
-                      s"${algo.getClass.getName}")
-                  sc.stop
-                  m
-                } catch {
-                  case e: NullPointerException =>
-                    logger.warn(
-                        s"Null model detected for algorithm ${algo.getClass.getName}")
-                    m
-                }
-              }
-          } // model match
-        }
+        model match {
+          case modelManifest: PersistentModelManifest => {
+            logger.info("Custom-persisted model detected for algorithm " +
+                  algo.getClass.getName)
+            SparkWorkflowUtils.getPersistentModel(
+                modelManifest,
+                Seq(engineInstanceId, ax, algoName).mkString("-"),
+                algoParams,
+                Some(sc),
+                getClass.getClassLoader)
+          }
+          case m => {
+            try {
+              logger.info(
+                  s"Loaded model ${m.getClass.getName} for algorithm " +
+                    s"${algo.getClass.getName}")
+              sc.stop
+              m
+            } catch {
+              case e: NullPointerException =>
+                logger.warn(
+                    s"Null model detected for algorithm ${algo.getClass.getName}")
+                m
+            }
+          }
+        } // model match
+      }
     }
   }
 
@@ -319,25 +319,25 @@ class Engine[TD, EI, PD, Q, P, A](
 
     val algorithms = algoParamsList.map {
       case (algoName, algoParams) => {
-          try {
-            Doer(algorithmClassMap(algoName), algoParams)
-          } catch {
-            case e: NoSuchElementException => {
-                if (algoName == "") {
-                  logger.error(
-                      "Empty algorithm name supplied but it could not " +
-                      "match with any algorithm in the engine's definition. " +
-                      "Existing algorithm name(s) are: " +
-                      s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
-                } else {
-                  logger.error(s"$algoName cannot be found in the engine's " +
-                      "definition. Existing algorithm name(s) are: " +
-                      s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
-                }
-                sys.exit(1)
-              }
+        try {
+          Doer(algorithmClassMap(algoName), algoParams)
+        } catch {
+          case e: NoSuchElementException => {
+            if (algoName == "") {
+              logger.error(
+                  "Empty algorithm name supplied but it could not " +
+                    "match with any algorithm in the engine's definition. " +
+                    "Existing algorithm name(s) are: " +
+                    s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
+            } else {
+              logger.error(s"$algoName cannot be found in the engine's " +
+                    "definition. Existing algorithm name(s) are: " +
+                    s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
+            }
+            sys.exit(1)
           }
         }
+      }
     }
 
     val (servingName, servingParams) = engineParams.servingParams
@@ -420,7 +420,7 @@ class Engine[TD, EI, PD, Q, P, A](
         read[(String, JValue)](engineInstance.dataSourceParams)
       if (!dataSourceClassMap.contains(name)) {
         logger.error(s"Unable to find datasource class with name '$name'" +
-            " defined in Engine.")
+              " defined in Engine.")
         sys.exit(1)
       }
       val extractedParams = WorkflowUtils.extractParams(
@@ -436,7 +436,7 @@ class Engine[TD, EI, PD, Q, P, A](
         read[(String, JValue)](engineInstance.preparatorParams)
       if (!preparatorClassMap.contains(name)) {
         logger.error(s"Unable to find preparator class with name '$name'" +
-            " defined in Engine.")
+              " defined in Engine.")
         sys.exit(1)
       }
       val extractedParams = WorkflowUtils.extractParams(
@@ -462,7 +462,7 @@ class Engine[TD, EI, PD, Q, P, A](
       val (name, params) = read[(String, JValue)](engineInstance.servingParams)
       if (!servingClassMap.contains(name)) {
         logger.error(s"Unable to find serving class with name '$name'" +
-            " defined in Engine.")
+              " defined in Engine.")
         sys.exit(1)
       }
       val extractedParams = WorkflowUtils.extractParams(
@@ -633,7 +633,7 @@ object Engine {
       case e: StorageClientException =>
         logger.error(
             s"Error occured reading from data source. (Reason: " +
-            e.getMessage + ") Please see the log for debugging details.",
+              e.getMessage + ") Please see the log for debugging details.",
             e)
         sys.exit(1)
     }
@@ -641,14 +641,14 @@ object Engine {
     if (!params.skipSanityCheck) {
       td match {
         case sanityCheckable: SanityCheck => {
-            logger.info(s"${td.getClass.getName} supports data sanity" +
+          logger.info(s"${td.getClass.getName} supports data sanity" +
                 " check. Performing check.")
-            sanityCheckable.sanityCheck()
-          }
+          sanityCheckable.sanityCheck()
+        }
         case _ => {
-            logger.info(s"${td.getClass.getName} does not support" +
+          logger.info(s"${td.getClass.getName} does not support" +
                 " data sanity check. Skipping check.")
-          }
+        }
       }
     }
 
@@ -662,14 +662,14 @@ object Engine {
     if (!params.skipSanityCheck) {
       pd match {
         case sanityCheckable: SanityCheck => {
-            logger.info(s"${pd.getClass.getName} supports data sanity" +
+          logger.info(s"${pd.getClass.getName} supports data sanity" +
                 " check. Performing check.")
-            sanityCheckable.sanityCheck()
-          }
+          sanityCheckable.sanityCheck()
+        }
         case _ => {
-            logger.info(s"${pd.getClass.getName} does not support" +
+          logger.info(s"${pd.getClass.getName} does not support" +
                 " data sanity check. Skipping check.")
-          }
+        }
       }
     }
 
@@ -685,14 +685,14 @@ object Engine {
         {
           model match {
             case sanityCheckable: SanityCheck => {
-                logger.info(s"${model.getClass.getName} supports data sanity" +
+              logger.info(s"${model.getClass.getName} supports data sanity" +
                     " check. Performing check.")
-                sanityCheckable.sanityCheck()
-              }
+              sanityCheckable.sanityCheck()
+            }
             case _ => {
-                logger.info(s"${model.getClass.getName} does not support" +
+              logger.info(s"${model.getClass.getName} does not support" +
                     " data sanity check. Skipping check.")
-              }
+            }
           }
         }
       }
@@ -777,8 +777,8 @@ object Engine {
                   algo.batchPredictBase(sc, model, qs)
                 val predicts: RDD[(QX, (AX, P))] = rawPredicts.map {
                   case (qx, p) => {
-                      (qx, (ax, p))
-                    }
+                    (qx, (ax, p))
+                  }
                 }
                 predicts
               }
@@ -800,18 +800,18 @@ object Engine {
 
     val servingQPAMap: Map[EX, RDD[(Q, P, A)]] = algoPredictsMap.map {
       case (ex, psMap) => {
-          // The query passed to serving.serve is the original one, not
-          // supplemented.
-          val qasMap: RDD[(QX, (Q, A))] = evalQAsMap(ex)
-          val qpsaMap: RDD[(QX, Q, Seq[P], A)] = psMap.join(qasMap).map {
-            case (qx, t) => (qx, t._2._1, t._1, t._2._2)
-          }
-
-          val qpaMap: RDD[(Q, P, A)] = qpsaMap.map {
-            case (qx, q, ps, a) => (q, serving.serveBase(q, ps), a)
-          }
-          (ex, qpaMap)
+        // The query passed to serving.serve is the original one, not
+        // supplemented.
+        val qasMap: RDD[(QX, (Q, A))] = evalQAsMap(ex)
+        val qpsaMap: RDD[(QX, Q, Seq[P], A)] = psMap.join(qasMap).map {
+          case (qx, t) => (qx, t._2._1, t._1, t._2._2)
         }
+
+        val qpaMap: RDD[(Q, P, A)] = qpsaMap.map {
+          case (qx, q, ps, a) => (q, serving.serveBase(q, ps), a)
+        }
+        (ex, qpaMap)
+      }
     }
 
     (0 until evalCount).map { ex =>

@@ -115,8 +115,8 @@ class LabelsServiceSpec extends FunSpec with ServiceSpecBase {
           dummyService.createLabel("user1", "repo1", "label1", "000000")
         dummyService.createLabel("user1", "repo2", "label1", "000000")
         dummyService.createLabel("user2", "repo1", "label1", "000000")
-        dummyService.updateLabel(
-            "user1", "repo1", labelId, "updated-label", "ffffff")
+        dummyService
+          .updateLabel("user1", "repo1", labelId, "updated-label", "ffffff")
         def getLabel = dummyService.getLabel("user1", "repo1", labelId)
         assert(getLabel == Some(
                 Label("user1", "repo1", labelId, "updated-label", "ffffff")))

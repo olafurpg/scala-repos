@@ -52,7 +52,7 @@ private[regression] object GLMRegressionModel {
       // Create JSON metadata.
       val metadata = compact(
           render(("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
-              ("numFeatures" -> weights.size)))
+                ("numFeatures" -> weights.size)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -80,14 +80,14 @@ private[regression] object GLMRegressionModel {
       assert(dataArray.length == 1,
              s"Unable to load $modelClass data from: $datapath")
       val data = dataArray(0)
-      assert(
-          data.size == 2, s"Unable to load $modelClass data from: $datapath")
+      assert(data.size == 2,
+             s"Unable to load $modelClass data from: $datapath")
       data match {
         case Row(weights: Vector, intercept: Double) =>
           assert(
               weights.size == numFeatures,
               s"Expected $numFeatures features, but" +
-              s" found ${weights.size} features when loading $modelClass weights from $datapath")
+                s" found ${weights.size} features when loading $modelClass weights from $datapath")
           Data(weights, intercept)
       }
     }

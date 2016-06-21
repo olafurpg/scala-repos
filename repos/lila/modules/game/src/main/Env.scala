@@ -38,11 +38,11 @@ final class Env(config: Config,
 
   lazy val pngExport = PngExport(PngExecPath) _
 
-  lazy val cached = new Cached(
-      mongoCache = mongoCache, defaultTtl = CachedNbTtl)
+  lazy val cached =
+    new Cached(mongoCache = mongoCache, defaultTtl = CachedNbTtl)
 
-  lazy val paginator = new PaginatorBuilder(
-      cached = cached, maxPerPage = PaginatorMaxPerPage)
+  lazy val paginator =
+    new PaginatorBuilder(cached = cached, maxPerPage = PaginatorMaxPerPage)
 
   lazy val rewind = Rewind
 
@@ -50,8 +50,8 @@ final class Env(config: Config,
 
   lazy val uciMemo = new UciMemo(UciMemoTtl)
 
-  lazy val pgnDump = new PgnDump(
-      netBaseUrl = netBaseUrl, getLightUser = getLightUser)
+  lazy val pgnDump =
+    new PgnDump(netBaseUrl = netBaseUrl, getLightUser = getLightUser)
 
   lazy val crosstableApi = new CrosstableApi(db(CollectionCrosstable))
 

@@ -12,8 +12,11 @@ private case class Record(flags: Int,
                           regType: String,
                           domain: String)
 
-private case class ResolvedRecord(
-    flags: Int, ifIndex: Int, fullName: String, hostName: String, port: Int)
+private case class ResolvedRecord(flags: Int,
+                                  ifIndex: Int,
+                                  fullName: String,
+                                  hostName: String,
+                                  port: Int)
 
 private class Listener(f: PartialFunction[(String, Array[Object]), Unit])
     extends InvocationHandler {
@@ -198,8 +201,10 @@ private class DNSSDAnnouncer extends MDNSAnnouncerIface {
 
   private[this] val dnssd = DNSSD.instance
 
-  def announce(
-      addr: InetSocketAddress, name: String, regType: String, domain: String) =
+  def announce(addr: InetSocketAddress,
+               name: String,
+               regType: String,
+               domain: String) =
     dnssd.register(name, regType, domain, addr.getHostName, addr.getPort)
 }
 

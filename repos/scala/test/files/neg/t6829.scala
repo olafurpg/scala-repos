@@ -21,8 +21,8 @@ object currenttype2 {
   case class RewardFunction[State, Action](r: (State, Action, State) => Reward)
 
   trait Rules[G <: GameDomain] {
-    def simulate(
-        state: G#State, agentActions: List[(G#Agent, G#Action)]): G#State
+    def simulate(state: G#State,
+                 agentActions: List[(G#Agent, G#Action)]): G#State
   }
 
   trait AgentSimulation[G <: GameDomain] {

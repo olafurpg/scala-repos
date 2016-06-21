@@ -177,8 +177,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
   with ProChoice[NullResult] {
     def id[A] =
       NullResult.lift(identity)
-    override def compose[A, B, C](
-        f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
+    override def compose[A, B, C](f: NullResult[B, C],
+                                  g: NullResult[A, B]): NullResult[A, C] =
       f compose g
     override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
       f *** g
@@ -194,8 +194,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       fa.left
     override def right[A, B, C](fa: NullResult[A, B]) =
       fa.right
-    override def choice[A, B, C](
-        f: => NullResult[A, C], g: => NullResult[B, C]) =
+    override def choice[A, B, C](f: => NullResult[A, C],
+                                 g: => NullResult[B, C]) =
       NullResult {
         case \/-(a) => g(a)
         case -\/(a) => f(a)

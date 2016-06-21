@@ -38,8 +38,8 @@ import scalaz.syntax.bitraverse._
 import scalaz.syntax.std.option._
 
 trait APIKeyFinder[M[+ _]] extends AccessControl[M] with Logging { self =>
-  def findAPIKey(
-      apiKey: APIKey, rootKey: Option[APIKey]): M[Option[v1.APIKeyDetails]]
+  def findAPIKey(apiKey: APIKey,
+                 rootKey: Option[APIKey]): M[Option[v1.APIKeyDetails]]
 
   def findAllAPIKeys(fromRoot: APIKey): M[Set[v1.APIKeyDetails]]
 
@@ -64,14 +64,15 @@ trait APIKeyFinder[M[+ _]] extends AccessControl[M] with Logging { self =>
     def addGrant(accountKey: APIKey, grantId: GrantId) =
       t(self.addGrant(accountKey, grantId))
 
-    def hasCapability(
-        apiKey: APIKey, perms: Set[Permission], at: Option[DateTime]) =
+    def hasCapability(apiKey: APIKey,
+                      perms: Set[Permission],
+                      at: Option[DateTime]) =
       t(self.hasCapability(apiKey, perms, at))
   }
 }
 
-class DirectAPIKeyFinder[M[+ _]](underlying: APIKeyManager[M])(
-    implicit val M: Monad[M])
+class DirectAPIKeyFinder[M[+ _]](
+    underlying: APIKeyManager[M])(implicit val M: Monad[M])
     extends APIKeyFinder[M]
     with Logging {
   val grantDetails: Grant => v1.GrantDetails = {
@@ -83,8 +84,7 @@ class DirectAPIKeyFinder[M[+ _]](underlying: APIKeyManager[M])(
     : PartialFunction[APIKeyRecord, M[v1.APIKeyDetails]] = {
     case APIKeyRecord(apiKey, name, description, issuer, grantIds, false) =>
       underlying.findAPIKeyAncestry(apiKey).flatMap { ancestors =>
-        val ancestorKeys =
-          ancestors.drop(1).map(_.apiKey) // The first element of ancestors is the key itself, so we drop it
+        val ancestorKeys = ancestors.drop(1).map(_.apiKey) // The first element of ancestors is the key itself, so we drop it
         grantIds.map(underlying.findGrant).toList.sequence map { grants =>
           val divulgedIssuers = rootKey.map { rk =>
             ancestorKeys.reverse.dropWhile(_ != rk).reverse

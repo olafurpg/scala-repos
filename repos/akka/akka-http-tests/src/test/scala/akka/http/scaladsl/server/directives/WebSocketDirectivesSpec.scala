@@ -69,7 +69,8 @@ class WebSocketDirectivesSpec extends RoutingSpec {
         status shouldEqual StatusCodes.BadRequest
         responseAs[String] shouldEqual "None of the websocket subprotocols offered in the request are supported. Supported are 'echo','greeter'."
         header[`Sec-WebSocket-Protocol`].get.protocols.toSet shouldEqual Set(
-            "greeter", "echo")
+            "greeter",
+            "echo")
       }
     }
     "reject non-websocket requests" in {
@@ -87,7 +88,8 @@ class WebSocketDirectivesSpec extends RoutingSpec {
   def websocketRoute = handleWebSocketMessages(greeter)
   def websocketMultipleProtocolRoute =
     handleWebSocketMessagesForProtocol(echo, "echo") ~ handleWebSocketMessagesForProtocol(
-        greeter, "greeter")
+        greeter,
+        "greeter")
 
   def greeter: Flow[Message, Message, Any] =
     Flow[Message].mapConcat {

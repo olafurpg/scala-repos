@@ -33,8 +33,10 @@ object AhcConfigSpec extends Specification with Mockito {
       val config = play.api.Configuration(ConfigFactory
             .parseString(input)
             .withFallback(ConfigFactory.defaultReference()))
-      val parser = new AhcWSClientConfigParser(
-          defaultWsConfig, config, app.injector.instanceOf[Environment])
+      val parser =
+        new AhcWSClientConfigParser(defaultWsConfig,
+                                    config,
+                                    app.injector.instanceOf[Environment])
       parser.parse()
     }
 
@@ -98,9 +100,9 @@ object AhcConfigSpec extends Specification with Mockito {
 
         actual.getReadTimeout must_== defaultWsConfig.idleTimeout.toMillis
         actual.getRequestTimeout must_==
-          defaultWsConfig.requestTimeout.toMillis
+        defaultWsConfig.requestTimeout.toMillis
         actual.getConnectTimeout must_==
-          defaultWsConfig.connectionTimeout.toMillis
+        defaultWsConfig.connectionTimeout.toMillis
         actual.isFollowRedirect must_== defaultWsConfig.followRedirects
 
         actual.getEnabledCipherSuites.toSeq must not contain Ciphers.deprecatedCiphers
@@ -158,7 +160,7 @@ object AhcConfigSpec extends Specification with Mockito {
           proxyServerSelector must not(beNull)
 
           proxyServerSelector must not be_==
-            ProxyServerSelector.NO_PROXY_SELECTOR
+          ProxyServerSelector.NO_PROXY_SELECTOR
         } finally {
           // Unset http.proxyHost
           System.clearProperty(ProxyUtils.PROXY_HOST)

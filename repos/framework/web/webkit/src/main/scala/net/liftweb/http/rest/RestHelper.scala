@@ -346,10 +346,11 @@ trait RestHelper extends LiftRules.DispatchPF {
               if (cvt.isDefinedAt((selType, resp, r)))
                 Full(cvt((selType, resp, r)))
               else
-                emptyToResp(ParamFailure("Unabled to convert the message",
-                                         Empty,
-                                         Empty,
-                                         500))
+                emptyToResp(
+                    ParamFailure("Unabled to convert the message",
+                                 Empty,
+                                 Empty,
+                                 500))
 
             case e: EmptyBox => emptyToResp(e)
           }
@@ -402,7 +403,8 @@ trait RestHelper extends LiftRules.DispatchPF {
     * The default way to convert a JsonXmlAble into JSON or XML
     */
   protected implicit lazy val convertJsonXmlAble: PartialFunction[
-      (JsonXmlSelect, JsonXmlAble, Req), LiftResponse] = {
+      (JsonXmlSelect, JsonXmlAble, Req),
+      LiftResponse] = {
     case (JsonSelect, obj, _) => Extraction.decompose(obj)
 
     case (XmlSelect, obj, _) =>
@@ -434,7 +436,8 @@ trait RestHelper extends LiftRules.DispatchPF {
     * JSON or XML
     */
   protected implicit lazy val convertAutoJsonXmlAble: PartialFunction[
-      (JsonXmlSelect, AutoJsonXmlAble, Req), LiftResponse] = {
+      (JsonXmlSelect, AutoJsonXmlAble, Req),
+      LiftResponse] = {
     case (JsonSelect, AutoJsonXmlAble(obj), _) =>
       Extraction.decompose(obj)
     case (XmlSelect, AutoJsonXmlAble(obj), _) =>
@@ -546,8 +549,7 @@ trait RestHelper extends LiftRules.DispatchPF {
       responseCreator: T => LiftResponse
   ): () => Box[LiftResponse] =
     () => {
-      RestContinuation.async(
-          reply => {
+      RestContinuation.async(reply => {
         asyncResolveProvider.resolveAsync(
             asyncContainer, { resolved =>
               reply(responseCreator(resolved))
@@ -566,13 +568,12 @@ trait RestHelper extends LiftRules.DispatchPF {
   protected implicit def asyncBoxToResponse[AsyncResolvableType, T](
       asyncBoxContainer: AsyncResolvableType
   )(
-      implicit asyncResolveProvider: CanResolveAsync[
-          AsyncResolvableType, Box[T]],
+      implicit asyncResolveProvider: CanResolveAsync[AsyncResolvableType,
+                                                     Box[T]],
       responseCreator: T => LiftResponse
   ): () => Box[LiftResponse] =
     () => {
-      RestContinuation.async(
-          reply => {
+      RestContinuation.async(reply => {
         asyncResolveProvider.resolveAsync(
             asyncBoxContainer, { resolvedBox =>
               boxToResp(resolvedBox).apply() openOr NotFoundResponse()
@@ -587,8 +588,8 @@ trait RestHelper extends LiftRules.DispatchPF {
     * messages from Failure() and return codes and messages
     * from ParamFailure[Int[(msg, _, _, code) 
     */
-  protected implicit def boxToResp[T](
-      in: Box[T])(implicit c: T => LiftResponse): () => Box[LiftResponse] =
+  protected implicit def boxToResp[T](in: Box[T])(
+      implicit c: T => LiftResponse): () => Box[LiftResponse] =
     in match {
       case Full(v) =>
         () =>

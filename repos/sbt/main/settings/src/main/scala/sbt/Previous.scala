@@ -14,7 +14,8 @@ import DefaultProtocol.{StringFormat, withStamp}
   * `referenced` provides the `Format` to use for each key.
   */
 private[sbt] final class Previous(
-    streams: Streams, referenced: IMap[ScopedTaskKey, Referenced]) {
+    streams: Streams,
+    referenced: IMap[ScopedTaskKey, Referenced]) {
   private[this] val map = referenced.mapValues(toValue)
   private[this] def toValue = new (Referenced ~> ReferencedValue) {
     def apply[T](x: Referenced[T]) = new ReferencedValue(x)
@@ -40,8 +41,8 @@ object Previous {
   private final val StreamName = "previous"
 
   /** Represents a reference task.previous*/
-  private[sbt] final class Referenced[T](
-      val task: ScopedKey[Task[T]], val format: Format[T]) {
+  private[sbt] final class Referenced[T](val task: ScopedKey[Task[T]],
+                                         val format: Format[T]) {
     lazy val stamped = withStamp(task.key.manifest.toString)(format)
     def setTask(newTask: ScopedKey[Task[T]]) = new Referenced(newTask, format)
   }
@@ -90,8 +91,9 @@ object Previous {
   private def read[T](stream: InputStream, format: Format[T]): Option[T] =
     try Some(format.reads(stream)) catch { case e: Exception => None }
 
-  private def write[T](
-      stream: OutputStream, format: Format[T], value: T): Unit =
+  private def write[T](stream: OutputStream,
+                       format: Format[T],
+                       value: T): Unit =
     try format.writes(stream, value) catch { case e: Exception => () }
 
   /** Public as a macro implementation detail.  Do not call directly. */
@@ -99,7 +101,7 @@ object Previous {
       implicit format: Format[T]): Initialize[Task[Option[T]]] = {
     val inputs =
       (cache in Global) zip Def.validated(skey, selfRefOk = true) zip
-      (references in Global)
+        (references in Global)
     inputs {
       case ((prevTask, resolved), refs) =>
         refs.recordReference(resolved, format) // always evaluated on project load

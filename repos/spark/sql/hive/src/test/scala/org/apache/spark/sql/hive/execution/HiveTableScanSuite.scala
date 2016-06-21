@@ -66,7 +66,8 @@ class HiveTableScanSuite extends HiveComparisonTest {
 
   test("Spark-4077: timestamp query for null value") {
     TestHive.sql("DROP TABLE IF EXISTS timestamp_query_null")
-    TestHive.sql("""
+    TestHive.sql(
+        """
         CREATE EXTERNAL TABLE timestamp_query_null (time TIMESTAMP,id INT)
         ROW FORMAT DELIMITED
         FIELDS TERMINATED BY ','
@@ -81,7 +82,8 @@ class HiveTableScanSuite extends HiveComparisonTest {
     assert(TestHive
           .sql("SELECT time from timestamp_query_null limit 2")
           .collect() === Array(
-            Row(java.sql.Timestamp.valueOf("2014-12-11 00:00:00")), Row(null)))
+            Row(java.sql.Timestamp.valueOf("2014-12-11 00:00:00")),
+            Row(null)))
     TestHive.sql("DROP TABLE timestamp_query_null")
   }
 

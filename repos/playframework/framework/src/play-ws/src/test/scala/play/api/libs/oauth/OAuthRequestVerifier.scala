@@ -90,8 +90,7 @@ object OAuthRequestVerifier {
         // If the body is form URL encoded, must include body parameters
         val collectedParamsWithBody = request.contentType match {
           case Some(formUrlEncoded)
-              if formUrlEncoded.startsWith(
-                  "application/x-www-form-urlencoded") =>
+              if formUrlEncoded.startsWith("application/x-www-form-urlencoded") =>
             val form =
               FormUrlEncodedParser.parse(body.utf8String).toSeq.flatMap {
                 case (key, values) => values.map(value => key -> value)
@@ -131,8 +130,8 @@ object OAuthRequestVerifier {
     val signingKey =
       s"${percentEncode(consumerSecret)}&${percentEncode(tokenSecret)}"
 
-    val keySpec = new SecretKeySpec(
-        signingKey.getBytes("US-ASCII"), "HmacSHA1")
+    val keySpec =
+      new SecretKeySpec(signingKey.getBytes("US-ASCII"), "HmacSHA1")
     val mac = Mac.getInstance("HmacSHA1")
     mac.init(keySpec)
     val signature = mac.doFinal(signatureBaseString.getBytes("US-ASCII"))

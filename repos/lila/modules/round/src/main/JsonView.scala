@@ -41,101 +41,102 @@ final class JsonView(chatApi: lila.chat.ChatApi,
       case (((socket, opponentUser), takebackable), chat) =>
         import pov._
         Json
-          .obj(
-              "game" -> gameJson(game, initialFen),
-              "clock" -> game.clock.map(clockJson),
-              "correspondence" -> game.correspondenceClock,
-              "player" -> Json
-                .obj(
-                    "id" -> playerId,
-                    "color" -> player.color.name,
-                    "version" -> socket.version,
-                    "spectator" -> false,
-                    "user" -> playerUser.map {
-                      userJsonView(_, game.perfType)
-                    },
-                    "rating" -> player.rating,
-                    "ratingDiff" -> player.ratingDiff,
-                    "provisional" -> player.provisional.option(true),
-                    "offeringRematch" -> player.isOfferingRematch.option(true),
-                    "offeringDraw" -> player.isOfferingDraw.option(true),
-                    "proposingTakeback" -> player.isProposingTakeback.option(
-                        true),
-                    "onGame" -> (player.isAi || socket.onGame(player.color)),
-                    "checks" -> checkCount(game, player.color),
-                    "hold" -> (withBlurs option hold(player)),
-                    "blurs" -> (withBlurs option blurs(game, player))
-                )
-                .noNull,
-              "opponent" -> Json
-                .obj(
-                    "color" -> opponent.color.name,
-                    "ai" -> opponent.aiLevel,
-                    "user" -> opponentUser.map {
-                      userJsonView(_, game.perfType)
-                    },
-                    "rating" -> opponent.rating,
-                    "ratingDiff" -> opponent.ratingDiff,
-                    "provisional" -> opponent.provisional.option(true),
-                    "offeringRematch" -> opponent.isOfferingRematch.option(
-                        true),
-                    "offeringDraw" -> opponent.isOfferingDraw.option(true),
-                    "proposingTakeback" -> opponent.isProposingTakeback.option(
-                        true),
-                    "onGame" ->
-                    (opponent.isAi || socket.onGame(opponent.color)),
-                    "isGone" ->
-                    (!opponent.isAi && socket.isGone(opponent.color)),
-                    "checks" -> checkCount(game, opponent.color),
-                    "hold" -> (withBlurs option hold(opponent)),
-                    "blurs" -> (withBlurs option blurs(game, opponent))
-                )
-                .noNull,
-              "url" -> Json.obj(
-                  "socket" -> s"/$fullId/socket/v$apiVersion",
-                  "round" -> s"/$fullId"
-              ),
-              "pref" -> Json.obj(
-                  "blindfold" -> pref.isBlindfold,
-                  "animationDuration" -> animationDuration(pov, pref),
-                  "highlight" -> (pref.highlight || pref.isBlindfold),
-                  "destination" -> (pref.destination && !pref.isBlindfold),
-                  "coords" -> pref.coords,
-                  "replay" -> pref.replay,
-                  "autoQueen" -> (pov.game.variant == chess.variant.Antichess)
-                    .fold(Pref.AutoQueen.NEVER, pref.autoQueen),
-                  "clockTenths" -> pref.clockTenths,
-                  "clockBar" -> pref.clockBar,
-                  "clockSound" -> pref.clockSound,
-                  "enablePremove" -> pref.premove,
-                  "showCaptured" -> pref.captured,
-                  "submitMove" -> {
-                    import Pref.SubmitMove._
-                    pref.submitMove match {
-                      case _ if game.hasAi => false
-                      case ALWAYS => true
-                      case CORRESPONDENCE_UNLIMITED if game.isCorrespondence =>
-                        true
-                      case CORRESPONDENCE_ONLY
-                          if game.hasCorrespondenceClock =>
-                        true
-                      case _ => false
-                    }
-                  },
-                  "confirmResign" ->
-                  (pref.confirmResign == Pref.ConfirmResign.YES).option(true)),
-              "chat" -> chat.map { c =>
-                JsArray(c.lines map {
-                  case lila.chat.UserLine(username, text, _) =>
-                    Json.obj("u" -> username, "t" -> text)
-                  case lila.chat.PlayerLine(color, text) =>
-                    Json.obj("c" -> color.name, "t" -> text)
-                })
-              },
-              "possibleMoves" -> possibleMoves(pov),
-              "possibleDrops" -> possibleDrops(pov),
-              "takebackable" -> takebackable,
-              "crazyhouse" -> pov.game.crazyData)
+          .obj("game" -> gameJson(game, initialFen),
+               "clock" -> game.clock.map(clockJson),
+               "correspondence" -> game.correspondenceClock,
+               "player" -> Json
+                 .obj(
+                     "id" -> playerId,
+                     "color" -> player.color.name,
+                     "version" -> socket.version,
+                     "spectator" -> false,
+                     "user" -> playerUser.map {
+                       userJsonView(_, game.perfType)
+                     },
+                     "rating" -> player.rating,
+                     "ratingDiff" -> player.ratingDiff,
+                     "provisional" -> player.provisional.option(true),
+                     "offeringRematch" -> player.isOfferingRematch.option(true),
+                     "offeringDraw" -> player.isOfferingDraw.option(true),
+                     "proposingTakeback" -> player.isProposingTakeback.option(
+                         true),
+                     "onGame" -> (player.isAi || socket.onGame(player.color)),
+                     "checks" -> checkCount(game, player.color),
+                     "hold" -> (withBlurs option hold(player)),
+                     "blurs" -> (withBlurs option blurs(game, player))
+                 )
+                 .noNull,
+               "opponent" -> Json
+                 .obj(
+                     "color" -> opponent.color.name,
+                     "ai" -> opponent.aiLevel,
+                     "user" -> opponentUser.map {
+                       userJsonView(_, game.perfType)
+                     },
+                     "rating" -> opponent.rating,
+                     "ratingDiff" -> opponent.ratingDiff,
+                     "provisional" -> opponent.provisional.option(true),
+                     "offeringRematch" -> opponent.isOfferingRematch.option(
+                         true),
+                     "offeringDraw" -> opponent.isOfferingDraw.option(true),
+                     "proposingTakeback" -> opponent.isProposingTakeback
+                       .option(true),
+                     "onGame" ->
+                       (opponent.isAi || socket.onGame(opponent.color)),
+                     "isGone" ->
+                       (!opponent.isAi && socket.isGone(opponent.color)),
+                     "checks" -> checkCount(game, opponent.color),
+                     "hold" -> (withBlurs option hold(opponent)),
+                     "blurs" -> (withBlurs option blurs(game, opponent))
+                 )
+                 .noNull,
+               "url" -> Json.obj(
+                   "socket" -> s"/$fullId/socket/v$apiVersion",
+                   "round" -> s"/$fullId"
+               ),
+               "pref" -> Json.obj(
+                   "blindfold" -> pref.isBlindfold,
+                   "animationDuration" -> animationDuration(pov, pref),
+                   "highlight" -> (pref.highlight || pref.isBlindfold),
+                   "destination" -> (pref.destination && !pref.isBlindfold),
+                   "coords" -> pref.coords,
+                   "replay" -> pref.replay,
+                   "autoQueen" -> (pov.game.variant == chess.variant.Antichess)
+                     .fold(Pref.AutoQueen.NEVER, pref.autoQueen),
+                   "clockTenths" -> pref.clockTenths,
+                   "clockBar" -> pref.clockBar,
+                   "clockSound" -> pref.clockSound,
+                   "enablePremove" -> pref.premove,
+                   "showCaptured" -> pref.captured,
+                   "submitMove" -> {
+                     import Pref.SubmitMove._
+                     pref.submitMove match {
+                       case _ if game.hasAi => false
+                       case ALWAYS => true
+                       case CORRESPONDENCE_UNLIMITED
+                           if game.isCorrespondence =>
+                         true
+                       case CORRESPONDENCE_ONLY
+                           if game.hasCorrespondenceClock =>
+                         true
+                       case _ => false
+                     }
+                   },
+                   "confirmResign" ->
+                     (pref.confirmResign == Pref.ConfirmResign.YES)
+                       .option(true)),
+               "chat" -> chat.map { c =>
+                 JsArray(c.lines map {
+                   case lila.chat.UserLine(username, text, _) =>
+                     Json.obj("u" -> username, "t" -> text)
+                   case lila.chat.PlayerLine(color, text) =>
+                     Json.obj("c" -> color.name, "t" -> text)
+                 })
+               },
+               "possibleMoves" -> possibleMoves(pov),
+               "possibleDrops" -> possibleDrops(pov),
+               "takebackable" -> takebackable,
+               "crazyhouse" -> pov.game.crazyData)
           .noNull
     }
 
@@ -192,7 +193,7 @@ final class JsonView(chatApi: lila.chat.ChatApi,
                     "ratingDiff" -> opponent.ratingDiff,
                     "provisional" -> opponent.provisional.option(true),
                     "onGame" ->
-                    (opponent.isAi || socket.onGame(opponent.color)),
+                      (opponent.isAi || socket.onGame(opponent.color)),
                     "checks" -> checkCount(game, opponent.color),
                     "berserk" -> opponent.berserk.option(true),
                     "hold" -> (withBlurs option hold(opponent)),
@@ -226,8 +227,10 @@ final class JsonView(chatApi: lila.chat.ChatApi,
           .noNull
     }
 
-  def userAnalysisJson(
-      pov: Pov, pref: Pref, orientation: chess.Color, owner: Boolean) =
+  def userAnalysisJson(pov: Pov,
+                       pref: Pref,
+                       orientation: chess.Color,
+                       owner: Boolean) =
     (pov.game.pgnMoves.nonEmpty ?? GameRepo.initialFen(pov.game)) map {
       initialFen =>
         import pov._
@@ -301,13 +304,15 @@ final class JsonView(chatApi: lila.chat.ChatApi,
   }
 
   private def getPlayerChat(
-      game: Game, forUser: Option[User]): Fu[Option[lila.chat.MixedChat]] =
+      game: Game,
+      forUser: Option[User]): Fu[Option[lila.chat.MixedChat]] =
     game.hasChat optionFu {
       chatApi.playerChat find game.id map (_ forUser forUser)
     }
 
   private def getWatcherChat(
-      game: Game, forUser: Option[User]): Fu[Option[lila.chat.UserChat]] =
+      game: Game,
+      forUser: Option[User]): Fu[Option[lila.chat.UserChat]] =
     forUser ?? { user =>
       chatApi.userChat find s"${game.id}/w" map (_ forUser user.some) map
       (_.some)
@@ -345,10 +350,11 @@ final class JsonView(chatApi: lila.chat.ChatApi,
   private def animationDuration(pov: Pov, pref: Pref) = math.round {
     animationFactor(pref) * baseAnimationDuration.toMillis * pov.game.finished
       .fold(
-        1,
-        math.max(0,
-                 math.min(1.2, ((pov.game.estimateTotalTime - 60) / 60) * 0.2))
-    )
+          1,
+          math.max(0,
+                   math.min(1.2,
+                            ((pov.game.estimateTotalTime - 60) / 60) * 0.2))
+      )
   }
 }
 

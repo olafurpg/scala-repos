@@ -45,8 +45,11 @@ private[deploy] object CommandUtils extends Logging {
       substituteArguments: String => String,
       classPaths: Seq[String] = Seq[String](),
       env: Map[String, String] = sys.env): ProcessBuilder = {
-    val localCommand = buildLocalCommand(
-        command, securityMgr, substituteArguments, classPaths, env)
+    val localCommand = buildLocalCommand(command,
+                                         securityMgr,
+                                         substituteArguments,
+                                         classPaths,
+                                         env)
     val commandSeq = buildCommandSeq(localCommand, memory, sparkHome)
     val builder = new ProcessBuilder(commandSeq: _*)
     val environment = builder.environment()
@@ -56,8 +59,9 @@ private[deploy] object CommandUtils extends Logging {
     builder
   }
 
-  private def buildCommandSeq(
-      command: Command, memory: Int, sparkHome: String): Seq[String] = {
+  private def buildCommandSeq(command: Command,
+                              memory: Int,
+                              sparkHome: String): Seq[String] = {
     // SPARK-698: do not call the run.cmd script, as process.destroy()
     // fails to kill a process tree on Windows
     val cmd =
@@ -92,7 +96,7 @@ private[deploy] object CommandUtils extends Logging {
     // set auth secret to env variable if needed
     if (securityMgr.isAuthenticationEnabled) {
       newEnvironment +=
-        (SecurityManager.ENV_AUTH_SECRET -> securityMgr.getSecretKey)
+      (SecurityManager.ENV_AUTH_SECRET -> securityMgr.getSecretKey)
     }
 
     Command(

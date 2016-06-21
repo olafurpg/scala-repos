@@ -48,7 +48,7 @@ object FPGrowthExample {
         .action((x, c) => c.copy(numPartition = x))
       arg[String]("<input>")
         .text("input paths to input data set, whose file format is that each line " +
-            "contains a transaction with each item in String and separated by a space")
+              "contains a transaction with each item in String and separated by a space")
         .required()
         .action((x, c) => c.copy(input = x))
     }

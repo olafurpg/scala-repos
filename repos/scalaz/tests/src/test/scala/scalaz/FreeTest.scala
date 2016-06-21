@@ -109,8 +109,8 @@ object FreeOption {
 }
 
 object FreeTest extends SpecLite {
-  def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(
-      implicit A: Arbitrary[A]): Gen[Free[F, A]] =
+  def freeGen[F[_], A](
+      g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
     Gen.frequency(
         (1, Functor[Arbitrary].map(A)(Free.pure[F, A](_)).arbitrary),
         (1, Functor[Arbitrary].map(Arbitrary(g))(Free[F, A](_)).arbitrary)

@@ -153,23 +153,22 @@ class HistoryServerSuite
         // the REST API returns the last modified time of EVENT LOG file for this field.
         // It is not applicable to hard-code this dynamic field in a static expected file,
         // so here we skip checking the lastUpdated field's value (setting it as "").
-        val json =
-          if (jsonOrg.indexOf("lastUpdated") >= 0) {
-            val subStrings = jsonOrg.split(",")
-            for (i <- subStrings.indices) {
-              if (subStrings(i).indexOf("lastUpdated") >= 0) {
-                subStrings(i) = "\"lastUpdated\":\"\""
-              }
+        val json = if (jsonOrg.indexOf("lastUpdated") >= 0) {
+          val subStrings = jsonOrg.split(",")
+          for (i <- subStrings.indices) {
+            if (subStrings(i).indexOf("lastUpdated") >= 0) {
+              subStrings(i) = "\"lastUpdated\":\"\""
             }
-            subStrings.mkString(",")
-          } else {
-            jsonOrg
           }
+          subStrings.mkString(",")
+        } else {
+          jsonOrg
+        }
 
         val exp = IOUtils.toString(new FileInputStream(
                 new File(expRoot,
                          HistoryServerSuite.sanitizePath(name) +
-                         "_expectation.json")))
+                           "_expectation.json")))
         // compare the ASTs so formatting differences don't cause failures
         import org.json4s._
         import org.json4s.jackson.JsonMethods._
@@ -220,8 +219,8 @@ class HistoryServerSuite
           new File(logDir, entry.getName)
         }
         val expected = Files.toString(expectedFile, StandardCharsets.UTF_8)
-        val actual = new String(
-            ByteStreams.toByteArray(zipStream), StandardCharsets.UTF_8)
+        val actual = new String(ByteStreams.toByteArray(zipStream),
+                                StandardCharsets.UTF_8)
         actual should be(expected)
         filesCompared += 1
       }
@@ -256,7 +255,7 @@ class HistoryServerSuite
     badQuantiles._1 should be(HttpServletResponse.SC_BAD_REQUEST)
     badQuantiles._3 should be(
         Some("Bad value for parameter \"quantiles\".  Expected a double, " +
-            "got \"foo\""))
+              "got \"foo\""))
 
     getContentAndCode("foobar")._1 should be(HttpServletResponse.SC_NOT_FOUND)
   }
@@ -271,8 +270,8 @@ class HistoryServerSuite
     // when
     System.setProperty("spark.ui.proxyBase", uiRoot)
     val response = page.render(request)
-    System.setProperty(
-        "spark.ui.proxyBase", Option(proxyBaseBeforeTest).getOrElse(""))
+    System.setProperty("spark.ui.proxyBase",
+                       Option(proxyBaseBeforeTest).getOrElse(""))
 
     // then
     val urls = response \\ "@href" map (_.toString)
@@ -337,7 +336,7 @@ class HistoryServerSuite
       if (actual != expected) {
         // this is here because Scalatest loses stack depth
         fail(s"Wrong $name value - expected $expected but got $actual" +
-            s" in metrics\n$metrics")
+              s" in metrics\n$metrics")
       }
     }
 
@@ -429,8 +428,8 @@ class HistoryServerSuite
     getNumJobs("") should be(1)
     getNumJobs("/jobs") should be(1)
     getNumJobsRestful() should be(1)
-    assert(
-        metrics.lookupCount.getCount > 1, s"lookup count too low in $metrics")
+    assert(metrics.lookupCount.getCount > 1,
+           s"lookup count too low in $metrics")
 
     // dump state before the next bit of test, which is where update
     // checking really gets stressed
@@ -485,9 +484,9 @@ class HistoryServerSuite
     logDir.deleteOnExit();
   }
 
-  def getContentAndCode(path: String,
-                        port: Int =
-                          port): (Int, Option[String], Option[String]) = {
+  def getContentAndCode(
+      path: String,
+      port: Int = port): (Int, Option[String], Option[String]) = {
     HistoryServerSuite.getContentAndCode(
         new URL(s"http://localhost:$port/api/v1/$path"))
   }
@@ -503,7 +502,8 @@ class HistoryServerSuite
   def generateExpectation(name: String, path: String): Unit = {
     val json = getUrl(path)
     val file = new File(
-        expRoot, HistoryServerSuite.sanitizePath(name) + "_expectation.json")
+        expRoot,
+        HistoryServerSuite.sanitizePath(name) + "_expectation.json")
     val out = new FileWriter(file)
     out.write(json)
     out.close()
@@ -567,7 +567,7 @@ object HistoryServerSuite {
     } else {
       throw new RuntimeException(
           "got code: " + code + " when getting " + path + " w/ error: " +
-          error)
+            error)
     }
   }
 }

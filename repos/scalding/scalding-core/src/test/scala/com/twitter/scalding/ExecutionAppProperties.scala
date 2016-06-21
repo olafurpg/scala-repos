@@ -26,8 +26,8 @@ object ExecutionAppProperties extends Properties("ExecutionApp Properties") {
                  resultingNonHadoop: NonHadoopArgs): Unit = {
     val errorMsg =
       "Input Args: " + inputArgs.map("\"" + _ + "\"").mkString(",") + "\n" +
-      "Hadoop Args: " + resultingHadoop.toArray.mkString(",") + "\n" +
-      "Non-Hadoop Args: " + resultingNonHadoop.toArray.mkString(",") + "\n"
+        "Hadoop Args: " + resultingHadoop.toArray.mkString(",") + "\n" +
+        "Non-Hadoop Args: " + resultingNonHadoop.toArray.mkString(",") + "\n"
     sys.error(errorMsg)
   }
 
@@ -50,8 +50,8 @@ object ExecutionAppProperties extends Properties("ExecutionApp Properties") {
         ExecutionApp.extractUserHadoopArgs(totalArgStr)
       val res =
         (!hadoopArgs.toArray.isEmpty) &&
-        (nonHadoop.toArray.sameElements(leftArgs ++ rightArgs)) &&
-        (inputHadoopArgs.sameElements(hadoopArgs.toArray))
+          (nonHadoop.toArray.sameElements(leftArgs ++ rightArgs)) &&
+          (inputHadoopArgs.sameElements(hadoopArgs.toArray))
       if (!res) debugPrint(totalArgStr, hadoopArgs, nonHadoop)
       res
     }
@@ -64,8 +64,8 @@ object ExecutionAppProperties extends Properties("ExecutionApp Properties") {
         ExecutionApp.extractUserHadoopArgs(totalArgStr)
       val res =
         (!hadoopArgs.toArray.isEmpty) &&
-        (nonHadoop.toArray.sameElements(leftArgs ++ rightArgs)) &&
-        (inputHadoopArgs.sameElements(hadoopArgs.toArray))
+          (nonHadoop.toArray.sameElements(leftArgs ++ rightArgs)) &&
+          (inputHadoopArgs.sameElements(hadoopArgs.toArray))
       if (!res) debugPrint(totalArgStr, hadoopArgs, nonHadoop)
       res
     }

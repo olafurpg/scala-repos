@@ -17,8 +17,8 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
 
   override def getID: String = "ScalaSyntacticSugar"
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     if (!holder.getFile.isInstanceOf[ScalaFile])
       return new PsiElementVisitor {}
 
@@ -45,7 +45,7 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
                       referredElement match {
                         case Some(QualifiedName(FunctionN(n)))
                             if te.typeArgList.typeArgs.length == (n.toInt +
-                                1) =>
+                                  1) =>
                           holder.registerProblem(
                               holder.getManager.createProblemDescriptor(
                                   te,
@@ -55,7 +55,7 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
                                   false))
                         case Some(QualifiedName(TupleN(n)))
                             if (te.typeArgList.typeArgs.length == n.toInt) &&
-                            n.toInt != 1 =>
+                              n.toInt != 1 =>
                           holder.registerProblem(
                               holder.getManager.createProblemDescriptor(
                                   te,
@@ -86,7 +86,8 @@ object FunctionTupleSyntacticSugarInspection {
 
   class TupleTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
       extends AbstractFixOnPsiElement(
-          ScalaBundle.message("replace.tuple.type"), te) {
+          ScalaBundle.message("replace.tuple.type"),
+          te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
 
@@ -99,14 +100,14 @@ object FunctionTupleSyntacticSugarInspection {
         ("(" + typeElement.typeArgList.getText.drop(1).dropRight(1) + ")")
           .parenthesisedIf(needParens)
       }
-      typeElement.replace(createTypeElementFromText(
-              typeTextWithParens, typeElement.getManager))
+      typeElement.replace(createTypeElementFromText(typeTextWithParens,
+                                                    typeElement.getManager))
     }
   }
 
   class FunctionTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
-      extends AbstractFixOnPsiElement(
-          ScalaBundle.message("replace.fun.type"), te) {
+      extends AbstractFixOnPsiElement(ScalaBundle.message("replace.fun.type"),
+                                      te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
       val paramTypes = typeElement.typeArgList.typeArgs.dropRight(1)
@@ -134,8 +135,8 @@ object FunctionTupleSyntacticSugarInspection {
         s"(${elemsInParamTypes.map(_.getText).mkString}) $arrow $returnTypeTextWithParens"
           .parenthesisedIf(needParens)
       }
-      typeElement.replace(createTypeElementFromText(
-              typeTextWithParens, typeElement.getManager))
+      typeElement.replace(createTypeElementFromText(typeTextWithParens,
+                                                    typeElement.getManager))
     }
   }
 }

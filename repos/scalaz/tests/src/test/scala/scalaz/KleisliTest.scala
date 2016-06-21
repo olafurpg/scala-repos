@@ -34,7 +34,7 @@ object KleisliTest extends SpecLite {
 
   "mapK" ! forAll { (f: Int => Option[Int], a: Int) =>
     Kleisli(f).mapK(_.toList.map(_.toString)).run(a) must_===
-      (f(a).toList.map(_.toString))
+    (f(a).toList.map(_.toString))
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
@@ -186,12 +186,12 @@ object KleisliTest extends SpecLite {
 
     "catch ambient exceptions (1/2)" in {
       C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO must_==
-        -\/(err)
+      -\/(err)
     }
 
     "catch ambient exceptions (2/2)" in {
       C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO must_==
-        -\/(err)
+      -\/(err)
     }
 
     "properly handle success" in {

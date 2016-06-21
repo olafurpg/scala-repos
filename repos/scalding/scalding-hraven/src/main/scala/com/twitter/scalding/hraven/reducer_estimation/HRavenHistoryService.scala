@@ -26,11 +26,11 @@ object HRavenClient {
   def apply(conf: JobConf): Try[HRavenRestClient] =
     conf
       .getFirstKey(apiHostnameKey)
-      .map(new HRavenRestClient(
-              _,
-              conf.getInt(
-                  clientConnectTimeoutKey, clientConnectTimeoutDefault),
-              conf.getInt(clientReadTimeoutKey, clientReadTimeoutDefault)))
+      .map(new HRavenRestClient(_,
+                                conf.getInt(clientConnectTimeoutKey,
+                                            clientConnectTimeoutDefault),
+                                conf.getInt(clientReadTimeoutKey,
+                                            clientReadTimeoutDefault)))
 }
 
 /**
@@ -44,8 +44,8 @@ object HRavenHistoryService extends HistoryService {
   // List of fields that we consume from fetchTaskDetails api.
   // This is sent to hraven service to filter the response data
   // and avoid hitting http content length limit on hraven side.
-  private val TaskDetailFields = List(
-      "taskType", "status", "startTime", "finishTime").asJava
+  private val TaskDetailFields =
+    List("taskType", "status", "startTime", "finishTime").asJava
 
   val RequiredJobConfigs = Seq("cascading.flow.step.num")
 
@@ -114,7 +114,7 @@ object HRavenHistoryService extends HistoryService {
           flows.asScala.filter(_.getHdfsBytesRead > 0).take(max)
         if (successfulFlows.isEmpty) {
           LOG.warn("Unable to find any successful flows in the last " +
-              nFetch + " jobs.")
+                nFetch + " jobs.")
         }
         successfulFlows
       }
@@ -133,8 +133,8 @@ object HRavenHistoryService extends HistoryService {
     * @param step  FlowStep to get info for
     * @return      Details about the previous successful run.
     */
-  def fetchPastJobDetails(
-      step: FlowStep[JobConf], max: Int): Try[Seq[JobDetails]] = {
+  def fetchPastJobDetails(step: FlowStep[JobConf],
+                          max: Int): Try[Seq[JobDetails]] = {
     val conf = step.getConfig
     val stepNum = step.getStepNum
 
@@ -176,8 +176,13 @@ object HRavenHistoryService extends HistoryService {
       signature <- conf.getFirstKey("scalding.flow.class.signature")
 
       // query hRaven for matching flows
-      flows <- fetchSuccessfulFlows(
-                  client, cluster, user, batch, signature, max, conf.maxFetch)
+      flows <- fetchSuccessfulFlows(client,
+                                    cluster,
+                                    user,
+                                    batch,
+                                    signature,
+                                    max,
+                                    conf.maxFetch)
     } yield flows
 
     // Find the FlowStep in the hRaven flow that corresponds to the current step
@@ -185,8 +190,8 @@ object HRavenHistoryService extends HistoryService {
     flowsTry.map(flows => flows.flatMap(findMatchingJobStep))
   }
 
-  override def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  override def fetchHistory(info: FlowStrategyInfo,
+                            maxHistory: Int): Try[Seq[FlowStepHistory]] =
     fetchPastJobDetails(info.step, maxHistory).map { history =>
       for {
         step <- history
@@ -203,8 +208,9 @@ object HRavenHistoryService extends HistoryService {
       } yield toFlowStepHistory(keys, step, tasks)
     }
 
-  private def toFlowStepHistory(
-      keys: FlowStepKeys, step: JobDetails, tasks: Seq[Task]) =
+  private def toFlowStepHistory(keys: FlowStepKeys,
+                                step: JobDetails,
+                                tasks: Seq[Task]) =
     FlowStepHistory(keys = keys,
                     submitTime = step.getSubmitTime,
                     launchTime = step.getLaunchTime,

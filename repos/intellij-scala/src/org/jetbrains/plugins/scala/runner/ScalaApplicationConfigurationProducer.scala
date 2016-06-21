@@ -78,8 +78,8 @@ abstract class BaseScalaApplicationConfigurationProducer[
 
   private var myPsiElement: PsiElement = null
 
-  private def hasClassAncestorWithName(
-      _element: PsiElement, name: String): Boolean = {
+  private def hasClassAncestorWithName(_element: PsiElement,
+                                       name: String): Boolean = {
     def isConfigClassWithName(clazz: PsiClass) = clazz match {
       case clazz: PsiClassWrapper if clazz.getQualifiedName == name => true
       case o: ScObject
@@ -101,12 +101,14 @@ abstract class BaseScalaApplicationConfigurationProducer[
   }
 
   override def isConfigurationFromContext(
-      configuration: T, context: ConfigurationContext): Boolean = {
+      configuration: T,
+      context: ConfigurationContext): Boolean = {
     val location = context.getLocation
     if (location == null) return false
     //use fast psi location check to filter off obvious candidates
     if (context.getPsiLocation == null || !hasClassAncestorWithName(
-            context.getPsiLocation, configuration.MAIN_CLASS_NAME))
+            context.getPsiLocation,
+            configuration.MAIN_CLASS_NAME))
       return false
     val aClass: PsiClass = getMainClass(context.getPsiLocation)
     if (aClass == null) return false
@@ -199,8 +201,8 @@ object ScalaApplicationConfigurationProducer {
             f.containingClass match {
               case o: ScObject =>
                 for {
-                  wrapper <- f.getFunctionWrappers(
-                                  isStatic = true, isInterface = false)
+                  wrapper <- f.getFunctionWrappers(isStatic = true,
+                                                   isInterface = false)
                               .headOption
                   if PsiMethodUtil.isMainMethod(wrapper)
                 } yield wrapper

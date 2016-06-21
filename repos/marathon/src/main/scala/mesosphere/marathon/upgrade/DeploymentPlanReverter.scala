@@ -69,8 +69,9 @@ private[upgrade] object DeploymentPlanReverter {
   //TODO: fix style issue and enable this scalastyle check
   //scalastyle:off cyclomatic.complexity method.length
   private[this] def revertGroupChanges(
-      version: Timestamp, groupChanges: Seq[(Option[Group], Option[Group])])(
-      group: Group): Group = {
+      version: Timestamp,
+      groupChanges: Seq[(Option[Group],
+                         Option[Group])])(group: Group): Group = {
 
     def revertGroupRemoval(oldGroup: Group)(existingGroup: Group): Group = {
       log.debug("re-adding group {} with dependencies {}",
@@ -92,8 +93,8 @@ private[upgrade] object DeploymentPlanReverter {
         if (log.isDebugEnabled)
           log.debug(
               s"revert dependency changes in group ${oldGroup.id}, " +
-              s"readding removed {${removedDependencies.mkString(", ")}}, " +
-              s"removing added {${addedDependencies.mkString(", ")}}")
+                s"readding removed {${removedDependencies.mkString(", ")}}, " +
+                s"removing added {${addedDependencies.mkString(", ")}}")
 
         group.copy(dependencies =
               group.dependencies ++ removedDependencies -- addedDependencies)
@@ -114,7 +115,7 @@ private[upgrade] object DeploymentPlanReverter {
         group.withNormalizedVersion.withoutChildren
       def isGroupUnchanged(group: Group): Boolean =
         !group.containsAppsOrGroups &&
-        normalized(group) == normalized(newGroup)
+          normalized(group) == normalized(newGroup)
 
       result.group(newGroup.id) match {
         case Some(unchanged) if isGroupUnchanged(unchanged) =>
@@ -124,7 +125,7 @@ private[upgrade] object DeploymentPlanReverter {
           // group dependencies have changed
           if (log.isDebugEnabled)
             log.debug(s"group ${newGroup.id} has changed. " +
-                s"Removed added dependencies ${newGroup.dependencies.mkString(", ")}")
+                  s"Removed added dependencies ${newGroup.dependencies.mkString(", ")}")
           result.update(newGroup.id,
                         group =>
                           group.copy(dependencies =
@@ -190,8 +191,9 @@ private[upgrade] object DeploymentPlanReverter {
             result.updateApp(oldApp.id, _ => oldApp, version)
           case (None, Some(newApp)) =>
             log.debug("remove app definition {}", newApp.id)
-            result.update(
-                newApp.id.parent, _.removeApplication(newApp.id), version)
+            result.update(newApp.id.parent,
+                          _.removeApplication(newApp.id),
+                          version)
           case (None, None) =>
             log.warn("processing unexpected NOOP in app changes")
             result

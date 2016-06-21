@@ -29,8 +29,7 @@ private trait LeastLoaded[Req, Rep] { self: Balancer[Req, Rep] =>
       counter.incrementAndGet()
       super.apply(conn).transform {
         case Return(svc) =>
-          Future.value(
-              new ServiceProxy(svc) {
+          Future.value(new ServiceProxy(svc) {
             override def close(deadline: Time) =
               super.close(deadline).ensure {
                 counter.decrementAndGet()
@@ -44,8 +43,8 @@ private trait LeastLoaded[Req, Rep] { self: Balancer[Req, Rep] =>
     }
   }
 
-  protected def newNode(
-      factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver) =
+  protected def newNode(factory: ServiceFactory[Req, Rep],
+                        statsReceiver: StatsReceiver) =
     Node(factory, new AtomicInteger(0), rng.nextInt())
 
   private[this] val failingLoad = new AtomicInteger(0)

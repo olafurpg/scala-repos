@@ -1,6 +1,6 @@
 object Naturals {
   trait NAT {
-    type a [s[_ <: NAT] <: NAT, z <: NAT] <: NAT
+    type a[s[_ <: NAT] <: NAT, z <: NAT] <: NAT
     type v = a[SUCC, ZERO]
   }
   final class ZERO extends NAT {

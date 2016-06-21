@@ -11,8 +11,8 @@ import org.jetbrains.plugins.scala.util.IntentionUtils
   * @since 5/10/12
   */
 class NameBooleanParametersQuickFix(element: ScLiteral)
-    extends AbstractFixOnPsiElement(
-        ScalaBundle.message("name.boolean.params"), element) {
+    extends AbstractFixOnPsiElement(ScalaBundle.message("name.boolean.params"),
+                                    element) {
 
   def doApplyFix(project: Project) {
     val elem = getElement

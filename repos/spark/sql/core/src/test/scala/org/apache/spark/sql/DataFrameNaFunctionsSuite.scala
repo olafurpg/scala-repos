@@ -92,10 +92,14 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
     val input = createDF()
 
     val fillNumeric = input.na.fill(50.6)
-    checkAnswer(fillNumeric,
-                Row("Bob", 16, 176.5) :: Row("Alice", 50, 164.3) :: Row(
-                    "David", 60, 50.6) :: Row("Nina", 25, 50.6) :: Row(
-                    "Amy", 50, 50.6) :: Row(null, 50, 50.6) :: Nil)
+    checkAnswer(
+        fillNumeric,
+        Row("Bob", 16, 176.5) :: Row("Alice", 50, 164.3) :: Row("David",
+                                                                60,
+                                                                50.6) :: Row(
+            "Nina",
+            25,
+            50.6) :: Row("Amy", 50, 50.6) :: Row(null, 50, 50.6) :: Nil)
 
     // Make sure the columns are properly named.
     assert(fillNumeric.columns.toSeq === input.columns.toSeq)
@@ -109,7 +113,8 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
     // fill double with subset columns
     checkAnswer(input.na.fill(50.6, "age" :: Nil).select("name", "age"),
                 Row("Bob", 16) :: Row("Alice", 50) :: Row("David", 60) :: Row(
-                    "Nina", 25) :: Row("Amy", 50) :: Row(null, 50) :: Nil)
+                    "Nina",
+                    25) :: Row("Amy", 50) :: Row(null, 50) :: Nil)
 
     // fill string with subset columns
     checkAnswer(Seq[(String, String)]((null, null))

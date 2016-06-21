@@ -121,8 +121,8 @@ class Queue[A]
     }
   }
 
-  private def removeAllFromList(
-      p: A => Boolean, res: ArrayBuffer[A]): ArrayBuffer[A] = {
+  private def removeAllFromList(p: A => Boolean,
+                                res: ArrayBuffer[A]): ArrayBuffer[A] = {
     var leftlst = first0
     while (leftlst.next.nonEmpty) {
       if (p(leftlst.next.elem)) {
@@ -141,8 +141,8 @@ class Queue[A]
   @deprecated(
       "extractFirst inappropriately exposes implementation details.  Use dequeue or dequeueAll.",
       "2.11.0")
-  def extractFirst(
-      start: LinkedList[A], p: A => Boolean): Option[LinkedList[A]] = {
+  def extractFirst(start: LinkedList[A],
+                   p: A => Boolean): Option[LinkedList[A]] = {
     if (isEmpty) None
     else {
       var cell = start

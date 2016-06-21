@@ -37,13 +37,14 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     ctx.setName(system.name)
     ctx.setStreamCaching(settings.StreamingCache)
     ctx.addComponent("akka", new ActorComponent(this, system))
-    ctx.getTypeConverterRegistry.addTypeConverter(
-        classOf[FiniteDuration], classOf[String], DurationTypeConverter)
+    ctx.getTypeConverterRegistry.addTypeConverter(classOf[FiniteDuration],
+                                                  classOf[String],
+                                                  DurationTypeConverter)
     ctx
   }
 
-  val settings = new CamelSettings(
-      system.settings.config, system.dynamicAccess)
+  val settings =
+    new CamelSettings(system.settings.config, system.dynamicAccess)
 
   lazy val template: ProducerTemplate = context.createProducerTemplate()
 
@@ -89,9 +90,9 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     * @param endpoint the endpoint to be activated
     * @param timeout the timeout for the Future
     */
-  def activationFutureFor(
-      endpoint: ActorRef)(implicit timeout: Timeout,
-                          executor: ExecutionContext): Future[ActorRef] =
+  def activationFutureFor(endpoint: ActorRef)(
+      implicit timeout: Timeout,
+      executor: ExecutionContext): Future[ActorRef] =
     (supervisor
       .ask(AwaitActivation(endpoint))(timeout))
       .map[ActorRef]({
@@ -106,9 +107,9 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     * @param endpoint the endpoint to be deactivated
     * @param timeout the timeout of the Future
     */
-  def deactivationFutureFor(
-      endpoint: ActorRef)(implicit timeout: Timeout,
-                          executor: ExecutionContext): Future[ActorRef] =
+  def deactivationFutureFor(endpoint: ActorRef)(
+      implicit timeout: Timeout,
+      executor: ExecutionContext): Future[ActorRef] =
     (supervisor
       .ask(AwaitDeActivation(endpoint))(timeout))
       .map[ActorRef]({

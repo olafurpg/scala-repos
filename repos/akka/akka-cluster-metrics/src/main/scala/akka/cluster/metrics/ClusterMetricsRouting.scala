@@ -34,7 +34,8 @@ import akka.cluster.routing.ClusterRouterSettingsBase
   *   on remaining capacity as indicated by the node metrics
   */
 final case class AdaptiveLoadBalancingRoutingLogic(
-    system: ActorSystem, metricsSelector: MetricsSelector = MixMetricsSelector)
+    system: ActorSystem,
+    metricsSelector: MetricsSelector = MixMetricsSelector)
     extends RoutingLogic
     with NoSerializationVerificationNeeded {
 
@@ -58,12 +59,13 @@ final case class AdaptiveLoadBalancingRoutingLogic(
                             metricsSelector.weights(event.nodeMetrics)))
     // retry when CAS failure
     if (!weightedRouteesRef.compareAndSet(
-            oldValue, (routees, event.nodeMetrics, weightedRoutees)))
+            oldValue,
+            (routees, event.nodeMetrics, weightedRoutees)))
       metricsChanged(event)
   }
 
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else {
 
@@ -77,8 +79,8 @@ final case class AdaptiveLoadBalancingRoutingLogic(
                                   cluster.selfAddress,
                                   metricsSelector.weights(oldMetrics)))
           // ignore, don't update, in case of CAS failure
-          weightedRouteesRef.compareAndSet(
-              oldValue, (routees, oldMetrics, weightedRoutees))
+          weightedRouteesRef
+            .compareAndSet(oldValue, (routees, oldMetrics, weightedRoutees))
           weightedRoutees
         } else oldWeightedRoutees
       }
@@ -424,8 +426,8 @@ object MetricsSelector {
             case exception ⇒
               throw new IllegalArgumentException(
                   (s"Cannot instantiate metrics-selector [$fqn], " +
-                      "make sure it extends [akka.cluster.routing.MetricsSelector] and " +
-                      "has constructor with [com.typesafe.config.Config] parameter"),
+                        "make sure it extends [akka.cluster.routing.MetricsSelector] and " +
+                        "has constructor with [com.typesafe.config.Config] parameter"),
                   exception)
           })
           .get
@@ -511,8 +513,7 @@ private[metrics] class WeightedRoutees(routees: immutable.IndexedSeq[Routee],
     val buckets = Array.ofDim[Int](routees.size)
     val meanWeight =
       if (weights.isEmpty) 1 else weights.values.sum / weights.size
-    val w =
-      weights.withDefaultValue(meanWeight) // we don’t necessarily have metrics for all addresses
+    val w = weights.withDefaultValue(meanWeight) // we don’t necessarily have metrics for all addresses
     var i = 0
     var sum = 0
     routees foreach { r ⇒
@@ -550,8 +551,8 @@ private[metrics] class WeightedRoutees(routees: immutable.IndexedSeq[Routee],
       val j = math.abs(i + 1)
       if (j >= buckets.length)
         throw new IndexOutOfBoundsException(
-            "Requested index [%s] is > max index [%s]".format(
-                i, buckets.length))
+            "Requested index [%s] is > max index [%s]".format(i,
+                                                              buckets.length))
       else j
     }
   }

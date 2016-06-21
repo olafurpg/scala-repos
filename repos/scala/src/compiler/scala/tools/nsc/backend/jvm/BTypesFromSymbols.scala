@@ -139,14 +139,14 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     assert(methodSymbol.isMethod, s"not a method-symbol: $methodSymbol")
     methodBTypeFromMethodType(methodSymbol.info,
                               methodSymbol.isClassConstructor ||
-                              methodSymbol.isConstructor)
+                                methodSymbol.isConstructor)
   }
 
   /**
     * Builds a [[MethodBType]] for a method type.
     */
-  final def methodBTypeFromMethodType(
-      tpe: Type, isConstructor: Boolean): MethodBType = {
+  final def methodBTypeFromMethodType(tpe: Type,
+                                      isConstructor: Boolean): MethodBType = {
     val resultType: BType =
       if (isConstructor) UNIT
       else typeToBType(tpe.resultType)
@@ -164,7 +164,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       reporter.error(
           pos,
           "Unable to convert static argument of ApplyDynamic into a classfile constant: " +
-          t); null
+            t); null
   }
 
   def staticHandleFromSymbol(sym: Symbol): asm.Handle = {
@@ -241,7 +241,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         currentUnit.warning(
             tp.typeSymbol.pos,
             s"an unexpected type representation reached the compiler backend while compiling $currentUnit: $tp. " +
-            "If possible, please file a bug on issues.scala-lang.org.")
+              "If possible, please file a bug on issues.scala-lang.org.")
 
         tp match {
           case ThisType(ArrayClass) =>
@@ -286,7 +286,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       if (classSym.hasJavaAnnotationFlag)
         parents.filterNot(c =>
               c.typeSymbol == ClassfileAnnotationClass ||
-              c.typeSymbol == AnnotationClass)
+                c.typeSymbol == AnnotationClass)
       else parents
     }
 
@@ -331,8 +331,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         r
     })(collection.breakOut)
 
-  private def setClassInfo(
-      classSym: Symbol, classBType: ClassBType): ClassBType = {
+  private def setClassInfo(classSym: Symbol,
+                           classBType: ClassBType): ClassBType = {
 
     /**
       * Reconstruct the classfile flags from a Java defined class symbol.
@@ -421,8 +421,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
      * We collect them here.
      */
     val nestedClassSymbols = {
-      val linkedClass =
-        exitingPickler(classSym.linkedClassOfClass) // linkedCoC does not work properly in late phases
+      val linkedClass = exitingPickler(classSym.linkedClassOfClass) // linkedCoC does not work properly in late phases
 
       // The lambdalift phase lifts all nested classes to the enclosing class, so if we collect
       // member classes right after lambdalift, we obtain all nested classes, including local and
@@ -595,13 +594,16 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         // phase travel necessary: after flatten, the name includes the name of outer classes.
         // if some outer name contains $anon, a non-anon class is considered anon.
         if (exitingPickler(innerClassSym.isAnonymousClass ||
-                innerClassSym.isAnonymousFunction)) None
+                  innerClassSym.isAnonymousFunction)) None
         else
           Some(innerClassSym.rawname + innerClassSym.moduleSuffix) // moduleSuffix for module classes
       }
 
-      Some(NestedInfo(
-              enclosingClass, outerName, innerName, isStaticNestedClass))
+      Some(
+          NestedInfo(enclosingClass,
+                     outerName,
+                     innerName,
+                     isStaticNestedClass))
     }
   }
 
@@ -617,8 +619,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     * So for classes being compiled, the InlineInfo is created here and stored in the ScalaInlineInfo
     * classfile attribute.
     */
-  private def buildInlineInfo(
-      classSym: Symbol, internalName: InternalName): InlineInfo = {
+  private def buildInlineInfo(classSym: Symbol,
+                              internalName: InternalName): InlineInfo = {
     def buildFromSymbol =
       buildInlineInfoFromClassSymbol(classSym,
                                      classBTypeFromSymbol(_).internalName,
@@ -668,8 +670,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
                 asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
               nestedClasses = nested,
               nestedInfo = None,
-              inlineInfo =
-                EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
+              inlineInfo = EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
       c
     })
   }
@@ -743,7 +744,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     // TODO: do this early, mark the symbol private.
     val privateFlag =
       sym.isPrivate ||
-      (sym.isPrimaryConstructor && isTopLevelModuleClass(sym.owner))
+        (sym.isPrimaryConstructor && isTopLevelModuleClass(sym.owner))
 
     // Symbols marked in source as `final` have the FINAL flag. (In the past, the flag was also
     // added to modules and module classes, not anymore since 296b706).
@@ -773,8 +774,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
     val finalFlag =
       ((((sym.rawflags & symtab.Flags.FINAL) != 0) ||
-              isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
-          !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
+                isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
+            !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
           )
 
     // Primitives are "abstract final" to prohibit instantiation

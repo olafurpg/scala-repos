@@ -50,12 +50,11 @@ object SafeNodeSeq {
   // I opened the scala ticket https://lampsvn.epfl.ch/trac/scala/ticket/1059#comment:1
   def unapply(any: Any): Option[Seq[Node]] = any match {
     case s: Seq[_] =>
-      Some(
-          s flatMap
-          (_ match {
-            case n: Node => n
-            case _ => NodeSeq.Empty
-          }))
+      Some(s flatMap
+            (_ match {
+              case n: Node => n
+              case _ => NodeSeq.Empty
+            }))
     case _ => None
   }
 }

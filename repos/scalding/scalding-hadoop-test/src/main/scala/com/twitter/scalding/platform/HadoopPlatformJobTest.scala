@@ -46,8 +46,8 @@ case class HadoopPlatformJobTest(
   def arg(inArg: String, value: String): HadoopPlatformJobTest =
     arg(inArg, List(value))
 
-  def source[T: TypeDescriptor](
-      location: String, data: Seq[T]): HadoopPlatformJobTest =
+  def source[T: TypeDescriptor](location: String,
+                                data: Seq[T]): HadoopPlatformJobTest =
     source(TypedText.tsv[T](location), data)
 
   def source[T](out: TypedSink[T], data: Seq[T]): HadoopPlatformJobTest =
@@ -70,8 +70,7 @@ case class HadoopPlatformJobTest(
 
   def sink[T](in: Mappable[T])(
       toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
-    copy(
-        sourceReaders =
+    copy(sourceReaders =
           sourceReaders :+ { m: Mode =>
         toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq)
       })

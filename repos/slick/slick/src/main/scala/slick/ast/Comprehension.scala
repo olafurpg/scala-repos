@@ -5,17 +5,17 @@ import Util._
 import slick.util.ConstArray
 
 /** A SQL comprehension */
-final case class Comprehension(sym: TermSymbol,
-                               from: Node,
-                               select: Node,
-                               where: Option[Node] = None,
-                               groupBy: Option[Node] = None,
-                               orderBy: ConstArray[(Node, Ordering)] =
-                                 ConstArray.empty,
-                               having: Option[Node] = None,
-                               distinct: Option[Node] = None,
-                               fetch: Option[Node] = None,
-                               offset: Option[Node] = None)
+final case class Comprehension(
+    sym: TermSymbol,
+    from: Node,
+    select: Node,
+    where: Option[Node] = None,
+    groupBy: Option[Node] = None,
+    orderBy: ConstArray[(Node, Ordering)] = ConstArray.empty,
+    having: Option[Node] = None,
+    distinct: Option[Node] = None,
+    fetch: Option[Node] = None,
+    offset: Option[Node] = None)
     extends DefNode {
   type Self = Comprehension
   lazy val children =
@@ -77,8 +77,8 @@ final case class Comprehension(sym: TermSymbol,
     // Check if the nodes changed
     val same =
       (f2 eq from) && (s2 eq select) && w2.isEmpty && g2.isEmpty &&
-      (o2 eq o) && h2.isEmpty && distinct2.isEmpty && fetch2.isEmpty &&
-      offset2.isEmpty
+        (o2 eq o) && h2.isEmpty && distinct2.isEmpty && fetch2.isEmpty &&
+        offset2.isEmpty
     val newType =
       if (!hasType)
         CollectionType(f2.nodeType.asCollectionType.cons,

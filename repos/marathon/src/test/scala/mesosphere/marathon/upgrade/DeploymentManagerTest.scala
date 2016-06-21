@@ -112,8 +112,7 @@ class DeploymentManagerTest
     )
     val probe = TestProbe()
 
-    probe.setAutoPilot(
-        new AutoPilot {
+    probe.setAutoPilot(new AutoPilot {
       override def run(sender: ActorRef, msg: Any): AutoPilot = msg match {
         case Cancel(_) =>
           system.stop(probe.ref)

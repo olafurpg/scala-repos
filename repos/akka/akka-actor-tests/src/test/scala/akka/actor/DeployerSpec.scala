@@ -182,8 +182,9 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
     }
 
     "be able to parse 'akka.actor.deployment._' with round-robin router" in {
-      assertRouting(
-          "/service-round-robin", RoundRobinPool(1), "/service-round-robin")
+      assertRouting("/service-round-robin",
+                    RoundRobinPool(1),
+                    "/service-round-robin")
     }
 
     "be able to parse 'akka.actor.deployment._' with random router" in {
@@ -251,8 +252,9 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
           classOf[akka.routing.ConsistentHashingGroup].getName)
     }
 
-    def assertRouting(
-        service: String, expected: RouterConfig, expectPath: String): Unit = {
+    def assertRouting(service: String,
+                      expected: RouterConfig,
+                      expectPath: String): Unit = {
       val deployment = system
         .asInstanceOf[ActorSystemImpl]
         .provider

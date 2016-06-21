@@ -45,8 +45,7 @@ class DensePolynomialTest extends FunSuite {
     val p = Polynomial.dense(Array[Double](1, 2, 4, 1, 2))
     val x = DenseVector.zeros[Double](M)
     val result = DenseVector.zeros[Double](M)
-    cfor(0)(j => j < M, j => j + 1)(
-        j => {
+    cfor(0)(j => j < M, j => j + 1)(j => {
       val t = j / M.toDouble
       x.update(j, t)
       result.update(j,
@@ -76,8 +75,7 @@ class DensePolynomialTest extends FunSuite {
       })
     })
 
-    val expectedResult =
-      DenseMatrix.zeros[Double](M, M) // expected result easy to compute
+    val expectedResult = DenseMatrix.zeros[Double](M, M) // expected result easy to compute
     cfor(0)(i => i < M, i => i + 1)(i => {
       cfor(0)(j => j < M, j => j + 1)(j => {
         if (j == i) { expectedResult.update(i, j, 1.0) }

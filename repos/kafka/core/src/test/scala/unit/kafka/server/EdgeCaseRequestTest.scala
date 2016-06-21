@@ -49,8 +49,9 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     new Socket("localhost", s.boundPort(protocol))
   }
 
-  private def sendRequest(
-      socket: Socket, request: Array[Byte], id: Option[Short] = None) {
+  private def sendRequest(socket: Socket,
+                          request: Array[Byte],
+                          id: Option[Short] = None) {
     val outgoing = new DataOutputStream(socket.getOutputStream)
     id match {
       case Some(id) =>
@@ -71,8 +72,8 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     response
   }
 
-  private def requestAndReceive(
-      request: Array[Byte], id: Option[Short] = None): Array[Byte] = {
+  private def requestAndReceive(request: Array[Byte],
+                                id: Option[Short] = None): Array[Byte] = {
     val plainSocket = connect()
     try {
       sendRequest(plainSocket, request, id)
@@ -124,8 +125,8 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
                           servers = servers)
 
     val serializedBytes = {
-      val headerBytes = requestHeaderBytes(
-          ApiKeys.PRODUCE.id, 2, null, correlationId)
+      val headerBytes =
+        requestHeaderBytes(ApiKeys.PRODUCE.id, 2, null, correlationId)
       val messageBytes = "message".getBytes
       val request = new ProduceRequest(
           1,
@@ -143,8 +144,9 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val responseHeader = ResponseHeader.parse(responseBuffer)
     val produceResponse = ProduceResponse.parse(responseBuffer)
 
-    assertEquals(
-        "The response should parse completely", 0, responseBuffer.remaining())
+    assertEquals("The response should parse completely",
+                 0,
+                 responseBuffer.remaining())
     assertEquals("The correlationId should match request",
                  correlationId,
                  responseHeader.correlationId())

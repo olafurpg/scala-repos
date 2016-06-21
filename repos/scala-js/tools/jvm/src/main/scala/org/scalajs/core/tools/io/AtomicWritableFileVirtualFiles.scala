@@ -30,8 +30,9 @@ trait AtomicWritableFileVirtualJSFile
     extends WritableFileVirtualJSFile
     with AtomicWritableFileVirtualTextFile {
   override def sourceMapWriter: Writer = {
-    new BufferedWriter(new OutputStreamWriter(
-            new AtomicFileOutputStream(sourceMapFile), "UTF-8"))
+    new BufferedWriter(
+        new OutputStreamWriter(new AtomicFileOutputStream(sourceMapFile),
+                               "UTF-8"))
   }
 }
 

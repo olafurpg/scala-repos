@@ -45,8 +45,8 @@ trait BitVectorOps {
   @expand.valify
   implicit def bv_bv_Op[@expand.args(OpAnd, OpOr, OpXor) Op <: OpType](
       implicit @expand.sequence[Op]({ _ and _ }, { _ or _ }, { _ xor _ }) op: Op.InPlaceImpl2[
-          java.util.BitSet, java.util.BitSet])
-    : Op.Impl2[BitVector, BitVector, BitVector] =
+          java.util.BitSet,
+          java.util.BitSet]): Op.Impl2[BitVector, BitVector, BitVector] =
     new Op.Impl2[BitVector, BitVector, BitVector] {
       def apply(a: BitVector, b: BitVector) = {
         if (!a.lengthsMatch(b))
@@ -54,8 +54,9 @@ trait BitVectorOps {
               s"Lengths don't match: ${a.length} ${b.length}")
         val result = a.data.clone().asInstanceOf[util.BitSet]
         op(result, b.data)
-        new BitVector(
-            result, a.length max b.length, a.enforceLength && b.enforceLength)
+        new BitVector(result,
+                      a.length max b.length,
+                      a.enforceLength && b.enforceLength)
       }
     }
 

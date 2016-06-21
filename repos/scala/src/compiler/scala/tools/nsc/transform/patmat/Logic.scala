@@ -32,8 +32,9 @@ trait Logic extends Debugging {
     }
   }
 
-  def alignAcrossRows(
-      xss: List[List[Any]], sep: String, lineSep: String = "\n"): String = {
+  def alignAcrossRows(xss: List[List[Any]],
+                      sep: String,
+                      lineSep: String = "\n"): String = {
     val maxLen = max(xss map (_.length))
     val padded = xss map (xs => xs ++ List.fill(maxLen - xs.length)(null))
     padded.transpose.map(alignedColumns).transpose map (_.mkString(sep)) mkString
@@ -130,8 +131,8 @@ trait Logic extends Debugging {
     case object False extends Prop
 
     // symbols are propositions
-    final class Sym private[PropositionalLogic](
-        val variable: Var, val const: Const)
+    final class Sym private[PropositionalLogic] (val variable: Var,
+                                                 val const: Const)
         extends Prop {
 
       override def equals(other: scala.Any): Boolean = other match {
@@ -339,8 +340,8 @@ trait Logic extends Debugging {
     // TODO: for V1 representing x1 and V2 standing for x1.head, encode that
     //       V1 = Nil implies -(V2 = Ci) for all Ci in V2's domain (i.e., it is unassignable)
     // may throw an AnalysisBudget.Exception
-    def removeVarEq(
-        props: List[Prop], modelNull: Boolean = false): (Prop, List[Prop]) = {
+    def removeVarEq(props: List[Prop],
+                    modelNull: Boolean = false): (Prop, List[Prop]) = {
       val start =
         if (Statistics.canEnable) Statistics.startTimer(patmatAnaVarEq)
         else null
@@ -437,8 +438,8 @@ trait Logic extends Debugging {
 
     def findModelFor(solvable: Solvable): Model
 
-    def findAllModelsFor(
-        solvable: Solvable, pos: Position = NoPosition): List[Solution]
+    def findAllModelsFor(solvable: Solvable,
+                         pos: Position = NoPosition): List[Solution]
   }
 }
 
@@ -500,11 +501,10 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
             }
           }
 
-        val allConsts =
-          if (mayBeNull) {
-            registerEquality(NullConst)
-            subConsts map (_ + NullConst)
-          } else subConsts
+        val allConsts = if (mayBeNull) {
+          registerEquality(NullConst)
+          subConsts map (_ + NullConst)
+        } else subConsts
 
         observed(); allConsts
       }
@@ -551,8 +551,9 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
         def implies(lower: Const, upper: Const): Boolean =
           // values and null
           lower == upper || // type implication
-          (lower != NullConst && !upper.isValue && instanceOfTpImplies(
-                  if (lower.isValue) lower.wideTp else lower.tp, upper.tp))
+            (lower != NullConst && !upper.isValue && instanceOfTpImplies(
+                    if (lower.isValue) lower.wideTp else lower.tp,
+                    upper.tp))
 
         // if(r) debug.patmat("implies    : "+(lower, lower.tp, upper, upper.tp))
         // else  debug.patmat("NOT implies: "+(lower, upper))
@@ -634,9 +635,9 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           // (nor the positive implications -B \/ A, or -A \/ B, which would entail the equality axioms falsifying the whole formula)
           val todo =
             equalitySyms filterNot
-            (b =>
-                  (b.const == sym.const) ||
-                  excludedPair(ExcludedPair(b.const, sym.const)))
+              (b =>
+                    (b.const == sym.const) ||
+                      excludedPair(ExcludedPair(b.const, sym.const)))
           val (excluded, notExcluded) =
             todo partition (b => excludes(sym.const, b.const))
           val implied = notExcluded filter (b => implies(sym.const, b.const))
@@ -695,8 +696,8 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
       def nextValueId = { _nextValueId += 1; _nextValueId }
 
       private val uniques = new mutable.HashMap[Type, Const]
-      private[TreesAndTypesDomain] def unique(
-          tp: Type, mkFresh: => Const): Const =
+      private[TreesAndTypesDomain] def unique(tp: Type,
+                                              mkFresh: => Const): Const =
         uniques
           .get(tp)
           .getOrElse(
@@ -829,8 +830,9 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
         }
       }
     }
-    sealed class ValueConst(
-        val tp: Type, val wideTp: Type, override val toString: String)
+    sealed class ValueConst(val tp: Type,
+                            val wideTp: Type,
+                            override val toString: String)
         extends Const {
       // debug.patmat("VC"+(tp, wideTp, toString))
       assert(!(tp =:= ConstantNull)) // TODO: assert(!tp.isStable)

@@ -13,8 +13,12 @@ trait EnsimeTestData {
     }
   }
 
-  val typeInfo = new BasicTypeInfo(
-      "type1", DeclaredAs.Method, "FOO.type1", List(), List(), None)
+  val typeInfo = new BasicTypeInfo("type1",
+                                   DeclaredAs.Method,
+                                   "FOO.type1",
+                                   List(),
+                                   List(),
+                                   None)
 
   val interfaceInfo = new InterfaceInfo(typeInfo, Some("DEF"))
   val typeInspectInfo = new TypeInspectInfo(typeInfo, List(interfaceInfo))
@@ -47,8 +51,9 @@ trait EnsimeTestData {
 
   val completionInfo = new CompletionInfo(
       "name",
-      new CompletionSignature(
-          List(List(("abc", "def"), ("hij", "lmn"))), "ABC", false),
+      new CompletionSignature(List(List(("abc", "def"), ("hij", "lmn"))),
+                              "ABC",
+                              false),
       false,
       90,
       Some("BAZ"))
@@ -70,12 +75,13 @@ trait EnsimeTestData {
   val file4 = canon("/foo/def")
   val file5 = canon("/foo/hij")
 
-  val refactorEffect = new RefactorEffect(
-      9, RefactorType.AddImport, List(TextEdit(file3, 5, 7, "aaa")))
-  val refactorResult = new RefactorResult(
-      7, RefactorType.AddImport, List(file3, file1))
-  val refactorDiffEffect = new RefactorDiffEffect(
-      9, RefactorType.AddImport, file2)
+  val refactorEffect = new RefactorEffect(9,
+                                          RefactorType.AddImport,
+                                          List(TextEdit(file3, 5, 7, "aaa")))
+  val refactorResult =
+    new RefactorResult(7, RefactorType.AddImport, List(file3, file1))
+  val refactorDiffEffect =
+    new RefactorDiffEffect(9, RefactorType.AddImport, file2)
 
   val sourcePos1 = new LineSourcePosition(file1, 57)
   val sourcePos2 = new LineSourcePosition(file1, 59)
@@ -99,8 +105,8 @@ trait EnsimeTestData {
       sourcePos1,
       DebugObjectId(7))
 
-  val debugBacktrace = DebugBacktrace(
-      List(debugStackFrame), DebugThreadId(17), "thread1")
+  val debugBacktrace =
+    DebugBacktrace(List(debugStackFrame), DebugThreadId(17), "thread1")
 
   val analyzerFile = canon("Analyzer.scala")
   val fooFile = canon("Foo.scala")
@@ -112,8 +118,10 @@ trait EnsimeTestData {
                                            DeclaredAs.Method,
                                            Some(LineSourcePosition(abd, 10)),
                                            "ownerStr")
-  val typeSearchRes = TypeSearchResult(
-      "abc", "a", DeclaredAs.Trait, Some(LineSourcePosition(abd, 10)))
+  val typeSearchRes = TypeSearchResult("abc",
+                                       "a",
+                                       DeclaredAs.Trait,
+                                       Some(LineSourcePosition(abd, 10)))
 
   val importSuggestions = new ImportSuggestions(
       List(List(methodSearchRes, typeSearchRes)))
@@ -124,7 +132,9 @@ trait EnsimeTestData {
   val completionInfoCList = CompletionInfoList("fooBar", List(completionInfo))
 
   val refactorRenameEffect = new RefactorEffect(
-      7, RefactorType.Rename, List(TextEdit(file3, 5, 7, "aaa")))
+      7,
+      RefactorType.Rename,
+      List(TextEdit(file3, 5, 7, "aaa")))
 
   val fileRange = FileRange("/abc", 7, 9)
 
@@ -132,27 +142,29 @@ trait EnsimeTestData {
 
   val debugNullValue = DebugNullValue("typeNameStr")
 
-  val debugArrayInstValue = DebugArrayInstance(
-      3, "typeName", "elementType", DebugObjectId(5L))
+  val debugArrayInstValue =
+    DebugArrayInstance(3, "typeName", "elementType", DebugObjectId(5L))
 
   val debugPrimitiveValue = DebugPrimitiveValue("summaryStr", "typeNameStr")
 
-  val debugClassField = DebugClassField(
-      19, "nameStr", "typeNameStr", "summaryStr")
+  val debugClassField =
+    DebugClassField(19, "nameStr", "typeNameStr", "summaryStr")
 
-  val debugStringValue = DebugStringInstance(
-      "summaryStr", List(debugClassField), "typeNameStr", DebugObjectId(6L))
+  val debugStringValue = DebugStringInstance("summaryStr",
+                                             List(debugClassField),
+                                             "typeNameStr",
+                                             DebugObjectId(6L))
 
   val note1 = new Note("file1", "note1", NoteError, 23, 33, 19, 8)
   val note2 = new Note("file1", "note2", NoteWarn, 23, 33, 19, 8)
 
   val noteList = NewScalaNotesEvent(isFull = true, List(note1, note2))
 
-  val entityInfo: TypeInfo = new ArrowTypeInfo(
-      "Arrow1", typeInfo, List(paramSectionInfo))
+  val entityInfo: TypeInfo =
+    new ArrowTypeInfo("Arrow1", typeInfo, List(paramSectionInfo))
 
-  val sourceFileInfo = SourceFileInfo(
-      file1, Some("{/* code here */}"), Some(file2))
+  val sourceFileInfo =
+    SourceFileInfo(file1, Some("{/* code here */}"), Some(file2))
   val dtid = DebugThreadId(13)
   val debugLocationArray = DebugArrayElement(DebugObjectId(13), 14)
 

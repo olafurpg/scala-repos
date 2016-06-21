@@ -39,8 +39,8 @@ object ParquetReadBenchmark {
   val sqlContext = new SQLContext(sc)
 
   // Set default configs. Individual cases will change them if necessary.
-  sqlContext.conf.setConfString(
-      SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key, "true")
+  sqlContext.conf
+    .setConfString(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key, "true")
   sqlContext.conf.setConfString(SQLConf.WHOLESTAGE_CODEGEN_ENABLED.key, "true")
 
   def withTempPath(f: File => Unit): Unit = {
@@ -70,8 +70,8 @@ object ParquetReadBenchmark {
     // Benchmarks running through spark sql.
     val sqlBenchmark = new Benchmark("SQL Single Int Column Scan", values)
     // Benchmarks driving reader component directly.
-    val parquetReaderBenchmark = new Benchmark(
-        "Parquet Reader Single Int Column Scan", values)
+    val parquetReaderBenchmark =
+      new Benchmark("Parquet Reader Single Int Column Scan", values)
 
     withTempPath { dir =>
       withTempTable("t1", "tempTable") {
@@ -280,14 +280,14 @@ object ParquetReadBenchmark {
     }
   }
 
-  def stringWithNullsScanBenchmark(
-      values: Int, fractionOfNulls: Double): Unit = {
+  def stringWithNullsScanBenchmark(values: Int,
+                                   fractionOfNulls: Double): Unit = {
     withTempPath { dir =>
       withTempTable("t1", "tempTable") {
         sqlContext.range(values).registerTempTable("t1")
         sqlContext
           .sql(s"select IF(rand(1) < $fractionOfNulls, NULL, cast(id as STRING)) as c1, " +
-              s"IF(rand(2) < $fractionOfNulls, NULL, cast(id as STRING)) as c2 from t1")
+                s"IF(rand(2) < $fractionOfNulls, NULL, cast(id as STRING)) as c2 from t1")
           .write
           .parquet(dir.getCanonicalPath)
         sqlContext.read
@@ -299,7 +299,7 @@ object ParquetReadBenchmark {
         benchmark.addCase("SQL Parquet Vectorized") { iter =>
           sqlContext
             .sql("select sum(length(c2)) from tempTable where c1 is " +
-                "not NULL and c2 is not NULL")
+                  "not NULL and c2 is not NULL")
             .collect()
         }
 

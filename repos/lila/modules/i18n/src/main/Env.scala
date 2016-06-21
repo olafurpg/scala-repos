@@ -38,11 +38,12 @@ final class Env(config: Config,
 
   lazy val keys = new I18nKeys(translator)
 
-  lazy val requestHandler = new I18nRequestHandler(
-      pool, RequestHandlerProtocol, CdnDomain)
+  lazy val requestHandler =
+    new I18nRequestHandler(pool, RequestHandlerProtocol, CdnDomain)
 
-  lazy val jsDump = new JsDump(
-      path = appPath + "/" + WebPathRelative, pool = pool, keys = keys)
+  lazy val jsDump = new JsDump(path = appPath + "/" + WebPathRelative,
+                               pool = pool,
+                               keys = keys)
 
   lazy val fileFix = new FileFix(path = appPath + "/" + FilePathRelative,
                                  pool = pool,
@@ -51,13 +52,14 @@ final class Env(config: Config,
 
   lazy val transInfos = TransInfos(messages = messages, keys = keys)
 
-  lazy val forms = new DataForm(
-      keys = keys, captcher = captcher, callApi = callApi)
+  lazy val forms =
+    new DataForm(keys = keys, captcher = captcher, callApi = callApi)
 
   def upstreamFetch = new UpstreamFetch(id => UpstreamUrlPattern format id)
 
-  lazy val gitWrite = new GitWrite(
-      transRelPath = FilePathRelative, repoPath = appPath, system = system)
+  lazy val gitWrite = new GitWrite(transRelPath = FilePathRelative,
+                                   repoPath = appPath,
+                                   system = system)
 
   lazy val context = new Context(ContextGitUrl, ContextGitFile, keys)
 

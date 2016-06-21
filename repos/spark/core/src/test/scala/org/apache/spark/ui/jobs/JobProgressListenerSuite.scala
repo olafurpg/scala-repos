@@ -36,24 +36,24 @@ class JobProgressListenerSuite
   val jobCompletionTime = 1421191296660L
 
   private def createStageStartEvent(stageId: Int) = {
-    val stageInfo = new StageInfo(
-        stageId, 0, stageId.toString, 0, null, null, "")
+    val stageInfo =
+      new StageInfo(stageId, 0, stageId.toString, 0, null, null, "")
     SparkListenerStageSubmitted(stageInfo)
   }
 
   private def createStageEndEvent(stageId: Int, failed: Boolean = false) = {
-    val stageInfo = new StageInfo(
-        stageId, 0, stageId.toString, 0, null, null, "")
+    val stageInfo =
+      new StageInfo(stageId, 0, stageId.toString, 0, null, null, "")
     if (failed) {
       stageInfo.failureReason = Some("Failed!")
     }
     SparkListenerStageCompleted(stageInfo)
   }
 
-  private def createJobStartEvent(jobId: Int,
-                                  stageIds: Seq[Int],
-                                  jobGroup: Option[String] =
-                                    None): SparkListenerJobStart = {
+  private def createJobStartEvent(
+      jobId: Int,
+      stageIds: Seq[Int],
+      jobGroup: Option[String] = None): SparkListenerJobStart = {
     val stageInfos = stageIds.map { stageId =>
       new StageInfo(stageId, 0, stageId.toString, 0, null, null, "")
     }
@@ -62,8 +62,10 @@ class JobProgressListenerSuite
       props.setProperty(SparkContext.SPARK_JOB_GROUP_ID, groupId)
       props
     }
-    SparkListenerJobStart(
-        jobId, jobSubmissionTime, stageInfos, properties.orNull)
+    SparkListenerJobStart(jobId,
+                          jobSubmissionTime,
+                          stageInfos,
+                          properties.orNull)
   }
 
   private def createJobEndEvent(jobId: Int, failed: Boolean = false) = {
@@ -72,8 +74,9 @@ class JobProgressListenerSuite
     SparkListenerJobEnd(jobId, jobCompletionTime, result)
   }
 
-  private def runJob(
-      listener: SparkListener, jobId: Int, shouldFail: Boolean = false) {
+  private def runJob(listener: SparkListener,
+                     jobId: Int,
+                     shouldFail: Boolean = false) {
     val stagesThatWontBeRun = jobId * 200 to jobId * 200 + 10
     val stageIds = jobId * 100 to jobId * 100 + 50
     listener.onJobStart(
@@ -205,13 +208,24 @@ class JobProgressListenerSuite
     // finish this task, should get updated shuffleRead
     shuffleReadMetrics.incRemoteBytesRead(1000)
     taskMetrics.mergeShuffleReadMetrics()
-    var taskInfo = new TaskInfo(
-        1234L, 0, 1, 0L, "exe-1", "host1", TaskLocality.NODE_LOCAL, false)
+    var taskInfo = new TaskInfo(1234L,
+                                0,
+                                1,
+                                0L,
+                                "exe-1",
+                                "host1",
+                                TaskLocality.NODE_LOCAL,
+                                false)
     taskInfo.finishTime = 1
     var task = new ShuffleMapTask(0)
     val taskType = Utils.getFormattedClassName(task)
-    listener.onTaskEnd(SparkListenerTaskEnd(
-            task.stageId, 0, taskType, Success, taskInfo, taskMetrics))
+    listener.onTaskEnd(
+        SparkListenerTaskEnd(task.stageId,
+                             0,
+                             taskType,
+                             Success,
+                             taskInfo,
+                             taskMetrics))
     assert(
         listener.stageIdToData
           .getOrElse((0, 0), fail())
@@ -230,17 +244,33 @@ class JobProgressListenerSuite
                             true)
     taskInfo.finishTime = 1
     task = new ShuffleMapTask(0)
-    listener.onTaskEnd(SparkListenerTaskEnd(
-            task.stageId, 0, taskType, Success, taskInfo, taskMetrics))
+    listener.onTaskEnd(
+        SparkListenerTaskEnd(task.stageId,
+                             0,
+                             taskType,
+                             Success,
+                             taskInfo,
+                             taskMetrics))
     assert(listener.stageIdToData.size === 1)
 
     // finish this task, should get updated duration
-    taskInfo = new TaskInfo(
-        1235L, 0, 1, 0L, "exe-1", "host1", TaskLocality.NODE_LOCAL, false)
+    taskInfo = new TaskInfo(1235L,
+                            0,
+                            1,
+                            0L,
+                            "exe-1",
+                            "host1",
+                            TaskLocality.NODE_LOCAL,
+                            false)
     taskInfo.finishTime = 1
     task = new ShuffleMapTask(0)
-    listener.onTaskEnd(SparkListenerTaskEnd(
-            task.stageId, 0, taskType, Success, taskInfo, taskMetrics))
+    listener.onTaskEnd(
+        SparkListenerTaskEnd(task.stageId,
+                             0,
+                             taskType,
+                             Success,
+                             taskInfo,
+                             taskMetrics))
     assert(
         listener.stageIdToData
           .getOrElse((0, 0), fail())
@@ -249,12 +279,23 @@ class JobProgressListenerSuite
           .shuffleRead === 2000)
 
     // finish this task, should get updated duration
-    taskInfo = new TaskInfo(
-        1236L, 0, 2, 0L, "exe-2", "host1", TaskLocality.NODE_LOCAL, false)
+    taskInfo = new TaskInfo(1236L,
+                            0,
+                            2,
+                            0L,
+                            "exe-2",
+                            "host1",
+                            TaskLocality.NODE_LOCAL,
+                            false)
     taskInfo.finishTime = 1
     task = new ShuffleMapTask(0)
-    listener.onTaskEnd(SparkListenerTaskEnd(
-            task.stageId, 0, taskType, Success, taskInfo, taskMetrics))
+    listener.onTaskEnd(
+        SparkListenerTaskEnd(task.stageId,
+                             0,
+                             taskType,
+                             Success,
+                             taskInfo,
+                             taskMetrics))
     assert(
         listener.stageIdToData
           .getOrElse((0, 0), fail())
@@ -267,8 +308,14 @@ class JobProgressListenerSuite
     val conf = new SparkConf()
     val listener = new JobProgressListener(conf)
     val metrics = new TaskMetrics()
-    val taskInfo = new TaskInfo(
-        1234L, 0, 3, 0L, "exe-1", "host1", TaskLocality.NODE_LOCAL, false)
+    val taskInfo = new TaskInfo(1234L,
+                                0,
+                                3,
+                                0L,
+                                "exe-1",
+                                "host1",
+                                TaskLocality.NODE_LOCAL,
+                                false)
     taskInfo.finishTime = 1
     val task = new ShuffleMapTask(0)
     val taskType = Utils.getFormattedClassName(task)
@@ -284,8 +331,13 @@ class JobProgressListenerSuite
           UnknownReason)
     var failCount = 0
     for (reason <- taskFailedReasons) {
-      listener.onTaskEnd(SparkListenerTaskEnd(
-              task.stageId, 0, taskType, reason, taskInfo, metrics))
+      listener.onTaskEnd(
+          SparkListenerTaskEnd(task.stageId,
+                               0,
+                               taskType,
+                               reason,
+                               taskInfo,
+                               metrics))
       failCount += 1
       assert(listener.stageIdToData((task.stageId, 0)).numCompleteTasks === 0)
       assert(
@@ -293,8 +345,13 @@ class JobProgressListenerSuite
     }
 
     // Make sure we count success as success.
-    listener.onTaskEnd(SparkListenerTaskEnd(
-            task.stageId, 1, taskType, Success, taskInfo, metrics))
+    listener.onTaskEnd(
+        SparkListenerTaskEnd(task.stageId,
+                             1,
+                             taskType,
+                             Success,
+                             taskInfo,
+                             metrics))
     assert(listener.stageIdToData((task.stageId, 1)).numCompleteTasks === 1)
     assert(
         listener.stageIdToData((task.stageId, 0)).numFailedTasks === failCount)
@@ -331,8 +388,14 @@ class JobProgressListenerSuite
     }
 
     def makeTaskInfo(taskId: Long, finishTime: Int = 0): TaskInfo = {
-      val taskInfo = new TaskInfo(
-          taskId, 0, 1, 0L, execId, "host1", TaskLocality.NODE_LOCAL, false)
+      val taskInfo = new TaskInfo(taskId,
+                                  0,
+                                  1,
+                                  0L,
+                                  execId,
+                                  "host1",
+                                  TaskLocality.NODE_LOCAL,
+                                  false)
       taskInfo.finishTime = finishTime
       taskInfo
     }

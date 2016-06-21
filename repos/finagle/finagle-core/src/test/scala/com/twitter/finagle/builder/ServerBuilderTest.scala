@@ -70,8 +70,7 @@ class ServerBuilderTest
         val specified =
           entries.filter(_.key.startsWith(Seq("server", expected)))
         // Entries are in the form: Entry(List(server, fancy, test, /127.0.0.1:58904, RequestStats, unit),MILLISECONDS)
-        val entry =
-          specified.head // data is repeated as entry.key, just take the first
+        val entry = specified.head // data is repeated as entry.key, just take the first
         val hostAndPort = entry.key.filter(_.contains("127.0.0.1")).head
         assert(!hostAndPort.contains(":0"),
                "unbounded address in server registry")
@@ -112,8 +111,8 @@ class ServerBuilderTest
     ServerBuilder().name("test").codec(cfServer).bindTo(loopback).build(svc)
   }
 
-  verifyProtocolRegistry(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
+  verifyProtocolRegistry("#codec(CodecFactory#Server)FancyCodec",
+                         expected = "fancy") {
     class FancyCodec extends CodecFactory[String, String] {
       def client = { config =>
         new com.twitter.finagle.Codec[String, String] {
@@ -135,8 +134,8 @@ class ServerBuilderTest
       .build(svc)
   }
 
-  verifyServerBoundAddress(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
+  verifyServerBoundAddress("#codec(CodecFactory#Server)FancyCodec",
+                           expected = "fancy") {
     class FancyCodec extends CodecFactory[String, String] {
       def client = { config =>
         new com.twitter.finagle.Codec[String, String] {

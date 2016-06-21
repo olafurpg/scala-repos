@@ -11,7 +11,7 @@ object Extractor {
       new {
         def isEmpty = false
         def get = ${"The width of the subpattern is: " +
-    (pos.end - pos.start + 1)}
+      (pos.end - pos.start + 1)}
         def unapply(x: Any) = this
       }.unapply($x)
     """

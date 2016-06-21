@@ -147,7 +147,9 @@ class ParameterDirectivesSpec
       } ~> check {
         inside(rejection) {
           case MalformedQueryParamRejection(
-              "really", "'absolutely' is not a valid Boolean value", None) ⇒
+              "really",
+              "'absolutely' is not a valid Boolean value",
+              None) ⇒
         }
       }
     }

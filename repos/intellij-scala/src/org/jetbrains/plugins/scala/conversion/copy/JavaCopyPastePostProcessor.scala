@@ -94,8 +94,8 @@ class JavaCopyPastePostProcessor
             }
             if (elem.getTextRange.getEndOffset < endOffset) {
               buffer +=
-                TextPart(new TextRange(elem.getTextRange.getEndOffset,
-                                       endOffset).substring(file.getText))
+              TextPart(new TextRange(elem.getTextRange.getEndOffset, endOffset)
+                    .substring(file.getText))
             }
           }
         }
@@ -104,8 +104,8 @@ class JavaCopyPastePostProcessor
 
       def getRefs: Seq[ReferenceData] = {
         val refs = {
-          val data = referenceProcessor.collectTransferableData(
-              file, editor, startOffsets, endOffsets)
+          val data = referenceProcessor
+            .collectTransferableData(file, editor, startOffsets, endOffsets)
           if (data.isEmpty) null
           else data.get(0).asInstanceOf[ReferenceTransferableData]
         }
@@ -129,7 +129,9 @@ class JavaCopyPastePostProcessor
             resultNode.addChild(LiteralExpression(s))
           case ElementPart(element) =>
             val result = JavaToScala.convertPsiToIntermdeiate(element, null)(
-                associationsHelper, data, withComments = true)
+                associationsHelper,
+                data,
+                withComments = true)
             resultNode.addChild(result)
         }
       }
@@ -215,8 +217,9 @@ class JavaCopyPastePostProcessor
 
         withSpecialStyleIn(project) {
           val manager = CodeStyleManager.getInstance(project)
-          manager.reformatText(
-              file, bounds.getStartOffset, bounds.getStartOffset + text.length)
+          manager.reformatText(file,
+                               bounds.getStartOffset,
+                               bounds.getStartOffset + text.length)
         }
 
         markedAssociations.map {
@@ -263,8 +266,9 @@ class JavaCopyPastePostProcessor
     }
   }
 
-  def replaceByConvertedCode(
-      editor: Editor, bounds: RangeMarker, text: String) = {
+  def replaceByConvertedCode(editor: Editor,
+                             bounds: RangeMarker,
+                             text: String) = {
     val document = editor.getDocument
     def hasQuoteAt(offset: Int) = {
       val chars = document.getCharsSequence
@@ -306,7 +310,7 @@ class JavaCopyPastePostProcessor
   }
 
   object ConvertedCode {
-    lazy val Flavor: DataFlavor = new DataFlavor(
-        classOf[ConvertedCode], "JavaToScalaConvertedCode")
+    lazy val Flavor: DataFlavor =
+      new DataFlavor(classOf[ConvertedCode], "JavaToScalaConvertedCode")
   }
 }

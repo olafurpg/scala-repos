@@ -43,8 +43,8 @@ class CookieMapTest extends FunSuite {
 
   test("cookie with attributes") {
     val request = Request()
-    request.headers.set(
-        "Cookie", "name=value; Max-Age=23; Domain=.example.com; Path=/")
+    request.headers
+      .set("Cookie", "name=value; Max-Age=23; Domain=.example.com; Path=/")
     val cookie = request.cookies("name")
 
     assert(cookie.value == "value")

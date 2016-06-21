@@ -36,12 +36,12 @@ class ModelSpec extends AkkaSpec {
     val userData = ByteString("abc")
     val authorization =
       headers.Authorization(BasicHttpCredentials("user", "pass"))
-    HttpRequest(PUT,
-                uri = "/user",
-                entity =
-                  HttpEntity(`text/plain` withCharset `UTF-8`, userData),
-                headers = List(authorization),
-                protocol = `HTTP/1.0`)
+    HttpRequest(
+        PUT,
+        uri = "/user",
+        entity = HttpEntity(`text/plain` withCharset `UTF-8`, userData),
+        headers = List(authorization),
+        protocol = `HTTP/1.0`)
     //#construct-request
   }
 
@@ -56,8 +56,8 @@ class ModelSpec extends AkkaSpec {
     HttpResponse(NotFound)
 
     // 404 response with a body explaining the error
-    HttpResponse(
-        404, entity = "Unfortunately, the resource couldn't be found.")
+    HttpResponse(404,
+                 entity = "Unfortunately, the resource couldn't be found.")
 
     // A redirecting response containing an extra header
     val locationHeader = headers.Location("http://example.com/other")
@@ -92,6 +92,7 @@ class ModelSpec extends AkkaSpec {
     credentialsOfRequest(HttpRequest()) should be(None)
     credentialsOfRequest(
         HttpRequest(headers = List(Authorization(GenericHttpCredentials(
-                        "Other", Map.empty[String, String]))))) should be(None)
+                        "Other",
+                        Map.empty[String, String]))))) should be(None)
   }
 }

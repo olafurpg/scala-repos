@@ -106,8 +106,8 @@ trait FutureAction[T] extends Future[T] {
   * count, collect, reduce.
   */
 @DeveloperApi
-class SimpleFutureAction[T] private[spark](
-    jobWaiter: JobWaiter[_], resultFunc: => T)
+class SimpleFutureAction[T] private[spark] (jobWaiter: JobWaiter[_],
+                                            resultFunc: => T)
     extends FutureAction[T] {
 
   @volatile private var _cancelled: Boolean = false
@@ -240,7 +240,8 @@ class ComplexFutureAction[T](run: JobSubmitter => Future[T])
 }
 
 private[spark] class JavaFutureActionWrapper[S, T](
-    futureAction: FutureAction[S], converter: S => T)
+    futureAction: FutureAction[S],
+    converter: S => T)
     extends JavaFutureAction[T] {
 
   import scala.collection.JavaConverters._

@@ -11,8 +11,8 @@ import lila.game.{Query, Game, GameRepo}
 import lila.hub.actorApi.map.Tell
 import lila.round.actorApi.round.{Outoftime, Abandon}
 
-private[round] final class Titivate(
-    roundMap: ActorRef, bookmark: ActorSelection)
+private[round] final class Titivate(roundMap: ActorRef,
+                                    bookmark: ActorSelection)
     extends Actor {
 
   object Schedule

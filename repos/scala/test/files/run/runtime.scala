@@ -169,11 +169,11 @@ object Test {
       test;
     } catch {
       case exception: Throwable => {
-          //val name: String = Thread.currentThread().getName();
-          Console.print("Exception in thread \"" + name + "\" " + exception);
-          Console.println;
-          errors = errors + 1;
-        }
+        //val name: String = Thread.currentThread().getName();
+        Console.print("Exception in thread \"" + name + "\" " + exception);
+        Console.println;
+        errors = errors + 1;
+      }
     }
     Console.println(">>> " + name);
     Console.println;

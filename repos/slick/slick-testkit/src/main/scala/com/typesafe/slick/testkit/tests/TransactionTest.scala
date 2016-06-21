@@ -26,10 +26,10 @@ class TransactionTest extends AsyncTest[JdbcTestDB] {
         _ <- GetTransactionality.map(_ shouldBe (1, false))
         _ = throw new ExpectedException
       } yield ()).transactionally.failed.map(_ should
-          (_.isInstanceOf[ExpectedException]))
+            (_.isInstanceOf[ExpectedException]))
     } andThen {
       ts.result.map(_ shouldBe Nil) andThen GetTransactionality.map(_ shouldBe
-          (0, true))
+            (0, true))
     } andThen {
       // successful transaction
       (for {
@@ -56,7 +56,7 @@ class TransactionTest extends AsyncTest[JdbcTestDB] {
         _ <- GetTransactionality.map(_ shouldBe (2, false))
         _ = throw new ExpectedException
       } yield ()).transactionally.transactionally.failed.map(_ should
-          (_.isInstanceOf[ExpectedException]))
+            (_.isInstanceOf[ExpectedException]))
     } andThen {
       // fused successful transaction
       (ts += 5).andThen(ts += 6).transactionally
@@ -75,14 +75,14 @@ class TransactionTest extends AsyncTest[JdbcTestDB] {
           ti1 <- getTI
           _ <- (for {
                 _ <- getTI.map(_ should
-                        (_ >= TransactionIsolation.ReadUncommitted.intValue))
+                          (_ >= TransactionIsolation.ReadUncommitted.intValue))
                 _ <- getTI
                       .withTransactionIsolation(
                           TransactionIsolation.Serializable)
                       .map(_ should
-                          (_ >= TransactionIsolation.Serializable.intValue))
+                            (_ >= TransactionIsolation.Serializable.intValue))
                 _ <- getTI.map(_ should
-                        (_ >= TransactionIsolation.ReadUncommitted.intValue))
+                          (_ >= TransactionIsolation.ReadUncommitted.intValue))
               } yield ())
                 .withTransactionIsolation(TransactionIsolation.ReadUncommitted)
           _ <- getTI.map(_ shouldBe ti1)

@@ -61,8 +61,7 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
     val kafkaParams: Map[String, String],
     val fromOffsets: Map[TopicAndPartition, Long],
     messageHandler: MessageAndMetadata[K, V] => R
-)
-    extends InputDStream[R](_ssc)
+) extends InputDStream[R](_ssc)
     with Logging {
   val maxRetries =
     context.sparkContext.getConf.getInt("spark.streaming.kafka.maxRetries", 1)
@@ -78,8 +77,10 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
     */
   override protected[streaming] val rateController: Option[RateController] = {
     if (RateController.isBackPressureEnabled(ssc.conf)) {
-      Some(new DirectKafkaRateController(
-              id, RateEstimator.create(ssc.conf, context.graph.batchDuration)))
+      Some(
+          new DirectKafkaRateController(
+              id,
+              RateEstimator.create(ssc.conf, context.graph.batchDuration)))
     } else {
       None
     }
@@ -120,8 +121,7 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
     if (effectiveRateLimitPerPartition.values.sum > 0) {
       val secsPerBatch =
         context.graph.batchDuration.milliseconds.toDouble / 1000
-      Some(
-          effectiveRateLimitPerPartition.map {
+      Some(effectiveRateLimitPerPartition.map {
         case (tp, limit) => tp -> (secsPerBatch * limit).toLong
       })
     } else {
@@ -231,11 +231,11 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
           logInfo(
               s"Restoring KafkaRDD for time $t ${b.mkString("[", ", ", "]")}")
           generatedRDDs +=
-            t -> new KafkaRDD[K, V, U, T, R](context.sparkContext,
-                                             kafkaParams,
-                                             b.map(OffsetRange(_)),
-                                             leaders,
-                                             messageHandler)
+          t -> new KafkaRDD[K, V, U, T, R](context.sparkContext,
+                                           kafkaParams,
+                                           b.map(OffsetRange(_)),
+                                           leaders,
+                                           messageHandler)
       }
     }
   }
@@ -243,8 +243,8 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
   /**
     * A RateController to retrieve the rate from RateEstimator.
     */
-  private[streaming] class DirectKafkaRateController(
-      id: Int, estimator: RateEstimator)
+  private[streaming] class DirectKafkaRateController(id: Int,
+                                                     estimator: RateEstimator)
       extends RateController(id, estimator) {
     override def publish(rate: Long): Unit = ()
   }

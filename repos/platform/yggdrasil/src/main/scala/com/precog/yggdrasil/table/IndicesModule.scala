@@ -252,8 +252,8 @@ trait IndicesModule[M[+ _]]
     def getSubTable(keyIds: Seq[Int], keyValues: Seq[RValue]): Table =
       buildSubTable(getRowsForKeys(keyIds, keyValues))
 
-    private def intersectBuffers(
-        as: ArrayIntList, bs: ArrayIntList): ArrayIntList = {
+    private def intersectBuffers(as: ArrayIntList,
+                                 bs: ArrayIntList): ArrayIntList = {
       //assertSorted(as)
       //assertSorted(bs)
       var i = 0
@@ -282,14 +282,15 @@ trait IndicesModule[M[+ _]]
     /**
       * Returns the rows specified by the given group key values.
       */
-    private[table] def getRowsForKeys(
-        keyIds: Seq[Int], keyValues: Seq[RValue]): ArrayIntList = {
+    private[table] def getRowsForKeys(keyIds: Seq[Int],
+                                      keyValues: Seq[RValue]): ArrayIntList = {
       var rows: ArrayIntList =
         dict.getOrElse((keyIds(0), keyValues(0)), emptyBuffer)
       var i: Int = 1
       while (i < keyIds.length && !rows.isEmpty) {
         rows = intersectBuffers(
-            rows, dict.getOrElse((keyIds(i), keyValues(i)), emptyBuffer))
+            rows,
+            dict.getOrElse((keyIds(i), keyValues(i)), emptyBuffer))
         i += 1
       }
       rows
@@ -447,20 +448,20 @@ trait IndicesModule[M[+ _]]
         keys(k) =
           st(slice) map {
             case (_, keySlice) => {
-                val arr = new Array[RValue](n)
+              val arr = new Array[RValue](n)
 
-                var i = 0
-                while (i < n) {
-                  val rv = keySlice.toRValue(i)
-                  rv match {
-                    case CUndefined =>
-                    case rv => arr(i) = rv
-                  }
-                  i += 1
+              var i = 0
+              while (i < n) {
+                val rv = keySlice.toRValue(i)
+                rv match {
+                  case CUndefined =>
+                  case rv => arr(i) = rv
                 }
-
-                arr
+                i += 1
               }
+
+              arr
+            }
           }
 
         k += 1
@@ -468,20 +469,20 @@ trait IndicesModule[M[+ _]]
 
       val back = (0 until keys.length)
         .foldLeft(M.point(Vector.fill[Array[RValue]](numKeys)(null))) {
-        case (accM, i) => {
+          case (accM, i) => {
             val arrM = keys(i)
 
             M.apply2(accM, arrM) { (acc, arr) =>
               acc.updated(i, arr)
             }
           }
-      }
+        }
 
       back map { _.toArray }
     }
 
-    private def unionBuffers(
-        as: ArrayIntList, bs: ArrayIntList): ArrayIntList = {
+    private def unionBuffers(as: ArrayIntList,
+                             bs: ArrayIntList): ArrayIntList = {
       //assertSorted(as)
       //assertSorted(bs)
       var i = 0

@@ -28,8 +28,8 @@ class ScalaMethodImplementor extends MethodImplementor {
   private val prototypeToBaseMethod =
     mutable.WeakHashMap[PsiMethod, PsiMethod]()
 
-  def createImplementationPrototypes(
-      inClass: PsiClass, method: PsiMethod): Array[PsiMethod] = {
+  def createImplementationPrototypes(inClass: PsiClass,
+                                     method: PsiMethod): Array[PsiMethod] = {
     (for {
       td <- inClass.asOptionOf[ScTemplateDefinition].toSeq
       member <- ScalaOIUtil.getMembersToImplement(td).collect {
@@ -38,8 +38,8 @@ class ScalaMethodImplementor extends MethodImplementor {
     } yield {
       val specifyType =
         ScalaApplicationSettings.getInstance().SPECIFY_RETURN_TYPE_EXPLICITLY
-      val body = ScalaGenerationInfo.defaultValue(
-          member.scType, inClass.getContainingFile)
+      val body = ScalaGenerationInfo.defaultValue(member.scType,
+                                                  inClass.getContainingFile)
       val prototype = ScalaPsiElementFactory.createOverrideImplementMethod(
           member.sign,
           inClass.getManager,
@@ -51,8 +51,8 @@ class ScalaMethodImplementor extends MethodImplementor {
     }).toArray
   }
 
-  def createGenerationInfo(
-      method: PsiMethod, mergeIfExists: Boolean): GenerationInfo = {
+  def createGenerationInfo(method: PsiMethod,
+                           mergeIfExists: Boolean): GenerationInfo = {
     val baseMethod = prototypeToBaseMethod.get(method)
     prototypeToBaseMethod.clear()
     new ScalaPsiMethodGenerationInfo(method, baseMethod.orNull)
@@ -67,8 +67,8 @@ class ScalaMethodImplementor extends MethodImplementor {
   def getMethodsToImplement(aClass: PsiClass): Array[PsiMethod] = Array()
 }
 
-private class ScalaPsiMethodGenerationInfo(
-    method: PsiMethod, baseMethod: PsiMethod)
+private class ScalaPsiMethodGenerationInfo(method: PsiMethod,
+                                           baseMethod: PsiMethod)
     extends PsiGenerationInfo[PsiMethod](method) {
 
   var member: PsiMember = method
@@ -79,8 +79,8 @@ private class ScalaPsiMethodGenerationInfo(
         val sign = new PhysicalSignature(method, ScSubstitutor.empty)
         val methodMember = new ScMethodMember(sign, isOverride = false)
 
-        member = ScalaGenerationInfo.insertMethod(
-            methodMember, td, findAnchor(td, baseMethod))
+        member = ScalaGenerationInfo
+          .insertMethod(methodMember, td, findAnchor(td, baseMethod))
       case _ => super.insert(aClass, anchor, before)
     }
   }
@@ -91,8 +91,8 @@ private class ScalaPsiMethodGenerationInfo(
       case _ => super.positionCaret(editor, toEditMethodBody)
     }
 
-  private def findAnchor(
-      td: ScTemplateDefinition, baseMethod: PsiMethod): PsiElement = {
+  private def findAnchor(td: ScTemplateDefinition,
+                         baseMethod: PsiMethod): PsiElement = {
     if (baseMethod == null) return null
 
     var prevBaseMethod: PsiMethod =

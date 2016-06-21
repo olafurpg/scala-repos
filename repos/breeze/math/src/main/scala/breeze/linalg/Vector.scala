@@ -39,8 +39,10 @@ trait VectorLike[@spec V, +Self <: Vector[V]]
     extends Tensor[Int, V]
     with TensorLike[Int, V, Self] {
   def map[V2, That](fn: V => V2)(
-      implicit canMapValues: CanMapValues[
-          Self @uncheckedVariance, V, V2, That]): That =
+      implicit canMapValues: CanMapValues[Self @uncheckedVariance,
+                                          V,
+                                          V2,
+                                          That]): That =
     values map fn
 
   def foreach[U](fn: V => U): Unit = { values foreach fn }
@@ -141,7 +143,8 @@ trait Vector[@spec(Int, Double, Float) V] extends VectorLike[V, Vector[V]] {
   /** See [[scala.collection.mutable.ArrayOps.scan]].
     */
   def scan[E1 >: V](z: E1)(op: (E1, E1) => E1)(
-      implicit cm: ClassTag[V], cm1: ClassTag[E1]): Vector[E1] = {
+      implicit cm: ClassTag[V],
+      cm1: ClassTag[E1]): Vector[E1] = {
     Vector[E1](toArray.scan(z)(op))
   }
 
@@ -343,9 +346,9 @@ trait VectorOps {
 
   @expand.valify
   @expand
-  implicit def v_v_Idempotent_Op[
-      @expand.args(Int, Double, Float, Long) T,
-      @expand.args(OpAdd, OpSub) Op <: OpType](implicit @expand.sequence[Op]({
+  implicit def v_v_Idempotent_Op[@expand.args(Int, Double, Float, Long) T,
+                                 @expand.args(OpAdd, OpSub) Op <: OpType](
+      implicit @expand.sequence[Op]({
     _ + _
   }, { _ - _ }) op: Op.Impl2[T, T, T])
     : BinaryRegistry[Vector[T], Vector[T], Op.type, Vector[T]] =
@@ -438,25 +441,23 @@ trait VectorOps {
 
   @expand
   @expand.valify
-  implicit def v_s_Op[
-      @expand.args(Int, Double, Float, Long) T,
-      @expand.args(
-          OpAdd,
-          OpSub,
-          OpMulScalar,
-          OpMulMatrix,
-          OpDiv,
-          OpSet,
-          OpMod,
-          OpPow) Op <: OpType](implicit @expand.sequence[Op]({ _ + _ }, {
-                                 _ - _
-                               }, { _ * _ }, { _ * _ }, {
-                                 _ / _
-                               }, { (a, b) =>
-                                 b
-                               }, { _ % _ }, { _ pow _ }) op: Op.Impl2[
-                                   T, T, T],
-                               @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+  implicit def v_s_Op[@expand.args(Int, Double, Float, Long) T,
+                      @expand.args(OpAdd,
+                                   OpSub,
+                                   OpMulScalar,
+                                   OpMulMatrix,
+                                   OpDiv,
+                                   OpSet,
+                                   OpMod,
+                                   OpPow) Op <: OpType](
+      implicit @expand.sequence[Op]({ _ + _ }, {
+        _ - _
+      }, { _ * _ }, { _ * _ }, {
+        _ / _
+      }, { (a, b) =>
+        b
+      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : BinaryRegistry[Vector[T], T, Op.type, Vector[T]] =
     new BinaryRegistry[Vector[T], T, Op.type, Vector[T]] {
       override def bindingMissing(a: Vector[T], b: T): Vector[T] = {
@@ -473,25 +474,23 @@ trait VectorOps {
 
   @expand
   @expand.valify
-  implicit def s_v_Op[
-      @expand.args(Int, Double, Float, Long) T,
-      @expand.args(
-          OpAdd,
-          OpSub,
-          OpMulScalar,
-          OpMulMatrix,
-          OpDiv,
-          OpSet,
-          OpMod,
-          OpPow) Op <: OpType](implicit @expand.sequence[Op]({ _ + _ }, {
-                                 _ - _
-                               }, { _ * _ }, { _ * _ }, {
-                                 _ / _
-                               }, { (a, b) =>
-                                 b
-                               }, { _ % _ }, { _ pow _ }) op: Op.Impl2[
-                                   T, T, T],
-                               @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+  implicit def s_v_Op[@expand.args(Int, Double, Float, Long) T,
+                      @expand.args(OpAdd,
+                                   OpSub,
+                                   OpMulScalar,
+                                   OpMulMatrix,
+                                   OpDiv,
+                                   OpSet,
+                                   OpMod,
+                                   OpPow) Op <: OpType](
+      implicit @expand.sequence[Op]({ _ + _ }, {
+        _ - _
+      }, { _ * _ }, { _ * _ }, {
+        _ / _
+      }, { (a, b) =>
+        b
+      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : BinaryRegistry[T, Vector[T], Op.type, Vector[T]] =
     new BinaryRegistry[T, Vector[T], Op.type, Vector[T]] {
       override def bindingMissing(b: T, a: Vector[T]): Vector[T] = {
@@ -610,17 +609,16 @@ trait VectorOps {
 
   @expand
   @expand.valify
-  implicit def v_s_UpdateOp[
-      @expand.args(Int, Double, Float, Long) T,
-      @expand.args(
-          OpAdd,
-          OpSub,
-          OpMulScalar,
-          OpMulMatrix,
-          OpDiv,
-          OpSet,
-          OpMod,
-          OpPow) Op <: OpType](implicit @expand.sequence[Op]({ _ + _ }, {
+  implicit def v_s_UpdateOp[@expand.args(Int, Double, Float, Long) T,
+                            @expand.args(OpAdd,
+                                         OpSub,
+                                         OpMulScalar,
+                                         OpMulMatrix,
+                                         OpDiv,
+                                         OpSet,
+                                         OpMod,
+                                         OpPow) Op <: OpType](
+      implicit @expand.sequence[Op]({ _ + _ }, {
     _ - _
   }, { _ * _ }, { _ * _ }, {
     _ / _
@@ -669,10 +667,15 @@ trait VectorOps {
   @expand
   @expand.valify
   implicit def canDot_V_V[@expand.args(Int, Long, Float, Double) T](
-      implicit @expand.sequence[T](0, 0l, 0.0f, 0.0) zero: T): BinaryRegistry[
-      Vector[T], Vector[T], breeze.linalg.operators.OpMulInner.type, T] = {
-    new BinaryRegistry[
-        Vector[T], Vector[T], breeze.linalg.operators.OpMulInner.type, T] {
+      implicit @expand.sequence[T](0, 0l, 0.0f, 0.0) zero: T)
+    : BinaryRegistry[Vector[T],
+                     Vector[T],
+                     breeze.linalg.operators.OpMulInner.type,
+                     T] = {
+    new BinaryRegistry[Vector[T],
+                       Vector[T],
+                       breeze.linalg.operators.OpMulInner.type,
+                       T] {
       override def bindingMissing(a: Vector[T], b: Vector[T]): T = {
         require(b.length == a.length, "Vectors must be the same length!")
         if (a.activeSize > b.activeSize) {
@@ -688,10 +691,15 @@ trait VectorOps {
     }
   }
 
-  implicit def canDot_V_V[T: ClassTag: Semiring]: BinaryRegistry[
-      Vector[T], Vector[T], breeze.linalg.operators.OpMulInner.type, T] = {
-    new BinaryRegistry[
-        Vector[T], Vector[T], breeze.linalg.operators.OpMulInner.type, T] {
+  implicit def canDot_V_V[T: ClassTag: Semiring]
+    : BinaryRegistry[Vector[T],
+                     Vector[T],
+                     breeze.linalg.operators.OpMulInner.type,
+                     T] = {
+    new BinaryRegistry[Vector[T],
+                       Vector[T],
+                       breeze.linalg.operators.OpMulInner.type,
+                       T] {
       val s = implicitly[Semiring[T]]
       override def bindingMissing(a: Vector[T], b: Vector[T]): T = {
         require(b.length == a.length, "Vectors must be the same length!")
@@ -747,10 +755,13 @@ trait VectorOps {
   @expand.valify
   implicit def zipValuesImpl_V_V[@expand.args(Int, Double, Float, Long) T]
     : BinaryRegistry[Vector[T], Vector[T], zipValues.type, ZippedValues[T, T]] = {
-    new BinaryRegistry[
-        Vector[T], Vector[T], zipValues.type, ZippedValues[T, T]] {
+    new BinaryRegistry[Vector[T],
+                       Vector[T],
+                       zipValues.type,
+                       ZippedValues[T, T]] {
       protected override def bindingMissing(
-          a: Vector[T], b: Vector[T]): ZippedValues[T, T] = {
+          a: Vector[T],
+          b: Vector[T]): ZippedValues[T, T] = {
         require(a.length == b.length, "vector dimension mismatch")
         ZippedVectorValues(a, b)
       }
@@ -766,7 +777,8 @@ trait VectorOps {
 
   case class ZippedVectorValues[@spec(Double, Int, Float, Long) T,
                                 @spec(Double, Int, Float, Long) U](
-      a: Vector[T], b: Vector[U])
+      a: Vector[T],
+      b: Vector[U])
       extends ZippedValues[T, U] {
     def foreach(f: (T, U) => Unit): Unit = {
       var i = 0
@@ -858,8 +870,9 @@ trait VectorOps {
       implicit field: Semiring[T],
       zero: Zero[T],
       ct: ClassTag[T]): OpMulScalar.Impl2[Vector[T], T, Vector[T]] =
-    binaryOpFromUpdateOp(
-        implicitly[CanCopy[Vector[T]]], vMulScalarIntoSField, ct)
+    binaryOpFromUpdateOp(implicitly[CanCopy[Vector[T]]],
+                         vMulScalarIntoSField,
+                         ct)
   implicit def vDivSField[T](
       implicit field: Field[T],
       zero: Zero[T],

@@ -85,8 +85,11 @@ private[spark] class ApplicationInfo(val startTime: Long,
   private[master] def addExecutor(worker: WorkerInfo,
                                   cores: Int,
                                   useID: Option[Int] = None): ExecutorDesc = {
-    val exec = new ExecutorDesc(
-        newExecutorId(useID), this, worker, cores, desc.memoryPerExecutorMB)
+    val exec = new ExecutorDesc(newExecutorId(useID),
+                                this,
+                                worker,
+                                cores,
+                                desc.memoryPerExecutorMB)
     executors(exec.id) = exec
     coresGranted += cores
     exec

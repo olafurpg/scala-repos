@@ -24,8 +24,8 @@ import org.apache.spark.sql.catalyst.CatalystTypeConverters
 import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProjection}
 import org.apache.spark.sql.types._
 
-class TestNullableColumnAccessor[JvmType](
-    buffer: ByteBuffer, columnType: ColumnType[JvmType])
+class TestNullableColumnAccessor[JvmType](buffer: ByteBuffer,
+                                          columnType: ColumnType[JvmType])
     extends BasicColumnAccessor(buffer, columnType)
     with NullableColumnAccessor
 

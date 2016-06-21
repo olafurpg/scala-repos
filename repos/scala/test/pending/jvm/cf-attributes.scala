@@ -77,7 +77,7 @@ trait Test1 {
       mods = AccessFlags.asString(c.getModifiers)
       kind = if (c.isInterface) "interface" else "class"
       println("  " + mods + kind + " " + c.getName + " of class " +
-          c.getEnclosingClass.getName)
+            c.getEnclosingClass.getName)
     }
   }
   def printClass(cls: Class[_]) {

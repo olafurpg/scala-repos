@@ -18,7 +18,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
   case class User(id: Long, name: String, friends: List[User])
 
   implicit val UserFormat: Format[User] = ((__ \ 'id).format[Long] and
-      (__ \ 'name).format[String] and (__ \ 'friends).lazyFormat(
+        (__ \ 'name).format[String] and (__ \ 'friends).lazyFormat(
           Reads.list(UserFormat),
           Writes.list(UserFormat)))(User, unlift(User.unapply))
 
@@ -28,30 +28,30 @@ object JsonSpec extends org.specs2.mutable.Specification {
         .format[Map[String, String]])(Car, unlift(Car.unapply))
 
   import java.text.SimpleDateFormat
-  val dateFormat =
-    "yyyy-MM-dd'T'HH:mm:ssX" // Iso8601 format (forgot timezone stuff)
+  val dateFormat = "yyyy-MM-dd'T'HH:mm:ssX" // Iso8601 format (forgot timezone stuff)
   val dateParser = new SimpleDateFormat(dateFormat)
 
   case class Post(body: String, created_at: Option[Date])
 
   implicit val PostFormat: Format[Post] = ((__ \ 'body).format[String] and
-      (__ \ 'created_at)
-        .formatNullable[Option[Date]](
-            Format(
-                Reads.optionWithNull(Reads.dateReads(dateFormat)),
-                Writes.optionWithNull(Writes.dateWrites(dateFormat))
-            )
-        )
-        .inmap(optopt => optopt.flatten, (opt: Option[Date]) => Some(opt)))(
-      Post, unlift(Post.unapply))
+        (__ \ 'created_at)
+          .formatNullable[Option[Date]](
+              Format(
+                  Reads.optionWithNull(Reads.dateReads(dateFormat)),
+                  Writes.optionWithNull(Writes.dateWrites(dateFormat))
+              )
+          )
+          .inmap(optopt => optopt.flatten, (opt: Option[Date]) => Some(opt)))(
+      Post,
+      unlift(Post.unapply))
 
   val LenientPostFormat: Format[Post] = ((__ \ 'body).format[String] and
-      (__ \ 'created_at).formatNullable[Date](
-          Format(
-              Reads.IsoDateReads,
-              Writes.dateWrites(dateFormat)
-          )
-      ))(Post, unlift(Post.unapply))
+        (__ \ 'created_at).formatNullable[Date](
+            Format(
+                Reads.IsoDateReads,
+                Writes.dateWrites(dateFormat)
+            )
+        ))(Post, unlift(Post.unapply))
 
   val mapper = new ObjectMapper()
 
@@ -366,8 +366,8 @@ object JsonSpec extends org.specs2.mutable.Specification {
       )
       Json.asciiStringify(js) must beEqualTo(
           "{\"key1\":\"\\u2028\\u2029\\u2030\"," +
-          "\"key2\":\"\\u00E1\\u00E9\\u00ED\\u00F3\\u00FA\"," +
-          "\"key3\":\"\\u00A9\\u00A3\"," + "" + "\"key4\":\"\\u6837\\u54C1\"}")
+            "\"key2\":\"\\u00E1\\u00E9\\u00ED\\u00F3\\u00FA\"," +
+            "\"key3\":\"\\u00A9\\u00A3\"," + "" + "\"key4\":\"\\u6837\\u54C1\"}")
     }
 
     "asciiStringify should escape ascii characters properly" in {
@@ -426,7 +426,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
           Json.obj("key1" -> "value1", "key2" -> "value2"))
 
       implicit val myWrites = ((__ \ 'key1).write(constraints.list[Int]) and
-          (__ \ 'key2).write(constraints.set[String]) and (__ \ 'key3).write(
+            (__ \ 'key2).write(constraints.set[String]) and (__ \ 'key3).write(
               constraints.seq[String]) and (__ \ 'key4).write(
               constraints.map[String])).tupled
 
@@ -458,7 +458,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
 
       implicit val testCaseWrites: Writes[TestCase] = ((__ \ "id")
             .write[String] and (__ \ "data" \ "attr1").write[String] and
-          (__ \ "data" \ "attr2").write[String])(unlift(TestCase.unapply))
+            (__ \ "data" \ "attr2").write[String])(unlift(TestCase.unapply))
 
       Json.toJson(TestCase("my-id", "foo", "bar")) must beEqualTo(js)
     }

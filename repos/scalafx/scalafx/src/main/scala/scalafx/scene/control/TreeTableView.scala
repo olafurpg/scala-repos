@@ -161,8 +161,11 @@ object TreeTableView {
              oldValue: T,
              newValue: T) =
       this(
-          new jfxsc.TreeTableView.EditEvent[T](
-              source, eventType, treeTableItem, oldValue, newValue))
+          new jfxsc.TreeTableView.EditEvent[T](source,
+                                               eventType,
+                                               treeTableItem,
+                                               oldValue,
+                                               newValue))
 
     /**
       * Returns the new value input into the TreeItem by the end user.
@@ -339,8 +342,8 @@ object TreeTableView {
                     minColumn: TableColumnBase[jfxsc.TreeItem[S], _],
                     maxRow: Int,
                     maxColumn: TableColumnBase[jfxsc.TreeItem[S], _]) {
-      delegate.selectRange(
-          minRow, minColumn.delegate, maxRow, maxColumn.delegate)
+      delegate
+        .selectRange(minRow, minColumn.delegate, maxRow, maxColumn.delegate)
     }
 
     /**
@@ -727,15 +730,16 @@ class TreeTableView[S](
       p: TreeTableView.ResizeFeatures[_] => Boolean): Unit = {
     delegate
       .columnResizePolicyProperty()
-      .setValue(new jfxu.Callback[
-              jfxsc.TreeTableView.ResizeFeatures[_], java.lang.Boolean] {
+      .setValue(new jfxu.Callback[jfxsc.TreeTableView.ResizeFeatures[_],
+                                  java.lang.Boolean] {
         def call(v: jfxsc.TreeTableView.ResizeFeatures[_]): java.lang.Boolean = {
           p(v)
         }
       })
   }
-  def columnResizePolicy_=(p: jfxu.Callback[
-          jfxsc.TreeTableView.ResizeFeatures[_], java.lang.Boolean]): Unit = {
+  def columnResizePolicy_=(
+      p: jfxu.Callback[jfxsc.TreeTableView.ResizeFeatures[_],
+                       java.lang.Boolean]): Unit = {
     delegate.columnResizePolicyProperty().setValue(p)
   }
 
@@ -887,7 +891,8 @@ class TreeTableView[S](
     : Unit = {
     ObjectProperty.fillProperty[
         jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TreeTableColumn[S, _]]]](
-        onScrollToColumn, v)
+        onScrollToColumn,
+        v)
   }
 
   /**

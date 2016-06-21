@@ -70,7 +70,9 @@ class DataTypeSuite extends SparkFunSuite {
             "b",
             LongType,
             false) :: StructField("c", StringType, true) :: StructField(
-            "d", FloatType, true) :: Nil)
+            "d",
+            FloatType,
+            true) :: Nil)
 
     assert(StructField("b", LongType, false) === struct("b"))
 
@@ -78,9 +80,10 @@ class DataTypeSuite extends SparkFunSuite {
       struct("e")
     }
 
-    val expectedStruct =
-      StructType(StructField("b", LongType, false) :: StructField(
-              "d", FloatType, true) :: Nil)
+    val expectedStruct = StructType(
+        StructField("b", LongType, false) :: StructField("d",
+                                                         FloatType,
+                                                         true) :: Nil)
 
     assert(expectedStruct === struct(Set("b", "d")))
     intercept[IllegalArgumentException] {
@@ -106,8 +109,8 @@ class DataTypeSuite extends SparkFunSuite {
 
     val mapped = StructType.fieldsMap(struct.fields)
 
-    val expected = Map(
-        "a" -> StructField("a", LongType), "b" -> StructField("b", FloatType))
+    val expected = Map("a" -> StructField("a", LongType),
+                       "b" -> StructField("b", FloatType))
 
     assert(mapped === expected)
   }
@@ -149,7 +152,8 @@ class DataTypeSuite extends SparkFunSuite {
     val right = StructType(StructField("c", LongType) :: Nil)
 
     val expected = StructType(StructField("a", LongType) :: StructField(
-            "b", FloatType) :: StructField("c", LongType) :: Nil)
+            "b",
+            FloatType) :: StructField("c", LongType) :: Nil)
 
     val merged = left.merge(right)
 
@@ -254,8 +258,9 @@ class DataTypeSuite extends SparkFunSuite {
   checkDefaultSize(MapType(IntegerType, ArrayType(DoubleType), false), 80400)
   checkDefaultSize(structType, 812)
 
-  def checkEqualsIgnoreCompatibleNullability(
-      from: DataType, to: DataType, expected: Boolean): Unit = {
+  def checkEqualsIgnoreCompatibleNullability(from: DataType,
+                                             to: DataType,
+                                             expected: Boolean): Unit = {
     val testName =
       s"equalsIgnoreCompatibleNullability: (from: ${from}, to: ${to})"
     test(testName) {
@@ -336,9 +341,13 @@ class DataTypeSuite extends SparkFunSuite {
   checkEqualsIgnoreCompatibleNullability(
       from = StructType(
           StructField("a", StringType, nullable = false) :: StructField(
-              "b", StringType, nullable = true) :: Nil),
+              "b",
+              StringType,
+              nullable = true) :: Nil),
       to = StructType(
           StructField("a", StringType, nullable = false) :: StructField(
-              "b", StringType, nullable = false) :: Nil),
+              "b",
+              StringType,
+              nullable = false) :: Nil),
       expected = false)
 }

@@ -57,8 +57,8 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(brzNorm(data1(3).toBreeze, 1) ~== 1.0 absTol 1E-5)
     assert(brzNorm(data1(4).toBreeze, 1) ~== 1.0 absTol 1E-5)
 
-    assert(data1(0) ~== Vectors.sparse(
-            3, Seq((0, -0.465116279), (1, 0.53488372))) absTol 1E-5)
+    assert(data1(0) ~== Vectors
+          .sparse(3, Seq((0, -0.465116279), (1, 0.53488372))) absTol 1E-5)
     assert(data1(1) ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(data1(2) ~==
           Vectors.dense(0.12765957, -0.23404255, -0.63829787) absTol 1E-5)
@@ -89,8 +89,8 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(brzNorm(data2(3).toBreeze, 2) ~== 1.0 absTol 1E-5)
     assert(brzNorm(data2(4).toBreeze, 2) ~== 1.0 absTol 1E-5)
 
-    assert(data2(0) ~== Vectors.sparse(
-            3, Seq((0, -0.65617871), (1, 0.75460552))) absTol 1E-5)
+    assert(data2(0) ~== Vectors
+          .sparse(3, Seq((0, -0.65617871), (1, 0.75460552))) absTol 1E-5)
     assert(data2(1) ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(data2(2) ~==
           Vectors.dense(0.184549876, -0.3383414, -0.922749378) absTol 1E-5)

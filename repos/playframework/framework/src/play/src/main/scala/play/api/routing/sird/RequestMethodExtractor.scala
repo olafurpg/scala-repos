@@ -8,7 +8,7 @@ import play.api.mvc.RequestHeader
 /**
   * An extractor that extracts requests by method.
   */
-class RequestMethodExtractor private[sird](method: String) {
+class RequestMethodExtractor private[sird] (method: String) {
   def unapply(request: RequestHeader): Option[RequestHeader] =
     Some(request).filter(_.method.equalsIgnoreCase(method))
 }

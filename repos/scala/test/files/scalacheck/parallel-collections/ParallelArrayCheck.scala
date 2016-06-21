@@ -44,8 +44,8 @@ abstract class ParallelArrayCheck[T](tp: String)
 
   property("array mappings must be equal") = forAll(collectionPairs) {
     case (t, coll) =>
-      val results = for ((f, ind) <- mapFunctions.zipWithIndex) yield
-        ("op index: " + ind) |: t.map(f) == coll.map(f)
+      val results = for ((f, ind) <- mapFunctions.zipWithIndex)
+        yield ("op index: " + ind) |: t.map(f) == coll.map(f)
       results.reduceLeft(_ && _)
   }
 }

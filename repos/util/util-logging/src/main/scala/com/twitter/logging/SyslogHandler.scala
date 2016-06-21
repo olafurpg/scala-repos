@@ -157,8 +157,9 @@ class SyslogFormatter(val hostname: String = NetUtil.getLocalHostName(),
 
   override def lineTerminator = ""
 
-  override def formatPrefix(
-      level: javalog.Level, date: String, name: String): String = {
+  override def formatPrefix(level: javalog.Level,
+                            date: String,
+                            name: String): String = {
     val syslogLevel = level match {
       case x: Level => SyslogHandler.severityForLogLevel(x.value)
       case x: javalog.Level => SyslogHandler.severityForLogLevel(x.intValue)
@@ -167,8 +168,8 @@ class SyslogFormatter(val hostname: String = NetUtil.getLocalHostName(),
       case None =>
         "<%d>%s %s %s: ".format(priority | syslogLevel, date, hostname, name)
       case Some(serverName) =>
-        "<%d>%s %s [%s] %s: ".format(
-            priority | syslogLevel, date, hostname, serverName, name)
+        "<%d>%s %s [%s] %s: "
+          .format(priority | syslogLevel, date, hostname, serverName, name)
     }
   }
 }
@@ -179,8 +180,7 @@ object SyslogFuture {
   private val noop = new Runnable { def run() {} }
 
   def apply(action: => Unit) =
-    executor.submit(
-        new Runnable {
+    executor.submit(new Runnable {
       def run() { action }
     })
 

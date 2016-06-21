@@ -80,7 +80,7 @@ class Tools[C <: Context](val c: C) {
 
   def blackList(sym: Symbol) =
     sym == AnyClass || sym == AnyRefClass || sym == AnyValClass ||
-    sym == ObjectClass
+      sym == ObjectClass
 
   def isRelevantSubclass(baseSym: Symbol, subSym: Symbol) = {
     !blackList(baseSym) && !blackList(subSym) && subSym.isClass && {
@@ -90,8 +90,9 @@ class Tools[C <: Context](val c: C) {
     }
   }
 
-  def compileTimeDispatchees(
-      tpe: Type, mirror: Mirror, excludeSelf: Boolean): List[Type] = {
+  def compileTimeDispatchees(tpe: Type,
+                             mirror: Mirror,
+                             excludeSelf: Boolean): List[Type] = {
     val subtypes =
       allStaticallyKnownConcreteSubclasses(tpe, mirror).filter(subtpe =>
             subtpe.typeSymbol != tpe.typeSymbol)
@@ -103,8 +104,8 @@ class Tools[C <: Context](val c: C) {
     result
   }
 
-  def allStaticallyKnownConcreteSubclasses(
-      tpe: Type, mirror: Mirror): List[Type] = {
+  def allStaticallyKnownConcreteSubclasses(tpe: Type,
+                                           mirror: Mirror): List[Type] = {
     // TODO: so far the search is a bit dumb
     // given `class C[T]; class D extends C[Int]` and `tpe = C[String]`, it will return <symbol of D>
     // TODO: on a more elaborate note
@@ -226,7 +227,7 @@ class Tools[C <: Context](val c: C) {
           // val tparamsMatch = subSym.typeParams.nonEmpty && tparamNames(baseSym) == tparamNames(subSym)
           val tparamsMatch =
             subSym.typeParams.nonEmpty &&
-            tparamNames(baseSym).length == tparamNames(subSym).length
+              tparamNames(baseSym).length == tparamNames(subSym).length
           val targsAreConcrete =
             baseTargs.nonEmpty && baseTargs.forall(_.typeSymbol.isClass)
           // NOTE: this is an extremely naïve heuristics
@@ -253,11 +254,12 @@ trait RichTypes {
       tpe.normalize match {
         case ExistentialType(tparams, TypeRef(pre, sym, targs))
             if targs.nonEmpty &&
-            targs.forall(targ => tparams.contains(targ.typeSymbol)) =>
+              targs.forall(targ => tparams.contains(targ.typeSymbol)) =>
           TypeRef(pre, sym, Nil).key
         case TypeRef(pre, sym, targs) if pre.typeSymbol.isModuleClass =>
           sym.fullName + (if (sym.isModuleClass) ".type" else "") +
-          (if (targs.isEmpty) "" else targs.map(_.key).mkString("[", ",", "]"))
+            (if (targs.isEmpty) ""
+             else targs.map(_.key).mkString("[", ",", "]"))
         case _ =>
           tpe.toString
       }
@@ -267,7 +269,7 @@ trait RichTypes {
       case TypeRef(_, sym: ClassSymbol, _) if sym.isPrimitive => true
       case TypeRef(_, sym, eltpe :: Nil)
           if sym == ArrayClass && eltpe.typeSymbol.isClass &&
-          eltpe.typeSymbol.asClass.isPrimitive =>
+            eltpe.typeSymbol.asClass.isPrimitive =>
         true
       case _ => false
     }
@@ -475,8 +477,7 @@ abstract class Macro extends RichTypes { self =>
     }
   }
 
-  private var reflectivePrologueEmitted =
-    false // TODO: come up with something better
+  private var reflectivePrologueEmitted = false // TODO: come up with something better
   def reflectively(target: String, fir: FieldIR)(
       body: Tree => Tree): List[Tree] =
     reflectively(newTermName(target), fir)(body)

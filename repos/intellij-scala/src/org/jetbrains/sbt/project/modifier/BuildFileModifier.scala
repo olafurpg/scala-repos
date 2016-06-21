@@ -98,15 +98,14 @@ trait BuildFileModifier {
         new BuildFileChange(originalRevision, copyRevision, buildFileStatus)
     }
     val changesToWorkingCopies = (vcsChanges zip changes).toMap
-    val dialog = ChangesConfirmationDialog(
-        project, vcsChanges.toList, fileStatusMap)
+    val dialog =
+      ChangesConfirmationDialog(project, vcsChanges.toList, fileStatusMap)
     dialog.setModal(true)
     val isOk = dialog.showAndGet()
     if (isOk) {
       val selectedChanges = dialog.selectedChanges
-      Some(
-          for (change <- selectedChanges) yield
-            changesToWorkingCopies(change.asInstanceOf[BuildFileChange]))
+      Some(for (change <- selectedChanges)
+            yield changesToWorkingCopies(change.asInstanceOf[BuildFileChange]))
     } else None
   }
 

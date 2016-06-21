@@ -25,8 +25,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.Success
 class KindProjectorSimplifyTypeProjectionInspection
     extends LocalInspectionTool {
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     def boundsDefined(param: ScTypeParam) = {
       param.lowerTypeElement.isDefined || param.upperTypeElement.isDefined
     }
@@ -75,10 +75,11 @@ class KindProjectorSimplifyTypeProjectionInspection
           val typeParam: Seq[ScTypeParam] = alias.typeParameters
           val valid =
             typeParam.nonEmpty && typeParam.forall(hasNoBounds) &&
-            !typeParam.exists(occursInsideParameterized(
-                    _, paramType, isInsideParam = false)) && typeParam.forall {
-              tpt =>
-                paramType.typeArgs.count(tpt.name == _.presentableText) == 1
+              !typeParam.exists(occursInsideParameterized(
+                      _,
+                      paramType,
+                      isInsideParam = false)) && typeParam.forall { tpt =>
+              paramType.typeArgs.count(tpt.name == _.presentableText) == 1
             }
 
           if (valid) {
@@ -97,9 +98,8 @@ class KindProjectorSimplifyTypeProjectionInspection
               }
             }
             if (!typeParamIt.hasNext && currentTypeParam.isEmpty) {
-              Some(
-                  s"${paramType.designator}${newTypeArgs.mkString(
-                  start = "[", sep = ",", end = "]")}")
+              Some(s"${paramType.designator}${newTypeArgs
+                .mkString(start = "[", sep = ",", end = "]")}")
             } else None
           } else None
         case _ => None
@@ -153,10 +153,10 @@ class KindProjectorSimplifyTypeProjectionInspection
                                           }
                                           if (parameters.length > 1) {
                                             builder.append(
-                                                parameters.mkString(start =
-                                                                      "(",
-                                                                    sep = ",",
-                                                                    end = ")"))
+                                                parameters.mkString(
+                                                    start = "(",
+                                                    sep = ",",
+                                                    end = ")"))
                                           } else
                                             builder.append(
                                                 parameters.mkString(start = "",
@@ -171,9 +171,11 @@ class KindProjectorSimplifyTypeProjectionInspection
                                     }
                                     val fix =
                                       new KindProjectorSimplifyTypeProjectionQuickFix(
-                                          projection, simplified())
-                                    holder.registerProblem(
-                                        projection, inspectionName, fix)
+                                          projection,
+                                          simplified())
+                                    holder.registerProblem(projection,
+                                                           inspectionName,
+                                                           fix)
                                   }
                                 case _ =>
                               }
@@ -197,15 +199,15 @@ class KindProjectorSimplifyTypeProjectionInspection
   override def getID: String = inspectionId
 }
 
-class KindProjectorSimplifyTypeProjectionQuickFix(
-    e: PsiElement, replacement: => String)
+class KindProjectorSimplifyTypeProjectionQuickFix(e: PsiElement,
+                                                  replacement: => String)
     extends AbstractFixOnPsiElement(inspectionName, e) {
   override def doApplyFix(project: Project): Unit = {
     val elem = getElement
     if (!elem.isValid) return
 
-    val te = ScalaPsiElementFactory.createTypeElementFromText(
-        replacement, elem.getManager)
+    val te = ScalaPsiElementFactory
+      .createTypeElementFromText(replacement, elem.getManager)
     elem.replace(te)
   }
 }

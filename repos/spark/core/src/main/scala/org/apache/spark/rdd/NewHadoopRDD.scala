@@ -38,8 +38,9 @@ import org.apache.spark.rdd.NewHadoopRDD.NewHadoopMapPartitionsWithSplitRDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.{SerializableConfiguration, ShutdownHookManager}
 
-private[spark] class NewHadoopPartition(
-    rddId: Int, val index: Int, rawSplit: InputSplit with Writable)
+private[spark] class NewHadoopPartition(rddId: Int,
+                                        val index: Int,
+                                        rawSplit: InputSplit with Writable)
     extends Partition {
 
   val serializableHadoopSplit = new SerializableWritable(rawSplit)
@@ -120,7 +121,9 @@ class NewHadoopRDD[K, V](sc: SparkContext,
     val result = new Array[Partition](rawSplits.size)
     for (i <- 0 until rawSplits.size) {
       result(i) = new NewHadoopPartition(
-          id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
+          id,
+          i,
+          rawSplits(i).asInstanceOf[InputSplit with Writable])
     }
     result
   }
@@ -161,13 +164,14 @@ class NewHadoopRDD[K, V](sc: SparkContext,
           configurable.setConf(conf)
         case _ =>
       }
-      val attemptId = new TaskAttemptID(
-          jobTrackerId, id, TaskType.MAP, split.index, 0)
+      val attemptId =
+        new TaskAttemptID(jobTrackerId, id, TaskType.MAP, split.index, 0)
       val hadoopAttemptContext = new TaskAttemptContextImpl(conf, attemptId)
       private var reader = format.createRecordReader(
-          split.serializableHadoopSplit.value, hadoopAttemptContext)
-      reader.initialize(
-          split.serializableHadoopSplit.value, hadoopAttemptContext)
+          split.serializableHadoopSplit.value,
+          hadoopAttemptContext)
+      reader
+        .initialize(split.serializableHadoopSplit.value, hadoopAttemptContext)
 
       // Register an on-task-completion callback to close the input stream.
       context.addTaskCompletionListener(context => close())
@@ -233,7 +237,8 @@ class NewHadoopRDD[K, V](sc: SparkContext,
             } catch {
               case e: java.io.IOException =>
                 logWarning(
-                    "Unable to get input size to set InputMetrics for task", e)
+                    "Unable to get input size to set InputMetrics for task",
+                    e)
             }
           }
         }
@@ -273,8 +278,8 @@ class NewHadoopRDD[K, V](sc: SparkContext,
     if (storageLevel.deserialized) {
       logWarning(
           "Caching NewHadoopRDDs as deserialized objects usually leads to undesired" +
-          " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
-          " Use a map transformation to make copies of the records.")
+            " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
+            " Use a map transformation to make copies of the records.")
     }
     super.persist(storageLevel)
   }
@@ -292,10 +297,11 @@ private[spark] object NewHadoopRDD {
     * Analogous to [[org.apache.spark.rdd.MapPartitionsRDD]], but passes in an InputSplit to
     * the given function rather than the index of the partition.
     */
-  private[spark] class NewHadoopMapPartitionsWithSplitRDD[
-      U: ClassTag, T: ClassTag](prev: RDD[T],
-                                f: (InputSplit, Iterator[T]) => Iterator[U],
-                                preservesPartitioning: Boolean = false)
+  private[spark] class NewHadoopMapPartitionsWithSplitRDD[U: ClassTag,
+                                                          T: ClassTag](
+      prev: RDD[T],
+      f: (InputSplit, Iterator[T]) => Iterator[U],
+      preservesPartitioning: Boolean = false)
       extends RDD[U](prev) {
 
     override val partitioner =

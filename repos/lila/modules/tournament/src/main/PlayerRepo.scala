@@ -34,8 +34,9 @@ object PlayerRepo {
       .cursor[Player]()
       .collect[List](nb)
 
-  def bestByTourWithRank(
-      tourId: String, nb: Int, skip: Int = 0): Fu[RankedPlayers] =
+  def bestByTourWithRank(tourId: String,
+                         nb: Int,
+                         skip: Int = 0): Fu[RankedPlayers] =
     bestByTour(tourId, nb, skip).map { res =>
       res
         .foldRight(List.empty[RankedPlayer] -> (res.size + skip)) {
@@ -44,8 +45,9 @@ object PlayerRepo {
         ._1
     }
 
-  def bestByTourWithRankByPage(
-      tourId: String, nb: Int, page: Int): Fu[RankedPlayers] =
+  def bestByTourWithRankByPage(tourId: String,
+                               nb: Int,
+                               page: Int): Fu[RankedPlayers] =
     bestByTourWithRank(tourId, nb, (page - 1) * nb)
 
   def countActive(tourId: String): Fu[Int] =
@@ -151,8 +153,8 @@ object PlayerRepo {
       }
     }
 
-  def byTourAndUserIds(
-      tourId: String, userIds: Iterable[String]): Fu[List[Player]] =
+  def byTourAndUserIds(tourId: String,
+                       userIds: Iterable[String]): Fu[List[Player]] =
     coll
       .find(selectTour(tourId) ++ BSONDocument(
               "uid" -> BSONDocument("$in" -> userIds)
@@ -165,8 +167,9 @@ object PlayerRepo {
       }
       .result
 
-  def pairByTourAndUserIds(
-      tourId: String, id1: String, id2: String): Fu[Option[(Player, Player)]] =
+  def pairByTourAndUserIds(tourId: String,
+                           id1: String,
+                           id2: String): Fu[Option[(Player, Player)]] =
     byTourAndUserIds(tourId, List(id1, id2)) map {
       case List(p1, p2) if p1.is(id1) && p2.is(id2) => Some(p1 -> p2)
       case List(p1, p2) if p1.is(id2) && p2.is(id1) => Some(p2 -> p1)
@@ -179,8 +182,8 @@ object PlayerRepo {
               BSONDocument("$set" -> BSONDocument("e" -> performance)))
       .void
 
-  private def rankPlayers(
-      players: List[Player], ranking: Ranking): RankedPlayers =
+  private def rankPlayers(players: List[Player],
+                          ranking: Ranking): RankedPlayers =
     players.flatMap { p =>
       ranking get p.userId map { RankedPlayer(_, p) }
     }.sortBy(_.rank)

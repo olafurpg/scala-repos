@@ -12,8 +12,10 @@ abstract class Employee {
   val salary: Int
 }
 
-case class Firefighter(
-    val name: String, val age: Int, val salary: Int, val since: Int)
+case class Firefighter(val name: String,
+                       val age: Int,
+                       val salary: Int,
+                       val since: Int)
     extends Employee
     with Person
 

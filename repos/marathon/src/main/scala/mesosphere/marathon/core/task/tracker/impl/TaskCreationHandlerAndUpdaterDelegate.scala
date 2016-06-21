@@ -17,7 +17,9 @@ import scala.util.control.NonFatal
   * Implements the [[TaskCreationHandler]]/[[TaskUpdater]] traits by sending messages to the TaskTracker actor.
   */
 private[tracker] class TaskCreationHandlerAndUpdaterDelegate(
-    clock: Clock, conf: TaskTrackerConfig, taskTrackerRef: ActorRef)
+    clock: Clock,
+    conf: TaskTrackerConfig,
+    taskTrackerRef: ActorRef)
     extends TaskCreationHandler
     with TaskUpdater {
 
@@ -38,7 +40,8 @@ private[tracker] class TaskCreationHandlerAndUpdaterDelegate(
   }
 
   private[this] def taskUpdate(
-      taskId: Task.Id, action: TaskOpProcessor.Action): Future[Unit] = {
+      taskId: Task.Id,
+      action: TaskOpProcessor.Action): Future[Unit] = {
 
     import akka.pattern.ask
     val deadline = clock.now + timeout.duration

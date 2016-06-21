@@ -75,8 +75,9 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @param elems the remaining elements to add.
     *  @return A new map with the new bindings added to this map.
     */
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): immutable.Map[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): immutable.Map[A, B1] =
     this + elem1 + elem2 ++ elems
 
   /** Adds a number of elements provided by a traversable object

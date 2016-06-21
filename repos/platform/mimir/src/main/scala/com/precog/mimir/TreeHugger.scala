@@ -48,7 +48,7 @@ class Code extends UsefulStuff {
         IMPORT("bytecode.Library") :: IMPORT("bytecode.BuiltInFunc1") :: IMPORT(
             "java.lang.Math") :: IMPORT("java.lang.String") :: IMPORT(
             "bytecode.BuiltInFunc2") :: IMPORT("yggdrasil._") :: Nil: _*) inPackage
-    ("mimir") inPackage ("com.precog")
+      ("mimir") inPackage ("com.precog")
 
   val methods: Array[String] = classOf[Math].getMethods.map(_.getName)
   val parameters = classOf[Math].getMethods.map(_.getParameterTypes)
@@ -76,18 +76,18 @@ class Code extends UsefulStuff {
     TRAITDEF("Genlib") withParents ("GenOpcode", "GenLibrary") := BLOCK(
         (DEF("_mathlib1") withFlags (Flags.OVERRIDE) :=
               REF("super._mathlib1") SEQ_++ (sym.Set UNAPPLY (ID(m1)))) ::
-        (DEF("_mathlib2") withFlags (Flags.OVERRIDE) :=
-              REF("super._mathlib2") SEQ_++
-            (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
+          (DEF("_mathlib2") withFlags (Flags.OVERRIDE) :=
+                REF("super._mathlib2") SEQ_++
+                  (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
     )
   }
 
   def objects1(method: String): Tree = {
     OBJECTDEF(method) withParents
     ("""BIF1(Vector("std", "math"), "%s")""".format(method)) :=
-      BLOCK(VAL("operandType") := (REF("Some(SDecimal)")),
-            VAL("operation", sym.PartialFunction1) :=
-              BLOCK(CASE(REF("SDecimal(num)")) ==> REF(
+    BLOCK(VAL("operandType") := (REF("Some(SDecimal)")),
+          VAL("operation", sym.PartialFunction1) :=
+            BLOCK(CASE(REF("SDecimal(num)")) ==> REF(
                     """SDecimal(Math.%s(num.toDouble))""".format(method))))
   }
 
@@ -97,8 +97,8 @@ class Code extends UsefulStuff {
         VAL("operandType") := (REF("(Some(SDecimal), Some(SDecimal))")),
         VAL("operation", sym.PartialFunction2) :=
           BLOCK(CASE(REF("(SDecimal(num1), SDecimal(num2))")) ==> REF(
-                """SDecimal(Math.%s(num1.toDouble, num2.toDouble))""".format(
-                    method))))
+                  """SDecimal(Math.%s(num1.toDouble, num2.toDouble))""".format(
+                      method))))
   }
 
   val methodsOneGen =

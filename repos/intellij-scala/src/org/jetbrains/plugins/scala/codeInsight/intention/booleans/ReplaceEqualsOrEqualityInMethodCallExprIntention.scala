@@ -24,8 +24,9 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
   def getFamilyName =
     ReplaceEqualsOrEqualityInMethodCallExprIntention.familyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -81,8 +82,8 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
       .append(replaceOper(oper))
       .append(methodCallExpr.args.getText)
 
-    val newMethodCallExpr = ScalaPsiElementFactory.createExpressionFromText(
-        expr.toString(), element.getManager)
+    val newMethodCallExpr = ScalaPsiElementFactory
+      .createExpressionFromText(expr.toString(), element.getManager)
 
     val size =
       newMethodCallExpr

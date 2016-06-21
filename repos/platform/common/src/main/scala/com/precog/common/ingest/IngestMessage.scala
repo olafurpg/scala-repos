@@ -133,8 +133,8 @@ case class IngestMessage(apiKey: APIKey,
   }
 
   override def toString =
-    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)".format(
-        apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
+    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)"
+      .format(apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
 }
 
 object IngestMessage {
@@ -145,7 +145,7 @@ object IngestMessage {
 
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" ::
-    ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
+      ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
   implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 

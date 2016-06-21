@@ -21,8 +21,8 @@ import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.ScalaIntro
   * Date: 29.03.2009
   */
 class ScalaRefactoringSupportProvider extends RefactoringSupportProvider {
-  override def isInplaceRenameAvailable(
-      element: PsiElement, context: PsiElement) = {
+  override def isInplaceRenameAvailable(element: PsiElement,
+                                        context: PsiElement) = {
     false // handled by ScalaInplaceRenameHandler
   }
 

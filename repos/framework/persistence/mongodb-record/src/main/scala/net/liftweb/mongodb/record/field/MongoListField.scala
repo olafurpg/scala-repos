@@ -130,8 +130,7 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
     else Empty
 
   def asJValue: JValue =
-    JArray(
-        value.map(li =>
+    JArray(value.map(li =>
               li.asInstanceOf[AnyRef] match {
         case x if primitive_?(x.getClass) => primitive2jvalue(x)
         case x if mongotype_?(x.getClass) =>
@@ -169,8 +168,8 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
  */
 class MongoJsonObjectListField[OwnerType <: BsonRecord[OwnerType],
                                JObjectType <: JsonObject[JObjectType]](
-    rec: OwnerType, valueMeta: JsonObjectMeta[JObjectType])(
-    implicit mf: Manifest[JObjectType])
+    rec: OwnerType,
+    valueMeta: JsonObjectMeta[JObjectType])(implicit mf: Manifest[JObjectType])
     extends MongoListField[OwnerType, JObjectType](rec: OwnerType) {
 
   override def asDBObject: DBObject = {
@@ -183,8 +182,7 @@ class MongoJsonObjectListField[OwnerType <: BsonRecord[OwnerType],
   }
 
   override def setFromDBObject(dbo: DBObject): Box[List[JObjectType]] =
-    setBox(
-        Full(dbo.keySet.toList.map(k => {
+    setBox(Full(dbo.keySet.toList.map(k => {
       valueMeta.create(JObjectParser
             .serialize(dbo.get(k.toString))(owner.meta.formats)
             .asInstanceOf[JObject])(owner.meta.formats)
@@ -196,8 +194,7 @@ class MongoJsonObjectListField[OwnerType <: BsonRecord[OwnerType],
   override def setFromJValue(jvalue: JValue) = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
     case JArray(arr) =>
-      setBox(
-          Full(arr.map(jv => {
+      setBox(Full(arr.map(jv => {
         valueMeta.create(jv.asInstanceOf[JObject])(owner.meta.formats)
       })))
     case other => setBox(FieldHelpers.expectedA("JArray", other))

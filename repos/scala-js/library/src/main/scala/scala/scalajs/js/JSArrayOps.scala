@@ -138,8 +138,8 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("forEach")
-  def jsForEach[T](
-      callbackfn: ThisFunction3[T, A, Int, Array[A], _], thisArg: T): Unit =
+  def jsForEach[T](callbackfn: ThisFunction3[T, A, Int, Array[A], _],
+                   thisArg: T): Unit =
     native
   @JSName("forEach")
   def jsForEach(callbackfn: Function3[A, Int, Array[A], _]): Unit = native
@@ -226,8 +226,8 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("reduce")
-  def jsReduce[B](
-      callbackfn: Function4[B, A, Int, Array[A], B], initialValue: B): B =
+  def jsReduce[B](callbackfn: Function4[B, A, Int, Array[A], B],
+                  initialValue: B): B =
     native
   @JSName("reduce")
   def jsReduce[B](callbackfn: Function3[B, A, Int, B], initialValue: B): B =
@@ -251,12 +251,12 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("reduceRight")
-  def jsReduceRight[B](
-      callbackfn: Function4[B, A, Int, Array[A], B], initialValue: B): B =
+  def jsReduceRight[B](callbackfn: Function4[B, A, Int, Array[A], B],
+                       initialValue: B): B =
     native
   @JSName("reduceRight")
-  def jsReduceRight[B](
-      callbackfn: Function3[B, A, Int, B], initialValue: B): B = native
+  def jsReduceRight[B](callbackfn: Function3[B, A, Int, B],
+                       initialValue: B): B = native
   @JSName("reduceRight")
   def jsReduceRight[B](callbackfn: Function2[B, A, B], initialValue: B): B =
     native

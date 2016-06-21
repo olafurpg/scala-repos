@@ -28,10 +28,10 @@ class BalancingDispatcherSpec
 
     def receive = {
       case x: Int ⇒ {
-          Thread.sleep(delay)
-          invocationCount += 1
-          finishedCounter.countDown()
-        }
+        Thread.sleep(delay)
+        invocationCount += 1
+        finishedCounter.countDown()
+      }
     }
   }
 

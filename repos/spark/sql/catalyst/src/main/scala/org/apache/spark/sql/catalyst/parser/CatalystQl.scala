@@ -215,37 +215,36 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
               .map(UnresolvedAlias(_))
             Seq(groupByClause.map(e =>
                       e match {
-                    case Token("TOK_GROUPBY", children) =>
-                      // Not a transformation so must be either project or aggregation.
-                      Aggregate(children.map(nodeToExpr),
-                                selectExpressions,
-                                withWhere)
-                    case _ => sys.error("Expect GROUP BY")
-                }),
-                groupingSetsClause.map(e =>
+                case Token("TOK_GROUPBY", children) =>
+                  // Not a transformation so must be either project or aggregation.
+                  Aggregate(children.map(nodeToExpr),
+                            selectExpressions,
+                            withWhere)
+                case _ => sys.error("Expect GROUP BY")
+            }), groupingSetsClause.map(e =>
                       e match {
-                    case Token("TOK_GROUPING_SETS", children) =>
-                      val (groupByExprs, masks) = extractGroupingSet(children)
-                      GroupingSets(
-                          masks, groupByExprs, withWhere, selectExpressions)
-                    case _ => sys.error("Expect GROUPING SETS")
-                }),
-                rollupGroupByClause.map(e =>
+                case Token("TOK_GROUPING_SETS", children) =>
+                  val (groupByExprs, masks) = extractGroupingSet(children)
+                  GroupingSets(masks,
+                               groupByExprs,
+                               withWhere,
+                               selectExpressions)
+                case _ => sys.error("Expect GROUPING SETS")
+            }), rollupGroupByClause.map(e =>
                       e match {
-                    case Token("TOK_ROLLUP_GROUPBY", children) =>
-                      Aggregate(Seq(Rollup(children.map(nodeToExpr))),
-                                selectExpressions,
-                                withWhere)
-                    case _ => sys.error("Expect WITH ROLLUP")
-                }),
-                cubeGroupByClause.map(e =>
+                case Token("TOK_ROLLUP_GROUPBY", children) =>
+                  Aggregate(Seq(Rollup(children.map(nodeToExpr))),
+                            selectExpressions,
+                            withWhere)
+                case _ => sys.error("Expect WITH ROLLUP")
+            }), cubeGroupByClause.map(e =>
                       e match {
                 case Token("TOK_CUBE_GROUPBY", children) =>
-                          Aggregate(Seq(Cube(children.map(nodeToExpr))),
-                                    selectExpressions,
-                                    withWhere)
-                        case _ => sys.error("Expect WITH CUBE") }),
-                Some(Project(selectExpressions, withWhere))).flatten.head
+                  Aggregate(Seq(Cube(children.map(nodeToExpr))),
+                            selectExpressions,
+                            withWhere)
+                case _ => sys.error("Expect WITH CUBE")
+            }), Some(Project(selectExpressions, withWhere))).flatten.head
           }
 
           // Handle HAVING clause.
@@ -277,8 +276,8 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                    global = false,
                    withDistinct)
             case (None, None, Some(partitionExprs), None) =>
-              RepartitionByExpression(
-                  partitionExprs.children.map(nodeToExpr), withDistinct)
+              RepartitionByExpression(partitionExprs.children.map(nodeToExpr),
+                                      withDistinct)
             case (None,
                   Some(perPartitionOrdering),
                   Some(partitionExprs),
@@ -367,8 +366,8 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
       case Token("TOK_SUBQUERY", query :: Token(alias, Nil) :: Nil) =>
         SubqueryAlias(cleanIdentifier(alias), nodeToPlan(query))
 
-      case Token(
-          laterViewToken(isOuter), selectClause :: relationClause :: Nil) =>
+      case Token(laterViewToken(isOuter),
+                 selectClause :: relationClause :: Nil) =>
         nodeToGenerate(selectClause,
                        outer = isOuter.nonEmpty,
                        nodeToRelation(relationClause))
@@ -409,7 +408,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
             // adjust the fraction.
             require(
                 fraction.toDouble >= (0.0 - RandomSampler.roundingEpsilon) &&
-                fraction.toDouble <= (100.0 + RandomSampler.roundingEpsilon),
+                  fraction.toDouble <= (100.0 + RandomSampler.roundingEpsilon),
                 s"Sampling fraction ($fraction) must be on interval [0, 100]")
             Sample(0.0,
                    fraction.toDouble / 100,
@@ -484,16 +483,17 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
   }
 
   val destinationToken = "TOK_DESTINATION|TOK_INSERT_INTO".r
-  protected def nodeToDest(
-      node: ASTNode, query: LogicalPlan, overwrite: Boolean): LogicalPlan =
+  protected def nodeToDest(node: ASTNode,
+                           query: LogicalPlan,
+                           overwrite: Boolean): LogicalPlan =
     node match {
       case Token(destinationToken(),
                  Token("TOK_DIR", Token("TOK_TMP_FILE", Nil) :: Nil) :: Nil) =>
         query
 
       case Token(destinationToken(), Token("TOK_TAB", tableArgs) :: Nil) =>
-        val Some(tableNameParts) :: partitionClause :: Nil = getClauses(
-            Seq("TOK_TABNAME", "TOK_PARTSPEC"), tableArgs)
+        val Some(tableNameParts) :: partitionClause :: Nil =
+          getClauses(Seq("TOK_TABNAME", "TOK_PARTSPEC"), tableArgs)
 
         val tableIdent = extractTableIdent(tableNameParts)
 
@@ -515,10 +515,10 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                         ifNotExists = false)
 
       case Token(destinationToken(),
-                 Token("TOK_TAB", tableArgs) :: Token(
-                 "TOK_IFNOTEXISTS", ifNotExists) :: Nil) =>
-        val Some(tableNameParts) :: partitionClause :: Nil = getClauses(
-            Seq("TOK_TABNAME", "TOK_PARTSPEC"), tableArgs)
+                 Token("TOK_TAB", tableArgs) :: Token("TOK_IFNOTEXISTS",
+                                                      ifNotExists) :: Nil) =>
+        val Some(tableNameParts) :: partitionClause :: Nil =
+          getClauses(Seq("TOK_TABNAME", "TOK_PARTSPEC"), tableArgs)
 
         val tableIdent = extractTableIdent(tableNameParts)
 
@@ -567,8 +567,8 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
   /**
     * Flattens the left deep tree with the specified pattern into a list.
     */
-  private def flattenLeftDeepTree(
-      node: ASTNode, pattern: Regex): Seq[ASTNode] = {
+  private def flattenLeftDeepTree(node: ASTNode,
+                                  pattern: Regex): Seq[ASTNode] = {
     val collected = ArrayBuffer[ASTNode]()
     var rest = node
     while (rest match {
@@ -656,8 +656,8 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
     case Token(
         "TOK_FUNCTION",
         Token("TOK_DECIMAL", precision :: scale :: nil) :: arg :: Nil) =>
-      Cast(
-          nodeToExpr(arg), DecimalType(precision.text.toInt, scale.text.toInt))
+      Cast(nodeToExpr(arg),
+           DecimalType(precision.text.toInt, scale.text.toInt))
     case Token("TOK_FUNCTION",
                Token("TOK_DECIMAL", precision :: Nil) :: arg :: Nil) =>
       Cast(nodeToExpr(arg), DecimalType(precision.text.toInt, 0))
@@ -780,16 +780,16 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
       Literal(strings.map(s => ParseUtils.unescapeSQLString(s.text)).mkString)
 
     case ast if ast.tokenType == SparkSqlParser.TinyintLiteral =>
-      Literal.create(
-          ast.text.substring(0, ast.text.length() - 1).toByte, ByteType)
+      Literal
+        .create(ast.text.substring(0, ast.text.length() - 1).toByte, ByteType)
 
     case ast if ast.tokenType == SparkSqlParser.SmallintLiteral =>
-      Literal.create(
-          ast.text.substring(0, ast.text.length() - 1).toShort, ShortType)
+      Literal.create(ast.text.substring(0, ast.text.length() - 1).toShort,
+                     ShortType)
 
     case ast if ast.tokenType == SparkSqlParser.BigintLiteral =>
-      Literal.create(
-          ast.text.substring(0, ast.text.length() - 1).toLong, LongType)
+      Literal
+        .create(ast.text.substring(0, ast.text.length() - 1).toLong, LongType)
 
     case ast if ast.tokenType == SparkSqlParser.DoubleLiteral =>
       Literal(ast.text.toDouble)
@@ -911,58 +911,60 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
         }
 
         // Handle Window Frame
-        val windowFrame =
-          if (rowFrame.isEmpty && rangeFrame.isEmpty) {
-            UnspecifiedFrame
-          } else {
-            val frameType = rowFrame.map(_ => RowFrame).getOrElse(RangeFrame)
-            def nodeToBoundary(node: ASTNode): FrameBoundary = node match {
-              case Token(PRECEDING(), Token(count, Nil) :: Nil) =>
-                if (count.toLowerCase() == "unbounded") {
-                  UnboundedPreceding
-                } else {
-                  ValuePreceding(count.toInt)
-                }
-              case Token(FOLLOWING(), Token(count, Nil) :: Nil) =>
-                if (count.toLowerCase() == "unbounded") {
-                  UnboundedFollowing
-                } else {
-                  ValueFollowing(count.toInt)
-                }
-              case Token(CURRENT(), Nil) => CurrentRow
-              case _ =>
-                noParseRule("Window Frame Boundary", node)
-            }
-
-            rowFrame
-              .orElse(rangeFrame)
-              .map { frame =>
-                frame.children match {
-                  case precedingNode :: followingNode :: Nil =>
-                    SpecifiedWindowFrame(frameType,
-                                         nodeToBoundary(precedingNode),
-                                         nodeToBoundary(followingNode))
-                  case precedingNode :: Nil =>
-                    SpecifiedWindowFrame(
-                        frameType, nodeToBoundary(precedingNode), CurrentRow)
-                  case _ =>
-                    noParseRule("Window Frame", frame)
-                }
+        val windowFrame = if (rowFrame.isEmpty && rangeFrame.isEmpty) {
+          UnspecifiedFrame
+        } else {
+          val frameType = rowFrame.map(_ => RowFrame).getOrElse(RangeFrame)
+          def nodeToBoundary(node: ASTNode): FrameBoundary = node match {
+            case Token(PRECEDING(), Token(count, Nil) :: Nil) =>
+              if (count.toLowerCase() == "unbounded") {
+                UnboundedPreceding
+              } else {
+                ValuePreceding(count.toInt)
               }
-              .getOrElse(sys.error(
-                      s"If you see this, please file a bug report with your query."))
+            case Token(FOLLOWING(), Token(count, Nil) :: Nil) =>
+              if (count.toLowerCase() == "unbounded") {
+                UnboundedFollowing
+              } else {
+                ValueFollowing(count.toInt)
+              }
+            case Token(CURRENT(), Nil) => CurrentRow
+            case _ =>
+              noParseRule("Window Frame Boundary", node)
           }
+
+          rowFrame
+            .orElse(rangeFrame)
+            .map { frame =>
+              frame.children match {
+                case precedingNode :: followingNode :: Nil =>
+                  SpecifiedWindowFrame(frameType,
+                                       nodeToBoundary(precedingNode),
+                                       nodeToBoundary(followingNode))
+                case precedingNode :: Nil =>
+                  SpecifiedWindowFrame(frameType,
+                                       nodeToBoundary(precedingNode),
+                                       CurrentRow)
+                case _ =>
+                  noParseRule("Window Frame", frame)
+              }
+            }
+            .getOrElse(sys.error(
+                    s"If you see this, please file a bug report with your query."))
+        }
 
         WindowSpecDefinition(partitionSpec, orderSpec, windowFrame)
     }
 
   protected def nodeToTransformation(
-      node: ASTNode, child: LogicalPlan): Option[ScriptTransformation] = None
+      node: ASTNode,
+      child: LogicalPlan): Option[ScriptTransformation] = None
 
   val explode = "(?i)explode".r
   val jsonTuple = "(?i)json_tuple".r
-  protected def nodeToGenerate(
-      node: ASTNode, outer: Boolean, child: LogicalPlan): Generate = {
+  protected def nodeToGenerate(node: ASTNode,
+                               outer: Boolean,
+                               child: LogicalPlan): Generate = {
     val Token("TOK_SELECT", Token("TOK_SELEXPR", clauses) :: Nil) = node
 
     val alias = cleanIdentifier(

@@ -124,8 +124,9 @@ private[deploy] object RPackageUtils extends Logging {
                 .mkString(File.separator))
 
       val process = builder.start()
-      new RedirectThread(
-          process.getInputStream, printStream, "redirect R packaging").start()
+      new RedirectThread(process.getInputStream,
+                         printStream,
+                         "redirect R packaging").start()
       process.waitFor() == 0
     } catch {
       case e: Throwable =>
@@ -137,8 +138,9 @@ private[deploy] object RPackageUtils extends Logging {
   /**
     * Extracts the files under /R in the jar to a temporary directory for building.
     */
-  private def extractRFolder(
-      jar: JarFile, printStream: PrintStream, verbose: Boolean): File = {
+  private def extractRFolder(jar: JarFile,
+                             printStream: PrintStream,
+                             verbose: Boolean): File = {
     val tempDir = Utils.createTempDir(null)
     val jarEntries = jar.entries()
     while (jarEntries.hasMoreElements) {
@@ -186,8 +188,10 @@ private[deploy] object RPackageUtils extends Logging {
             RUtils.rPackages = Some(Utils.createTempDir().getAbsolutePath)
           }
           try {
-            if (!rPackageBuilder(
-                    rSource, printStream, verbose, RUtils.rPackages.get)) {
+            if (!rPackageBuilder(rSource,
+                                 printStream,
+                                 verbose,
+                                 RUtils.rPackages.get)) {
               print(s"ERROR: Failed to build R package in $file.", printStream)
               print(RJarDoc, printStream)
             }
@@ -211,14 +215,13 @@ private[deploy] object RPackageUtils extends Logging {
     }
   }
 
-  private def listFilesRecursively(
-      dir: File, excludePatterns: Seq[String]): Set[File] = {
+  private def listFilesRecursively(dir: File,
+                                   excludePatterns: Seq[String]): Set[File] = {
     if (!dir.exists()) {
       Set.empty[File]
     } else {
       if (dir.isDirectory) {
-        val subDir = dir.listFiles(
-            new FilenameFilter {
+        val subDir = dir.listFiles(new FilenameFilter {
           override def accept(dir: File, name: String): Boolean = {
             !excludePatterns.map(name.contains).reduce(_ || _) // exclude files with given pattern
           }

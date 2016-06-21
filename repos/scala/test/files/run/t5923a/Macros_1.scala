@@ -48,8 +48,8 @@ object Macros {
           TypeTag.Nothing.asInstanceOf[TypeTag[T]]
         else ttag0
       }
-      reify(
-          C[T](c.Expr[String](Literal(Constant(weakTypeOf[T].toString)))
+      reify(C[T](c
+                .Expr[String](Literal(Constant(weakTypeOf[T].toString)))
                 .splice))
     }
   }

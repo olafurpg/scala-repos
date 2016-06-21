@@ -80,7 +80,7 @@ private[sql] case class InsertIntoHadoopFsRelation(
         .mkString(", ")
       throw new AnalysisException(
           s"Duplicate column(s) : $duplicateColumns found, " +
-          s"cannot save to file.")
+            s"cannot save to file.")
     }
 
     val hadoopConf = sqlContext.sparkContext.hadoopConfiguration
@@ -97,7 +97,7 @@ private[sql] case class InsertIntoHadoopFsRelation(
         Utils.tryOrIOException {
           if (!fs.delete(qualifiedOutputPath, true /* recursively */ )) {
             throw new IOException(s"Unable to clear output " +
-                s"directory $qualifiedOutputPath prior to writing to it")
+                  s"directory $qualifiedOutputPath prior to writing to it")
           }
         }
         true
@@ -124,13 +124,13 @@ private[sql] case class InsertIntoHadoopFsRelation(
       val queryExecution =
         Dataset.newDataFrame(sqlContext, query).queryExecution
       SQLExecution.withNewExecutionId(sqlContext, queryExecution) {
-        val relation =
-          WriteRelation(sqlContext,
-                        dataColumns.toStructType,
-                        qualifiedOutputPath.toString,
-                        fileFormat.prepareWrite(
-                            sqlContext, _, options, dataColumns.toStructType),
-                        bucketSpec)
+        val relation = WriteRelation(
+            sqlContext,
+            dataColumns.toStructType,
+            qualifiedOutputPath.toString,
+            fileFormat
+              .prepareWrite(sqlContext, _, options, dataColumns.toStructType),
+            bucketSpec)
 
         val writerContainer =
           if (partitionColumns.isEmpty && bucketSpec.isEmpty) {
@@ -152,8 +152,8 @@ private[sql] case class InsertIntoHadoopFsRelation(
         writerContainer.driverSideSetup()
 
         try {
-          sqlContext.sparkContext.runJob(
-              queryExecution.toRdd, writerContainer.writeRows _)
+          sqlContext.sparkContext
+            .runJob(queryExecution.toRdd, writerContainer.writeRows _)
           writerContainer.commitJob()
           refreshFunction()
         } catch {

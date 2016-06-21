@@ -69,8 +69,8 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseAnd(nullLit, nullLit), null)
     checkEvaluation(BitwiseAnd(positiveShortLit, negativeShortLit),
                     (positiveShort & negativeShort).toShort)
-    checkEvaluation(
-        BitwiseAnd(positiveIntLit, negativeIntLit), positiveInt & negativeInt)
+    checkEvaluation(BitwiseAnd(positiveIntLit, negativeIntLit),
+                    positiveInt & negativeInt)
     checkEvaluation(BitwiseAnd(positiveLongLit, negativeLongLit),
                     positiveLong & negativeLong)
 
@@ -98,8 +98,8 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseOr(nullLit, nullLit), null)
     checkEvaluation(BitwiseOr(positiveShortLit, negativeShortLit),
                     (positiveShort | negativeShort).toShort)
-    checkEvaluation(
-        BitwiseOr(positiveIntLit, negativeIntLit), positiveInt | negativeInt)
+    checkEvaluation(BitwiseOr(positiveIntLit, negativeIntLit),
+                    positiveInt | negativeInt)
     checkEvaluation(BitwiseOr(positiveLongLit, negativeLongLit),
                     positiveLong | negativeLong)
 
@@ -127,8 +127,8 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseXor(nullLit, nullLit), null)
     checkEvaluation(BitwiseXor(positiveShortLit, negativeShortLit),
                     (positiveShort ^ negativeShort).toShort)
-    checkEvaluation(
-        BitwiseXor(positiveIntLit, negativeIntLit), positiveInt ^ negativeInt)
+    checkEvaluation(BitwiseXor(positiveIntLit, negativeIntLit),
+                    positiveInt ^ negativeInt)
     checkEvaluation(BitwiseXor(positiveLongLit, negativeLongLit),
                     positiveLong ^ negativeLong)
 

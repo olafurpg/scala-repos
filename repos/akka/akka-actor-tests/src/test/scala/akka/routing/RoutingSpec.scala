@@ -104,8 +104,9 @@ class RoutingSpec
     }
 
     "use configured nr-of-instances when FromConfig" in {
-      val router = system.actorOf(
-          FromConfig.props(routeeProps = Props[TestActor]), "router1")
+      val router =
+        system.actorOf(FromConfig.props(routeeProps = Props[TestActor]),
+                       "router1")
       router ! GetRoutees
       expectMsgType[Routees].routees.size should ===(3)
       watch(router)
@@ -189,8 +190,7 @@ class RoutingSpec
         case e ⇒ testActor ! e; SupervisorStrategy.Restart
       }
       val supervisor = system.actorOf(Props(new Supervisor(restarter)))
-      supervisor ! RoundRobinPool(3).props(
-          routeeProps = Props(new Actor {
+      supervisor ! RoundRobinPool(3).props(routeeProps = Props(new Actor {
         def receive = {
           case x: String ⇒ throw new Exception(x)
         }

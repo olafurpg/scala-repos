@@ -101,10 +101,10 @@ final class TaskDef(_fullyQualifiedName: String,
   override def equals(that: Any): Boolean = that match {
     case that: TaskDef =>
       this.fullyQualifiedName == that.fullyQualifiedName &&
-      this.fingerprint == that.fingerprint &&
-      this.explicitlySpecified == that.explicitlySpecified &&
-      Arrays.equals(this.selectors.asInstanceOf[Array[AnyRef]],
-                    that.selectors.asInstanceOf[Array[AnyRef]])
+        this.fingerprint == that.fingerprint &&
+        this.explicitlySpecified == that.explicitlySpecified &&
+        Arrays.equals(this.selectors.asInstanceOf[Array[AnyRef]],
+                      that.selectors.asInstanceOf[Array[AnyRef]])
     case _ => false
   }
 

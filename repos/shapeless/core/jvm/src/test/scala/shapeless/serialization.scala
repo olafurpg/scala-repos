@@ -225,8 +225,9 @@ object SerializationTestDefns {
         def show(t: CNil) = ""
       }
 
-      def coproduct[L, R <: Coproduct](
-          name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R] {
+      def coproduct[L, R <: Coproduct](name: String,
+                                       sl: => Show[L],
+                                       sr: => Show[R]) = new Show[L :+: R] {
         def show(lr: L :+: R) = lr match {
           case Inl(l) => s"$name(${sl.show(l)})"
           case Inr(r) => s"${sr.show(r)}"
@@ -950,8 +951,9 @@ class SerializationTests {
 
   @Test
   def testHMap {
-    assertSerializable(HMap[(Set ~?> Option)#λ](
-            Set("foo") -> Option("bar"), Set(23) -> Option(13)))
+    assertSerializable(
+        HMap[(Set ~?> Option)#λ](Set("foo") -> Option("bar"),
+                                 Set(23) -> Option(13)))
     assertSerializable(new (Set ~?> Option))
     assertSerializable(implicitly[(Set ~?> Option)#λ[Set[Int], Option[Int]]])
   }
@@ -1131,7 +1133,7 @@ class SerializationTests {
     val l10 = optic.hlistNthLens[Int :: String :: Boolean :: HNil, _1]
     val l11 = optic
       .recordLens[Record.`'foo -> Int, 'bar -> String, 'baz -> Boolean`.T](
-        'bar)
+          'bar)
     val l12 = optic[Tree[Int]].l.r.l.t
     val l13 = optic[Node[Int]] >> 'r
     val l14 = optic[Node[Int]] >> _1

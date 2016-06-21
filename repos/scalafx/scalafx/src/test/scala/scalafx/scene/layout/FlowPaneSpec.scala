@@ -40,5 +40,6 @@ import scalafx.testutil.{AlignmentDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class FlowPaneSpec
     extends SimpleSFXDelegateSpec[jfxsl.FlowPane, FlowPane](
-        classOf[jfxsl.FlowPane], classOf[FlowPane])
+        classOf[jfxsl.FlowPane],
+        classOf[FlowPane])
     with AlignmentDelegateSpec[jfxsl.FlowPane, FlowPane]

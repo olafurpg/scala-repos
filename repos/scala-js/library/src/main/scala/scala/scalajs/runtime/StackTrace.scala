@@ -124,8 +124,11 @@ object StackTrace {
           val mtch2 = NormalizedFrameLine.exec(line)
           if (mtch2 ne null) {
             val (className, methodName) = extractClassMethod(mtch2(1).get)
-            trace.push(JSStackTraceElem(
-                    className, methodName, mtch2(2).get, mtch2(3).get.toInt))
+            trace.push(
+                JSStackTraceElem(className,
+                                 methodName,
+                                 mtch2(2).get,
+                                 mtch2(3).get.toInt))
           } else {
             // just in case
             trace.push(JSStackTraceElem("<jscode>", line, null, -1))
@@ -218,25 +221,24 @@ object StackTrace {
     val encoded =
       if (encodedName.charAt(0) == '$') encodedName.substring(1)
       else encodedName
-    val base =
-      if (decompressedClasses.contains(encoded)) {
-        decompressedClasses(encoded)
-      } else {
-        @tailrec
-        def loop(i: Int): String = {
-          if (i < compressedPrefixes.length) {
-            val prefix = compressedPrefixes(i)
-            if (encoded.startsWith(prefix))
-              decompressedPrefixes(prefix) + encoded.substring(prefix.length)
-            else loop(i + 1)
-          } else {
-            // no prefix matches
-            if (encoded.startsWith("L")) encoded.substring(1)
-            else encoded // just in case
-          }
+    val base = if (decompressedClasses.contains(encoded)) {
+      decompressedClasses(encoded)
+    } else {
+      @tailrec
+      def loop(i: Int): String = {
+        if (i < compressedPrefixes.length) {
+          val prefix = compressedPrefixes(i)
+          if (encoded.startsWith(prefix))
+            decompressedPrefixes(prefix) + encoded.substring(prefix.length)
+          else loop(i + 1)
+        } else {
+          // no prefix matches
+          if (encoded.startsWith("L")) encoded.substring(1)
+          else encoded // just in case
         }
-        loop(0)
       }
+      loop(0)
+    }
     base.replace("_", ".").replace("$und", "_")
   }
 
@@ -546,12 +548,12 @@ object StackTrace {
 
   object JSStackTraceElem {
     @inline
-    def apply(declaringClass: String,
-              methodName: String,
-              fileName: String,
-              lineNumber: Int,
-              columnNumber: js.UndefOr[Int] =
-                js.undefined): JSStackTraceElem = {
+    def apply(
+        declaringClass: String,
+        methodName: String,
+        fileName: String,
+        lineNumber: Int,
+        columnNumber: js.UndefOr[Int] = js.undefined): JSStackTraceElem = {
       js.Dynamic
         .literal(
             declaringClass = declaringClass,

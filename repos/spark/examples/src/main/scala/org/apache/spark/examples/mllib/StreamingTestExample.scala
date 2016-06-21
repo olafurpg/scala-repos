@@ -48,7 +48,7 @@ object StreamingTestExample {
     if (args.length != 3) {
       // scalastyle:off println
       System.err.println("Usage: StreamingTestExample " +
-          "<dataDir> <batchDuration> <numBatchesTimeout>")
+            "<dataDir> <batchDuration> <numBatchesTimeout>")
       // scalastyle:on println
       System.exit(1)
     }

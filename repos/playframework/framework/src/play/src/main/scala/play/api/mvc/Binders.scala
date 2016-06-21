@@ -75,8 +75,8 @@ trait QueryStringBindable[A] { self =>
     * @return `None` if the parameter was not present in the query string data. Otherwise, returns `Some` of either
     * `Right` of the parameter value, or `Left` of an error message if the binding failed.
     */
-  def bind(
-      key: String, params: Map[String, Seq[String]]): Option[Either[String, A]]
+  def bind(key: String,
+           params: Map[String, Seq[String]]): Option[Either[String, A]]
 
   /**
     * Unbind a query string parameter.
@@ -555,8 +555,8 @@ object QueryStringBindable {
       key: String,
       params: Map[String, Seq[String]]): Option[Either[String, Seq[T]]] = {
     @tailrec
-    def collectResults(
-        values: List[String], results: List[T]): Either[String, Seq[T]] = {
+    def collectResults(values: List[String],
+                       results: List[T]): Either[String, Seq[T]] = {
       values match {
         case Nil => Right(results.reverse) // to preserve the original order
         case head :: rest =>
@@ -569,8 +569,8 @@ object QueryStringBindable {
     }
 
     @tailrec
-    def collectErrs(
-        values: List[String], errs: List[String]): Left[String, Seq[T]] = {
+    def collectErrs(values: List[String],
+                    errs: List[String]): Left[String, Seq[T]] = {
       values match {
         case Nil => Left(errs.reverse.mkString("\n"))
         case head :: rest =>
@@ -588,7 +588,8 @@ object QueryStringBindable {
   }
 
   private def unbindSeq[T: QueryStringBindable](
-      key: String, values: Iterable[T]): String = {
+      key: String,
+      values: Iterable[T]): String = {
     (for (value <- values) yield {
       implicitly[QueryStringBindable[T]].unbind(key, value)
     }).mkString("&")
@@ -596,7 +597,7 @@ object QueryStringBindable {
 
   private def javascriptUnbindSeq(jsUnbindT: String) =
     "function(k,vs){var l=vs&&vs.length,r=[],i=0;for(;i<l;i++){r[i]=(" +
-    jsUnbindT + ")(k,vs[i])}return r.join('&')}"
+      jsUnbindT + ")(k,vs[i])}return r.join('&')}"
 
   /**
     * QueryString binder for QueryStringBindable.

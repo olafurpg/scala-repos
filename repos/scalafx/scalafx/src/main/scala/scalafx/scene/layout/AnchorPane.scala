@@ -102,8 +102,11 @@ object AnchorPane {
     * @param bottom Bottom Anchor
     * @param left Left Anchor
     */
-  def setAnchors(
-      child: Node, top: Double, right: Double, bottom: Double, left: Double) {
+  def setAnchors(child: Node,
+                 top: Double,
+                 right: Double,
+                 bottom: Double,
+                 left: Double) {
     setTopAnchor(child, top)
     setRightAnchor(child, right)
     setBottomAnchor(child, bottom)

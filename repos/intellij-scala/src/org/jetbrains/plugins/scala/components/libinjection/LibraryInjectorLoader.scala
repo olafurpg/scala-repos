@@ -28,7 +28,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 case class InjectorPersistentCache(
-    pluginVersion: Version, cache: java.util.HashMap[String, JarManifest])
+    pluginVersion: Version,
+    cache: java.util.HashMap[String, JarManifest])
 
 class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
   import LibraryInjectorLoader._
@@ -48,10 +49,13 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
   val myInjectorCacheIndex = new File(
       ScalaUtil.getScalaPluginSystemPath + "injectorCache/libs.index")
   private val myClassLoader = new DynamicClassLoader(
-      Array(myInjectorCacheDir.toURI.toURL), this.getClass.getClassLoader)
+      Array(myInjectorCacheDir.toURI.toURL),
+      this.getClass.getClassLoader)
   implicit private val LOG = Logger.getInstance(getClass)
   private val GROUP = new NotificationGroup(
-      "Injector", NotificationDisplayType.STICKY_BALLOON, false)
+      "Injector",
+      NotificationDisplayType.STICKY_BALLOON,
+      false)
   private val ackProvider = {
     if (ApplicationManager.getApplication.isUnitTestMode)
       new TestAcknowledgementProvider
@@ -61,8 +65,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
   // reset cache if plugin has been updated
   // cache: jarFilePath -> jarManifest
   private var jarCache: InjectorPersistentCache = null
-  private val loadedInjectors: mutable.HashMap[
-      Class[_], mutable.HashSet[String]] = mutable.HashMap()
+  private val loadedInjectors: mutable.HashMap[Class[_],
+                                               mutable.HashSet[String]] =
+    mutable.HashMap()
 
   private val myLibraryTableListener = new LibraryTable.Listener {
 
@@ -178,8 +183,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       cache: InjectorPersistentCache): InjectorPersistentCache = {
     if (ScalaPluginVersionVerifier.getPluginVersion.exists(
             _ != cache.pluginVersion))
-      InjectorPersistentCache(
-          ScalaPluginVersionVerifier.getPluginVersion.get, new util.HashMap())
+      InjectorPersistentCache(ScalaPluginVersionVerifier.getPluginVersion.get,
+                              new util.HashMap())
     else cache
   }
 
@@ -290,7 +295,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
   private def getAllJarsWithManifest: Seq[VirtualFile] = {
     val jarFS = JarFileSystem.getInstance
     val psiFiles = FilenameIndex.getFilesByName(
-        project, INJECTOR_MANIFEST_NAME, GlobalSearchScope.allScope(project))
+        project,
+        INJECTOR_MANIFEST_NAME,
+        GlobalSearchScope.allScope(project))
     psiFiles.map(f =>
           jarFS.getJarRootForLocalFile(
               jarFS.getVirtualFileForJar(f.getVirtualFile)))
@@ -303,9 +310,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     getLibraryCacheDir(jarFile).list().nonEmpty
   }
 
-  private def extractLibraryManifest(jar: VirtualFile,
-                                     skipIncompatible: Boolean =
-                                       true): Option[JarManifest] = {
+  private def extractLibraryManifest(
+      jar: VirtualFile,
+      skipIncompatible: Boolean = true): Option[JarManifest] = {
     val manifestFile = Option(
         jar.findFileByRelativePath(s"META-INF/$INJECTOR_MANIFEST_NAME"))
     manifestFile
@@ -313,12 +320,13 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       .filterNot(m => skipIncompatible && findMatchingInjectors(m).isEmpty)
   }
 
-  private def compileInjectorFromLibrary(
-      sources: Seq[File], outDir: File, m: Module): Seq[File] = {
+  private def compileInjectorFromLibrary(sources: Seq[File],
+                                         outDir: File,
+                                         m: Module): Seq[File] = {
     val platformJars = collectPlatformJars()
     CompileServerLauncher.ensureServerRunning(project)
-    val connector = new InjectorServerConnector(
-        m, sources, outDir, platformJars)
+    val connector =
+      new InjectorServerConnector(m, sources, outDir, platformJars)
     try {
       connector.compile() match {
         case Left(output) => output.map(_._1)
@@ -330,8 +338,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     }
   }
 
-  private def loadInjector(
-      jarManifest: JarManifest, injectorDescriptor: InjectorDescriptor) = {
+  private def loadInjector(jarManifest: JarManifest,
+                           injectorDescriptor: InjectorDescriptor) = {
     myClassLoader.addUrl(
         getInjectorCacheDir(jarManifest)(injectorDescriptor).toURI.toURL)
     val injectors = findMatchingInjectors(jarManifest)
@@ -360,7 +368,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
 
   // don't forget to remove temp directory after compilation
   private def extractInjectorSources(
-      jar: File, injectorDescriptor: InjectorDescriptor): Seq[File] = {
+      jar: File,
+      injectorDescriptor: InjectorDescriptor): Seq[File] = {
     val tmpDir = ScalaUtil.createTmpDir("inject", "")
     def copyToTmpDir(virtualFile: VirtualFile): File = {
       val target = new File(tmpDir, virtualFile.getName)
@@ -403,8 +412,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val (accepted, rejected) =
       ackProvider.showReviewDialogAndFilter(candidates)
     for ((manifest, _) <- rejected) {
-      jarCache.cache.put(
-          manifest.jarPath, manifest.copy()(isBlackListed = true))
+      jarCache.cache
+        .put(manifest.jarPath, manifest.copy()(isBlackListed = true))
     }
     accepted
   }
@@ -449,8 +458,10 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
             if (numFailed == 0) NotificationType.INFORMATION
             else NotificationType.ERROR
           GROUP
-            .createNotification(
-                "IDEA Extensions", msg, notificationDisplayType, null)
+            .createNotification("IDEA Extensions",
+                                msg,
+                                notificationDisplayType,
+                                null)
             .notify(project)
           LOG.trace(msg)
         }, indicator)
@@ -461,7 +472,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val file = new File(
         myInjectorCacheDir,
         (jar.getName +
-            ScalaPluginVersionVerifier.getPluginVersion.get.toString)
+              ScalaPluginVersionVerifier.getPluginVersion.get.toString)
           .replaceAll("\\.", "_"))
     file.mkdir()
     file
@@ -472,10 +483,10 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val jarName = new File(jarManifest.jarPath).getName
     val pluginVersion =
       ScalaPluginVersionVerifier.getPluginVersion.get.toString
-    val libraryDir = new File(
-        myInjectorCacheDir, (jarName + pluginVersion).replaceAll("\\.", "_"))
-    val injectorDir = new File(
-        libraryDir, injectorDescriptor.impl.hashCode.abs.toString)
+    val libraryDir = new File(myInjectorCacheDir,
+                              (jarName + pluginVersion).replaceAll("\\.", "_"))
+    val injectorDir =
+      new File(libraryDir, injectorDescriptor.impl.hashCode.abs.toString)
     injectorDir.mkdirs()
     injectorDir
   }
@@ -532,7 +543,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val model = ModuleManager.getInstance(project).getModifiableModel
     val module = model.newModule(
         ScalaUtil.createTmpDir("injectorModule", "").getAbsolutePath +
-        "/" + INJECTOR_MODULE_NAME,
+          "/" + INJECTOR_MODULE_NAME,
         JavaModuleType.getModuleType.getId)
     model.commit()
     module.configureScalaCompilerSettingsFrom("Default", Seq())
@@ -569,8 +580,7 @@ object LibraryInjectorLoader {
 
   val HELPER_LIBRARY_NAME = "scala-plugin-dev"
   val INJECTOR_MANIFEST_NAME = "intellij-compat.xml"
-  val INJECTOR_MODULE_NAME =
-    "ijscala-plugin-injector-compile.iml" // TODO: use UUID
+  val INJECTOR_MODULE_NAME = "ijscala-plugin-injector-compile.iml" // TODO: use UUID
 
   def getInstance(project: Project) =
     project.getComponent(classOf[LibraryInjectorLoader])

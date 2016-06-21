@@ -247,8 +247,8 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
   def testLibraryFunctions() {
     runDebugger() {
       waitForBreakpoint()
-      evalStartsWith(
-          "scala.collection.mutable.ArrayBuffer.newBuilder", "ArrayBuffer()")
+      evalStartsWith("scala.collection.mutable.ArrayBuffer.newBuilder",
+                     "ArrayBuffer()")
       evalStartsWith("\"test\".substring(0, 2)", "te")
       evalStartsWith("\"test\".substring(2)", "st")
       evalEquals("List[Int](1, 2)", "List(1, 2)")

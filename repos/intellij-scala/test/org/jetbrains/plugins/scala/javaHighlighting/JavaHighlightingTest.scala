@@ -112,8 +112,10 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
 
-    assertMatches(messagesFromJavaCode(
-            scala, java, javaClassName = "JavaHighlightingValueTypes")) {
+    assertMatches(
+        messagesFromJavaCode(scala,
+                             java,
+                             javaClassName = "JavaHighlightingValueTypes")) {
       case Error("(42.0)", CannotBeApplied()) :: Nil =>
     }
   }
@@ -132,8 +134,10 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
 
-    assertNoErrors(messagesFromJavaCode(
-            scalaFileText = "", java, javaClassName = "OptionApply"))
+    assertNoErrors(
+        messagesFromJavaCode(scalaFileText = "",
+                             java,
+                             javaClassName = "OptionApply"))
   }
 
   def testAccessBacktick(): Unit = {
@@ -411,8 +415,10 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
 
-    assertNoErrors(messagesFromJavaCode(
-            scalaCode, javaCode, javaClassName = "SCL5852WrapsFoo"))
+    assertNoErrors(
+        messagesFromJavaCode(scalaCode,
+                             javaCode,
+                             javaClassName = "SCL5852WrapsFoo"))
   }
 
   def testGenericsParameterizedInnerClass(): Unit = {
@@ -534,7 +540,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
                            javaClassName: String): List[Message] = {
     myFixture.addFileToProject("dummy.scala", scalaFileText)
     val myFile: PsiFile = myFixture.addFileToProject(
-        javaClassName + JavaFileType.DOT_DEFAULT_EXTENSION, javaFileText)
+        javaClassName + JavaFileType.DOT_DEFAULT_EXTENSION,
+        javaFileText)
     myFixture.openFileInEditor(myFile.getVirtualFile)
     val allInfo = myFixture.doHighlighting()
 
@@ -546,8 +553,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
     }
   }
 
-  def messagesFromScalaCode(
-      scalaFileText: String, javaFileText: String): List[Message] = {
+  def messagesFromScalaCode(scalaFileText: String,
+                            javaFileText: String): List[Message] = {
     myFixture.addFileToProject("dummy.java", javaFileText)
     myFixture.configureByText("dummy.scala", scalaFileText)
     PsiDocumentManager.getInstance(getProject).commitAllDocuments()
@@ -564,8 +571,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert.assertTrue(
-        "actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert
+      .assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
   }
 
   def assertNoErrors(messages: List[Message]): Unit = {
@@ -589,8 +596,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
     super.setUp()
 
     TestUtils.setLanguageLevel(getProject, LanguageLevel.JDK_1_8)
-    scalaLibraryLoader = new ScalaLibraryLoader(
-        getProject, myFixture.getModule, null)
+    scalaLibraryLoader =
+      new ScalaLibraryLoader(getProject, myFixture.getModule, null)
     scalaLibraryLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
   }
 

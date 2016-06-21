@@ -309,10 +309,9 @@ class StreamExecution(val sqlContext: SQLContext,
   }
 
   def toDebugString: String = {
-    val deathCauseStr =
-      if (streamDeathCause != null) {
-        "Error:\n" + stackTraceToString(streamDeathCause.cause)
-      } else ""
+    val deathCauseStr = if (streamDeathCause != null) {
+      "Error:\n" + stackTraceToString(streamDeathCause.cause)
+    } else ""
     s"""
        |=== Continuous Query ===
        |Name: $name

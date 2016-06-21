@@ -61,8 +61,8 @@ class PipedProcessTest {
                        defaultIO: ProcessIO,
                        toError: Boolean)
       extends Process.PipedProcesses(a, b, defaultIO, toError) {
-    def callRunAndExitValue(
-        source: Process.PipeSource, sink: Process.PipeSink) = {
+    def callRunAndExitValue(source: Process.PipeSource,
+                            sink: Process.PipeSink) = {
       val m = classOf[Process.PipedProcesses].getDeclaredMethod(
           "runAndExitValue",
           classOf[Process.PipeSource],

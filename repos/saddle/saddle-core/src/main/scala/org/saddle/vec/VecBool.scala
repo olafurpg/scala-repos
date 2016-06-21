@@ -40,8 +40,8 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
 
   def unary_-(): Vec[Boolean] = map(!_)
 
-  def concat[B, C](v: Vec[B])(
-      implicit wd: Promoter[Boolean, B, C], mc: ST[C]): Vec[C] =
+  def concat[B, C](v: Vec[B])(implicit wd: Promoter[Boolean, B, C],
+                              mc: ST[C]): Vec[C] =
     Vec(util.Concat.append[Boolean, B, C](toArray, v.toArray))
 
   def foldLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
@@ -61,7 +61,8 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
     VecImpl.filterScanLeft(this)(pred)(init)(f)
 
   def rolling[@spec(Boolean, Int, Long, Double) B: ST](
-      winSz: Int, f: Vec[Boolean] => B): Vec[B] =
+      winSz: Int,
+      f: Vec[Boolean] => B): Vec[B] =
     VecImpl.rolling(this)(winSz, f)
 
   def map[@spec(Boolean, Int, Long, Double) B: ST](f: Boolean => B): Vec[B] =
@@ -115,8 +116,8 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
         val loc = b + i
         if (loc >= e || loc < b)
           throw new ArrayIndexOutOfBoundsException(
-              "Cannot access location %d (vec length %d)".format(
-                  i, self.length))
+              "Cannot access location %d (vec length %d)".format(i,
+                                                                 self.length))
         else if (loc >= self.length || loc < 0) scalarTag.missing
         else self.apply(loc)
       }

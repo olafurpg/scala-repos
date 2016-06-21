@@ -225,7 +225,7 @@ trait Symbols { self: Universe =>
     def asMethod: MethodSymbol = {
       def overloadedMsg =
         "encapsulates multiple overloaded alternatives and cannot be treated as a method. " +
-        "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
+          "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
       def vanillaMsg = "is not a method"
       val msg = if (isOverloadedMethod) overloadedMsg else vanillaMsg
       throw new ScalaReflectionException(s"$this $msg")

@@ -6,22 +6,22 @@ import scala.reflect._
 import reflect.macros._
 
 private[sbt] object KeyMacro {
-  def settingKeyImpl[T: c.WeakTypeTag](
-      c: Context)(description: c.Expr[String]): c.Expr[SettingKey[T]] =
+  def settingKeyImpl[T: c.WeakTypeTag](c: Context)(
+      description: c.Expr[String]): c.Expr[SettingKey[T]] =
     keyImpl[T, SettingKey[T]](c) { (name, mf) =>
       c.universe.reify {
         SettingKey[T](name.splice, description.splice)(mf.splice)
       }
     }
-  def taskKeyImpl[T: c.WeakTypeTag](c: Context)(
-      description: c.Expr[String]): c.Expr[TaskKey[T]] =
+  def taskKeyImpl[T: c.WeakTypeTag](
+      c: Context)(description: c.Expr[String]): c.Expr[TaskKey[T]] =
     keyImpl[T, TaskKey[T]](c) { (name, mf) =>
       c.universe.reify {
         TaskKey[T](name.splice, description.splice)(mf.splice)
       }
     }
-  def inputKeyImpl[T: c.WeakTypeTag](
-      c: Context)(description: c.Expr[String]): c.Expr[InputKey[T]] =
+  def inputKeyImpl[T: c.WeakTypeTag](c: Context)(
+      description: c.Expr[String]): c.Expr[InputKey[T]] =
     keyImpl[T, InputKey[T]](c) { (name, mf) =>
       c.universe.reify {
         InputKey[T](name.splice, description.splice)(mf.splice)
@@ -39,8 +39,8 @@ private[sbt] object KeyMacro {
     val mf = c.Expr[Manifest[T]](c.inferImplicitValue(weakTypeOf[Manifest[T]]))
     f(name, mf)
   }
-  def definingValName(
-      c: Context, invalidEnclosingTree: String => String): String = {
+  def definingValName(c: Context,
+                      invalidEnclosingTree: String => String): String = {
     import c.universe.{Apply => ApplyTree, _}
     val methodName = c.macroApplication.symbol.name
     def processName(n: Name): String =
@@ -55,8 +55,8 @@ private[sbt] object KeyMacro {
             if mods.hasFlag(Flag.LAZY) =>
           processName(name)
         case _ =>
-          c.error(
-              c.enclosingPosition, invalidEnclosingTree(methodName.decoded))
+          c.error(c.enclosingPosition,
+                  invalidEnclosingTree(methodName.decoded))
           "<error>"
       }
     }

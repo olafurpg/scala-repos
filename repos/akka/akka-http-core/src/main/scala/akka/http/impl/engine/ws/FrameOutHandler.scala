@@ -19,8 +19,9 @@ import akka.http.impl.engine.ws.FrameHandler.UserHandlerErredOut
   *
   * INTERNAL API
   */
-private[http] class FrameOutHandler(
-    serverSide: Boolean, _closeTimeout: FiniteDuration, log: LoggingAdapter)
+private[http] class FrameOutHandler(serverSide: Boolean,
+                                    _closeTimeout: FiniteDuration,
+                                    log: LoggingAdapter)
     extends StatefulStage[FrameOutHandler.Input, FrameStart] {
   def initial: StageState[AnyRef, FrameStart] = Idle
   def closeTimeout: Timestamp = Timestamp.now + _closeTimeout
@@ -35,19 +36,20 @@ private[http] class FrameOutHandler(
           // let user complete it, FIXME: maybe make configurable? immediately, or timeout
           become(
               new WaitingForUserHandlerClosed(FrameEvent.closeFrame(
-                      code.getOrElse(Protocol.CloseCodes.Regular), reason)))
+                      code.getOrElse(Protocol.CloseCodes.Regular),
+                      reason)))
           ctx.pull()
         case PeerClosed(code, reason) ⇒
-          val closeFrame = FrameEvent.closeFrame(
-              code.getOrElse(Protocol.CloseCodes.Regular), reason)
+          val closeFrame = FrameEvent
+            .closeFrame(code.getOrElse(Protocol.CloseCodes.Regular), reason)
           if (serverSide) ctx.pushAndFinish(closeFrame)
           else {
             become(new WaitingForTransportClose)
             ctx.push(closeFrame)
           }
         case ActivelyCloseWithCode(code, reason) ⇒
-          val closeFrame = FrameEvent.closeFrame(
-              code.getOrElse(Protocol.CloseCodes.Regular), reason)
+          val closeFrame = FrameEvent
+            .closeFrame(code.getOrElse(Protocol.CloseCodes.Regular), reason)
           become(new WaitingForPeerCloseFrame())
           ctx.push(closeFrame)
         case UserHandlerCompleted ⇒
@@ -56,8 +58,9 @@ private[http] class FrameOutHandler(
         case UserHandlerErredOut(e) ⇒
           log.error(e, s"WebSocket handler failed with ${e.getMessage}")
           become(new WaitingForPeerCloseFrame())
-          ctx.push(FrameEvent.closeFrame(
-                  Protocol.CloseCodes.UnexpectedCondition, "internal error"))
+          ctx.push(
+              FrameEvent.closeFrame(Protocol.CloseCodes.UnexpectedCondition,
+                                    "internal error"))
         case Tick ⇒ ctx.pull() // ignore
       }
 
@@ -160,7 +163,8 @@ private[http] class FrameOutHandler(
     current.asInstanceOf[CompletionHandlingState].onComplete(ctx)
 
   override def onUpstreamFailure(
-      cause: scala.Throwable, ctx: Context[FrameStart]): TerminationDirective =
+      cause: scala.Throwable,
+      ctx: Context[FrameStart]): TerminationDirective =
     cause match {
       case p: ProtocolException ⇒
         become(new SendOutCloseFrameAndComplete(

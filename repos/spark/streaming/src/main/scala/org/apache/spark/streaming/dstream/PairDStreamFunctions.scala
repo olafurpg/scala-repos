@@ -35,7 +35,9 @@ import org.apache.spark.util.{SerializableConfiguration, SerializableJobConf}
   * Extra functions available on DStream of (key, value) pairs through an implicit conversion.
   */
 class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
-    implicit kt: ClassTag[K], vt: ClassTag[V], ord: Ordering[K])
+    implicit kt: ClassTag[K],
+    vt: ClassTag[V],
+    ord: Ordering[K])
     extends Serializable {
   private[streaming] def ssc = self.ssc
 
@@ -91,8 +93,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     * merged using the supplied reduce function. Hash partitioning is used to generate the RDDs
     * with `numPartitions` partitions.
     */
-  def reduceByKey(
-      reduceFunc: (V, V) => V, numPartitions: Int): DStream[(K, V)] =
+  def reduceByKey(reduceFunc: (V, V) => V,
+                  numPartitions: Int): DStream[(K, V)] =
     ssc.withScope {
       reduceByKey(reduceFunc, defaultPartitioner(numPartitions))
     }
@@ -102,8 +104,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     * merged using the supplied reduce function. org.apache.spark.Partitioner is used to control
     * the partitioning of each RDD.
     */
-  def reduceByKey(
-      reduceFunc: (V, V) => V, partitioner: Partitioner): DStream[(K, V)] =
+  def reduceByKey(reduceFunc: (V, V) => V,
+                  partitioner: Partitioner): DStream[(K, V)] =
     ssc.withScope {
       combineByKey((v: V) => v, reduceFunc, reduceFunc, partitioner)
     }
@@ -113,12 +115,12 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     * combineByKey for RDDs. Please refer to combineByKey in
     * org.apache.spark.rdd.PairRDDFunctions in the Spark core documentation for more information.
     */
-  def combineByKey[C: ClassTag](createCombiner: V => C,
-                                mergeValue: (C, V) => C,
-                                mergeCombiner: (C, C) => C,
-                                partitioner: Partitioner,
-                                mapSideCombine: Boolean =
-                                  true): DStream[(K, C)] = ssc.withScope {
+  def combineByKey[C: ClassTag](
+      createCombiner: V => C,
+      mergeValue: (C, V) => C,
+      mergeCombiner: (C, C) => C,
+      partitioner: Partitioner,
+      mapSideCombine: Boolean = true): DStream[(K, C)] = ssc.withScope {
     val cleanedCreateCombiner = sparkContext.clean(createCombiner)
     val cleanedMergeValue = sparkContext.clean(mergeValue)
     val cleanedMergeCombiner = sparkContext.clean(mergeCombiner)
@@ -140,8 +142,9 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     */
   def groupByKeyAndWindow(
       windowDuration: Duration): DStream[(K, Iterable[V])] = ssc.withScope {
-    groupByKeyAndWindow(
-        windowDuration, self.slideDuration, defaultPartitioner())
+    groupByKeyAndWindow(windowDuration,
+                        self.slideDuration,
+                        defaultPartitioner())
   }
 
   /**
@@ -177,8 +180,9 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
       slideDuration: Duration,
       numPartitions: Int
   ): DStream[(K, Iterable[V])] = ssc.withScope {
-    groupByKeyAndWindow(
-        windowDuration, slideDuration, defaultPartitioner(numPartitions))
+    groupByKeyAndWindow(windowDuration,
+                        slideDuration,
+                        defaultPartitioner(numPartitions))
   }
 
   /**
@@ -204,8 +208,10 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     self
       .groupByKey(partitioner)
       .window(windowDuration, slideDuration)
-      .combineByKey[ArrayBuffer[V]](
-          createCombiner, mergeValue, mergeCombiner, partitioner)
+      .combineByKey[ArrayBuffer[V]](createCombiner,
+                                    mergeValue,
+                                    mergeCombiner,
+                                    partitioner)
       .asInstanceOf[DStream[(K, Iterable[V])]]
   }
 
@@ -222,8 +228,10 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
       reduceFunc: (V, V) => V,
       windowDuration: Duration
   ): DStream[(K, V)] = ssc.withScope {
-    reduceByKeyAndWindow(
-        reduceFunc, windowDuration, self.slideDuration, defaultPartitioner())
+    reduceByKeyAndWindow(reduceFunc,
+                         windowDuration,
+                         self.slideDuration,
+                         defaultPartitioner())
   }
 
   /**
@@ -242,8 +250,10 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
       windowDuration: Duration,
       slideDuration: Duration
   ): DStream[(K, V)] = ssc.withScope {
-    reduceByKeyAndWindow(
-        reduceFunc, windowDuration, slideDuration, defaultPartitioner())
+    reduceByKeyAndWindow(reduceFunc,
+                         windowDuration,
+                         slideDuration,
+                         defaultPartitioner())
   }
 
   /**
@@ -479,8 +489,11 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
       partitioner: Partitioner,
       rememberPartitioner: Boolean
   ): DStream[(K, S)] = ssc.withScope {
-    new StateDStream(
-        self, ssc.sc.clean(updateFunc), partitioner, rememberPartitioner, None)
+    new StateDStream(self,
+                     ssc.sc.clean(updateFunc),
+                     partitioner,
+                     rememberPartitioner,
+                     None)
   }
 
   /**
@@ -549,8 +562,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
   def flatMapValues[U: ClassTag](
       flatMapValuesFunc: V => TraversableOnce[U]
   ): DStream[(K, U)] = ssc.withScope {
-    new FlatMapValuedDStream[K, V, U](
-        self, sparkContext.clean(flatMapValuesFunc))
+    new FlatMapValuedDStream[K, V, U](self,
+                                      sparkContext.clean(flatMapValuesFunc))
   }
 
   /**
@@ -603,8 +616,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     * Return a new DStream by applying 'join' between RDDs of `this` DStream and `other` DStream.
     * Hash partitioning is used to generate the RDDs with `numPartitions` partitions.
     */
-  def join[W: ClassTag](
-      other: DStream[(K, W)], numPartitions: Int): DStream[(K, (V, W))] =
+  def join[W: ClassTag](other: DStream[(K, W)],
+                        numPartitions: Int): DStream[(K, (V, W))] =
     ssc.withScope {
       join[W](other, defaultPartitioner(numPartitions))
     }

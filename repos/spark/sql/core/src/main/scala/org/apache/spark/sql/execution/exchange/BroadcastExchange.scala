@@ -80,7 +80,8 @@ case class BroadcastExchange(mode: BroadcastMode, child: SparkPlan)
         "BroadcastExchange does not support the execute() code path.")
   }
 
-  override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] = {
+  override protected[sql] def doExecuteBroadcast[T]()
+    : broadcast.Broadcast[T] = {
     val result = Await.result(relationFuture, timeout)
     result.asInstanceOf[broadcast.Broadcast[T]]
   }

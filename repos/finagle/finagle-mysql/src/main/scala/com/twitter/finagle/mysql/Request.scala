@@ -27,8 +27,7 @@ object Command {
   val COM_BINLOG_DUMP = 0x12.toByte // sent by slave IO thread to req a binlog
   val COM_TABLE_DUMP = 0x13.toByte // deprecated
   val COM_CONNECT_OUT = 0x14.toByte // internal thread state
-  val COM_REGISTER_SLAVE =
-    0x15.toByte // sent by the slave to register with the master (optional)
+  val COM_REGISTER_SLAVE = 0x15.toByte // sent by the slave to register with the master (optional)
   val COM_STMT_PREPARE = 0x16.toByte // mysql_stmt_prepare
   val COM_STMT_EXECUTE = 0x17.toByte // mysql_stmt_execute
   val COM_STMT_SEND_LONG_DATA = 0x18.toByte // mysql_stmt_send_long_data
@@ -90,8 +89,8 @@ case class QueryRequest(sqlStatement: String)
   * [[http://dev.mysql.com/doc/internals/en/com-stmt-prepare.html]]
   */
 case class PrepareRequest(sqlStatement: String)
-    extends SimpleCommandRequest(
-        Command.COM_STMT_PREPARE, sqlStatement.getBytes)
+    extends SimpleCommandRequest(Command.COM_STMT_PREPARE,
+                                 sqlStatement.getBytes)
 
 /**
   * Client response sent during connection phase.
@@ -108,8 +107,7 @@ case class HandshakeResponse(
     serverCap: Capability,
     charset: Short,
     maxPacketSize: Int
-)
-    extends Request {
+) extends Request {
   import Capability._
   override val seq: Short = 1
 
@@ -123,7 +121,7 @@ case class HandshakeResponse(
     val dbStrSize = database.map { _.length + 1 }.getOrElse(0)
     val packetBodySize =
       username.getOrElse("").length + hashPassword.length + dbStrSize +
-      fixedBodySize
+        fixedBodySize
     val bw = BufferWriter(new Array[Byte](packetBodySize))
     bw.writeInt(clientCap.mask)
     bw.writeInt(maxPacketSize)
@@ -164,8 +162,7 @@ class ExecuteRequest(
     val params: IndexedSeq[Parameter],
     val hasNewParams: Boolean,
     val flags: Byte
-)
-    extends CommandRequest(Command.COM_STMT_EXECUTE) {
+) extends CommandRequest(Command.COM_STMT_EXECUTE) {
   private[this] val log = Logger.getLogger("finagle-mysql")
 
   private[this] def makeNullBitmap(
@@ -184,8 +181,8 @@ class ExecuteRequest(
     bitmap
   }
 
-  private[this] def writeTypeCode(
-      param: Parameter, writer: BufferWriter): Unit = {
+  private[this] def writeTypeCode(param: Parameter,
+                                  writer: BufferWriter): Unit = {
     val typeCode = param.typeCode
     if (typeCode != -1) writer.writeShort(typeCode)
     else {
@@ -207,8 +204,8 @@ class ExecuteRequest(
   /**
     * Writes the parameter into its MySQL binary representation.
     */
-  private[this] def writeParam(
-      param: Parameter, writer: BufferWriter): BufferWriter = {
+  private[this] def writeParam(param: Parameter,
+                               writer: BufferWriter): BufferWriter = {
     param.writeTo(writer)
     writer
   }
@@ -232,18 +229,17 @@ class ExecuteRequest(
 
     // parameters are appended to the end of the packet
     // only if the statement has new parameters.
-    val composite =
-      if (hasNewParams) {
-        val types = BufferWriter(new Array[Byte](params.size * 2))
-        params foreach { writeTypeCode(_, types) }
-        Buffer(bw,
-               Buffer(nullBitmap),
-               Buffer(Array(newParamsBound)),
-               types,
-               values)
-      } else {
-        Buffer(bw, Buffer(nullBitmap), Buffer(Array(newParamsBound)), values)
-      }
+    val composite = if (hasNewParams) {
+      val types = BufferWriter(new Array[Byte](params.size * 2))
+      params foreach { writeTypeCode(_, types) }
+      Buffer(bw,
+             Buffer(nullBitmap),
+             Buffer(Array(newParamsBound)),
+             types,
+             values)
+    } else {
+      Buffer(bw, Buffer(nullBitmap), Buffer(Array(newParamsBound)), values)
+    }
     Packet(seq, composite)
   }
 }

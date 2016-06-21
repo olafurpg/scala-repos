@@ -90,8 +90,8 @@ object Task {
 
     override def update(update: TaskStateOp): TaskStateChange = update match {
       // case 1: now running
-      case TaskStateOp.MesosUpdate(
-          MarathonTaskStatus.Running(mesosStatus), now)
+      case TaskStateOp
+            .MesosUpdate(MarathonTaskStatus.Running(mesosStatus), now)
           if !hasStartedRunning =>
         val updated = copy(
             status =
@@ -113,8 +113,8 @@ object Task {
               copy(status = status.copy(mesosStatus = Some(newStatus))))
 
         healthOrStateChange.getOrElse {
-          log.debug(
-              "Ignoring status update for {}. Status did not change.", taskId)
+          log.debug("Ignoring status update for {}. Status did not change.",
+                    taskId)
           TaskStateChange.NoChange
         }
 
@@ -141,8 +141,9 @@ object Task {
     * @param taskId The task Id
     * @param reservation Information about the reserved resources and persistent volumes
     */
-  case class Reserved(
-      taskId: Task.Id, agentInfo: AgentInfo, reservation: Reservation)
+  case class Reserved(taskId: Task.Id,
+                      agentInfo: AgentInfo,
+                      reservation: Reservation)
       extends Task {
 
     override def reservationWithVolumes: Option[Reservation] =
@@ -190,8 +191,8 @@ object Task {
 
     override def update(update: TaskStateOp): TaskStateChange = update match {
       // case 1: now running
-      case TaskStateOp.MesosUpdate(
-          MarathonTaskStatus.Running(mesosStatus), now)
+      case TaskStateOp
+            .MesosUpdate(MarathonTaskStatus.Running(mesosStatus), now)
           if !hasStartedRunning =>
         val updated = copy(
             status =
@@ -220,8 +221,8 @@ object Task {
               copy(status = status.copy(mesosStatus = Some(newStatus))))
 
         healthOrStateChange.getOrElse {
-          log.debug(
-              "Ignoring status update for {}. Status did not change.", taskId)
+          log.debug("Ignoring status update for {}. Status did not change.",
+                    taskId)
           TaskStateChange.NoChange
         }
 
@@ -248,7 +249,7 @@ object Task {
 
     val healthy =
       update.hasHealthy &&
-      (!current.hasHealthy || current.getHealthy != update.getHealthy)
+        (!current.hasHealthy || current.getHealthy != update.getHealthy)
     val changed = healthy || current.getState != update.getState
     if (changed) {
       Some(update)
@@ -294,8 +295,8 @@ object Task {
     * Represents a reservation for all resources that are needed for launching a task
     * and associated persistent local volumes.
     */
-  case class Reservation(
-      volumeIds: Iterable[LocalVolumeId], state: Reservation.State)
+  case class Reservation(volumeIds: Iterable[LocalVolumeId],
+                         state: Reservation.State)
 
   object Reservation {
     sealed trait State {
@@ -329,8 +330,9 @@ object Task {
       * @param deadline When this timeout should become effective
       * @param reason The reason why this timeout was set up
       */
-    case class Timeout(
-        initiated: Timestamp, deadline: Timestamp, reason: Timeout.Reason)
+    case class Timeout(initiated: Timestamp,
+                       deadline: Timestamp,
+                       reason: Timeout.Reason)
 
     object Timeout {
       sealed trait Reason
@@ -363,8 +365,9 @@ object Task {
       s"^([^.]+)[$delimiter]([^.]+)[$delimiter]([^.]+)$$".r
 
     def apply(appId: PathId, volume: PersistentVolume): LocalVolumeId =
-      LocalVolumeId(
-          appId, volume.containerPath, uuidGenerator.generate().toString)
+      LocalVolumeId(appId,
+                    volume.containerPath,
+                    uuidGenerator.generate().toString)
 
     def unapply(id: String): Option[(LocalVolumeId)] = id match {
       case LocalVolumeEncoderRE(app, path, uuid) =>
@@ -376,8 +379,9 @@ object Task {
   /**
     * Represents a task which has been launched (i.e. sent to Mesos for launching).
     */
-  case class Launched(
-      appVersion: Timestamp, status: Status, networking: Networking) {
+  case class Launched(appVersion: Timestamp,
+                      status: Status,
+                      networking: Networking) {
 
     def hasStartedRunning: Boolean = status.startedAt.isDefined
 

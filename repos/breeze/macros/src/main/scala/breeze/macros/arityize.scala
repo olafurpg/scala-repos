@@ -31,8 +31,10 @@ object arityize {
               impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
-          ClassDef(
-              mods, newTypeName(name.encoded + order), newTargs, newTemplate)
+          ClassDef(mods,
+                   newTypeName(name.encoded + order),
+                   newTargs,
+                   newTemplate)
         }
 
         val ret = c.Expr(Block(results.toList, Literal(Constant(()))))
@@ -142,9 +144,10 @@ object arityize {
       case t @ Literal(x) => Seq(t)
       case Apply(who, args) =>
         for (w2 <- expandArity(c, order, bindings)(who);
-             args2 = args.flatMap(arg => expandArity(c, order, bindings)(arg))) yield {
-          Apply(w2, args2)
-        }
+             args2 = args.flatMap(arg => expandArity(c, order, bindings)(arg)))
+          yield {
+            Apply(w2, args2)
+          }
       case Select(lhs, name) =>
         for (w2 <- expandArity(c, order, bindings)(lhs)) yield {
           Select(w2, name)

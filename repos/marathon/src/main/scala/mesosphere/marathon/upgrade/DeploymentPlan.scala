@@ -38,8 +38,8 @@ final case class RestartApplication(app: AppDefinition)
     extends DeploymentAction
 
 // resolve and store artifacts for given app
-final case class ResolveArtifacts(
-    app: AppDefinition, url2Path: Map[URL, String])
+final case class ResolveArtifacts(app: AppDefinition,
+                                  url2Path: Map[URL, String])
     extends DeploymentAction
 
 /**
@@ -123,14 +123,13 @@ final case class DeploymentPlan(id: String,
       case RestartApplication(app) => s"Restart(${appString(app)})"
       case ResolveArtifacts(app, urls) => s"Resolve(${appString(app)}, $urls})"
     }
-    val stepString =
-      if (steps.nonEmpty) {
-        steps.map {
-          _.actions.map(actionString).mkString("  * ", "\n  * ", "")
-        }.zipWithIndex.map {
-          case (stepsString, index) => s"step ${index + 1}:\n$stepsString"
-        }.mkString("\n", "\n", "")
-      } else " NO STEPS"
+    val stepString = if (steps.nonEmpty) {
+      steps.map {
+        _.actions.map(actionString).mkString("  * ", "\n  * ", "")
+      }.zipWithIndex.map {
+        case (stepsString, index) => s"step ${index + 1}:\n$stepsString"
+      }.mkString("\n", "\n", "")
+    } else " NO STEPS"
     s"DeploymentPlan $version$stepString\n"
   }
 
@@ -198,8 +197,8 @@ object DeploymentPlan {
     import org.jgrapht.DirectedGraph
     import org.jgrapht.graph.DefaultEdge
 
-    def longestPathFromVertex[V](
-        g: DirectedGraph[V, DefaultEdge], vertex: V): Seq[V] = {
+    def longestPathFromVertex[V](g: DirectedGraph[V, DefaultEdge],
+                                 vertex: V): Seq[V] = {
       val outgoingEdges: Set[DefaultEdge] =
         if (g.containsVertex(vertex)) g.outgoingEdgesOf(vertex).asScala.toSet
         else Set[DefaultEdge]()
@@ -243,8 +242,9 @@ object DeploymentPlan {
 
               // Scale-only change.
               case Some(oldApp) if oldApp.isOnlyScaleChange(newApp) =>
-                Some(ScaleApplication(
-                        newApp, newApp.instances, toKill.get(newApp.id)))
+                Some(ScaleApplication(newApp,
+                                      newApp.instances,
+                                      toKill.get(newApp.id)))
 
               // Update or restart an existing app.
               case Some(oldApp) if oldApp.needsRestart(newApp) =>

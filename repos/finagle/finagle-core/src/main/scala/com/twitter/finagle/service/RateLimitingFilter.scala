@@ -12,8 +12,7 @@ class LocalRateLimitingStrategy[Req](
     categorizer: Req => String,
     windowSize: Duration,
     rate: Int
-)
-    extends (Req => Future[Boolean]) {
+) extends (Req => Future[Boolean]) {
 
   private[this] val rates = mutable.HashMap.empty[String, (Int, Time)]
 
@@ -22,16 +21,15 @@ class LocalRateLimitingStrategy[Req](
     val id = categorizer(req)
     val (remainingRequests, timestamp) = rates.getOrElse(id, (rate, now))
 
-    val accept =
-      if (timestamp.until(now) > windowSize) {
-        rates(id) = (rate, now)
+    val accept = if (timestamp.until(now) > windowSize) {
+      rates(id) = (rate, now)
+      true
+    } else {
+      if (remainingRequests > 0) {
+        rates(id) = (remainingRequests - 1, timestamp)
         true
-      } else {
-        if (remainingRequests > 0) {
-          rates(id) = (remainingRequests - 1, timestamp)
-          true
-        } else false
-      }
+      } else false
+    }
 
     Future.value(accept)
   }
@@ -44,8 +42,7 @@ class LocalRateLimitingStrategy[Req](
 class RateLimitingFilter[Req, Rep](
     strategy: Req => Future[Boolean],
     statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends SimpleFilter[Req, Rep] {
+) extends SimpleFilter[Req, Rep] {
 
   private[this] val refused = statsReceiver.counter("refused")
 

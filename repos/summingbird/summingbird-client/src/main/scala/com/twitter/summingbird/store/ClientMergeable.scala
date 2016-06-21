@@ -27,11 +27,12 @@ import com.twitter.util.Future
 import scala.collection.breakOut
 
 object ClientMergeable {
-  def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
-                  onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[
-                      (K, BatchID), V],
-                  batchesToKeep: Int)(
-      implicit batcher: Batcher, monoid: Semigroup[V]): ClientMergeable[K, V] =
+  def apply[K, V](
+      offlineStore: ReadableStore[K, (BatchID, V)],
+      onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[(K, BatchID),
+                                                                 V],
+      batchesToKeep: Int)(implicit batcher: Batcher,
+                          monoid: Semigroup[V]): ClientMergeable[K, V] =
     new ClientMergeable[K, V](offlineStore,
                               onlineStore,
                               batcher,
@@ -46,8 +47,8 @@ object ClientMergeable {
   */
 class ClientMergeable[K, V: Semigroup](
     offlineStore: ReadableStore[K, (BatchID, V)],
-    onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[
-        (K, BatchID), V],
+    onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[(K, BatchID),
+                                                               V],
     batcher: Batcher,
     batchesToKeep: Int,
     onlineKeyFilter: K => Boolean,

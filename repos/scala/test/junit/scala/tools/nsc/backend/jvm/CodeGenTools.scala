@@ -20,24 +20,31 @@ import AsmUtils._
 object CodeGenTools {
   import ASMConverters._
 
-  def genMethod(flags: Int = Opcodes.ACC_PUBLIC,
-                name: String = "m",
-                descriptor: String = "()V",
-                genericSignature: String = null,
-                throwsExceptions: Array[String] = null,
-                handlers: List[ExceptionHandler] = Nil,
-                localVars: List[LocalVariable] = Nil)(
-      body: Instruction*): MethodNode = {
-    val node = new MethodNode(
-        flags, name, descriptor, genericSignature, throwsExceptions)
+  def genMethod(
+      flags: Int = Opcodes.ACC_PUBLIC,
+      name: String = "m",
+      descriptor: String = "()V",
+      genericSignature: String = null,
+      throwsExceptions: Array[String] = null,
+      handlers: List[ExceptionHandler] = Nil,
+      localVars: List[LocalVariable] = Nil)(body: Instruction*): MethodNode = {
+    val node = new MethodNode(flags,
+                              name,
+                              descriptor,
+                              genericSignature,
+                              throwsExceptions)
     applyToMethod(node, Method(body.toList, handlers, localVars))
     node
   }
 
   def wrapInClass(method: MethodNode): ClassNode = {
     val cls = new ClassNode()
-    cls.visit(
-        Opcodes.V1_6, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null)
+    cls.visit(Opcodes.V1_6,
+              Opcodes.ACC_PUBLIC,
+              "C",
+              null,
+              "java/lang/Object",
+              null)
     cls.methods.add(method)
     cls
   }
@@ -47,20 +54,20 @@ object CodeGenTools {
       .setSingleOutput(new VirtualDirectory("(memory)", None))
   }
 
-  def newCompiler(
-      defaultArgs: String = "-usejavacp", extraArgs: String = ""): Global = {
+  def newCompiler(defaultArgs: String = "-usejavacp",
+                  extraArgs: String = ""): Global = {
     val compiler = newCompilerWithoutVirtualOutdir(defaultArgs, extraArgs)
     resetOutput(compiler)
     compiler
   }
 
-  def newCompilerWithoutVirtualOutdir(
-      defaultArgs: String = "-usejavacp", extraArgs: String = ""): Global = {
+  def newCompilerWithoutVirtualOutdir(defaultArgs: String = "-usejavacp",
+                                      extraArgs: String = ""): Global = {
     def showError(s: String) = throw new Exception(s)
     val settings = new Settings(showError)
     val args =
       (CommandLineParser tokenize defaultArgs) ++
-      (CommandLineParser tokenize extraArgs)
+        (CommandLineParser tokenize extraArgs)
     val (_, nonSettingsArgs) =
       settings.processArguments(args, processAll = true)
     if (nonSettingsArgs.nonEmpty)
@@ -93,15 +100,14 @@ object CodeGenTools {
     files(outDir)
   }
 
-  def checkReport(compiler: Global,
-                  allowMessage: StoreReporter#Info => Boolean = _ =>
-                    false): Unit = {
-    val disallowed =
-      reporter(compiler).infos.toList.filter(!allowMessage(_)) // toList prevents an infer-non-wildcard-existential warning.
+  def checkReport(
+      compiler: Global,
+      allowMessage: StoreReporter#Info => Boolean = _ => false): Unit = {
+    val disallowed = reporter(compiler).infos.toList.filter(!allowMessage(_)) // toList prevents an infer-non-wildcard-existential warning.
     if (disallowed.nonEmpty) {
       val msg = disallowed.mkString("\n")
-      assert(
-          false, "The compiler issued non-allowed warnings or errors:\n" + msg)
+      assert(false,
+             "The compiler issued non-allowed warnings or errors:\n" + msg)
     }
   }
 
@@ -151,8 +157,8 @@ object CodeGenTools {
                         extraArgs: String = "",
                         allowMessage: StoreReporter#Info => Boolean = _ =>
                           false,
-                        afterEach: AbstractFile => Unit = _ =>
-                          ()): List[(String, Array[Byte])] = {
+                        afterEach: AbstractFile => Unit = _ => ())
+    : List[(String, Array[Byte])] = {
     val outDir = AbstractFile.getDirectory(TempDir.createTempDir())
     val outDirPath = outDir.canonicalPath
     val argsWithOutDir = extraArgs + s" -d $outDirPath -cp $outDirPath"
@@ -171,11 +177,11 @@ object CodeGenTools {
     classfiles
   }
 
-  def compileClassesSeparately(codes: List[String],
-                               extraArgs: String = "",
-                               allowMessage: StoreReporter#Info => Boolean =
-                                 _ => false,
-                               afterEach: AbstractFile => Unit = _ => ()) = {
+  def compileClassesSeparately(
+      codes: List[String],
+      extraArgs: String = "",
+      allowMessage: StoreReporter#Info => Boolean = _ => false,
+      afterEach: AbstractFile => Unit = _ => ()) = {
     readAsmClasses(
         compileSeparately(codes, extraArgs, allowMessage, afterEach))
   }
@@ -187,23 +193,23 @@ object CodeGenTools {
   def compileClasses(compiler: Global)(
       code: String,
       javaCode: List[(String, String)] = Nil,
-      allowMessage: StoreReporter#Info => Boolean = _ =>
-        false): List[ClassNode] = {
+      allowMessage: StoreReporter#Info => Boolean = _ => false)
+    : List[ClassNode] = {
     readAsmClasses(compile(compiler)(code, javaCode, allowMessage))
   }
 
   def compileMethods(compiler: Global)(
       code: String,
-      allowMessage: StoreReporter#Info => Boolean =
-        _ => false): List[MethodNode] = {
+      allowMessage: StoreReporter#Info => Boolean = _ => false)
+    : List[MethodNode] = {
     compileClasses(compiler)(s"class C { $code }", allowMessage = allowMessage).head.methods.asScala.toList
       .filterNot(_.name == "<init>")
   }
 
   def singleMethodInstructions(compiler: Global)(
       code: String,
-      allowMessage: StoreReporter#Info => Boolean =
-        _ => false): List[Instruction] = {
+      allowMessage: StoreReporter#Info => Boolean = _ => false)
+    : List[Instruction] = {
     val List(m) = compileMethods(compiler)(code, allowMessage = allowMessage)
     instructionsFromMethod(m)
   }
@@ -217,8 +223,8 @@ object CodeGenTools {
 
   def assertSameCode(method: Method, expected: List[Instruction]): Unit =
     assertSameCode(method.instructions.dropNonOp, expected)
-  def assertSameCode(
-      actual: List[Instruction], expected: List[Instruction]): Unit = {
+  def assertSameCode(actual: List[Instruction],
+                     expected: List[Instruction]): Unit = {
     assert(actual === expected, s"\nExpected: $expected\nActual  : $actual")
   }
 
@@ -243,8 +249,9 @@ object CodeGenTools {
 
   def assertInvoke(m: Method, receiver: String, method: String): Unit =
     assertInvoke(m.instructions, receiver, method)
-  def assertInvoke(
-      l: List[Instruction], receiver: String, method: String): Unit = {
+  def assertInvoke(l: List[Instruction],
+                   receiver: String,
+                   method: String): Unit = {
     assert(l.exists {
       case Invoke(_, `receiver`, `method`, _, _) => true
       case _ => false
@@ -262,8 +269,8 @@ object CodeGenTools {
 
   def assertInvokedMethods(m: Method, expected: List[String]): Unit =
     assertInvokedMethods(m.instructions, expected)
-  def assertInvokedMethods(
-      l: List[Instruction], expected: List[String]): Unit = {
+  def assertInvokedMethods(l: List[Instruction],
+                           expected: List[String]): Unit = {
     def quote(l: List[String]) =
       l.map(s => s""""$s"""").mkString("List(", ", ", ")")
     val actual = l collect { case i: Invoke => i.owner + "." + i.name }
@@ -299,7 +306,7 @@ object CodeGenTools {
                                  handlerIndex: Int): Unit = {
     val insVec = instructions.toVector
     assertTrue(h.start == insVec(startIndex) && h.end == insVec(endIndex) &&
-        h.handler == insVec(handlerIndex))
+          h.handler == insVec(handlerIndex))
   }
 
   import scala.language.implicitConversions

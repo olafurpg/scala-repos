@@ -229,8 +229,9 @@ private[runtime] object RuntimeString {
     thiz.replace(oldChar.toString, newChar.toString)
 
   @inline
-  def replace(
-      thiz: String, target: CharSequence, replacement: CharSequence): String =
+  def replace(thiz: String,
+              target: CharSequence,
+              replacement: CharSequence): String =
     thiz.jsSplit(target.toString).join(replacement.toString)
 
   def replaceAll(thiz: String, regex: String, replacement: String): String = {
@@ -336,8 +337,10 @@ private[runtime] object RuntimeString {
                 charsetName: String): String =
     newString(bytes, offset, length, Charset.forName(charsetName))
 
-  def newString(
-      bytes: Array[Byte], offset: Int, length: Int, charset: Charset): String =
+  def newString(bytes: Array[Byte],
+                offset: Int,
+                length: Int,
+                charset: Charset): String =
     charset.decode(ByteBuffer.wrap(bytes, offset, length)).toString()
 
   def newString(codePoints: Array[Int], offset: Int, count: Int): String = {

@@ -46,7 +46,8 @@ class ScalaFindUsagesHandlerFactory(project: Project)
   }
 
   override def createFindUsagesHandler(
-      element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler = {
+      element: PsiElement,
+      forHighlightUsages: Boolean): FindUsagesHandler = {
     var replacedElement = element match {
       case wrapper: PsiClassWrapper => wrapper.definition
       case p: PsiTypedDefinitionWrapper => p.typedDefinition
@@ -60,8 +61,10 @@ class ScalaFindUsagesHandlerFactory(project: Project)
       def showDialog() {
         val message =
           ScalaBundle.message("find.usages.member.has.supers", name)
-        val result = Messages.showYesNoCancelDialog(
-            element.getProject, message, "Warning", Messages.getQuestionIcon)
+        val result = Messages.showYesNoCancelDialog(element.getProject,
+                                                    message,
+                                                    "Warning",
+                                                    Messages.getQuestionIcon)
         result match {
           case 0 =>
             val elem = supers.last
@@ -91,7 +94,7 @@ class ScalaFindUsagesHandlerFactory(project: Project)
     named match {
       case fun: ScFunction
           if fun.containingClass.qualifiedName.startsWith("scala.Function") &&
-          fun.name == "apply" =>
+            fun.name == "apply" =>
         false
       case _ => true
     }

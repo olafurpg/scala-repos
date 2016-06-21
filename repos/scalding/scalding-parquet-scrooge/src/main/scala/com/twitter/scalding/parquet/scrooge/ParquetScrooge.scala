@@ -16,16 +16,18 @@ trait ParquetScrooge[T <: ThriftStruct] extends ParquetThriftBase[T] {
 }
 
 class DailySuffixParquetScrooge[T <: ThriftStruct](
-    path: String, dateRange: DateRange)(implicit override val mf: Manifest[T])
+    path: String,
+    dateRange: DateRange)(implicit override val mf: Manifest[T])
     extends DailySuffixSource(path, dateRange)
     with ParquetScrooge[T]
 
 class HourlySuffixParquetScrooge[T <: ThriftStruct](
-    path: String, dateRange: DateRange)(implicit override val mf: Manifest[T])
+    path: String,
+    dateRange: DateRange)(implicit override val mf: Manifest[T])
     extends HourlySuffixSource(path, dateRange)
     with ParquetScrooge[T]
 
-class FixedPathParquetScrooge[T <: ThriftStruct](paths: String*)(
-    implicit override val mf: Manifest[T])
+class FixedPathParquetScrooge[T <: ThriftStruct](
+    paths: String*)(implicit override val mf: Manifest[T])
     extends FixedPathSource(paths: _*)
     with ParquetScrooge[T]

@@ -20,16 +20,17 @@ class RedundantBlockInspection extends AbstractInspection {
   def actionFor(holder: ProblemsHolder) = {
     case (block: ScBlock) childOf ((blockOfExpr: ScBlock) childOf (_: ScCaseClause))
         if block.hasRBrace && block.getFirstChild.getText == "{" &&
-        blockOfExpr.getChildren.length == 1 &&
-        !block.getChildren.exists(_.isInstanceOf[ScCaseClauses]) =>
+          blockOfExpr.getChildren.length == 1 &&
+          !block.getChildren.exists(_.isInstanceOf[ScCaseClauses]) =>
       holder.registerProblem(block,
                              new TextRange(0, 1),
                              "Remove redundant braces",
                              new InCaseClauseQuickFix(block))
     case block: ScBlockExpr if block.getChildren.length == 3 =>
       if (RedundantBlockInspection.isRedundantBlock(block)) {
-        holder.registerProblem(
-            block, "The enclosing block is redundant", new QuickFix(block))
+        holder.registerProblem(block,
+                               "The enclosing block is redundant",
+                               new QuickFix(block))
       }
   }
 
@@ -73,7 +74,7 @@ object RedundantBlockInspection {
           val nextLetter = next.getText.headOption.getOrElse(' ')
           val checkId =
             ScalaNamesUtil.isIdentifier(text) && (nextLetter == '$' ||
-                !ScalaNamesUtil.isIdentifier(text + nextLetter))
+                  !ScalaNamesUtil.isIdentifier(text + nextLetter))
           checkId && !text.startsWith("_") && !text.exists(_ == '$') &&
           !text.startsWith("`")
         case _ => false

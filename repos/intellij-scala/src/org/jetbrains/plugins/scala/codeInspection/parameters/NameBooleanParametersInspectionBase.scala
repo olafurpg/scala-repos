@@ -22,8 +22,8 @@ import scala.collection.Seq
 abstract class NameBooleanParametersInspectionBase
     extends LocalInspectionTool {
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitMethodCallExpression(mc: ScMethodCall) {
         if (mc == null || mc.args == null || mc.args.exprs.isEmpty) return
@@ -47,8 +47,8 @@ abstract class NameBooleanParametersInspectionBase
         }
       }
 
-      def isArgForBooleanParam(
-          expr: ScExpression, argList: ScArgumentExprList): Boolean = {
+      def isArgForBooleanParam(expr: ScExpression,
+                               argList: ScArgumentExprList): Boolean = {
         argList.parameterOf(expr).exists(isBooleanParam)
       }
 

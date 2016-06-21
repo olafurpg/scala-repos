@@ -20,7 +20,8 @@ import scala.annotation.tailrec
   */
 object ScFunctionType {
   def apply(returnType: ScType, params: Seq[ScType])(
-      project: Project, scope: GlobalSearchScope): ValueType = {
+      project: Project,
+      scope: GlobalSearchScope): ValueType = {
     def findClass(fullyQualifiedName: String): Option[PsiClass] = {
       ScalaPsiManager
         .instance(project)
@@ -48,7 +49,8 @@ object ScFunctionType {
 
 object ScPartialFunctionType {
   def apply(returnType: ScType, param: ScType)(
-      project: Project, scope: GlobalSearchScope): ValueType = {
+      project: Project,
+      scope: GlobalSearchScope): ValueType = {
     def findClass(fullyQualifiedName: String): Option[PsiClass] = {
       ScalaPsiManager
         .instance(project)
@@ -74,8 +76,8 @@ object ScPartialFunctionType {
 }
 
 object ScTupleType {
-  def apply(components: Seq[ScType])(
-      project: Project, scope: GlobalSearchScope): ValueType = {
+  def apply(components: Seq[ScType])(project: Project,
+                                     scope: GlobalSearchScope): ValueType = {
     def findClass(fullyQualifiedName: String): Option[PsiClass] = {
       ScalaPsiManager
         .instance(project)
@@ -99,10 +101,10 @@ object ScTupleType {
 
 object ScSynteticSugarClassesUtil {
   @tailrec
-  def extractForPrefix(tp: ScType,
-                       prefix: String,
-                       depth: Int =
-                         100): Option[(ScTypeDefinition, Seq[ScType])] = {
+  def extractForPrefix(
+      tp: ScType,
+      prefix: String,
+      depth: Int = 100): Option[(ScTypeDefinition, Seq[ScType])] = {
     if (depth == 0)
       return None //hack for http://youtrack.jetbrains.com/issue/SCL-6880 to avoid infinite loop.
     tp.isAliasType match {
@@ -113,7 +115,7 @@ object ScSynteticSugarClassesUtil {
           case p: ScParameterizedType =>
             def startsWith(clazz: PsiClass, qualNamePrefix: String) =
               clazz.qualifiedName != null &&
-              clazz.qualifiedName.startsWith(qualNamePrefix)
+                clazz.qualifiedName.startsWith(qualNamePrefix)
 
             ScType.extractClassType(p.designator) match {
               case Some((clazz: ScTypeDefinition, sub))

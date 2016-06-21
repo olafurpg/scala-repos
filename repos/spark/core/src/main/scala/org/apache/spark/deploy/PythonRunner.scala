@@ -38,7 +38,8 @@ object PythonRunner {
     val pyFiles = args(1)
     val otherArgs = args.slice(2, args.length)
     val pythonExec = sys.env.getOrElse(
-        "PYSPARK_DRIVER_PYTHON", sys.env.getOrElse("PYSPARK_PYTHON", "python"))
+        "PYSPARK_DRIVER_PYTHON",
+        sys.env.getOrElse("PYSPARK_PYTHON", "python"))
 
     // Format python file paths before adding them to the PYTHONPATH
     val formattedPythonFile = formatPath(pythonFile)
@@ -47,8 +48,7 @@ object PythonRunner {
     // Launch a Py4J gateway server for the process to connect to; this will let it see our
     // Java system properties and such
     val gatewayServer = new py4j.GatewayServer(null, 0)
-    val thread = new Thread(
-        new Runnable() {
+    val thread = new Thread(new Runnable() {
       override def run(): Unit = Utils.logUncaughtExceptions {
         gatewayServer.start()
       }
@@ -106,7 +106,7 @@ object PythonRunner {
     if (Utils.nonLocalPaths(path, testWindows).nonEmpty) {
       throw new IllegalArgumentException(
           "Launching Python applications through " +
-          s"spark-submit is currently only supported for local files: $path")
+            s"spark-submit is currently only supported for local files: $path")
     }
     // get path when scheme is file.
     val uri = Try(new URI(path)).getOrElse(new File(path).toURI)

@@ -52,10 +52,10 @@ class ApplicationCacheSuite
     * subclass with access to the cache internals
     * @param retainedApplications number of retained applications
     */
-  class TestApplicationCache(operations: ApplicationCacheOperations =
-                               new StubCacheOperations(),
-                             retainedApplications: Int,
-                             clock: Clock = new ManualClock(0))
+  class TestApplicationCache(
+      operations: ApplicationCacheOperations = new StubCacheOperations(),
+      retainedApplications: Int,
+      clock: Clock = new ManualClock(0))
       extends ApplicationCache(operations, retainedApplications, clock) {
 
     def cache(): LoadingCache[CacheKey, CacheEntry] = appCache
@@ -79,8 +79,8 @@ class ApplicationCacheSuite
     var detachCount = 0L
     var updateProbeCount = 0L
 
-    override def getAppUI(
-        appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
+    override def getAppUI(appId: String,
+                          attemptId: Option[String]): Option[LoadedAppUI] = {
       logDebug(s"getAppUI($appId, $attemptId)")
       getAppUICount += 1
       instances
@@ -137,8 +137,9 @@ class ApplicationCacheSuite
       *
       * @param ui Spark UI
       */
-    override def detachSparkUI(
-        appId: String, attemptId: Option[String], ui: SparkUI): Unit = {
+    override def detachSparkUI(appId: String,
+                               attemptId: Option[String],
+                               ui: SparkUI): Unit = {
       logDebug(s"detachSparkUI($appId, $attemptId, $ui)")
       detachCount += 1
       var name = ui.getAppName
@@ -150,8 +151,8 @@ class ApplicationCacheSuite
     /**
       * Lookup from the internal cache of attached UIs
       */
-    def getAttached(
-        appId: String, attemptId: Option[String]): Option[SparkUI] = {
+    def getAttached(appId: String,
+                    attemptId: Option[String]): Option[SparkUI] = {
       attached.get(CacheKey(appId, attemptId))
     }
 
@@ -275,8 +276,9 @@ class ApplicationCacheSuite
   test("Test that if an attempt ID is is set, it must be used in lookups") {
     val operations = new StubCacheOperations()
     val clock = new ManualClock(1)
-    implicit val cache = new ApplicationCache(
-        operations, retainedApplications = 10, clock = clock)
+    implicit val cache = new ApplicationCache(operations,
+                                              retainedApplications = 10,
+                                              clock = clock)
     val appId = "app1"
     val attemptId = Some("_01")
     operations.putAppUI(appId, attemptId, false, clock.getTimeMillis(), 0, 0)
@@ -322,8 +324,8 @@ class ApplicationCacheSuite
 
     val updateTime = window * 3
     // update the cached value
-    val updatedApp = operations.putAppUI(
-        appId, attemptId, true, started, updateTime, updateTime)
+    val updatedApp = operations
+      .putAppUI(appId, attemptId, true, started, updateTime, updateTime)
     val endTime = window * 10
     clock.setTime(endTime)
     logDebug(s"Before operation = $cache")
@@ -369,8 +371,9 @@ class ApplicationCacheSuite
     * @param cache app cache
     */
   def assertCacheEntryEquals(
-      appId: String, attemptId: Option[String], expected: CacheEntry)(
-      implicit cache: ApplicationCache): Unit = {
+      appId: String,
+      attemptId: Option[String],
+      expected: CacheEntry)(implicit cache: ApplicationCache): Unit = {
     val actual = cache.lookupCacheEntry(appId, attemptId)
     val errorText =
       s"Expected get($appId, $attemptId) -> $expected, but got $actual from $cache"
@@ -405,8 +408,10 @@ class ApplicationCacheSuite
     val clock = new ManualClock(0)
     val size = 5
     // only two entries are retained, so we expect evictions to occur on lookups
-    implicit val cache: ApplicationCache = new TestApplicationCache(
-        operations, retainedApplications = size, clock = clock)
+    implicit val cache: ApplicationCache =
+      new TestApplicationCache(operations,
+                               retainedApplications = size,
+                               clock = clock)
 
     val attempt1 = Some("01")
 
@@ -448,11 +453,12 @@ class ApplicationCacheSuite
     val attempt5 = Some("05")
     operations.putAppUI(appId, attempt5, true, 500, 510, 510)
 
-    def expectLoadAndEvictionCounts(
-        expectedLoad: Int, expectedEvictionCount: Int): Unit = {
+    def expectLoadAndEvictionCounts(expectedLoad: Int,
+                                    expectedEvictionCount: Int): Unit = {
       assertMetric("loadCount", metrics.loadCount, expectedLoad)
-      assertMetric(
-          "evictionCount", metrics.evictionCount, expectedEvictionCount)
+      assertMetric("evictionCount",
+                   metrics.evictionCount,
+                   expectedEvictionCount)
     }
 
     // first entry

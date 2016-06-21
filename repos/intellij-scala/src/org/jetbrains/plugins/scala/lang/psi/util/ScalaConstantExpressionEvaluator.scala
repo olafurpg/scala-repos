@@ -22,14 +22,14 @@ class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
     }
   }
 
-  def computeConstantExpression(
-      expression: PsiElement, throwExceptionOnOverflow: Boolean): AnyRef = {
+  def computeConstantExpression(expression: PsiElement,
+                                throwExceptionOnOverflow: Boolean): AnyRef = {
     expression match {
       case ref: ScReferenceExpression =>
         computeConstantExpression(ref.resolve(), throwExceptionOnOverflow)
       case refPattern: ScReferencePattern =>
-        computeConstantExpression(
-            ScalaPsiUtil nameContext refPattern, throwExceptionOnOverflow)
+        computeConstantExpression(ScalaPsiUtil nameContext refPattern,
+                                  throwExceptionOnOverflow)
       case deff: ScPatternDefinition =>
         deff.expr.map {
           case e => computeConstantExpression(e, throwExceptionOnOverflow)

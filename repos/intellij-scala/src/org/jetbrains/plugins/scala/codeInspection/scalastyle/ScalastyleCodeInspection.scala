@@ -16,8 +16,8 @@ object ScalastyleCodeInspection {
     new mutable.HashMap[VirtualFile, TimestampedScalastyleConfiguration]()
 
   private object locations {
-    val possibleConfigFileNames = Seq(
-        "scalastyle_config.xml", "scalastyle-config.xml")
+    val possibleConfigFileNames =
+      Seq("scalastyle_config.xml", "scalastyle-config.xml")
     val possibleLocations = Seq(".idea", "project")
 
     def findConfigFile(dir: VirtualFile) =
@@ -77,12 +77,14 @@ class ScalastyleCodeInspection extends LocalInspectionTool {
       withConfiguration { configuration =>
         val scalaFile = file.asInstanceOf[ScalaFile]
         val result = new ScalastyleChecker(None).checkFiles(
-            configuration, Seq(new SourceSpec(file.getName, file.getText)))
+            configuration,
+            Seq(new SourceSpec(file.getName, file.getText)))
         val document =
           PsiDocumentManager.getInstance(file.getProject).getDocument(file)
 
-        def atPosition(
-            e: PsiElement, line: Int, column: Option[Int]): Boolean = {
+        def atPosition(e: PsiElement,
+                       line: Int,
+                       column: Option[Int]): Boolean = {
           val correctLine = if (line > 0) line - 1 else 0
           val sameLine = correctLine == document.getLineNumber(e.getTextOffset)
           column match {
@@ -93,11 +95,11 @@ class ScalastyleCodeInspection extends LocalInspectionTool {
           }
         }
 
-        def findPsiElement(
-            line: Int, column: Option[Int]): Option[PsiElement] = {
+        def findPsiElement(line: Int,
+                           column: Option[Int]): Option[PsiElement] = {
           (for {
             element <- scalaFile.depthFirst if element != scalaFile &&
-            atPosition(element, line, column)
+              atPosition(element, line, column)
           } yield element).toList.headOption
         }
 
@@ -110,8 +112,14 @@ class ScalastyleCodeInspection extends LocalInspectionTool {
           }
 
         result.flatMap {
-          case StyleError(
-              _, _, key, level, args, Some(line), column, customMessage) =>
+          case StyleError(_,
+                          _,
+                          key,
+                          level,
+                          args,
+                          Some(line),
+                          column,
+                          customMessage) =>
             findPsiElement(line, column)
               .filter(e => e.isPhysical && !e.getTextRange.isEmpty)
               .map { e =>

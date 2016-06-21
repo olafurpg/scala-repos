@@ -39,7 +39,7 @@ object PageViewStream {
       System.err.println("Usage: PageViewStream <metric> <host> <port>")
       System.err.println(
           "<metric> must be one of pageCounts, slidingPageCounts," +
-          " errorRatePerZipCode, activeUserCount, popularUsersSeen")
+            " errorRatePerZipCode, activeUserCount, popularUsersSeen")
       System.exit(1)
     }
     StreamingExamples.setStreamingLogLevels()

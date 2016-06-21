@@ -62,8 +62,8 @@ class IsotonicRegressionSuite
     assert(predictions === Array(1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
 
     assert(model.boundaries === Vectors.dense(0, 1, 3, 4, 5, 6, 7, 8))
-    assert(model.predictions === Vectors.dense(
-            1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
+    assert(model.predictions === Vectors
+          .dense(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
     assert(model.getIsotonic)
   }
 
@@ -198,8 +198,10 @@ class IsotonicRegressionSuite
     }
 
     val ir = new IsotonicRegression()
-    testEstimatorAndModelReadWrite(
-        ir, dataset, IsotonicRegressionSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(ir,
+                                   dataset,
+                                   IsotonicRegressionSuite.allParamSettings,
+                                   checkModelData)
   }
 }
 

@@ -158,9 +158,9 @@ package ll {
 
   def signaturesIn(info: Type): List[String] =
     (info.members.toList filterNot
-        (s =>
-              s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
-              s.isConstructor) map (_.defString))
+          (s =>
+                s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
+                  s.isConstructor) map (_.defString))
 
   def check(source: String, unit: global.CompilationUnit) = {
     import syms._

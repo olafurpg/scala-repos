@@ -72,8 +72,8 @@ trait DievImplementation {
     private[this] sealed abstract class SearchResult
     private[this] sealed case class Coincidence(position: Int)
         extends SearchResult
-    private[this] sealed case class Between(
-        before: Option[Int], after: Option[Int])
+    private[this] sealed case class Between(before: Option[Int],
+                                            after: Option[Int])
         extends SearchResult {
       def adjacentBefore(interval: (A, A)): Option[Int] = before.filter {
         pos =>
@@ -98,19 +98,19 @@ trait DievImplementation {
           val adjustedPosition = 0.max(min.min(max).min(intervals.size - 1))
           liftedIntervals(adjustedPosition) match {
             case Some((start, end)) => {
-                if (start <= value && value <= end)
-                  Coincidence(adjustedPosition)
-                else {
-                  if (value < start)
-                    Between(liftedIntervals(adjustedPosition - 1).map(_ =>
-                                  adjustedPosition - 1),
-                            adjustedPosition.some)
-                  else
-                    Between(adjustedPosition.some,
-                            liftedIntervals(adjustedPosition + 1).map(_ =>
-                                  adjustedPosition + 1))
-                }
+              if (start <= value && value <= end)
+                Coincidence(adjustedPosition)
+              else {
+                if (value < start)
+                  Between(liftedIntervals(adjustedPosition - 1).map(_ =>
+                                adjustedPosition - 1),
+                          adjustedPosition.some)
+                else
+                  Between(adjustedPosition.some,
+                          liftedIntervals(adjustedPosition + 1).map(_ =>
+                                adjustedPosition + 1))
               }
+            }
             case _ => Between(None, None)
           }
         } else {
@@ -118,12 +118,12 @@ trait DievImplementation {
 
           intervals(mid) match {
             case (start, end) => {
-                if (start <= value && value <= end) Coincidence(mid)
-                else {
-                  if (value < start) innerSearch(min, mid - 1)
-                  else innerSearch(mid + 1, max)
-                }
+              if (start <= value && value <= end) Coincidence(mid)
+              else {
+                if (value < start) innerSearch(min, mid - 1)
+                else innerSearch(mid + 1, max)
               }
+            }
           }
         }
       }
@@ -137,63 +137,61 @@ trait DievImplementation {
       val correctedInterval = fixIntervalOrder(interval)
       (binarySearch(correctedInterval._1), binarySearch(correctedInterval._2)) match {
         case (Coincidence(startPosition), Coincidence(endPosition)) => {
-            construct(
-                startPosition,
-                Vector((intervals(startPosition)._1.min(correctedInterval._1),
-                        intervals(endPosition)._2.max(correctedInterval._2))),
-                endPosition + 1)
-          }
+          construct(
+              startPosition,
+              Vector((intervals(startPosition)._1.min(correctedInterval._1),
+                      intervals(endPosition)._2.max(correctedInterval._2))),
+              endPosition + 1)
+        }
         case (Coincidence(startPosition), between @ Between(_, after)) => {
-            val adjacentAfterResult = between.adjacentAfter(correctedInterval)
-            construct(
-                startPosition,
-                Vector(
-                    (intervals(startPosition)._1.min(correctedInterval._1),
-                     adjacentAfterResult
-                       .map(intervals(_)._2)
-                       .getOrElse(correctedInterval._2))),
-                adjacentAfterResult
-                  .map(_ + 1)
-                  .orElse(after)
-                  .getOrElse(intervals.size)
-            )
-          }
-        case (earlyBound @ Between(before, after), Coincidence(endPosition)) =>
-          {
-            val adjacentBeforeResult =
-              earlyBound.adjacentBefore(correctedInterval)
-            construct(
-                adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
-                Vector(
-                    (adjacentBeforeResult
-                       .map(intervals(_)._1)
-                       .getOrElse(correctedInterval._1),
-                     intervals(endPosition)._2.max(correctedInterval._2))),
-                endPosition + 1
-            )
-          }
+          val adjacentAfterResult = between.adjacentAfter(correctedInterval)
+          construct(
+              startPosition,
+              Vector(
+                  (intervals(startPosition)._1.min(correctedInterval._1),
+                   adjacentAfterResult
+                     .map(intervals(_)._2)
+                     .getOrElse(correctedInterval._2))),
+              adjacentAfterResult
+                .map(_ + 1)
+                .orElse(after)
+                .getOrElse(intervals.size)
+          )
+        }
+        case (earlyBound @ Between(before, after), Coincidence(endPosition)) => {
+          val adjacentBeforeResult =
+            earlyBound.adjacentBefore(correctedInterval)
+          construct(
+              adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
+              Vector(
+                  (adjacentBeforeResult
+                     .map(intervals(_)._1)
+                     .getOrElse(correctedInterval._1),
+                   intervals(endPosition)._2.max(correctedInterval._2))),
+              endPosition + 1
+          )
+        }
         //(Between(None,Some(0)),Between(Some(0),Some(1)))
         case (earlyBound @ Between(before, after),
               lateBound @ Between(_, otherAfter)) => {
-            val adjacentBeforeResult =
-              earlyBound.adjacentBefore(correctedInterval)
-            val adjacentAfterResult =
-              lateBound.adjacentAfter(correctedInterval)
-            construct(
-                adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
-                Vector(
-                    (adjacentBeforeResult
-                       .map(intervals(_)._1)
-                       .getOrElse(correctedInterval._1),
-                     adjacentAfterResult
-                       .map(intervals(_)._2)
-                       .getOrElse(correctedInterval._2))),
-                adjacentAfterResult
-                  .map(_ + 1)
-                  .orElse(otherAfter)
-                  .getOrElse(intervals.size)
-            )
-          }
+          val adjacentBeforeResult =
+            earlyBound.adjacentBefore(correctedInterval)
+          val adjacentAfterResult = lateBound.adjacentAfter(correctedInterval)
+          construct(
+              adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
+              Vector(
+                  (adjacentBeforeResult
+                     .map(intervals(_)._1)
+                     .getOrElse(correctedInterval._1),
+                   adjacentAfterResult
+                     .map(intervals(_)._2)
+                     .getOrElse(correctedInterval._2))),
+              adjacentAfterResult
+                .map(_ + 1)
+                .orElse(otherAfter)
+                .getOrElse(intervals.size)
+          )
+        }
       }
     }
 
@@ -203,34 +201,34 @@ trait DievImplementation {
       val orderedInterval = fixIntervalOrder(interval)
       (binarySearch(orderedInterval._1), binarySearch(orderedInterval._2)) match {
         case (Coincidence(startPosition), Coincidence(endPosition)) => {
-            val middle =
-              if (startPosition == endPosition)
-                subtractInterval(intervals(startPosition), interval)
-              else
-                subtractInterval(intervals(startPosition), interval) ++ subtractInterval(
-                    intervals(endPosition), interval)
-            construct(startPosition, middle, endPosition + 1)
-          }
+          val middle =
+            if (startPosition == endPosition)
+              subtractInterval(intervals(startPosition), interval)
+            else
+              subtractInterval(intervals(startPosition), interval) ++ subtractInterval(
+                  intervals(endPosition),
+                  interval)
+          construct(startPosition, middle, endPosition + 1)
+        }
         case (Coincidence(startPosition), Between(_, endAfter)) => {
-            val middle = subtractInterval(
-                intervals(startPosition), orderedInterval)
-            construct(
-                startPosition, middle, endAfter.getOrElse(intervals.size))
-          }
+          val middle =
+            subtractInterval(intervals(startPosition), orderedInterval)
+          construct(startPosition, middle, endAfter.getOrElse(intervals.size))
+        }
         case (Between(startBefore, _), Coincidence(endPosition)) => {
-            val middle = subtractInterval(
-                intervals(endPosition), orderedInterval)
-            construct(
-                startBefore.map(startBeforePos => startBeforePos + 1).orZero,
-                middle,
-                endPosition + 1)
-          }
+          val middle =
+            subtractInterval(intervals(endPosition), orderedInterval)
+          construct(
+              startBefore.map(startBeforePos => startBeforePos + 1).orZero,
+              middle,
+              endPosition + 1)
+        }
         case (Between(startBefore, _), Between(_, endAfter)) => {
-            construct(
-                startBefore.map(startBeforePos => startBeforePos + 1).orZero,
-                Vector.empty,
-                endAfter.getOrElse(intervals.size))
-          }
+          construct(
+              startBefore.map(startBeforePos => startBeforePos + 1).orZero,
+              Vector.empty,
+              endAfter.getOrElse(intervals.size))
+        }
       }
     }
 

@@ -65,8 +65,8 @@ trait ProducerSupport extends Actor with CamelSupport {
             context.actorOf(Props(new ProducerChild(endpoint, processor))))
         messages = {
           for (child ← producerChild;
-               (snd, msg) ← messages) child.tell(
-              transformOutgoingMessage(msg), snd)
+               (snd, msg) ← messages)
+            child.tell(transformOutgoingMessage(msg), snd)
           Vector.empty
         }
       }
@@ -182,8 +182,8 @@ private final case class MessageResult(message: CamelMessage)
 /**
   * INTERNAL API
   */
-private final case class FailureResult(
-    cause: Throwable, headers: Map[String, Any] = Map.empty)
+private final case class FailureResult(cause: Throwable,
+                                       headers: Map[String, Any] = Map.empty)
     extends NoSerializationVerificationNeeded
 
 /**

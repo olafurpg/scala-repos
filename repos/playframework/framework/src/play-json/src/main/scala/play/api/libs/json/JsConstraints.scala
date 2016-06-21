@@ -67,8 +67,7 @@ trait PathReads {
 
   def jsPickBranch[A <: JsValue](
       path: JsPath)(implicit reads: Reads[A]): Reads[JsObject] =
-    Reads[JsObject](
-        js =>
+    Reads[JsObject](js =>
           path
             .asSingleJsResult(js)
             .flatMap { jsv =>
@@ -110,8 +109,7 @@ trait ConstraintReads {
 
   /** very simple optional field Reads that maps "null" to None */
   def optionWithNull[T](implicit rds: Reads[T]): Reads[Option[T]] =
-    Reads(
-        js =>
+    Reads(js =>
           js match {
         case JsNull => JsSuccess(None)
         case js => rds.reads(js).map(Some(_))
@@ -164,16 +162,12 @@ trait ConstraintReads {
   /**
     * Defines a regular expression constraint for `String` values, i.e. the string must match the regular expression pattern
     */
-  def pattern(
-      regex: => scala.util.matching.Regex, error: String = "error.pattern")(
-      implicit reads: Reads[String]) =
-    Reads[String](
-        js =>
-          reads
-            .reads(js)
-            .flatMap { o =>
-          regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
-      })
+  def pattern(regex: => scala.util.matching.Regex,
+              error: String = "error.pattern")(implicit reads: Reads[String]) =
+    Reads[String](js =>
+          reads.reads(js).flatMap { o =>
+        regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
+    })
 
   def email(implicit reads: Reads[String]): Reads[String] =
     pattern(
@@ -229,16 +223,17 @@ trait PathWrites {
       JsPath.createObj(path -> path(obj).headOption.getOrElse(JsNull))
     }
 
-  def jsPickBranchUpdate(
-      path: JsPath, wrs: OWrites[JsValue]): OWrites[JsValue] =
+  def jsPickBranchUpdate(path: JsPath,
+                         wrs: OWrites[JsValue]): OWrites[JsValue] =
     OWrites[JsValue] { js =>
-      JsPath.createObj(
-          path -> path(js).headOption
-            .flatMap(js =>
-                  js.asOpt[JsObject]
-                    .map(obj => obj.deepMerge(wrs.writes(obj))))
-            .getOrElse(JsNull)
-      )
+      JsPath
+        .createObj(
+            path -> path(js).headOption
+              .flatMap(js =>
+                    js.asOpt[JsObject]
+                      .map(obj => obj.deepMerge(wrs.writes(obj))))
+              .getOrElse(JsNull)
+        )
     }
 
   def pure[A](path: JsPath, fixed: => A)(

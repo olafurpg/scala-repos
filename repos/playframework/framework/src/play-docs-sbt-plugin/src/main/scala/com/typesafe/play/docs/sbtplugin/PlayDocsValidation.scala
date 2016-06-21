@@ -63,8 +63,9 @@ object PlayDocsValidation {
       }
       .toMap
   }
-  case class FileWithCodeSamples(
-      name: String, source: String, codeSamples: Seq[CodeSample])
+  case class FileWithCodeSamples(name: String,
+                                 source: String,
+                                 codeSamples: Seq[CodeSample])
   case class CodeSample(source: String,
                         segment: String,
                         sourcePosition: Int,
@@ -128,8 +129,9 @@ object PlayDocsValidation {
               val parts = link.split('|')
               val desc = parts.head
               val page = stripFragment(parts.tail.head.trim)
-              wikiLinks += LinkRef(
-                  page, markdownFile, node.getStartIndex + desc.length + 3)
+              wikiLinks += LinkRef(page,
+                                   markdownFile,
+                                   node.getStartIndex + desc.length + 3)
 
             case image if image.endsWith(".png") =>
               image match {
@@ -146,7 +148,7 @@ object PlayDocsValidation {
                       .stripPrefix(base.getCanonicalPath)
                       .stripPrefix("/") + "/" + relative
                   resourceLinks +=
-                    LinkRef(link, markdownFile, node.getStartIndex + 2)
+                  LinkRef(link, markdownFile, node.getStartIndex + 2)
               }
 
             case link =>
@@ -182,34 +184,35 @@ object PlayDocsValidation {
           node match {
             case code: CodeReferenceNode => {
 
-                // Label is after the #, or if no #, then is the link label
-                val (source, label) = code.getSource.split("#", 2) match {
-                  case Array(source, label) => (source, label)
-                  case Array(source) => (source, code.getLabel)
-                }
-
-                // The file is either relative to current page page or absolute, under the root
-                val sourceFile =
-                  if (source.startsWith("/")) {
-                    source.drop(1)
-                  } else {
-                    markdownFile.getParentFile.getCanonicalPath
-                      .stripPrefix(base.getCanonicalPath)
-                      .stripPrefix("/") + "/" + source
-                  }
-
-                val sourcePos = code.getStartIndex + code.getLabel.length + 4
-                val labelPos =
-                  if (code.getSource.contains("#")) {
-                    sourcePos + source.length + 1
-                  } else {
-                    code.getStartIndex + 2
-                  }
-
-                codeSamples += CodeSampleRef(
-                    sourceFile, label, markdownFile, sourcePos, labelPos)
-                true
+              // Label is after the #, or if no #, then is the link label
+              val (source, label) = code.getSource.split("#", 2) match {
+                case Array(source, label) => (source, label)
+                case Array(source) => (source, code.getLabel)
               }
+
+              // The file is either relative to current page page or absolute, under the root
+              val sourceFile = if (source.startsWith("/")) {
+                source.drop(1)
+              } else {
+                markdownFile.getParentFile.getCanonicalPath
+                  .stripPrefix(base.getCanonicalPath)
+                  .stripPrefix("/") + "/" + source
+              }
+
+              val sourcePos = code.getStartIndex + code.getLabel.length + 4
+              val labelPos = if (code.getSource.contains("#")) {
+                sourcePos + source.length + 1
+              } else {
+                code.getStartIndex + 2
+              }
+
+              codeSamples += CodeSampleRef(sourceFile,
+                                           label,
+                                           markdownFile,
+                                           sourcePos,
+                                           labelPos)
+              true
+            }
             case _ => false
           }
       }
@@ -231,47 +234,45 @@ object PlayDocsValidation {
   }
 
   private def extractCodeSamples(
-      filename: String, markdownSource: String): FileWithCodeSamples = {
+      filename: String,
+      markdownSource: String): FileWithCodeSamples = {
 
     val codeSamples = ListBuffer.empty[CodeSample]
 
-    val processor = new PegDownProcessor(
-        Extensions.ALL,
-        PegDownPlugins
-          .builder()
-          .withPlugin(classOf[CodeReferenceParser])
-          .build)
+    val processor =
+      new PegDownProcessor(Extensions.ALL,
+                           PegDownPlugins
+                             .builder()
+                             .withPlugin(classOf[CodeReferenceParser])
+                             .build)
 
     val codeReferenceSerializer = new ToHtmlSerializerPlugin() {
       def visit(node: Node, visitor: Visitor, printer: Printer) = node match {
         case code: CodeReferenceNode => {
 
-            // Label is after the #, or if no #, then is the link label
-            val (source, label) = code.getSource.split("#", 2) match {
-              case Array(source, label) => (source, label)
-              case Array(source) => (source, code.getLabel)
-            }
-
-            // The file is either relative to current page page or absolute, under the root
-            val sourceFile =
-              if (source.startsWith("/")) {
-                source.drop(1)
-              } else {
-                filename.dropRight(
-                    filename.length - filename.lastIndexOf('/') + 1) + source
-              }
-
-            val sourcePos = code.getStartIndex + code.getLabel.length + 4
-            val labelPos =
-              if (code.getSource.contains("#")) {
-                sourcePos + source.length + 1
-              } else {
-                code.getStartIndex + 2
-              }
-
-            codeSamples += CodeSample(sourceFile, label, sourcePos, labelPos)
-            true
+          // Label is after the #, or if no #, then is the link label
+          val (source, label) = code.getSource.split("#", 2) match {
+            case Array(source, label) => (source, label)
+            case Array(source) => (source, code.getLabel)
           }
+
+          // The file is either relative to current page page or absolute, under the root
+          val sourceFile = if (source.startsWith("/")) {
+            source.drop(1)
+          } else {
+            filename.dropRight(filename.length - filename.lastIndexOf('/') + 1) + source
+          }
+
+          val sourcePos = code.getStartIndex + code.getLabel.length + 4
+          val labelPos = if (code.getSource.contains("#")) {
+            sourcePos + source.length + 1
+          } else {
+            code.getStartIndex + 2
+          }
+
+          codeSamples += CodeSample(sourceFile, label, sourcePos, labelPos)
+          true
+        }
         case _ => false
       }
     }
@@ -295,7 +296,7 @@ object PlayDocsValidation {
           .collect {
             case entry
                 if entry.getName.endsWith(".md") &&
-                entry.getName.startsWith("play/docs/content/manual") =>
+                  entry.getName.startsWith("play/docs/content/manual") =>
               val fileName = entry.getName.stripPrefix("play/docs/content")
               val contents = IO.readStream(jar.getInputStream(entry))
               extractCodeSamples(fileName, contents)
@@ -416,7 +417,7 @@ object PlayDocsValidation {
         failed = true
         onFail
         log.info("[" + Colors.red("fail") + "] " + desc + " (" + errors.size +
-            " errors)")
+              " errors)")
       }
     }
 
@@ -424,12 +425,15 @@ object PlayDocsValidation {
       combinedRepo.loadFile(path)(_ => ()).nonEmpty
     }
 
-    def assertLinksNotMissing(
-        desc: String, links: Seq[LinkRef], errorMessage: String): Unit = {
+    def assertLinksNotMissing(desc: String,
+                              links: Seq[LinkRef],
+                              errorMessage: String): Unit = {
       doAssertion(desc, links) {
         links.foreach { link =>
-          logErrorAtLocation(
-              log, link.file, link.position, errorMessage + " " + link.link)
+          logErrorAtLocation(log,
+                             link.file,
+                             link.position,
+                             errorMessage + " " + link.link)
         }
       }
     }
@@ -446,11 +450,13 @@ object PlayDocsValidation {
     }
 
     assertLinksNotMissing(
-        "Missing wiki links test", report.wikiLinks.filterNot { link =>
-      pages.contains(link.link) ||
-      validationConfig.downstreamWikiPages(link.link) ||
-      combinedRepo.findFileWithName(link.link + ".md").nonEmpty
-    }, "Could not find link")
+        "Missing wiki links test",
+        report.wikiLinks.filterNot { link =>
+          pages.contains(link.link) ||
+          validationConfig.downstreamWikiPages(link.link) ||
+          combinedRepo.findFileWithName(link.link + ".md").nonEmpty
+        },
+        "Could not find link")
 
     def relativeLinkOk(link: LinkRef) = {
       link match {
@@ -476,10 +482,11 @@ object PlayDocsValidation {
       case link if !relativeLinkOk(link) => link
     }, "Bad relative link")
 
-    assertLinksNotMissing(
-        "Missing wiki resources test", report.resourceLinks.collect {
-      case link if !fileExists(link.link) => link
-    }, "Could not find resource")
+    assertLinksNotMissing("Missing wiki resources test",
+                          report.resourceLinks.collect {
+                            case link if !fileExists(link.link) => link
+                          },
+                          "Could not find resource")
 
     val (existing, nonExisting) =
       report.codeSamples.partition(sample => fileExists(sample.source))
@@ -561,16 +568,16 @@ object PlayDocsValidation {
                 if "GitHub.com".equals(connection.getHeaderField("Server")) =>
               Nil
             case bad if bad >= 300 => {
-                refs.foreach { link =>
-                  logErrorAtLocation(log,
-                                     link.file,
-                                     link.position,
-                                     connection.getResponseCode +
+              refs.foreach { link =>
+                logErrorAtLocation(log,
+                                   link.file,
+                                   link.position,
+                                   connection.getResponseCode +
                                      " response for external link " +
                                      link.link)
-                }
-                refs
               }
+              refs
+            }
             case ok => Nil
           }
         } catch {
@@ -580,7 +587,7 @@ object PlayDocsValidation {
                                  link.file,
                                  link.position,
                                  e.getClass.getName + ": " + e.getMessage +
-                                 " for external link " + link.link)
+                                   " for external link " + link.link)
             }
             refs
         } finally {
@@ -598,15 +605,17 @@ object PlayDocsValidation {
       log.info("[" + Colors.green("pass") + "] External links test")
     } else {
       log.info("[" + Colors.red("fail") + "] External links test (" +
-          invalidRefs.size + " errors)")
+            invalidRefs.size + " errors)")
       throw new RuntimeException("External links validation failed")
     }
 
     grouped.map(_._1)
   }
 
-  private def logErrorAtLocation(
-      log: Logger, file: File, position: Int, errorMessage: String) =
+  private def logErrorAtLocation(log: Logger,
+                                 file: File,
+                                 position: Int,
+                                 errorMessage: String) =
     synchronized {
       // Load the source
       val lines = IO.readLines(file)
@@ -617,12 +626,12 @@ object PlayDocsValidation {
           state match {
             case (_, _, _, Some(_)) => state
             case (total, l, c, None) => {
-                if (total + line.length < position) {
-                  (total + line.length + 1, l + 1, c, None)
-                } else {
-                  (0, l + 1, position - total + 1, Some(line))
-                }
+              if (total + line.length < position) {
+                (total + line.length + 1, l + 1, c, None)
+              } else {
+                (0, l + 1, position - total + 1, Some(line))
               }
+            }
           }
         }
       log.error(errorMessage + " at " + file.getAbsolutePath + ":" + lineNo)

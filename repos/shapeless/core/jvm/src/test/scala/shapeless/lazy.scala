@@ -54,13 +54,13 @@ class LazyStrictTestsJVM {
     implicit def hnilTC: TC[HNil] =
       TC.instance(_ => "HNil")
 
-    implicit def hconsTC[H, T <: HList](
-        implicit headTC: B[TC[H]], tailTC: TC[T]): TC[H :: T] =
+    implicit def hconsTC[H, T <: HList](implicit headTC: B[TC[H]],
+                                        tailTC: TC[T]): TC[H :: T] =
       TC.instance(depth =>
             s"${headTC.value.repr(depth - 1)} :: ${tailTC.repr(depth)}")
 
-    implicit def genericTC[F, G](
-        implicit gen: Generic.Aux[F, G], underlying: C[TC[G]]): TC[F] =
+    implicit def genericTC[F, G](implicit gen: Generic.Aux[F, G],
+                                 underlying: C[TC[G]]): TC[F] =
       TC.instance(depth => s"Generic(${underlying.value.repr(depth - 1)})")
   }
 

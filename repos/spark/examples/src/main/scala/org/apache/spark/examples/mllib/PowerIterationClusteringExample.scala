@@ -59,8 +59,7 @@ object PowerIterationClusteringExample {
       k: Int = 2,
       numPoints: Int = 10,
       maxIterations: Int = 15
-  )
-      extends AbstractParams[Params]
+  ) extends AbstractParams[Params]
 
   def main(args: Array[String]) {
     val defaultParams = Params()

@@ -125,11 +125,11 @@ trait NIHDB {
 
   def getSnapshot(): Future[NIHDBSnapshot]
 
-  def getBlockAfter(
-      id: Option[Long], cols: Option[Set[ColumnRef]]): Future[Option[Block]]
+  def getBlockAfter(id: Option[Long],
+                    cols: Option[Set[ColumnRef]]): Future[Option[Block]]
 
-  def getBlock(
-      id: Option[Long], cols: Option[Set[CPath]]): Future[Option[Block]]
+  def getBlock(id: Option[Long],
+               cols: Option[Set[CPath]]): Future[Option[Block]]
 
   def length: Future[Long]
 
@@ -152,9 +152,10 @@ trait NIHDB {
   def close(implicit actorSystem: ActorSystem): Future[PrecogUnit]
 }
 
-private[niflheim] class NIHDBImpl private[niflheim](
-    actor: ActorRef, timeout: Timeout, val authorities: Authorities)(
-    implicit executor: ExecutionContext)
+private[niflheim] class NIHDBImpl private[niflheim] (
+    actor: ActorRef,
+    timeout: Timeout,
+    val authorities: Authorities)(implicit executor: ExecutionContext)
     extends NIHDB
     with GracefulStopSupport
     with AskSupport {
@@ -171,12 +172,12 @@ private[niflheim] class NIHDBImpl private[niflheim](
   def getSnapshot(): Future[NIHDBSnapshot] =
     (actor ? GetSnapshot).mapTo[NIHDBSnapshot]
 
-  def getBlockAfter(
-      id: Option[Long], cols: Option[Set[ColumnRef]]): Future[Option[Block]] =
+  def getBlockAfter(id: Option[Long],
+                    cols: Option[Set[ColumnRef]]): Future[Option[Block]] =
     getSnapshot().map(_.getBlockAfter(id, cols))
 
-  def getBlock(
-      id: Option[Long], cols: Option[Set[CPath]]): Future[Option[Block]] =
+  def getBlock(id: Option[Long],
+               cols: Option[Set[CPath]]): Future[Option[Block]] =
     getSnapshot().map(_.getBlock(id, cols))
 
   def length: Future[Long] =
@@ -231,7 +232,7 @@ private[niflheim] object NIHDBActor extends Logging {
         for {
           _ <- IO {
                 logger.info("No current descriptor found for " + baseDir +
-                    "; " + authorities + ", creating fresh descriptor")
+                      "; " + authorities + ", creating fresh descriptor")
               }
           _ <- ProjectionState.toFile(state, descriptorFile)
         } yield {
@@ -241,8 +242,12 @@ private[niflheim] object NIHDBActor extends Logging {
 
     currentState map {
       _ map { s =>
-        actorSystem.actorOf(Props(new NIHDBActor(
-                    s, baseDir, chef, cookThreshold, txLogScheduler)))
+        actorSystem.actorOf(
+            Props(new NIHDBActor(s,
+                                 baseDir,
+                                 chef,
+                                 cookThreshold,
+                                 txLogScheduler)))
       }
     }
   }
@@ -272,8 +277,11 @@ private[niflheim] object NIHDBActor extends Logging {
       _ map {
         _ map { s =>
           (s.authorities,
-           actorSystem.actorOf(Props(new NIHDBActor(
-                       s, baseDir, chef, cookThreshold, txLogScheduler))))
+           actorSystem.actorOf(Props(new NIHDBActor(s,
+                                                    baseDir,
+                                                    chef,
+                                                    cookThreshold,
+                                                    txLogScheduler))))
         }
       }
     }
@@ -337,19 +345,17 @@ private[niflheim] class NIHDBActor private (
     var maxOffset = currentState.maxOffset
 
     val currentRawFile = rawFileFor(txLog.currentBlockId)
-    val (currentLog, rawLogOffsets) =
-      if (currentRawFile.exists) {
-        val (handler, offsets, ok) =
-          RawHandler.load(txLog.currentBlockId, currentRawFile)
-        if (!ok) {
-          logger.warn("Corruption detected and recovery performed on " +
+    val (currentLog, rawLogOffsets) = if (currentRawFile.exists) {
+      val (handler, offsets, ok) =
+        RawHandler.load(txLog.currentBlockId, currentRawFile)
+      if (!ok) {
+        logger.warn("Corruption detected and recovery performed on " +
               currentRawFile)
-        }
-        (handler, offsets)
-      } else {
-        (RawHandler.empty(txLog.currentBlockId, currentRawFile),
-         Seq.empty[Long])
       }
+      (handler, offsets)
+    } else {
+      (RawHandler.empty(txLog.currentBlockId, currentRawFile), Seq.empty[Long])
+    }
 
     rawLogOffsets.sortBy(-_).headOption.foreach { newMaxOffset =>
       maxOffset = maxOffset max newMaxOffset
@@ -429,8 +435,8 @@ private[niflheim] class NIHDBActor private (
     }.toSeq: _*)
   }
 
-  def updatedThresholds(
-      current: Map[Int, Int], ids: Seq[Long]): Map[Int, Int] = {
+  def updatedThresholds(current: Map[Int, Int],
+                        ids: Seq[Long]): Map[Int, Int] = {
     (current.toSeq ++ ids.map { i =>
           val EventId(p, s) = EventId.fromLong(i); (p -> s)
         }).groupBy(_._1).map { case (p, ids) => (p -> ids.map(_._2).max) }
@@ -503,12 +509,14 @@ private[niflheim] class NIHDBActor private (
                 pending = state.blockState.pending + (toCook.id -> toCook),
                 rawLog = newRaw)
             state.txLog.startCook(toCook.id)
-            chef ! Prepare(
-                toCook.id, cookSequence.getAndIncrement, cookedDir, toCook)
+            chef ! Prepare(toCook.id,
+                           cookSequence.getAndIncrement,
+                           cookedDir,
+                           toCook)
           }
 
-          logger.debug("Insert complete on %d rows at offset %d for %s".format(
-                  values.length, offset, baseDir.getCanonicalPath))
+          logger.debug("Insert complete on %d rows at offset %d for %s"
+                .format(values.length, offset, baseDir.getCanonicalPath))
           if (responseRequested) sender ! Inserted(offset, values.length)
         }
       }
@@ -523,8 +531,9 @@ private[niflheim] class NIHDBActor private (
   }
 }
 
-private[niflheim] case class ProjectionState(
-    maxOffset: Long, cookedMap: Map[Long, String], authorities: Authorities) {
+private[niflheim] case class ProjectionState(maxOffset: Long,
+                                             cookedMap: Map[Long, String],
+                                             authorities: Authorities) {
   def readers(baseDir: File): List[CookedReader] =
     cookedMap.map {
       case (id, metadataFile) =>

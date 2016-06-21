@@ -267,16 +267,14 @@ object Templates {
                     val body = resp.body
                     body match {
                       case pending
-                          if body.contains(
-                              "This template is being processed.") =>
+                          if body.contains("This template is being processed.") =>
                         TemplatePending(uuid)
                       case validated
                           if body.contains(
                               "This template was published successfully!") =>
                         TemplateValidated(uuid)
                       case failed
-                          if body.contains(
-                              "This template failed to publish.") =>
+                          if body.contains("This template failed to publish.") =>
                         TemplateFailed(uuid, extractErrors(body))
                     }
                 }
@@ -329,7 +327,7 @@ object Templates {
                     false
                   case (name, key, Right(uuid)) =>
                     logger.info("Template " + name +
-                        " published successfully with uuid: " + uuid)
+                          " published successfully with uuid: " + uuid)
                     overall
                 }
             }
@@ -367,8 +365,9 @@ object Templates {
       def createSetCommand(dirs: Seq[TemplateSources]): String = {
         dirs
           .map("file(\"" + _.mainDir.getAbsolutePath + "\")")
-          .mkString(
-              "set play.sbt.activator.Templates.templates := Seq(", ",", ")")
+          .mkString("set play.sbt.activator.Templates.templates := Seq(",
+                    ",",
+                    ")")
       }
 
       val setCommand = createSetCommand(templateDirs)

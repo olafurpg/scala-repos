@@ -46,7 +46,8 @@ trait SampleSpec[M[+ _]]
   val simpleData2: Stream[JValue] = Stream.tabulate(100) { i =>
     JObject(
         JField("id", if (i % 2 == 0) JString(i.toString) else JNum(i)) :: JField(
-            "value", if (i % 2 == 0) JBool(true) else JNum(i)) :: Nil)
+            "value",
+            if (i % 2 == 0) JBool(true) else JNum(i)) :: Nil)
   }
 
   def testSample = {
@@ -86,8 +87,9 @@ trait SampleSpec[M[+ _]]
         val expected1 = toJson(
             table.transform(trans.DerefObjectStatic(TransSpec1.Id,
                                                     CPathField("id")))).copoint
-        val expected2 = toJson(table.transform(trans.DerefObjectStatic(
-                    TransSpec1.Id, CPathField("value")))).copoint
+        val expected2 = toJson(table.transform(
+                trans.DerefObjectStatic(TransSpec1.Id,
+                                        CPathField("value")))).copoint
         expected1 must containAllOf(result1)
         expected2 must containAllOf(result2)
     }

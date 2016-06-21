@@ -30,20 +30,20 @@ import scala.concurrent.Future
   * @param next The composed action that is being protected.
   * @param errorHandler handling failed token error.
   */
-class CSRFAction(
-    next: EssentialAction,
-    config: CSRFConfig = CSRFConfig(),
-    tokenSigner: CSRFTokenSigner = Crypto.crypto,
-    tokenProvider: TokenProvider = new SignedTokenProvider(Crypto.crypto),
-    errorHandler: => ErrorHandler = CSRF.DefaultErrorHandler)(
+class CSRFAction(next: EssentialAction,
+                 config: CSRFConfig = CSRFConfig(),
+                 tokenSigner: CSRFTokenSigner = Crypto.crypto,
+                 tokenProvider: TokenProvider =
+                   new SignedTokenProvider(Crypto.crypto),
+                 errorHandler: => ErrorHandler = CSRF.DefaultErrorHandler)(
     implicit mat: Materializer)
     extends EssentialAction {
 
   import CSRFAction._
   import play.api.libs.iteratee.Execution.Implicits.trampoline
 
-  private def checkFailed(
-      req: RequestHeader, msg: String): Accumulator[ByteString, Result] =
+  private def checkFailed(req: RequestHeader,
+                          msg: String): Accumulator[ByteString, Result] =
     Accumulator.done(clearTokenIfInvalid(req, config, errorHandler, msg))
 
   def apply(untaggedRequest: RequestHeader) = {
@@ -70,7 +70,7 @@ class CSRFAction(
             } else {
               filterLogger.trace(
                   "[CSRF] Check failed because invalid token found in query string: " +
-                  queryStringToken)
+                    queryStringToken)
               checkFailed(request, "Bad CSRF token found in query String")
             }
           } getOrElse {
@@ -80,8 +80,10 @@ class CSRFAction(
               case Some("application/x-www-form-urlencoded") =>
                 checkFormBody(request, next, headerToken, config.tokenName)
               case Some("multipart/form-data") =>
-                checkMultipartBody(
-                    request, next, headerToken, config.tokenName)
+                checkMultipartBody(request,
+                                   next,
+                                   headerToken,
+                                   config.tokenName)
               // No way to extract token from other content types
               case Some(content) =>
                 filterLogger.trace(
@@ -109,8 +111,8 @@ class CSRFAction(
       val newToken = tokenProvider.generateToken
 
       // The request
-      val requestWithNewToken = tagRequest(
-          request, Token(config.tokenName, newToken))
+      val requestWithNewToken =
+        tagRequest(request, Token(config.tokenName, newToken))
 
       // Once done, add it to the result
       next(requestWithNewToken).map(result =>
@@ -132,9 +134,13 @@ class CSRFAction(
       boundary <- maybeBoundary._2
     } yield {
       checkBody(extractTokenFromMultipartFormDataBody(ByteString(boundary)))(
-          request, action, tokenFromHeader, tokenName)
-    }).getOrElse(checkFailed(
-            request, "No boundary found in multipart/form-data request"))
+          request,
+          action,
+          tokenFromHeader,
+          tokenName)
+    }).getOrElse(
+        checkFailed(request,
+                    "No boundary found in multipart/form-data request"))
   }
 
   private def checkBody[T](extractor: (ByteString, String) => Option[String])(
@@ -172,16 +178,18 @@ class CSRFAction(
       action(request).run(validatedBodySource)
     }.recoverWith {
       case NoTokenInBody =>
-        clearTokenIfInvalid(
-            request, config, errorHandler, "No CSRF token found in body")
+        clearTokenIfInvalid(request,
+                            config,
+                            errorHandler,
+                            "No CSRF token found in body")
     }
   }
 
   /**
     * Does a very simple parse of the form body to find the token, if it exists.
     */
-  private def extractTokenFromFormBody(
-      body: ByteString, tokenName: String): Option[String] = {
+  private def extractTokenFromFormBody(body: ByteString,
+                                       tokenName: String): Option[String] = {
     val tokenEquals =
       ByteString(URLEncoder.encode(tokenName, "utf-8")) ++ ByteString('=')
 
@@ -211,7 +219,8 @@ class CSRFAction(
     * Does a very simple multipart/form-data parse to find the token if it exists.
     */
   private def extractTokenFromMultipartFormDataBody(boundary: ByteString)(
-      body: ByteString, tokenName: String): Option[String] = {
+      body: ByteString,
+      tokenName: String): Option[String] = {
     val crlf = ByteString("\r\n")
     val boundaryLine = ByteString("\r\n--") ++ boundary
 
@@ -283,8 +292,7 @@ class CSRFAction(
                   None
                 } else {
                   // Extract the token value
-                  Some(
-                      prefixedBody
+                  Some(prefixedBody
                         .slice(startOfPartData, endOfData)
                         .utf8String)
                 }
@@ -453,8 +461,8 @@ object CSRFAction {
             request.body)
   }
 
-  private[csrf] def tagRequest(
-      request: RequestHeader, token: Token): RequestHeader = {
+  private[csrf] def tagRequest(request: RequestHeader,
+                               token: Token): RequestHeader = {
     request.copy(
         tags =
           request.tags ++ Map(
@@ -463,21 +471,21 @@ object CSRFAction {
           ))
   }
 
-  private[csrf] def tagRequest[A](
-      request: Request[A], token: Token): Request[A] = {
+  private[csrf] def tagRequest[A](request: Request[A],
+                                  token: Token): Request[A] = {
     Request(tagRequest(request: RequestHeader, token), request.body)
   }
 
-  private[csrf] def getHeaderToken(
-      request: RequestHeader, config: CSRFConfig) = {
+  private[csrf] def getHeaderToken(request: RequestHeader,
+                                   config: CSRFConfig) = {
     val queryStringToken = request.getQueryString(config.tokenName)
     val headerToken = request.headers.get(config.headerName)
 
     queryStringToken orElse headerToken
   }
 
-  private[csrf] def requiresCsrfCheck(
-      request: RequestHeader, config: CSRFConfig): Boolean = {
+  private[csrf] def requiresCsrfCheck(request: RequestHeader,
+                                      config: CSRFConfig): Boolean = {
     if (config.bypassCorsTrustedOrigins &&
         request.tags.contains(CORSFilter.RequestTag)) {
       filterLogger.trace(
@@ -554,8 +562,8 @@ object CSRFAction {
   *
   * Apply this to all actions that require a CSRF check.
   */
-case class CSRFCheck @Inject()(
-    config: CSRFConfig, tokenSigner: CSRFTokenSigner) {
+case class CSRFCheck @Inject()(config: CSRFConfig,
+                               tokenSigner: CSRFTokenSigner) {
 
   private class CSRFCheckAction[A](tokenProvider: TokenProvider,
                                    errorHandler: ErrorHandler,
@@ -603,8 +611,10 @@ case class CSRFCheck @Inject()(
               }
           }
           .getOrElse {
-            CSRFAction.clearTokenIfInvalid(
-                request, config, errorHandler, "CSRF token check failed")
+            CSRFAction.clearTokenIfInvalid(request,
+                                           config,
+                                           errorHandler,
+                                           "CSRF token check failed")
           }
       }
     }
@@ -644,8 +654,9 @@ object CSRFCheck {
   */
 case class CSRFAddToken @Inject()(config: CSRFConfig, crypto: CSRFTokenSigner) {
 
-  private class CSRFAddTokenAction[A](
-      config: CSRFConfig, tokenProvider: TokenProvider, wrapped: Action[A])
+  private class CSRFAddTokenAction[A](config: CSRFConfig,
+                                      tokenProvider: TokenProvider,
+                                      wrapped: Action[A])
       extends Action[A] {
     def parser = wrapped.parser
     def apply(untaggedRequest: Request[A]) = {
@@ -674,12 +685,13 @@ case class CSRFAddToken @Inject()(config: CSRFConfig, crypto: CSRFTokenSigner) {
     * Wrap an action in an action that ensures there is a CSRF token.
     */
   def apply[A](action: Action[A]): Action[A] =
-    new CSRFAddTokenAction(
-        config, new TokenProviderProvider(config, crypto).get, action)
+    new CSRFAddTokenAction(config,
+                           new TokenProviderProvider(config, crypto).get,
+                           action)
 }
 object CSRFAddToken {
-  @deprecated(
-      "Use CSRFAddToken class with dependency injection instead", "2.5.0")
+  @deprecated("Use CSRFAddToken class with dependency injection instead",
+              "2.5.0")
   def apply[A](action: Action[A],
                config: CSRFConfig = CSRFConfig.global,
                tokenSigner: CSRFTokenSigner = Crypto.crypto): Action[A] =

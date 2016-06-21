@@ -170,7 +170,8 @@ private[http] final object HtmlNormalizer {
   // Given an element id and the `EventAttribute`s to apply to elements with
   // that id, return a JsCmd that binds all those event handlers to that id.
   private[this] def jsForEventAttributes(
-      elementId: String, eventAttributes: List[EventAttribute]): JsCmd = {
+      elementId: String,
+      eventAttributes: List[EventAttribute]): JsCmd = {
     eventAttributes.map {
       case EventAttribute(name, handlerJs) =>
         Call(
@@ -202,8 +203,9 @@ private[http] final object HtmlNormalizer {
             case EventAttribute(event, _) =>
               s"on$event"
           }
-          new UnprefixedAttribute(
-              attribute, removedAttributes.mkString(" "), normalizedAttributes)
+          new UnprefixedAttribute(attribute,
+                                  removedAttributes.mkString(" "),
+                                  normalizedAttributes)
 
         case _ =>
           normalizedAttributes
@@ -219,8 +221,10 @@ private[http] final object HtmlNormalizer {
         val generatedId = s"lift-event-js-${nextFuncName}"
 
         NodeAndEventJs(
-            element.copy(attributes = new UnprefixedAttribute(
-                    "id", generatedId, attributesIncludingEventsAsData)),
+            element.copy(attributes =
+                  new UnprefixedAttribute("id",
+                                          generatedId,
+                                          attributesIncludingEventsAsData)),
             jsForEventAttributes(generatedId, eventAttributes)
         )
       } else {

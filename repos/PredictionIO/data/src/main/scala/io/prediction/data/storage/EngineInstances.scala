@@ -139,8 +139,8 @@ class EngineInstanceSerializer
                 case JField("env", env) =>
                   i.copy(env = Extraction.extract[Map[String, String]](env))
                 case JField("sparkConf", sparkConf) =>
-                  i.copy(sparkConf = Extraction.extract[Map[String, String]](
-                            sparkConf))
+                  i.copy(sparkConf =
+                        Extraction.extract[Map[String, String]](sparkConf))
                 case JField("dataSourceParams", JString(dataSourceParams)) =>
                   i.copy(dataSourceParams = dataSourceParams)
                 case JField("preparatorParams", JString(preparatorParams)) =>
@@ -154,24 +154,34 @@ class EngineInstanceSerializer
           }
       }, {
         case i: EngineInstance =>
-          JObject(JField("id", JString(i.id)) :: JField(
-                  "status", JString(i.status)) :: JField(
+          JObject(
+              JField("id", JString(i.id)) :: JField(
+                  "status",
+                  JString(i.status)) :: JField(
                   "startTime",
                   JString(i.startTime.toString)) :: JField(
                   "endTime",
                   JString(i.endTime.toString)) :: JField(
-                  "engineId", JString(i.engineId)) :: JField(
+                  "engineId",
+                  JString(i.engineId)) :: JField(
                   "engineVersion",
                   JString(i.engineVersion)) :: JField(
-                  "engineVariant", JString(i.engineVariant)) :: JField(
-                  "engineFactory", JString(i.engineFactory)) :: JField(
-                  "batch", JString(i.batch)) :: JField(
+                  "engineVariant",
+                  JString(i.engineVariant)) :: JField(
+                  "engineFactory",
+                  JString(i.engineFactory)) :: JField(
+                  "batch",
+                  JString(i.batch)) :: JField(
                   "env",
                   Extraction.decompose(i.env)(DefaultFormats)) :: JField(
                   "sparkConf",
                   Extraction.decompose(i.sparkConf)(DefaultFormats)) :: JField(
-                  "dataSourceParams", JString(i.dataSourceParams)) :: JField(
-                  "preparatorParams", JString(i.preparatorParams)) :: JField(
-                  "algorithmsParams", JString(i.algorithmsParams)) :: JField(
-                  "servingParams", JString(i.servingParams)) :: Nil)
+                  "dataSourceParams",
+                  JString(i.dataSourceParams)) :: JField(
+                  "preparatorParams",
+                  JString(i.preparatorParams)) :: JField(
+                  "algorithmsParams",
+                  JString(i.algorithmsParams)) :: JField(
+                  "servingParams",
+                  JString(i.servingParams)) :: Nil)
       }))

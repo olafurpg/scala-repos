@@ -29,8 +29,7 @@ import org.apache.spark.streaming.dstream.InputDStream
 class JavaPairInputDStream[K, V](val inputDStream: InputDStream[(K, V)])(
     implicit val kClassTag: ClassTag[K],
     implicit val vClassTag: ClassTag[V]
-)
-    extends JavaPairDStream[K, V](inputDStream) {}
+) extends JavaPairDStream[K, V](inputDStream) {}
 
 object JavaPairInputDStream {
 

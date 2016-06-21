@@ -24,8 +24,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param controller The controller to be evaluated
   * @param method     The method to be evaluated
   */
-class JavaActionAnnotations(
-    val controller: Class[_], val method: java.lang.reflect.Method) {
+class JavaActionAnnotations(val controller: Class[_],
+                            val method: java.lang.reflect.Method) {
   private def config: ActionCompositionConfiguration =
     HttpConfiguration.current.actionComposition
 
@@ -92,16 +92,15 @@ abstract class JavaAction(components: JavaHandlerComponents)
       }
     }
 
-    val baseAction = components.actionCreator.createAction(
-        javaContext.request, annotations.method)
+    val baseAction = components.actionCreator
+      .createAction(javaContext.request, annotations.method)
 
-    val endOfChainAction =
-      if (config.executeActionCreatorActionFirst) {
-        rootAction
-      } else {
-        baseAction.delegate = rootAction
-        baseAction
-      }
+    val endOfChainAction = if (config.executeActionCreatorActionFirst) {
+      rootAction
+    } else {
+      baseAction.delegate = rootAction
+      baseAction
+    }
 
     val finalUserDeclaredAction =
       annotations.actionMixins.foldLeft[JAction[_ <: Any]](endOfChainAction) {
@@ -162,7 +161,8 @@ trait JavaHandlerComponents {
   * The components necessary to handle a Java handler.
   */
 class DefaultJavaHandlerComponents @Inject()(
-    injector: Injector, val actionCreator: play.http.ActionCreator)
+    injector: Injector,
+    val actionCreator: play.http.ActionCreator)
     extends JavaHandlerComponents {
   def getBodyParser[A <: JBodyParser[_]](parserClass: Class[A]): A =
     injector.instanceOf(parserClass)

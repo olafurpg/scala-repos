@@ -76,8 +76,7 @@ object JsObjectSpec extends Specification {
                 "field3c" -> JsNull
             )
         )
-        .deepMerge(
-            Json.obj(
+        .deepMerge(Json.obj(
                 "field3" -> Json.arr(
                     "jkl",
                     "mno",

@@ -42,8 +42,8 @@ abstract class ScalaValidator(conflictsReporter: ConflictsReporter,
     result
   }
 
-  def findConflicts(
-      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)]
+  def findConflicts(name: String,
+                    allOcc: Boolean): Array[(PsiNamedElement, String)]
 
   def validateName(name: String, increaseNumber: Boolean): String = {
     if (noOccurrences) return name

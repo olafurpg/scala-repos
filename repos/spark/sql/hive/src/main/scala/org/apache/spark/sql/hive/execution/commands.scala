@@ -116,14 +116,14 @@ private[hive] case class CreateMetastoreDataSource(
     if (!MetaStoreUtils.validateName(tableIdent.table)) {
       throw new AnalysisException(
           s"Table name ${tableIdent.table} is not a valid name for " +
-          s"metastore. Metastore only accepts table name containing characters, numbers and _.")
+            s"metastore. Metastore only accepts table name containing characters, numbers and _.")
     }
     if (tableIdent.database.isDefined &&
         !MetaStoreUtils.validateName(tableIdent.database.get)) {
       throw new AnalysisException(
           s"Database name ${tableIdent.database.get} is not a valid name " +
-          s"for metastore. Metastore only accepts database name containing " +
-          s"characters, numbers and _.")
+            s"for metastore. Metastore only accepts database name containing " +
+            s"characters, numbers and _.")
     }
 
     val tableName = tableIdent.unquotedString
@@ -138,14 +138,13 @@ private[hive] case class CreateMetastoreDataSource(
     }
 
     var isExternal = true
-    val optionsWithPath =
-      if (!options.contains("path") && managedIfNoPath) {
-        isExternal = false
-        options + ("path" -> hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(tableIdent))
-      } else {
-        options
-      }
+    val optionsWithPath = if (!options.contains("path") && managedIfNoPath) {
+      isExternal = false
+      options + ("path" -> hiveContext.sessionState.catalog
+            .hiveDefaultTableFilePath(tableIdent))
+    } else {
+      options
+    }
 
     // Create the relation to validate the arguments before writing the metadata to the metastore.
     DataSource(sqlContext = sqlContext,
@@ -184,28 +183,27 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
     if (!MetaStoreUtils.validateName(tableIdent.table)) {
       throw new AnalysisException(
           s"Table name ${tableIdent.table} is not a valid name for " +
-          s"metastore. Metastore only accepts table name containing characters, numbers and _.")
+            s"metastore. Metastore only accepts table name containing characters, numbers and _.")
     }
     if (tableIdent.database.isDefined &&
         !MetaStoreUtils.validateName(tableIdent.database.get)) {
       throw new AnalysisException(
           s"Database name ${tableIdent.database.get} is not a valid name " +
-          s"for metastore. Metastore only accepts database name containing " +
-          s"characters, numbers and _.")
+            s"for metastore. Metastore only accepts database name containing " +
+            s"characters, numbers and _.")
     }
 
     val tableName = tableIdent.unquotedString
     val hiveContext = sqlContext.asInstanceOf[HiveContext]
     var createMetastoreTable = false
     var isExternal = true
-    val optionsWithPath =
-      if (!options.contains("path")) {
-        isExternal = false
-        options + ("path" -> hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(tableIdent))
-      } else {
-        options
-      }
+    val optionsWithPath = if (!options.contains("path")) {
+      isExternal = false
+      options + ("path" -> hiveContext.sessionState.catalog
+            .hiveDefaultTableFilePath(tableIdent))
+    } else {
+      options
+    }
 
     var existingSchema = None: Option[StructType]
     if (sqlContext.sessionState.catalog.tableExists(tableIdent)) {
@@ -214,10 +212,10 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
         case SaveMode.ErrorIfExists =>
           throw new AnalysisException(
               s"Table $tableName already exists. " +
-              s"If you are using saveAsTable, you can set SaveMode to SaveMode.Append to " +
-              s"insert data into the table or set SaveMode to SaveMode.Overwrite to overwrite" +
-              s"the existing data. " +
-              s"Or, if you are using SQL CREATE TABLE, you need to drop $tableName first.")
+                s"If you are using saveAsTable, you can set SaveMode to SaveMode.Append to " +
+                s"insert data into the table or set SaveMode to SaveMode.Overwrite to overwrite" +
+                s"the existing data. " +
+                s"Or, if you are using SQL CREATE TABLE, you need to drop $tableName first.")
         case SaveMode.Ignore =>
           // Since the table already exists and the save mode is Ignore, we will just return.
           return Seq.empty[Row]
@@ -236,7 +234,9 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
           EliminateSubqueryAliases(sqlContext.sessionState.catalog
                 .lookupRelation(tableIdent)) match {
             case l @ LogicalRelation(
-                _: InsertableRelation | _: HadoopFsRelation, _, _) =>
+                _: InsertableRelation | _: HadoopFsRelation,
+                _,
+                _) =>
               existingSchema = Some(l.schema)
             case o =>
               throw new AnalysisException(

@@ -65,8 +65,9 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case DoWhile(body, cond, Some(label)) =>
         val doNode =
           new Node(Token.DO, transformBlock(body), transformExpr(cond))
-        new Node(
-            Token.LABEL, transformLabel(label), setNodePosition(doNode, pos))
+        new Node(Token.LABEL,
+                 transformLabel(label),
+                 setNodePosition(doNode, pos))
       case Try(block, errVar, handler, EmptyTree) =>
         val catchPos = handler.pos orElse pos
         val catchNode =
@@ -162,8 +163,9 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
         args.foreach(arg => node.addChildToBack(transformExpr(arg)))
         node
       case DotSelect(qualifier, item) =>
-        new Node(
-            Token.GETPROP, transformExpr(qualifier), transformString(item))
+        new Node(Token.GETPROP,
+                 transformExpr(qualifier),
+                 transformString(item))
       case BracketSelect(qualifier, item) =>
         new Node(Token.GETELEM, transformExpr(qualifier), transformExpr(item))
 
@@ -241,8 +243,8 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
     transformName(param.name)
 
   def transformName(ident: Ident)(implicit parentPos: Position): Node =
-    setNodePosition(
-        Node.newString(Token.NAME, ident.name), ident.pos orElse parentPos)
+    setNodePosition(Node.newString(Token.NAME, ident.name),
+                    ident.pos orElse parentPos)
 
   def transformLabel(ident: Ident)(implicit parentPos: Position): Node =
     setNodePosition(Node.newString(Token.LABEL_NAME, ident.name),

@@ -13,15 +13,17 @@ object DatabasesSpec extends Specification {
   "Databases" should {
 
     "create database" in new WithDatabase {
-      val db = Databases(
-          name = "test", driver = "org.h2.Driver", url = "jdbc:h2:mem:test")
+      val db = Databases(name = "test",
+                         driver = "org.h2.Driver",
+                         url = "jdbc:h2:mem:test")
       db.name must_== "test"
       db.url must_== "jdbc:h2:mem:test"
     }
 
     "create database with named arguments" in new WithDatabase {
-      val db = Databases(
-          name = "test", driver = "org.h2.Driver", url = "jdbc:h2:mem:test")
+      val db = Databases(name = "test",
+                         driver = "org.h2.Driver",
+                         url = "jdbc:h2:mem:test")
       db.name must_== "test"
       db.url must_== "jdbc:h2:mem:test"
     }

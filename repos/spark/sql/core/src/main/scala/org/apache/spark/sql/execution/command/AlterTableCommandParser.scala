@@ -201,8 +201,8 @@ object AlterTableCommandParser {
           }
         }
         AlterTableStorageProperties(
-            tableIdent, BucketSpec(numBuckets, clusterCols, sortCols))(
-            node.source)
+            tableIdent,
+            BucketSpec(numBuckets, clusterCols, sortCols))(node.source)
 
       // ALTER TABLE table_name NOT CLUSTERED
       case Token("TOK_ALTERTABLE_CLUSTER_SORT",
@@ -249,8 +249,8 @@ object AlterTableCommandParser {
             })
           case Token("TOK_TABCOLVALUE_PAIR", pairs) =>
             pairs.map {
-              case Token(
-                  "TOK_TABCOLVALUES", Token("TOK_TABCOLVALUE", vals) :: Nil) =>
+              case Token("TOK_TABCOLVALUES",
+                         Token("TOK_TABCOLVALUE", vals) :: Nil) =>
                 vals.map { n =>
                   cleanAndUnquoteString(n.text)
                 }
@@ -301,8 +301,8 @@ object AlterTableCommandParser {
               case Token(const, Nil) =>
                 Seq((cleanAndUnquoteString(const),
                      cleanAndUnquoteString(loc.text)))
-              case Token(
-                  "TOK_TABCOLVALUES", Token("TOK_TABCOLVALUE", keys) :: Nil) =>
+              case Token("TOK_TABCOLVALUES",
+                         Token("TOK_TABCOLVALUE", keys) :: Nil) =>
                 keys.map { k =>
                   (cleanAndUnquoteString(k.text),
                    cleanAndUnquoteString(loc.text))
@@ -379,7 +379,8 @@ object AlterTableCommandParser {
       // ALTER TABLE table_name [PARTITION spec] SET FILEFORMAT file_format;
       case Token("TOK_ALTERTABLE_FILEFORMAT", args) :: _ =>
         val Seq(fileFormat, genericFormat) = getClauses(
-            Seq("TOK_TABLEFILEFORMAT", "TOK_FILEFORMAT_GENERIC"), args)
+            Seq("TOK_TABLEFILEFORMAT", "TOK_FILEFORMAT_GENERIC"),
+            args)
         // Note: the AST doesn't contain information about which file format is being set here.
         // E.g. we can't differentiate between INPUTFORMAT and OUTPUTFORMAT if either is set.
         // Right now this just stores the values, but we should figure out how to get the keys.
@@ -396,8 +397,9 @@ object AlterTableCommandParser {
 
       // ALTER TABLE table_name [PARTITION spec] SET LOCATION "loc";
       case Token("TOK_ALTERTABLE_LOCATION", Token(loc, Nil) :: Nil) :: _ =>
-        AlterTableSetLocation(
-            tableIdent, partition, cleanAndUnquoteString(loc))(node.source)
+        AlterTableSetLocation(tableIdent,
+                              partition,
+                              cleanAndUnquoteString(loc))(node.source)
 
       // ALTER TABLE table_name TOUCH [PARTITION spec];
       case Token("TOK_ALTERTABLE_TOUCH", args) :: _ =>
@@ -422,7 +424,8 @@ object AlterTableCommandParser {
       case Token("TOK_ALTERTABLE_RENAMECOL",
                  oldName :: newName :: dataType :: args) :: _ =>
         val afterColName: Option[String] = getClauseOption(
-            "TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION", args).map { ap =>
+            "TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION",
+            args).map { ap =>
           ap.children match {
             case Token(col, Nil) :: Nil => col
             case _ => parseFailed("Invalid ALTER TABLE command", node)
@@ -464,8 +467,11 @@ object AlterTableCommandParser {
         val columns = StructType(columnNodes.map(nodeToStructField))
         val restrict = getClauseOption("TOK_RESTRICT", args).isDefined
         val cascade = getClauseOption("TOK_CASCADE", args).isDefined
-        AlterTableReplaceCol(
-            tableIdent, partition, columns, restrict, cascade)(node.source)
+        AlterTableReplaceCol(tableIdent,
+                             partition,
+                             columns,
+                             restrict,
+                             cascade)(node.source)
 
       case _ =>
         parseFailed("Unsupported ALTER TABLE command", node)

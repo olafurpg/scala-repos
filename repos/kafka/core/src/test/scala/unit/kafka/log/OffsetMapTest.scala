@@ -64,7 +64,7 @@ object OffsetMapTest {
     val map = test.validateMap(size, load)
     val ellapsedMs = (System.nanoTime - start) / 1000.0 / 1000.0
     println(map.size + " entries in map of size " + map.slots + " in " +
-        ellapsedMs + " ms")
+          ellapsedMs + " ms")
     println("Collision rate: %.1f%%".format(100 * map.collisionRate))
   }
 }

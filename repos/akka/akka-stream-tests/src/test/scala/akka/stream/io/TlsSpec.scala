@@ -32,12 +32,12 @@ object TlsSpec {
     val password = "changeme"
 
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
-    keyStore.load(
-        getClass.getResourceAsStream("/keystore"), password.toCharArray)
+    keyStore
+      .load(getClass.getResourceAsStream("/keystore"), password.toCharArray)
 
     val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
-    trustStore.load(
-        getClass.getResourceAsStream(trustPath), password.toCharArray)
+    trustStore
+      .load(getClass.getResourceAsStream(trustPath), password.toCharArray)
 
     val keyManagerFactory =
       KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
@@ -114,7 +114,8 @@ class TlsSpec
     }
 
     val cipherSuites = NegotiateNewSession.withCipherSuites(
-        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA")
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_RSA_WITH_AES_128_CBC_SHA")
     def clientTls(closing: TLSClosing) =
       TLS(sslContext, cipherSuites, Client, closing)
     def badClientTls(closing: TLSClosing) =
@@ -412,21 +413,23 @@ class TlsSpec
         .collect { case Right(e) ⇒ e }
         .toMat(Sink.head)(Keep.right)
 
-      val simple = Flow.fromSinkAndSourceMat(
-          getError, Source.maybe[SslTlsOutbound])(Keep.left)
+      val simple =
+        Flow.fromSinkAndSourceMat(getError, Source.maybe[SslTlsOutbound])(
+            Keep.left)
 
       // The creation of actual TCP connections is necessary. It is the easiest way to decouple the client and server
       // under error conditions, and has the bonus of matching most actual SSL deployments.
-      val (server, serverErr) = Tcp()
-        .bind("localhost", 0)
-        .map(c ⇒ {
-          c.flow
-            .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
-                    Keep.right))(Keep.right)
-            .run()
-        })
-        .toMat(Sink.head)(Keep.both)
-        .run()
+      val (server, serverErr) =
+        Tcp()
+          .bind("localhost", 0)
+          .map(c ⇒ {
+            c.flow
+              .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
+                      Keep.right))(Keep.right)
+              .run()
+          })
+          .toMat(Sink.head)(Keep.both)
+          .run()
 
       val clientErr = simple
         .join(badClientTls(IgnoreBoth))

@@ -1,7 +1,7 @@
 import scala.language.{higherKinds, implicitConversions}
 
 trait Intf {
-  type Rep [+T]
+  type Rep[+T]
   type M[+T] = Rep[Maybe[T]]
 
   val __match: Matcher

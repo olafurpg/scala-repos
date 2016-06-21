@@ -64,14 +64,22 @@ trait StartingBehavior {
   }
 
   final def checkForRunning: Receive = {
-    case MesosStatusUpdateEvent(
-        _, taskId, "TASK_RUNNING", _, app.`id`, _, _, _, VersionString, _, _)
-        if !startedRunningTasks(taskId.idString) =>
+    case MesosStatusUpdateEvent(_,
+                                taskId,
+                                "TASK_RUNNING",
+                                _,
+                                app.`id`,
+                                _,
+                                _,
+                                _,
+                                VersionString,
+                                _,
+                                _) if !startedRunningTasks(taskId.idString) =>
       // scalastyle:off line.size.limit
       startedRunningTasks += taskId.idString
       log.info(
           s"New task $taskId now running during app ${app.id.toString} scaling, " +
-          s"${nrToStart - startedRunningTasks.size} more to go")
+            s"${nrToStart - startedRunningTasks.size} more to go")
       checkFinished()
   }
 

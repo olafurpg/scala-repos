@@ -38,7 +38,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PickResultSpec
     extends SimpleSFXDelegateSpec[jfxsi.PickResult, PickResult](
-        classOf[jfxsi.PickResult], classOf[PickResult]) {
+        classOf[jfxsi.PickResult],
+        classOf[PickResult]) {
 
   override protected def getJavaClassInstance =
     new jfxsi.PickResult(null, 0, 0)

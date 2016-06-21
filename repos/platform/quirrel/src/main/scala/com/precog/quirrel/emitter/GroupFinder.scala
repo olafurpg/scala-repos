@@ -103,10 +103,10 @@ trait GroupFinder extends parser.AST with Tracer {
         findVars(solve, id)(left) ++ findVars(solve, id)(right)
 
       case Solve(_, constraints, child) => {
-          val constrVars =
-            constraints map findVars(solve, id) reduceOption { _ ++ _ } getOrElse Set()
-          constrVars ++ findVars(solve, id)(child)
-        }
+        val constrVars =
+          constraints map findVars(solve, id) reduceOption { _ ++ _ } getOrElse Set()
+        constrVars ++ findVars(solve, id)(child)
+      }
 
       case New(_, child) => findVars(solve, id)(child)
 
@@ -114,8 +114,9 @@ trait GroupFinder extends parser.AST with Tracer {
         findVars(solve, id)(pred) ++ findVars(solve, id)(child)
 
       case Relate(_, from, to, in) =>
-        findVars(solve, id)(from) ++ findVars(solve, id)(to) ++ findVars(
-            solve, id)(in)
+        findVars(solve, id)(from) ++ findVars(solve, id)(to) ++ findVars(solve,
+                                                                         id)(
+            in)
 
       case expr @ TicVar(_, `id`) if expr.binding == SolveBinding(solve) =>
         Set(expr)

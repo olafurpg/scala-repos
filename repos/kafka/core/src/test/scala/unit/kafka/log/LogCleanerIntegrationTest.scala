@@ -76,8 +76,9 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
         startSize > compactedSize)
 
     val read = readFromLog(log)
-    assertEquals(
-        "Contents of the map shouldn't change.", appends.toMap, read.toMap)
+    assertEquals("Contents of the map shouldn't change.",
+                 appends.toMap,
+                 read.toMap)
     assertTrue(startSize > log.size)
 
     // write some more stuff and validate again
@@ -97,8 +98,9 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
                lastCleaned2 >= firstDirty2);
 
     val read2 = readFromLog(log)
-    assertEquals(
-        "Contents of the map shouldn't change.", appends2.toMap, read2.toMap)
+    assertEquals("Contents of the map shouldn't change.",
+                 appends2.toMap,
+                 read2.toMap)
 
     // simulate deleting a partition, by removing it from logs
     // force a checkpoint
@@ -165,10 +167,10 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
       dir.mkdirs()
       val logProps = new Properties()
       logProps.put(LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
-      logProps.put(
-          LogConfig.SegmentIndexBytesProp, 100 * 1024: java.lang.Integer)
-      logProps.put(
-          LogConfig.FileDeleteDelayMsProp, deleteDelay: java.lang.Integer)
+      logProps
+        .put(LogConfig.SegmentIndexBytesProp, 100 * 1024: java.lang.Integer)
+      logProps
+        .put(LogConfig.FileDeleteDelayMsProp, deleteDelay: java.lang.Integer)
       logProps.put(LogConfig.CleanupPolicyProp, LogConfig.Compact)
       logProps.put(LogConfig.MinCleanableDirtyRatioProp,
                    minCleanableDirtyRatio: java.lang.Float)

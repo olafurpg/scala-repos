@@ -35,8 +35,9 @@ import Analysis._
 /** Links the information from [[io.VirtualScalaJSIRFile]]s into
   *  [[LinkedClass]]es. Does a dead code elimination pass.
   */
-final class BaseLinker(
-    semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean) {
+final class BaseLinker(semantics: Semantics,
+                       esLevel: ESLevel,
+                       considerPositions: Boolean) {
 
   private type TreeProvider = String => (ClassDef, Option[String])
 
@@ -53,15 +54,18 @@ final class BaseLinker(
 
   @deprecated(
       "Bypassing linking errors will not be possible in the next major version. " +
-      "Use the overload without the bypassLinkingError parameter instead.",
+        "Use the overload without the bypassLinkingError parameter instead.",
       "0.6.6")
   def link(irInput: Seq[VirtualScalaJSIRFile],
            logger: Logger,
            symbolRequirements: SymbolRequirement,
            bypassLinkingErrors: Boolean,
            checkIR: Boolean): LinkingUnit = {
-    linkInternal(
-        irInput, logger, symbolRequirements, bypassLinkingErrors, checkIR)
+    linkInternal(irInput,
+                 logger,
+                 symbolRequirements,
+                 bypassLinkingErrors,
+                 checkIR)
   }
 
   // Non-deprecated version to be called from `LinkerFrontend`
@@ -173,10 +177,13 @@ final class BaseLinker(
         .get(encodedName)
         .map { info =>
           val (tree, version) = getTree(encodedName)
-          val newVersion =
-            version.map("real" + _) // avoid collision with dummy
-          linkedClassDef(
-              info, tree, analyzerInfo, newVersion, getTree, analysis)
+          val newVersion = version.map("real" + _) // avoid collision with dummy
+          linkedClassDef(info,
+                         tree,
+                         analyzerInfo,
+                         newVersion,
+                         getTree,
+                         analysis)
         }
         .orElse(optDummyParent)
     }
@@ -274,18 +281,25 @@ final class BaseLinker(
         // nothing to do
 
         case MethodSyntheticKind.InheritedConstructor =>
-          val syntheticMDef = synthesizeInheritedConstructor(
-              analyzerInfo, m, getTree, analysis)(classDef.pos)
+          val syntheticMDef =
+            synthesizeInheritedConstructor(analyzerInfo, m, getTree, analysis)(
+                classDef.pos)
           memberMethods += linkedSyntheticMethod(syntheticMDef)
 
         case MethodSyntheticKind.ReflectiveProxy(targetName) =>
-          val syntheticMDef = synthesizeReflectiveProxy(
-              analyzerInfo, m, targetName, getTree, analysis)
+          val syntheticMDef = synthesizeReflectiveProxy(analyzerInfo,
+                                                        m,
+                                                        targetName,
+                                                        getTree,
+                                                        analysis)
           memberMethods += linkedSyntheticMethod(syntheticMDef)
 
         case MethodSyntheticKind.DefaultBridge(targetInterface) =>
-          val syntheticMDef = synthesizeDefaultBridge(
-              analyzerInfo, m, targetInterface, getTree, analysis)
+          val syntheticMDef = synthesizeDefaultBridge(analyzerInfo,
+                                                      m,
+                                                      targetInterface,
+                                                      getTree,
+                                                      analysis)
           memberMethods += linkedSyntheticMethod(syntheticMDef)
       }
     }
@@ -320,11 +334,11 @@ final class BaseLinker(
                     version)
   }
 
-  private def synthesizeInheritedConstructor(classInfo: Analysis.ClassInfo,
-                                             methodInfo: Analysis.MethodInfo,
-                                             getTree: TreeProvider,
-                                             analysis: Analysis)(
-      implicit pos: Position): MethodDef = {
+  private def synthesizeInheritedConstructor(
+      classInfo: Analysis.ClassInfo,
+      methodInfo: Analysis.MethodInfo,
+      getTree: TreeProvider,
+      analysis: Analysis)(implicit pos: Position): MethodDef = {
     val encodedName = methodInfo.encodedName
 
     val inheritedMDef = findInheritedMethodDef(
@@ -346,7 +360,8 @@ final class BaseLinker(
                               superClassType,
                               ctorIdent,
                               params.map(_.ref))(NoType))(
-        OptimizerHints.empty, inheritedMDef.hash) // over-approximation
+        OptimizerHints.empty,
+        inheritedMDef.hash) // over-approximation
   }
 
   private def synthesizeReflectiveProxy(classInfo: Analysis.ClassInfo,
@@ -360,8 +375,7 @@ final class BaseLinker(
 
     implicit val pos = targetMDef.pos
 
-    val targetIdent =
-      targetMDef.name.asInstanceOf[Ident].copy() // for the new pos
+    val targetIdent = targetMDef.name.asInstanceOf[Ident].copy() // for the new pos
     val proxyIdent = Ident(encodedName, None)
     val params = targetMDef.args.map(_.copy()) // for the new pos
     val currentClassType = ClassType(classInfo.encodedName)
@@ -369,21 +383,21 @@ final class BaseLinker(
     val call = Apply(This()(currentClassType), targetIdent, params.map(_.ref))(
         targetMDef.resultType)
 
-    val body =
-      if (targetName.endsWith("__C")) {
-        // A Char needs to be boxed
-        New(ClassType(Definitions.BoxedCharacterClass),
-            Ident("init___C"),
-            List(call))
-      } else if (targetName.endsWith("__V")) {
-        // Materialize an `undefined` result for void methods
-        Block(call, Undefined())
-      } else {
-        call
-      }
+    val body = if (targetName.endsWith("__C")) {
+      // A Char needs to be boxed
+      New(ClassType(Definitions.BoxedCharacterClass),
+          Ident("init___C"),
+          List(call))
+    } else if (targetName.endsWith("__V")) {
+      // Materialize an `undefined` result for void methods
+      Block(call, Undefined())
+    } else {
+      call
+    }
 
     MethodDef(static = false, proxyIdent, params, AnyType, body)(
-        OptimizerHints.empty, targetMDef.hash)
+        OptimizerHints.empty,
+        targetMDef.hash)
   }
 
   private def synthesizeDefaultBridge(classInfo: Analysis.ClassInfo,
@@ -398,8 +412,7 @@ final class BaseLinker(
 
     implicit val pos = targetMDef.pos
 
-    val targetIdent =
-      targetMDef.name.asInstanceOf[Ident].copy() // for the new pos
+    val targetIdent = targetMDef.name.asInstanceOf[Ident].copy() // for the new pos
     val bridgeIdent = targetIdent
     val params = targetMDef.args.map(_.copy()) // for the new pos
     val currentClassType = ClassType(classInfo.encodedName)
@@ -409,9 +422,11 @@ final class BaseLinker(
                                targetIdent,
                                params.map(_.ref))(targetMDef.resultType)
 
-    MethodDef(
-        static = false, bridgeIdent, params, targetMDef.resultType, body)(
-        OptimizerHints.empty, targetMDef.hash)
+    MethodDef(static = false,
+              bridgeIdent,
+              params,
+              targetMDef.resultType,
+              body)(OptimizerHints.empty, targetMDef.hash)
   }
 
   private def findInheritedMethodDef(classInfo: Analysis.ClassInfo,

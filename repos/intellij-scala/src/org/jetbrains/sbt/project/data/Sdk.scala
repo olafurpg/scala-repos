@@ -76,8 +76,8 @@ object SdkUtils {
     val matchingSdks = for {
       sdk <- allAndroidSdks
       platformVersion <- Option(AndroidPlatform.getInstance(sdk))
-                          .map(_.getApiLevel.toString) if isGEQAsInt(
-          platformVersion, version)
+                          .map(_.getApiLevel.toString)
+      if isGEQAsInt(platformVersion, version)
     } yield sdk
     matchingSdks.headOption
   }

@@ -790,22 +790,26 @@ object MutableOptimizationSpace {
 
   object DenseDoubleOptimizationSpace {
     implicit def denseDoubleOptSpace: MutableOptimizationSpace[
-        DenseMatrix[Double], DenseVector[Double], Double] = {
+        DenseMatrix[Double],
+        DenseVector[Double],
+        Double] = {
       val norms = EntrywiseMatrixNorms.make[DenseMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
       import DenseMatrix.canMapValues
-      make[DenseMatrix[Double], DenseVector[Double], Double](
-          _.asDenseMatrix, _.flatten())
+      make[DenseMatrix[Double], DenseVector[Double], Double](_.asDenseMatrix,
+                                                             _.flatten())
     }
   }
 
   object SparseDoubleOptimizationSpace {
     implicit def sparseDoubleOptSpace: MutableOptimizationSpace[
-        CSCMatrix[Double], SparseVector[Double], Double] = {
+        CSCMatrix[Double],
+        SparseVector[Double],
+        Double] = {
       val norms = EntrywiseMatrixNorms.make[CSCMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
-      make[CSCMatrix[Double], SparseVector[Double], Double](
-          _.asCscRow, _.flatten())
+      make[CSCMatrix[Double], SparseVector[Double], Double](_.asCscRow,
+                                                            _.flatten())
     }
   }
 
@@ -936,8 +940,12 @@ object MutableOptimizationSpace {
       implicit def mulIntoVV: OpMulScalar.InPlaceImpl2[V, V] = _mulIntoVV
       implicit def setIntoVS: OpSet.InPlaceImpl2[V, S] = _setIntoVS
       implicit def zipMapValues: CanZipMapValues[V, S, S, V] = _zipMapVals
-      override implicit def zipMapKeyValues: CanZipMapKeyValues[
-          V, Int, S, S, V] = _zipMapKeyVals
+      override implicit def zipMapKeyValues: CanZipMapKeyValues[V,
+                                                                Int,
+                                                                S,
+                                                                S,
+                                                                V] =
+        _zipMapKeyVals
       implicit def iterateValues: CanTraverseValues[V, S] = _traverseVals
       implicit def mapValues: CanMapValues[V, S, S, V] = _mapVals
 

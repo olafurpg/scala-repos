@@ -60,7 +60,7 @@ object v1 {
 
     val schema =
       "grantId" :: "name" :: "description" :: "permissions" ::
-      ("createdAt" ||| new Instant(0L)) :: "expirationDate" :: HNil
+        ("createdAt" ||| new Instant(0L)) :: "expirationDate" :: HNil
 
     implicit val (decomposerV1, extractorV1) =
       IsoSerialization.serialization[GrantDetails](schema)

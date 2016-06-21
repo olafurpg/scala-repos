@@ -67,14 +67,20 @@ class C1 {
     }
     val fv: () => Boolean = () =>
       synchronized {
-        checkLocks(this)(
-            this.getClass, C1.this, C1.this.getClass, fv, fv.getClass)
+        checkLocks(this)(this.getClass,
+                         C1.this,
+                         C1.this.getClass,
+                         fv,
+                         fv.getClass)
     }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
-          checkLocks(lock)(
-              ffv, ffv.getClass, lock.getClass, C1.this, C1.this.getClass)
+          checkLocks(lock)(ffv,
+                           ffv.getClass,
+                           lock.getClass,
+                           C1.this,
+                           C1.this.getClass)
       }
       ffv(this)
     }
@@ -85,8 +91,11 @@ class C1 {
       flv
     }
     def fo = lock.synchronized {
-      checkLocks(lock)(
-          lock.getClass, this, this.getClass, C1.this, C1.this.getClass)
+      checkLocks(lock)(lock.getClass,
+                       this,
+                       this.getClass,
+                       C1.this,
+                       C1.this.getClass)
     }
     def fn = C1.this.synchronized {
       checkLocks(C1.this)(C1.this.getClass, this, this.getClass)
@@ -96,12 +105,20 @@ class C1 {
     @inline final def gi =
       checkLocks()(this, this.getClass, C1.this, C1.this.getClass)
     val gv: () => Boolean = () =>
-      checkLocks()(
-          this, this.getClass, C1.this, C1.this.getClass, gv, gv.getClass)
+      checkLocks()(this,
+                   this.getClass,
+                   C1.this,
+                   C1.this.getClass,
+                   gv,
+                   gv.getClass)
     def gf = {
       lazy val gfv: AnyRef => Boolean = lock =>
-        checkLocks()(
-            gfv, gfv.getClass, lock, lock.getClass, C1.this, C1.this.getClass)
+        checkLocks()(gfv,
+                     gfv.getClass,
+                     lock,
+                     lock.getClass,
+                     C1.this,
+                     C1.this.getClass)
       gfv(this)
     }
     def gl = {
@@ -121,14 +138,20 @@ class C1 {
     }
     val fv: () => Boolean = () =>
       synchronized {
-        checkLocks(this)(
-            this.getClass, fv, fv.getClass, C1.this, C1.this.getClass)
+        checkLocks(this)(this.getClass,
+                         fv,
+                         fv.getClass,
+                         C1.this,
+                         C1.this.getClass)
     }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
-          checkLocks(lock)(
-              lock.getClass, ffv, ffv.getClass, C1.this, C1.this.getClass)
+          checkLocks(lock)(lock.getClass,
+                           ffv,
+                           ffv.getClass,
+                           C1.this,
+                           C1.this.getClass)
       }
       ffv(this)
     }
@@ -139,8 +162,11 @@ class C1 {
       flv
     }
     def fo = lock.synchronized {
-      checkLocks(lock)(
-          lock.getClass, this, this.getClass, C1.this, C1.this.getClass)
+      checkLocks(lock)(lock.getClass,
+                       this,
+                       this.getClass,
+                       C1.this,
+                       C1.this.getClass)
     }
     def fn = C1.this.synchronized {
       checkLocks(C1.this)(C1.this.getClass, this, this.getClass)
@@ -150,12 +176,20 @@ class C1 {
     @inline final def gi =
       checkLocks()(this, this.getClass, C1.this, C1.this.getClass)
     val gv: () => Boolean = () =>
-      checkLocks()(
-          this, this.getClass, gv, gv.getClass, C1.this, C1.this.getClass)
+      checkLocks()(this,
+                   this.getClass,
+                   gv,
+                   gv.getClass,
+                   C1.this,
+                   C1.this.getClass)
     def gf = {
       lazy val gfv: AnyRef => Boolean = lock =>
-        checkLocks()(
-            lock, lock.getClass, gfv, gfv.getClass, C1.this, C1.this.getClass)
+        checkLocks()(lock,
+                     lock.getClass,
+                     gfv,
+                     gfv.getClass,
+                     C1.this,
+                     C1.this.getClass)
       gfv(this)
     }
     def gl = {
@@ -305,8 +339,12 @@ trait T {
   }
   val fv: () => Boolean = () =>
     synchronized {
-      checkLocks(this)(
-          this.getClass, fv, fv.getClass, classOf[T], classOf[C2], O2.getClass)
+      checkLocks(this)(this.getClass,
+                       fv,
+                       fv.getClass,
+                       classOf[T],
+                       classOf[C2],
+                       O2.getClass)
   }
   def ff = {
     lazy val ffv: AnyRef => Boolean = lock =>

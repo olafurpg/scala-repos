@@ -30,12 +30,9 @@ private[streaming] case class JobSet(
     streamIdToInputInfo: Map[Int, StreamInputInfo] = Map.empty) {
 
   private val incompleteJobs = new HashSet[Job]()
-  private val submissionTime =
-    System.currentTimeMillis() // when this jobset was submitted
-  private var processingStartTime =
-    -1L // when the first job of this jobset started processing
-  private var processingEndTime =
-    -1L // when the last job of this jobset finished processing
+  private val submissionTime = System.currentTimeMillis() // when this jobset was submitted
+  private var processingStartTime = -1L // when the first job of this jobset started processing
+  private var processingEndTime = -1L // when the last job of this jobset finished processing
 
   jobs.zipWithIndex.foreach { case (job, i) => job.setOutputOpId(i) }
   incompleteJobs ++= jobs

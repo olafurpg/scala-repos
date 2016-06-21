@@ -54,8 +54,8 @@ abstract class Module {
     * @param configuration The configuration
     * @return A sequence of bindings
     */
-  def bindings(
-      environment: Environment, configuration: Configuration): Seq[Binding[_]]
+  def bindings(environment: Environment,
+               configuration: Configuration): Seq[Binding[_]]
 
   /**
     * Create a binding key for the given class.
@@ -96,8 +96,8 @@ object Modules {
     * @return A sequence of objects. This method makes no attempt to cast or check the types of the modules being loaded,
     *         allowing ApplicationLoader implementations to reuse the same mechanism to load modules specific to them.
     */
-  def locate(
-      environment: Environment, configuration: Configuration): Seq[Any] = {
+  def locate(environment: Environment,
+             configuration: Configuration): Seq[Any] = {
 
     val includes =
       configuration.getStringSeq("play.modules.enabled").getOrElse(Seq.empty)

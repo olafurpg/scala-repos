@@ -54,8 +54,8 @@ object StepBuilder {
     }
   }
 
-  private def applyAnalysisEvals(
-      steps: List[Step], analysis: Analysis): List[Step] =
+  private def applyAnalysisEvals(steps: List[Step],
+                                 analysis: Analysis): List[Step] =
     steps.zipWithIndex map {
       case (step, index) =>
         analysis.infos.lift(index - 1).fold(step) { info =>

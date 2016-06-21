@@ -140,8 +140,8 @@ private[data] sealed trait AppFuncApplicative[F[_], C]
   def ap[A, B](f: AppFunc[F, C, A => B])(
       fa: AppFunc[F, C, A]): AppFunc[F, C, B] =
     Func.appFunc[F, C, B](c => F.ap(f.run(c))(fa.run(c)))(F)
-  def product[A, B](
-      fa: AppFunc[F, C, A], fb: AppFunc[F, C, B]): AppFunc[F, C, (A, B)] =
+  def product[A, B](fa: AppFunc[F, C, A],
+                    fb: AppFunc[F, C, B]): AppFunc[F, C, (A, B)] =
     Func.appFunc[F, C, (A, B)](c => F.product(fa.run(c), fb.run(c)))(F)
   def pure[A](a: A): AppFunc[F, C, A] =
     Func.appFunc[F, C, A](c => F.pure(a))(F)

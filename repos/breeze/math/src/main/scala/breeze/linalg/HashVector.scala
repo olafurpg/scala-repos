@@ -180,8 +180,8 @@ object HashVector
     : CanTraverseKeyValuePairs[HashVector[V], Int, V] = {
     new CanTraverseKeyValuePairs[HashVector[V], Int, V] {
 
-      def traverse(
-          from: HashVector[V], fn: KeyValuePairsVisitor[Int, V]): Unit = {
+      def traverse(from: HashVector[V],
+                   fn: KeyValuePairsVisitor[Int, V]): Unit = {
         fn.zeros(from.size - from.activeSize,
                  Iterator.range(0, from.size).filterNot(from.index contains _),
                  from.default)

@@ -51,8 +51,7 @@ case class Simul(_id: Simul.ID,
   }
 
   def accept(userId: String, v: Boolean) = Created {
-    copy(
-        applicants =
+    copy(applicants =
           applicants map {
         case a if a is userId => a.copy(accepted = v)
         case a => a
@@ -75,8 +74,7 @@ case class Simul(_id: Simul.ID,
                           hostSeenAt = none)
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
-    copy(
-        pairings =
+    copy(pairings =
           pairings collect {
         case p if p.gameId == gameId => f(p)
         case p => p

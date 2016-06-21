@@ -67,30 +67,34 @@ private[forum] final class TopicApi(
               lila.hub.actorApi.shutup.RecordPublicForumMessage(userId, text))
         } >>- {
           (ctx.userId ifFalse post.troll) ?? { userId =>
-            timeline ! Propagate(ForumPost(
-                    userId, topic.id.some, topic.name, post.id)).|>(prop =>
-                  post.isStaff.fold(prop toStaffFriendsOf userId,
-                                    prop toFollowersOf userId))
+            timeline ! Propagate(
+                ForumPost(userId, topic.id.some, topic.name, post.id))
+              .|>(prop =>
+                    post.isStaff.fold(prop toStaffFriendsOf userId,
+                                      prop toFollowersOf userId))
           }
           lila.mon.forum.post.create()
         } inject topic
     }
 
-  def paginator(
-      categ: Categ, page: Int, troll: Boolean): Fu[Paginator[TopicView]] =
-    Paginator(
-        adapter =
-          new Adapter[Topic](
-              selector = TopicRepo(troll) byCategQuery categ,
-              sort = Seq($sort.updatedDesc)
-          ) mapFuture { topic =>
-            $find.byId[Post](topic lastPostId troll) map { post =>
-              TopicView(
-                  categ, topic, post, env.postApi lastPageOf topic, troll)
-            }
-          },
-        currentPage = page,
-        maxPerPage = maxPerPage)
+  def paginator(categ: Categ,
+                page: Int,
+                troll: Boolean): Fu[Paginator[TopicView]] =
+    Paginator(adapter =
+                new Adapter[Topic](
+                    selector = TopicRepo(troll) byCategQuery categ,
+                    sort = Seq($sort.updatedDesc)
+                ) mapFuture { topic =>
+                  $find.byId[Post](topic lastPostId troll) map { post =>
+                    TopicView(categ,
+                              topic,
+                              post,
+                              env.postApi lastPageOf topic,
+                              troll)
+                  }
+                },
+              currentPage = page,
+              maxPerPage = maxPerPage)
 
   def delete(categ: Categ, topic: Topic): Funit =
     PostRepo.idsByTopicId(topic.id) flatMap { postIds =>
@@ -100,8 +104,8 @@ private[forum] final class TopicApi(
 
   def toggleClose(categ: Categ, topic: Topic, mod: User): Funit =
     TopicRepo.close(topic.id, topic.open) >> {
-      MasterGranter(_.ModerateForum)(mod) ?? modLog.toggleCloseTopic(
-          mod, categ.name, topic.name, topic.open)
+      MasterGranter(_.ModerateForum)(mod) ?? modLog
+        .toggleCloseTopic(mod, categ.name, topic.name, topic.open)
     }
 
   def toggleHide(categ: Categ, topic: Topic, mod: User): Funit =

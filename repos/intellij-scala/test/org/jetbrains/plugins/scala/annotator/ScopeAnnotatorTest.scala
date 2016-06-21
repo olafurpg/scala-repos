@@ -142,8 +142,10 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   }
 
   def testGroups() {
-    assertClashes(
-        "def f(a: Any, a: Any); def f(b: Any, b: Any)", "f", "a", "b")
+    assertClashes("def f(a: Any, a: Any); def f(b: Any, b: Any)",
+                  "f",
+                  "a",
+                  "b")
   }
 
   def testScopeInspection() {
@@ -163,8 +165,8 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("while(true) { class C; class C }", "C")
     assertClashes("do { class C; class C } while(true)", "C")
     assertClashes("try { class C; class C } catch { case _ => }", "C")
-    assertClashes(
-        "try {} catch { case _ => } finally { class C; class C }", "C")
+    assertClashes("try {} catch { case _ => } finally { class C; class C }",
+                  "C")
     assertClashes("new { class C; class C }", "C")
     assertClashes("null match { case _ => class C; class C }", "C")
     assertClashes("val x: (Any => Unit) = { case _ => class C; class C }", "C")
@@ -392,7 +394,8 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("def x { def f(a: Any) {}; def f(a: Any, b: Any) {} }", "f")
     assertClashes("def x { def f(a: Any) {}; def f(a: Any)(b: Any) {} }", "f")
     assertClashes(
-        "def x { def f(a: Any)(b: Foo) {}; def f(a: Any)(b: Bar) {} }", "f")
+        "def x { def f(a: Any)(b: Foo) {}; def f(a: Any)(b: Bar) {} }",
+        "f")
   }
 
   def testFunctionFollowingApplications() {
@@ -432,8 +435,8 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   def testTypeErasure() {
     // precheck
     assertFine("def f(a: Foo) {}; def f(a: Bar) {}")
-    assertClashes(
-        "class Holder[T]; def f(a: Holder) {}; def f(a: Holder) {}", "f")
+    assertClashes("class Holder[T]; def f(a: Holder) {}; def f(a: Holder) {}",
+                  "f")
     assertClashes(
         "class Holder[T]; def f(a: Holder[Any]) {}; def f(a: Holder[Any]) {}",
         "f")

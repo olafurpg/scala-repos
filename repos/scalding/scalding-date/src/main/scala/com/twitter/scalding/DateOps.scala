@@ -37,8 +37,8 @@ object DateOps extends java.io.Serializable {
   val DATETIME_HMS_WITH_DASH = "yyyy-MM-dd HH:mm:ss"
   val DATETIME_HMSM_WITH_DASH = "yyyy-MM-dd HH:mm:ss.SSS"
 
-  private[scalding] sealed abstract class Format(
-      val pattern: String, val validator: Regex) {
+  private[scalding] sealed abstract class Format(val pattern: String,
+                                                 val validator: Regex) {
     def matches(s: String): Boolean = validator.findFirstIn(s).isDefined
   }
 
@@ -52,8 +52,8 @@ object DateOps extends java.io.Serializable {
         extends Format(DateOps.DATE_WITHOUT_DASH,
                        new Regex(emptyBegin + """\d{8}""" + emptyEnd))
     case object DATE_WITH_DASH
-        extends Format(
-            DateOps.DATE_WITH_DASH, new Regex(emptyBegin + date + emptyEnd))
+        extends Format(DateOps.DATE_WITH_DASH,
+                       new Regex(emptyBegin + date + emptyEnd))
     case object DATEHOUR_WITHOUT_DASH
         extends Format(DateOps.DATEHOUR_WITHOUT_DASH,
                        new Regex(emptyBegin + """\d{10}""" + emptyEnd))
@@ -79,7 +79,7 @@ object DateOps extends java.io.Serializable {
     case object DATETIME_HMSM_WITH_DASH
         extends Format(DateOps.DATETIME_HMSM_WITH_DASH,
                        new Regex(emptyBegin + date + sep +
-                           """\d\d:\d\d:\d\d\.\d{1,3}""" + emptyEnd))
+                             """\d\d:\d\d:\d\d\.\d{1,3}""" + emptyEnd))
   }
 
   private val prepare: String => String = { (str: String) =>

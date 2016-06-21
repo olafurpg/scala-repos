@@ -93,20 +93,20 @@ class ZkAsyncSemaphore(zk: ZkClient,
           } else {
             maxWaiters match {
               case Some(max) if (waitq.size >= max) => {
-                  MaxWaitersExceededException
-                }
+                MaxWaitersExceededException
+              }
               case _ => {
-                  val promise = new Promise[ZkSemaphorePermit]
-                  waitq.add((promise, permitNode))
-                  promise
-                }
+                val promise = new Promise[ZkSemaphorePermit]
+                waitq.add((promise, permitNode))
+                promise
+              }
             }
           }
         } onFailure {
           case err => {
-              permitNode.delete()
-              Future.exception(err)
-            }
+            permitNode.delete()
+            Future.exception(err)
+          }
         }
       }
     }
@@ -126,11 +126,11 @@ class ZkAsyncSemaphore(zk: ZkClient,
         zk onSessionEvent {
           case StateEvent.Expired => rejectWaitQueue()
           case StateEvent.Connected => {
-              permitNodes() map { nodes =>
-                checkWaiters(nodes)
-              }
-              monitorSemaphore(semaphoreNode)
+            permitNodes() map { nodes =>
+              checkWaiters(nodes)
             }
+            monitorSemaphore(semaphoreNode)
+          }
         }
       }
       semaphoreNode
@@ -197,13 +197,13 @@ class ZkAsyncSemaphore(zk: ZkClient,
   private[this] def checkWaiters(nodes: Seq[ZNode]) = {
     nodes.size match {
       case length if length <= numPermits => {
-          numPermitsAvailable = numPermits - length
-          numWaiters = 0
-        }
+        numPermitsAvailable = numPermits - length
+        numWaiters = 0
+      }
       case length => {
-          numPermitsAvailable = 0
-          numWaiters = length - numPermits
-        }
+        numPermitsAvailable = 0
+        numWaiters = length - numPermits
+      }
     }
     val permits =
       nodes filter { child =>

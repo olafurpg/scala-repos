@@ -19,8 +19,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScParamClausesStub
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-class ScParametersImpl private (
-    stub: StubElement[ScParameters], nodeType: IElementType, node: ASTNode)
+class ScParametersImpl private (stub: StubElement[ScParameters],
+                                nodeType: IElementType,
+                                node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScParameters {
 

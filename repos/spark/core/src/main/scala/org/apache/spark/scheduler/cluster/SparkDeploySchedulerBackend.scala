@@ -87,12 +87,11 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
     // When testing, expose the parent class path to the child. This is processed by
     // compute-classpath.{cmd,sh} and makes all needed jars available to child processes
     // when the assembly is built with the "*-provided" profiles enabled.
-    val testingClassPath =
-      if (sys.props.contains("spark.testing")) {
-        sys.props("java.class.path").split(java.io.File.pathSeparator).toSeq
-      } else {
-        Nil
-      }
+    val testingClassPath = if (sys.props.contains("spark.testing")) {
+      sys.props("java.class.path").split(java.io.File.pathSeparator).toSeq
+    } else {
+      Nil
+    }
 
     // Start executors with a few necessary configs for registering with the scheduler
     val sparkJavaOpts =
@@ -109,12 +108,11 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
     val coresPerExecutor = conf.getOption("spark.executor.cores").map(_.toInt)
     // If we're using dynamic allocation, set our initial executor limit to 0 for now.
     // ExecutorAllocationManager will send the real initial limit to the Master later.
-    val initialExecutorLimit =
-      if (Utils.isDynamicAllocationEnabled(conf)) {
-        Some(0)
-      } else {
-        None
-      }
+    val initialExecutorLimit = if (Utils.isDynamicAllocationEnabled(conf)) {
+      Some(0)
+    } else {
+      None
+    }
     val appDesc = new ApplicationDescription(sc.appName,
                                              maxCores,
                                              sc.executorMemory,
@@ -170,12 +168,13 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
                              cores: Int,
                              memory: Int) {
     logInfo(
-        "Granted executor ID %s on hostPort %s with %d cores, %s RAM".format(
-            fullId, hostPort, cores, Utils.megabytesToString(memory)))
+        "Granted executor ID %s on hostPort %s with %d cores, %s RAM"
+          .format(fullId, hostPort, cores, Utils.megabytesToString(memory)))
   }
 
-  override def executorRemoved(
-      fullId: String, message: String, exitStatus: Option[Int]) {
+  override def executorRemoved(fullId: String,
+                               message: String,
+                               exitStatus: Option[Int]) {
     val reason: ExecutorLossReason = exitStatus match {
       case Some(code) => ExecutorExited(code, exitCausedByApp = true, message)
       case None => SlaveLost(message)

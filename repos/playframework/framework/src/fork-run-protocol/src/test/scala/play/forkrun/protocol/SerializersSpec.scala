@@ -82,12 +82,13 @@ trait PicklingTestUtils extends Specification {
       case e: Throwable =>
         e.printStackTrace()
         throw new AssertionError(
-            s"Crash round-tripping ${t.getClass.getName}: value was: ${t}", e)
+            s"Crash round-tripping ${t.getClass.getName}: value was: ${t}",
+            e)
     }
 
-  def roundTripArray[A](
-      x: Array[A])(implicit ev0: Pickler[Array[A]],
-                   ev1: Unpickler[Array[A]]): MatchResult[Any] =
+  def roundTripArray[A](x: Array[A])(
+      implicit ev0: Pickler[Array[A]],
+      ev1: Unpickler[Array[A]]): MatchResult[Any] =
     roundTripBase[Array[A]](x)((a, b) => (a.toList) must beEqualTo(b.toList)) {
       (a, b) =>
         a.getMessage must beEqualTo(b.getMessage)
@@ -98,8 +99,8 @@ trait PicklingTestUtils extends Specification {
       a.getMessage must beEqualTo(b.getMessage)
     }
 
-  def roundTripBase[A: Pickler: Unpickler](
-      a: A)(f: (A, A) => MatchResult[Any])(
+  def roundTripBase[A: Pickler: Unpickler](a: A)(f: (A,
+                                                     A) => MatchResult[Any])(
       e: (Throwable, Throwable) => MatchResult[Any]): MatchResult[Any] =
     addWhatWeWerePickling(a) {
       val json = SerializedValue(a).toJsonString

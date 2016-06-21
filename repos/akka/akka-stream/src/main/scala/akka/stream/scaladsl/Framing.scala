@@ -30,12 +30,13 @@ object Framing {
     */
   def delimiter(delimiter: ByteString,
                 maximumFrameLength: Int,
-                allowTruncation: Boolean =
-                  false): Flow[ByteString, ByteString, NotUsed] =
+                allowTruncation: Boolean = false)
+    : Flow[ByteString, ByteString, NotUsed] =
     Flow[ByteString]
       .transform(() ⇒
-            new DelimiterFramingStage(
-                delimiter, maximumFrameLength, allowTruncation))
+            new DelimiterFramingStage(delimiter,
+                                      maximumFrameLength,
+                                      allowTruncation))
       .named("delimiterFraming")
 
   /**
@@ -52,18 +53,19 @@ object Framing {
     *                           the length of the size field)
     * @param byteOrder The ''ByteOrder'' to be used when decoding the field
     */
-  def lengthField(
-      fieldLength: Int,
-      fieldOffset: Int = 0,
-      maximumFrameLength: Int,
-      byteOrder: ByteOrder =
-        ByteOrder.LITTLE_ENDIAN): Flow[ByteString, ByteString, NotUsed] = {
+  def lengthField(fieldLength: Int,
+                  fieldOffset: Int = 0,
+                  maximumFrameLength: Int,
+                  byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN)
+    : Flow[ByteString, ByteString, NotUsed] = {
     require(fieldLength >= 1 && fieldLength <= 4,
             "Length field length must be 1, 2, 3 or 4.")
     Flow[ByteString]
       .transform(() ⇒
-            new LengthFieldFramingStage(
-                fieldLength, fieldOffset, maximumFrameLength, byteOrder))
+            new LengthFieldFramingStage(fieldLength,
+                                        fieldOffset,
+                                        maximumFrameLength,
+                                        byteOrder))
       .named("lengthFieldFraming")
   }
 
@@ -107,8 +109,8 @@ object Framing {
       maximumMessageLength: Int): Flow[ByteString, ByteString, NotUsed] =
     Flow[ByteString].transform(() ⇒
           new PushStage[ByteString, ByteString] {
-        override def onPush(
-            message: ByteString, ctx: Context[ByteString]): SyncDirective = {
+        override def onPush(message: ByteString,
+                            ctx: Context[ByteString]): SyncDirective = {
           val msgSize = message.size
           if (msgSize > maximumMessageLength)
             ctx.fail(new FramingException(
@@ -159,8 +161,8 @@ object Framing {
     private var buffer = ByteString.empty
     private var nextPossibleMatch = 0
 
-    override def onPush(
-        chunk: ByteString, ctx: Context[ByteString]): SyncDirective = {
+    override def onPush(chunk: ByteString,
+                        ctx: Context[ByteString]): SyncDirective = {
       buffer ++= chunk
       doParse(ctx)
     }
@@ -187,7 +189,7 @@ object Framing {
         buffer.indexOf(firstSeparatorByte, from = nextPossibleMatch)
       if (possibleMatchPos > maximumLineBytes)
         ctx.fail(new FramingException(s"Read ${buffer.size} bytes " +
-                s"which is more than $maximumLineBytes without seeing a line terminator"))
+                  s"which is more than $maximumLineBytes without seeing a line terminator"))
       else {
         if (possibleMatchPos == -1) {
           // No matching character, we need to accumulate more bytes into the buffer
@@ -240,8 +242,8 @@ object Framing {
                 "Stream finished but there was a truncated final frame in the buffer"))
       else ctx.pull()
 
-    override def onPush(
-        chunk: ByteString, ctx: Context[ByteString]): SyncDirective = {
+    override def onPush(chunk: ByteString,
+                        ctx: Context[ByteString]): SyncDirective = {
       buffer ++= chunk
       doParse(ctx)
     }
@@ -265,8 +267,8 @@ object Framing {
       val bufSize = buffer.size
       if (bufSize >= frameSize) emitFrame(ctx)
       else if (bufSize >= minimumChunkSize) {
-        val parsedLength = intDecoder(
-            buffer.iterator.drop(lengthFieldOffset), lengthFieldLength)
+        val parsedLength = intDecoder(buffer.iterator.drop(lengthFieldOffset),
+                                      lengthFieldLength)
         frameSize = parsedLength + minimumChunkSize
         if (frameSize > maximumFrameLength)
           ctx.fail(new FramingException(

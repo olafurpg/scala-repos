@@ -110,8 +110,8 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     }
   }
 
-  private def createBaseRdd(
-      sqlContext: SQLContext, inputPaths: Seq[FileStatus]): RDD[String] = {
+  private def createBaseRdd(sqlContext: SQLContext,
+                            inputPaths: Seq[FileStatus]): RDD[String] = {
     val job = Job.getInstance(sqlContext.sparkContext.hadoopConfiguration)
     val conf = job.getConfiguration
 
@@ -140,7 +140,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
         .mkString(", ")
       throw new AnalysisException(
           s"Duplicate column(s) : $duplicateColumns found, " +
-          s"cannot save to JSON format")
+            s"cannot save to JSON format")
     }
   }
 
@@ -163,8 +163,8 @@ private[json] class JsonOutputWriter(path: String,
 
   private val recordWriter: RecordWriter[NullWritable, Text] = {
     new TextOutputFormat[NullWritable, Text]() {
-      override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+      override def getDefaultWorkFile(context: TaskAttemptContext,
+                                      extension: String): Path = {
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")

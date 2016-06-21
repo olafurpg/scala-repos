@@ -14,11 +14,12 @@ object Test extends App {
   class MyDynamic extends Dynamic {
     def applyDynamic[T](n: String)(as: Any*) = {
       println(
-          "qual.applyDynamic(" + n + ")" + as.toList.mkString("(", ", ", ")")); stub
+          "qual.applyDynamic(" + n + ")" + as.toList.mkString("(", ", ", ")"));
+      stub
     }
     def applyDynamicNamed[T](n: String)(as: (String, Any)*) = {
       println("qual.applyDynamicNamed(" + n + ")" +
-          as.toList.mkString("(", ", ", ")")); stub
+            as.toList.mkString("(", ", ", ")")); stub
     }
     def selectDynamic[T](n: String) = {
       println("qual.selectDynamic(" + n + ")"); stub

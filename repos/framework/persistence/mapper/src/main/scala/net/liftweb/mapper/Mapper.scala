@@ -234,12 +234,13 @@ trait Mapper[A <: Mapper[A]]
   def toForm(button: Box[String], f: A => Any): NodeSeq =
     getSingleton.toForm(this) ++ S
       .fmapFunc((ignore: List[String]) => f(this)) { (name: String) =>
-      ( <input type='hidden' name={name} value="n/a" />)
-    } ++
-    (button.map(b =>
-              getSingleton.formatFormElement(
-                  <xml:group>&nbsp;</xml:group>,
-                  <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
+        ( <input type='hidden' name={name} value="n/a" />)
+      } ++
+      (button.map(b =>
+                getSingleton.formatFormElement(
+                    <xml:group>&nbsp;</xml:group>,
+                    <input type="submit" value={b}/>)) openOr scala.xml.Text(
+              ""))
 
   def toForm(button: Box[String],
              redoSnippet: NodeSeq => NodeSeq,
@@ -476,7 +477,7 @@ trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
       case null => false
       case km: KeyedMapper[_, _]
           if this.getClass.isAssignableFrom(km.getClass) ||
-          km.getClass.isAssignableFrom(this.getClass) =>
+            km.getClass.isAssignableFrom(this.getClass) =>
         this.primaryKeyField == km.primaryKeyField
       case k => super.equals(k)
     }

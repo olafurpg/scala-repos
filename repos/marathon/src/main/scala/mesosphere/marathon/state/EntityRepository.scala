@@ -86,8 +86,9 @@ trait EntityRepository[T <: MarathonState[_, T]]
     maximum.getOrElse(Future.successful(Nil))
   }
 
-  protected def storeWithVersion(
-      id: String, version: Timestamp, t: T): Future[T] = {
+  protected def storeWithVersion(id: String,
+                                 version: Timestamp,
+                                 t: T): Future[T] = {
     for {
       alias <- storeByName(id, t)
       result <- storeByName(versionKey(id, version), t)

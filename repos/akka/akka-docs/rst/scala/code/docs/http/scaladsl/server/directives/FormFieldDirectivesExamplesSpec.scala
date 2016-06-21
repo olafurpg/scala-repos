@@ -62,7 +62,7 @@ class FormFieldDirectivesExamplesSpec extends RoutingSpec {
   "formFieldMultiMap" in {
     val route = formFieldMultiMap { fields =>
       complete("There are " +
-          s"form fields ${fields.map(x => x._1 + " -> " + x._2.size).mkString(", ")}")
+            s"form fields ${fields.map(x => x._1 + " -> " + x._2.size).mkString(", ")}")
     }
 
     // tests:

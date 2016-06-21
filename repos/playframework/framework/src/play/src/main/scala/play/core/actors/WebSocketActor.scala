@@ -18,8 +18,9 @@ private[play] object WebSocketActor {
                                  iteratee: Iteratee[Out, Unit],
                                  createHandler: ActorRef => Props) =
       Props(
-          new WebSocketActorSupervisor[In, Out](
-              enumerator, iteratee, createHandler))
+          new WebSocketActorSupervisor[In, Out](enumerator,
+                                                iteratee,
+                                                createHandler))
   }
 
   /**
@@ -122,8 +123,8 @@ private[play] object WebSocketActor {
     def receive = {
       case c @ Connect(requestId, enumerator, iteratee, createHandler) =>
         implicit val mt = c.messageType
-        context.actorOf(WebSocketActorSupervisor.props(
-                            enumerator, iteratee, createHandler),
+        context.actorOf(WebSocketActorSupervisor
+                          .props(enumerator, iteratee, createHandler),
                         requestId.toString)
     }
   }

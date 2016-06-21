@@ -41,7 +41,8 @@ private[streaming] case class BlockAdditionEvent(
     receivedBlockInfo: ReceivedBlockInfo)
     extends ReceivedBlockTrackerLogEvent
 private[streaming] case class BatchAllocationEvent(
-    time: Time, allocatedBlocks: AllocatedBlocks)
+    time: Time,
+    allocatedBlocks: AllocatedBlocks)
     extends ReceivedBlockTrackerLogEvent
 private[streaming] case class BatchCleanupEvent(times: Seq[Time])
     extends ReceivedBlockTrackerLogEvent
@@ -95,13 +96,12 @@ private[streaming] class ReceivedBlockTracker(
         synchronized {
           getReceivedBlockQueue(receivedBlockInfo.streamId) += receivedBlockInfo
         }
-        logDebug(
-            s"Stream ${receivedBlockInfo.streamId} received " +
-            s"block ${receivedBlockInfo.blockStoreResult.blockId}")
+        logDebug(s"Stream ${receivedBlockInfo.streamId} received " +
+              s"block ${receivedBlockInfo.blockStoreResult.blockId}")
       } else {
         logDebug(
             s"Failed to acknowledge stream ${receivedBlockInfo.streamId} receiving " +
-            s"block ${receivedBlockInfo.blockStoreResult.blockId} in the Write Ahead Log.")
+              s"block ${receivedBlockInfo.blockStoreResult.blockId} in the Write Ahead Log.")
       }
       writeResult
     } catch {
@@ -151,8 +151,8 @@ private[streaming] class ReceivedBlockTracker(
     }
 
   /** Get the blocks allocated to the given batch and stream. */
-  def getBlocksOfBatchAndStream(
-      batchTime: Time, streamId: Int): Seq[ReceivedBlockInfo] = {
+  def getBlocksOfBatchAndStream(batchTime: Time,
+                                streamId: Int): Seq[ReceivedBlockInfo] = {
     synchronized {
       timeToAllocatedBlocks
         .get(batchTime)
@@ -181,8 +181,8 @@ private[streaming] class ReceivedBlockTracker(
     * Clean up block information of old batches. If waitForCompletion is true, this method
     * returns only after the files are cleaned up.
     */
-  def cleanupOldBatches(
-      cleanupThreshTime: Time, waitForCompletion: Boolean): Unit =
+  def cleanupOldBatches(cleanupThreshTime: Time,
+                        waitForCompletion: Boolean): Unit =
     synchronized {
       require(cleanupThreshTime.milliseconds < clock.getTimeMillis())
       val timesToCleanup = timeToAllocatedBlocks.keys.filter {
@@ -218,10 +218,10 @@ private[streaming] class ReceivedBlockTracker(
 
     // Insert the recovered block-to-batch allocations and clear the queue of received blocks
     // (when the blocks were originally allocated to the batch, the queue must have been cleared).
-    def insertAllocatedBatch(
-        batchTime: Time, allocatedBlocks: AllocatedBlocks) {
+    def insertAllocatedBatch(batchTime: Time,
+                             allocatedBlocks: AllocatedBlocks) {
       logTrace(s"Recovery: Inserting allocated batch for time $batchTime to " +
-          s"${allocatedBlocks.streamIdToAllocatedBlocks}")
+            s"${allocatedBlocks.streamIdToAllocatedBlocks}")
       streamIdToUnallocatedBlockQueues.values.foreach { _.clear() }
       timeToAllocatedBlocks.put(batchTime, allocatedBlocks)
       lastAllocatedBatchTime = batchTime
@@ -257,8 +257,8 @@ private[streaming] class ReceivedBlockTracker(
     if (isWriteAheadLogEnabled) {
       logTrace(s"Writing record: $record")
       try {
-        writeAheadLogOption.get.write(
-            ByteBuffer.wrap(Utils.serialize(record)), clock.getTimeMillis())
+        writeAheadLogOption.get.write(ByteBuffer.wrap(Utils.serialize(record)),
+                                      clock.getTimeMillis())
         true
       } catch {
         case NonFatal(e) =>
@@ -274,8 +274,8 @@ private[streaming] class ReceivedBlockTracker(
 
   /** Get the queue of received blocks belonging to a particular stream */
   private def getReceivedBlockQueue(streamId: Int): ReceivedBlockQueue = {
-    streamIdToUnallocatedBlockQueues.getOrElseUpdate(
-        streamId, new ReceivedBlockQueue)
+    streamIdToUnallocatedBlockQueues
+      .getOrElseUpdate(streamId, new ReceivedBlockQueue)
   }
 
   /** Optionally create the write ahead log manager only if the feature is enabled */

@@ -46,8 +46,8 @@ object Templates {
     } else Empty
   }
 
-  private def checkForFunc(
-      whole: List[String], what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
+  private def checkForFunc(whole: List[String],
+                           what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
     if (what.isDefinedAt(whole))
       what(whole) match {
         case Left(func) => func()
@@ -67,8 +67,9 @@ object Templates {
         }
     }
 
-  private[http] def findTopLevelTemplate(
-      places: List[String], locale: Locale, needAutoSurround: Boolean) = {
+  private[http] def findTopLevelTemplate(places: List[String],
+                                         locale: Locale,
+                                         needAutoSurround: Boolean) = {
     findRawTemplate0(places, locale, needAutoSurround).map(checkForContentId)
   }
 
@@ -119,19 +120,19 @@ object Templates {
       case e: Elem if e.label == "html" =>
         e.child.flatMap {
           case e: Elem if e.label == "body" => {
-              e.attribute("data-lift-content-id").headOption.map(_.text) orElse e
-                .attribute("class")
-                .flatMap { ns =>
-                  {
-                    val clz = ns.text.charSplit(' ')
-                    clz.flatMap {
-                      case s if s.startsWith("lift:content_id=") =>
-                        Some(urlDecode(s.substring("lift:content_id=".length)))
-                      case _ => None
-                    }.headOption
-                  }
+            e.attribute("data-lift-content-id").headOption.map(_.text) orElse e
+              .attribute("class")
+              .flatMap { ns =>
+                {
+                  val clz = ns.text.charSplit(' ')
+                  clz.flatMap {
+                    case s if s.startsWith("lift:content_id=") =>
+                      Some(urlDecode(s.substring("lift:content_id=".length)))
+                    case _ => None
+                  }.headOption
                 }
-            }
+              }
+          }
 
           case _ => None
         }

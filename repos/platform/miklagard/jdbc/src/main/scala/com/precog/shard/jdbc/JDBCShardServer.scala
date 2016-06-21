@@ -34,8 +34,8 @@ import com.precog.common.security.APIKeyFinder
 import com.precog.standalone.StandaloneShardServer
 
 object JDBCShardServer extends StandaloneShardServer {
-  val caveatMessage =
-    Some("""
+  val caveatMessage = Some(
+      """
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Precog for PostgreSQL is a free product that Precog provides to the
 PostgreSQL community for doing data analysis on PostgreSQL.

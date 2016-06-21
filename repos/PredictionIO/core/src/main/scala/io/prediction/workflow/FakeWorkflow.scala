@@ -36,8 +36,9 @@ private[prediction] class FakeEngine
     throw new StopAfterReadInterruption()
   }
 
-  def eval(
-      sc: SparkContext, engineParams: EngineParams, params: WorkflowParams)
+  def eval(sc: SparkContext,
+           engineParams: EngineParams,
+           params: WorkflowParams)
     : Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])] = {
     return Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])]()
   }
@@ -45,8 +46,11 @@ private[prediction] class FakeEngine
 
 @Experimental
 private[prediction] class FakeRunner(f: (SparkContext => Unit))
-    extends BaseEvaluator[
-        EmptyParams, EmptyParams, EmptyParams, EmptyParams, FakeEvalResult] {
+    extends BaseEvaluator[EmptyParams,
+                          EmptyParams,
+                          EmptyParams,
+                          EmptyParams,
+                          FakeEvalResult] {
   @transient private lazy val logger = Logger[this.type]
   def evaluateBase(sc: SparkContext,
                    evaluation: Evaluation,

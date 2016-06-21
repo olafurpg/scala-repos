@@ -27,8 +27,9 @@ import java.util
   * @author dlwh
   */
 @SerialVersionUID(1L)
-class BloomFilter[@specialized(Int, Long) T](
-    val numBuckets: Int, val numHashFunctions: Int, val bits: util.BitSet)
+class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int,
+                                             val numHashFunctions: Int,
+                                             val bits: util.BitSet)
     extends (T => Boolean)
     with Serializable {
   def this(numBuckets: Int, numHashFunctions: Int) =
@@ -65,7 +66,7 @@ class BloomFilter[@specialized(Int, Long) T](
   override def equals(other: Any) = other match {
     case that: BloomFilter[_] =>
       this.numBuckets == that.numBuckets &&
-      this.numHashFunctions == that.numHashFunctions && this.bits == that.bits
+        this.numHashFunctions == that.numHashFunctions && this.bits == that.bits
     case _ => false
   }
 
@@ -76,8 +77,9 @@ class BloomFilter[@specialized(Int, Long) T](
 
   def &(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](
-        this.numBuckets, this.numHashFunctions, this.bits & that.bits)
+    new BloomFilter[T](this.numBuckets,
+                       this.numHashFunctions,
+                       this.bits & that.bits)
   }
 
   private def checkCompatibility(that: BloomFilter[T]) {
@@ -89,8 +91,9 @@ class BloomFilter[@specialized(Int, Long) T](
 
   def |(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](
-        this.numBuckets, this.numHashFunctions, this.bits | that.bits)
+    new BloomFilter[T](this.numBuckets,
+                       this.numHashFunctions,
+                       this.bits | that.bits)
   }
 
   def |=(that: BloomFilter[T]): this.type = {
@@ -113,8 +116,9 @@ class BloomFilter[@specialized(Int, Long) T](
 
   def &~(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](
-        this.numBuckets, this.numHashFunctions, this.bits &~ that.bits)
+    new BloomFilter[T](this.numBuckets,
+                       this.numHashFunctions,
+                       this.bits &~ that.bits)
   }
 }
 
@@ -133,8 +137,8 @@ object BloomFilter {
     * @param falsePositiveRate
     * @return
     */
-  def optimalSize(
-      expectedNumItems: Double, falsePositiveRate: Double): (Int, Int) = {
+  def optimalSize(expectedNumItems: Double,
+                  falsePositiveRate: Double): (Int, Int) = {
     val n = expectedNumItems
     val p = falsePositiveRate
     import scala.math._
@@ -150,8 +154,8 @@ object BloomFilter {
     * @tparam T
     * @return
     */
-  def optimallySized[T](
-      expectedNumItems: Double, falsePositiveRate: Double): BloomFilter[T] = {
+  def optimallySized[T](expectedNumItems: Double,
+                        falsePositiveRate: Double): BloomFilter[T] = {
     val (buckets, funs) = optimalSize(expectedNumItems, falsePositiveRate)
     new BloomFilter(buckets, funs)
   }

@@ -24,8 +24,8 @@ private[streams] abstract class CheckingPublisher[T] extends Publisher[T] {
 
   // Streams method
   final override def subscribe(subr: Subscriber[_ >: T]): Unit = {
-    val handle: SubscriptionHandle[_] = createSubscription(
-        subr, removeSubscription)
+    val handle: SubscriptionHandle[_] =
+      createSubscription(subr, removeSubscription)
 
     @tailrec
     def addSubscription(): Unit = {

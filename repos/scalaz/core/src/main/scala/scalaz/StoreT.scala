@@ -9,8 +9,8 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   import StoreT._
   import BijectionT._
 
-  def xmap[X1, X2](f: I => X1)(g: X2 => A)(
-      implicit F: Functor[F]): IndexedStoreT[F, X1, X2, B] =
+  def xmap[X1, X2](f: I => X1)(
+      g: X2 => A)(implicit F: Functor[F]): IndexedStoreT[F, X1, X2, B] =
     indexedStoreT((F.map(set)(_ compose g), f(pos)))
 
   def bmap[X, Z >: I <: A](b: Bijection[Z, X])(
@@ -54,8 +54,8 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def seeks[J](f: I => J): IndexedStoreT[F, J, A, B] =
     indexedStoreT((set, f(pos)))
 
-  def experiment[G[_]](f: I => G[A])(
-      implicit F: Comonad[F], G: Functor[G]): G[B] =
+  def experiment[G[_]](f: I => G[A])(implicit F: Comonad[F],
+                                     G: Functor[G]): G[B] =
     G.map(f(pos))(F.copoint(set))
 
   def copoint(implicit F: Comonad[F], ev: I <:< A): B =
@@ -78,11 +78,10 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def product[J, C, D](that: IndexedStoreT[F, J, C, D])(
       implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] =
     IndexedStoreT(M.bind(set) { s =>
-                    M.map(that.set)(t => { (ac: (A, C)) =>
-                      (s(ac._1), t(ac._2))
-                    })
-                  },
-                  (pos, that.pos))
+      M.map(that.set)(t => { (ac: (A, C)) =>
+        (s(ac._1), t(ac._2))
+      })
+    }, (pos, that.pos))
 
   /** alias for `product` */
   def ***[J, C, D](that: IndexedStoreT[F, J, C, D])(
@@ -188,7 +187,8 @@ private trait IndexedStoreTBifunctor[F[_], A0]
     extends Bifunctor[IndexedStoreT[F, ?, A0, ?]] {
   implicit def F: Functor[F]
   override def bimap[A, B, C, D](fab: IndexedStoreT[F, A, A0, B])(
-      f: A => C, g: B => D): IndexedStoreT[F, C, A0, D] = (fab bimap f)(g)
+      f: A => C,
+      g: B => D): IndexedStoreT[F, C, A0, D] = (fab bimap f)(g)
 }
 
 private trait StoreTCobind[F[_], A0]

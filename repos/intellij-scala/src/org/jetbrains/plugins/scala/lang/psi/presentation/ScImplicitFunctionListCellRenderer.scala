@@ -49,8 +49,11 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
     val item = tuple.getNewExpression
     val firstPart = tuple.getFirstPart
     val secondPart = tuple.getSecondPart
-    val comp = getSuperListCellRendererComponent(
-        containter.getList, item, index, isSelected, cellHasFocus)
+    val comp = getSuperListCellRendererComponent(containter.getList,
+                                                 item,
+                                                 index,
+                                                 isSelected,
+                                                 cellHasFocus)
     comp match {
       case container: Container =>
         val colored =
@@ -111,8 +114,8 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
     element match {
       case method: ScFunction =>
         method.name +
-        PresentationUtil.presentationString(method.paramClauses) + ": " +
-        PresentationUtil.presentationString(method.returnType.getOrAny)
+          PresentationUtil.presentationString(method.paramClauses) + ": " +
+          PresentationUtil.presentationString(method.returnType.getOrAny)
       case b: ScBindingPattern =>
         b.name + ": " + PresentationUtil.presentationString(
             b.getType(TypingContext.empty).getOrAny)

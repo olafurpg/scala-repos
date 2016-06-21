@@ -71,8 +71,8 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
     val ts = TableQuery[T]
 
     val a1 = (ts.schema.create >>
-        (ts += (1, new SerialBlob(Array[Byte](1, 2, 3)))) >>
-        (ts += (2, new SerialBlob(Array[Byte](4, 5)))) >> ts.result).transactionally
+          (ts += (1, new SerialBlob(Array[Byte](1, 2, 3)))) >>
+          (ts += (2, new SerialBlob(Array[Byte](4, 5)))) >> ts.result).transactionally
     val p1 = db.stream(a1).mapResult {
       case (id, data) => (id, data.getBytes(1, data.length.toInt).mkString)
     }
@@ -80,9 +80,9 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
       _ =>
         val f = materializeAsync[(Int, Blob), (Int, String)](
             db.stream(ts.result.transactionally, bufferNext = false), {
-          case (id, data) =>
-            db.io((id, data.getBytes(1, data.length.toInt).mkString))
-        })
+              case (id, data) =>
+                db.io((id, data.getBytes(1, data.length.toInt).mkString))
+            })
         f.map(_.toSet shouldBe Set((1, "123"), (2, "45")))
     }
   }
@@ -161,8 +161,8 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
     roundtrip("time_t1", Time.valueOf("17:53:48"))
 
   def testTimestamp = {
-    roundtrip[Timestamp](
-        "timestamp_t1", Timestamp.valueOf("2012-12-24 17:53:48.0")) >> {
+    roundtrip[Timestamp]("timestamp_t1",
+                         Timestamp.valueOf("2012-12-24 17:53:48.0")) >> {
       class T2(tag: Tag)
           extends Table[Option[Timestamp]](tag, "timestamp_t2") {
         def t = column[Option[Timestamp]]("t")

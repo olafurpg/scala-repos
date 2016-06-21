@@ -13,7 +13,8 @@ class TransformProcessorTest extends AkkaIdentityProcessorVerification[Int] {
   override def createIdentityProcessor(
       maxBufferSize: Int): Processor[Int, Int] = {
     val settings = ActorMaterializerSettings(system).withInputBuffer(
-        initialSize = maxBufferSize / 2, maxSize = maxBufferSize)
+        initialSize = maxBufferSize / 2,
+        maxSize = maxBufferSize)
 
     implicit val materializer = ActorMaterializer(settings)(system)
 

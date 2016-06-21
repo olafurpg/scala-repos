@@ -74,13 +74,15 @@ class SceneProperty(
       "8.0.60-R10")
   def effectiveNodeOrientation =
     jfxbb.Bindings.select[jfxbp.ReadOnlyObjectProperty[jfxg.NodeOrientation]](
-        delegate, "effectiveNodeOrientation")
+        delegate,
+        "effectiveNodeOrientation")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def eventDispatcher =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[jfxe.EventDispatcher]](
-        delegate, "eventDispatcher")
+        delegate,
+        "eventDispatcher")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
@@ -99,67 +101,78 @@ class SceneProperty(
       "8.0.60-R10")
   def nodeOrientation =
     jfxbb.Bindings.select[jfxbp.ReadOnlyObjectProperty[jfxg.NodeOrientation]](
-        delegate, "nodeOrientation")
+        delegate,
+        "nodeOrientation")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onContextMenuRequested =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.ContextMenuEvent]](
-        delegate, "onContextMenuRequested")
+        delegate,
+        "onContextMenuRequested")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onDragDetected =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.DragEvent]](
-        delegate, "onDragDetected")
+        delegate,
+        "onDragDetected")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onDragDone =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.DragEvent]](
-        delegate, "onDragDone")
+        delegate,
+        "onDragDone")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onDragDropped =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.DragEvent]](
-        delegate, "onDragDropped")
+        delegate,
+        "onDragDropped")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onDragEntered =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.DragEvent]](
-        delegate, "onDragEntered")
+        delegate,
+        "onDragEntered")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onDragExited =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.DragEvent]](
-        delegate, "onDragExited")
+        delegate,
+        "onDragExited")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onDragOver =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.DragEvent]](
-        delegate, "onDragOver")
+        delegate,
+        "onDragOver")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onInputMethodTextChanged =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.InputEvent]](
-        delegate, "onInputMethodTextChanged")
+        delegate,
+        "onInputMethodTextChanged")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onKeyPressed =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.KeyEvent]](
-        delegate, "onKeyPressed")
+        delegate,
+        "onKeyPressed")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onKeyReleased =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.KeyEvent]](
-        delegate, "onKeyReleased")
+        delegate,
+        "onKeyReleased")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
@@ -171,151 +184,176 @@ class SceneProperty(
       "8.0.60-R10")
   def onMouseClicked =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMouseClicked")
+        delegate,
+        "onMouseClicked")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseDragEntered =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseDragEvent]](
-        delegate, "onMouseDragEntered")
+        delegate,
+        "onMouseDragEntered")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseDragExited =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseDragEvent]](
-        delegate, "onMouseDragExited")
+        delegate,
+        "onMouseDragExited")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseDragOver =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseDragEvent]](
-        delegate, "onMouseDragOver")
+        delegate,
+        "onMouseDragOver")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseDragReleased =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseDragEvent]](
-        delegate, "onMouseDragReleased")
+        delegate,
+        "onMouseDragReleased")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseDragged =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMouseDragged")
+        delegate,
+        "onMouseDragged")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseEntered =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMouseEntered")
+        delegate,
+        "onMouseEntered")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseExited =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMouseExited")
+        delegate,
+        "onMouseExited")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseMoved =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMouseMoved")
+        delegate,
+        "onMouseMoved")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMousePressed =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMousePressed")
+        delegate,
+        "onMousePressed")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onMouseReleased =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.MouseEvent]](
-        delegate, "onMouseReleased")
+        delegate,
+        "onMouseReleased")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onRotate =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.RotateEvent]](
-        delegate, "onRotate")
+        delegate,
+        "onRotate")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onRotationFinished =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.RotateEvent]](
-        delegate, "onRotationFinished")
+        delegate,
+        "onRotationFinished")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onRotationStarted =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.RotateEvent]](
-        delegate, "onRotationStarted")
+        delegate,
+        "onRotationStarted")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onScroll =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.ScrollEvent]](
-        delegate, "onScroll")
+        delegate,
+        "onScroll")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onScrollFinished =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.ScrollEvent]](
-        delegate, "onScrollFinished")
+        delegate,
+        "onScrollFinished")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onScrollStarted =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.ScrollEvent]](
-        delegate, "onScrollStarted")
+        delegate,
+        "onScrollStarted")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onSwipeDown =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.SwipeEvent]](
-        delegate, "onSwipeDown")
+        delegate,
+        "onSwipeDown")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onSwipeLeft =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.SwipeEvent]](
-        delegate, "onSwipeLeft")
+        delegate,
+        "onSwipeLeft")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onSwipeRight =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.SwipeEvent]](
-        delegate, "onSwipeRight")
+        delegate,
+        "onSwipeRight")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onSwipeUp =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.SwipeEvent]](
-        delegate, "onSwipeUp")
+        delegate,
+        "onSwipeUp")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onTouchMoved =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.TouchEvent]](
-        delegate, "onTouchMoved")
+        delegate,
+        "onTouchMoved")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onTouchPressed =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.TouchEvent]](
-        delegate, "onTouchPressed")
+        delegate,
+        "onTouchPressed")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onTouchReleased =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.TouchEvent]](
-        delegate, "onTouchReleased")
+        delegate,
+        "onTouchReleased")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onTouchStationary =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.TouchEvent]](
-        delegate, "onTouchStationary")
+        delegate,
+        "onTouchStationary")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
@@ -327,13 +365,15 @@ class SceneProperty(
       "8.0.60-R10")
   def onZoomFinished =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.ZoomEvent]](
-        delegate, "onZoomFinished")
+        delegate,
+        "onZoomFinished")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def onZoomStarted =
     jfxbb.Bindings.select[jfxbb.ObjectBinding[_ >: jfxsi.ZoomEvent]](
-        delegate, "onZoomStarted")
+        delegate,
+        "onZoomStarted")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
@@ -344,7 +384,8 @@ class SceneProperty(
   def stylesheets =
     jfxbb.Bindings
       .select[jfxbb.ObjectBinding[javafx.collections.ObservableList[String]]](
-        delegate, "stylesheets")
+          delegate,
+          "stylesheets")
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")

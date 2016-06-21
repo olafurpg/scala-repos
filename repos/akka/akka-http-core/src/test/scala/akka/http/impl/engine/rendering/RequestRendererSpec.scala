@@ -24,8 +24,8 @@ class RequestRendererSpec
     extends FreeSpec
     with Matchers
     with BeforeAndAfterAll {
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -347,10 +347,11 @@ class RequestRendererSpec
 
   class TestSetup(val userAgent: Option[`User-Agent`] =
                     Some(`User-Agent`("akka-http/1.0.0")),
-                  serverAddress: InetSocketAddress = new InetSocketAddress(
-                      "test.com", 8080))
-      extends HttpRequestRendererFactory(
-          userAgent, requestHeaderSizeHint = 64, NoLogging) {
+                  serverAddress: InetSocketAddress =
+                    new InetSocketAddress("test.com", 8080))
+      extends HttpRequestRendererFactory(userAgent,
+                                         requestHeaderSizeHint = 64,
+                                         NoLogging) {
 
     def renderTo(expected: String): Matcher[HttpRequest] =
       equal(expected.stripMarginWithNewline("\r\n")).matcher[String] compose {

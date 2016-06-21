@@ -139,7 +139,7 @@ class ConcurrentHashMap[K >: Null, V >: Null]
 
 object ConcurrentHashMap {
 
-  class KeySetView[K >: Null, V >: Null] private[ConcurrentHashMap](
+  class KeySetView[K >: Null, V >: Null] private[ConcurrentHashMap] (
       chm: ConcurrentHashMap[K, V])
       extends Set[K]
       with Serializable {

@@ -9,8 +9,8 @@ import java.util.Optional
 import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
-final case class ContentTypeRange(
-    mediaRange: MediaRange, charsetRange: HttpCharsetRange)
+final case class ContentTypeRange(mediaRange: MediaRange,
+                                  charsetRange: HttpCharsetRange)
     extends jm.ContentTypeRange
     with ValueRenderable {
   def matches(contentType: jm.ContentType) =
@@ -77,8 +77,8 @@ object ContentType {
     def charset = mediaType.charset
   }
 
-  final case class WithCharset(
-      val mediaType: MediaType.WithOpenCharset, val charset: HttpCharset)
+  final case class WithCharset(val mediaType: MediaType.WithOpenCharset,
+                               val charset: HttpCharset)
       extends jm.ContentType.WithCharset
       with NonBinary {
 

@@ -38,8 +38,9 @@ abstract class LinkerBackend(val semantics: Semantics,
     *  @param output File to write to
     *  @param logger Logger to use
     */
-  def emit(
-      unit: LinkingUnit, output: WritableVirtualJSFile, logger: Logger): Unit
+  def emit(unit: LinkingUnit,
+           output: WritableVirtualJSFile,
+           logger: Logger): Unit
 
   /** Verify that a [[LinkingUnit]] corresponds to this [[LinkerBackend]]'s
     *  [[org.scalajs.core.tools.sem.Semantics Semantics]] and

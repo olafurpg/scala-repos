@@ -27,11 +27,11 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "call postStop in order on stages - when upstream completes" in new OneBoundedSetup[
         String](
-        Seq(PreStartAndPostStopIdentity(onUpstreamCompleted =
-                                          () ⇒ testActor ! "complete-a",
+        Seq(PreStartAndPostStopIdentity(onUpstreamCompleted = () ⇒
+                                          testActor ! "complete-a",
                                         onStop = () ⇒ testActor ! "stop-a"),
-            PreStartAndPostStopIdentity(onUpstreamCompleted =
-                                          () ⇒ testActor ! "complete-b",
+            PreStartAndPostStopIdentity(onUpstreamCompleted = () ⇒
+                                          testActor ! "complete-b",
                                         onStop = () ⇒ testActor ! "stop-b"),
             PreStartAndPostStopIdentity(onUpstreamCompleted = () ⇒
                                           testActor ! "complete-c",
@@ -165,8 +165,8 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       super.onUpstreamFinish(ctx)
     }
 
-    override def onUpstreamFailure(
-        cause: Throwable, ctx: Context[T]): TerminationDirective = {
+    override def onUpstreamFailure(cause: Throwable,
+                                   ctx: Context[T]): TerminationDirective = {
       onUpstreamFailed(cause)
       super.onUpstreamFailure(cause, ctx)
     }

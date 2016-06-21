@@ -19,8 +19,8 @@ object Utils {
       extends RuntimeException(message)
       with NoStackTrace
 
-  def assertAllStagesStopped[T](
-      block: ⇒ T)(implicit materializer: Materializer): T =
+  def assertAllStagesStopped[T](block: ⇒ T)(
+      implicit materializer: Materializer): T =
     materializer match {
       case impl: ActorMaterializerImpl ⇒
         val probe = TestProbe()(impl.system)

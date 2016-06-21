@@ -226,15 +226,14 @@ private[ml] object DefaultParamsWriter {
     val cls = instance.getClass.getName
     val params =
       instance.extractParamMap().toSeq.asInstanceOf[Seq[ParamPair[Any]]]
-    val jsonParams = paramMap.getOrElse(
-        render(params.map {
+    val jsonParams = paramMap.getOrElse(render(params.map {
       case ParamPair(p, v) =>
         p.name -> parse(p.jsonEncode(v))
     }.toList))
     val basicMetadata =
       ("class" -> cls) ~ ("timestamp" -> System.currentTimeMillis()) ~
-      ("sparkVersion" -> sc.version) ~ ("uid" -> uid) ~
-      ("paramMap" -> jsonParams)
+        ("sparkVersion" -> sc.version) ~ ("uid" -> uid) ~
+        ("paramMap" -> jsonParams)
     val metadata = extraMetadata match {
       case Some(jObject) =>
         basicMetadata ~ jObject
@@ -299,8 +298,8 @@ private[ml] object DefaultParamsReader {
           }.map(_._2)
           assert(values.length == 1,
                  s"Expected one instance of Param '$paramName' but found" +
-                 s" ${values.length} in JSON Params: " +
-                 pairs.map(_.toString).mkString(", "))
+                   s" ${values.length} in JSON Params: " +
+                   pairs.map(_.toString).mkString(", "))
           values.head
         case _ =>
           throw new IllegalArgumentException(
@@ -330,11 +329,16 @@ private[ml] object DefaultParamsReader {
     if (expectedClassName.nonEmpty) {
       require(className == expectedClassName,
               s"Error loading metadata: Expected class name" +
-              s" $expectedClassName but found class name $className")
+                s" $expectedClassName but found class name $className")
     }
 
-    Metadata(
-        className, uid, timestamp, sparkVersion, params, metadata, metadataStr)
+    Metadata(className,
+             uid,
+             timestamp,
+             sparkVersion,
+             params,
+             metadata,
+             metadataStr)
   }
 
   /**

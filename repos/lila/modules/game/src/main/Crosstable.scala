@@ -32,8 +32,7 @@ case class Crosstable(user1: Crosstable.User,
     else none
 
   def addWins(userId: Option[String], wins: Int) =
-    copy(user1 = user1.copy(
-             score =
+    copy(user1 = user1.copy(score =
                user1.score + (userId match {
                  case None => wins * 5
                  case Some(u) if user1.id == u => wins * 10
@@ -82,16 +81,14 @@ object Crosstable {
       case Array(u1Id, u2Id) =>
         Crosstable(user1 = User(u1Id, r intD "s1"),
                    user2 = User(u2Id, r intD "s2"),
-                   results = r
-                     .get[List[String]](results)
-                     .map { r =>
-                       r drop 8 match {
-                         case "" => Result(r take 8, none)
-                         case "+" => Result(r take 8, Some(u1Id))
-                         case "-" => Result(r take 8, Some(u2Id))
-                         case _ => sys error s"Invalid result string $r"
-                       }
-                     },
+                   results = r.get[List[String]](results).map { r =>
+                     r drop 8 match {
+                       case "" => Result(r take 8, none)
+                       case "+" => Result(r take 8, Some(u1Id))
+                       case "-" => Result(r take 8, Some(u2Id))
+                       case _ => sys error s"Invalid result string $r"
+                     }
+                   },
                    nbGames = r int nbGames)
       case x => sys error s"Invalid crosstable id $x"
     }

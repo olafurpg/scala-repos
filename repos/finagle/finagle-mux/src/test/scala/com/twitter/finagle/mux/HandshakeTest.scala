@@ -28,11 +28,11 @@ class HandshakeTest
   val clientToServer = new AsyncQueue[ChannelBuffer]
   val serverToClient = new AsyncQueue[ChannelBuffer]
 
-  val clientTransport = new QueueTransport(
-      writeq = clientToServer, readq = serverToClient)
+  val clientTransport =
+    new QueueTransport(writeq = clientToServer, readq = serverToClient)
 
-  val serverTransport = new QueueTransport(
-      writeq = serverToClient, readq = clientToServer)
+  val serverTransport =
+    new QueueTransport(writeq = serverToClient, readq = clientToServer)
 
   test("handshake") {
     var clientNegotiated = false
@@ -159,8 +159,8 @@ class HandshakeTest
 
     val f = client.write(Message.Tping(2))
 
-    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message.Rerr(
-            1, "tinit check"))
+    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message
+          .Rerr(1, "tinit check"))
     assert(!negotiated)
     assert(!f.isDefined)
   }
@@ -183,16 +183,15 @@ class HandshakeTest
 
     val f = client.write(Message.Tping(2))
 
-    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message.Rerr(
-            1, "tinit check"))
+    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message
+          .Rerr(1, "tinit check"))
     assert(!negotiated)
     assert(!f.isDefined)
 
     serverToClient.offer(enc(Message.Rerr(1, "tinit check")))
 
-    assert(
-        dec(Await.result(clientToServer.poll(), 5.seconds)) == Message.Tinit(
-            1, version, headers))
+    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message
+          .Tinit(1, version, headers))
     assert(!negotiated)
     assert(!f.isDefined)
 
@@ -216,8 +215,8 @@ class HandshakeTest
 
     val f = client.write(Message.Tping(2))
 
-    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message.Rerr(
-            1, "tinit check"))
+    assert(dec(Await.result(clientToServer.poll(), 5.seconds)) == Message
+          .Rerr(1, "tinit check"))
     assert(!negotiated)
     assert(!f.isDefined)
 
@@ -245,9 +244,8 @@ class HandshakeTest
 
     clientToServer.offer(enc(Message.Tinit(1, version, Seq.empty)))
 
-    assert(
-        dec(Await.result(serverToClient.poll(), 5.seconds)) == Message.Rinit(
-            1, version, hdrs))
+    assert(dec(Await.result(serverToClient.poll(), 5.seconds)) == Message
+          .Rinit(1, version, hdrs))
     assert(negotiated)
   }
 

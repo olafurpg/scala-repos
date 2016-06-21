@@ -88,12 +88,12 @@ class OrderedRDDFunctions[K: Ordering: ClassTag, V: ClassTag,
 
     val rddToFilter: RDD[P] = self.partitioner match {
       case Some(rp: RangePartitioner[K, V]) => {
-          val partitionIndicies =
-            (rp.getPartition(lower), rp.getPartition(upper)) match {
-              case (l, u) => Math.min(l, u) to Math.max(l, u)
-            }
-          PartitionPruningRDD.create(self, partitionIndicies.contains)
-        }
+        val partitionIndicies =
+          (rp.getPartition(lower), rp.getPartition(upper)) match {
+            case (l, u) => Math.min(l, u) to Math.max(l, u)
+          }
+        PartitionPruningRDD.create(self, partitionIndicies.contains)
+      }
       case _ =>
         self
     }

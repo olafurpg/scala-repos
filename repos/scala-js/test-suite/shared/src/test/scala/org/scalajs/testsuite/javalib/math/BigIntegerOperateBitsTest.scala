@@ -1067,8 +1067,22 @@ class BigIntegerOperateBitsTest {
       Array[Byte](1, -128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26)
     val aSign = 1
     val number = 27
-    val rBytes = Array[Byte](
-        12, 1, -61, 39, -11, -94, -55, 106, -40, 31, -119, 24, -48, 0, 0, 0)
+    val rBytes = Array[Byte](12,
+                             1,
+                             -61,
+                             39,
+                             -11,
+                             -94,
+                             -55,
+                             106,
+                             -40,
+                             31,
+                             -119,
+                             24,
+                             -48,
+                             0,
+                             0,
+                             0)
     val aNumber = new BigInteger(aSign, aBytes)
     val result = aNumber.shiftLeft(number)
     var resBytes = Array.ofDim[Byte](rBytes.length)
@@ -1084,8 +1098,24 @@ class BigIntegerOperateBitsTest {
       Array[Byte](1, -128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26)
     val aSign = 1
     val number = 45
-    val rBytes = Array[Byte](
-        48, 7, 12, -97, -42, -117, 37, -85, 96, 126, 36, 99, 64, 0, 0, 0, 0, 0)
+    val rBytes = Array[Byte](48,
+                             7,
+                             12,
+                             -97,
+                             -42,
+                             -117,
+                             37,
+                             -85,
+                             96,
+                             126,
+                             36,
+                             99,
+                             64,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0)
     val aNumber = new BigInteger(aSign, aBytes)
     val result = aNumber.shiftLeft(number)
     var resBytes = Array.ofDim[Byte](rBytes.length)
@@ -1151,8 +1181,22 @@ class BigIntegerOperateBitsTest {
       Array[Byte](1, -128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26)
     val aSign = 1
     val number = -27
-    val rBytes = Array[Byte](
-        12, 1, -61, 39, -11, -94, -55, 106, -40, 31, -119, 24, -48, 0, 0, 0)
+    val rBytes = Array[Byte](12,
+                             1,
+                             -61,
+                             39,
+                             -11,
+                             -94,
+                             -55,
+                             106,
+                             -40,
+                             31,
+                             -119,
+                             24,
+                             -48,
+                             0,
+                             0,
+                             0)
     val aNumber = new BigInteger(aSign, aBytes)
     val result = aNumber.shiftRight(number)
     var resBytes = Array.ofDim[Byte](rBytes.length)
@@ -1212,8 +1256,23 @@ class BigIntegerOperateBitsTest {
   }
 
   @Test def testShiftRightNegNonZeroes(): Unit = {
-    val aBytes = Array[Byte](
-        1, -128, 56, 100, -2, -76, 89, 45, 91, 0, 0, 0, 0, 0, 0, 0, 0)
+    val aBytes = Array[Byte](1,
+                             -128,
+                             56,
+                             100,
+                             -2,
+                             -76,
+                             89,
+                             45,
+                             91,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0)
     val aSign = -1
     val number = 68
     val rBytes = Array[Byte](-25, -4, 121, -80, 20, -70, 109, 42)
@@ -1228,8 +1287,23 @@ class BigIntegerOperateBitsTest {
   }
 
   @Test def testShiftRightNegNonZeroesMul32(): Unit = {
-    val aBytes = Array[Byte](
-        1, -128, 56, 100, -2, -76, 89, 45, 91, 1, 0, 0, 0, 0, 0, 0, 0)
+    val aBytes = Array[Byte](1,
+                             -128,
+                             56,
+                             100,
+                             -2,
+                             -76,
+                             89,
+                             45,
+                             91,
+                             1,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0)
     val aSign = -1
     val number = 64
     val rBytes = Array[Byte](-2, 127, -57, -101, 1, 75, -90, -46, -92)
@@ -1260,8 +1334,23 @@ class BigIntegerOperateBitsTest {
   }
 
   @Test def testShiftRightNegZeroesMul32(): Unit = {
-    val aBytes = Array[Byte](
-        1, -128, 56, 100, -2, -76, 89, 45, 91, 0, 0, 0, 0, 0, 0, 0, 0)
+    val aBytes = Array[Byte](1,
+                             -128,
+                             56,
+                             100,
+                             -2,
+                             -76,
+                             89,
+                             45,
+                             91,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0,
+                             0)
     val aSign = -1
     val number = 64
     val rBytes = Array[Byte](-2, 127, -57, -101, 1, 75, -90, -46, -91)

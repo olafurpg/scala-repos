@@ -75,8 +75,7 @@ class P2CBalancerTest extends FunSuite with App with P2CSuite {
       sum += load
       count += 1
 
-      Future.value(
-          new Service[Unit, Int] {
+      Future.value(new Service[Unit, Int] {
         def apply(req: Unit) = Future.value(which)
         override def close(deadline: Time) = {
           load -= 1
@@ -327,7 +326,7 @@ class P2CBalancerEwmaTest extends FunSuite with App with P2CSuite {
           val latency = Await.result(svc((): Unit)).toLong
           val work =
             (clock() + latency ->
-                (schedule.getOrElse(clock() + latency, Nil) :+ svc))
+                  (schedule.getOrElse(clock() + latency, Nil) :+ svc))
           schedule + work
         }
       for (seq <- next.get(step); c <- seq) c.close()

@@ -45,16 +45,23 @@ class LinearAlgebraTest
   test("kron") {
     val a = DenseMatrix((1, 2), (3, 4))
     val b = DenseMatrix((0, 5), (6, 7))
-    assert(kron(a, b) === DenseMatrix(
-            (0, 5, 0, 10), (6, 7, 12, 14), (0, 15, 0, 20), (18, 21, 24, 28)))
+    assert(
+        kron(a, b) === DenseMatrix((0, 5, 0, 10),
+                                   (6, 7, 12, 14),
+                                   (0, 15, 0, 20),
+                                   (18, 21, 24, 28)))
   }
 
   test("ranks") {
     assert(ranks(DenseVector(1, 2, 3)).toList === List(1.0, 2.0, 3.0))
     assert(ranks(DenseVector(3, -1, 2)).toList === List(3.0, 1.0, 2.0))
     assert(ranks(DenseVector(1, 2, 3, 3)).toList === List(1.0, 2.0, 3.5, 3.5))
-    assert(ranks(DenseVector(1, 2, 3, 3, 3)).toList === List(
-            1.0, 2.0, 4.0, 4.0, 4.0))
+    assert(
+        ranks(DenseVector(1, 2, 3, 3, 3)).toList === List(1.0,
+                                                          2.0,
+                                                          4.0,
+                                                          4.0,
+                                                          4.0))
   }
 
   test("cholesky") {
@@ -107,8 +114,7 @@ class LinearAlgebraTest
     val B = DenseMatrix((1, 2, 3), (4, 5, -6), (7, 8, 9))
     det(B) should be(-72.0 +- 1e-16)
 
-    val C =
-      DenseMatrix((1, 2, 3), (2, 4, 6), (0, -1, 0)) // 1st and 2nd row linearly dep.
+    val C = DenseMatrix((1, 2, 3), (2, 4, 6), (0, -1, 0)) // 1st and 2nd row linearly dep.
     det(C) should be(0.0 +- 1e-6)
 
     val D = DenseMatrix((-1, 1, -1), (1, 2, 3), (3, -10, 1))
@@ -126,8 +132,7 @@ class LinearAlgebraTest
     detB should be(math.log(72.0) +- 1e-15)
     assert(signB === -1.0)
 
-    val C =
-      DenseMatrix((1, 2, 3), (2, 4, 6), (0, -1, 0)) // 1st and 2nd row linearly dep.
+    val C = DenseMatrix((1, 2, 3), (2, 4, 6), (0, -1, 0)) // 1st and 2nd row linearly dep.
     val (signC, detC) = logdet(C)
     detC should be(Double.NegativeInfinity +- 1e-15)
     assert(signC === 0.0)
@@ -181,7 +186,8 @@ class LinearAlgebraTest
     implicit def arb3DVector: Arbitrary[DenseVector[Double]] = Arbitrary {
       for {
         els <- Gen.containerOfN[Array, Double](
-                  3, Gen.chooseNum[Double](-100.0, 100.0))
+                  3,
+                  Gen.chooseNum[Double](-100.0, 100.0))
       } yield DenseVector(els(0), els(1), els(2))
     }
     check { (a: DenseVector[Double], b: DenseVector[Double]) =>
@@ -200,12 +206,9 @@ class LinearAlgebraTest
   }
 
   test("rank") {
-    val r1 =
-      DenseMatrix((1.0, 2.0, 3.0), (1.0, 2.0, 3.0), (1.0, 2.0, 3.0)) // rank 1 matrix
-    val r2 =
-      DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)) // rank 2 matrix
-    val r3 =
-      DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (6.0, 8.0, 9.0)) // rank 3 matrix
+    val r1 = DenseMatrix((1.0, 2.0, 3.0), (1.0, 2.0, 3.0), (1.0, 2.0, 3.0)) // rank 1 matrix
+    val r2 = DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)) // rank 2 matrix
+    val r3 = DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (6.0, 8.0, 9.0)) // rank 3 matrix
     assert(rank(r1) === 1)
     assert(rank(r2) === 2)
     assert(rank(r3) === 3)
@@ -225,8 +228,9 @@ class LinearAlgebraTest
   }
 
   test("qr A[m, n], m < n") {
-    val A = DenseMatrix(
-        (1.0, 1.0, 1.0, 1.0), (4.0, 2.0, 1.0, 1.0), (16.0, 4.0, 1.0, 1.0))
+    val A = DenseMatrix((1.0, 1.0, 1.0, 1.0),
+                        (4.0, 2.0, 1.0, 1.0),
+                        (16.0, 4.0, 1.0, 1.0))
     val QR(_Q, _R) = qr(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, A.rows))
@@ -242,8 +246,10 @@ class LinearAlgebraTest
   }
 
   test("qr A[m, n], m > n") {
-    val A = DenseMatrix(
-        (1.0, 1.0, 1.0), (4.0, 2.0, 1.0), (16.0, 4.0, 1.0), (32.0, 8.0, 1.0))
+    val A = DenseMatrix((1.0, 1.0, 1.0),
+                        (4.0, 2.0, 1.0),
+                        (16.0, 4.0, 1.0),
+                        (32.0, 8.0, 1.0))
     val QR(_Q, _R) = qr(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, A.rows))
@@ -320,8 +326,9 @@ class LinearAlgebraTest
   }
 
   test("qr reduced A[m, n], m < n") {
-    val A = DenseMatrix(
-        (1.0, 1.0, 1.0, 1.0), (4.0, 2.0, 1.0, 1.0), (16.0, 4.0, 1.0, 1.0))
+    val A = DenseMatrix((1.0, 1.0, 1.0, 1.0),
+                        (4.0, 2.0, 1.0, 1.0),
+                        (16.0, 4.0, 1.0, 1.0))
     val QR(_Q, _R) = qr.reduced(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, min(A.rows, A.cols)))
@@ -353,8 +360,10 @@ class LinearAlgebraTest
   }
 
   test("qr reduced A[m, n], m > n") {
-    val A = DenseMatrix(
-        (1.0, 1.0, 1.0), (4.0, 2.0, 1.0), (16.0, 4.0, 1.0), (32.0, 8.0, 1.0))
+    val A = DenseMatrix((1.0, 1.0, 1.0),
+                        (4.0, 2.0, 1.0),
+                        (16.0, 4.0, 1.0),
+                        (32.0, 8.0, 1.0))
     val QR(_Q, _R) = qr.reduced(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, min(A.rows, A.cols)))
@@ -521,8 +530,8 @@ class LinearAlgebraTest
     diag(ss(0 until s.length, 0 until s.length)) := s
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
-    for (i <- 0 until reM.rows; j <- 0 until reM.cols) reM(i, j) should be(
-        m(i, j) +- 1E-6f)
+    for (i <- 0 until reM.rows; j <- 0 until reM.cols)
+      reM(i, j) should be(m(i, j) +- 1E-6f)
   }
 
   test("svd float A(m, n), m < n") {
@@ -544,8 +553,8 @@ class LinearAlgebraTest
     diag(ss(0 until s.length, 0 until s.length)) := s
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
-    for (i <- 0 until reM.rows; j <- 0 until reM.cols) reM(i, j) should be(
-        m(i, j) +- 1E-5f)
+    for (i <- 0 until reM.rows; j <- 0 until reM.cols)
+      reM(i, j) should be(m(i, j) +- 1E-5f)
   }
 
   test("svd reduced A(m, n), m > n") {
@@ -626,8 +635,8 @@ class LinearAlgebraTest
     diag(ss(0 until s.length, 0 until s.length)) := s
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
-    for (i <- 0 until reM.rows; j <- 0 until reM.cols) reM(i, j) should be(
-        m(i, j) +- 1E-6f)
+    for (i <- 0 until reM.rows; j <- 0 until reM.cols)
+      reM(i, j) should be(m(i, j) +- 1E-6f)
   }
 
   test("svd reduced float A(m, n), m = n") {
@@ -648,8 +657,8 @@ class LinearAlgebraTest
     diag(ss(0 until s.length, 0 until s.length)) := s
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
-    for (i <- 0 until reM.rows; j <- 0 until reM.cols) reM(i, j) should be(
-        m(i, j) +- 1E-5f)
+    for (i <- 0 until reM.rows; j <- 0 until reM.cols)
+      reM(i, j) should be(m(i, j) +- 1E-5f)
   }
 
   test("svd reduced float A(m, n), m < n") {
@@ -671,8 +680,8 @@ class LinearAlgebraTest
     diag(ss(0 until s.length, 0 until s.length)) := s
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
-    for (i <- 0 until reM.rows; j <- 0 until reM.cols) reM(i, j) should be(
-        m(i, j) +- 1E-5f)
+    for (i <- 0 until reM.rows; j <- 0 until reM.cols)
+      reM(i, j) should be(m(i, j) +- 1E-5f)
   }
 
   test("svd and svdr singular values are equal") {
@@ -795,8 +804,7 @@ class LinearAlgebraTest
 
     val vec = DenseVector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     val seq = vec.findAll(_ % 2 == 0) //Even Numbers
-    val slice =
-      new SliceVector(vec, seq) //Note: No companion object, requires new
+    val slice = new SliceVector(vec, seq) //Note: No companion object, requires new
     val difference = diff(slice)
   }
 
@@ -947,14 +955,15 @@ class LinearAlgebraTest
   def matricesNearlyEqual(A: DenseMatrix[Double],
                           B: DenseMatrix[Double],
                           threshold: Double = 1E-6) {
-    for (i <- 0 until A.rows; j <- 0 until A.cols) A(i, j) should be(
-        B(i, j) +- threshold)
+    for (i <- 0 until A.rows; j <- 0 until A.cols)
+      A(i, j) should be(B(i, j) +- threshold)
   }
 
-  def matricesNearlyEqual_Float(
-      A: DenseMatrix[Float], B: DenseMatrix[Float], threshold: Float = 1E-6f) {
-    for (i <- 0 until A.rows; j <- 0 until A.cols) A(i, j) should be(
-        B(i, j) +- threshold)
+  def matricesNearlyEqual_Float(A: DenseMatrix[Float],
+                                B: DenseMatrix[Float],
+                                threshold: Float = 1E-6f) {
+    for (i <- 0 until A.rows; j <- 0 until A.cols)
+      A(i, j) should be(B(i, j) +- threshold)
   }
 
   test("RangeExtender test") {

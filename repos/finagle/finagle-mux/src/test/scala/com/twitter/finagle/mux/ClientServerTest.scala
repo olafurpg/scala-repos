@@ -47,20 +47,20 @@ private[mux] class ClientServerTest(canDispatch: Boolean)
     val clientToServer = new AsyncQueue[Message]
     val serverToClient = new AsyncQueue[Message]
 
-    val serverTransport = new QueueTransport(
-        writeq = serverToClient, readq = clientToServer) {
-      override def write(m: Message) = super.write(decode(encode(m)))
-    }
+    val serverTransport =
+      new QueueTransport(writeq = serverToClient, readq = clientToServer) {
+        override def write(m: Message) = super.write(decode(encode(m)))
+      }
 
-    val clientTransport = new QueueTransport(
-        writeq = clientToServer, readq = serverToClient) {
-      override def write(m: Message) = super.write(decode(encode(m)))
-    }
+    val clientTransport =
+      new QueueTransport(writeq = clientToServer, readq = serverToClient) {
+        override def write(m: Message) = super.write(decode(encode(m)))
+      }
 
     val service = mock[Service[Request, Response]]
 
-    val session = new ClientSession(
-        clientTransport, config, "test", NullStatsReceiver)
+    val session =
+      new ClientSession(clientTransport, config, "test", NullStatsReceiver)
     val client = ClientDispatcher.newRequestResponse(session)
 
     val nping = new AtomicInteger(0)
@@ -73,8 +73,8 @@ private[mux] class ClientServerTest(canDispatch: Boolean)
     }
 
     val filter = new SimpleFilter[Message, Message] {
-      def apply(
-          req: Message, service: Service[Message, Message]): Future[Message] =
+      def apply(req: Message,
+                service: Service[Message, Message]): Future[Message] =
         req match {
           case Message.Tdispatch(tag, _, _, _, _) if !canDispatch =>
             Future.value(Message.Rerr(tag, "Tdispatch not enabled"))
@@ -268,8 +268,8 @@ private[mux] class ClientServerTest(canDispatch: Boolean)
   }
 
   test("failure detection") {
-    val config = FailureDetector.ThresholdConfig(
-        minPeriod = 10.milliseconds, closeTimeout = Duration.Top)
+    val config = FailureDetector.ThresholdConfig(minPeriod = 10.milliseconds,
+                                                 closeTimeout = Duration.Top)
 
     val ctx = new Ctx(config)
     import ctx._

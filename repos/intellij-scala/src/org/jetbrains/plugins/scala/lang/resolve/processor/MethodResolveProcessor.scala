@@ -99,12 +99,12 @@ class MethodResolveProcessor(
         // do not resolve to package object
         case obj: ScObject
             if ref.getParent.isInstanceOf[ScMethodCall] ||
-            ref.getParent.isInstanceOf[ScGenericCall] =>
+              ref.getParent.isInstanceOf[ScGenericCall] =>
           val functionName = if (isUpdate) "update" else "apply"
           val typeResult = getFromType(state) match {
             case Some(tp) =>
-              Success(
-                  ScProjectionType(tp, obj, superReference = false), Some(obj))
+              Success(ScProjectionType(tp, obj, superReference = false),
+                      Some(obj))
             case _ => obj.getType(TypingContext.empty)
           }
           val processor = new CollectMethodsProcessor(ref, functionName)
@@ -265,13 +265,13 @@ object MethodResolveProcessor {
 
     val typeParameters: Seq[TypeParameter] =
       prevTypeInfo ++
-      (element match {
-            case fun: ScFunction =>
-              fun.typeParameters.map(new TypeParameter(_))
-            case fun: PsiMethod =>
-              fun.getTypeParameters.map(new TypeParameter(_)).toSeq
-            case _ => Seq.empty
-          })
+        (element match {
+              case fun: ScFunction =>
+                fun.typeParameters.map(new TypeParameter(_))
+              case fun: PsiMethod =>
+                fun.getTypeParameters.map(new TypeParameter(_)).toSeq
+              case _ => Seq.empty
+            })
 
     def addExpectedTypeProblems(
         eOption: Option[ScType] = expectedOption()): Unit = {
@@ -279,7 +279,7 @@ object MethodResolveProcessor {
         val retType: ScType = element match {
           case f: ScFunction
               if f.paramClauses.clauses.length > 1 &&
-              !f.paramClauses.clauses.apply(1).isImplicit =>
+                !f.paramClauses.clauses.apply(1).isImplicit =>
             problems += ExpectedTypeMismatch //do not check expected types for more than one param clauses
             Nothing
           case f: ScFunction => substitutor.subst(f.returnType.getOrNothing)
@@ -302,17 +302,17 @@ object MethodResolveProcessor {
         fun match {
           case fun: ScFunction
               if fun.paramClauses.clauses.isEmpty ||
-              fun.paramClauses.clauses.head.parameters.isEmpty ||
-              isUnderscore =>
+                fun.paramClauses.clauses.head.parameters.isEmpty ||
+                isUnderscore =>
             ConformanceExtResult(problems)
           case fun: ScFun
               if fun.paramClauses == Seq() || fun.paramClauses == Seq(Seq()) ||
-              isUnderscore =>
+                isUnderscore =>
             addExpectedTypeProblems()
             ConformanceExtResult(problems)
           case method: PsiMethod
               if method.getParameterList.getParameters.isEmpty ||
-              isUnderscore =>
+                isUnderscore =>
             addExpectedTypeProblems()
             ConformanceExtResult(problems)
           case _ =>
@@ -322,8 +322,8 @@ object MethodResolveProcessor {
         }
       }
 
-      def processFunctionType(
-          retType: ScType, params: Seq[ScType]): ConformanceExtResult = {
+      def processFunctionType(retType: ScType,
+                              params: Seq[ScType]): ConformanceExtResult = {
         val args = params.map(new Expression(_))
         val result = Compatibility.compatible(fun,
                                               substitutor,
@@ -417,17 +417,17 @@ object MethodResolveProcessor {
         javaConstructorCompatibility(method)
       case fun: ScFunction
           if (typeArgElements.isEmpty ||
-              typeArgElements.length == fun.typeParameters.length) &&
-          fun.paramClauses.clauses.length == 1 &&
-          fun.paramClauses.clauses.head.isImplicit &&
-          argumentClauses.isEmpty =>
+                typeArgElements.length == fun.typeParameters.length) &&
+            fun.paramClauses.clauses.length == 1 &&
+            fun.paramClauses.clauses.head.isImplicit &&
+            argumentClauses.isEmpty =>
         addExpectedTypeProblems()
         ConformanceExtResult(problems) //special case for cases like Seq.toArray
       //eta expansion
       case fun: ScTypeParametersOwner
           if (typeArgElements.isEmpty ||
-              typeArgElements.length == fun.typeParameters.length) &&
-          argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
+                typeArgElements.length == fun.typeParameters.length) &&
+            argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
         fun match {
           case function: ScFunction if function.isConstructor =>
             problems += new ApplicabilityProblem("1")
@@ -437,8 +437,8 @@ object MethodResolveProcessor {
         checkFunction(fun.asInstanceOf[PsiNamedElement])
       case fun: PsiTypeParameterListOwner
           if (typeArgElements.isEmpty ||
-              typeArgElements.length == fun.getTypeParameters.length) &&
-          argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
+                typeArgElements.length == fun.getTypeParameters.length) &&
+            argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
         checkFunction(fun.asInstanceOf[PsiNamedElement])
       //simple application including empty application
       case tp: ScTypeParametersOwner with PsiNamedElement =>
@@ -451,7 +451,7 @@ object MethodResolveProcessor {
             problems += DoesNotTakeTypeParameters
           } else if (typeParamCount < typeArgCount) {
             problems ++=
-              typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
+            typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
           } else {
             problems ++= tp.typeParameters
               .drop(typeArgCount)
@@ -479,7 +479,7 @@ object MethodResolveProcessor {
             problems += DoesNotTakeTypeParameters
           } else if (typeParamCount < typeArgCount) {
             problems ++=
-              typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
+            typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
           } else {
             problems ++= tp.getTypeParameters
               .drop(typeArgCount)
@@ -517,7 +517,7 @@ object MethodResolveProcessor {
               case tpt: ScTypeParameterType =>
                 typeParameters.find(tp =>
                       (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
-                      (tpt.name, tpt.getId)) match {
+                        (tpt.name, tpt.getId)) match {
                   case None => (true, tpt)
                   case _ =>
                     hasRecursiveTypeParameters = true
@@ -570,9 +570,8 @@ object MethodResolveProcessor {
     (constructorTypeParameters, element) match {
       case (Some(typeParameterClause), _) =>
         val typeParameters = typeParameterClause.typeParameters
-        s.followed(
-            if (typeArgElements.nonEmpty &&
-                typeParameters.length == typeArgElements.length) {
+        s.followed(if (typeArgElements.nonEmpty &&
+                       typeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
               typeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
@@ -580,18 +579,18 @@ object MethodResolveProcessor {
         } else {
           typeParameters.foldLeft(ScSubstitutor.empty) {
             (subst: ScSubstitutor, tp: ScTypeParam) =>
-              subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                          new ScUndefinedType(new ScTypeParameterType(
-                                  tp, ScSubstitutor.empty)))
+              subst.bindT(
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                  new ScUndefinedType(
+                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
           }
         })
       //todo: this case is impossible case for reasons mentioned above
       case (_, method: PsiMethod) if method.isConstructor =>
         // Java constructors
         val typeParameters = method.containingClass.getTypeParameters
-        s.followed(
-            if (typeArgElements.nonEmpty &&
-                typeParameters.length == typeArgElements.length) {
+        s.followed(if (typeArgElements.nonEmpty &&
+                       typeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
               typeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
@@ -599,15 +598,15 @@ object MethodResolveProcessor {
         } else {
           typeParameters.foldLeft(ScSubstitutor.empty) {
             (subst: ScSubstitutor, tp: PsiTypeParameter) =>
-              subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                          new ScUndefinedType(new ScTypeParameterType(
-                                  tp, ScSubstitutor.empty)))
+              subst.bindT(
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                  new ScUndefinedType(
+                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
           }
         })
       case (None, t: ScTypeParametersOwner) =>
-        s.followed(
-            if (typeArgElements.nonEmpty &&
-                t.typeParameters.length == typeArgElements.length) {
+        s.followed(if (typeArgElements.nonEmpty &&
+                       t.typeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
               t.typeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
@@ -615,15 +614,15 @@ object MethodResolveProcessor {
         } else {
           t.typeParameters.foldLeft(ScSubstitutor.empty) {
             (subst: ScSubstitutor, tp: ScTypeParam) =>
-              subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                          new ScUndefinedType(new ScTypeParameterType(
-                                  tp, ScSubstitutor.empty)))
+              subst.bindT(
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                  new ScUndefinedType(
+                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
           }
         })
       case (None, p: PsiTypeParameterListOwner) =>
-        s.followed(
-            if (typeArgElements.nonEmpty &&
-                p.getTypeParameters.length == typeArgElements.length) {
+        s.followed(if (typeArgElements.nonEmpty &&
+                       p.getTypeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
               p.getTypeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
@@ -631,9 +630,10 @@ object MethodResolveProcessor {
         } else {
           p.getTypeParameters.foldLeft(ScSubstitutor.empty) {
             (subst: ScSubstitutor, tp: PsiTypeParameter) =>
-              subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                          new ScUndefinedType(new ScTypeParameterType(
-                                  tp, ScSubstitutor.empty)))
+              subst.bindT(
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                  new ScUndefinedType(
+                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
           }
         })
       case _ => s
@@ -751,8 +751,7 @@ object MethodResolveProcessor {
       return input.map(_.copy(notCheckedResolveResult = true))
     } else if (!onlyValues) {
       //in this case all values are not applicable
-      mapped = mapped.map(
-          r => {
+      mapped = mapped.map(r => {
         if (r.isApplicable()) {
           r.innerResolveResult match {
             case Some(rr) => r.copy(problems = rr.problems)
@@ -764,8 +763,7 @@ object MethodResolveProcessor {
 
     //remove default parameters alternatives
     if (filtered.size > 1 && !isShapeResolve)
-      filtered = filtered.filter(
-          r =>
+      filtered = filtered.filter(r =>
             r.innerResolveResult match {
           case Some(rr) => !rr.defaultParameterUsed
           case None => !r.defaultParameterUsed
@@ -805,7 +803,8 @@ object MethodResolveProcessor {
       val len = if (argumentClauses.isEmpty) 0 else argumentClauses.head.length
       if (filtered.size == 1) return filtered
       MostSpecificUtil(ref, len).mostSpecificForResolveResult(
-          filtered, hasTypeParametersCall = typeArgElements.nonEmpty) match {
+          filtered,
+          hasTypeParametersCall = typeArgElements.nonEmpty) match {
         case Some(r) => HashSet(r)
         case None => filtered
       }

@@ -50,12 +50,12 @@ import org.apache.spark.util.collection.BitSet
   */
 private[sql] object DataSourceAnalysis extends Rule[LogicalPlan] {
   override def apply(plan: LogicalPlan): LogicalPlan = plan transform {
-    case i @ logical.InsertIntoTable(l @ LogicalRelation(
-                                     t: HadoopFsRelation, _, _),
-                                     part,
-                                     query,
-                                     overwrite,
-                                     false)
+    case i @ logical.InsertIntoTable(
+        l @ LogicalRelation(t: HadoopFsRelation, _, _),
+        part,
+        query,
+        overwrite,
+        false)
         if query.resolved && t.schema.asNullable == query.schema.asNullable =>
       // Sanity checks
       if (t.location.paths.size != 1) {
@@ -91,8 +91,9 @@ private[sql] object DataSourceAnalysis extends Rule[LogicalPlan] {
   */
 private[sql] object DataSourceStrategy extends Strategy with Logging {
   def apply(plan: LogicalPlan): Seq[execution.SparkPlan] = plan match {
-    case PhysicalOperation(
-        projects, filters, l @ LogicalRelation(t: CatalystScan, _, _)) =>
+    case PhysicalOperation(projects,
+                           filters,
+                           l @ LogicalRelation(t: CatalystScan, _, _)) =>
       pruneFilterProjectRaw(
           l,
           projects,
@@ -102,8 +103,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
                           requestedColumns,
                           t.buildScan(requestedColumns, allPredicates))) :: Nil
 
-    case PhysicalOperation(
-        projects, filters, l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
+    case PhysicalOperation(projects,
+                           filters,
+                           l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
       pruneFilterProject(
           l,
           projects,
@@ -111,8 +113,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
           (a, f) =>
             toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray, f))) :: Nil
 
-    case PhysicalOperation(
-        projects, filters, l @ LogicalRelation(t: PrunedScan, _, _)) =>
+    case PhysicalOperation(projects,
+                           filters,
+                           l @ LogicalRelation(t: PrunedScan, _, _)) =>
       pruneFilterProject(
           l,
           projects,
@@ -121,8 +124,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
             toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray))) :: Nil
 
     // Scanning partitioned HadoopFsRelation
-    case PhysicalOperation(
-        projects, filters, l @ LogicalRelation(t: HadoopFsRelation, _, _))
+    case PhysicalOperation(projects,
+                           filters,
+                           l @ LogicalRelation(t: HadoopFsRelation, _, _))
         if t.partitionSchema.nonEmpty =>
       // We divide the filter expressions into 3 parts
       val partitionColumns = AttributeSet(
@@ -190,8 +194,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     // a lot of duplication and produces overly complicated RDDs.
 
     // Scanning non-partitioned HadoopFsRelation
-    case PhysicalOperation(
-        projects, filters, l @ LogicalRelation(t: HadoopFsRelation, _, _)) =>
+    case PhysicalOperation(projects,
+                           filters,
+                           l @ LogicalRelation(t: HadoopFsRelation, _, _)) =>
       // See buildPartitionedTableScan for the reason that we need to create a shard
       // broadcast HadoopConf.
       val sharedHadoopConf = SparkHadoopUtil.get.conf
@@ -228,12 +233,12 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
                 }
 
                 val bucketedRDD = new UnionRDD(
-                    t.sqlContext.sparkContext, (0 until spec.numBuckets).map {
-                  bucketId =>
-                    bucketedDataMap.get(bucketId).getOrElse {
-                      t.sqlContext.emptyResult: RDD[InternalRow]
-                    }
-                })
+                    t.sqlContext.sparkContext,
+                    (0 until spec.numBuckets).map { bucketId =>
+                      bucketedDataMap.get(bucketId).getOrElse {
+                        t.sqlContext.emptyResult: RDD[InternalRow]
+                      }
+                    })
                 bucketedRDD
               }
           }
@@ -382,8 +387,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     // Create the scan operator. If needed, add Filter and/or Project on top of the scan.
     // The added Filter/Project is on top of the unioned RDD. We do not want to create
     // one Filter/Project for every partition.
-    val sparkPlan = pruneFilterProject(
-        logicalRelation, projections, filters, scanBuilder)
+    val sparkPlan =
+      pruneFilterProject(logicalRelation, projections, filters, scanBuilder)
 
     sparkPlan
   }
@@ -422,8 +427,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
         partitionColumnSchema.fields.foreach { f =>
           {
             if (f.name.equals(attr.name)) {
-              ColumnVectorUtils.populate(
-                  result.column(resultIdx), partitionValues, partitionIdx)
+              ColumnVectorUtils.populate(result.column(resultIdx),
+                                         partitionValues,
+                                         partitionIdx)
             }
             partitionIdx += 1
           }
@@ -460,8 +466,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
         val mutableJoinedRow = new JoinedRow()
         val unsafePartitionValues =
           UnsafeProjection.create(partitionColumnSchema)(partitionValues)
-        val unsafeProjection = UnsafeProjection.create(
-            requiredColumns, dataColumns ++ partitionColumns)
+        val unsafeProjection = UnsafeProjection
+          .create(requiredColumns, dataColumns ++ partitionColumns)
 
         // If we are returning batches directly, we need to augment them with the partitioning
         // columns. We want to do this without a row by row operation.
@@ -497,8 +503,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       // the call site may add up.
       Utils
         .withDummyCallSite(dataRows.sparkContext) {
-          new MapPartitionsRDD(
-              dataRows, mapPartitionsFunc, preservesPartitioning = false)
+          new MapPartitionsRDD(dataRows,
+                               mapPartitionsFunc,
+                               preservesPartitioning = false)
         }
         .asInstanceOf[RDD[InternalRow]]
     } else {
@@ -554,7 +561,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       // down.
       case expressions.In(a: Attribute, list)
           if list.forall(_.isInstanceOf[Literal]) &&
-          a.name == bucketColumnName =>
+            a.name == bucketColumnName =>
         val hSet = list.map(e => e.eval(EmptyRow))
         hSet.foreach(e => matchedBuckets.set(getBucketId(a, numBuckets, e)))
       case expressions.IsNull(a: Attribute) if a.name == bucketColumnName =>
@@ -618,8 +625,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       }
     }
 
-    val (unhandledPredicates, pushedFilters) = selectFilters(
-        relation.relation, candidatePredicates)
+    val (unhandledPredicates, pushedFilters) =
+      selectFilters(relation.relation, candidatePredicates)
 
     // A set of column attributes that are only referenced by pushed down filters.  We can eliminate
     // them from requested columns.
@@ -704,8 +711,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
   /**
     * Convert RDD of Row into RDD of InternalRow with objects in catalyst types
     */
-  private[this] def toCatalystRDD(
-      relation: LogicalRelation, rdd: RDD[Row]): RDD[InternalRow] = {
+  private[this] def toCatalystRDD(relation: LogicalRelation,
+                                  rdd: RDD[Row]): RDD[InternalRow] = {
     toCatalystRDD(relation, relation.output, rdd)
   }
 
@@ -777,16 +784,16 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       case expressions.Not(child) =>
         translateFilter(child).map(sources.Not)
 
-      case expressions.StartsWith(
-          a: Attribute, Literal(v: UTF8String, StringType)) =>
+      case expressions
+            .StartsWith(a: Attribute, Literal(v: UTF8String, StringType)) =>
         Some(sources.StringStartsWith(a.name, v.toString))
 
-      case expressions.EndsWith(
-          a: Attribute, Literal(v: UTF8String, StringType)) =>
+      case expressions
+            .EndsWith(a: Attribute, Literal(v: UTF8String, StringType)) =>
         Some(sources.StringEndsWith(a.name, v.toString))
 
-      case expressions.Contains(
-          a: Attribute, Literal(v: UTF8String, StringType)) =>
+      case expressions
+            .Contains(a: Attribute, Literal(v: UTF8String, StringType)) =>
         Some(sources.StringContains(a.name, v.toString))
 
       case _ => None

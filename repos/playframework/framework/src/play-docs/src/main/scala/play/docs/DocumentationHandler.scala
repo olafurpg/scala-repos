@@ -17,8 +17,9 @@ import play.doc.{FileRepository, PlayDoc, RenderedPage, PageIndex}
   * Documentation is located in the given repository - either a JAR file or directly from
   * the filesystem.
   */
-class DocumentationHandler(
-    repo: FileRepository, apiRepo: FileRepository, toClose: Closeable)
+class DocumentationHandler(repo: FileRepository,
+                           apiRepo: FileRepository,
+                           toClose: Closeable)
     extends BuildDocHandler
     with Closeable {
 

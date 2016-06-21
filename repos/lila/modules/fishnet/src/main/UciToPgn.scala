@@ -34,7 +34,7 @@ private object UciToPgn {
                      replay moveAtPly ply map
                      (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
         ucis ← variation.map(Uci.Move.apply).sequence toValid "Invalid UCI moves " +
-              variation
+                variation
         moves ← ucis.foldLeft[Valid[(Situation, List[Move])]](
                    success(situation -> Nil)) {
                  case (scalaz.Success((sit, moves)), uci) =>

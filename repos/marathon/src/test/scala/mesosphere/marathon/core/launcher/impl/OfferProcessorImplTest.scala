@@ -273,8 +273,9 @@ class OfferProcessorImplTest
     Await.result(offerProcessor.processOffer(offer), 1.second)
 
     verify(offerMatcher).matchOffer(deadline, offer)
-    verify(taskLauncher).declineOffer(
-        offerId, refuseMilliseconds = Some(conf.declineOfferDuration()))
+    verify(taskLauncher).declineOffer(offerId,
+                                      refuseMilliseconds =
+                                        Some(conf.declineOfferDuration()))
   }
 
   test("match crashed => decline") {
@@ -319,8 +320,8 @@ class OfferProcessorImplTest
     import org.apache.mesos.{Protos => Mesos}
     val launch = new TaskOpFactoryHelper(Some("principal"), Some("role"))
       .launch(_: Mesos.TaskInfo, _: Task, None)
-    val launchWithOldTask = new TaskOpFactoryHelper(
-        Some("principal"), Some("role")).launch _
+    val launchWithOldTask =
+      new TaskOpFactoryHelper(Some("principal"), Some("role")).launch _
   }
 
   class DummySource extends TaskOpSource {

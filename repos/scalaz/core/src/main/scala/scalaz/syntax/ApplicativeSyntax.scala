@@ -2,8 +2,8 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Applicative` */
-final class ApplicativeOps[F[_], A] private[syntax](val self: F[A])(
-    implicit val F: Applicative[F])
+final class ApplicativeOps[F[_], A] private[syntax] (
+    val self: F[A])(implicit val F: Applicative[F])
     extends Ops[F[A]] {
   ////
   final def unlessM(cond: Boolean): F[Unit] =

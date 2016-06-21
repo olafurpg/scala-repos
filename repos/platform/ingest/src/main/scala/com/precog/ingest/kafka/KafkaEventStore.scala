@@ -52,8 +52,8 @@ import scalaz.\/._
 import scalaz.syntax.std.option._
 
 object KafkaEventStore {
-  def apply(
-      config: Configuration, permissionsFinder: PermissionsFinder[Future])(
+  def apply(config: Configuration,
+            permissionsFinder: PermissionsFinder[Future])(
       implicit executor: ExecutionContext)
     : Validation[NEL[String], (EventStore[Future], Stoppable)] = {
     val localConfig = config.detach("local")
@@ -67,35 +67,37 @@ object KafkaEventStore {
       .toSuccess(NEL("central.zk.connect configuration parameter is required")) map {
       centralZookeeperHosts =>
         val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
-        val coordination = ZookeeperSystemCoordination(
-            centralZookeeperHosts, serviceUID, yggCheckpointsEnabled = true)
+        val coordination = ZookeeperSystemCoordination(centralZookeeperHosts,
+                                                       serviceUID,
+                                                       yggCheckpointsEnabled =
+                                                         true)
         val agent = serviceUID.hostId + serviceUID.serviceId
 
         val eventIdSeq = SystemEventIdSequence(agent, coordination)
         val Some((eventStore, esStop)) = LocalKafkaEventStore(localConfig)
 
-        val stoppables =
-          if (config[Boolean]("relay_data", true)) {
-            val (_, raStop) = KafkaRelayAgent(
-                permissionsFinder, eventIdSeq, localConfig, centralConfig)
-            esStop.parent(raStop)
-          } else esStop
+        val stoppables = if (config[Boolean]("relay_data", true)) {
+          val (_, raStop) = KafkaRelayAgent(permissionsFinder,
+                                            eventIdSeq,
+                                            localConfig,
+                                            centralConfig)
+          esStop.parent(raStop)
+        } else esStop
 
         (eventStore, stoppables)
     }
   }
 }
 
-class LocalKafkaEventStore(producer: Producer[String, Message],
-                           topic: String,
-                           maxMessageSize: Int,
-                           messagePadding: Int)(
-    implicit executor: ExecutionContext)
+class LocalKafkaEventStore(
+    producer: Producer[String, Message],
+    topic: String,
+    maxMessageSize: Int,
+    messagePadding: Int)(implicit executor: ExecutionContext)
     extends EventStore[Future]
     with Logging {
-  logger.info(
-      "Creating LocalKafkaEventStore for %s with max message size = %d".format(
-          topic, maxMessageSize))
+  logger.info("Creating LocalKafkaEventStore for %s with max message size = %d"
+        .format(topic, maxMessageSize))
   private[this] val codec = new KafkaEventCodec
   private implicit val M = new blueeyes.bkka.FutureMonad(executor)
 
@@ -164,7 +166,10 @@ object LocalKafkaEventStore {
       new Producer[String, Message](new ProducerConfig(localProperties))
     val stoppable = Stoppable.fromFuture(Future { producer.close })
 
-    Some(new LocalKafkaEventStore(
-            producer, localTopic, maxMessageSize, messagePadding) -> stoppable)
+    Some(
+        new LocalKafkaEventStore(producer,
+                                 localTopic,
+                                 maxMessageSize,
+                                 messagePadding) -> stoppable)
   }
 }

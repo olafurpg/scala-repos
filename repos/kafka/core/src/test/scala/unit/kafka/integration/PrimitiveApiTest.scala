@@ -79,7 +79,7 @@ class PrimitiveApiTest
     val replica = servers.head.replicaManager.getReplica(topic, 0).get
     assertTrue("HighWatermark should equal logEndOffset with just 1 replica",
                replica.logEndOffset.messageOffset > 0 &&
-               replica.logEndOffset.equals(replica.highWatermark))
+                 replica.logEndOffset.equals(replica.highWatermark))
 
     val request = new FetchRequestBuilder()
       .clientId("test-client")
@@ -127,8 +127,8 @@ class PrimitiveApiTest
   }
 
   private def produceAndMultiFetch(producer: Producer[String, String]) {
-    for (topic <- List("test1", "test2", "test3", "test4")) TestUtils
-      .createTopic(zkUtils, topic, servers = servers)
+    for (topic <- List("test1", "test2", "test3", "test4"))
+      TestUtils.createTopic(zkUtils, topic, servers = servers)
 
     // send some messages
     val topics = List(("test4", 0), ("test1", 0), ("test2", 0), ("test3", 0));
@@ -161,8 +161,8 @@ class PrimitiveApiTest
     {
       // send some invalid offsets
       val builder = new FetchRequestBuilder()
-      for ((topic, partition) <- topics) builder.addFetch(
-          topic, partition, -1, 10000)
+      for ((topic, partition) <- topics)
+        builder.addFetch(topic, partition, -1, 10000)
 
       try {
         val request = builder.build()

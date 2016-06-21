@@ -189,5 +189,6 @@ class AsyncCommandExecutor[T <: Command, S](
   */
 class AsyncModelExecutor[T <: Command, S](
     handle: S => Future[ModelValidation[S]])(
-    implicit executionContext: ExecutionContext, vw: T => S)
+    implicit executionContext: ExecutionContext,
+    vw: T => S)
     extends AsyncExecutor[T, S](handle(_))(executionContext)

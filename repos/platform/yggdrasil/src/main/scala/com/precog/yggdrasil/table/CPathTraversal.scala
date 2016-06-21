@@ -43,8 +43,8 @@ sealed trait CPathTraversal { self =>
     */
   def rowOrder(cpaths: List[CPath],
                left: Map[CPath, Set[Column]],
-               optRight: Option[Map[CPath, Set[Column]]] =
-                 None): spire.math.Order[Int] = {
+               optRight: Option[Map[CPath, Set[Column]]] = None)
+    : spire.math.Order[Int] = {
     val right = optRight getOrElse left
 
     def plan0(t: CPathTraversal,
@@ -64,14 +64,15 @@ sealed trait CPathTraversal { self =>
         val rCols = makeCols(right)
 
         val comparators: Array[CPathComparator] = (for ((lPath, lCol) <- lCols;
-                                                        (rPath, rCol) <- rCols) yield {
-          CPathComparator(lPath, lCol, rPath, rCol)
-        })(collection.breakOut)
+                                                        (rPath, rCol) <- rCols)
+          yield {
+            CPathComparator(lPath, lCol, rPath, rCol)
+          })(collection.breakOut)
 
         // Return the first column in the array defined at the row, or -1 if none are defined for that row
         @inline
-        def firstDefinedIndexFor(
-            columns: Array[(CPath, Column)], row: Int): Int = {
+        def firstDefinedIndexFor(columns: Array[(CPath, Column)],
+                                 row: Int): Int = {
           var i = 0
           while (i < columns.length && !columns(i)._2.isDefinedAt(row)) {
             i += 1
@@ -224,8 +225,8 @@ object CPathTraversal {
     }
 
     // Joins (merges) a list of sorted traversals into a single traversal.
-    def join(
-        os: List[CPathTraversal], seq: List[CPathTraversal]): CPathTraversal =
+    def join(os: List[CPathTraversal],
+             seq: List[CPathTraversal]): CPathTraversal =
       os match {
         case Select(n, t) :: os =>
           val (ts, os2) = collectWhile(os) { case Select(`n`, t2) => t2 }
@@ -270,8 +271,9 @@ object CPathTraversal {
 
   private sealed trait CPathPosition
   private case class CPathPoint(node: CPathNode) extends CPathPosition
-  private case class CPathRange(
-      nodes: Set[CPathNode], start: Int, end: Option[Int])
+  private case class CPathRange(nodes: Set[CPathNode],
+                                start: Int,
+                                end: Option[Int])
       extends CPathPosition
 
   private object CPathPosition {
@@ -341,8 +343,10 @@ object CPathTraversal {
       case node => CPathPoint(node)
     }
 
-    private def overlaps(
-        l1: Int, r1: Option[Int], l2: Int, r2: Option[Int]): Boolean = {
+    private def overlaps(l1: Int,
+                         r1: Option[Int],
+                         l2: Int,
+                         r2: Option[Int]): Boolean = {
       (l2 >= l1 && l2 <= r1.getOrElse(l2)) ||
       (l1 >= l2 && l1 <= r2.getOrElse(l1))
     }
@@ -369,46 +373,40 @@ object CPathTraversal {
           case (p :: ps, q :: qs) if p == q =>
             loop(ps, qs, p :: is, rss)
 
-          case (
-              CPathPoint(n @ CPathIndex(i)) :: ps, CPathRange(ns, j, k) :: qs)
-              if i >= j && i <= k.getOrElse(i) =>
-            val rss0 =
-              if (j < i) {
-                ((CPathRange(ns, j, Some(i - 1)) :: is) reverse_::: qs) :: rss
-              } else rss
+          case (CPathPoint(n @ CPathIndex(i)) :: ps,
+                CPathRange(ns, j, k) :: qs) if i >= j && i <= k.getOrElse(i) =>
+            val rss0 = if (j < i) {
+              ((CPathRange(ns, j, Some(i - 1)) :: is) reverse_::: qs) :: rss
+            } else rss
 
-            val rss1 =
-              if (k map (_ > i) getOrElse true) {
-                ((CPathRange(ns, i + 1, k) :: is) reverse_::: qs) :: rss0
-              } else rss0
+            val rss1 = if (k map (_ > i) getOrElse true) {
+              ((CPathRange(ns, i + 1, k) :: is) reverse_::: qs) :: rss0
+            } else rss0
 
             loop(ps, qs, CPathRange(ns + n, i, Some(i)) :: is, rss1)
 
-          case (
-              CPathRange(ns, j, k) :: ps, CPathPoint(n @ CPathIndex(i)) :: qs)
+          case (CPathRange(ns, j, k) :: ps,
+                CPathPoint(n @ CPathIndex(i)) :: qs)
               if i >= j && i <= k.getOrElse(i) =>
-            val rss0 =
-              if (j < i) {
-                ((CPathRange(ns, j, Some(i - 1)) :: is) reverse_::: ps) :: rss
-              } else rss
+            val rss0 = if (j < i) {
+              ((CPathRange(ns, j, Some(i - 1)) :: is) reverse_::: ps) :: rss
+            } else rss
 
-            val rss1 =
-              if (k map (_ > i) getOrElse true) {
-                ((CPathRange(ns, i + 1, k) :: is) reverse_::: ps) :: rss0
-              } else rss0
+            val rss1 = if (k map (_ > i) getOrElse true) {
+              ((CPathRange(ns, i + 1, k) :: is) reverse_::: ps) :: rss0
+            } else rss0
 
             loop(ps, qs, CPathRange(ns + n, i, Some(i)) :: is, rss1)
 
           case (CPathRange(ns1, l1, r1) :: ps, CPathRange(ns2, l2, r2) :: qs)
               if overlaps(l1, r1, l2, r2) =>
-            val rss0 =
-              if (l1 < l2) {
-                ((CPathRange(ns1, l1, Some(l2 - 1)) :: is) reverse_::: ps) :: rss
-              } else if (l2 < l1) {
-                ((CPathRange(ns2, l2, Some(l1 - 1)) :: is) reverse_::: qs) :: rss
-              } else {
-                rss
-              }
+            val rss0 = if (l1 < l2) {
+              ((CPathRange(ns1, l1, Some(l2 - 1)) :: is) reverse_::: ps) :: rss
+            } else if (l2 < l1) {
+              ((CPathRange(ns2, l2, Some(l1 - 1)) :: is) reverse_::: qs) :: rss
+            } else {
+              rss
+            }
 
             val rss1 = (r1, r2) match {
               case (r1, Some(r2)) if r1 map (_ > r2) getOrElse true =>

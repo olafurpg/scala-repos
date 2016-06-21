@@ -28,8 +28,8 @@ class LatencyCompensationTest
       val description = "Verify stack behavior"
       val parameters = Seq(
           implicitly[Stack.Param[LatencyCompensation.Compensator]])
-      def make(
-          prms: Stack.Params, next: Stack[ServiceFactory[String, String]]) = {
+      def make(prms: Stack.Params,
+               next: Stack[ServiceFactory[String, String]]) = {
         val LatencyCompensation.Compensation(compensation) =
           prms[LatencyCompensation.Compensation]
         assert(expected == compensation)
@@ -118,8 +118,8 @@ class LatencyCompensationTest
       val client =
         echoClient.newService(Name.Bound(Var.value(addr), "id"), "label")
 
-      try f(client) finally Await.result(
-          client.close() join server.close(), 10.seconds)
+      try f(client) finally Await
+        .result(client.close() join server.close(), 10.seconds)
     }
   }
 

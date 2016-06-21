@@ -66,8 +66,8 @@ class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
       Future.successful(cache.keySet.toSeq)
   }
 
-  override def expunge(
-      key: String, onSuccess: () => Unit = () => ()): Future[Boolean] =
+  override def expunge(key: String,
+                       onSuccess: () => Unit = () => ()): Future[Boolean] =
     directOrCached(store.expunge(key, onSuccess)) { cache =>
       def onExpunged(): Unit = {
         cache.remove(key)

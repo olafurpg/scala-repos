@@ -23,7 +23,8 @@ object CharEncodingSpec extends Specification {
         Enumerator(input: _*) &> CharEncoding.decode("US-ASCII") |>>> Iteratee
           .consume[String]()
       Await.result(result, Duration.Inf) must be equalTo new String(
-          input.flatten.toArray, "US-ASCII")
+          input.flatten.toArray,
+          "US-ASCII")
     }
 
     "decode UTF-8" in {
@@ -36,7 +37,8 @@ object CharEncodingSpec extends Specification {
         Enumerator(input: _*) &> CharEncoding.decode("UTF-8") |>>> Iteratee
           .consume[String]()
       Await.result(result, Duration.Inf) must be equalTo new String(
-          input.flatten.toArray, "UTF-8")
+          input.flatten.toArray,
+          "UTF-8")
     }
 
     "decode UTF-8 with split characters" in {

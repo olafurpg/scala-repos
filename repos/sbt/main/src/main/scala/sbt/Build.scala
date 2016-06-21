@@ -59,12 +59,15 @@ object Build {
     defaultProject(defaultID(base), base)
   def defaultProject(id: String, base: File): Project =
     Project(id, base).settings(defaultProjectSettings)
-  def defaultAggregatedProject(
-      id: String, base: File, agg: Seq[ProjectRef]): Project =
+  def defaultAggregatedProject(id: String,
+                               base: File,
+                               agg: Seq[ProjectRef]): Project =
     defaultProject(id, base).aggregate(agg: _*)
 
   private[sbt] def generatedRootWithoutIvyPlugin(
-      id: String, base: File, agg: Seq[ProjectRef]): Project =
+      id: String,
+      base: File,
+      agg: Seq[ProjectRef]): Project =
     Project.mkGeneratedRoot(id, base, agg).settings(defaultProjectSettings)
   private[sbt] def defaultProjectSettings: Seq[Setting[_]] = Seq(
       // TODO - Can we move this somewhere else?  ordering of settings is causing this to get borked.

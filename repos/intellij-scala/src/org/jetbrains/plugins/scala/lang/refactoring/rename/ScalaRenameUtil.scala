@@ -180,13 +180,15 @@ object ScalaRenameUtil {
     }
     modified.foreach {
       case UsagesWithName(name, usagez) if usagez.nonEmpty =>
-        RenameUtil.doRenameGenericNamedElement(
-            namedElement, name, usagez, listener)
+        RenameUtil
+          .doRenameGenericNamedElement(namedElement, name, usagez, listener)
       case _ =>
     }
     //to guarantee correct name of namedElement itself
-    RenameUtil.doRenameGenericNamedElement(
-        namedElement, newName, Array.empty[UsageInfo], listener)
+    RenameUtil.doRenameGenericNamedElement(namedElement,
+                                           newName,
+                                           Array.empty[UsageInfo],
+                                           listener)
   }
 
   def setterSuffix(name: String) = {
@@ -200,6 +202,6 @@ object ScalaRenameUtil {
       .map(_.getTextRange)
     newElemRange.exists(nr =>
           nr.getStartOffset == range.getStartOffset &&
-          nr.getEndOffset == range.getEndOffset)
+            nr.getEndOffset == range.getEndOffset)
   }
 }

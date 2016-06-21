@@ -13,8 +13,8 @@ import annotation.tailrec
   * @param maxCapacity - the maximum capacity of this Queue, needs to be &gt; 0
   * @param backing - the backing Queue
   */
-class BoundedBlockingQueue[E <: AnyRef](
-    val maxCapacity: Int, private val backing: Queue[E])
+class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
+                                        private val backing: Queue[E])
     extends AbstractQueue[E]
     with BlockingQueue[E] {
 
@@ -113,9 +113,9 @@ class BoundedBlockingQueue[E <: AnyRef](
           case null if remainingNanos <= 0 ⇒ null.asInstanceOf[E]
           case null ⇒ pollElement(notEmpty.awaitNanos(remainingNanos))
           case e ⇒ {
-              notFull.signal()
-              e
-            }
+            notFull.signal()
+            e
+          }
         }
       }
       pollElement(unit.toNanos(timeout))
@@ -255,8 +255,8 @@ class BoundedBlockingQueue[E <: AnyRef](
           last = -1 //To avoid 2 subsequent removes without a next in between
           lock.lock()
           try {
-            @tailrec def removeTarget(i: Iterator[E] =
-                  backing.iterator()): Unit =
+            @tailrec def removeTarget(i: Iterator[E] = backing.iterator())
+              : Unit =
               if (i.hasNext) {
                 if (i.next eq target) {
                   i.remove()

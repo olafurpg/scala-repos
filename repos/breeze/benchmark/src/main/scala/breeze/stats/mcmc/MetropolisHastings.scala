@@ -19,7 +19,7 @@ class MetropolisHastingsBenchmark extends BreezeBenchmark {
   val epsilon = 1e-8
   def likelihood(x: Double) =
     2 * math.log1p(1 + epsilon - x) +
-    3 * math.log1p(x * x * x + epsilon) //Epsilon is present to avoid throwing exceptions in the unlikely event either 0 or 1 is sampled
+      3 * math.log1p(x * x * x + epsilon) //Epsilon is present to avoid throwing exceptions in the unlikely event either 0 or 1 is sampled
 
   def gaussianJump(x: Double) = Gaussian(x, 1)
   def gaussianJumpLogProb(start: Double, end: Double) =

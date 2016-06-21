@@ -62,10 +62,10 @@ object Versions {
       }
     } catch {
       case ex: Throwable => {
-          logger.error("Failed to schema update", ex)
-          ex.printStackTrace()
-          conn.rollback()
-        }
+        logger.error("Failed to schema update", ex)
+        ex.printStackTrace()
+        conn.rollback()
+      }
     }
     logger.debug("End schema update")
   }

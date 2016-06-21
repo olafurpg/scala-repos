@@ -30,7 +30,8 @@ class SourceTrackingMonitor(logger: Logger, which: String) extends Monitor {
   }
 
   private[this] def unrollCauses(
-      exc: Throwable, res: Seq[String] = Nil): Seq[String] = exc match {
+      exc: Throwable,
+      res: Seq[String] = Nil): Seq[String] = exc match {
     case null => res.reverse
     case se: SourcedException =>
       unrollCauses(se.getCause, se.serviceName +: res)

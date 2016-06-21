@@ -24,8 +24,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
     })
 
   def cojoin(implicit F: Cobind[F]): OneOr[F, OneOr[F, A]] =
-    OneOr(
-        run match {
+    OneOr(run match {
       case \/-(_) =>
         \/-(this)
       case -\/(a) =>
@@ -33,8 +32,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
     })
 
   def cobind[B](f: OneOr[F, A] => B)(implicit F: Cobind[F]): OneOr[F, B] =
-    OneOr(
-        run match {
+    OneOr(run match {
       case \/-(_) =>
         \/-(f(this))
       case -\/(a) =>
@@ -93,8 +91,8 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         F.foldMapLeft1(a)(z)(f)
     }
 
-  def traverse[G[_], B](f: A => G[B])(
-      implicit T: Traverse[F], F: Applicative[G]): G[OneOr[F, B]] =
+  def traverse[G[_], B](f: A => G[B])(implicit T: Traverse[F],
+                                      F: Applicative[G]): G[OneOr[F, B]] =
     run match {
       case \/-(a) =>
         F.map(f(a))(t => OneOr(\/-(t)))
@@ -102,8 +100,8 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         F.map(T.traverse(a)(f))(t => OneOr(-\/(t)))
     }
 
-  def traverse1[G[_], B](f: A => G[B])(
-      implicit T: Traverse1[F], F: Apply[G]): G[OneOr[F, B]] =
+  def traverse1[G[_], B](f: A => G[B])(implicit T: Traverse1[F],
+                                       F: Apply[G]): G[OneOr[F, B]] =
     run match {
       case \/-(a) =>
         F.map(f(a))(t => OneOr(\/-(t)))
@@ -267,15 +265,15 @@ sealed abstract class OneOrInstances extends OneOrInstances0 {
       def F = implicitly
     }
 
-  implicit def OneOrEqual[F[_], A](
-      implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
+  implicit def OneOrEqual[F[_], A](implicit oa: Equal[A],
+                                   ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
     new OneOrEqual[F, A] {
       def OA = implicitly
       def OFA = implicitly
     }
 
-  implicit def OneOrShow[F[_], A](
-      implicit oa: Show[A], ofa: Show[F[A]]): Show[OneOr[F, A]] =
+  implicit def OneOrShow[F[_], A](implicit oa: Show[A],
+                                  ofa: Show[F[A]]): Show[OneOr[F, A]] =
     new OneOrShow[F, A] {
       def OA = implicitly
       def OFA = implicitly
@@ -288,8 +286,8 @@ sealed abstract class OneOrInstances0 extends OneOrInstances1 {
       def F = implicitly
     }
 
-  implicit def OneOrOrder[F[_], A](
-      implicit oa: Order[A], ofa: Order[F[A]]): Order[OneOr[F, A]] =
+  implicit def OneOrOrder[F[_], A](implicit oa: Order[A],
+                                   ofa: Order[F[A]]): Order[OneOr[F, A]] =
     new OneOrOrder[F, A] {
       def OA = implicitly
       def OFA = implicitly

@@ -59,7 +59,7 @@ object UnwrappedExamples {
       encodeRest: Strict[Encode[Rest]]) = new Encode[FieldType[K, V] :: Rest] {
       def fields(hl: FieldType[K, V] :: Rest) =
         encodeRest.value.fields(hl.tail) +
-        (key.value.name -> encodeV.value.toJsonFragment(hl.head))
+          (key.value.name -> encodeV.value.toJsonFragment(hl.head))
     }
     // the magic one!
     implicit def encodeGeneric[T, Repr](

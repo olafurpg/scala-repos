@@ -67,8 +67,8 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     */
   val selfUniqueAddress: UniqueAddress = system.provider match {
     case c: ClusterActorRefProvider ⇒
-      UniqueAddress(
-          c.transport.defaultAddress, AddressUidExtension(system).addressUid)
+      UniqueAddress(c.transport.defaultAddress,
+                    AddressUidExtension(system).addressUid)
     case other ⇒
       throw new ConfigurationException(
           s"ActorSystem [${system}] needs to have a 'ClusterActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
@@ -117,7 +117,7 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     if (system.scheduler.maxFrequency < 1.second / SchedulerTickDuration) {
       logInfo(
           "Using a dedicated scheduler for cluster. Default scheduler can be used if configured " +
-          "with 'akka.scheduler.tick-duration' [{} ms] <=  'akka.cluster.scheduler.tick-duration' [{} ms].",
+            "with 'akka.scheduler.tick-duration' [{} ms] <=  'akka.cluster.scheduler.tick-duration' [{} ms].",
           (1000 / system.scheduler.maxFrequency).toInt,
           SchedulerTickDuration.toMillis)
 
@@ -246,13 +246,13 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   def subscribe(subscriber: ActorRef,
                 initialStateMode: SubscriptionInitialStateMode,
                 to: Class[_]*): Unit = {
-    require(
-        to.length > 0, "at least one `ClusterDomainEvent` class is required")
+    require(to.length > 0,
+            "at least one `ClusterDomainEvent` class is required")
     require(
         to.forall(classOf[ClusterDomainEvent].isAssignableFrom),
         s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")
-    clusterCore ! InternalClusterAction.Subscribe(
-        subscriber, initialStateMode, to.toSet)
+    clusterCore ! InternalClusterAction
+      .Subscribe(subscriber, initialStateMode, to.toSet)
   }
 
   /**

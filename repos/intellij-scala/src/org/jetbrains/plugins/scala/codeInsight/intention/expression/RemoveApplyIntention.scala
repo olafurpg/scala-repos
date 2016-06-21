@@ -33,8 +33,9 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -99,16 +100,16 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
             val clazz: Option[ScTemplateDefinition] = expr.getParent match {
               case _ if expr.isInstanceOf[ScClassParameter] =>
                 Option(
-                    PsiTreeUtil.getParentOfType(
-                        expr, classOf[ScTemplateDefinition]))
+                    PsiTreeUtil.getParentOfType(expr,
+                                                classOf[ScTemplateDefinition]))
               case _: ScEarlyDefinitions =>
                 Option(
-                    PsiTreeUtil.getParentOfType(
-                        expr, classOf[ScTemplateDefinition]))
+                    PsiTreeUtil.getParentOfType(expr,
+                                                classOf[ScTemplateDefinition]))
               case _: ScTemplateBody =>
                 Option(
-                    PsiTreeUtil.getParentOfType(
-                        expr, classOf[ScTemplateDefinition]))
+                    PsiTreeUtil.getParentOfType(expr,
+                                                classOf[ScTemplateDefinition]))
               case _ => None
             }
 
@@ -143,8 +144,8 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
 
             if (flag) {
               showErrorHint(
-                  InspectionBundle.message(
-                      "remove.apply.overloaded", namedElement.name))
+                  InspectionBundle.message("remove.apply.overloaded",
+                                           namedElement.name))
               return
             }
           case _ =>
@@ -213,8 +214,8 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
     }
 
     buf.append(expr.args.getText)
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        buf.toString(), element.getManager)
+    val newExpr = ScalaPsiElementFactory
+      .createExpressionFromText(buf.toString(), element.getManager)
 
     inWriteAction {
       expr.replace(newExpr)

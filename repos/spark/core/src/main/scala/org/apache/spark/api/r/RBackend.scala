@@ -113,8 +113,8 @@ private[spark] object RBackend extends Logging {
     try {
       // bind to random port
       val boundPort = sparkRBackend.init()
-      val serverSocket = new ServerSocket(
-          0, 1, InetAddress.getByName("localhost"))
+      val serverSocket =
+        new ServerSocket(0, 1, InetAddress.getByName("localhost"))
       val listenPort = serverSocket.getLocalPort()
 
       // tell the R process via temporary file

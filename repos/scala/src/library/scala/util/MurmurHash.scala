@@ -183,8 +183,7 @@ object MurmurHash {
   def symmetricHash[T](xs: scala.collection.TraversableOnce[T], seed: Int) = {
     var a, b, n = 0
     var c = 1
-    xs.seq.foreach(
-        i => {
+    xs.seq.foreach(i => {
       val h = i.##
       a += h
       b ^= h

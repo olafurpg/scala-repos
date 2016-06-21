@@ -28,10 +28,8 @@ import org.apache.spark.sql.types.{DataType, IntegerType}
 class HyperLogLogPlusPlusSuite extends SparkFunSuite {
 
   /** Create a HLL++ instance and an input and output buffer. */
-  def createEstimator(
-      rsd: Double,
-      dt: DataType =
-        IntegerType): (HyperLogLogPlusPlus, MutableRow, MutableRow) = {
+  def createEstimator(rsd: Double, dt: DataType = IntegerType)
+    : (HyperLogLogPlusPlus, MutableRow, MutableRow) = {
     val input = new SpecificMutableRow(Seq(dt))
     val hll = new HyperLogLogPlusPlus(new BoundReference(0, dt, true), rsd)
     val buffer = createBuffer(hll)
@@ -46,8 +44,9 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
   }
 
   /** Evaluate the estimate. It should be within 3*SD's of the given true rsd. */
-  def evaluateEstimate(
-      hll: HyperLogLogPlusPlus, buffer: MutableRow, cardinality: Int): Unit = {
+  def evaluateEstimate(hll: HyperLogLogPlusPlus,
+                       buffer: MutableRow,
+                       cardinality: Int): Unit = {
     val estimate = hll.eval(buffer).asInstanceOf[Long].toDouble
     val error = math.abs((estimate / cardinality.toDouble) - 1.0d)
     assert(error < hll.trueRsd * 3.0d, "Error should be within 3 std. errors.")
@@ -87,8 +86,8 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
     val repeats = 10
     testCardinalityEstimates(
         Seq(0.1, 0.05, 0.025, 0.01),
-        Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000)
-          .map(_ * repeats),
+        Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000).map(
+            _ * repeats),
         i => i / repeats,
         i => i / repeats)
   }
@@ -106,8 +105,10 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
       seen.clear()
       cardinality
     }
-    testCardinalityEstimates(
-        Seq(0.05, 0.01), Seq(100, 10000, 500000), update, eval)
+    testCardinalityEstimates(Seq(0.05, 0.01),
+                             Seq(100, 10000, 500000),
+                             update,
+                             eval)
   }
 
   // Test merging

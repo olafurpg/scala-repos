@@ -22,8 +22,8 @@ object EventBusSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-abstract class EventBusSpec(
-    busName: String, conf: Config = ConfigFactory.empty())
+abstract class EventBusSpec(busName: String,
+                            conf: Config = ConfigFactory.empty())
     extends AkkaSpec(conf)
     with BeforeAndAfterEach {
   type BusType <: EventBus
@@ -36,8 +36,8 @@ abstract class EventBusSpec(
 
   def classifierFor(event: BusType#Event): BusType#Classifier
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit
 
   lazy val bus = createNewEventBus()
 
@@ -201,8 +201,8 @@ class ActorEventBusSpec(conf: Config)
 
   def classifierFor(event: BusType#Event) = event.ref
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit =
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit =
     system.stop(subscriber)
 
   // ManagedActorClassification specific tests
@@ -340,8 +340,8 @@ class ScanningEventBusSpec extends EventBusSpec("ScanningEventBus") {
 
   def classifierFor(event: BusType#Event) = event.toString
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit = ()
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit = ()
 }
 
 object LookupEventBusSpec {
@@ -351,12 +351,12 @@ object LookupEventBusSpec {
     type Classifier = String
 
     override protected def classify(event: Int): String = event.toString
-    override protected def compareSubscribers(
-        a: Procedure[Int], b: Procedure[Int]): Int =
+    override protected def compareSubscribers(a: Procedure[Int],
+                                              b: Procedure[Int]): Int =
       akka.util.Helpers.compareIdentityHash(a, b)
     override protected def mapSize = 32
-    override protected def publish(
-        event: Int, subscriber: Procedure[Int]): Unit =
+    override protected def publish(event: Int,
+                                   subscriber: Procedure[Int]): Unit =
       subscriber(event)
   }
 }
@@ -376,6 +376,6 @@ class LookupEventBusSpec extends EventBusSpec("LookupEventBus") {
 
   def classifierFor(event: BusType#Event) = event.toString
 
-  def disposeSubscriber(
-      system: ActorSystem, subscriber: BusType#Subscriber): Unit = ()
+  def disposeSubscriber(system: ActorSystem,
+                        subscriber: BusType#Subscriber): Unit = ()
 }

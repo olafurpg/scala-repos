@@ -50,8 +50,8 @@ object TreeSet extends MutableSortedSetFactory[TreeSet] {
   */
 // Original API designed in part by Lucien Pereira
 @SerialVersionUID(-3642111301929493640L)
-sealed class TreeSet[A] private (tree: RB.Tree[A, Null])(
-    implicit val ordering: Ordering[A])
+sealed class TreeSet[A] private (
+    tree: RB.Tree[A, Null])(implicit val ordering: Ordering[A])
     extends AbstractSortedSet[A]
     with SortedSet[A]
     with SetLike[A, TreeSet[A]]

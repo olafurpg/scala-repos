@@ -18,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
     extends ScStubElementType[ScVariableStub, ScVariable](debugName) {
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScVariable, parentStub: StubElement[ParentPsi]): ScVariableStub = {
+      psi: ScVariable,
+      parentStub: StubElement[ParentPsi]): ScVariableStub = {
     val isDecl = psi.isInstanceOf[ScVariableDeclaration]
     val typeText = psi.typeElement match {
       case Some(te) => te.getText
@@ -57,20 +58,26 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
     dataStream.writeBoolean(stub.isLocal)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScVariableStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScVariableStub = {
     val isDecl = dataStream.readBoolean
     val namesLength = dataStream.readInt
     val names = new Array[String](namesLength)
-    for (i <- 0 to (namesLength - 1)) names(i) =
-      StringRef.toString(dataStream.readName)
+    for (i <- 0 to (namesLength - 1))
+      names(i) = StringRef.toString(dataStream.readName)
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
     val typeText = StringRef.toString(dataStream.readName)
     val bodyText = StringRef.toString(dataStream.readName)
     val bindingsText = StringRef.toString(dataStream.readName)
     val isLocal = dataStream.readBoolean()
-    new ScVariableStubImpl(
-        parent, this, names, isDecl, typeText, bodyText, bindingsText, isLocal)
+    new ScVariableStubImpl(parent,
+                           this,
+                           names,
+                           isDecl,
+                           typeText,
+                           bodyText,
+                           bindingsText,
+                           isLocal)
   }
 
   def indexStub(stub: ScVariableStub, sink: IndexSink) {

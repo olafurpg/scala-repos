@@ -49,13 +49,15 @@ trait ParquetTupleSource extends FileSource with HasFilterPredicate {
   * See [[com.twitter.scalding.parquet.thrift.DailySuffixParquetThrift]] for documentation on
   * how to specify filter predicates for these sources.
   */
-class DailySuffixParquetTuple(
-    path: String, dateRange: DateRange, override val fields: Fields)
+class DailySuffixParquetTuple(path: String,
+                              dateRange: DateRange,
+                              override val fields: Fields)
     extends DailySuffixSource(path, dateRange)
     with ParquetTupleSource
 
-class HourlySuffixParquetTuple(
-    path: String, dateRange: DateRange, override val fields: Fields)
+class HourlySuffixParquetTuple(path: String,
+                               dateRange: DateRange,
+                               override val fields: Fields)
     extends HourlySuffixSource(path, dateRange)
     with ParquetTupleSource
 

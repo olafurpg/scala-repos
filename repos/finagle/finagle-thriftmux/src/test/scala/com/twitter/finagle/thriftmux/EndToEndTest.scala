@@ -89,8 +89,8 @@ class EndToEndTest
 
       assert(Await.result(client.query("ok"), 5.seconds) == "okok")
 
-      Contexts.broadcast.let(
-          testContext, TestContext(Buf.Utf8("hello context world"))) {
+      Contexts.broadcast.let(testContext,
+                             TestContext(Buf.Utf8("hello context world"))) {
         assert(Await.result(client.query("ok")) == "hello context world")
       }
     }
@@ -134,8 +134,8 @@ class EndToEndTest
 
       assert(Await.result(client.query("ok"), 5.seconds) == "okok")
 
-      Contexts.broadcast.let(
-          testContext, TestContext(Buf.Utf8("hello context world"))) {
+      Contexts.broadcast.let(testContext,
+                             TestContext(Buf.Utf8("hello context world"))) {
         assert(
             Await.result(client.query("ok"), 5.seconds) == "hello context world")
       }
@@ -184,12 +184,12 @@ class EndToEndTest
         .build(pfSvc)
       val protoNew = ThriftMux.server
         .withProtocolFactory(pf)
-        .serveIface(
-            new InetSocketAddress(InetAddress.getLoopbackAddress, 0), iface)
+        .serveIface(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+                    iface)
       val protoOld = ThriftMuxServer
         .withProtocolFactory(pf)
-        .serveIface(
-            new InetSocketAddress(InetAddress.getLoopbackAddress, 0), iface)
+        .serveIface(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+                    iface)
 
       def port(socketAddr: SocketAddress): Int =
         socketAddr.asInstanceOf[InetSocketAddress].getPort
@@ -280,8 +280,8 @@ class EndToEndTest
 
       assert(Await.result(client.query("ok"), 5.seconds) == "okok")
 
-      Contexts.broadcast.let(
-          testContext, TestContext(Buf.Utf8("hello context world"))) {
+      Contexts.broadcast.let(testContext,
+                             TestContext(Buf.Utf8("hello context world"))) {
         assert(
             Await.result(client.query("ok"), 5.seconds) == "hello context world")
       }
@@ -289,7 +289,7 @@ class EndToEndTest
   }
 
   test("thriftmux server + Finagle thrift client: client should receive a " +
-      "TApplicationException if the server throws an unhandled exception") {
+        "TApplicationException if the server throws an unhandled exception") {
     val server = ThriftMux.serveIface(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
         new TestService.FutureIface {
@@ -477,7 +477,7 @@ class EndToEndTest
   }
 
   test("thriftmux server + thrift client: client should receive a " +
-      "TApplicationException if the server throws an unhandled exception") {
+        "TApplicationException if the server throws an unhandled exception") {
     val server = ThriftMux.serveIface(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
         new TestService.FutureIface {
@@ -686,7 +686,8 @@ class EndToEndTest
       }
     }
     val server = ThriftMux.serveIface(
-        new InetSocketAddress(InetAddress.getLoopbackAddress, 0), testService)
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+        testService)
 
     object OldPlainPipeliningThriftClient
         extends Thrift.Client(stack = StackClient.newStack) {
@@ -758,8 +759,8 @@ class EndToEndTest
     val server = ThriftMux.server
       .configured(sr)
       .configured(Label("server"))
-      .serveIface(
-          new InetSocketAddress(InetAddress.getLoopbackAddress, 0), iface)
+      .serveIface(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+                  iface)
 
     val client = ThriftMux.client
       .configured(sr)
@@ -890,8 +891,8 @@ class EndToEndTest
     val sr = Stats(mem)
     val server = Thrift.server
       .configured(sr)
-      .serveIface(
-          new InetSocketAddress(InetAddress.getLoopbackAddress, 0), iface)
+      .serveIface(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+                  iface)
 
     val port = server.boundAddress.asInstanceOf[InetSocketAddress].getPort
     val clientSvc = ThriftMux.client

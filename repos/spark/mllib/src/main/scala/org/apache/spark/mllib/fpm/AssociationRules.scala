@@ -36,7 +36,7 @@ import org.apache.spark.rdd.RDD
   */
 @Since("1.5.0")
 @Experimental
-class AssociationRules private[fpm](private var minConfidence: Double)
+class AssociationRules private[fpm] (private var minConfidence: Double)
     extends Logging
     with Serializable {
 
@@ -115,10 +115,10 @@ object AssociationRules {
     */
   @Since("1.5.0")
   @Experimental
-  class Rule[Item] private[fpm](@Since("1.5.0") val antecedent: Array[Item],
-                                @Since("1.5.0") val consequent: Array[Item],
-                                freqUnion: Double,
-                                freqAntecedent: Double)
+  class Rule[Item] private[fpm] (@Since("1.5.0") val antecedent: Array[Item],
+                                 @Since("1.5.0") val consequent: Array[Item],
+                                 freqUnion: Double,
+                                 freqAntecedent: Double)
       extends Serializable {
 
     /**

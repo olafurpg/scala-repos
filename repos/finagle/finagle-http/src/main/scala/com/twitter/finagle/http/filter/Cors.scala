@@ -85,8 +85,8 @@ object Cors {
       *
       * n.b. The string "*" cannot be used for a resource that supports credentials.
       */
-    protected[this] def setOriginAndCredentials(
-        response: Response, origin: String): Response = {
+    protected[this] def setOriginAndCredentials(response: Response,
+                                                origin: String): Response = {
       response.headers.add("Access-Control-Allow-Origin", origin)
       if (policy.supportsCredentials && origin != "*") {
         response.headers.add("Access-Control-Allow-Credentials", "true")
@@ -125,8 +125,8 @@ object Cors {
     }
 
     /** http://www.w3.org/TR/cors/#resource-requests */
-    protected[this] def handleSimple(
-        request: Request, response: Response): Response =
+    protected[this] def handleSimple(request: Request,
+                                     response: Response): Response =
       getOrigin(request) map {
         setOriginAndCredentials(response, _)
       } map {
@@ -152,10 +152,10 @@ object Cors {
       * Add one or more Access-Control-Allow-Methods headers consisting of (a subset of) the list of
       * methods.
       */
-    protected[this] def setMethod(
-        response: Response, methods: Seq[String]): Response = {
-      response.headers.set(
-          "Access-Control-Allow-Methods", methods.mkString(", "))
+    protected[this] def setMethod(response: Response,
+                                  methods: Seq[String]): Response = {
+      response.headers
+        .set("Access-Control-Allow-Methods", methods.mkString(", "))
       response
     }
 
@@ -165,8 +165,8 @@ object Cors {
       */
     protected[this] def setMaxAge(response: Response): Response = {
       policy.maxAge foreach { maxAge =>
-        response.headers.add(
-            "Access-Control-Max-Age", maxAge.inSeconds.toString)
+        response.headers
+          .add("Access-Control-Max-Age", maxAge.inSeconds.toString)
       }
       response
     }
@@ -190,11 +190,11 @@ object Cors {
       * Add one or more Access-Control-Allow-Headers headers consisting of (a subset of) the list of
       * headers.
       */
-    protected[this] def setHeaders(
-        response: Response, headers: Seq[String]): Response = {
+    protected[this] def setHeaders(response: Response,
+                                   headers: Seq[String]): Response = {
       if (headers.nonEmpty) {
-        response.headers.set(
-            "Access-Control-Allow-Headers", headers.mkString(", "))
+        response.headers
+          .set("Access-Control-Allow-Headers", headers.mkString(", "))
       }
       response
     }
@@ -254,8 +254,7 @@ object CorsFilter {
     val methodList = Some(sep.split(methods).toSeq)
     val headerList = Some(sep.split(headers).toSeq)
     val exposeList = sep.split(exposes).toSeq
-    new Cors.HttpFilter(
-        Cors.Policy({ _ =>
+    new Cors.HttpFilter(Cors.Policy({ _ =>
       Some(origin)
     }, { _ =>
       methodList

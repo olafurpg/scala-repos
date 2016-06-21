@@ -44,8 +44,8 @@ class VecAny[T: ST](values: Array[T]) extends Vec[T] { self =>
 
   def unary_-(): Vec[T] = sys.error("Cannot negate AnyVec")
 
-  def concat[B, C](v: Vec[B])(
-      implicit wd: Promoter[T, B, C], mc: ST[C]): Vec[C] =
+  def concat[B, C](v: Vec[B])(implicit wd: Promoter[T, B, C],
+                              mc: ST[C]): Vec[C] =
     Vec(util.Concat.append[T, B, C](toArray, v.toArray))
 
   def foldLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
@@ -65,7 +65,8 @@ class VecAny[T: ST](values: Array[T]) extends Vec[T] { self =>
     VecImpl.filterScanLeft(this)(pred)(init)(f)
 
   def rolling[@spec(Boolean, Int, Long, Double) B: ST](
-      winSz: Int, f: Vec[T] => B): Vec[B] =
+      winSz: Int,
+      f: Vec[T] => B): Vec[B] =
     VecImpl.rolling(this)(winSz, f)
 
   def map[@spec(Boolean, Int, Long, Double) B: ST](f: T => B): Vec[B] =
@@ -119,8 +120,8 @@ class VecAny[T: ST](values: Array[T]) extends Vec[T] { self =>
         val loc = b + i
         if (loc >= e || loc < b)
           throw new ArrayIndexOutOfBoundsException(
-              "Cannot access location %d (vec length %d)".format(
-                  i, self.length))
+              "Cannot access location %d (vec length %d)".format(i,
+                                                                 self.length))
         else if (loc >= self.length || loc < 0) scalarTag.missing
         else self.apply(loc)
       }

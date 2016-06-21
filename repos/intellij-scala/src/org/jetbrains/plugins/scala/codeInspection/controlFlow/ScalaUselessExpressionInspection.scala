@@ -23,23 +23,23 @@ class ScalaUselessExpressionInspection
   override def actionFor(
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case expr: ScExpression
-        if IntentionAvailabilityChecker.checkInspection(
-            this, expr.getParent) =>
+        if IntentionAvailabilityChecker.checkInspection(this, expr.getParent) =>
       if (canResultInSideEffectsOnly(expr) &&
           SideEffectsUtil.hasNoSideEffects(expr)) {
         val message = "Useless expression"
-        val removeElemFix = new RemoveElementQuickFix(
-            "Remove expression", expr)
-        val addReturnKeywordFix = PsiTreeUtil.getParentOfType(
-            expr, classOf[ScFunctionDefinition]) match {
+        val removeElemFix =
+          new RemoveElementQuickFix("Remove expression", expr)
+        val addReturnKeywordFix = PsiTreeUtil
+          .getParentOfType(expr, classOf[ScFunctionDefinition]) match {
           case null => Seq.empty
           case fun if fun.returnType.getOrAny != types.Unit =>
             Seq(new AddReturnQuickFix(expr))
           case _ => Seq.empty
         }
 
-        holder.registerProblem(
-            expr, message, removeElemFix +: addReturnKeywordFix: _*)
+        holder.registerProblem(expr,
+                               message,
+                               removeElemFix +: addReturnKeywordFix: _*)
       }
   }
 
@@ -64,8 +64,7 @@ class ScalaUselessExpressionInspection
             if ms.expr.exists(PsiTreeUtil.isAncestor(_, expr, false)) =>
           false
         case ifStmt: ScIfStmt
-            if ifStmt.condition.exists(
-                PsiTreeUtil.isAncestor(_, expr, false)) =>
+            if ifStmt.condition.exists(PsiTreeUtil.isAncestor(_, expr, false)) =>
           false
         case _: ScBlock | _: ScParenthesisedExpr | _: ScIfStmt |
             _: ScCaseClause | _: ScCaseClauses | _: ScMatchStmt |
@@ -94,7 +93,9 @@ class AddReturnQuickFix(e: ScExpression)
   override def doApplyFix(project: Project): Unit = {
     val expr = getElement
     val retStmt = ScalaPsiElementFactory.createExpressionWithContextFromText(
-        s"return ${expr.getText}", expr.getContext, expr)
+        s"return ${expr.getText}",
+        expr.getContext,
+        expr)
     expr.replaceExpression(retStmt, removeParenthesis = true)
   }
 }

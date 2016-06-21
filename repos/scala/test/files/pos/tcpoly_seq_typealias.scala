@@ -14,7 +14,7 @@ trait HOSeq {
   // variance: if we write m[+x] instead of +m[+x], x is an invariant position because its enclosing type
   //           is an invariant position -- should probably rule that out?
   trait Iterable[+t] {
-    type m [+x]
+    type m[+x]
 
     //def unit[a](orig: a): m[a]
     def iterator: Iterator[t]
@@ -69,8 +69,7 @@ trait HOSeq {
         start = last
       } else {
         val last1 = last
-        last =
-          new HOSeq.this.::(x, null) // hack: ::'s tail will actually be last
+        last = new HOSeq.this.::(x, null) // hack: ::'s tail will actually be last
         //last1.tl = last
       }
     }

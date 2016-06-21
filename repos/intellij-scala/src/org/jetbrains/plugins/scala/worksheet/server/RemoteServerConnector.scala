@@ -29,10 +29,13 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
   * User: Dmitry Naydanov
   * Date: 1/28/14
   */
-class RemoteServerConnector(
-    module: Module, worksheet: File, output: File, worksheetClassName: String)
-    extends RemoteServerConnectorBase(
-        module: Module, worksheet: File, output: File) {
+class RemoteServerConnector(module: Module,
+                            worksheet: File,
+                            output: File,
+                            worksheetClassName: String)
+    extends RemoteServerConnectorBase(module: Module,
+                                      worksheet: File,
+                                      output: File) {
 
   val runType = WorksheetCompiler.getRunType(module.getProject)
 
@@ -50,8 +53,8 @@ class RemoteServerConnector(
     val project = module.getProject
     val worksheetHook = WorksheetFileHook.instance(project)
 
-    val client = new MyTranslatingClient(
-        callback, project, originalFile, consumer)
+    val client =
+      new MyTranslatingClient(callback, project, originalFile, consumer)
 
     try {
       val worksheetProcess = runType match {
@@ -80,10 +83,10 @@ class RemoteServerConnector(
 
           new NonServerRunner(project, Some(errorHandler))
             .buildProcess(encodedArgs, (text: String) => {
-            val event =
-              Event.fromBytes(Base64Converter.decode(text.getBytes("UTF-8")))
-            eventClient.process(event)
-          })
+              val event =
+                Event.fromBytes(Base64Converter.decode(text.getBytes("UTF-8")))
+              eventClient.process(event)
+            })
       }
 
       if (worksheetProcess == null) return ExitCode.ABORT
@@ -138,12 +141,11 @@ object RemoteServerConnector {
       val lines = text split "\n"
       val linesLength = lines.length
 
-      val differ =
-        if (linesLength > 2) {
-          val i =
-            lines(linesLength - 2) indexOf WorksheetSourceProcessor.END_GENERATED_MARKER
-          if (i > -1) i + length else 0
-        } else 0
+      val differ = if (linesLength > 2) {
+        val i =
+          lines(linesLength - 2) indexOf WorksheetSourceProcessor.END_GENERATED_MARKER
+        if (i > -1) i + length else 0
+      } else 0
 
       val finalText =
         if (differ == 0) text
@@ -151,7 +153,7 @@ object RemoteServerConnector {
           val buffer = new StringBuilder
 
           for (j <- 0 until (linesLength -
-                       2)) buffer append lines(j) append "\n"
+                         2)) buffer append lines(j) append "\n"
 
           val lines1 = lines(linesLength - 1)
 

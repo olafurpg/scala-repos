@@ -20,8 +20,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScValueStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScValue](parent, elemType)
     with ScValueStub {
   private var names: Array[StringRef] = _
@@ -37,8 +37,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
   private var local: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            names: Array[String],
            isDeclaration: Boolean,
            typeText: String,
@@ -60,8 +60,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
   }
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            names: Array[StringRef],
            isDeclaration: Boolean,
            typeText: StringRef,
@@ -85,8 +85,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
   def isLocal: Boolean = local
 
   def getNames: Array[String] =
-    for (name <- names) yield
-      StringRef.toString(name) //todo: remove it if unused
+    for (name <- names)
+      yield StringRef.toString(name) //todo: remove it if unused
 
   def isDeclaration = declaration
 
@@ -98,11 +98,10 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
           (patterns.isEmpty || (patterns.get.getContext eq getPsi)))
         return patterns
     }
-    val res: Option[ScPatternList] =
-      if (getBindingsContainerText != "") {
-        Some(ScalaPsiElementFactory.createPatterListFromText(
-                getBindingsContainerText, getPsi, null))
-      } else None
+    val res: Option[ScPatternList] = if (getBindingsContainerText != "") {
+      Some(ScalaPsiElementFactory
+            .createPatterListFromText(getBindingsContainerText, getPsi, null))
+    } else None
     myPatterns = new SofterReference(res)
     res
   }
@@ -115,11 +114,10 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
       if (body != null && (body.isEmpty || (body.get.getContext eq getPsi)))
         return body
     }
-    val res: Option[ScExpression] =
-      if (getBodyText != "") {
-        Some(ScalaPsiElementFactory.createExpressionWithContextFromText(
-                getBodyText, getPsi, null))
-      } else None
+    val res: Option[ScExpression] = if (getBodyText != "") {
+      Some(ScalaPsiElementFactory
+            .createExpressionWithContextFromText(getBodyText, getPsi, null))
+    } else None
     myBodyExpression = new SofterReference(res)
     res
   }
@@ -133,9 +131,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     }
     val res: Option[ScTypeElement] =
       if (getTypeText != "")
-        Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getTypeText, getPsi, null))
+        Some(ScalaPsiElementFactory
+              .createTypeElementFromText(getTypeText, getPsi, null))
       else None
     myTypeElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -148,11 +145,11 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
       if (ids != null && (ids.isEmpty || (ids.get.getContext eq getPsi)))
         return ids
     }
-    val res: Option[ScIdList] =
-      if (getBindingsContainerText != "") {
-        Some(ScalaPsiElementFactory.createIdsListFromText(
-                getBindingsContainerText, getPsi, null))
-      } else None
+    val res: Option[ScIdList] = if (getBindingsContainerText != "") {
+      Some(
+          ScalaPsiElementFactory
+            .createIdsListFromText(getBindingsContainerText, getPsi, null))
+    } else None
     myIds = new SofterReference[Option[ScIdList]](res)
     res
   }

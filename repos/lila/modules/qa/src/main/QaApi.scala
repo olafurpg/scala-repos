@@ -150,7 +150,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(id: QuestionId) =
       questionColl.remove(BSONDocument("_id" -> id)) >>
-      (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
+        (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
 
     def removeComment(id: QuestionId, c: CommentId) = questionColl.update(
         BSONDocument("_id" -> id),
@@ -233,7 +233,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(a: Answer): Fu[Unit] =
       answerColl.remove(BSONDocument("_id" -> a.id)) >>
-      (question recountAnswers a.questionId).void
+        (question recountAnswers a.questionId).void
 
     def remove(id: AnswerId): Fu[Unit] = findById(id) flatMap { _ ?? remove }
 
@@ -295,8 +295,8 @@ final class QaApi(questionColl: Coll,
     }
 
     def remove(questionId: QuestionId, commentId: CommentId) =
-      question.removeComment(questionId, commentId) >> answer.removeComment(
-          questionId, commentId)
+      question.removeComment(questionId, commentId) >> answer
+        .removeComment(questionId, commentId)
 
     private implicit val commentBSONHandler = Macros.handler[Comment]
   }

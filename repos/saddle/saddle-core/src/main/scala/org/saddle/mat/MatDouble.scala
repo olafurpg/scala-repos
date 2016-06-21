@@ -75,7 +75,7 @@ class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double] {
   override def equals(o: Any): Boolean = o match {
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+        this.numCols == rv.numCols && {
         var i = 0
         var eq = true
         while (eq && i < length) {

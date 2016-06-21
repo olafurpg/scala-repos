@@ -81,34 +81,35 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
                 case SampleState(maybePrevInserters, len0, transform) =>
                   transform advance origSlice map {
                     case (nextTransform, slice) => {
-                        val inserter =
-                          maybePrevInserters map { _.withSource(slice) } getOrElse RowInserter(
-                              sampleSize, slice)
+                      val inserter =
+                        maybePrevInserters map { _.withSource(slice) } getOrElse RowInserter(
+                            sampleSize,
+                            slice)
 
-                        val defined = slice.definedAt
+                      val defined = slice.definedAt
 
-                        @tailrec
-                        def loop(i: Int, len: Int): Int =
-                          if (i < slice.size) {
-                            // `k` is a number between 0 and number of rows we've seen
-                            if (!defined(i)) {
-                              loop(i + 1, len)
-                            } else if (len < sampleSize) {
-                              inserter.insert(src = i, dest = len)
-                              loop(i + 1, len + 1)
-                            } else {
-                              val k = rng.nextInt(len + 1)
-                              if (k < sampleSize) {
-                                inserter.insert(src = i, dest = k)
-                              }
-                              loop(i + 1, len + 1)
+                      @tailrec
+                      def loop(i: Int, len: Int): Int =
+                        if (i < slice.size) {
+                          // `k` is a number between 0 and number of rows we've seen
+                          if (!defined(i)) {
+                            loop(i + 1, len)
+                          } else if (len < sampleSize) {
+                            inserter.insert(src = i, dest = len)
+                            loop(i + 1, len + 1)
+                          } else {
+                            val k = rng.nextInt(len + 1)
+                            if (k < sampleSize) {
+                              inserter.insert(src = i, dest = k)
                             }
-                          } else len
+                            loop(i + 1, len + 1)
+                          }
+                        } else len
 
-                        val newLength = loop(0, len0)
+                      val newLength = loop(0, len0)
 
-                        SampleState(Some(inserter), newLength, nextTransform)
-                      }
+                      SampleState(Some(inserter), newLength, nextTransform)
+                    }
                   }
               }
 
@@ -249,7 +250,7 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
           case (src, dest) =>
             sys.error(
                 "Slice lied about column type. Expected %s, but found %s." format
-                (ref.ctype, src.tpe))
+                  (ref.ctype, src.tpe))
         }
     }
   }

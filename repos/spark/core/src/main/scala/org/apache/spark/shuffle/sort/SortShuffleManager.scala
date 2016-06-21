@@ -73,7 +73,7 @@ private[spark] class SortShuffleManager(conf: SparkConf)
   if (!conf.getBoolean("spark.shuffle.spill", true)) {
     logWarning(
         "spark.shuffle.spill was set to false, but this configuration is ignored as of Spark 1.6+." +
-        " Shuffle will continue to spill to disk when necessary.")
+          " Shuffle will continue to spill to disk when necessary.")
   }
 
   /**
@@ -138,8 +138,8 @@ private[spark] class SortShuffleManager(conf: SparkConf)
         handle.asInstanceOf[BaseShuffleHandle[_, _, _]].numMaps)
     val env = SparkEnv.get
     handle match {
-      case unsafeShuffleHandle: SerializedShuffleHandle[
-              K @unchecked, V @unchecked] =>
+      case unsafeShuffleHandle: SerializedShuffleHandle[K @unchecked,
+                                                        V @unchecked] =>
         new UnsafeShuffleWriter(
             env.blockManager,
             shuffleBlockResolver.asInstanceOf[IndexShuffleBlockResolver],
@@ -148,8 +148,8 @@ private[spark] class SortShuffleManager(conf: SparkConf)
             mapId,
             context,
             env.conf)
-      case bypassMergeSortHandle: BypassMergeSortShuffleHandle[
-              K @unchecked, V @unchecked] =>
+      case bypassMergeSortHandle: BypassMergeSortShuffleHandle[K @unchecked,
+                                                               V @unchecked] =>
         new BypassMergeSortShuffleWriter(
             env.blockManager,
             shuffleBlockResolver.asInstanceOf[IndexShuffleBlockResolver],
@@ -199,7 +199,7 @@ private[spark] object SortShuffleManager extends Logging {
     if (!dependency.serializer.supportsRelocationOfSerializedObjects) {
       log.debug(
           s"Can't use serialized shuffle for shuffle $shufId because the serializer, " +
-          s"${dependency.serializer.getClass.getName}, does not support object relocation")
+            s"${dependency.serializer.getClass.getName}, does not support object relocation")
       false
     } else if (dependency.aggregator.isDefined) {
       log.debug(
@@ -208,7 +208,7 @@ private[spark] object SortShuffleManager extends Logging {
     } else if (numPartitions > MAX_SHUFFLE_OUTPUT_PARTITIONS_FOR_SERIALIZED_MODE) {
       log.debug(
           s"Can't use serialized shuffle for shuffle $shufId because it has more than " +
-          s"$MAX_SHUFFLE_OUTPUT_PARTITIONS_FOR_SERIALIZED_MODE partitions")
+            s"$MAX_SHUFFLE_OUTPUT_PARTITIONS_FOR_SERIALIZED_MODE partitions")
       false
     } else {
       log.debug(s"Can use serialized shuffle for shuffle $shufId")
@@ -222,7 +222,9 @@ private[spark] object SortShuffleManager extends Logging {
   * serialized shuffle.
   */
 private[spark] class SerializedShuffleHandle[K, V](
-    shuffleId: Int, numMaps: Int, dependency: ShuffleDependency[K, V, V])
+    shuffleId: Int,
+    numMaps: Int,
+    dependency: ShuffleDependency[K, V, V])
     extends BaseShuffleHandle(shuffleId, numMaps, dependency) {}
 
 /**
@@ -230,5 +232,7 @@ private[spark] class SerializedShuffleHandle[K, V](
   * bypass merge sort shuffle path.
   */
 private[spark] class BypassMergeSortShuffleHandle[K, V](
-    shuffleId: Int, numMaps: Int, dependency: ShuffleDependency[K, V, V])
+    shuffleId: Int,
+    numMaps: Int,
+    dependency: ShuffleDependency[K, V, V])
     extends BaseShuffleHandle(shuffleId, numMaps, dependency) {}

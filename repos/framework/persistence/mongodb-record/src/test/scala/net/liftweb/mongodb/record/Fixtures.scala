@@ -225,9 +225,9 @@ class BinaryFieldTestRecord
   override def equals(other: Any): Boolean = other match {
     case that: BinaryFieldTestRecord =>
       this.id.value == that.id.value &&
-      this.mandatoryBinaryField == that.mandatoryBinaryField &&
-      this.legacyOptionalBinaryField == that.legacyOptionalBinaryField &&
-      this.optionalBinaryField == that.optionalBinaryField
+        this.mandatoryBinaryField == that.mandatoryBinaryField &&
+        this.legacyOptionalBinaryField == that.legacyOptionalBinaryField &&
+        this.optionalBinaryField == that.optionalBinaryField
     case _ => false
   }
 }
@@ -239,8 +239,7 @@ case class TypeTestJsonObject(
     intField: Int,
     stringField: String,
     mapField: Map[String, String]
-)
-    extends JsonObject[TypeTestJsonObject] {
+) extends JsonObject[TypeTestJsonObject] {
   // TODO: Add more types
   def meta = TypeTestJsonObject
 }
@@ -286,8 +285,8 @@ class MongoFieldTypeTestRecord private ()
   }
 
   object mandatoryMongoCaseClassField
-      extends MongoCaseClassField[
-          MongoFieldTypeTestRecord, MongoCaseClassTestObject](this) {
+      extends MongoCaseClassField[MongoFieldTypeTestRecord,
+                                  MongoCaseClassTestObject](this) {
     override def formats = owner.meta.formats
   }
 }
@@ -330,8 +329,9 @@ object PasswordTestRecord
     extends PasswordTestRecord
     with MongoMetaRecord[PasswordTestRecord]
 
-case class MongoCaseClassTestObject(
-    intField: Int, stringField: String, enum: MyTestEnum.Value)
+case class MongoCaseClassTestObject(intField: Int,
+                                    stringField: String,
+                                    enum: MyTestEnum.Value)
 
 class ListTestRecord private ()
     extends MongoRecord[ListTestRecord]
@@ -347,8 +347,8 @@ class ListTestRecord private ()
   object mandatoryMongoJsonObjectListField
       extends MongoJsonObjectListField(this, TypeTestJsonObject)
   object mongoCaseClassListField
-      extends MongoCaseClassListField[
-          ListTestRecord, MongoCaseClassTestObject](this) {
+      extends MongoCaseClassListField[ListTestRecord,
+                                      MongoCaseClassTestObject](this) {
     override def formats = owner.meta.formats
   }
 }
@@ -375,7 +375,7 @@ object MongoListTestRecord
     with MongoMetaRecord[MongoListTestRecord] {
   override def formats =
     DefaultFormats.lossless + new ObjectIdSerializer + new PatternSerializer +
-    new DateSerializer
+      new DateSerializer
 }
 
 class MongoJodaListTestRecord private ()
@@ -523,14 +523,15 @@ class BoxTestRecord private ()
   def meta = BoxTestRecord
 
   object jsonobj
-      extends JsonObjectField[BoxTestRecord, BoxTestJsonObj](
-          this, BoxTestJsonObj) {
+      extends JsonObjectField[BoxTestRecord, BoxTestJsonObj](this,
+                                                             BoxTestJsonObj) {
     def defaultValue =
       BoxTestJsonObj("0", Empty, Full("Full String"), Failure("Failure"))
   }
   object jsonobjlist
       extends MongoJsonObjectListField[BoxTestRecord, BoxTestJsonObj](
-          this, BoxTestJsonObj)
+          this,
+          BoxTestJsonObj)
 }
 object BoxTestRecord
     extends BoxTestRecord

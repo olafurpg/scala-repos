@@ -31,8 +31,10 @@ private[akka] sealed trait DaemonMsg
   * INTERNAL API
   */
 @SerialVersionUID(1L)
-private[akka] final case class DaemonMsgCreate(
-    props: Props, deploy: Deploy, path: String, supervisor: ActorRef)
+private[akka] final case class DaemonMsgCreate(props: Props,
+                                               deploy: Deploy,
+                                               path: String,
+                                               supervisor: ActorRef)
     extends DaemonMsg
 
 /**
@@ -58,8 +60,8 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
 
   private val parent2children = new ConcurrentHashMap[ActorRef, Set[ActorRef]]
 
-  @tailrec private def addChildParentNeedsWatch(
-      parent: ActorRef, child: ActorRef): Boolean =
+  @tailrec private def addChildParentNeedsWatch(parent: ActorRef,
+                                                child: ActorRef): Boolean =
     parent2children.get(parent) match {
       case null ⇒
         if (parent2children.putIfAbsent(parent, Set(child)) == null) true
@@ -70,7 +72,8 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
     }
 
   @tailrec private def removeChildParentNeedsUnwatch(
-      parent: ActorRef, child: ActorRef): Boolean = {
+      parent: ActorRef,
+      child: ActorRef): Boolean = {
     parent2children.get(parent) match {
       case null ⇒ false // no-op
       case children ⇒
@@ -117,8 +120,9 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
 
   override def sendSystemMessage(message: SystemMessage): Unit =
     message match {
-      case DeathWatchNotification(
-          child: ActorRefWithCell with ActorRefScope, _, _) if child.isLocal ⇒
+      case DeathWatchNotification(child: ActorRefWithCell with ActorRefScope,
+                                  _,
+                                  _) if child.isLocal ⇒
         terminating.locked {
           removeChild(child.path.elements.drop(1).mkString("/"), child)
           val parent = child.getParent

@@ -31,8 +31,8 @@ import java.util.concurrent.TimeoutException
 final case class ScatterGatherFirstCompletedRoutingLogic(
     within: FiniteDuration)
     extends RoutingLogic {
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     ScatterGatherFirstCompletedRoutees(routees, within)
 }
 
@@ -41,7 +41,8 @@ final case class ScatterGatherFirstCompletedRoutingLogic(
   */
 @SerialVersionUID(1L)
 private[akka] final case class ScatterGatherFirstCompletedRoutees(
-    routees: immutable.IndexedSeq[Routee], within: FiniteDuration)
+    routees: immutable.IndexedSeq[Routee],
+    within: FiniteDuration)
     extends Routee {
 
   override def send(message: Any, sender: ActorRef): Unit =

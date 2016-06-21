@@ -72,7 +72,7 @@ private[spark] class Benchmark(name: String,
            "Relative")
     println(
         "-----------------------------------------------------------------------------------" +
-        "--------")
+          "--------")
     results.zip(benchmarks).foreach {
       case (result, benchmark) =>
         printf("%-35s %16s %12s %13s %10s\n",

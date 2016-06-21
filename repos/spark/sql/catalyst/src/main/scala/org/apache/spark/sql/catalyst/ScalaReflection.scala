@@ -159,8 +159,9 @@ object ScalaReflection extends ScalaReflection {
         if (path.isDefined) {
           path.get
         } else {
-          upCastToExpectedType(
-              BoundReference(0, dataType, true), dataType, walkedTypePath)
+          upCastToExpectedType(BoundReference(0, dataType, true),
+                               dataType,
+                               walkedTypePath)
         }
       }
 
@@ -193,8 +194,8 @@ object ScalaReflection extends ScalaReflection {
           val className = getClassNameFromType(optType)
           val newTypePath =
             s"""- option value class: "$className"""" +: walkedTypePath
-          WrapOption(
-              constructorFor(optType, path, newTypePath), dataTypeFor(optType))
+          WrapOption(constructorFor(optType, path, newTypePath),
+                     dataTypeFor(optType))
 
         case t if t <:< localTypeOf[java.lang.Integer] =>
           val boxedType = classOf[java.lang.Integer]
@@ -443,8 +444,9 @@ object ScalaReflection extends ScalaReflection {
           val clsName = getClassNameFromType(elementType)
           val newPath =
             s"""- array element class: "$clsName"""" +: walkedTypePath
-          MapObjects(
-              extractorFor(_, elementType, newPath), input, externalDataType)
+          MapObjects(extractorFor(_, elementType, newPath),
+                     input,
+                     externalDataType)
         }
       }
 
@@ -508,10 +510,11 @@ object ScalaReflection extends ScalaReflection {
                 }
                 val unwrapped = UnwrapOption(optionObjectType, inputObject)
 
-                expressions.If(IsNull(unwrapped),
-                               expressions.Literal.create(
-                                   null, silentSchemaFor(optType).dataType),
-                               extractorFor(unwrapped, optType, newPath))
+                expressions.If(
+                    IsNull(unwrapped),
+                    expressions.Literal
+                      .create(null, silentSchemaFor(optType).dataType),
+                    extractorFor(unwrapped, optType, newPath))
             }
 
           case t if t <:< localTypeOf[Product] =>
@@ -523,8 +526,9 @@ object ScalaReflection extends ScalaReflection {
                 val clsName = getClassNameFromType(fieldType)
                 val newPath =
                   s"""- field (class: "$clsName", name: "$fieldName")""" +: walkedTypePath
-                expressions.Literal(fieldName) :: extractorFor(
-                    fieldValue, fieldType, newPath) :: Nil
+                expressions.Literal(fieldName) :: extractorFor(fieldValue,
+                                                               fieldType,
+                                                               newPath) :: Nil
             })
             val nullOutput =
               expressions.Literal.create(null, nonNullOutput.dataType)
@@ -858,21 +862,20 @@ trait ScalaReflection {
 
   protected def constructParams(tpe: Type): Seq[Symbol] = {
     val constructorSymbol = tpe.member(nme.CONSTRUCTOR)
-    val params =
-      if (constructorSymbol.isMethod) {
-        constructorSymbol.asMethod.paramss
+    val params = if (constructorSymbol.isMethod) {
+      constructorSymbol.asMethod.paramss
+    } else {
+      // Find the primary constructor, and use its parameter ordering.
+      val primaryConstructorSymbol: Option[Symbol] =
+        constructorSymbol.asTerm.alternatives.find(s =>
+              s.isMethod && s.asMethod.isPrimaryConstructor)
+      if (primaryConstructorSymbol.isEmpty) {
+        sys.error(
+            "Internal SQL error: Product object did not have a primary constructor.")
       } else {
-        // Find the primary constructor, and use its parameter ordering.
-        val primaryConstructorSymbol: Option[Symbol] =
-          constructorSymbol.asTerm.alternatives.find(s =>
-                s.isMethod && s.asMethod.isPrimaryConstructor)
-        if (primaryConstructorSymbol.isEmpty) {
-          sys.error(
-              "Internal SQL error: Product object did not have a primary constructor.")
-        } else {
-          primaryConstructorSymbol.get.asMethod.paramss
-        }
+        primaryConstructorSymbol.get.asMethod.paramss
       }
+    }
     params.flatten
   }
 }

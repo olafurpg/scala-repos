@@ -56,8 +56,8 @@ class FormattedStringFormatterTest extends SimpleTestCase {
   }
 
   def testPlainComplexExpression() {
-    assertEquals(
-        call("%s", "foo.bar"), format(Injection(exp("foo.bar"), None)))
+    assertEquals(call("%s", "foo.bar"),
+                 format(Injection(exp("foo.bar"), None)))
   }
 
   def testComplexExpressionWithDispensableFormat() {
@@ -73,8 +73,8 @@ class FormattedStringFormatterTest extends SimpleTestCase {
   }
 
   def testPlainBlockExpression() {
-    assertEquals(
-        call("%s", "foo.bar"), format(Injection(exp("{foo.bar}"), None)))
+    assertEquals(call("%s", "foo.bar"),
+                 format(Injection(exp("{foo.bar}"), None)))
   }
 
   def testBlockExpressionWithDispensableFormat() {
@@ -116,8 +116,8 @@ class FormattedStringFormatterTest extends SimpleTestCase {
   }
 
   def testLiterals() {
-    assertEquals(
-        call("foo", ""), format(Injection(exp('"' + "foo" + '"'), None)))
+    assertEquals(call("foo", ""),
+                 format(Injection(exp('"' + "foo" + '"'), None)))
     assertEquals(call("123", ""), format(Injection(exp("123L"), None)))
     assertEquals(call("true", ""), format(Injection(exp("true"), None)))
   }

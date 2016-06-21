@@ -60,7 +60,8 @@ private[streaming] class MapWithStateDStreamImpl[KeyType: ClassTag,
 
   private val internalStream =
     new InternalMapWithStateDStream[KeyType, ValueType, StateType, MappedType](
-        dataStream, spec)
+        dataStream,
+        spec)
 
   override def slideDuration: Duration = internalStream.slideDuration
 
@@ -109,9 +110,12 @@ private[streaming] class MapWithStateDStreamImpl[KeyType: ClassTag,
   * @tparam S   Type of the state maintained
   * @tparam E   Type of the mapped data
   */
-private[streaming] class InternalMapWithStateDStream[
-    K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
-    parent: DStream[(K, V)], spec: StateSpecImpl[K, V, S, E])
+private[streaming] class InternalMapWithStateDStream[K: ClassTag,
+                                                     V: ClassTag,
+                                                     S: ClassTag,
+                                                     E: ClassTag](
+    parent: DStream[(K, V)],
+    spec: StateSpecImpl[K, V, S, E])
     extends DStream[MapWithStateRDDRecord[K, S, E]](parent.context) {
 
   persist(StorageLevel.MEMORY_ONLY)

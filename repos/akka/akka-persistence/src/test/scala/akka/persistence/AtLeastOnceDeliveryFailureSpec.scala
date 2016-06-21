@@ -117,13 +117,14 @@ object AtLeastOnceDeliveryFailureSpec {
     private def debugMessage(msg: String): String =
       s"[sender] ${msg} (mode = ${if (recoveryRunning) "replay" else "live"} snr = ${lastSequenceNr} state = ${state.sorted})"
 
-    override protected def onRecoveryFailure(
-        cause: Throwable, event: Option[Any]): Unit = {
+    override protected def onRecoveryFailure(cause: Throwable,
+                                             event: Option[Any]): Unit = {
       // mute logging
     }
 
-    override protected def onPersistFailure(
-        cause: Throwable, event: Any, seqNr: Long): Unit = {
+    override protected def onPersistFailure(cause: Throwable,
+                                            event: Any,
+                                            seqNr: Long): Unit = {
       // mute logging
     }
   }
@@ -161,8 +162,9 @@ object AtLeastOnceDeliveryFailureSpec {
     var acks = Set.empty[Int]
 
     def createSender(): ActorRef =
-      context.watch(context.actorOf(
-              Props(classOf[ChaosSender], destination, probe), "sender"))
+      context.watch(
+          context.actorOf(Props(classOf[ChaosSender], destination, probe),
+                          "sender"))
 
     def receive = {
       case Start ⇒ 1 to numMessages foreach (snd ! _)

@@ -11,8 +11,8 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class StatsFilterTest extends FunSuite {
-  val BasicExceptions = new CategorizingExceptionStatsHandler(
-      _ => None, _ => None, rollup = false)
+  val BasicExceptions =
+    new CategorizingExceptionStatsHandler(_ => None, _ => None, rollup = false)
 
   def getService(
       exceptionStatsHandler: ExceptionStatsHandler = BasicExceptions
@@ -47,8 +47,9 @@ class StatsFilterTest extends FunSuite {
 
   test("latency stat in microseconds") {
     val sr = new InMemoryStatsReceiver()
-    val filter = new StatsFilter[String, String](
-        sr, StatsFilter.DefaultExceptions, TimeUnit.MICROSECONDS)
+    val filter = new StatsFilter[String, String](sr,
+                                                 StatsFilter.DefaultExceptions,
+                                                 TimeUnit.MICROSECONDS)
     val promise = new Promise[String]
     val svc =
       filter andThen new Service[String, String] {
@@ -219,8 +220,10 @@ class StatsFilterTest extends FunSuite {
         ResponseClass.RetryableFailure
       case ReqRep(_, Throw(x)) if x.getMessage == "-5" => ResponseClass.Success
     }
-    val statsFilter = new StatsFilter[Int, Int](
-        sr, aClassifier, StatsFilter.DefaultExceptions, TimeUnit.MILLISECONDS)
+    val statsFilter = new StatsFilter[Int, Int](sr,
+                                                aClassifier,
+                                                StatsFilter.DefaultExceptions,
+                                                TimeUnit.MILLISECONDS)
 
     val service = statsFilter.andThen(svc)
 

@@ -94,7 +94,7 @@ case class Window(windowExpression: Seq[NamedExpression],
       // Only show warning when the number of bytes is larger than 100 MB?
       logWarning(
           "No Partition Defined for Window operation! Moving all data to a single " +
-          "partition, this can cause serious performance degradation.")
+            "partition, this can cause serious performance degradation.")
       AllTuples :: Nil
     } else ClusteredDistribution(partitionSpec) :: Nil
   }
@@ -114,37 +114,36 @@ case class Window(windowExpression: Seq[NamedExpression],
     * @param offset with respect to the row.
     * @return a bound ordering object.
     */
-  private[this] def createBoundOrdering(
-      frameType: FrameType, offset: Int): BoundOrdering = {
+  private[this] def createBoundOrdering(frameType: FrameType,
+                                        offset: Int): BoundOrdering = {
     frameType match {
       case RangeFrame =>
-        val (exprs, current, bound) =
-          if (offset == 0) {
-            // Use the entire order expression when the offset is 0.
-            val exprs = orderSpec.map(_.child)
-            val projection = newMutableProjection(exprs, child.output)
-            (orderSpec, projection(), projection())
-          } else if (orderSpec.size == 1) {
-            // Use only the first order expression when the offset is non-null.
-            val sortExpr = orderSpec.head
-            val expr = sortExpr.child
-            // Create the projection which returns the current 'value'.
-            val current = newMutableProjection(expr :: Nil, child.output)()
-            // Flip the sign of the offset when processing the order is descending
-            val boundOffset = sortExpr.direction match {
-              case Descending => -offset
-              case Ascending => offset
-            }
-            // Create the projection which returns the current 'value' modified by adding the offset.
-            val boundExpr = Add(
-                expr,
-                Cast(Literal.create(boundOffset, IntegerType), expr.dataType))
-            val bound = newMutableProjection(boundExpr :: Nil, child.output)()
-            (sortExpr :: Nil, current, bound)
-          } else {
-            sys.error("Non-Zero range offsets are not supported for windows " +
-                "with multiple order expressions.")
+        val (exprs, current, bound) = if (offset == 0) {
+          // Use the entire order expression when the offset is 0.
+          val exprs = orderSpec.map(_.child)
+          val projection = newMutableProjection(exprs, child.output)
+          (orderSpec, projection(), projection())
+        } else if (orderSpec.size == 1) {
+          // Use only the first order expression when the offset is non-null.
+          val sortExpr = orderSpec.head
+          val expr = sortExpr.child
+          // Create the projection which returns the current 'value'.
+          val current = newMutableProjection(expr :: Nil, child.output)()
+          // Flip the sign of the offset when processing the order is descending
+          val boundOffset = sortExpr.direction match {
+            case Descending => -offset
+            case Ascending => offset
           }
+          // Create the projection which returns the current 'value' modified by adding the offset.
+          val boundExpr = Add(
+              expr,
+              Cast(Literal.create(boundOffset, IntegerType), expr.dataType))
+          val bound = newMutableProjection(boundExpr :: Nil, child.output)()
+          (sortExpr :: Nil, current, bound)
+        } else {
+          sys.error("Non-Zero range offsets are not supported for windows " +
+                "with multiple order expressions.")
+        }
         // Construct the ordering. This is used to compare the result of current value projection
         // to the result of bound value projection. This is done manually because we want to use
         // Code Generation (if it is enabled).
@@ -178,7 +177,8 @@ case class Window(windowExpression: Seq[NamedExpression],
                  FrameBoundary(fr.frameStart),
                  FrameBoundary(fr.frameEnd))
       val (es, fns) = framedFunctions.getOrElseUpdate(
-          key, (ArrayBuffer.empty[Expression], ArrayBuffer.empty[Expression]))
+          key,
+          (ArrayBuffer.empty[Expression], ArrayBuffer.empty[Expression]))
       es.append(e)
       fns.append(fn)
     }
@@ -215,8 +215,9 @@ case class Window(windowExpression: Seq[NamedExpression],
               ordinal,
               child.output,
               (expressions, schema) =>
-                newMutableProjection(
-                    expressions, schema, subexpressionEliminationEnabled))
+                newMutableProjection(expressions,
+                                     schema,
+                                     subexpressionEliminationEnabled))
 
         // Create the factory
         val factory = key match {
@@ -229,8 +230,9 @@ case class Window(windowExpression: Seq[NamedExpression],
                   functions,
                   child.output,
                   (expressions, schema) =>
-                    newMutableProjection(
-                        expressions, schema, subexpressionEliminationEnabled),
+                    newMutableProjection(expressions,
+                                         schema,
+                                         subexpressionEliminationEnabled),
                   offset)
 
             // Growing Frame.
@@ -298,8 +300,8 @@ case class Window(windowExpression: Seq[NamedExpression],
     val unboundToRefMap = expressions.zip(references).toMap
     val patchedWindowExpression =
       windowExpression.map(_.transform(unboundToRefMap))
-    UnsafeProjection.create(
-        child.output ++ patchedWindowExpression, child.output)
+    UnsafeProjection
+      .create(child.output ++ patchedWindowExpression, child.output)
   }
 
   protected override def doExecute(): RDD[InternalRow] = {
@@ -369,8 +371,10 @@ case class Window(windowExpression: Seq[NamedExpression],
                     1024,
                     SparkEnv.get.memoryManager.pageSizeBytes)
                 rows.foreach { r =>
-                  sorter.insertRecord(
-                      r.getBaseObject, r.getBaseOffset, r.getSizeInBytes, 0)
+                  sorter.insertRecord(r.getBaseObject,
+                                      r.getBaseOffset,
+                                      r.getSizeInBytes,
+                                      0)
                 }
                 rows.clear()
               }
@@ -526,8 +530,8 @@ private[execution] class ArrayRowBuffer(buffer: ArrayBuffer[UnsafeRow])
 /**
   * An external buffer of rows based on UnsafeExternalSorter
   */
-private[execution] class ExternalRowBuffer(
-    sorter: UnsafeExternalSorter, numFields: Int)
+private[execution] class ExternalRowBuffer(sorter: UnsafeExternalSorter,
+                                           numFields: Int)
     extends RowBuffer {
 
   private[this] val iter: UnsafeSorterIterator = sorter.getIterator
@@ -541,8 +545,8 @@ private[execution] class ExternalRowBuffer(
   def next(): InternalRow = {
     if (iter.hasNext) {
       iter.loadNext()
-      currentRow.pointTo(
-          iter.getBaseObject, iter.getBaseOffset, iter.getRecordLength)
+      currentRow
+        .pointTo(iter.getBaseObject, iter.getBaseOffset, iter.getRecordLength)
       currentRow
     } else {
       null
@@ -759,7 +763,8 @@ private[execution] final class SlidingWindowFunctionFrame(
   * @param processor to calculate the row values with.
   */
 private[execution] final class UnboundedWindowFunctionFrame(
-    target: MutableRow, processor: AggregateProcessor)
+    target: MutableRow,
+    processor: AggregateProcessor)
     extends WindowFunctionFrame {
 
   /** Prepare the frame for calculating a new partition. Process all rows eagerly. */
@@ -970,8 +975,9 @@ private[execution] object AggregateProcessor {
     // Create the projections.
     val initialProjection =
       newMutableProjection(initialValues, Seq(SizeBasedWindowFunction.n))()
-    val updateProjection = newMutableProjection(
-        updateExpressions, aggBufferAttributes ++ inputAttributes)()
+    val updateProjection =
+      newMutableProjection(updateExpressions,
+                           aggBufferAttributes ++ inputAttributes)()
     val evaluateProjection =
       newMutableProjection(evaluateExpressions, aggBufferAttributes)()
 

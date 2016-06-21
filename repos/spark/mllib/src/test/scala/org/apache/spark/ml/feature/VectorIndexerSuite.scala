@@ -79,10 +79,9 @@ class VectorIndexerSuite
     assert(densePoints2Seq.head.size == sparsePoints2Seq.head.size)
     assert(densePoints1Seq.head.size != densePoints2Seq.head.size)
     def checkPair(dvSeq: Seq[Vector], svSeq: Seq[Vector]): Unit = {
-      assert(dvSeq
-               .zip(svSeq)
-               .forall { case (dv, sv) => dv.toArray === sv.toArray },
-             "typo in unit test")
+      assert(dvSeq.zip(svSeq).forall {
+        case (dv, sv) => dv.toArray === sv.toArray
+      }, "typo in unit test")
     }
     checkPair(densePoints1Seq, sparsePoints1Seq)
     checkPair(densePoints2Seq, sparsePoints2Seq)
@@ -139,8 +138,8 @@ class VectorIndexerSuite
   }
 
   test("Same result with dense and sparse vectors") {
-    def testDenseSparse(
-        densePoints: DataFrame, sparsePoints: DataFrame): Unit = {
+    def testDenseSparse(densePoints: DataFrame,
+                        sparsePoints: DataFrame): Unit = {
       val denseVectorIndexer = getIndexer.setMaxCategories(2)
       val sparseVectorIndexer = getIndexer.setMaxCategories(2)
       val denseModel = denseVectorIndexer.fit(densePoints)
@@ -166,7 +165,7 @@ class VectorIndexerSuite
       val collectedData = data.collect().map(_.getAs[Vector](0))
       val errMsg =
         s"checkCategoryMaps failed for input with maxCategories=$maxCategories," +
-        s" categoricalFeatures=${categoricalFeatures.mkString(", ")}"
+          s" categoricalFeatures=${categoricalFeatures.mkString(", ")}"
       try {
         val vectorIndexer = getIndexer.setMaxCategories(maxCategories)
         val model = vectorIndexer.fit(data)
@@ -205,7 +204,7 @@ class VectorIndexerSuite
             case _ =>
               throw new RuntimeException(
                   errMsg + s". Categorical feature $feature failed" +
-                  s" metadata check. Found feature attribute: $featureAttr.")
+                    s" metadata check. Found feature attribute: $featureAttr.")
           }
         }
         // Check numerical feature metadata.
@@ -219,7 +218,7 @@ class VectorIndexerSuite
               case _ =>
                 throw new RuntimeException(
                     errMsg + s". Numerical feature $feature failed" +
-                    s" metadata check. Found feature attribute: $featureAttr.")
+                      s" metadata check. Found feature attribute: $featureAttr.")
             }
           }
       } catch {
@@ -228,12 +227,15 @@ class VectorIndexerSuite
           throw e
       }
     }
-    checkCategoryMaps(
-        densePoints1, maxCategories = 2, categoricalFeatures = Set(0))
-    checkCategoryMaps(
-        densePoints1, maxCategories = 3, categoricalFeatures = Set(0, 2))
-    checkCategoryMaps(
-        densePoints2, maxCategories = 2, categoricalFeatures = Set(1, 3))
+    checkCategoryMaps(densePoints1,
+                      maxCategories = 2,
+                      categoricalFeatures = Set(0))
+    checkCategoryMaps(densePoints1,
+                      maxCategories = 3,
+                      categoricalFeatures = Set(0, 2))
+    checkCategoryMaps(densePoints2,
+                      maxCategories = 2,
+                      categoricalFeatures = Set(1, 3))
   }
 
   test("Maintain sparsity for sparse vectors") {

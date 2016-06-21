@@ -56,8 +56,8 @@ object SessionVar {
     ScopedKey(scope, key.key)
   }
 
-  def read[T](key: ScopedKey[Task[T]], state: State)(
-      implicit f: Format[T]): Option[T] =
+  def read[T](key: ScopedKey[Task[T]],
+              state: State)(implicit f: Format[T]): Option[T] =
     Project.structure(state).streams(state).use(key) { s =>
       try { Some(Operations.read(s.readBinary(key, DefaultDataID))) } catch {
         case e: Exception => None
@@ -69,8 +69,9 @@ object SessionVar {
     get(key, state) orElse read(key, state)(f)
 
   def loadAndSet[T](
-      key: ScopedKey[Task[T]], state: State, setIfUnset: Boolean = true)(
-      implicit f: Format[T]): (State, Option[T]) =
+      key: ScopedKey[Task[T]],
+      state: State,
+      setIfUnset: Boolean = true)(implicit f: Format[T]): (State, Option[T]) =
     get(key, state) match {
       case s: Some[T] => (state, s)
       case None =>

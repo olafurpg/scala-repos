@@ -25,14 +25,18 @@ class IvyCacheTest extends IndexingTestCase with UsefulTestCaseHelper {
       assertException[InvalidRepository](
           Some(SbtBundle("sbt.resolverIndexer.invalidRepository",
                          "C:\\non-existent-dir"))) {
-        createAndUpdateIndex(SbtResolver(
-                SbtResolver.Kind.Ivy, "Test repo", "C:\\non-existent-dir"))
+        createAndUpdateIndex(
+            SbtResolver(SbtResolver.Kind.Ivy,
+                        "Test repo",
+                        "C:\\non-existent-dir"))
       } else
       assertException[InvalidRepository](
           Some(SbtBundle("sbt.resolverIndexer.invalidRepository",
                          "/non-existent-dir"))) {
-        createAndUpdateIndex(SbtResolver(
-                SbtResolver.Kind.Ivy, "Test repo", "/non-existent-dir"))
+        createAndUpdateIndex(
+            SbtResolver(SbtResolver.Kind.Ivy,
+                        "Test repo",
+                        "/non-existent-dir"))
       }
   }
 }

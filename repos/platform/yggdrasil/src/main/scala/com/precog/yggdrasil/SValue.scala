@@ -140,7 +140,8 @@ sealed trait SValue {
 
   lazy val toJValue: JValue = this match {
     case SObject(obj) =>
-      JObject(obj.map({ case (k, v) => JField(k, v.toJValue) })(
+      JObject(
+          obj.map({ case (k, v) => JField(k, v.toJValue) })(
               collection.breakOut))
     case SArray(arr) => JArray(arr.map(_.toJValue)(collection.breakOut): _*)
     case SString(s) => JString(s)
@@ -201,9 +202,9 @@ trait SValueInstances {
         (o1.size ?|? o2.size) |+|
         (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1))
           .foldLeft[Ordering](EQ) {
-          case (ord, ((k1, v1), (k2, v2))) =>
-            ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
-        }
+            case (ord, ((k1, v1), (k2, v2))) =>
+              ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
+          }
     }
 
     private val arrayOrder = (o1: Vector[SValue]) =>
@@ -234,9 +235,9 @@ trait SValueInstances {
     private val objectEqual = (o1: Map[String, SValue]) =>
       (o2: Map[String, SValue]) =>
         (o1.size == o2.size) &&
-        (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1)).foldLeft(true) {
-          case (eql, ((k1, v1), (k2, v2))) => eql && k1 == k2 && v1 === v2
-    }
+          (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1)).foldLeft(true) {
+            case (eql, ((k1, v1), (k2, v2))) => eql && k1 == k2 && v1 === v2
+      }
 
     private val arrayEqual = (o1: Vector[SValue]) =>
       (o2: Vector[SValue]) =>

@@ -21,7 +21,9 @@ class InteractiveStatusDisplay extends TopComponentDisplayable {
   private val myPanel = new JPanel()
 
   private val successIcon = createAnimatedIcon(
-      InteractiveStatusDisplay.MY_COMPILE_ACTION, MY_OK_ICON, ICON_STEP_COUNT)
+      InteractiveStatusDisplay.MY_COMPILE_ACTION,
+      MY_OK_ICON,
+      ICON_STEP_COUNT)
   private val failIcon = createAnimatedIcon(
       InteractiveStatusDisplay.MY_COMPILE_ACTION,
       MY_ERROR_ICON,
@@ -78,15 +80,16 @@ class InteractiveStatusDisplay extends TopComponentDisplayable {
   private def createSimpleIcon(icon: Icon): JComponent =
     new ScalableIconComponent(icon)
 
-  private def createAnimatedIcon(
-      icon1: Icon, icon2: Icon, steps: Int): AnimatedIcon = {
+  private def createAnimatedIcon(icon1: Icon,
+                                 icon2: Icon,
+                                 steps: Int): AnimatedIcon = {
     val pi2 = Math.PI * 2
     val step = pi2 / steps
 
     val i = new AnimatedIcon(
         "Compiling...",
-        (for (i <- 0 to steps) yield
-          new RotatedIcon(icon1, step * i)).toArray[Icon],
+        (for (i <- 0 to steps)
+          yield new RotatedIcon(icon1, step * i)).toArray[Icon],
         icon2,
         ICON_CYCLE_LENGTH
     )

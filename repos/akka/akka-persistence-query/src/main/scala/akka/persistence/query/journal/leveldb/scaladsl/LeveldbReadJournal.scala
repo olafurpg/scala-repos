@@ -72,8 +72,8 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     // no polling for this query, the write journal will push all changes, i.e.
     // no refreshInterval
     Source
-      .actorPublisher[String](AllPersistenceIdsPublisher.props(
-              liveQuery = true, maxBufSize, writeJournalPluginId))
+      .actorPublisher[String](AllPersistenceIdsPublisher
+            .props(liveQuery = true, maxBufSize, writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("allPersistenceIds")
   }
@@ -85,8 +85,8 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     */
   override def currentPersistenceIds(): Source[String, NotUsed] = {
     Source
-      .actorPublisher[String](AllPersistenceIdsPublisher.props(
-              liveQuery = false, maxBufSize, writeJournalPluginId))
+      .actorPublisher[String](AllPersistenceIdsPublisher
+            .props(liveQuery = false, maxBufSize, writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("currentPersistenceIds")
   }
@@ -190,7 +190,8 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     * backend journal.
     */
   override def eventsByTag(
-      tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
+      tag: String,
+      offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
     Source
       .actorPublisher[EventEnvelope](
           EventsByTagPublisher.props(tag,
@@ -209,7 +210,8 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     * stored after the query is completed are not included in the event stream.
     */
   override def currentEventsByTag(
-      tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
+      tag: String,
+      offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
     Source
       .actorPublisher[EventEnvelope](
           EventsByTagPublisher.props(tag,

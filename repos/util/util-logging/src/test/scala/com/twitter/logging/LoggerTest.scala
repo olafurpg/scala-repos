@@ -209,8 +209,7 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
       val executorService = Executors.newFixedThreadPool(numThreads)
       val futureResults = new mutable.ListBuffer[Future[Logger]]
       for (i <- 0.until(numThreads)) {
-        val future = executorService.submit(
-            new Callable[Logger]() {
+        val future = executorService.submit(new Callable[Logger]() {
           def call(): Logger = {
             latch.await(10, TimeUnit.SECONDS)
             return Logger.get("concurrencyTest")

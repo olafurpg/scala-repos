@@ -56,10 +56,10 @@ private[mesos] object MesosSchedulerBackendUtil extends Logging {
                   .setHostPath(host_path)
                   .setMode(Volume.Mode.RO))
           case spec => {
-              logWarning(s"Unable to parse volume specs: $volumes. " +
+            logWarning(s"Unable to parse volume specs: $volumes. " +
                   "Expected form: \"[host-dir:]container-dir[:rw|:ro](, ...)\"")
-              None
-            }
+            None
+          }
         }
       }
       .map { _.build() }
@@ -95,10 +95,10 @@ private[mesos] object MesosSchedulerBackendUtil extends Logging {
                   .setContainerPort(container_port.toInt)
                   .setProtocol(protocol))
           case spec => {
-              logWarning(s"Unable to parse port mapping specs: $portmaps. " +
+            logWarning(s"Unable to parse port mapping specs: $portmaps. " +
                   "Expected form: \"host_port:container_port[:udp|:tcp](, ...)\"")
-              None
-            }
+            None
+          }
         }
       }
       .map { _.build() }
@@ -113,8 +113,8 @@ private[mesos] object MesosSchedulerBackendUtil extends Logging {
       image: String,
       volumes: Option[List[Volume]] = None,
       network: Option[ContainerInfo.DockerInfo.Network] = None,
-      portmaps: Option[List[ContainerInfo.DockerInfo.PortMapping]] =
-        None): Unit = {
+      portmaps: Option[List[ContainerInfo.DockerInfo.PortMapping]] = None)
+    : Unit = {
 
     val docker = ContainerInfo.DockerInfo.newBuilder().setImage(image)
 

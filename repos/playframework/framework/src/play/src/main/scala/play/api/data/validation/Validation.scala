@@ -11,8 +11,8 @@ package play.api.data.validation
   * @param args the message arguments, to format the constraint name
   * @param f the validation function
   */
-case class Constraint[-T](name: Option[String], args: Seq[Any])(
-    f: (T => ValidationResult)) {
+case class Constraint[-T](name: Option[String],
+                          args: Seq[Any])(f: (T => ValidationResult)) {
 
   /**
     * Run the constraint validation.
@@ -235,8 +235,8 @@ object Invalid {
 }
 
 object ParameterValidator {
-  def apply[T](
-      constraints: Iterable[Constraint[T]], optionalParam: Option[T]*) =
+  def apply[T](constraints: Iterable[Constraint[T]],
+               optionalParam: Option[T]*) =
     optionalParam.flatMap {
       _.map { param =>
         constraints.flatMap {

@@ -52,8 +52,9 @@ import scalafx.delegate.SFXDelegate
   *
   */
 abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
-    javaClass: Class[J], scalaClass: Class[S])(
-    implicit jfx2sfx: J => S = null, sfx2jfx: S => J = null)
+    javaClass: Class[J],
+    scalaClass: Class[S])(implicit jfx2sfx: J => S = null,
+                          sfx2jfx: S => J = null)
     extends FlatSpec
     with AbstractComparator {
 
@@ -140,7 +141,7 @@ abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
     try {
       assert(expectedNullSFXToJFXValue === sfx2jfx(null.asInstanceOf[S]),
              ". Implicit conversion of ScalaFX `null` to JavaFX should be `" +
-             expectedNullSFXToJFXValue + "`.")
+               expectedNullSFXToJFXValue + "`.")
     } catch {
       case ex: NullPointerException =>
         fail("sfx2jfx implicit conversion should accept `null` argument.")
@@ -172,7 +173,7 @@ abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
     try {
       assert(expectedNullJFXToSFXValue === jfx2sfx(null.asInstanceOf[J]),
              ". Implicit conversion of JavaFX `null` to ScalaFX should be `" +
-             expectedNullJFXToSFXValue + "`.")
+               expectedNullJFXToSFXValue + "`.")
     } catch {
       case ex: NullPointerException =>
         fail("jfx2sfx implicit conversion should accept `null` argument.")

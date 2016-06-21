@@ -135,8 +135,11 @@ case class TestCC(a: Int,
                   aBB: ByteBuffer)
     extends SealedTraitTest
 
-case class TestCaseClassB(
-    a: Int, b: Long, c: Option[Int], d: Double, e: Option[String])
+case class TestCaseClassB(a: Int,
+                          b: Long,
+                          c: Option[Int],
+                          d: Double,
+                          e: Option[String])
     extends SealedTraitTest
 
 case class TestCaseClassD(a: Int) extends SealedTraitTest
@@ -607,18 +610,18 @@ class MacroOrderingProperties
   }
   test("Test out HashMap[Long, Long]") {
     import scala.collection.immutable.HashMap
-    implicit val isa = Arbitrary(
-        implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
-          .map(HashMap(_: _*)))
+    implicit val isa =
+      Arbitrary(implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
+            .map(HashMap(_: _*)))
     primitiveOrderedBufferSupplier[HashMap[Long, Long]]
     check[HashMap[Long, Long]]
     checkCollisions[HashMap[Long, Long]]
   }
   test("Test out ListMap[Long, Long]") {
     import scala.collection.immutable.ListMap
-    implicit val isa = Arbitrary(
-        implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
-          .map(ListMap(_: _*)))
+    implicit val isa =
+      Arbitrary(implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
+            .map(ListMap(_: _*)))
     primitiveOrderedBufferSupplier[ListMap[Long, Long]]
     check[ListMap[Long, Long]]
     checkCollisions[ListMap[Long, Long]]

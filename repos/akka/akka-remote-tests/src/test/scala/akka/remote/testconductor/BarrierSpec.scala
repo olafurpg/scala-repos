@@ -139,10 +139,11 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
                     Data(Set(nodeA), "bar6", a.ref :: Nil, thr.data.deadline),
                     B)) ⇒
         case x ⇒
-          fail("Expected " +
-              Failed(barrier,
-                     ClientLost(Data(Set(nodeA), "bar6", a.ref :: Nil, null),
-                                B)) + " but got " + x)
+          fail(
+              "Expected " +
+                Failed(barrier,
+                       ClientLost(Data(Set(nodeA), "bar6", a.ref :: Nil, null),
+                                  B)) + " but got " + x)
       }
     }
 
@@ -225,11 +226,11 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
         case x ⇒
           fail(
               "Expected " +
-              Failed(barrier,
-                     BarrierEmpty(
-                         Data(Set(), "", Nil, null),
-                         "cannot remove RoleName(a): no client to remove")) +
-              " but got " + x)
+                Failed(barrier,
+                       BarrierEmpty(
+                           Data(Set(), "", Nil, null),
+                           "cannot remove RoleName(a): no client to remove")) +
+                " but got " + x)
       }
       barrier ! NodeInfo(A, AddressFromURIString("akka://sys"), a.ref)
       a.send(barrier, EnterBarrier("bar9", None))
@@ -254,11 +255,12 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
                                              thr.data.deadline))) ⇒
           case x ⇒
             fail(
-                "Expected " + Failed(
-                    barrier,
-                    BarrierTimeout(Data(
-                            Set(nodeA, nodeB), "bar10", a.ref :: Nil, null))) +
-                " but got " + x)
+                "Expected " + Failed(barrier,
+                                     BarrierTimeout(Data(Set(nodeA, nodeB),
+                                                         "bar10",
+                                                         a.ref :: Nil,
+                                                         null))) +
+                  " but got " + x)
         }
       }
     }
@@ -279,11 +281,10 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
                     Data(Set(nodeA), "", Nil, thr.data.deadline),
                     nodeB)) ⇒
         case x ⇒
-          fail(
-              "Expected " +
-              Failed(barrier,
-                     DuplicateNode(Data(Set(nodeA), "", Nil, null), nodeB)) +
-              " but got " + x)
+          fail("Expected " +
+                Failed(barrier,
+                       DuplicateNode(Data(Set(nodeA), "", Nil, null), nodeB)) +
+                " but got " + x)
       }
     }
 

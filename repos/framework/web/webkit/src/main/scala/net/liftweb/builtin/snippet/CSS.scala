@@ -53,8 +53,8 @@ object CSS extends DispatchSnippet {
                                    "/blueprint/print.css"} type="text/css" media="print"/>
     </xml:group> ++ Unparsed("""
   <!--[if IE]><link rel="stylesheet" href=""" + '"' +
-        S.contextPath + """/""" + LiftRules.resourceServerPath +
-        """/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+          S.contextPath + """/""" + LiftRules.resourceServerPath +
+          """/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
     """)
   }
 

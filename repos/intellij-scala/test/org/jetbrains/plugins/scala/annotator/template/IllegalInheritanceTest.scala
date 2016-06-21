@@ -22,7 +22,7 @@ class IllegalInheritanceTest extends AnnotatorTestBase(IllegalInheritance) {
     assertNothing(
         messages(
             "trait U; trait X[A]; trait Y[A] { self: X[A] => }; class Z extends X[U]; " +
-            "object A {new Z with Y[U]}"))
+              "object A {new Z with Y[U]}"))
     assertNothing(
         messages(
             """

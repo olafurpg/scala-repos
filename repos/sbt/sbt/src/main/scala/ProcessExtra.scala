@@ -13,8 +13,8 @@ trait ProcessExtra {
   @deprecated("Use string interpolation", "0.13.0")
   implicit def xmlToProcess(command: scala.xml.Elem): ProcessBuilder =
     apply(command)
-  implicit def buildersToProcess[T](builders: Seq[T])(
-      implicit convert: T => ProcessBuilder.Source)
+  implicit def buildersToProcess[T](
+      builders: Seq[T])(implicit convert: T => ProcessBuilder.Source)
     : Seq[ProcessBuilder.Source] = applySeq(builders)
 
   implicit def stringToProcess(command: String): ProcessBuilder =

@@ -45,7 +45,8 @@ class PrimitivePickler[T: FastTypeTag](name: String)
             s"""error in unpickle of primitive unpickler '$name':
                                    |tag in unpickle: '${tag}'
                                    |message:
-                                   |$msg""".stripMargin, cause)
+                                   |$msg""".stripMargin,
+            cause)
     }
   }
 }

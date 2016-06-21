@@ -30,8 +30,10 @@ object SnapshotDirectoryFailureSpec {
 }
 
 class SnapshotDirectoryFailureSpec
-    extends AkkaSpec(PersistenceSpec.config(
-            "leveldb", "SnapshotDirectoryFailureSpec", extraConfig = Some(s"""
+    extends AkkaSpec(
+        PersistenceSpec.config("leveldb",
+                               "SnapshotDirectoryFailureSpec",
+                               extraConfig = Some(s"""
   akka.persistence.snapshot-store.local.dir = "${SnapshotDirectoryFailureSpec.inUseSnapshotPath}"
   """)))
     with ImplicitSender {

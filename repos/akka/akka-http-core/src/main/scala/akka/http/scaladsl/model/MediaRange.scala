@@ -52,18 +52,19 @@ sealed abstract class MediaRange
 }
 
 object MediaRange {
-  private[http] def splitOffQValue(params: Map[String, String],
-                                   defaultQ: Float =
-                                     1.0f): (Map[String, String], Float) =
+  private[http] def splitOffQValue(
+      params: Map[String, String],
+      defaultQ: Float = 1.0f): (Map[String, String], Float) =
     params.get("q") match {
       case Some(x) ⇒
         (params - "q") ->
-        (try x.toFloat catch { case _: NumberFormatException ⇒ 1.0f })
+          (try x.toFloat catch { case _: NumberFormatException ⇒ 1.0f })
       case None ⇒ params -> defaultQ
     }
 
-  private final case class Custom(
-      mainType: String, params: Map[String, String], qValue: Float)
+  private final case class Custom(mainType: String,
+                                  params: Map[String, String],
+                                  qValue: Float)
       extends MediaRange
       with ValueRenderable {
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
@@ -111,7 +112,7 @@ object MediaRange {
     override def isVideo = mediaType.isVideo
     def matches(mediaType: MediaType) =
       this.mediaType.mainType == mediaType.mainType &&
-      this.mediaType.subType == mediaType.subType
+        this.mediaType.subType == mediaType.subType
     def withParams(params: Map[String, String]) =
       copy(mediaType = mediaType.withParams(params))
     def withQValue(qValue: Float) = copy(qValue = qValue)

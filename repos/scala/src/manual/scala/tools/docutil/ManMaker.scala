@@ -52,7 +52,7 @@ class ManMaker extends Task {
 
           val manFileName =
             manout.get.getPath + File.separator + "man1" + File.separator +
-            cmd + ".1"
+              cmd + ".1"
           val manFile = new FileOutputStream(manFileName)
           EmitManPage.emitManPage(classname, manFile)
         })

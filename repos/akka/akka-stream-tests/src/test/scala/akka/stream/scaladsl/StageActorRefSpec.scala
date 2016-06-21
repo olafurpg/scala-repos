@@ -153,7 +153,7 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
       val actorName = """StageActorRef-[\d+]"""
       val expectedMsg =
         s"[PoisonPill|Kill] message sent to StageActorRef($actorName) will be ignored,since it is not a real Actor. " +
-        "Use a custom message type to communicate with it instead."
+          "Use a custom message type to communicate with it instead."
       expectMsgPF(1.second, expectedMsg) {
         case Logging.Warning(_, _, msg) ⇒
           expectedMsg.r.pattern.matcher(msg.toString).matches()

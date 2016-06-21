@@ -46,8 +46,8 @@ class ClientBuilderTest
       val client = m.build()
       val requestFuture = client("123")
 
-      verify(m.codec).prepareConnFactory(
-          any[ServiceFactory[String, String]], any[Stack.Params])
+      verify(m.codec).prepareConnFactory(any[ServiceFactory[String, String]],
+                                         any[Stack.Params])
       verify(preparedFactory)()
 
       assert(!requestFuture.isDefined)

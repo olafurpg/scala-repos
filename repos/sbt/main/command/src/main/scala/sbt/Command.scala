@@ -73,16 +73,16 @@ object Command {
   def single(name: String, briefHelp: (String, String), detail: String)(
       f: (State, String) => State): Command =
     single(name, Help(name, briefHelp, detail))(f)
-  def single(name: String, help: Help = Help.empty)(
-      f: (State, String) => State): Command =
+  def single(name: String,
+             help: Help = Help.empty)(f: (State, String) => State): Command =
     make(name, help)(state =>
           token(trimmed(spacedAny(name)) map apply1(f, state)))
 
-  def custom(
-      parser: State => Parser[() => State], help: Help = Help.empty): Command =
+  def custom(parser: State => Parser[() => State],
+             help: Help = Help.empty): Command =
     customHelp(parser, const(help))
-  def customHelp(
-      parser: State => Parser[() => State], help: State => Help): Command =
+  def customHelp(parser: State => Parser[() => State],
+                 help: State => Help): Command =
     new ArbitraryCommand(parser, help, AttributeMap.empty)
   def arb[T](parser: State => Parser[T], help: Help = Help.empty)(
       effect: (State, T) => State): Command =
@@ -155,7 +155,7 @@ object Command {
     bs.map { b =>
       (b, distance(a, b))
     } filter (_._2 <= maxDistance) sortBy (_._2) take (maxSuggestions) map
-    (_._1)
+      (_._1)
   def distance(a: String, b: String): Int =
     EditDistance.levenshtein(a,
                              b,

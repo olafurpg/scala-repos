@@ -36,19 +36,19 @@ object Dist {
       distExclude := Seq.empty,
       distAllClasspaths <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          dependencyClasspath.task in Compile),
+            dependencyClasspath.task in Compile),
       distDependencies <<= distAllClasspaths map {
         _.flatten.map(_.data).filter(ClasspathUtilities.isArchive).distinct
       },
       distLibJars <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          packageBin.task in Compile),
+            packageBin.task in Compile),
       distSrcJars <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          packageSrc.task in Compile),
+            packageSrc.task in Compile),
       distDocJars <<=
         (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-          packageDoc.task in Compile),
+            packageDoc.task in Compile),
       distSources <<= (distDependencies,
                        distLibJars,
                        distSrcJars,
@@ -59,17 +59,17 @@ object Dist {
       distUnzipped <<= distDirectory / "unzipped",
       distFile <<=
         (distDirectory, version, scalaBinaryVersion) { (dir, v, sbv) =>
-        dir / ("akka_" + sbv + "-" + v + ".zip")
-      },
+          dir / ("akka_" + sbv + "-" + v + ".zip")
+        },
       dist <<= distTask
   )
 
   def docsProject: ProjectReference = LocalProject(AkkaBuild.docs.id)
 
-  def aggregated[T](
-      task: SettingKey[Task[T]])(projectRef: ProjectRef,
-                                 structure: Load.BuildStructure,
-                                 exclude: Seq[String]): Task[Seq[T]] = {
+  def aggregated[T](task: SettingKey[Task[T]])(
+      projectRef: ProjectRef,
+      structure: Load.BuildStructure,
+      exclude: Seq[String]): Task[Seq[T]] = {
     val projects = aggregatedProjects(projectRef, structure, exclude)
     projects flatMap { task in LocalProject(_) get structure.data } join
   }

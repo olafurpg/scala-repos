@@ -62,8 +62,8 @@ object WriteSupportProvider {
         case tpe if tpe.erasure =:= typeOf[Option[Any]] =>
           val cacheName = newTermName(ctx.fresh(s"optionIndex"))
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
-          val (_, subTree) = matchField(
-              idx, innerType, q"$cacheName", groupName)
+          val (_, subTree) =
+            matchField(idx, innerType, q"$cacheName", groupName)
           (idx + 1,
            q"""if($fValue.isDefined) {
                           val $cacheName = $fValue.get
@@ -72,7 +72,7 @@ object WriteSupportProvider {
                      """)
         case tpe
             if tpe.erasure =:= typeOf[List[Any]] ||
-            tpe.erasure =:= typeOf[Set[_]] =>
+              tpe.erasure =:= typeOf[Set[_]] =>
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
           val newGroupName = createGroupName()
           val (_, subTree) = matchField(0, innerType, q"element", newGroupName)
@@ -90,8 +90,8 @@ object WriteSupportProvider {
           val List(keyType, valueType) = tpe.asInstanceOf[TypeRefApi].args
           val newGroupName = createGroupName()
           val (_, keySubTree) = matchField(0, keyType, q"key", newGroupName)
-          val (_, valueSubTree) = matchField(
-              1, valueType, q"value", newGroupName)
+          val (_, valueSubTree) =
+            matchField(1, valueType, q"value", newGroupName)
           (idx + 1,
            writeCollectionField(newGroupName,
                                 q"""
@@ -116,14 +116,17 @@ object WriteSupportProvider {
       }
     }
 
-    def expandMethod(
-        outerTpe: Type, pValueTree: Tree, groupName: TermName): (Int, Tree) = {
+    def expandMethod(outerTpe: Type,
+                     pValueTree: Tree,
+                     groupName: TermName): (Int, Tree) = {
       outerTpe.declarations.collect {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.foldLeft((0, q"")) {
         case ((idx, existingTree), getter) =>
-          val (newIdx, subTree) = matchField(
-              idx, getter.returnType, q"$pValueTree.$getter", groupName)
+          val (newIdx, subTree) = matchField(idx,
+                                             getter.returnType,
+                                             q"$pValueTree.$getter",
+                                             groupName)
           (newIdx,
            q"""
                       $existingTree

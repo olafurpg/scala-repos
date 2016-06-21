@@ -36,8 +36,8 @@ import org.apache.spark.util.Utils
   * Parses and encapsulates arguments from the spark-submit script.
   * The env argument is used for testing.
   */
-private[deploy] class SparkSubmitArguments(
-    args: Seq[String], env: Map[String, String] = sys.env)
+private[deploy] class SparkSubmitArguments(args: Seq[String],
+                                           env: Map[String, String] = sys.env)
     extends SparkSubmitArgumentsParser {
   var master: String = null
   var deployMode: String = null
@@ -221,7 +221,7 @@ private[deploy] class SparkSubmitArguments(
         case _ =>
           SparkSubmit.printErrorAndExit(
               s"Cannot load main class from JAR $primaryResource with URI $uriScheme. " +
-              "Please specify a class through --class.")
+                "Please specify a class through --class.")
       }
     }
 
@@ -273,9 +273,8 @@ private[deploy] class SparkSubmitArguments(
       val hasHadoopEnv =
         env.contains("HADOOP_CONF_DIR") || env.contains("YARN_CONF_DIR")
       if (!hasHadoopEnv && !Utils.isTesting) {
-        throw new Exception(
-            s"When running with master '$master' " +
-            "either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.")
+        throw new Exception(s"When running with master '$master' " +
+              "either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.")
       }
     }
 
@@ -497,8 +496,8 @@ private[deploy] class SparkSubmitArguments(
     childArgs ++= extra.asScala
   }
 
-  private def printUsageAndExit(
-      exitCode: Int, unknownParam: Any = null): Unit = {
+  private def printUsageAndExit(exitCode: Int,
+                                unknownParam: Any = null): Unit = {
     // scalastyle:off println
     val outStream = SparkSubmit.printStream
     if (unknownParam != null) {

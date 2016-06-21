@@ -93,8 +93,7 @@ class WorksheetFileHook(private val project: Project)
         case ref =>
           val p = ref.get()
 
-          ApplicationManager.getApplication.invokeLater(
-              new Runnable {
+          ApplicationManager.getApplication.invokeLater(new Runnable {
             override def run() {
               if (p != null) myFileEditorManager.removeTopComponent(editor, p)
             }
@@ -124,8 +123,8 @@ class WorksheetFileHook(private val project: Project)
           else display.onSuccessfulCompiling())
   }
 
-  private def cleanAndAdd(
-      file: VirtualFile, action: Option[TopComponentDisplayable]) {
+  private def cleanAndAdd(file: VirtualFile,
+                          action: Option[TopComponentDisplayable]) {
     WorksheetFileHook getPanel file foreach {
       case panelRef =>
         val panel = panelRef.get()
@@ -177,11 +176,12 @@ class WorksheetFileHook(private val project: Project)
       loadEvaluationResult(source, file)
 
       WorksheetAutoRunner.getInstance(source.getProject) addListener doc(
-          source, file)
+          source,
+          file)
     }
 
-    private def loadEvaluationResult(
-        source: FileEditorManager, file: VirtualFile) {
+    private def loadEvaluationResult(source: FileEditorManager,
+                                     file: VirtualFile) {
       source getSelectedEditor file match {
         case txt: TextEditor =>
           txt.getEditor match {
@@ -209,8 +209,8 @@ class WorksheetFileHook(private val project: Project)
 
                         if (splitter != null) {
                           splitter setProportion ratio
-                          WorksheetFoldGroup.load(
-                              viewer, ext, project, splitter, scalaFile)
+                          WorksheetFoldGroup
+                            .load(viewer, ext, project, splitter, scalaFile)
                         }
                       }
                     case _ =>

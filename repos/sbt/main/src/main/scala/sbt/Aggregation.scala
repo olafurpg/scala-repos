@@ -19,8 +19,10 @@ final object Aggregation {
                               taskValues: Boolean,
                               print: String => Unit,
                               success: Boolean)
-  final case class Complete[T](
-      start: Long, stop: Long, results: Result[Seq[KeyValue[T]]], state: State)
+  final case class Complete[T](start: Long,
+                               stop: Long,
+                               results: Result[Seq[KeyValue[T]]],
+                               state: State)
   final case class KeyValue[+T](key: ScopedKey[_], value: T)
 
   def defaultShow(state: State, showTasks: Boolean): ShowConfig =
@@ -52,8 +54,8 @@ final object Aggregation {
       runTasks(s, structure, ts, DummyTaskMap(Nil), show)
     }
 
-  @deprecated(
-      "Use `timedRun` and `showRun` directly or use `runTasks`.", "0.13.0")
+  @deprecated("Use `timedRun` and `showRun` directly or use `runTasks`.",
+              "0.13.0")
   def runTasksWithResult[T](
       s: State,
       structure: BuildStructure,
@@ -76,8 +78,9 @@ final object Aggregation {
     }
     if (show.success) printSuccess(start, stop, extracted, success, log)
   }
-  def timedRun[T](
-      s: State, ts: Values[Task[T]], extra: DummyTaskMap): Complete[T] = {
+  def timedRun[T](s: State,
+                  ts: Values[Task[T]],
+                  extra: DummyTaskMap): Complete[T] = {
     import EvaluateTask._
     import std.TaskExtra._
 
@@ -96,12 +99,12 @@ final object Aggregation {
     Complete(start, stop, result, newS)
   }
 
-  def runTasks[HL <: HList, T](s: State,
-                               structure: BuildStructure,
-                               ts: Values[Task[T]],
-                               extra: DummyTaskMap,
-                               show: ShowConfig)(
-      implicit display: Show[ScopedKey[_]]): State = {
+  def runTasks[HL <: HList, T](
+      s: State,
+      structure: BuildStructure,
+      ts: Values[Task[T]],
+      extra: DummyTaskMap,
+      show: ShowConfig)(implicit display: Show[ScopedKey[_]]): State = {
     val complete = timedRun[T](s, ts, extra)
     showRun(complete, show)
     complete.results match {
@@ -120,8 +123,8 @@ final object Aggregation {
       key in currentRef get structure.data getOrElse true
     if (get(showSuccess)) {
       if (get(showTiming)) {
-        val msg = timingString(
-            start, stop, "", structure.data, currentRef, log)
+        val msg =
+          timingString(start, stop, "", structure.data, currentRef, log)
         if (success) log.success(msg) else log.error(msg)
       } else if (success) log.success("")
     }
@@ -155,8 +158,8 @@ final object Aggregation {
                            inputs: Values[InputTask[I]],
                            show: ShowConfig)(
       implicit display: Show[ScopedKey[_]]): Parser[() => State] = {
-    val parsers = for (KeyValue(k, it) <- inputs) yield
-      it.parser(s).map(v => KeyValue(k, v))
+    val parsers = for (KeyValue(k, it) <- inputs)
+      yield it.parser(s).map(v => KeyValue(k, v))
     Command.applyEffect(seq(parsers)) { roots =>
       import EvaluateTask._
       runTasks(s, structure, roots, DummyTaskMap(Nil), show)
@@ -204,8 +207,10 @@ final object Aggregation {
         val base =
           if (tasks.isEmpty) success(() => s)
           else
-            applyTasks(
-                s, structure, maps(tasks)(x => success(castToAny(x))), show)
+            applyTasks(s,
+                       structure,
+                       maps(tasks)(x => success(castToAny(x))),
+                       show)
         base.map { res => () =>
           val newState = res()
           if (show.settingValues && settings.nonEmpty)

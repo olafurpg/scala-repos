@@ -16,13 +16,15 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  private[this] def portRange(
-      role: String, begin: Long, end: Long): PortRange = {
+  private[this] def portRange(role: String,
+                              begin: Long,
+                              end: Long): PortRange = {
     PortRange(role, begin.toInt, end.toInt)
   }
 
   private[this] def withRandomSeeds(
-      input: Seq[PortRange], expectedOutput: Iterable[PortWithRole]): Unit = {
+      input: Seq[PortRange],
+      expectedOutput: Iterable[PortWithRole]): Unit = {
     for (seed <- 1 to 10) {
       withClue(s"seed = $seed") {
         val rand = new Random(new util.Random(seed.toLong))
@@ -98,7 +100,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
     val allowTimeForTest = benchmarkDuration
     log.info(
         s"benchmarkDuration = ${benchmarkDuration.toMillis}ms, " +
-        s"allowing time for test = ${allowTimeForTest.toMillis}ms"
+          s"allowing time for test = ${allowTimeForTest.toMillis}ms"
     )
     log.info(s"duration = ${duration.toMillis}ms")
     assert(duration.toMillis < allowTimeForTest.toMillis)
@@ -137,7 +139,7 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
     val allowTimeForTest = benchmarkDuration * 50
     log.info(
         s"benchmarkDuration = ${benchmarkDuration.toMillis}ms, " +
-        s"allowing time for test = ${allowTimeForTest.toMillis}ms"
+          s"allowing time for test = ${allowTimeForTest.toMillis}ms"
     )
     log.info(
         s"duration = ${duration.toMillis}ms for $iterations iterations and $numberOfRanges ranges")

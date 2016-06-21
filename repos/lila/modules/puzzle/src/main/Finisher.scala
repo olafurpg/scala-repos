@@ -28,7 +28,8 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
             _.puzzle.crazyGlicko,
             s"puzzle ${puzzle.id} user")(puzzleRating, date)
         val userPerf = user.perfs.puzzle.addOrReset(
-            _.puzzle.crazyGlicko, s"puzzle ${puzzle.id}")(userRating, date)
+            _.puzzle.crazyGlicko,
+            s"puzzle ${puzzle.id}")(userRating, date)
         val a = new Attempt(id = Attempt.makeId(puzzle.id, user.id),
                             puzzleId = puzzle.id,
                             userId = user.id,

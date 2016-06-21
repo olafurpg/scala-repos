@@ -840,8 +840,10 @@ object Algebraic extends AlgebraicInstances {
     }
 
     @SerialVersionUID(0L)
-    case class ConstantRoot(
-        poly: Polynomial[BigInt], i: Int, lb: Rational, ub: Rational)
+    case class ConstantRoot(poly: Polynomial[BigInt],
+                            i: Int,
+                            lb: Rational,
+                            ub: Rational)
         extends Constant[Polynomial[BigInt]] {
       def value: Polynomial[BigInt] = poly
 
@@ -964,7 +966,7 @@ object Algebraic extends AlgebraicInstances {
         val rDigits = max(
             1 - rhs.lowerBound.decimalDigits,
             digits + 4 - 2 * rhs.lowerBound.decimalDigits +
-            lhs.upperBound.decimalDigits
+              lhs.upperBound.decimalDigits
         )
         if (lDigits >= Int.MaxValue || rDigits >= Int.MaxValue) {
           throw new IllegalArgumentException("required precision is too high")
@@ -1247,8 +1249,10 @@ object Algebraic extends AlgebraicInstances {
     } else if (cutoff > 18) {
       // We'd like to work with Long arithmetic, if possible. Our rounding is
       // exact anyways, so it doesn't hurt to remove some digits.
-      roundPositive(
-          exact, approx.setScale(scale + 18, RoundingMode.DOWN), scale, mode)
+      roundPositive(exact,
+                    approx.setScale(scale + 18, RoundingMode.DOWN),
+                    scale,
+                    mode)
     } else {
       val unscale = spire.math.pow(10L, cutoff.toLong)
       val Array(truncatedUnscaledValue, bigRemainder) =
@@ -1406,7 +1410,7 @@ object Algebraic extends AlgebraicInstances {
           val lc = lhs.lc * rhsExpr.degreeBound + rhs.lc * lhsExpr.degreeBound
           val tc =
             lhs.measure * rhsExpr.degreeBound +
-            rhs.measure * lhsExpr.degreeBound + 2 * degreeBound
+              rhs.measure * lhsExpr.degreeBound + 2 * degreeBound
           val measure = tc
           val ub = max(lhs.ub, rhs.ub) + 1
           val lb = max(-measure, -(ub * (degreeBound - 1) + lc))
@@ -1419,7 +1423,7 @@ object Algebraic extends AlgebraicInstances {
           val tc = lhs.tc * rhsExpr.degreeBound + rhs.tc * lhsExpr.degreeBound
           val measure =
             lhs.measure * rhsExpr.degreeBound +
-            rhs.measure * lhsExpr.degreeBound
+              rhs.measure * lhsExpr.degreeBound
           val lb = lhs.lb + rhs.lb
           val ub = lhs.ub + rhs.ub
           Bound(lc, tc, measure, lb, ub)
@@ -1431,7 +1435,7 @@ object Algebraic extends AlgebraicInstances {
           val tc = lhs.tc * rhsExpr.degreeBound + rhs.lc * lhsExpr.degreeBound
           val measure =
             lhs.measure * rhsExpr.degreeBound +
-            rhs.measure * lhsExpr.degreeBound
+              rhs.measure * lhsExpr.degreeBound
           val lb = lhs.lb - rhs.ub
           val ub = lhs.ub - rhs.lb
           Bound(lc, tc, measure, lb, ub)
@@ -1446,8 +1450,11 @@ object Algebraic extends AlgebraicInstances {
 
         case Pow(subExpr, k) =>
           val sub = subExpr.getBound(this)
-          Bound(
-              sub.lc * k, sub.tc * k, sub.measure * k, sub.lb * k, sub.ub * k)
+          Bound(sub.lc * k,
+                sub.tc * k,
+                sub.measure * k,
+                sub.lb * k,
+                sub.ub * k)
       }
     }
 

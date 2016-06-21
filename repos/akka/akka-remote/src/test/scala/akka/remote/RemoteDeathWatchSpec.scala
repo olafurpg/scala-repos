@@ -13,7 +13,8 @@ import akka.event.Logging.Warning
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteDeathWatchSpec
-    extends AkkaSpec(ConfigFactory.parseString("""
+    extends AkkaSpec(ConfigFactory.parseString(
+            """
 akka {
     actor {
         provider = "akka.remote.RemoteActorRefProvider"
@@ -58,8 +59,7 @@ akka {
     // simulate de-serialized ActorRef
     val ref = rarp.resolveActorRef(
         s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
-    system.actorOf(
-        Props(new Actor {
+    system.actorOf(Props(new Actor {
       context.watch(ref)
       def receive = {
         case Terminated(r) ⇒ testActor ! r

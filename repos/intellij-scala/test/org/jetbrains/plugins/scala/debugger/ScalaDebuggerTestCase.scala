@@ -46,9 +46,8 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   private val breakpoints: mutable.Set[(String, Int, Integer)] =
     mutable.Set.empty
 
-  protected def runDebugger(
-      mainClass: String = mainClassName, debug: Boolean = false)(
-      callback: => Unit) {
+  protected def runDebugger(mainClass: String = mainClassName,
+                            debug: Boolean = false)(callback: => Unit) {
     var processHandler: ProcessHandler = null
     UsefulTestCase.edt(new Runnable {
       def run() {
@@ -87,7 +86,9 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
       listener: ProcessListener,
       runner: ProgramRunner[_ <: RunnerSettings]): ProcessHandler = {
     val configuration: ApplicationConfiguration = new ApplicationConfiguration(
-        "app", module.getProject, ApplicationConfigurationType.getInstance)
+        "app",
+        module.getProject,
+        ApplicationConfigurationType.getInstance)
     configuration.setModule(module)
     configuration.setMainClassName(className)
     val executor: Executor =
@@ -99,16 +100,16 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
     semaphore.down()
     val processHandler: AtomicReference[ProcessHandler] =
       new AtomicReference[ProcessHandler]
-    runner.execute(
-        executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-      def processStarted(descriptor: RunContentDescriptor) {
-        val handler: ProcessHandler = descriptor.getProcessHandler
-        assert(handler != null)
-        handler.addProcessListener(listener)
-        processHandler.set(handler)
-        semaphore.up()
-      }
-    })
+    runner
+      .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
+        def processStarted(descriptor: RunContentDescriptor) {
+          val handler: ProcessHandler = descriptor.getProcessHandler
+          assert(handler != null)
+          handler.addProcessListener(listener)
+          processHandler.set(handler)
+          semaphore.up()
+        }
+      })
     semaphore.waitFor()
     processHandler.get
   }
@@ -144,8 +145,10 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
         val properties = new JavaLineBreakpointProperties
         properties.setLambdaOrdinal(ordinal)
         inWriteAction {
-          xBreakpointManager.addLineBreakpoint(
-              scalaLineBreakpointType, file.getUrl, line, properties)
+          xBreakpointManager.addLineBreakpoint(scalaLineBreakpointType,
+                                               file.getUrl,
+                                               line,
+                                               properties)
         }
     }
   }
@@ -194,8 +197,8 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   protected def managed[T >: Null](callback: => T): T = {
     var result: T = null
     def ctx =
-      DebuggerContextUtil.createDebuggerContext(
-          getDebugSession, suspendContext)
+      DebuggerContextUtil
+        .createDebuggerContext(getDebugSession, suspendContext)
     val semaphore = new Semaphore()
     semaphore.down()
     getDebugProcess.getManagerThread.invokeAndWait(
@@ -257,14 +260,14 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
       semaphore.up()
       res
     }
-    assert(
-        semaphore.waitFor(10000), "Too long evaluate expression: " + codeText)
+    assert(semaphore.waitFor(10000),
+           "Too long evaluate expression: " + codeText)
     result
   }
 
   protected def evalEquals(codeText: String, expected: String) {
-    Assert.assertEquals(
-        s"Evaluating:\n $codeText", expected, evalResult(codeText))
+    Assert
+      .assertEquals(s"Evaluating:\n $codeText", expected, evalResult(codeText))
   }
 
   protected def evalStartsWith(codeText: String, startsWith: String) {
@@ -293,8 +296,9 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
 
   protected def addOtherLibraries() = {}
 
-  def checkLocation(
-      source: String, methodName: String, lineNumber: Int): Unit = {
+  def checkLocation(source: String,
+                    methodName: String,
+                    lineNumber: Int): Unit = {
     def format(s: String, mn: String, ln: Int) = s"$s:$mn:$ln"
     managed {
       val location = suspendContext.getFrameProxy.getStackFrame.location

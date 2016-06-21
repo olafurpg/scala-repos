@@ -81,8 +81,9 @@ object Mailer extends Mailer {
   final case class ReplyTo(address: String, name: Box[String] = Empty)
       extends AddressType
 
-  final case class MessageInfo(
-      from: From, subject: Subject, info: List[MailTypes])
+  final case class MessageInfo(from: From,
+                               subject: Subject,
+                               info: List[MailTypes])
 }
 
 /**
@@ -269,8 +270,7 @@ trait Mailer extends SimpleInjector {
     })
     message.setSentDate(new java.util.Date())
     // message.setReplyTo(filter[MailTypes, ReplyTo](info, {case x @ ReplyTo(_) => Some(x); case _ => None}))
-    message.setReplyTo(
-        info.flatMap {
+    message.setReplyTo(info.flatMap {
       case x: ReplyTo => Some[ReplyTo](x)
       case _ => None
     })
@@ -333,16 +333,16 @@ trait Mailer extends SimpleInjector {
         bp.setText(txt, charset)
 
       case XHTMLMailBodyType(html) =>
-        bp.setContent(
-            encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
+        bp.setContent(encodeHtmlBodyPart(html),
+                      "text/html; charset=" + charSet)
 
       case XHTMLPlusImages(html, img @ _ *) =>
         val (attachments, images) = img.partition(_.attachment)
         val relatedMultipart = new MimeMultipart("related")
 
         val htmlBodyPart = new MimeBodyPart
-        htmlBodyPart.setContent(
-            encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
+        htmlBodyPart.setContent(encodeHtmlBodyPart(html),
+                                "text/html; charset=" + charSet)
         relatedMultipart.addBodyPart(htmlBodyPart)
 
         images.foreach { image =>

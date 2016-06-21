@@ -153,8 +153,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
   override def guardian: LocalActorRef = local.guardian
   override def systemGuardian: LocalActorRef = local.systemGuardian
   override def terminationFuture: Future[Terminated] = local.terminationFuture
-  override def registerTempActor(
-      actorRef: InternalActorRef, path: ActorPath): Unit =
+  override def registerTempActor(actorRef: InternalActorRef,
+                                 path: ActorPath): Unit =
     local.registerTempActor(actorRef, path)
   override def unregisterTempActor(path: ActorPath): Unit =
     local.unregisterTempActor(path)
@@ -316,7 +316,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
       }
 
       Iterator(props.deploy) ++ deployment.iterator reduce
-      ((a, b) ⇒ b withFallback a) match {
+        ((a, b) ⇒ b withFallback a) match {
         case d @ Deploy(_, _, _, RemoteScope(addr), _, _) ⇒
           if (hasAddress(addr)) {
             local.actorOf(system,
@@ -335,8 +335,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
               try {
                 // for consistency we check configuration of dispatcher and mailbox locally
                 val dispatcher = system.dispatchers.lookup(props.dispatcher)
-                system.mailboxes.getMailboxType(
-                    props, dispatcher.configurator.config)
+                system.mailboxes
+                  .getMailboxType(props, dispatcher.configurator.config)
               } catch {
                 case NonFatal(e) ⇒
                   throw new ConfigurationException(
@@ -356,7 +356,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
             } catch {
               case NonFatal(e) ⇒
                 throw new IllegalArgumentException(
-                    s"remote deployment failed for [$path]", e)
+                    s"remote deployment failed for [$path]",
+                    e)
             }
 
         case _ ⇒
@@ -391,7 +392,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
   override private[akka] def actorFor(
-      ref: InternalActorRef, path: String): InternalActorRef = path match {
+      ref: InternalActorRef,
+      path: String): InternalActorRef = path match {
     case ActorPathExtractor(address, elems) ⇒
       if (hasAddress(address)) actorFor(rootGuardian, elems)
       else {
@@ -405,8 +407,9 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                              deploy = None)
         } catch {
           case NonFatal(e) ⇒
-            log.error(
-                e, "Error while looking up address [{}]", rootPath.address)
+            log.error(e,
+                      "Error while looking up address [{}]",
+                      rootPath.address)
             new EmptyLocalActorRef(this, rootPath, eventStream)
         }
       }
@@ -415,7 +418,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
   override private[akka] def actorFor(
-      ref: InternalActorRef, path: Iterable[String]): InternalActorRef =
+      ref: InternalActorRef,
+      path: Iterable[String]): InternalActorRef =
     local.actorFor(ref, path)
 
   def rootGuardianAt(address: Address): ActorRef =
@@ -433,7 +437,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     * Called in deserialization of incoming remote messages where the correct local address is known.
     */
   private[akka] def resolveActorRefWithLocalAddress(
-      path: String, localAddress: Address): InternalActorRef = {
+      path: String,
+      localAddress: Address): InternalActorRef = {
     path match {
       case ActorPathExtractor(address, elems) ⇒
         if (hasAddress(address)) local.resolveActorRef(rootGuardian, elems)
@@ -506,10 +511,13 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     // actorSelection can't be used here because then it is not guaranteed that the actor is created
     // before someone can send messages to it
     resolveActorRef(RootActorPath(ref.path.address) / "remote") ! DaemonMsgCreate(
-        props, deploy, ref.path.toSerializationFormat, supervisor)
+        props,
+        deploy,
+        ref.path.toSerializationFormat,
+        supervisor)
 
-    remoteDeploymentWatcher ! RemoteDeploymentWatcher.WatchRemote(
-        ref, supervisor)
+    remoteDeploymentWatcher ! RemoteDeploymentWatcher.WatchRemote(ref,
+                                                                  supervisor)
   }
 
   def getExternalAddressFor(addr: Address): Option[Address] = {
@@ -527,7 +535,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
   private def hasAddress(address: Address): Boolean =
     address == local.rootPath.address || address == rootPath.address ||
-    transport.addresses(address)
+      transport.addresses(address)
 
   /**
     * Marks a remote system as out of sync and prevents reconnects until the quarantine timeout elapses.
@@ -548,7 +556,7 @@ private[akka] trait RemoteRef extends ActorRefScope {
   * Remote ActorRef that is used when referencing the Actor on a different node than its "home" node.
   * This reference is network-aware (remembers its origin) and immutable.
   */
-private[akka] class RemoteActorRef private[akka](
+private[akka] class RemoteActorRef private[akka] (
     remote: RemoteTransport,
     val localAddressToUse: Address,
     val path: ActorPath,
@@ -613,8 +621,8 @@ private[akka] class RemoteActorRef private[akka](
         //Unwatch has a different signature, need to pattern match arguments against InternalActorRef
         case Unwatch(watchee: InternalActorRef, watcher: InternalActorRef)
             if isWatchIntercepted(watchee, watcher) ⇒
-          provider.remoteWatcher ! RemoteWatcher.UnwatchRemote(
-              watchee, watcher)
+          provider.remoteWatcher ! RemoteWatcher.UnwatchRemote(watchee,
+                                                               watcher)
         case _ ⇒ remote.send(message, None, this)
       }
     } catch handleException

@@ -16,7 +16,8 @@ object AssertThrows {
     *  released. See org.junit.Assert.scala in jUnitRuntime.
     */
   private def expectThrowsBackport[T <: Throwable](
-      expectedThrowable: Class[T], runnable: ThrowingRunnable): T = {
+      expectedThrowable: Class[T],
+      runnable: ThrowingRunnable): T = {
     val result = {
       try {
         runnable.run()
@@ -28,8 +29,8 @@ object AssertThrows {
           } else {
             val mismatchMessage =
               "unexpected exception type thrown;" +
-              expectedThrowable.getSimpleName + " " +
-              actualThrown.getClass.getSimpleName
+                expectedThrowable.getSimpleName + " " +
+                actualThrown.getClass.getSimpleName
 
             val assertionError = new AssertionError(mismatchMessage)
             assertionError.initCause(actualThrown)
@@ -39,7 +40,7 @@ object AssertThrows {
     }
     if (result == null) {
       throw new AssertionError("expected " + expectedThrowable.getSimpleName +
-          " to be thrown, but nothing was thrown")
+            " to be thrown, but nothing was thrown")
     } else {
       result
     }
@@ -58,15 +59,15 @@ object AssertThrows {
     }
   }
 
-  def assertThrows[T <: Throwable, U](
-      expectedThrowable: Class[T], code: => U): Unit = {
+  def assertThrows[T <: Throwable, U](expectedThrowable: Class[T],
+                                      code: => U): Unit = {
     assertThrowsBackport(expectedThrowable, throwingRunnable {
       code
     })
   }
 
-  def expectThrows[T <: Throwable, U](
-      expectedThrowable: Class[T], code: => U): T = {
+  def expectThrows[T <: Throwable, U](expectedThrowable: Class[T],
+                                      code: => U): T = {
     expectThrowsBackport(expectedThrowable, throwingRunnable {
       code
     })

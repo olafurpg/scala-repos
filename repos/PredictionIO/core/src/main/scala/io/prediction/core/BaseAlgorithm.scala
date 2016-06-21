@@ -77,8 +77,9 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     * @return Batch of predicted results
     */
   @DeveloperApi
-  def batchPredictBase(
-      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)]
+  def batchPredictBase(sc: SparkContext,
+                       bm: Any,
+                       qs: RDD[(Long, Q)]): RDD[(Long, P)]
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. Called by serving to
@@ -107,8 +108,10 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     *         persistence, or Unit for re-training on deployment
     */
   @DeveloperApi
-  def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any =
+  def makePersistentModel(sc: SparkContext,
+                          modelId: String,
+                          algoParams: Params,
+                          bm: Any): Any =
     Unit
 
   /** :: DeveloperApi ::
@@ -117,8 +120,8 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     * @return Type signature of query
     */
   def queryClass: Class[Q] = {
-    val types = TypeResolver.resolveRawArguments(
-        classOf[BaseAlgorithm[PD, M, Q, P]], getClass)
+    val types = TypeResolver
+      .resolveRawArguments(classOf[BaseAlgorithm[PD, M, Q, P]], getClass)
     types(2).asInstanceOf[Class[Q]]
   }
 }

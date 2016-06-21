@@ -23,7 +23,8 @@ final case class Snapshot(data: Any)
   */
 @SerialVersionUID(1L)
 private[serialization] final case class SnapshotHeader(
-    serializerId: Int, manifest: Option[String])
+    serializerId: Int,
+    manifest: Option[String])
 
 /**
   * [[Snapshot]] serializer.
@@ -128,13 +129,12 @@ class SnapshotSerializer(val system: ExtendedActorSystem)
     // If we are allowed to break serialization compatibility of stored snapshots in 2.4
     // we can remove this attempt to deserialize SnapshotHeader with JavaSerializer.
     // Then the class SnapshotHeader can be removed. See issue #16009
-    val oldHeader =
-      if (readShort(in) == 0xedac) {
-        // Java Serialization magic value with swapped bytes
-        val b =
-          if (SnapshotSerializer.doPatch) patch(headerBytes) else headerBytes
-        serialization.deserialize(b, classOf[SnapshotHeader]).toOption
-      } else None
+    val oldHeader = if (readShort(in) == 0xedac) {
+      // Java Serialization magic value with swapped bytes
+      val b =
+        if (SnapshotSerializer.doPatch) patch(headerBytes) else headerBytes
+      serialization.deserialize(b, classOf[SnapshotHeader]).toOption
+    } else None
 
     val header = oldHeader.getOrElse {
       val headerIn = new ByteArrayInputStream(headerBytes)
@@ -151,8 +151,9 @@ class SnapshotSerializer(val system: ExtendedActorSystem)
     }
 
     serialization
-      .deserialize(
-          snapshotBytes, header.serializerId, header.manifest.getOrElse(""))
+      .deserialize(snapshotBytes,
+                   header.serializerId,
+                   header.manifest.getOrElse(""))
       .get
   }
 

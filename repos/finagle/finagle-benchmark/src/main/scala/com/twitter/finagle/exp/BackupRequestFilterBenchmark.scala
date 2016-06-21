@@ -30,11 +30,11 @@ class BackupRequestFilterBenchmark extends StdBenchAnnotations {
 
   private[this] val svc = backupReqFilter.andThen(Service.const(Response))
 
-  private[this] val sometimesSleepySvc = backupReqFilter.andThen(
-      Service.mk[String, Int] { _ =>
-    if (i.incrementAndGet() % 100 == 0) Thread.sleep(2)
-    Response
-  })
+  private[this] val sometimesSleepySvc =
+    backupReqFilter.andThen(Service.mk[String, Int] { _ =>
+      if (i.incrementAndGet() % 100 == 0) Thread.sleep(2)
+      Response
+    })
 
   @Benchmark
   def noBackups(): Int =

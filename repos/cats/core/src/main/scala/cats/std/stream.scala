@@ -31,16 +31,16 @@ trait StreamInstances {
     def foldLeft[A, B](fa: Stream[A], b: B)(f: (B, A) => B): B =
       fa.foldLeft(b)(f)
 
-    def foldRight[A, B](
-        fa: Stream[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+    def foldRight[A, B](fa: Stream[A],
+                        lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
       Now(fa).flatMap { s =>
         // Note that we don't use pattern matching to deconstruct the
         // stream, since that would needlessly force the tail.
         if (s.isEmpty) lb else f(s.head, Eval.defer(foldRight(s.tail, lb)(f)))
       }
 
-    def traverse[G[_], A, B](fa: Stream[A])(
-        f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
+    def traverse[G[_], A, B](fa: Stream[A])(f: A => G[B])(
+        implicit G: Applicative[G]): G[Stream[B]] = {
       def init: G[Stream[B]] = G.pure(Stream.empty[B])
 
       // We use foldRight to avoid possible stack overflows. Since

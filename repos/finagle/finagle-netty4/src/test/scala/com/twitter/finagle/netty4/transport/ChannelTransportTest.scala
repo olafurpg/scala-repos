@@ -28,8 +28,9 @@ class ChannelTransportTest
     (tr, ch)
   }
 
-  def assertSeenWhatsWritten[A](
-      written: Boolean, a: A, seen: Future[A]): Unit =
+  def assertSeenWhatsWritten[A](written: Boolean,
+                                a: A,
+                                seen: Future[A]): Unit =
     assert(!written || (written && Await.result(seen, timeout) == a))
 
   def assertFailedRead[A](seen: Future[A], e: Exception): Unit = {
@@ -169,7 +170,8 @@ class ChannelTransportTest
     channel.pipeline.fireExceptionCaught(e)
 
     assert(Await.result(transport.onClose, timeout) == ChannelException(
-            e, transport.remoteAddress))
+            e,
+            transport.remoteAddress))
     assert(transport.status == Status.Closed)
   }
 

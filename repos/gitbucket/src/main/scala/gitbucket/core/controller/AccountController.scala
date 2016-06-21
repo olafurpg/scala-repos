@@ -162,30 +162,30 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
         // Members
         case "members" if (account.isGroupAccount) => {
-            val members = getGroupMembers(account.userName)
-            gitbucket.core.account.html.members(
-                account,
-                members.map(_.userName),
-                context.loginAccount.exists(x =>
-                      members.exists { member =>
-                    member.userName == x.userName && member.isManager
-                }))
-          }
+          val members = getGroupMembers(account.userName)
+          gitbucket.core.account.html.members(
+              account,
+              members.map(_.userName),
+              context.loginAccount.exists(x =>
+                    members.exists { member =>
+                  member.userName == x.userName && member.isManager
+              }))
+        }
 
         // Repositories
         case _ => {
-            val members = getGroupMembers(account.userName)
-            gitbucket.core.account.html.repositories(
-                account,
-                if (account.isGroupAccount)
-                  Nil
-                else getGroupsByUserName(userName),
-                getVisibleRepositories(context.loginAccount, Some(userName)),
-                context.loginAccount.exists(x =>
-                      members.exists { member =>
-                    member.userName == x.userName && member.isManager
-                }))
-          }
+          val members = getGroupMembers(account.userName)
+          gitbucket.core.account.html.repositories(
+              account,
+              if (account.isGroupAccount)
+                Nil
+              else getGroupsByUserName(userName),
+              getVisibleRepositories(context.loginAccount, Some(userName)),
+              context.loginAccount.exists(x =>
+                    members.exists { member =>
+                  member.userName == x.userName && member.isManager
+              }))
+        }
       }
     } getOrElse NotFound
   }
@@ -208,8 +208,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     }
   }
 
-  get("/:userName/_edit")(
-      oneselfOnly {
+  get("/:userName/_edit")(oneselfOnly {
     val userName = params("userName")
     getAccountByUserName(userName).map { x =>
       html.edit(x, flash.get("info"))
@@ -219,11 +218,12 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   post("/:userName/_edit", editForm)(oneselfOnly { form =>
     val userName = params("userName")
     getAccountByUserName(userName).map { account =>
-      updateAccount(account.copy(
-              password = form.password.map(sha1).getOrElse(account.password),
-              fullName = form.fullName,
-              mailAddress = form.mailAddress,
-              url = form.url))
+      updateAccount(
+          account.copy(password =
+                         form.password.map(sha1).getOrElse(account.password),
+                       fullName = form.fullName,
+                       mailAddress = form.mailAddress,
+                       url = form.url))
 
       updateImage(userName, form.fileId, form.clearImage)
       flash += "info" -> "Account information has been updated."
@@ -254,23 +254,20 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     redirect("/")
   })
 
-  get("/:userName/_ssh")(
-      oneselfOnly {
+  get("/:userName/_ssh")(oneselfOnly {
     val userName = params("userName")
     getAccountByUserName(userName).map { x =>
       html.ssh(x, getPublicKeys(x.userName))
     } getOrElse NotFound
   })
 
-  post("/:userName/_ssh", sshKeyForm)(
-      oneselfOnly { form =>
+  post("/:userName/_ssh", sshKeyForm)(oneselfOnly { form =>
     val userName = params("userName")
     addPublicKey(userName, form.title, form.publicKey)
     redirect(s"/${userName}/_ssh")
   })
 
-  get("/:userName/_ssh/delete/:id")(
-      oneselfOnly {
+  get("/:userName/_ssh/delete/:id")(oneselfOnly {
     val userName = params("userName")
     val sshKeyId = params("id").toInt
     deletePublicKey(userName, sshKeyId)
@@ -284,20 +281,19 @@ trait AccountControllerBase extends AccountManagementControllerBase {
         var tokens = getAccessTokens(x.userName)
         val generatedToken = flash.get("generatedToken") match {
           case Some((tokenId: Int, token: String)) => {
-              val gt = tokens.find(_.accessTokenId == tokenId)
-              gt.map { t =>
-                tokens = tokens.filterNot(_ == t)
-                (t, token)
-              }
+            val gt = tokens.find(_.accessTokenId == tokenId)
+            gt.map { t =>
+              tokens = tokens.filterNot(_ == t)
+              (t, token)
             }
+          }
           case _ => None
         }
         html.application(x, tokens, generatedToken)
     } getOrElse NotFound
   })
 
-  post("/:userName/_personalToken", personalTokenForm)(
-      oneselfOnly { form =>
+  post("/:userName/_personalToken", personalTokenForm)(oneselfOnly { form =>
     val userName = params("userName")
     getAccountByUserName(userName).map { x =>
       val (tokenId, token) = generateAccessToken(userName, form.note)
@@ -306,8 +302,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     redirect(s"/${userName}/_application")
   })
 
-  get("/:userName/_personalToken/delete/:id")(
-      oneselfOnly {
+  get("/:userName/_personalToken/delete/:id")(oneselfOnly {
     val userName = params("userName")
     val tokenId = params("id").toInt
     deleteAccessToken(userName, tokenId)
@@ -337,14 +332,12 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     } else NotFound
   }
 
-  get("/groups/new")(
-      usersOnly {
+  get("/groups/new")(usersOnly {
     html.group(None,
                List(GroupMember("", context.loginAccount.get.userName, true)))
   })
 
-  post("/groups/new", newGroupForm)(
-      usersOnly { form =>
+  post("/groups/new", newGroupForm)(usersOnly { form =>
     createGroup(form.groupName, form.url)
     updateGroupMembers(form.groupName,
                        form.members
@@ -360,8 +353,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     redirect(s"/${form.groupName}")
   })
 
-  get("/:groupName/_editgroup")(
-      managersOnly {
+  get("/:groupName/_editgroup")(managersOnly {
     defining(params("groupName")) { groupName =>
       html.group(getAccountByUserName(groupName, true),
                  getGroupMembers(groupName))
@@ -425,8 +417,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   /**
     * Show the new repository form.
     */
-  get("/new")(
-      usersOnly {
+  get("/new")(usersOnly {
     html.newrepo(getGroupsByUserName(context.loginAccount.get.userName),
                  context.settings.isCreateRepoOptionPublic)
   })
@@ -523,8 +514,10 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               getWikiRepositoryDir(accountName, repository.name))
 
           // Record activity
-          recordForkActivity(
-              repository.owner, repository.name, loginUserName, accountName)
+          recordForkActivity(repository.owner,
+                             repository.name,
+                             loginUserName,
+                             accountName)
           // redirect to the repository
           redirect(s"/${accountName}/${repository.name}")
         }
@@ -532,8 +525,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   })
 
   private def existsAccount: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] =
       if (getAccountByUserName(value).isEmpty)
         Some("User or group does not exist.")
       else None
@@ -552,22 +546,22 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   }
 
   private def members: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
-      if (value
-            .split(",")
-            .exists {
-              _.split(":") match {
-                case Array(userName, isManager) => isManager.toBoolean
-              }
-            }) None
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] = {
+      if (value.split(",").exists {
+            _.split(":") match {
+              case Array(userName, isManager) => isManager.toBoolean
+            }
+          }) None
       else Some("Must select one manager at least.")
     }
   }
 
   private def validPublicKey: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] =
       SshUtil.str2PublicKey(value) match {
         case Some(_) => None
         case None => Some("Key is invalid.")
@@ -575,8 +569,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   }
 
   private def validAccountName: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] = {
       getAccountByUserName(value) match {
         case Some(_) => None
         case None => Some("Invalid Group/User Account.")

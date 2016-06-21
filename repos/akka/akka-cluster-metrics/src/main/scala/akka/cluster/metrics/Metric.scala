@@ -20,8 +20,9 @@ import scala.util.Try
   *   averages (e.g. system load average) or finite (e.g. as number of processors), are not trended.
   */
 @SerialVersionUID(1L)
-final case class Metric private[metrics](
-    name: String, value: Number, average: Option[EWMA])
+final case class Metric private[metrics] (name: String,
+                                          value: Number,
+                                          average: Option[EWMA])
     extends MetricNumericConverter {
 
   require(defined(value), s"Invalid Metric [$name] value [$value]")
@@ -413,7 +414,7 @@ private[metrics] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
         copy(
             nodes =
               nodes - existingNodeMetrics +
-              (existingNodeMetrics update newNodeMetrics))
+                (existingNodeMetrics update newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
 

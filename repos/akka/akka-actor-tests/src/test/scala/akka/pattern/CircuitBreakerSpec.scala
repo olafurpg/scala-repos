@@ -27,35 +27,43 @@ object CircuitBreakerSpec {
       .onOpen(openLatch.countDown())
   }
 
-  def shortCallTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+  def shortCallTimeoutCb()(implicit system: ActorSystem,
+                           ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 1, 50.millis.dilated, 500.millis.dilated))
+        new CircuitBreaker(system.scheduler,
+                           1,
+                           50.millis.dilated,
+                           500.millis.dilated))
 
-  def shortResetTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+  def shortResetTimeoutCb()(implicit system: ActorSystem,
+                            ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 1, 1000.millis.dilated, 50.millis.dilated))
+        new CircuitBreaker(system.scheduler,
+                           1,
+                           1000.millis.dilated,
+                           50.millis.dilated))
 
-  def longCallTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+  def longCallTimeoutCb()(implicit system: ActorSystem,
+                          ec: ExecutionContext): Breaker =
     new Breaker(
         new CircuitBreaker(system.scheduler, 1, 5 seconds, 500.millis.dilated))
 
   val longResetTimeout = 5.seconds
-  def longResetTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+  def longResetTimeoutCb()(implicit system: ActorSystem,
+                           ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 1, 100.millis.dilated, longResetTimeout))
+        new CircuitBreaker(system.scheduler,
+                           1,
+                           100.millis.dilated,
+                           longResetTimeout))
 
-  def multiFailureCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+  def multiFailureCb()(implicit system: ActorSystem,
+                       ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 5, 200.millis.dilated, 500.millis.dilated))
+        new CircuitBreaker(system.scheduler,
+                           5,
+                           200.millis.dilated,
+                           500.millis.dilated))
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -143,8 +151,7 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       val breaker = CircuitBreakerSpec.multiFailureCb()
       breaker().currentFailureCount should ===(0)
       intercept[TestException] {
-        val ct =
-          Thread.currentThread() // Ensure that the thunk is executed in the tests thread
+        val ct = Thread.currentThread() // Ensure that the thunk is executed in the tests thread
         breaker().withSyncCircuitBreaker({
           if (Thread.currentThread() eq ct) throwException else "fail"
         })

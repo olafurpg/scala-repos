@@ -1,7 +1,7 @@
 class B[@specialized(Int, AnyRef, Unit) A, @specialized(Int, AnyRef, Unit) B](
     f: A => B)
-class C[@specialized(Int, AnyRef) A, @specialized(Int, AnyRef) B, @specialized(
-        Int, AnyRef) C](f: (A, B) => C)
+class C[@specialized(Int, AnyRef) A, @specialized(Int, AnyRef) B,
+    @specialized(Int, AnyRef) C](f: (A, B) => C)
 
 object Test {
   def main(args: Array[String]) {

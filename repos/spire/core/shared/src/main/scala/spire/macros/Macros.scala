@@ -17,12 +17,14 @@ object Macros {
     }
   }
 
-  def parseContext(
-      c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseContext(c: Context,
+                   lower: BigInt,
+                   upper: BigInt): Either[String, BigInt] =
     parseNumber(LiteralUtil(c).getString, lower, upper)
 
-  def parseNumber(
-      s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseNumber(s: String,
+                  lower: BigInt,
+                  upper: BigInt): Either[String, BigInt] =
     try {
       val n = BigInt(s)
       if (n < lower || n > upper) Left("illegal constant: %s" format s)
@@ -199,8 +201,7 @@ object Macros {
 
   def intAs[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Ring[A]]): c.Expr[A] = {
     import c.universe._
-    c.Expr[A](
-        c.prefix.tree match {
+    c.Expr[A](c.prefix.tree match {
       case Apply((_, List(Literal(Constant(0))))) => q"$ev.zero"
       case Apply((_, List(Literal(Constant(1))))) => q"$ev.one"
       case Apply((_, List(n))) => q"$ev.fromInt($n)"
@@ -209,8 +210,7 @@ object Macros {
 
   def dblAs[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Field[A]]): c.Expr[A] = {
     import c.universe._
-    c.Expr[A](
-        c.prefix.tree match {
+    c.Expr[A](c.prefix.tree match {
       case Apply((_, List(Literal(Constant(0.0))))) => q"$ev.zero"
       case Apply((_, List(Literal(Constant(1.0))))) => q"$ev.one"
       case Apply((_, List(n))) => q"$ev.fromDouble($n)"

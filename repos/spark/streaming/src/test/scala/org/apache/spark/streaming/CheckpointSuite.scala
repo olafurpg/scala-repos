@@ -89,7 +89,7 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     require(
         numBatchesBeforeRestart < expectedOutput.size,
         "Number of batches before context restart less than number of expected output " +
-        "(i.e. number of total batches to run)")
+          "(i.e. number of total batches to run)")
     require(StreamingContext.getActive().isEmpty,
             "Cannot run test with already active streaming context")
 
@@ -110,7 +110,8 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     val operatedStream = operation(inputStream)
     operatedStream.print()
     val outputStream = new TestOutputStreamWithPartitions(
-        operatedStream, new ConcurrentLinkedQueue[Seq[Seq[V]]])
+        operatedStream,
+        new ConcurrentLinkedQueue[Seq[Seq[V]]])
     outputStream.register()
     ssc.checkpoint(checkpointDir)
 
@@ -124,8 +125,8 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     // Restart and complete the computation from checkpoint file
     logInfo(
         "\n-------------------------------------------\n" +
-        "        Restarting stream computation          " +
-        "\n-------------------------------------------\n"
+          "        Restarting stream computation          " +
+          "\n-------------------------------------------\n"
     )
 
     val restartedSsc = new StreamingContext(checkpointDir)
@@ -198,20 +199,19 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
   private def assertOutput[V: ClassTag](output: Seq[Seq[V]],
                                         expectedOutput: Seq[Seq[V]],
                                         beforeRestart: Boolean): Unit = {
-    val expectedPartialOutput =
-      if (beforeRestart) {
-        expectedOutput.take(output.size)
-      } else {
-        expectedOutput.takeRight(output.size)
-      }
+    val expectedPartialOutput = if (beforeRestart) {
+      expectedOutput.take(output.size)
+    } else {
+      expectedOutput.takeRight(output.size)
+    }
     val setComparison = output.zip(expectedPartialOutput).forall {
       case (o, e) => o.toSet === e.toSet
     }
     assert(
         setComparison,
         s"set comparison failed\n" +
-        s"Expected output items:\n${expectedPartialOutput.mkString("\n")}\n" +
-        s"Generated output items: ${output.mkString("\n")}")
+          s"Expected output items:\n${expectedPartialOutput.mkString("\n")}\n" +
+          s"Generated output items: ${output.mkString("\n")}")
   }
 }
 
@@ -282,10 +282,10 @@ class CheckpointSuite
            "No checkpointed RDDs in state stream before first failure")
     stateStream.checkpointData.currentCheckpointFiles.foreach {
       case (time, file) => {
-          assert(fs.exists(new Path(file)),
-                 "Checkpoint file '" + file + "' for time " + time +
+        assert(fs.exists(new Path(file)),
+               "Checkpoint file '" + file + "' for time " + time +
                  " for state stream before first failure does not exist")
-        }
+      }
     }
 
     // Run till a further time such that previous checkpoint files in the stream would be deleted
@@ -305,7 +305,7 @@ class CheckpointSuite
     stateStream =
       ssc.graph.getOutputStreams().head.dependencies.head.dependencies.head
     logInfo("Restored data of state stream = \n[" +
-        stateStream.generatedRDDs.mkString("\n") + "]")
+          stateStream.generatedRDDs.mkString("\n") + "]")
     assert(
         !stateStream.generatedRDDs.isEmpty,
         "No restored RDDs in state stream after recovery from first failure")
@@ -318,10 +318,10 @@ class CheckpointSuite
            "No checkpointed RDDs in state stream before second failure")
     stateStream.checkpointData.currentCheckpointFiles.foreach {
       case (time, file) => {
-          assert(fs.exists(new Path(file)),
-                 "Checkpoint file '" + file + "' for time " + time +
+        assert(fs.exists(new Path(file)),
+               "Checkpoint file '" + file + "' for time " + time +
                  " for state stream before seconds failure does not exist")
-        }
+      }
     }
     ssc.stop()
 
@@ -331,7 +331,7 @@ class CheckpointSuite
     stateStream =
       ssc.graph.getOutputStreams().head.dependencies.head.dependencies.head
     logInfo("Restored data of state stream = \n[" +
-        stateStream.generatedRDDs.mkString("\n") + "]")
+          stateStream.generatedRDDs.mkString("\n") + "]")
     assert(
         !stateStream.generatedRDDs.isEmpty,
         "No restored RDDs in state stream after recovery from second failure")
@@ -578,8 +578,7 @@ class CheckpointSuite
               (rdd, time) =>
                 val output = rdd.map(x => (x, 1)).reduceByKey(_ + _)
                 output.saveAsHadoopFile(
-                    new File(tempDir,
-                             "result-" + time.milliseconds).getAbsolutePath,
+                    new File(tempDir, "result-" + time.milliseconds).getAbsolutePath,
                     classOf[Text],
                     classOf[IntWritable],
                     classOf[TextOutputFormat[Text, IntWritable]])
@@ -655,8 +654,7 @@ class CheckpointSuite
   // failure, are re-processed or not.
   test("recovery with file input stream") {
     // Set up the streaming context and input streams
-    val batchDuration =
-      Seconds(2) // Due to 1-second resolution of setLastModified() on some OS's.
+    val batchDuration = Seconds(2) // Due to 1-second resolution of setLastModified() on some OS's.
     val testDir = Utils.createTempDir()
     val outputBuffer = new ConcurrentLinkedQueue[Seq[Int]]
 
@@ -698,8 +696,7 @@ class CheckpointSuite
         // Make value 3 take a large time to process, to ensure that the driver
         // shuts down in the middle of processing the 3rd batch
         CheckpointSuite.batchThreeShouldBlockIndefinitely = true
-        val mappedStream = fileStream.map(
-            s => {
+        val mappedStream = fileStream.map(s => {
           val i = s.toInt
           if (i == 3) {
             while (CheckpointSuite.batchThreeShouldBlockIndefinitely) {
@@ -735,7 +732,7 @@ class CheckpointSuite
         eventually(eventuallyTimeout) {
           // Wait until all files have been recorded and all batches have started
           assert(recordedFiles(ssc) === Seq(1, 2, 3) &&
-              batchCounter.getNumStartedBatches === 3)
+                batchCounter.getNumStartedBatches === 3)
         }
         clock.advance(batchDuration.milliseconds)
         // Wait for a checkpoint to be written
@@ -768,7 +765,7 @@ class CheckpointSuite
         // with the batch time, we need to add the offset "batchDuration.milliseconds / 2".
         ssc.conf.set("spark.streaming.manualClock.jump",
                      (batchDuration.milliseconds / 2 +
-                         batchDuration.milliseconds * 3).toString)
+                           batchDuration.milliseconds * 3).toString)
         val oldClockTime = clock.getTimeMillis() // 15000ms
         clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
         val batchCounter = new BatchCounter(ssc)
@@ -796,11 +793,11 @@ class CheckpointSuite
           clock.advance(batchDuration.milliseconds)
           eventually(eventuallyTimeout) {
             assert(batchCounter.getNumCompletedBatches === index +
-                numBatchesAfterRestart + 1)
+                  numBatchesAfterRestart + 1)
           }
         }
         logInfo("Output after restart = " +
-            outputStream.output.asScala.mkString("[", ", ", "]"))
+              outputStream.output.asScala.mkString("[", ", ", "]"))
         assert(outputStream.output.size > 0,
                "No files processed after restart")
         ssc.stop()
@@ -881,21 +878,28 @@ class CheckpointSuite
 
     // deserialize the Array[testClz]
     val ois = new ObjectInputStreamWithLoader(
-        new ByteArrayInputStream(bos.toByteArray), loader)
+        new ByteArrayInputStream(bos.toByteArray),
+        loader)
     assert(ois.readObject().asInstanceOf[Class[_]].getName == "[LtestClz;")
   }
 
   test("SPARK-11267: the race condition of two checkpoints in a batch") {
     val jobGenerator = mock(classOf[JobGenerator])
     val checkpointDir = Utils.createTempDir().toString
-    val checkpointWriter = new CheckpointWriter(
-        jobGenerator, conf, checkpointDir, new Configuration())
+    val checkpointWriter = new CheckpointWriter(jobGenerator,
+                                                conf,
+                                                checkpointDir,
+                                                new Configuration())
     val bytes1 = Array.fill[Byte](10)(1)
-    new checkpointWriter.CheckpointWriteHandler(
-        Time(2000), bytes1, clearCheckpointDataLater = false).run()
+    new checkpointWriter.CheckpointWriteHandler(Time(2000),
+                                                bytes1,
+                                                clearCheckpointDataLater =
+                                                  false).run()
     val bytes2 = Array.fill[Byte](10)(2)
     new checkpointWriter.CheckpointWriteHandler(
-        Time(1000), bytes2, clearCheckpointDataLater = true).run()
+        Time(1000),
+        bytes2,
+        clearCheckpointDataLater = true).run()
     val checkpointFiles =
       Checkpoint.getCheckpointFiles(checkpointDir).reverse.map { path =>
         new File(path.toUri)
@@ -989,7 +993,8 @@ class CheckpointSuite
     * It also waits for the expected amount of time for each batch.
     */
   def advanceTimeWithRealDelay[V: ClassTag](
-      ssc: StreamingContext, numBatches: Long): Iterable[Seq[V]] = {
+      ssc: StreamingContext,
+      numBatches: Long): Iterable[Seq[V]] = {
     val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
     logInfo("Manual clock before advancing = " + clock.getTimeMillis())
     for (i <- 1 to numBatches.toInt) {

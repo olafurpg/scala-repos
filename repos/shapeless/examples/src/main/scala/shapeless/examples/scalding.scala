@@ -44,7 +44,7 @@ object ScaldingPoC extends App {
 
   val britishBirds = birds.map(b =>
         b + ("weightKg" ->> b("weightLb") * 0.454) +
-        ("heightM" ->> b("heightFt") * 0.305))
+          ("heightM" ->> b("heightFt") * 0.305))
   britishBirds foreach println
 
   val items = List(
@@ -61,7 +61,7 @@ object ScaldingPoC extends App {
   )
 
   val lines = books.flatMap(book =>
-        for (word <- book("text").split("\\s+")) yield
-          book + ("word" ->> word))
+        for (word <- book("text").split("\\s+"))
+          yield book + ("word" ->> word))
   lines foreach println
 }

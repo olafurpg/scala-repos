@@ -238,16 +238,16 @@ class MasterSuite
   private def basicScheduling(spreadOut: Boolean): Unit = {
     val master = makeMaster()
     val appInfo = makeAppInfo(1024)
-    val scheduledCores = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     assert(scheduledCores === Array(10, 10, 10))
   }
 
   private def basicSchedulingWithMoreMemory(spreadOut: Boolean): Unit = {
     val master = makeMaster()
     val appInfo = makeAppInfo(3072)
-    val scheduledCores = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     assert(scheduledCores === Array(10, 10, 10))
   }
 
@@ -255,10 +255,10 @@ class MasterSuite
     val master = makeMaster()
     val appInfo1 = makeAppInfo(1024, maxCores = Some(8))
     val appInfo2 = makeAppInfo(1024, maxCores = Some(16))
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo1, workerInfos, spreadOut)
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo2, workerInfos, spreadOut)
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo1, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo2, workerInfos, spreadOut)
     if (spreadOut) {
       assert(scheduledCores1 === Array(3, 3, 2))
       assert(scheduledCores2 === Array(6, 5, 5))
@@ -273,12 +273,12 @@ class MasterSuite
     val appInfo1 = makeAppInfo(1024, coresPerExecutor = Some(2))
     val appInfo2 = makeAppInfo(256, coresPerExecutor = Some(2))
     val appInfo3 = makeAppInfo(256, coresPerExecutor = Some(3))
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo1, workerInfos, spreadOut)
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo2, workerInfos, spreadOut)
-    val scheduledCores3 = scheduleExecutorsOnWorkers(
-        master, appInfo3, workerInfos, spreadOut)
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo1, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo2, workerInfos, spreadOut)
+    val scheduledCores3 =
+      scheduleExecutorsOnWorkers(master, appInfo3, workerInfos, spreadOut)
     assert(scheduledCores1 === Array(8, 8, 8)) // 4 * 2 because of memory limits
     assert(scheduledCores2 === Array(10, 10, 10)) // 5 * 2
     assert(scheduledCores3 === Array(9, 9, 9)) // 3 * 3
@@ -288,18 +288,18 @@ class MasterSuite
   private def schedulingWithCoresPerExecutorAndMaxCores(
       spreadOut: Boolean): Unit = {
     val master = makeMaster()
-    val appInfo1 = makeAppInfo(
-        256, coresPerExecutor = Some(2), maxCores = Some(4))
-    val appInfo2 = makeAppInfo(
-        256, coresPerExecutor = Some(2), maxCores = Some(20))
-    val appInfo3 = makeAppInfo(
-        256, coresPerExecutor = Some(3), maxCores = Some(20))
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo1, workerInfos, spreadOut)
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo2, workerInfos, spreadOut)
-    val scheduledCores3 = scheduleExecutorsOnWorkers(
-        master, appInfo3, workerInfos, spreadOut)
+    val appInfo1 =
+      makeAppInfo(256, coresPerExecutor = Some(2), maxCores = Some(4))
+    val appInfo2 =
+      makeAppInfo(256, coresPerExecutor = Some(2), maxCores = Some(20))
+    val appInfo3 =
+      makeAppInfo(256, coresPerExecutor = Some(3), maxCores = Some(20))
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo1, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo2, workerInfos, spreadOut)
+    val scheduledCores3 =
+      scheduleExecutorsOnWorkers(master, appInfo3, workerInfos, spreadOut)
     if (spreadOut) {
       assert(scheduledCores1 === Array(2, 2, 0))
       assert(scheduledCores2 === Array(8, 6, 6))
@@ -315,14 +315,14 @@ class MasterSuite
     val master = makeMaster()
     val appInfo = makeAppInfo(256)
     appInfo.executorLimit = 0
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 2
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 5
-    val scheduledCores3 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores3 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     assert(scheduledCores1 === Array(0, 0, 0))
     assert(scheduledCores2 === Array(10, 10, 0))
     assert(scheduledCores3 === Array(10, 10, 10))
@@ -333,14 +333,14 @@ class MasterSuite
     val master = makeMaster()
     val appInfo = makeAppInfo(256, maxCores = Some(16))
     appInfo.executorLimit = 0
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 2
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 5
-    val scheduledCores3 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores3 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     assert(scheduledCores1 === Array(0, 0, 0))
     if (spreadOut) {
       assert(scheduledCores2 === Array(8, 8, 0))
@@ -356,14 +356,14 @@ class MasterSuite
     val master = makeMaster()
     val appInfo = makeAppInfo(256, coresPerExecutor = Some(4))
     appInfo.executorLimit = 0
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 2
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 5
-    val scheduledCores3 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores3 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     assert(scheduledCores1 === Array(0, 0, 0))
     if (spreadOut) {
       assert(scheduledCores2 === Array(4, 4, 0))
@@ -376,17 +376,17 @@ class MasterSuite
   // Everything being: executor limit + cores per executor + max cores
   private def schedulingWithEverything(spreadOut: Boolean): Unit = {
     val master = makeMaster()
-    val appInfo = makeAppInfo(
-        256, coresPerExecutor = Some(4), maxCores = Some(18))
+    val appInfo =
+      makeAppInfo(256, coresPerExecutor = Some(4), maxCores = Some(18))
     appInfo.executorLimit = 0
-    val scheduledCores1 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores1 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 2
-    val scheduledCores2 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores2 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     appInfo.executorLimit = 5
-    val scheduledCores3 = scheduleExecutorsOnWorkers(
-        master, appInfo, workerInfos, spreadOut)
+    val scheduledCores3 =
+      scheduleExecutorsOnWorkers(master, appInfo, workerInfos, spreadOut)
     assert(scheduledCores1 === Array(0, 0, 0))
     if (spreadOut) {
       assert(scheduledCores2 === Array(4, 4, 0))
@@ -432,8 +432,13 @@ class MasterSuite
 
   private def makeWorkerInfo(memoryMb: Int, cores: Int): WorkerInfo = {
     val workerId = System.currentTimeMillis.toString
-    new WorkerInfo(
-        workerId, "host", 100, cores, memoryMb, null, "http://localhost:80")
+    new WorkerInfo(workerId,
+                   "host",
+                   100,
+                   cores,
+                   memoryMb,
+                   null,
+                   "http://localhost:80")
   }
 
   private def scheduleExecutorsOnWorkers(master: Master,
@@ -475,15 +480,18 @@ class MasterSuite
                        1024,
                        "http://localhost:8080"))
     val executors = (0 until 3).map { i =>
-      new ExecutorDescription(
-          appId = i.toString, execId = i, 2, ExecutorState.RUNNING)
+      new ExecutorDescription(appId = i.toString,
+                              execId = i,
+                              2,
+                              ExecutorState.RUNNING)
     }
     master.self.send(
         WorkerLatestState("1", executors, driverIds = Seq("0", "1", "2")))
 
     eventually(timeout(10.seconds)) {
-      assert(killedExecutors.asScala.toList.sorted === List(
-              "0" -> 0, "1" -> 1, "2" -> 2))
+      assert(killedExecutors.asScala.toList.sorted === List("0" -> 0,
+                                                            "1" -> 1,
+                                                            "2" -> 2))
       assert(killedDrivers.asScala.toList.sorted === List("0", "1", "2"))
     }
   }

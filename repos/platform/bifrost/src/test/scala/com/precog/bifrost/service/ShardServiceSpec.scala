@@ -102,14 +102,13 @@ trait TestShardService
   val executionContext = ExecutionContext.defaultExecutionContext(actorSystem)
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executionContext, Duration(5, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
+                                          Duration(5, "seconds"))
 
   private val apiKeyManager =
     new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
   private val apiKeyFinder = new DirectAPIKeyFinder[Future](apiKeyManager)
-  protected val jobManager =
-    new InMemoryJobManager[Future] //TODO: should be private?
+  protected val jobManager = new InMemoryJobManager[Future] //TODO: should be private?
   private val clock = Clock.System
   private val accountFinder =
     new StaticAccountFinder[Future]("test", "who-cares")
@@ -183,8 +182,9 @@ trait TestShardService
         }
 
       val rawVFS = new InMemoryVFS(stubData, clock)
-      val permissionsFinder = new PermissionsFinder(
-          self.apiKeyFinder, accountFinder, clock.instant())
+      val permissionsFinder = new PermissionsFinder(self.apiKeyFinder,
+                                                    accountFinder,
+                                                    clock.instant())
       val vfs = new SecureVFS(rawVFS, permissionsFinder, jobManager, clock)
     }
 
@@ -274,8 +274,8 @@ trait TestShardService
     .contentType[QueryResult](application / (MimeTypes.json))
     .path("/analytics/v2/analytics/queries")
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      1, Duration(3, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(1, Duration(3, "second"))
   val shortFutureTimeouts = FutureTimeouts(1, Duration(50, "millis"))
 }
 
@@ -306,10 +306,9 @@ class ShardServiceSpec extends TestShardService {
       }
   }
 
-  def asyncQueryResults(
-      jobId: JobId,
-      apiKey: Option[String] =
-        Some(testAPIKey)): Future[HttpResponse[QueryResult]] = {
+  def asyncQueryResults(jobId: JobId,
+                        apiKey: Option[String] = Some(testAPIKey))
+    : Future[HttpResponse[QueryResult]] = {
     apiKey.map { asyncService.query("apiKey", _) }
       .getOrElse(asyncService)
       .get(jobId)
@@ -465,10 +464,10 @@ class ShardServiceSpec extends TestShardService {
       .get(path)
   }
 
-  def structure(apiKey: Option[String] = Some(testAPIKey),
-                path: String = "/test",
-                cpath: CPath =
-                  CPath.Identity): Future[HttpResponse[QueryResult]] = {
+  def structure(
+      apiKey: Option[String] = Some(testAPIKey),
+      path: String = "/test",
+      cpath: CPath = CPath.Identity): Future[HttpResponse[QueryResult]] = {
     apiKey.map { metaService.query("apiKey", _) }
       .getOrElse(metaService)
       .query("type", "structure")
@@ -586,8 +585,7 @@ trait TestPlatform extends ManagedPlatform { self =>
 
   def asyncExecutorFor(apiKey: APIKey)
     : EitherT[Future, String, QueryExecutor[Future, JobId]] = {
-    EitherT.right(
-        Future(new AsyncQueryExecutor {
+    EitherT.right(Future(new AsyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
@@ -596,8 +594,7 @@ trait TestPlatform extends ManagedPlatform { self =>
       Future,
       String,
       QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
-    EitherT.right(
-        Future(new SyncQueryExecutor {
+    EitherT.right(Future(new SyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
@@ -609,17 +606,18 @@ trait TestPlatform extends ManagedPlatform { self =>
         if (query == "bad query") {
           val mu =
             shardQueryMonad.jobId traverse { jobId =>
-              jobManager.addMessage(
-                  jobId, JobManager.channels.Error, JString("ERROR!"))
+              jobManager.addMessage(jobId,
+                                    JobManager.channels.Error,
+                                    JString("ERROR!"))
             }
 
           EitherT[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
             shardQueryMonad
               .liftM[Future, EvaluationError \/ StreamT[JobQueryTF, Slice]] {
-              mu map { _ =>
-                \/.right(toSlice(JObject("value" -> JNum(2))))
+                mu map { _ =>
+                  \/.right(toSlice(JObject("value" -> JNum(2))))
+                }
               }
-            }
           }
         } else {
           EitherT[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {

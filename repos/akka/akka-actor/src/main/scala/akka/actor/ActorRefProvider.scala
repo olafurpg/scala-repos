@@ -134,8 +134,8 @@ trait ActorRefProvider {
     * it relative to the given ref.
     */
   @deprecated("use actorSelection instead of actorFor", "2.2")
-  private[akka] def actorFor(
-      ref: InternalActorRef, s: String): InternalActorRef
+  private[akka] def actorFor(ref: InternalActorRef,
+                             s: String): InternalActorRef
 
   /**
     * INTERNAL API
@@ -146,8 +146,8 @@ trait ActorRefProvider {
     * physically or logically attached to this actor system.
     */
   @deprecated("use actorSelection instead of actorFor", "2.2")
-  private[akka] def actorFor(
-      ref: InternalActorRef, p: Iterable[String]): InternalActorRef
+  private[akka] def actorFor(ref: InternalActorRef,
+                             p: Iterable[String]): InternalActorRef
 
   /**
     * Create actor reference for a specified path. If no such
@@ -486,7 +486,7 @@ private[akka] object LocalActorRefProvider {
   *
   * Depending on this class is not supported, only the [[ActorRefProvider]] interface is supported.
   */
-private[akka] class LocalActorRefProvider private[akka](
+private[akka] class LocalActorRefProvider private[akka] (
     _systemName: String,
     override val settings: ActorSystem.Settings,
     val eventStream: EventStream,
@@ -510,8 +510,8 @@ private[akka] class LocalActorRefProvider private[akka](
   override val rootPath: ActorPath = RootActorPath(
       Address("akka", _systemName))
 
-  private[akka] val log: LoggingAdapter = Logging(
-      eventStream, getClass.getName + "(" + rootPath.address + ")")
+  private[akka] val log: LoggingAdapter =
+    Logging(eventStream, getClass.getName + "(" + rootPath.address + ")")
 
   override val deadLetters: InternalActorRef = _deadLetters
     .getOrElse((p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
@@ -547,15 +547,14 @@ private[akka] class LocalActorRefProvider private[akka](
       def isWalking = causeOfTermination.future.isCompleted == false
 
       override def stop(): Unit = {
-        causeOfTermination.trySuccess(
-            Terminated(provider.rootGuardian)(existenceConfirmed = true,
-                                              addressTerminated =
-                                                true)) //Idempotent
+        causeOfTermination.trySuccess(Terminated(provider.rootGuardian)(
+                existenceConfirmed = true,
+                addressTerminated = true)) //Idempotent
         terminationPromise.tryCompleteWith(causeOfTermination.future) // Signal termination downstream, idempotent
       }
 
-      @deprecated(
-          "Use context.watch(actor) and receive Terminated(actor)", "2.2")
+      @deprecated("Use context.watch(actor) and receive Terminated(actor)",
+                  "2.2")
       override private[akka] def isTerminated: Boolean = !isWalking
 
       override def !(message: Any)(
@@ -607,7 +606,8 @@ private[akka] class LocalActorRefProvider private[akka](
   private def guardianSupervisorStrategyConfigurator =
     dynamicAccess
       .createInstanceFor[SupervisorStrategyConfigurator](
-          settings.SupervisorStrategyClass, EmptyImmutableSeq)
+          settings.SupervisorStrategyClass,
+          EmptyImmutableSeq)
       .get
 
   /**
@@ -690,8 +690,8 @@ private[akka] class LocalActorRefProvider private[akka](
     ref
   }
 
-  lazy val tempContainer = new VirtualPathContainer(
-      system.provider, tempNode, rootGuardian, log)
+  lazy val tempContainer =
+    new VirtualPathContainer(system.provider, tempNode, rootGuardian, log)
 
   def registerTempActor(actorRef: InternalActorRef, path: ActorPath): Unit = {
     assert(
@@ -718,11 +718,12 @@ private[akka] class LocalActorRefProvider private[akka](
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
   private[akka] override def actorFor(
-      ref: InternalActorRef, path: String): InternalActorRef = path match {
+      ref: InternalActorRef,
+      path: String): InternalActorRef = path match {
     case RelativeActorPath(elems) ⇒
       if (elems.isEmpty) {
-        log.debug(
-            "look-up of empty path string [{}] fails (per definition)", path)
+        log.debug("look-up of empty path string [{}] fails (per definition)",
+                  path)
         deadLetters
       } else if (elems.head.isEmpty) actorFor(rootGuardian, elems.tail)
       else actorFor(ref, elems)
@@ -743,15 +744,16 @@ private[akka] class LocalActorRefProvider private[akka](
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
   private[akka] override def actorFor(
-      ref: InternalActorRef, path: Iterable[String]): InternalActorRef =
+      ref: InternalActorRef,
+      path: Iterable[String]): InternalActorRef =
     if (path.isEmpty) {
       log.debug("look-up of empty path sequence fails (per definition)")
       deadLetters
     } else
       ref.getChild(path.iterator) match {
         case Nobody ⇒
-          log.debug(
-              "look-up of path sequence [/{}] failed", path.mkString("/"))
+          log
+            .debug("look-up of path sequence [/{}] failed", path.mkString("/"))
           new EmptyLocalActorRef(system.provider, ref.path / path, eventStream)
         case x ⇒ x
       }
@@ -786,8 +788,9 @@ private[akka] class LocalActorRefProvider private[akka](
         case Nobody ⇒
           log.debug("resolve of path sequence [/{}] failed",
                     pathElements.mkString("/"))
-          new EmptyLocalActorRef(
-              system.provider, ref.path / pathElements, eventStream)
+          new EmptyLocalActorRef(system.provider,
+                                 ref.path / pathElements,
+                                 eventStream)
         case x ⇒ x
       }
 
@@ -829,16 +832,23 @@ private[akka] class LocalActorRefProvider private[akka](
 
         try {
           val dispatcher = system.dispatchers.lookup(props2.dispatcher)
-          val mailboxType = system.mailboxes.getMailboxType(
-              props2, dispatcher.configurator.config)
+          val mailboxType = system.mailboxes
+            .getMailboxType(props2, dispatcher.configurator.config)
 
           if (async)
-            new RepointableActorRef(
-                system, props2, dispatcher, mailboxType, supervisor, path)
-              .initialize(async)
+            new RepointableActorRef(system,
+                                    props2,
+                                    dispatcher,
+                                    mailboxType,
+                                    supervisor,
+                                    path).initialize(async)
           else
-            new LocalActorRef(
-                system, props2, dispatcher, mailboxType, supervisor, path)
+            new LocalActorRef(system,
+                              props2,
+                              dispatcher,
+                              mailboxType,
+                              supervisor,
+                              path)
         } catch {
           case NonFatal(e) ⇒
             throw new ConfigurationException(
@@ -870,14 +880,14 @@ private[akka] class LocalActorRefProvider private[akka](
         try {
           val routerDispatcher =
             system.dispatchers.lookup(p.routerConfig.routerDispatcher)
-          val routerMailbox = system.mailboxes.getMailboxType(
-              routerProps, routerDispatcher.configurator.config)
+          val routerMailbox = system.mailboxes
+            .getMailboxType(routerProps, routerDispatcher.configurator.config)
 
           // routers use context.actorOf() to create the routees, which does not allow us to pass
           // these through, but obtain them here for early verification
           val routeeDispatcher = system.dispatchers.lookup(p.dispatcher)
-          val routeeMailbox = system.mailboxes.getMailboxType(
-              routeeProps, routeeDispatcher.configurator.config)
+          val routeeMailbox = system.mailboxes
+            .getMailboxType(routeeProps, routeeDispatcher.configurator.config)
 
           new RoutedActorRef(system,
                              routerProps,
@@ -890,7 +900,7 @@ private[akka] class LocalActorRefProvider private[akka](
           case NonFatal(e) ⇒
             throw new ConfigurationException(
                 s"configuration problem while creating [$path] with router dispatcher [${routerProps.dispatcher}] and mailbox [${routerProps.mailbox}] " +
-                s"and routee dispatcher [${routeeProps.dispatcher}] and mailbox [${routeeProps.mailbox}]",
+                  s"and routee dispatcher [${routeeProps.dispatcher}] and mailbox [${routeeProps.mailbox}]",
                 e)
         }
     }

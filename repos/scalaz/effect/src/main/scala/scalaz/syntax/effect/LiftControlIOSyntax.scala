@@ -5,8 +5,8 @@ package effect
 import scalaz.effect.LiftControlIO
 
 /** Wraps a value `self` and provides methods related to `LiftControlIO` */
-final class LiftControlIOOps[F[_], A] private[syntax](val self: F[A])(
-    implicit val F: LiftControlIO[F])
+final class LiftControlIOOps[F[_], A] private[syntax] (
+    val self: F[A])(implicit val F: LiftControlIO[F])
     extends Ops[F[A]] {
   ////
 

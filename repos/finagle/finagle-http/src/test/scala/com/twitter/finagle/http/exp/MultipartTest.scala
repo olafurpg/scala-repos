@@ -22,8 +22,10 @@ class MultipartTest extends FunSuite {
   private[this] def newRequest(buf: Buf): Request =
     RequestBuilder()
       .url("http://example.com")
-      .add(FileElement(
-              "groups", buf, Some("image/gif"), Some("dealwithit.gif")))
+      .add(FileElement("groups",
+                       buf,
+                       Some("image/gif"),
+                       Some("dealwithit.gif")))
       .add(SimpleElement("type", "text"))
       .buildFormPost(multipart = true)
 
@@ -50,8 +52,10 @@ class MultipartTest extends FunSuite {
     val foo = Buf.Utf8("foo")
     val multipart = newRequest(foo).multipart.get
 
-    val Multipart.InMemoryFileUpload(
-    buf, contentType, fileName, contentTransferEncoding) =
+    val Multipart.InMemoryFileUpload(buf,
+                                     contentType,
+                                     fileName,
+                                     contentTransferEncoding) =
       multipart.files("groups").head
     val attr = multipart.attributes("type").head
 
@@ -67,8 +71,8 @@ class MultipartTest extends FunSuite {
       Buf.Utf8("." * (Multipart.MaxInMemoryFileSize.inBytes.toInt + 10))
     val multipart = newRequest(foo).multipart.get
 
-    val Multipart.OnDiskFileUpload(
-    file, contentType, fileName, contentTransferEncoding) =
+    val Multipart
+      .OnDiskFileUpload(file, contentType, fileName, contentTransferEncoding) =
       multipart.files("groups").head
     val attr = multipart.attributes("type").head
 

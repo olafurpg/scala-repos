@@ -231,17 +231,16 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
     val url = S.uri
 
-    val extraFields: List[ScreenFieldInfo] =
-      if (theScreen.confirmScreen_?) {
+    val extraFields: List[ScreenFieldInfo] = if (theScreen.confirmScreen_?) {
 
-        for {
-          screen <- VisitedScreens.is.toList
-          field <- screen.screenFields.collect {
-                    case c: ConfirmField => c
-                  } if field.show_? && field.onConfirm_?
-        } yield
-          ScreenFieldInfo(field, field.displayHtml, Empty, Full(field.asHtml))
-      } else Nil
+      for {
+        screen <- VisitedScreens.is.toList
+        field <- screen.screenFields.collect {
+                  case c: ConfirmField => c
+                } if field.show_? && field.onConfirm_?
+      } yield
+        ScreenFieldInfo(field, field.displayHtml, Empty, Full(field.asHtml))
+    } else Nil
 
     renderAll(
         CurrentScreen.is.map(s => Text((s.myScreenNum + 1).toString)), //currentScreenNumber: Box[NodeSeq],
@@ -259,20 +258,19 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
         theScreen.screenBottom, // screenBottom: Box[Elem],
         wizardBottom, //wizardBottom: Box[Elem],
         nextId ->
-        (() => {
-              this.nextScreen()
-              // if (currentScreen.isEmpty) S.seeOther(Referer.is)
-            }), // nextId: (String, () => Unit),
-        Full(
-            prevId ->
-            (() => {
-              this.prevScreen
-            })), // prevId: Box[(String, () => Unit)],
+          (() => {
+                this.nextScreen()
+                // if (currentScreen.isEmpty) S.seeOther(Referer.is)
+              }), // nextId: (String, () => Unit),
+        Full(prevId ->
+              (() => {
+                this.prevScreen
+              })), // prevId: Box[(String, () => Unit)],
         cancelId ->
-        (() => {
-              WizardRules.deregisterWizardSession(CurrentSession.is);
-              redirectBack()
-            }), //cancelId: (String, () => Unit),
+          (() => {
+                WizardRules.deregisterWizardSession(CurrentSession.is);
+                redirectBack()
+              }), //cancelId: (String, () => Unit),
         theScreen,
         ajaxForms_?)
   }
@@ -297,12 +295,12 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
     (from, to) match {
       case (Full(old), Full(cur)) if old eq cur => {
-          /* do nothing */
-        }
+        /* do nothing */
+      }
       case (Full(old), Full(cur)) => {
-          old.transitionOutOfTo(Full(cur))
-          cur.transitionIntoFrom(Full(old))
-        }
+        old.transitionOutOfTo(Full(cur))
+        cur.transitionIntoFrom(Full(old))
+      }
 
       case (Full(old), _) => old.transitionOutOfTo(Empty)
       case (_, Full(cur)) => cur.transitionIntoFrom(Empty)
@@ -399,51 +397,51 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     } yield {
       screen.validate match {
         case Nil => {
-            val snapshot = createSnapshot
-            PrevSnapshot.set(Full(snapshot))
-            val nextScreen = screen.nextScreen
-            CurrentScreen.is.foreach { s =>
-              VisitedScreens.set(VisitedScreens :+ s)
-            }
-            doTransition(CurrentScreen.get, nextScreen)
-            CurrentScreen.set(nextScreen)
-            OnFirstScreen.set(false)
+          val snapshot = createSnapshot
+          PrevSnapshot.set(Full(snapshot))
+          val nextScreen = screen.nextScreen
+          CurrentScreen.is.foreach { s =>
+            VisitedScreens.set(VisitedScreens :+ s)
+          }
+          doTransition(CurrentScreen.get, nextScreen)
+          CurrentScreen.set(nextScreen)
+          OnFirstScreen.set(false)
 
-            nextScreen match {
-              case Empty =>
-                def useAndFinish(in: List[LoanWrapper]) {
-                  in match {
-                    case Nil => {
-                        WizardRules.deregisterWizardSession(CurrentSession.is)
-                        VisitedScreens.foreach { s =>
-                          s.finish()
-                        }
-                        finish()
-                        VisitedScreens.foreach { s =>
-                          s.postFinish()
-                        }
-                      }
-
-                    case x :: xs =>
-                      x.apply {
-                        useAndFinish(xs)
-                      }
+          nextScreen match {
+            case Empty =>
+              def useAndFinish(in: List[LoanWrapper]) {
+                in match {
+                  case Nil => {
+                    WizardRules.deregisterWizardSession(CurrentSession.is)
+                    VisitedScreens.foreach { s =>
+                      s.finish()
+                    }
+                    finish()
+                    VisitedScreens.foreach { s =>
+                      s.postFinish()
+                    }
                   }
-                }
-                useAndFinish(dbConnections)
-                if (ajaxForms_?) {
-                  AjaxOnDone.is
-                } else {
-                  Noop
-                }
 
-              case _ => SetHtml(FormGUID, renderHtml())
-            }
+                  case x :: xs =>
+                    x.apply {
+                      useAndFinish(xs)
+                    }
+                }
+              }
+              useAndFinish(dbConnections)
+              if (ajaxForms_?) {
+                AjaxOnDone.is
+              } else {
+                Noop
+              }
+
+            case _ => SetHtml(FormGUID, renderHtml())
           }
+        }
         case xs => {
-            S.error(xs)
-            SetHtml(FormGUID, renderHtml())
-          }
+          S.error(xs)
+          SetHtml(FormGUID, renderHtml())
+        }
       }
     }) openOr AjaxOnDone.is
   }

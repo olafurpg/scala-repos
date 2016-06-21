@@ -76,8 +76,8 @@ class UtilsTest extends JUnitSuite {
   def testReplaceSuffix() {
     assertEquals("blah.foo.text",
                  CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ".text"))
-    assertEquals(
-        "blah.foo", CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ""))
+    assertEquals("blah.foo",
+                 CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ""))
     assertEquals("txt.txt", CoreUtils.replaceSuffix("txt.txt.txt", ".txt", ""))
     assertEquals("foo.txt", CoreUtils.replaceSuffix("foo", "", ".txt"))
   }

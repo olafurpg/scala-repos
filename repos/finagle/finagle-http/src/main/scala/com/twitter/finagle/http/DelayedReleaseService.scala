@@ -11,8 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean
   */
 private[finagle] class DelayedReleaseService[-Req <: Request](
     service: Service[Req, Response]
-)
-    extends ServiceProxy[Req, Response](service) {
+) extends ServiceProxy[Req, Response](service) {
 
   protected[this] val counter = new AsyncLatch
 

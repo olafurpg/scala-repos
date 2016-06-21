@@ -485,8 +485,9 @@ class BasicOperationsSuite extends TestSuiteBase {
         Some(values.sum + state.getOrElse(0))
       }
       s.map(x => (x, 1))
-        .updateStateByKey[Int](
-            updateFunc, new HashPartitioner(numInputPartitions), initialRDD)
+        .updateStateByKey[Int](updateFunc,
+                               new HashPartitioner(numInputPartitions),
+                               initialRDD)
     }
 
     testOperation(inputData, updateStateOperation, outputData, true)
@@ -561,10 +562,10 @@ class BasicOperationsSuite extends TestSuiteBase {
         values.sum match {
           case 0 => stateObj.expireCounter += 1 // no new values
           case n => {
-              // has new values, increment and reset expireCounter
-              stateObj.counter += n
-              stateObj.expireCounter = 0
-            }
+            // has new values, increment and reset expireCounter
+            stateObj.counter += n
+            stateObj.expireCounter = 0
+          }
         }
         stateObj.expireCounter match {
           case 2 => None // seen twice with no new values, give it the boot
@@ -633,9 +634,9 @@ class BasicOperationsSuite extends TestSuiteBase {
     // Checkpoint remember durations
     assert(windowedStream2.rememberDuration === rememberDuration)
     assert(windowedStream1.rememberDuration === rememberDuration +
-        windowedStream2.windowDuration)
+          windowedStream2.windowDuration)
     assert(mappedStream.rememberDuration === rememberDuration +
-        windowedStream2.windowDuration + windowedStream1.windowDuration)
+          windowedStream2.windowDuration + windowedStream1.windowDuration)
 
     // WindowedStream2 should remember till 7 seconds: 10, 9, 8, 7
     // WindowedStream1 should remember till 4 seconds: 10, 9, 8, 7, 6, 5, 4

@@ -40,8 +40,10 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class NumberStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[
-        Number, jfxuc.NumberStringConverter, Number, NumberStringConverter](
+    extends AbstractStringConverterDelegateSpec[Number,
+                                                jfxuc.NumberStringConverter,
+                                                Number,
+                                                NumberStringConverter](
         classOf[jfxuc.NumberStringConverter],
         classOf[NumberStringConverter],
         classOf[Number]) {

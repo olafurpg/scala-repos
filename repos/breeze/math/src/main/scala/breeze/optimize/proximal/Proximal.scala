@@ -36,8 +36,7 @@ case class ProjectProbabilitySimplex(s: Double) extends Proximal {
   def prox(x: DenseVector[Double], rho: Double = 1.0) = {
     val sorted = x.data.sorted(Ordering[Double].reverse)
     val cum = sorted.scanLeft(0.0)(_ + _).slice(1, x.length + 1)
-    val cs = DenseVector(
-        cum.zipWithIndex.map { elem =>
+    val cs = DenseVector(cum.zipWithIndex.map { elem =>
       (elem._1 - s) / (elem._2 + 1)
     })
     val ndx =

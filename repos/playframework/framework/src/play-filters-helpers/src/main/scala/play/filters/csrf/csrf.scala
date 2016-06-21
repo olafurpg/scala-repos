@@ -37,20 +37,20 @@ import scala.concurrent.Future
   * @param shouldProtect A function that decides based on the headers of the request if a check is needed.
   * @param bypassCorsTrustedOrigins Whether to bypass the CSRF check if the CORS filter trusts this origin
   */
-case class CSRFConfig(tokenName: String = "csrfToken",
-                      cookieName: Option[String] = None,
-                      secureCookie: Boolean = false,
-                      httpOnlyCookie: Boolean = false,
-                      createIfNotFound: RequestHeader => Boolean =
-                        CSRFConfig.defaultCreateIfNotFound,
-                      postBodyBuffer: Long = 102400,
-                      signTokens: Boolean = true,
-                      checkMethod: String => Boolean =
-                        !CSRFConfig.SafeMethods.contains(_),
-                      checkContentType: Option[String] => Boolean = _ => true,
-                      headerName: String = "Csrf-Token",
-                      shouldProtect: RequestHeader => Boolean = _ => false,
-                      bypassCorsTrustedOrigins: Boolean = true) {
+case class CSRFConfig(
+    tokenName: String = "csrfToken",
+    cookieName: Option[String] = None,
+    secureCookie: Boolean = false,
+    httpOnlyCookie: Boolean = false,
+    createIfNotFound: RequestHeader => Boolean =
+      CSRFConfig.defaultCreateIfNotFound,
+    postBodyBuffer: Long = 102400,
+    signTokens: Boolean = true,
+    checkMethod: String => Boolean = !CSRFConfig.SafeMethods.contains(_),
+    checkContentType: Option[String] => Boolean = _ => true,
+    headerName: String = "Csrf-Token",
+    shouldProtect: RequestHeader => Boolean = _ => false,
+    bypassCorsTrustedOrigins: Boolean = true) {
 
   // Java builder methods
   def this() = this(cookieName = None)
@@ -110,16 +110,15 @@ object CSRFConfig {
     val methodWhiteList = config.get[Seq[String]]("method.whiteList").toSet
     val methodBlackList = config.get[Seq[String]]("method.blackList").toSet
 
-    val checkMethod: String => Boolean =
-      if (methodWhiteList.nonEmpty) {
-        !methodWhiteList.contains(_)
+    val checkMethod: String => Boolean = if (methodWhiteList.nonEmpty) {
+      !methodWhiteList.contains(_)
+    } else {
+      if (methodBlackList.isEmpty) { _ =>
+        true
       } else {
-        if (methodBlackList.isEmpty) { _ =>
-          true
-        } else {
-          methodBlackList.contains
-        }
+        methodBlackList.contains
       }
+    }
 
     val contentTypeWhiteList =
       config.get[Seq[String]]("contentType.whiteList").toSet
@@ -231,8 +230,8 @@ object CSRF {
     def compareTokens(tokenA: String, tokenB: String): Boolean
   }
 
-  class TokenProviderProvider @Inject()(
-      config: CSRFConfig, tokenSigner: CSRFTokenSigner)
+  class TokenProviderProvider @Inject()(config: CSRFConfig,
+                                        tokenSigner: CSRFTokenSigner)
       extends Provider[TokenProvider] {
     override val get = config.signTokens match {
       case true => new SignedTokenProvider(tokenSigner)
@@ -240,8 +239,8 @@ object CSRF {
     }
   }
 
-  class ConfigTokenProvider(
-      config: => CSRFConfig, tokenSigner: CSRFTokenSigner)
+  class ConfigTokenProvider(config: => CSRFConfig,
+                            tokenSigner: CSRFTokenSigner)
       extends TokenProvider {
     lazy val underlying = new TokenProviderProvider(config, tokenSigner).get
     def generateToken = underlying.generateToken
@@ -287,8 +286,8 @@ object CSRF {
   class JavaCSRFErrorHandlerAdapter @Inject()(underlying: CSRFErrorHandler)
       extends ErrorHandler {
     def handle(request: RequestHeader, msg: String) =
-      JavaHelpers.invokeWithContext(
-          request, req => underlying.handle(req, msg))
+      JavaHelpers.invokeWithContext(request, req =>
+            underlying.handle(req, msg))
   }
 
   class JavaCSRFErrorHandlerDelegate @Inject()(delegate: ErrorHandler)
@@ -344,6 +343,8 @@ trait CSRFComponents {
     new CSRF.TokenProviderProvider(csrfConfig, csrfTokenSigner).get
   lazy val csrfErrorHandler: CSRF.ErrorHandler = new CSRFHttpErrorHandler(
       httpErrorHandler)
-  lazy val csrfFilter: CSRFFilter = new CSRFFilter(
-      csrfConfig, csrfTokenSigner, csrfTokenProvider, csrfErrorHandler)
+  lazy val csrfFilter: CSRFFilter = new CSRFFilter(csrfConfig,
+                                                   csrfTokenSigner,
+                                                   csrfTokenProvider,
+                                                   csrfErrorHandler)
 }

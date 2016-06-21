@@ -171,16 +171,14 @@ object ConcurrentSpec
         val startCount = new AtomicInteger()
         val completeCount = new AtomicInteger()
         val errorCount = new AtomicInteger()
-        val enumerator = Concurrent.unicast[String](
-            c => {
-              startCount.incrementAndGet()
-              c.push(a)
-              c.push(b)
-              c.eofAndEnd()
-            },
-            () => completeCount.incrementAndGet(),
-            (_: String,
-             _: Input[String]) => errorCount.incrementAndGet())(unicastEC)
+        val enumerator = Concurrent.unicast[String](c => {
+          startCount.incrementAndGet()
+          c.push(a)
+          c.push(b)
+          c.eofAndEnd()
+        }, () =>
+              completeCount.incrementAndGet(), (_: String, _: Input[String]) =>
+              errorCount.incrementAndGet())(unicastEC)
         val promise =
           (enumerator |>> Iteratee.fold[String, String]("")(_ ++ _)(foldEC))
             .flatMap(_.run)

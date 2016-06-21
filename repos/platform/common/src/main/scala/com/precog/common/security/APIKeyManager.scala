@@ -86,8 +86,8 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
     val path = Path("/%s/".format(accountId))
     val grantName = name.map(_ + "-grant")
     val grantDescription = name.map(_ + " account grant")
-    val grant = newStandardAccountGrant(
-        accountId, path, grantName, grantDescription)
+    val grant =
+      newStandardAccountGrant(accountId, path, grantName, grantDescription)
     for {
       rk <- rootAPIKey
       ng <- grant
@@ -122,14 +122,14 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
   def findDeletedGrantChildren(gid: GrantId): M[Set[Grant]]
 
   def addGrants(apiKey: APIKey, grants: Set[GrantId]): M[Option[APIKeyRecord]]
-  def removeGrants(
-      apiKey: APIKey, grants: Set[GrantId]): M[Option[APIKeyRecord]]
+  def removeGrants(apiKey: APIKey,
+                   grants: Set[GrantId]): M[Option[APIKeyRecord]]
 
   def deleteAPIKey(apiKey: APIKey): M[Option[APIKeyRecord]]
   def deleteGrant(apiKey: GrantId): M[Set[Grant]]
 
-  def findValidGrant(
-      grantId: GrantId, at: Option[DateTime] = None): M[Option[Grant]] =
+  def findValidGrant(grantId: GrantId,
+                     at: Option[DateTime] = None): M[Option[Grant]] =
     findGrant(grantId) flatMap { grantOpt =>
       grantOpt map { (grant: Grant) =>
         if (grant.isExpired(at)) None.point[M]
@@ -173,8 +173,12 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
         if (minimized.isEmpty) {
           none[Grant].point[M]
         } else {
-          createGrant(
-              name, description, issuerKey, minimized, perms, expiration) map {
+          createGrant(name,
+                      description,
+                      issuerKey,
+                      minimized,
+                      perms,
+                      expiration) map {
             some
           }
         }
@@ -182,13 +186,13 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
     }
   }
 
-  def deriveSingleParentGrant(name: Option[String],
-                              description: Option[String],
-                              issuerKey: APIKey,
-                              parentId: GrantId,
-                              perms: Set[Permission],
-                              expiration: Option[DateTime] =
-                                None): M[Option[Grant]] = {
+  def deriveSingleParentGrant(
+      name: Option[String],
+      description: Option[String],
+      issuerKey: APIKey,
+      parentId: GrantId,
+      perms: Set[Permission],
+      expiration: Option[DateTime] = None): M[Option[Grant]] = {
     validGrants(issuerKey, expiration).flatMap { validGrants =>
       validGrants.find(_.grantId == parentId) match {
         case Some(parent) if parent.implies(perms, expiration) =>
@@ -203,13 +207,13 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
     }
   }
 
-  def deriveAndAddGrant(name: Option[String],
-                        description: Option[String],
-                        issuerKey: APIKey,
-                        perms: Set[Permission],
-                        recipientKey: APIKey,
-                        expiration: Option[DateTime] =
-                          None): M[Option[Grant]] = {
+  def deriveAndAddGrant(
+      name: Option[String],
+      description: Option[String],
+      issuerKey: APIKey,
+      perms: Set[Permission],
+      recipientKey: APIKey,
+      expiration: Option[DateTime] = None): M[Option[Grant]] = {
     deriveGrant(name, description, issuerKey, perms, expiration) flatMap {
       case Some(grant) =>
         addGrants(recipientKey, Set(grant.grantId)) map {

@@ -1,5 +1,5 @@
 package foo {
-  case class Opt[A] private[foo](val get: A) extends AnyVal
+  case class Opt[A] private[foo] (val get: A) extends AnyVal
   object Opt {
     def mkOpt = Opt("")
   }

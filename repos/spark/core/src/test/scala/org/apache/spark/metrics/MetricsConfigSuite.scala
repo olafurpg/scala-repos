@@ -114,8 +114,9 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     val sparkConf = new SparkConf(loadDefaults = false)
     setMetricsProperty(sparkConf, "*.sink.console.period", "10")
     setMetricsProperty(sparkConf, "*.sink.console.unit", "seconds")
-    setMetricsProperty(
-        sparkConf, "*.source.jvm.class", "org.apache.spark.SomeOtherSource")
+    setMetricsProperty(sparkConf,
+                       "*.source.jvm.class",
+                       "org.apache.spark.SomeOtherSource")
     setMetricsProperty(sparkConf, "master.sink.console.period", "50")
     setMetricsProperty(sparkConf, "master.sink.console.unit", "seconds")
     sparkConf.set("spark.metrics.conf", filePath)
@@ -172,8 +173,9 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(servletProps.size() === 2)
   }
 
-  private def setMetricsProperty(
-      conf: SparkConf, name: String, value: String): Unit = {
+  private def setMetricsProperty(conf: SparkConf,
+                                 name: String,
+                                 value: String): Unit = {
     conf.set(s"spark.metrics.conf.$name", value)
   }
 }

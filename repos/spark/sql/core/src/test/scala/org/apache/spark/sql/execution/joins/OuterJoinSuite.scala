@@ -75,8 +75,10 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
                             expectedAnswer: Seq[Product]): Unit = {
 
     def extractJoinParts(): Option[ExtractEquiJoinKeys.ReturnType] = {
-      val join = Join(
-          leftRows.logicalPlan, rightRows.logicalPlan, Inner, Some(condition))
+      val join = Join(leftRows.logicalPlan,
+                      rightRows.logicalPlan,
+                      Inner,
+                      Some(condition))
       ExtractEquiJoinKeys.unapply(join)
     }
 
@@ -158,8 +160,11 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
         checkAnswer2(leftRows,
                      rightRows,
                      (left: SparkPlan, right: SparkPlan) =>
-                       BroadcastNestedLoopJoin(
-                           left, right, BuildLeft, joinType, Some(condition)),
+                       BroadcastNestedLoopJoin(left,
+                                               right,
+                                               BuildLeft,
+                                               joinType,
+                                               Some(condition)),
                      expectedAnswer.map(Row.fromTuple),
                      sortAnswers = true)
       }
@@ -170,8 +175,11 @@ class OuterJoinSuite extends SparkPlanTest with SharedSQLContext {
         checkAnswer2(leftRows,
                      rightRows,
                      (left: SparkPlan, right: SparkPlan) =>
-                       BroadcastNestedLoopJoin(
-                           left, right, BuildRight, joinType, Some(condition)),
+                       BroadcastNestedLoopJoin(left,
+                                               right,
+                                               BuildRight,
+                                               joinType,
+                                               Some(condition)),
                      expectedAnswer.map(Row.fromTuple),
                      sortAnswers = true)
       }

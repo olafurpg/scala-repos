@@ -67,8 +67,8 @@ class CompactHessian(M: DenseMatrix[Double],
 
     // M is the 2k x 2k matrix given by: M = [ \sigma * S_k^T S_k    L_k ]
     //                                       [         L_k^T        -D_k ]
-    val M = DenseMatrix.vertcat(
-        DenseMatrix.horzcat(STS, L), DenseMatrix.horzcat(L.t, -D))
+    val M = DenseMatrix
+      .vertcat(DenseMatrix.horzcat(STS, L), DenseMatrix.horzcat(L.t, -D))
 
     val newB = new CompactHessian(M, Y, S, sigma, m)
     newB
@@ -97,8 +97,8 @@ class ProjectedQuasiNewton(
     val gamma: Double,
     val projection: DenseVector[Double] => DenseVector[Double])(
     implicit space: MutableInnerProductModule[DenseVector[Double], Double])
-    extends FirstOrderMinimizer[
-        DenseVector[Double], DiffFunction[DenseVector[Double]]](
+    extends FirstOrderMinimizer[DenseVector[Double],
+                                DiffFunction[DenseVector[Double]]](
         convergenceCheck)
     with Projecting[DenseVector[Double]]
     with SerializableLogging {
@@ -116,7 +116,9 @@ class ProjectedQuasiNewton(
     this(
         convergenceCheck =
           FirstOrderMinimizer.defaultConvergenceCheck[DenseVector[Double]](
-              maxIter, tolerance, relativeTolerance),
+              maxIter,
+              tolerance,
+              relativeTolerance),
         m = m,
         initFeas = initFeas,
         testOpt = testOpt,
@@ -146,8 +148,8 @@ class ProjectedQuasiNewton(
       newVal: Double): (Double, DenseVector[Double]) =
     (newVal, projectedVector(newX, -newGrad))
 
-  private def computeGradient(
-      x: DenseVector[Double], g: DenseVector[Double]): DenseVector[Double] =
+  private def computeGradient(x: DenseVector[Double],
+                              g: DenseVector[Double]): DenseVector[Double] =
     projectedVector(x, -g)
 
   protected def chooseDescentDirection(
@@ -161,9 +163,12 @@ class ProjectedQuasiNewton(
       //B.update(y, s)
       // Solve subproblem; we use the current iterate x as a guess
       val subprob = new ProjectedQuasiNewton.QuadraticSubproblem(
-          state.adjustedValue, x, grad, history)
-      val spgResult = innerOptimizer.minimizeAndReturnState(
-          new CachedDiffFunction(subprob), x)
+          state.adjustedValue,
+          x,
+          grad,
+          history)
+      val spgResult = innerOptimizer
+        .minimizeAndReturnState(new CachedDiffFunction(subprob), x)
       logger.info(
           f"ProjectedQuasiNewton: outerIter ${state.iter} innerIters ${spgResult.iter}")
       spgResult.x - x

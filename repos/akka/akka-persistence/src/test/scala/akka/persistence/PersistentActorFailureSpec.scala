@@ -35,14 +35,14 @@ object PersistentActorFailureSpec {
       }
     }
 
-    override def asyncReplayMessages(persistenceId: String,
-                                     fromSequenceNr: Long,
-                                     toSequenceNr: Long,
-                                     max: Long)(
-        recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
+    override def asyncReplayMessages(
+        persistenceId: String,
+        fromSequenceNr: Long,
+        toSequenceNr: Long,
+        max: Long)(recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
       val highest = highestSequenceNr(persistenceId)
-      val readFromStore = read(
-          persistenceId, fromSequenceNr, toSequenceNr, max)
+      val readFromStore =
+        read(persistenceId, fromSequenceNr, toSequenceNr, max)
       if (readFromStore.isEmpty) Future.successful(())
       else if (isCorrupt(readFromStore))
         Future.failed(
@@ -89,8 +89,8 @@ object PersistentActorFailureSpec {
         case c @ Cmd(txt) ⇒ persist(Evt(txt))(updateState)
       }
 
-    override protected def onRecoveryFailure(
-        cause: Throwable, event: Option[Any]): Unit =
+    override protected def onRecoveryFailure(cause: Throwable,
+                                             event: Option[Any]): Unit =
       probe ! "recovery-failure:" + cause.getMessage
   }
 
@@ -163,8 +163,8 @@ class PersistentActorFailureSpec
         PersistenceSpec.config(
             "inmem",
             "SnapshotFailureRobustnessSpec",
-            extraConfig =
-              Some("""
+            extraConfig = Some(
+                """
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorFailureSpec$FailingInmemJournal"
   """)))
     with ImplicitSender {
@@ -194,7 +194,8 @@ class PersistentActorFailureSpec
 
       // recover by creating another with same name
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[Behavior1PersistentActor], name)
+          classOf[Behavior1PersistentActor],
+          name)
       val ref = expectMsgType[ActorRef]
       watch(ref)
       expectTerminated(ref)
@@ -217,7 +218,8 @@ class PersistentActorFailureSpec
     }
     "call onPersistFailure and stop when persist fails" in {
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[Behavior1PersistentActor], name)
+          classOf[Behavior1PersistentActor],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       watch(persistentActor)
       persistentActor ! Cmd("wrong")
@@ -226,7 +228,8 @@ class PersistentActorFailureSpec
     }
     "call onPersistFailure and stop if persistAsync fails" in {
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[AsyncPersistPersistentActor], name)
+          classOf[AsyncPersistPersistentActor],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       persistentActor ! Cmd("a")
       watch(persistentActor)
@@ -239,7 +242,8 @@ class PersistentActorFailureSpec
     }
     "call onPersistRejected and continue if persist rejected" in {
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[Behavior1PersistentActor], name)
+          classOf[Behavior1PersistentActor],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       persistentActor ! Cmd("not serializable")
       expectMsg("Rejected: not serializable-1")
@@ -254,7 +258,8 @@ class PersistentActorFailureSpec
 
       // recover by creating another with same name
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[FailingRecovery], name)
+          classOf[FailingRecovery],
+          name)
       val ref = expectMsgType[ActorRef]
       watch(ref)
       expectTerminated(ref)
@@ -262,7 +267,8 @@ class PersistentActorFailureSpec
 
     "support resume when persist followed by exception" in {
       system.actorOf(Props(classOf[ResumingSupervisor], testActor)) ! Props(
-          classOf[ThrowingActor1], name)
+          classOf[ThrowingActor1],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       persistentActor ! Cmd("a")
       persistentActor ! Cmd("err")
@@ -275,7 +281,8 @@ class PersistentActorFailureSpec
 
     "support restart when persist followed by exception" in {
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[ThrowingActor1], name)
+          classOf[ThrowingActor1],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       persistentActor ! Cmd("a")
       persistentActor ! Cmd("err")
@@ -288,7 +295,8 @@ class PersistentActorFailureSpec
 
     "support resume when persist handler throws exception" in {
       system.actorOf(Props(classOf[ResumingSupervisor], testActor)) ! Props(
-          classOf[ThrowingActor2], name)
+          classOf[ThrowingActor2],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       persistentActor ! Cmd("a")
       persistentActor ! Cmd("b")
@@ -302,7 +310,8 @@ class PersistentActorFailureSpec
 
     "support restart when persist handler throws exception" in {
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
-          classOf[ThrowingActor2], name)
+          classOf[ThrowingActor2],
+          name)
       val persistentActor = expectMsgType[ActorRef]
       persistentActor ! Cmd("a")
       persistentActor ! Cmd("b")

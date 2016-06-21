@@ -49,8 +49,8 @@ trait PartitionSchemed[P, T]
 
   // The partition fields, offset by the value arity.
   def partitionFields =
-    PartitionUtil.toFields(
-        valueSetter.arity, valueSetter.arity + partitionSetter.arity)
+    PartitionUtil
+      .toFields(valueSetter.arity, valueSetter.arity + partitionSetter.arity)
 
   /*
    Advertise all the sinkFields, both the value and partition ones, this needs to be like this even
@@ -71,29 +71,29 @@ trait PartitionSchemed[P, T]
     PartitionUtil.setter[P, T, U](valueSetter, partitionSetter)
 
   /** Creates the taps for local and hdfs mode.*/
-  override def createTap(
-      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(readOrWrite: AccessMode)(
+      implicit mode: Mode): Tap[_, _, _] =
     mode match {
       case Local(_) => {
-          val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
-          new LocalPartitionTap(
-              fileTap,
-              new TemplatePartition(partitionFields, template),
-              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
+        new LocalPartitionTap(fileTap,
+                              new TemplatePartition(partitionFields, template),
+                              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case Hdfs(_, _) => {
-          val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
-          new PartitionTap(hfs,
-                           new TemplatePartition(partitionFields, template),
-                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
+        new PartitionTap(hfs,
+                         new TemplatePartition(partitionFields, template),
+                         SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case hdfsTest @ HadoopTest(_, _) => {
-          val hfs = createHfsTap(
-              hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
-          new PartitionTap(hfs,
-                           new TemplatePartition(partitionFields, template),
-                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val hfs = createHfsTap(hdfsScheme,
+                               hdfsTest.getWritePathFor(this),
+                               SinkMode.REPLACE)
+        new PartitionTap(hfs,
+                         new TemplatePartition(partitionFields, template),
+                         SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
     }
 }

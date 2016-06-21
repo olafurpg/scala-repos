@@ -23,13 +23,13 @@ class ForwardReferenceInspection extends AbstractInspection {
         member.getContext match {
           case tb: ScTemplateBody
               if member.isInstanceOf[ScValue] ||
-              member.isInstanceOf[ScVariable] =>
+                member.isInstanceOf[ScVariable] =>
             ref.bind() match {
               case Some(r: ScalaResolveResult) =>
                 ScalaPsiUtil.nameContext(r.getActualElement) match {
                   case resolved
                       if resolved.isInstanceOf[ScValue] ||
-                      resolved.isInstanceOf[ScVariable] =>
+                        resolved.isInstanceOf[ScVariable] =>
                     if (resolved.getParent == tb &&
                         !member.hasModifierProperty("lazy") && !resolved
                           .asInstanceOf[ScMember]

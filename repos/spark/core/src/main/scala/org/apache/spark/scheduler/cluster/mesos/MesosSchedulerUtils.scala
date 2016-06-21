@@ -96,8 +96,10 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
       fwInfoBuilder.setRole(role)
     }
     if (credBuilder.hasPrincipal) {
-      new MesosSchedulerDriver(
-          scheduler, fwInfoBuilder.build(), masterUrl, credBuilder.build())
+      new MesosSchedulerDriver(scheduler,
+                               fwInfoBuilder.build(),
+                               masterUrl,
+                               credBuilder.build())
     } else {
       new MesosSchedulerDriver(scheduler, fwInfoBuilder.build(), masterUrl)
     }
@@ -133,10 +135,10 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
             }
           } catch {
             case e: Exception => {
-                logError("driver.run() failed", e)
-                error = Some(e)
-                markErr()
-              }
+              logError("driver.run() failed", e)
+              error = Some(e)
+              markErr()
+            }
           }
         }
       }.start()
@@ -166,8 +168,9 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
     registerLatch.countDown()
   }
 
-  def createResource(
-      name: String, amount: Double, role: Option[String] = None): Resource = {
+  def createResource(name: String,
+                     amount: Double,
+                     role: Option[String] = None): Resource = {
     val builder = Resource
       .newBuilder()
       .setName(name)
@@ -197,18 +200,19 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
     var requestedResources = new ArrayBuffer[Resource]
     val remainingResources = resources.asScala.map {
       case r => {
-          if (remain > 0 && r.getType == Value.Type.SCALAR &&
-              r.getScalar.getValue > 0.0 && r.getName == resourceName) {
-            val usage = Math.min(remain, r.getScalar.getValue)
-            requestedResources +=
-              createResource(resourceName, usage, Some(r.getRole))
-            remain -= usage
-            createResource(
-                resourceName, r.getScalar.getValue - usage, Some(r.getRole))
-          } else {
-            r
-          }
+        if (remain > 0 && r.getType == Value.Type.SCALAR &&
+            r.getScalar.getValue > 0.0 && r.getName == resourceName) {
+          val usage = Math.min(remain, r.getScalar.getValue)
+          requestedResources +=
+          createResource(resourceName, usage, Some(r.getRole))
+          remain -= usage
+          createResource(resourceName,
+                         r.getScalar.getValue - usage,
+                         Some(r.getRole))
+        } else {
+          r
         }
+      }
     }
 
     // Filter any resource that has depleted.
@@ -224,8 +228,8 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
   }
 
   /** Build a Mesos resource protobuf object */
-  protected def createResource(
-      resourceName: String, quantity: Double): Protos.Resource = {
+  protected def createResource(resourceName: String,
+                               quantity: Double): Protos.Resource = {
     Resource
       .newBuilder()
       .setName(resourceName)
@@ -342,7 +346,8 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
       } catch {
         case NonFatal(e) =>
           throw new IllegalArgumentException(
-              s"Bad constraint string: $constraintsVal", e)
+              s"Bad constraint string: $constraintsVal",
+              e)
       }
     }
   }
@@ -375,6 +380,7 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
   protected def getRejectOfferDurationForUnmetConstraints(
       sc: SparkContext): Long = {
     sc.conf.getTimeAsSeconds(
-        "spark.mesos.rejectOfferDurationForUnmetConstraints", "120s")
+        "spark.mesos.rejectOfferDurationForUnmetConstraints",
+        "120s")
   }
 }

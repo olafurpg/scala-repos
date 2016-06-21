@@ -22,8 +22,8 @@ package scala.concurrent
   *  @author  Paul Phillips
   *  @version 2.8
   */
-class DelayedLazyVal[T](f: () => T, body: => Unit)(
-    implicit exec: ExecutionContext) {
+class DelayedLazyVal[T](f: () => T,
+                        body: => Unit)(implicit exec: ExecutionContext) {
   @volatile private[this] var _isDone = false
   private[this] lazy val complete = f()
 

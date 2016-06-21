@@ -56,7 +56,8 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
     * read journal configuration entry.
     */
   final def getReadJournalFor[T <: javadsl.ReadJournal](
-      clazz: Class[T], readJournalPluginId: String): T =
+      clazz: Class[T],
+      readJournalPluginId: String): T =
     readJournalPluginFor(readJournalPluginId).javadslPlugin.asInstanceOf[T]
 
   @tailrec private def readJournalPluginFor(
@@ -71,12 +72,13 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
           override def createExtension(
               system: ExtendedActorSystem): PluginHolder = {
             val provider = createPlugin(configPath)
-            PluginHolder(
-                provider.scaladslReadJournal(), provider.javadslReadJournal())
+            PluginHolder(provider.scaladslReadJournal(),
+                         provider.javadslReadJournal())
           }
         }
         readJournalPluginExtensionIds.compareAndSet(
-            extensionIdMap, extensionIdMap.updated(configPath, extensionId))
+            extensionIdMap,
+            extensionIdMap.updated(configPath, extensionId))
         readJournalPluginFor(readJournalPluginId) // Recursive invocation.
     }
   }

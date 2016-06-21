@@ -20,8 +20,9 @@ import xml.Node
 //TODO do not use Play's internal execution context in libs
 import play.core.Execution.Implicits.internalContext
 
-case class OpenIDServer(
-    protocolVersion: String, url: String, delegate: Option[String])
+case class OpenIDServer(protocolVersion: String,
+                        url: String,
+                        delegate: Option[String])
 
 case class UserInfo(id: String, attributes: Map[String, String] = Map.empty)
 
@@ -51,7 +52,7 @@ object UserInfo {
 
     private lazy val signedFields =
       params.get("openid.signed") flatMap { _.headOption map { _.split(",") } } getOrElse
-      (Array())
+        (Array())
 
     def id =
       params
@@ -94,8 +95,8 @@ object OpenID {
     * From a request corresponding to the callback from the OpenID server, check the identity of the current user
     */
   @deprecated("Inject OpenIdClient into your component", "2.5.0")
-  def verifiedId(
-      implicit request: Request[_], app: Application): Future[UserInfo] =
+  def verifiedId(implicit request: Request[_],
+                 app: Application): Future[UserInfo] =
     app.injector.instanceOf[OpenIdClient].verifiedId(request)
 }
 
@@ -183,10 +184,10 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
      queryString.get("openid.claimed_id").flatMap(_.headOption)) match {
       // The Claimed Identifier. "openid.claimed_id" and "openid.identity" SHALL be either both present or both absent.
       case (Some("id_res"), Some(id)) => {
-          // MUST perform discovery on the claimedId to resolve the op_endpoint.
-          val server: Future[OpenIDServer] = discovery.discoverServer(id)
-          server.flatMap(directVerification(queryString))
-        }
+        // MUST perform discovery on the claimedId to resolve the op_endpoint.
+        val server: Future[OpenIDServer] = discovery.discoverServer(id)
+        server.flatMap(directVerification(queryString))
+      }
       case (Some("cancel"), _) => Future.failed(Errors.AUTH_CANCEL)
       case _ => Future.failed(Errors.BAD_RESPONSE)
     }
@@ -199,7 +200,7 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
       server: OpenIDServer) = {
     val fields =
       (queryString - "openid.mode" +
-          ("openid.mode" -> Seq("check_authentication")))
+            ("openid.mode" -> Seq("check_authentication")))
     ws.url(server.url)
       .post(fields)
       .map(response => {
@@ -332,8 +333,8 @@ private[openid] object Discovery {
 
     private def findUriWithType(xml: Node)(typeId: String) =
       (xml \ "XRD" \ "Service" find
-          (node =>
-                (node \ "Type").find(inner => inner.text == typeId).isDefined)).map {
+            (node =>
+                  (node \ "Type").find(inner => inner.text == typeId).isDefined)).map {
         node =>
           (typeId, (node \ "URI").text.trim)
       }
@@ -394,6 +395,6 @@ trait OpenIDComponents {
   def wsClient: WSClient
 
   lazy val openIdDiscovery: Discovery = new WsDiscovery(wsClient)
-  lazy val openIdClient: OpenIdClient = new WsOpenIdClient(
-      wsClient, openIdDiscovery)
+  lazy val openIdClient: OpenIdClient =
+    new WsOpenIdClient(wsClient, openIdDiscovery)
 }

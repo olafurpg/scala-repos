@@ -439,28 +439,29 @@ trait Loc[T] {
         _menu.buildUpperLines(_menu, _menu, buildKidMenuItems(_menu.kids)))
   }
 
-  private[liftweb] def buildItem(
-      kids: List[MenuItem], current: Boolean, path: Boolean): Box[MenuItem] =
+  private[liftweb] def buildItem(kids: List[MenuItem],
+                                 current: Boolean,
+                                 path: Boolean): Box[MenuItem] =
     (calcHidden(kids), testAccess) match {
       case (false, Left(true)) => {
-          for {
-            p <- currentValue
-            t <- link.createLink(p).map(appendQueryParams(p))
-          } yield
-            new MenuItem(
-                text.text(p),
-                t,
-                kids,
-                current,
-                path,
-                allParams.flatMap {
-                  case v: Loc.LocInfo[_] => List(v())
-                  case _ => Nil
-                },
-                placeHolder_?,
-                this
-            )
-        }
+        for {
+          p <- currentValue
+          t <- link.createLink(p).map(appendQueryParams(p))
+        } yield
+          new MenuItem(
+              text.text(p),
+              t,
+              kids,
+              current,
+              path,
+              allParams.flatMap {
+                case v: Loc.LocInfo[_] => List(v())
+                case _ => Nil
+              },
+              placeHolder_?,
+              this
+          )
+      }
 
       case _ => Empty
     }
@@ -472,8 +473,7 @@ trait Loc[T] {
 
   def hidden = _hidden
 
-  private lazy val groupSet: Set[String] = Set(
-      allParams.flatMap {
+  private lazy val groupSet: Set[String] = Set(allParams.flatMap {
     case s: Loc.LocGroup => s.group
     case _ => Nil
   }: _*)
@@ -525,8 +525,7 @@ object Loc {
       override val link: Link[Unit],
       override val text: LinkText[Unit],
       override val params: List[LocParam[Unit]]
-  )
-      extends Loc[Unit] {
+  ) extends Loc[Unit] {
     override def defaultValue: Box[Unit] = Full(())
 
     init()
@@ -538,8 +537,7 @@ object Loc {
       override val text: LinkText[T],
       override val defaultValue: Box[T],
       xparams: LocParam[T]*
-  )
-      extends Loc[T] {
+  ) extends Loc[T] {
     override val params = xparams.toList
 
     init()

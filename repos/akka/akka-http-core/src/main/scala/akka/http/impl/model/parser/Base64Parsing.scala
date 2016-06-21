@@ -55,8 +55,8 @@ private[parser] trait Base64Parsing {
     * Parses a BASE64-encoded string with the given alphabet and decodes it onto the value
     * stack using the given codec.
     */
-  def base64StringOrBlock(
-      alphabet: CharPredicate, decoder: Decoder): Rule1[Array[Byte]] = {
+  def base64StringOrBlock(alphabet: CharPredicate,
+                          decoder: Decoder): Rule1[Array[Byte]] = {
     val start = cursor
     rule {
       oneOrMore(alphabet) ~ run {

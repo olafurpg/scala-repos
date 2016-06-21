@@ -59,12 +59,12 @@ object HiveThriftServer2 extends Logging {
     server.start()
     listener = new HiveThriftServer2Listener(server, sqlContext.conf)
     sqlContext.sparkContext.addSparkListener(listener)
-    uiTab =
-      if (sqlContext.sparkContext.getConf.getBoolean("spark.ui.enabled", true)) {
-        Some(new ThriftServerTab(sqlContext.sparkContext))
-      } else {
-        None
-      }
+    uiTab = if (sqlContext.sparkContext.getConf
+                  .getBoolean("spark.ui.enabled", true)) {
+      Some(new ThriftServerTab(sqlContext.sparkContext))
+    } else {
+      None
+    }
   }
 
   def main(args: Array[String]) {
@@ -88,12 +88,12 @@ object HiveThriftServer2 extends Logging {
       server.init(SparkSQLEnv.hiveContext.hiveconf)
       server.start()
       logInfo("HiveThriftServer2 started")
-      listener = new HiveThriftServer2Listener(
-          server, SparkSQLEnv.hiveContext.conf)
+      listener =
+        new HiveThriftServer2Listener(server, SparkSQLEnv.hiveContext.conf)
       SparkSQLEnv.sparkContext.addSparkListener(listener)
       uiTab =
-        if (SparkSQLEnv.sparkContext.getConf.getBoolean(
-                "spark.ui.enabled", true)) {
+        if (SparkSQLEnv.sparkContext.getConf
+              .getBoolean("spark.ui.enabled", true)) {
           Some(new ThriftServerTab(SparkSQLEnv.sparkContext))
         } else {
           None
@@ -155,7 +155,8 @@ object HiveThriftServer2 extends Logging {
     * A inner sparkListener called in sc.stop to clean up the HiveThriftServer2
     */
   private[thriftserver] class HiveThriftServer2Listener(
-      val server: HiveServer2, val conf: SQLConf)
+      val server: HiveServer2,
+      val conf: SQLConf)
       extends SparkListener {
 
     override def onApplicationEnd(
@@ -200,8 +201,9 @@ object HiveThriftServer2 extends Logging {
         }
       }
 
-    def onSessionCreated(
-        ip: String, sessionId: String, userName: String = "UNKNOWN"): Unit = {
+    def onSessionCreated(ip: String,
+                         sessionId: String,
+                         userName: String = "UNKNOWN"): Unit = {
       synchronized {
         val info =
           new SessionInfo(sessionId, System.currentTimeMillis, ip, userName)
@@ -222,8 +224,10 @@ object HiveThriftServer2 extends Logging {
                          statement: String,
                          groupId: String,
                          userName: String = "UNKNOWN"): Unit = synchronized {
-      val info = new ExecutionInfo(
-          statement, sessionId, System.currentTimeMillis, userName)
+      val info = new ExecutionInfo(statement,
+                                   sessionId,
+                                   System.currentTimeMillis,
+                                   userName)
       info.state = ExecutionState.STARTED
       executionList.put(id, info)
       trimExecutionIfNecessary()
@@ -238,8 +242,9 @@ object HiveThriftServer2 extends Logging {
         executionList(id).state = ExecutionState.COMPILED
       }
 
-    def onStatementError(
-        id: String, errorMessage: String, errorTrace: String): Unit = {
+    def onStatementError(id: String,
+                         errorMessage: String,
+                         errorTrace: String): Unit = {
       synchronized {
         executionList(id).finishTimestamp = System.currentTimeMillis
         executionList(id).detail = errorMessage
@@ -292,12 +297,11 @@ private[hive] class HiveThriftServer2(hiveContext: HiveContext)
     setSuperField(this, "cliService", sparkSqlCliService)
     addService(sparkSqlCliService)
 
-    val thriftCliService =
-      if (isHTTPTransportMode(hiveConf)) {
-        new ThriftHttpCLIService(sparkSqlCliService)
-      } else {
-        new ThriftBinaryCLIService(sparkSqlCliService)
-      }
+    val thriftCliService = if (isHTTPTransportMode(hiveConf)) {
+      new ThriftHttpCLIService(sparkSqlCliService)
+    } else {
+      new ThriftBinaryCLIService(sparkSqlCliService)
+    }
 
     setSuperField(this, "thriftCLIService", thriftCliService)
     addService(thriftCliService)

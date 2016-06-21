@@ -241,8 +241,10 @@ class UtilsSuite
     assert(Utils.splitCommandString("a \"b c\"") === Seq("a", "b c"))
     assert(Utils.splitCommandString("a \"b c\" d") === Seq("a", "b c", "d"))
     assert(Utils.splitCommandString("\"b c\"") === Seq("b c"))
-    assert(Utils.splitCommandString("a 'b\" c' \"d' e\"") === Seq(
-            "a", "b\" c", "d' e"))
+    assert(
+        Utils.splitCommandString("a 'b\" c' \"d' e\"") === Seq("a",
+                                                               "b\" c",
+                                                               "d' e"))
     assert(Utils.splitCommandString("a\t'b\nc'\nd") === Seq("a", "b\nc", "d"))
     assert(Utils.splitCommandString("a \"b\\\\c\"") === Seq("a", "b\\c"))
     assert(Utils.splitCommandString("a \"b\\\"c\"") === Seq("a", "b\"c"))
@@ -272,7 +274,7 @@ class UtilsSuite
     assert(str(minute + 4 * second + 34) === "1" + sep + "1 m")
     assert(str(10 * hour + minute + 4 * second) === "10" + sep + "02 h")
     assert(str(10 * hour + 59 * minute + 59 * second + 999) === "11" + sep +
-        "00 h")
+          "00 h")
   }
 
   test("reading offset bytes of a file") {
@@ -393,8 +395,8 @@ class UtilsSuite
     val rawCwd = System.getProperty("user.dir")
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("hdfs:/root/spark.jar", "hdfs:/root/spark.jar")
-    assertResolves(
-        "hdfs:///root/spark.jar#app.jar", "hdfs:/root/spark.jar#app.jar")
+    assertResolves("hdfs:///root/spark.jar#app.jar",
+                   "hdfs:/root/spark.jar#app.jar")
     assertResolves("spark.jar", s"file:$cwd/spark.jar")
     assertResolves("spark.jar#app.jar", s"file:$cwd/spark.jar#app.jar")
     assertResolves("path to/file.txt", s"file:$cwd/path%20to/file.txt")
@@ -404,8 +406,8 @@ class UtilsSuite
     }
     assertResolves("file:/C:/path/to/file.txt", "file:/C:/path/to/file.txt")
     assertResolves("file:///C:/path/to/file.txt", "file:/C:/path/to/file.txt")
-    assertResolves(
-        "file:/C:/file.txt#alias.txt", "file:/C:/file.txt#alias.txt")
+    assertResolves("file:/C:/file.txt#alias.txt",
+                   "file:/C:/file.txt#alias.txt")
     assertResolves("file:foo", s"file:foo")
     assertResolves("file:foo:baby", s"file:foo:baby")
   }
@@ -425,8 +427,8 @@ class UtilsSuite
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("jar1,jar2", s"file:$cwd/jar1,file:$cwd/jar2")
     assertResolves("file:/jar1,file:/jar2", "file:/jar1,file:/jar2")
-    assertResolves(
-        "hdfs:/jar1,file:/jar2,jar3", s"hdfs:/jar1,file:/jar2,file:$cwd/jar3")
+    assertResolves("hdfs:/jar1,file:/jar2,jar3",
+                   s"hdfs:/jar1,file:/jar2,file:$cwd/jar3")
     assertResolves(
         "hdfs:/jar1,file:/jar2,jar3,jar4#jar5,path to/jar6",
         s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:$cwd/jar4#jar5,file:$cwd/path%20to/jar6")
@@ -451,16 +453,22 @@ class UtilsSuite
     assert(
         Utils.nonLocalPaths("local:/spark.jar,file:/smart.jar,family.py") === Array.empty)
     assert(Utils.nonLocalPaths("hdfs:/spark.jar,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
+            "hdfs:/spark.jar",
+            "s3:/smart.jar"))
     assert(
         Utils.nonLocalPaths("hdfs:/spark.jar,path to/a.jar,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
-    assert(Utils.nonLocalPaths(
+            "hdfs:/spark.jar",
+            "s3:/smart.jar"))
+    assert(
+        Utils.nonLocalPaths(
             "hdfs:/spark.jar,s3:/smart.jar,local.py,file:/hello/pi.py") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
-    assert(Utils.nonLocalPaths(
+            "hdfs:/spark.jar",
+            "s3:/smart.jar"))
+    assert(
+        Utils.nonLocalPaths(
             "local.py,hdfs:/spark.jar,file:/hello/pi.py,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
+            "hdfs:/spark.jar",
+            "s3:/smart.jar"))
 
     // Test Windows paths
     assert(
@@ -599,12 +607,11 @@ class UtilsSuite
     val targetDir = new File(tempDir, "target-dir")
     Files.write("some text", sourceFile, StandardCharsets.UTF_8)
 
-    val path =
-      if (Utils.isWindows) {
-        new Path("file:/" + sourceDir.getAbsolutePath.replace("\\", "/"))
-      } else {
-        new Path("file://" + sourceDir.getAbsolutePath)
-      }
+    val path = if (Utils.isWindows) {
+      new Path("file:/" + sourceDir.getAbsolutePath.replace("\\", "/"))
+    } else {
+      new Path("file://" + sourceDir.getAbsolutePath)
+    }
     val conf = new Configuration()
     val fs = Utils.getHadoopFileSystem(path.toString, conf)
 
@@ -624,12 +631,11 @@ class UtilsSuite
     val destInnerFile = new File(destInnerDir, sourceFile.getName)
     assert(destInnerFile.isFile())
 
-    val filePath =
-      if (Utils.isWindows) {
-        new Path("file:/" + sourceFile.getAbsolutePath.replace("\\", "/"))
-      } else {
-        new Path("file://" + sourceFile.getAbsolutePath)
-      }
+    val filePath = if (Utils.isWindows) {
+      new Path("file:/" + sourceFile.getAbsolutePath.replace("\\", "/"))
+    } else {
+      new Path("file://" + sourceFile.getAbsolutePath)
+    }
     val testFileDir = new File(tempDir, "test-filename")
     val testFileName = "testFName"
     val testFilefs = Utils.getHadoopFileSystem(filePath.toString, conf)

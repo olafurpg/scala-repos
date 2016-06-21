@@ -44,8 +44,8 @@ import MaterializeOnDemandPublisher._
   *
   * This is used to work around https://github.com/akka/akka/issues/18013.
   */
-private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
-    implicit mat: Materializer)
+private[play] class MaterializeOnDemandPublisher[T](
+    source: Source[T, _])(implicit mat: Materializer)
     extends StateMachine[State](AwaitingDemand)
     with Publisher[T] {
 

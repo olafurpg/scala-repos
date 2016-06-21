@@ -36,8 +36,9 @@ import scala.collection.JavaConverters._
   * mechanisms to address the data (a FileSource).
   */
 case class IterableSource[+T](
-    @transient iter: Iterable[T], inFields: Fields = Fields.NONE)(
-    implicit set: TupleSetter[T], conv: TupleConverter[T])
+    @transient iter: Iterable[T],
+    inFields: Fields = Fields.NONE)(implicit set: TupleSetter[T],
+                                    conv: TupleConverter[T])
     extends Source
     with Mappable[T] {
 
@@ -52,8 +53,8 @@ case class IterableSource[+T](
   @transient
   private val asBuffer: Buffer[Tuple] = iter.map { set(_) }.toBuffer
 
-  private lazy val hdfsTap: Tap[_, _, _] = new MemorySourceTap(
-      asBuffer.asJava, fields)
+  private lazy val hdfsTap: Tap[_, _, _] =
+    new MemorySourceTap(asBuffer.asJava, fields)
 
   override def createTap(readOrWrite: AccessMode)(
       implicit mode: Mode): Tap[_, _, _] = {
@@ -63,10 +64,12 @@ case class IterableSource[+T](
     mode match {
       case Local(_) =>
         new MemoryTap[InputStream, OutputStream](
-            new NullScheme(fields, fields), asBuffer)
+            new NullScheme(fields, fields),
+            asBuffer)
       case Test(_) =>
         new MemoryTap[InputStream, OutputStream](
-            new NullScheme(fields, fields), asBuffer)
+            new NullScheme(fields, fields),
+            asBuffer)
       case Hdfs(_, _) => hdfsTap
       case HadoopTest(_, _) => hdfsTap
       case _ =>
@@ -79,6 +82,6 @@ case class IterableSource[+T](
     * Don't use the whole string of the iterable, which can be huge.
     * We take the first 10 items + the identityHashCode of the iter.
     */
-  override val sourceId: String = "IterableSource(%s)-%d".format(
-      iter.take(10).toString, System.identityHashCode(iter))
+  override val sourceId: String = "IterableSource(%s)-%d"
+    .format(iter.take(10).toString, System.identityHashCode(iter))
 }

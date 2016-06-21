@@ -23,8 +23,7 @@ class ActorDSLDummy {
 
 class ActorDSLSpec extends AkkaSpec {
 
-  val echo = system.actorOf(
-      Props(new Actor {
+  val echo = system.actorOf(Props(new Actor {
     def receive = {
       case x ⇒ sender() ! x
     }
@@ -56,8 +55,9 @@ class ActorDSLSpec extends AkkaSpec {
     "support queueing multiple queries" in {
       val i = inbox()
       import system.dispatcher
-      val res = Future.sequence(
-          Seq(Future { i.receive() } recover { case x ⇒ x }, Future {
+      val res = Future.sequence(Seq(Future { i.receive() } recover {
+        case x ⇒ x
+      }, Future {
         Thread.sleep(100); i.select() { case "world" ⇒ 1 }
       } recover { case x ⇒ x }, Future {
         Thread.sleep(200); i.select() { case "hello" ⇒ 2 }
@@ -118,8 +118,7 @@ class ActorDSLSpec extends AkkaSpec {
 
     "support creating regular actors" in {
       //#simple-actor
-      val a = actor(
-          new Act {
+      val a = actor(new Act {
         become {
           case "hello" ⇒ sender() ! "hi"
         }
@@ -161,8 +160,7 @@ class ActorDSLSpec extends AkkaSpec {
 
     "support setup/teardown" in {
       //#simple-start-stop
-      val a = actor(
-          new Act {
+      val a = actor(new Act {
         whenStarting { testActor ! "started" }
         whenStopping { testActor ! "stopped" }
       })
@@ -175,8 +173,7 @@ class ActorDSLSpec extends AkkaSpec {
 
     "support restart" in {
       //#failing-actor
-      val a = actor(
-          new Act {
+      val a = actor(new Act {
         become {
           case "die" ⇒ throw new Exception
         }
@@ -205,7 +202,7 @@ class ActorDSLSpec extends AkkaSpec {
         //#supervise-with
         val child = actor("child")(new Act {
           whenFailing { (_, _) ⇒
-          }
+            }
           become {
             case ref: ActorRef ⇒ whenStopping(ref ! "stopped")
             case ex: Exception ⇒ throw ex
@@ -230,8 +227,7 @@ class ActorDSLSpec extends AkkaSpec {
       val system = this.system
       //#nested-actor
       // here we pass in the ActorRefFactory explicitly as an example
-      val a = actor(system, "fred")(
-          new Act {
+      val a = actor(system, "fred")(new Act {
         val b = actor("barney")(new Act {
           whenStarting { context.parent ! ("hello from " + self.path) }
         })
@@ -246,8 +242,7 @@ class ActorDSLSpec extends AkkaSpec {
 
     "support Stash" in {
       //#act-with-stash
-      val a = actor(
-          new ActWithStash {
+      val a = actor(new ActWithStash {
         become {
           case 1 ⇒ stash()
           case 2 ⇒

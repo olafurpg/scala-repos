@@ -77,8 +77,9 @@ class ParquetFilterSuite
         assert(maybeAnalyzedPredicate.isDefined,
                "No filter is analyzed from the given query")
 
-        val (_, selectedFilters) = DataSourceStrategy.selectFilters(
-            maybeRelation.get, maybeAnalyzedPredicate.toSeq)
+        val (_, selectedFilters) =
+          DataSourceStrategy.selectFilters(maybeRelation.get,
+                                           maybeAnalyzedPredicate.toSeq)
         assert(selectedFilters.nonEmpty, "No filter is pushed down")
 
         selectedFilters.foreach { pred =>
@@ -93,18 +94,21 @@ class ParquetFilterSuite
     }
   }
 
-  private def checkFilterPredicate(predicate: Predicate,
-                                   filterClass: Class[_ <: FilterPredicate],
-                                   expected: Seq[Row])(
-      implicit df: DataFrame): Unit = {
-    checkFilterPredicate(
-        df, predicate, filterClass, checkAnswer(_, _: Seq[Row]), expected)
+  private def checkFilterPredicate(
+      predicate: Predicate,
+      filterClass: Class[_ <: FilterPredicate],
+      expected: Seq[Row])(implicit df: DataFrame): Unit = {
+    checkFilterPredicate(df,
+                         predicate,
+                         filterClass,
+                         checkAnswer(_, _: Seq[Row]),
+                         expected)
   }
 
-  private def checkFilterPredicate[T](predicate: Predicate,
-                                      filterClass: Class[_ <: FilterPredicate],
-                                      expected: T)(
-      implicit df: DataFrame): Unit = {
+  private def checkFilterPredicate[T](
+      predicate: Predicate,
+      filterClass: Class[_ <: FilterPredicate],
+      expected: T)(implicit df: DataFrame): Unit = {
     checkFilterPredicate(predicate, filterClass, Seq(Row(expected)))(df)
   }
 
@@ -122,8 +126,11 @@ class ParquetFilterSuite
       }
     }
 
-    checkFilterPredicate(
-        df, predicate, filterClass, checkBinaryAnswer _, expected)
+    checkFilterPredicate(df,
+                         predicate,
+                         filterClass,
+                         checkBinaryAnswer _,
+                         expected)
   }
 
   private def checkBinaryFilterPredicate(
@@ -138,8 +145,9 @@ class ParquetFilterSuite
         (true :: false :: Nil).map(b => Tuple1.apply(Option(b)))) {
       implicit df =>
         checkFilterPredicate('_1.isNull, classOf[Eq[_]], Seq.empty[Row])
-        checkFilterPredicate(
-            '_1.isNotNull, classOf[NotEq[_]], Seq(Row(true), Row(false)))
+        checkFilterPredicate('_1.isNotNull,
+                             classOf[NotEq[_]],
+                             Seq(Row(true), Row(false)))
 
         checkFilterPredicate('_1 === true, classOf[Eq[_]], true)
         checkFilterPredicate('_1 <=> true, classOf[Eq[_]], true)
@@ -150,13 +158,15 @@ class ParquetFilterSuite
   test("filter pushdown - integer") {
     withParquetDataFrame((1 to 4).map(i => Tuple1(Option(i)))) { implicit df =>
       checkFilterPredicate('_1.isNull, classOf[Eq[_]], Seq.empty[Row])
-      checkFilterPredicate(
-          '_1.isNotNull, classOf[NotEq[_]], (1 to 4).map(Row.apply(_)))
+      checkFilterPredicate('_1.isNotNull,
+                           classOf[NotEq[_]],
+                           (1 to 4).map(Row.apply(_)))
 
       checkFilterPredicate('_1 === 1, classOf[Eq[_]], 1)
       checkFilterPredicate('_1 <=> 1, classOf[Eq[_]], 1)
-      checkFilterPredicate(
-          '_1 =!= 1, classOf[NotEq[_]], (2 to 4).map(Row.apply(_)))
+      checkFilterPredicate('_1 =!= 1,
+                           classOf[NotEq[_]],
+                           (2 to 4).map(Row.apply(_)))
 
       checkFilterPredicate('_1 < 2, classOf[Lt[_]], 1)
       checkFilterPredicate('_1 > 3, classOf[Gt[_]], 4)
@@ -171,8 +181,9 @@ class ParquetFilterSuite
       checkFilterPredicate(Literal(4) <= '_1, classOf[GtEq[_]], 4)
 
       checkFilterPredicate(!('_1 < 4), classOf[GtEq[_]], 4)
-      checkFilterPredicate(
-          '_1 < 2 || '_1 > 3, classOf[Operators.Or], Seq(Row(1), Row(4)))
+      checkFilterPredicate('_1 < 2 || '_1 > 3,
+                           classOf[Operators.Or],
+                           Seq(Row(1), Row(4)))
     }
   }
 
@@ -180,13 +191,15 @@ class ParquetFilterSuite
     withParquetDataFrame((1 to 4).map(i => Tuple1(Option(i.toLong)))) {
       implicit df =>
         checkFilterPredicate('_1.isNull, classOf[Eq[_]], Seq.empty[Row])
-        checkFilterPredicate(
-            '_1.isNotNull, classOf[NotEq[_]], (1 to 4).map(Row.apply(_)))
+        checkFilterPredicate('_1.isNotNull,
+                             classOf[NotEq[_]],
+                             (1 to 4).map(Row.apply(_)))
 
         checkFilterPredicate('_1 === 1, classOf[Eq[_]], 1)
         checkFilterPredicate('_1 <=> 1, classOf[Eq[_]], 1)
-        checkFilterPredicate(
-            '_1 =!= 1, classOf[NotEq[_]], (2 to 4).map(Row.apply(_)))
+        checkFilterPredicate('_1 =!= 1,
+                             classOf[NotEq[_]],
+                             (2 to 4).map(Row.apply(_)))
 
         checkFilterPredicate('_1 < 2, classOf[Lt[_]], 1)
         checkFilterPredicate('_1 > 3, classOf[Gt[_]], 4)
@@ -201,8 +214,9 @@ class ParquetFilterSuite
         checkFilterPredicate(Literal(4) <= '_1, classOf[GtEq[_]], 4)
 
         checkFilterPredicate(!('_1 < 4), classOf[GtEq[_]], 4)
-        checkFilterPredicate(
-            '_1 < 2 || '_1 > 3, classOf[Operators.Or], Seq(Row(1), Row(4)))
+        checkFilterPredicate('_1 < 2 || '_1 > 3,
+                             classOf[Operators.Or],
+                             Seq(Row(1), Row(4)))
     }
   }
 
@@ -210,13 +224,15 @@ class ParquetFilterSuite
     withParquetDataFrame((1 to 4).map(i => Tuple1(Option(i.toFloat)))) {
       implicit df =>
         checkFilterPredicate('_1.isNull, classOf[Eq[_]], Seq.empty[Row])
-        checkFilterPredicate(
-            '_1.isNotNull, classOf[NotEq[_]], (1 to 4).map(Row.apply(_)))
+        checkFilterPredicate('_1.isNotNull,
+                             classOf[NotEq[_]],
+                             (1 to 4).map(Row.apply(_)))
 
         checkFilterPredicate('_1 === 1, classOf[Eq[_]], 1)
         checkFilterPredicate('_1 <=> 1, classOf[Eq[_]], 1)
-        checkFilterPredicate(
-            '_1 =!= 1, classOf[NotEq[_]], (2 to 4).map(Row.apply(_)))
+        checkFilterPredicate('_1 =!= 1,
+                             classOf[NotEq[_]],
+                             (2 to 4).map(Row.apply(_)))
 
         checkFilterPredicate('_1 < 2, classOf[Lt[_]], 1)
         checkFilterPredicate('_1 > 3, classOf[Gt[_]], 4)
@@ -231,8 +247,9 @@ class ParquetFilterSuite
         checkFilterPredicate(Literal(4) <= '_1, classOf[GtEq[_]], 4)
 
         checkFilterPredicate(!('_1 < 4), classOf[GtEq[_]], 4)
-        checkFilterPredicate(
-            '_1 < 2 || '_1 > 3, classOf[Operators.Or], Seq(Row(1), Row(4)))
+        checkFilterPredicate('_1 < 2 || '_1 > 3,
+                             classOf[Operators.Or],
+                             Seq(Row(1), Row(4)))
     }
   }
 
@@ -240,13 +257,15 @@ class ParquetFilterSuite
     withParquetDataFrame((1 to 4).map(i => Tuple1(Option(i.toDouble)))) {
       implicit df =>
         checkFilterPredicate('_1.isNull, classOf[Eq[_]], Seq.empty[Row])
-        checkFilterPredicate(
-            '_1.isNotNull, classOf[NotEq[_]], (1 to 4).map(Row.apply(_)))
+        checkFilterPredicate('_1.isNotNull,
+                             classOf[NotEq[_]],
+                             (1 to 4).map(Row.apply(_)))
 
         checkFilterPredicate('_1 === 1, classOf[Eq[_]], 1)
         checkFilterPredicate('_1 <=> 1, classOf[Eq[_]], 1)
-        checkFilterPredicate(
-            '_1 =!= 1, classOf[NotEq[_]], (2 to 4).map(Row.apply(_)))
+        checkFilterPredicate('_1 =!= 1,
+                             classOf[NotEq[_]],
+                             (2 to 4).map(Row.apply(_)))
 
         checkFilterPredicate('_1 < 2, classOf[Lt[_]], 1)
         checkFilterPredicate('_1 > 3, classOf[Gt[_]], 4)
@@ -261,8 +280,9 @@ class ParquetFilterSuite
         checkFilterPredicate(Literal(4) <= '_1, classOf[GtEq[_]], 4)
 
         checkFilterPredicate(!('_1 < 4), classOf[GtEq[_]], 4)
-        checkFilterPredicate(
-            '_1 < 2 || '_1 > 3, classOf[Operators.Or], Seq(Row(1), Row(4)))
+        checkFilterPredicate('_1 < 2 || '_1 > 3,
+                             classOf[Operators.Or],
+                             Seq(Row(1), Row(4)))
     }
   }
 

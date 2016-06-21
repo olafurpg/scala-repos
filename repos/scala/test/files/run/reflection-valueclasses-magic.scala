@@ -55,8 +55,7 @@ object Test extends App {
             case (arg, i) =>
               convert(arg, testee.paramLists.flatten.apply(i).info)
           }
-          print(
-              s"testing ${tpe.typeSymbol.name}.$method(${testee.paramLists.flatten
+          print(s"testing ${tpe.typeSymbol.name}.$method(${testee.paramLists.flatten
             .map(_.info)
             .mkString(','.toString)}) with receiver = $receiver and args = ${convertedArgs
             .map(arg => arg + ' '.toString + arg.getClass)

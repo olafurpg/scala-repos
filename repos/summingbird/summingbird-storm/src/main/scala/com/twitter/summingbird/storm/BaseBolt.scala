@@ -43,16 +43,18 @@ import org.slf4j.{LoggerFactory, Logger}
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-case class BaseBolt[I, O](
-    jobID: JobId,
-    metrics: () => TraversableOnce[StormMetric[_]],
-    anchorTuples: AnchorTuples,
-    hasDependants: Boolean,
-    outputFields: Fields,
-    ackOnEntry: AckOnEntry,
-    maxExecutePerSec: MaxExecutePerSecond,
-    executor: OperationContainer[
-        I, O, InputState[Tuple], JList[AnyRef], TopologyContext])
+case class BaseBolt[I, O](jobID: JobId,
+                          metrics: () => TraversableOnce[StormMetric[_]],
+                          anchorTuples: AnchorTuples,
+                          hasDependants: Boolean,
+                          outputFields: Fields,
+                          ackOnEntry: AckOnEntry,
+                          maxExecutePerSec: MaxExecutePerSecond,
+                          executor: OperationContainer[I,
+                                                       O,
+                                                       InputState[Tuple],
+                                                       JList[AnyRef],
+                                                       TopologyContext])
     extends IRichBolt {
 
   @transient protected lazy val logger: Logger =
@@ -95,12 +97,11 @@ case class BaseBolt[I, O](
         (currentPeriod + 1) * PERIOD_LENGTH_MS - baseTime
 
       if (currentPeriod == lastPeriod) {
-        val maxPerPeriod =
-          if (currentPeriod < endRampPeriod) {
-            ((currentPeriod - startPeriod) * deltaPerPeriod) + lowerBound
-          } else {
-            upperBound
-          }
+        val maxPerPeriod = if (currentPeriod < endRampPeriod) {
+          ((currentPeriod - startPeriod) * deltaPerPeriod) + lowerBound
+        } else {
+          upperBound
+        }
         if (executedThisPeriod > maxPerPeriod) {
           timeTillNextPeriod
         } else {
@@ -141,18 +142,16 @@ case class BaseBolt[I, O](
     /**
       * System ticks come with a fixed stream id
       */
-    val curResults =
-      if (!tuple.getSourceStreamId.equals("__tick")) {
-        val tsIn =
-          executor.decoder.invert(tuple.getValues).get // Failing to decode here is an ERROR
-        // Don't hold on to the input values
-        clearValues(tuple)
-        if (earlyAck) { collector.ack(tuple) }
-        executor.execute(InputState(tuple), tsIn)
-      } else {
-        collector.ack(tuple)
-        executor.executeTick
-      }
+    val curResults = if (!tuple.getSourceStreamId.equals("__tick")) {
+      val tsIn = executor.decoder.invert(tuple.getValues).get // Failing to decode here is an ERROR
+      // Don't hold on to the input values
+      clearValues(tuple)
+      if (earlyAck) { collector.ack(tuple) }
+      executor.execute(InputState(tuple), tsIn)
+    } else {
+      collector.ack(tuple)
+      executor.executeTick
+    }
 
     curResults.foreach {
       case (tups, res) =>
@@ -163,8 +162,8 @@ case class BaseBolt[I, O](
     }
   }
 
-  private def finish(
-      inputs: Seq[InputState[Tuple]], results: TraversableOnce[O]) {
+  private def finish(inputs: Seq[InputState[Tuple]],
+                     results: TraversableOnce[O]) {
     var emitCount = 0
     if (hasDependants) {
       if (anchorTuples.anchor) {
@@ -188,15 +187,16 @@ case class BaseBolt[I, O](
                  emitCount)
   }
 
-  override def prepare(
-      conf: JMap[_, _], context: TopologyContext, oc: OutputCollector) {
+  override def prepare(conf: JMap[_, _],
+                       context: TopologyContext,
+                       oc: OutputCollector) {
     collector = oc
     metrics().foreach { _.register(context) }
     executor.init(context)
     StormStatProvider.registerMetrics(jobID, context, countersForBolt)
     SummingbirdRuntimeStats.addPlatformStatProvider(StormStatProvider)
-    logger.debug(
-        "In Bolt prepare: added jobID stat provider for jobID {}", jobID)
+    logger
+      .debug("In Bolt prepare: added jobID stat provider for jobID {}", jobID)
   }
 
   override def declareOutputFields(declarer: OutputFieldsDeclarer) {

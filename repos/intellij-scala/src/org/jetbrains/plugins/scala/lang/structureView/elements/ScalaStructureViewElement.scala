@@ -13,8 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-abstract class ScalaStructureViewElement(
-    protected val myElement: PsiElement, val inherited: Boolean)
+abstract class ScalaStructureViewElement(protected val myElement: PsiElement,
+                                         val inherited: Boolean)
     extends StructureViewTreeElement {
 
   def getValue: Object = {

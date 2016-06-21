@@ -64,10 +64,10 @@ object Test extends App {
   checkNotCorrupted(lb5)
 
   // buffer should neither be changed nor corrupted after calling remove with invalid arguments
-  def checkNotCorrupted(lb: ListBuffer[Symbol],
-                        expectedString: String =
-                          "ListBuffer('a, 'b, 'c, 'd, 'e)",
-                        expectedLength: Int = 5) = {
+  def checkNotCorrupted(
+      lb: ListBuffer[Symbol],
+      expectedString: String = "ListBuffer('a, 'b, 'c, 'd, 'e)",
+      expectedLength: Int = 5) = {
     println("Checking ...")
     val replStr = scala.runtime.ScalaRunTime.replStringOf(lb, 100)
     if (replStr == expectedString + "\n") println("String OK.")

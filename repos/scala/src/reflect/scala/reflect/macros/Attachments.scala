@@ -63,8 +63,8 @@ abstract class Attachments { self =>
 
 // SI-7018: This used to be an inner class of `Attachments`, but that led to a memory leak in the
 // IDE via $outer pointers.
-private final class NonemptyAttachments[P >: Null](
-    override val pos: P, override val all: Set[Any])
+private final class NonemptyAttachments[P >: Null](override val pos: P,
+                                                   override val all: Set[Any])
     extends Attachments {
   type Pos = P
   def withPos(newPos: Pos) = new NonemptyAttachments(newPos, all)

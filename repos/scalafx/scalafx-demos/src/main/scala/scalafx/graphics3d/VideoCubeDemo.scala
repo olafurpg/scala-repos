@@ -75,13 +75,13 @@ object VideoCubeDemo extends JFXApp {
 
   val folder = folderOption match {
     case Some(folderName) => {
-        val file = new File(folderName)
-        if (file.exists() && file.isDirectory) file
-        else
-          throw new IllegalArgumentException(
-              "System property `" + folderSysProperty + " = " + folderName +
+      val file = new File(folderName)
+      if (file.exists() && file.isDirectory) file
+      else
+        throw new IllegalArgumentException(
+            "System property `" + folderSysProperty + " = " + folderName +
               "` " + "has to point to an existing directory.")
-      }
+    }
     case None =>
       throw new IllegalArgumentException(
           "System property `" + folderSysProperty + "` is not defined.")

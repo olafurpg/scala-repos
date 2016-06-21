@@ -49,23 +49,24 @@ abstract class TemplateSource extends SchemedSource with HfsTapProvider {
       case Read =>
         throw new InvalidSourceException("Cannot use TemplateSource for input")
       case Write => {
-          mode match {
-            case Local(_) => {
-                val localTap = new FileTap(localScheme, basePath, sinkMode)
-                new LTemplateTap(localTap, template, pathFields)
-              }
-            case hdfsMode @ Hdfs(_, _) => {
-                val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
-                new HTemplateTap(hfsTap, template, pathFields)
-              }
-            case hdfsTest @ HadoopTest(_, _) => {
-                val hfsTap = createHfsTap(
-                    hdfsScheme, hdfsTest.getWritePathFor(this), sinkMode)
-                new HTemplateTap(hfsTap, template, pathFields)
-              }
-            case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
+        mode match {
+          case Local(_) => {
+            val localTap = new FileTap(localScheme, basePath, sinkMode)
+            new LTemplateTap(localTap, template, pathFields)
           }
+          case hdfsMode @ Hdfs(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
+            new HTemplateTap(hfsTap, template, pathFields)
+          }
+          case hdfsTest @ HadoopTest(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme,
+                                      hdfsTest.getWritePathFor(this),
+                                      sinkMode)
+            new HTemplateTap(hfsTap, template, pathFields)
+          }
+          case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
         }
+      }
     }
   }
 

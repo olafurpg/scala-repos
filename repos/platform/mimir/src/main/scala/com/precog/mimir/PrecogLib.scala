@@ -66,9 +66,10 @@ trait PrecogLibModule[M[+ _]]
           JObjectUnfixedT)
 
       def spec[A <: SourceType](ctx: MorphContext)(
-          left: TransSpec[A], right: TransSpec[A]): TransSpec[A] = {
-        trans.MapWith(trans.InnerArrayConcat(
-                          trans.WrapArray(left), trans.WrapArray(right)),
+          left: TransSpec[A],
+          right: TransSpec[A]): TransSpec[A] = {
+        trans.MapWith(trans.InnerArrayConcat(trans.WrapArray(left),
+                                             trans.WrapArray(right)),
                       new EnrichmentMapper(ctx))
       }
 
@@ -215,11 +216,11 @@ trait PrecogLibModule[M[+ _]]
             case Failure(errors) =>
               val messages =
                 errors.toList map
-                (_.fold({ httpError =>
-                      "Error making HTTP request: " + httpError.userMessage
-                    }, { jsonError =>
-                      "Error parsing JSON: " + jsonError.message
-                    }))
+                  (_.fold({ httpError =>
+                        "Error making HTTP request: " + httpError.userMessage
+                      }, { jsonError =>
+                        "Error parsing JSON: " + jsonError.message
+                      }))
               val units: M[List[Unit]] =
                 messages traverse (ctx.logger.error(_))
               units flatMap { _ =>

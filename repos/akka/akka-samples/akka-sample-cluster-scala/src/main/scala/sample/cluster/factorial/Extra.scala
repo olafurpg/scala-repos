@@ -34,11 +34,11 @@ abstract class FactorialFrontend3 extends Actor {
   val backend = context.actorOf(
       ClusterRouterPool(
           AdaptiveLoadBalancingPool(SystemLoadAverageMetricsSelector),
-          ClusterRouterPoolSettings(
-              totalInstances = 100,
-              maxInstancesPerNode = 3,
-              allowLocalRoutees = false,
-              useRole = Some("backend"))).props(Props[FactorialBackend]),
+          ClusterRouterPoolSettings(totalInstances = 100,
+                                    maxInstancesPerNode = 3,
+                                    allowLocalRoutees = false,
+                                    useRole = Some("backend")))
+        .props(Props[FactorialBackend]),
       name = "factorialBackendRouter3")
   //#router-deploy-in-code
 }

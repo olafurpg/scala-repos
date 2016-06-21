@@ -32,19 +32,21 @@ trait TypeInferencer extends DAG {
 
   def inferTypes(jtpe: JType)(graph: DepGraph): DepGraph = {
 
-    def collectTypes(
-        universe: JType, graph: DepGraph): Map[DepGraph, Set[JType]] = {
+    def collectTypes(universe: JType,
+                     graph: DepGraph): Map[DepGraph, Set[JType]] = {
       def collectSpecTypes(
           typing: Map[DepGraph, Set[JType]],
           splits: Map[Identifier, Split],
           spec: BucketSpec): Map[DepGraph, Set[JType]] = spec match {
         case UnionBucketSpec(left, right) =>
-          collectSpecTypes(
-              collectSpecTypes(typing, splits, left), splits, right)
+          collectSpecTypes(collectSpecTypes(typing, splits, left),
+                           splits,
+                           right)
 
         case IntersectBucketSpec(left, right) =>
-          collectSpecTypes(
-              collectSpecTypes(typing, splits, left), splits, right)
+          collectSpecTypes(collectSpecTypes(typing, splits, left),
+                           splits,
+                           right)
 
         case Group(id, target, child) =>
           collectSpecTypes(inner(None, typing, splits, target), splits, child)
@@ -115,29 +117,29 @@ trait TypeInferencer extends DAG {
             }, typing, splits, left)
 
           case Join(WrapObject, Cross(_), ConstString(str), right) => {
-              val jtpe2 =
-                jtpe map {
-                  case JObjectFixedT(map) =>
-                    map get str getOrElse universe
+            val jtpe2 =
+              jtpe map {
+                case JObjectFixedT(map) =>
+                  map get str getOrElse universe
 
-                  case _ => universe
-                }
+                case _ => universe
+              }
 
-              inner(jtpe2, typing, splits, right)
-            }
+            inner(jtpe2, typing, splits, right)
+          }
 
           case Join(ArraySwap, Cross(_), left, right) => {
-              val jtpe2 =
-                jtpe flatMap {
-                  case JArrayFixedT(_) => jtpe
-                  case _ => Some(JArrayUnfixedT)
-                }
+            val jtpe2 =
+              jtpe flatMap {
+                case JArrayFixedT(_) => jtpe
+                case _ => Some(JArrayUnfixedT)
+              }
 
-              inner(Some(JNumberT),
-                    inner(jtpe2, typing, splits, left),
-                    splits,
-                    right)
-            }
+            inner(Some(JNumberT),
+                  inner(jtpe2, typing, splits, left),
+                  splits,
+                  right)
+          }
 
           case Join(op: BinaryOperation, _, left, right) =>
             inner(Some(op.tpe.arg1),
@@ -181,18 +183,18 @@ trait TypeInferencer extends DAG {
 
           // not using extractors due to bug
           case s: SplitGroup => {
-              val Split(spec, _, _) = splits(s.parentId)
-              findGroup(spec, s.id) map { inner(jtpe, typing, splits, _) } getOrElse typing
-            }
+            val Split(spec, _, _) = splits(s.parentId)
+            findGroup(spec, s.id) map { inner(jtpe, typing, splits, _) } getOrElse typing
+          }
 
           // not using extractors due to bug
           case s: SplitParam => {
-              val Split(spec, _, _) = splits(s.parentId)
+            val Split(spec, _, _) = splits(s.parentId)
 
-              findParams(spec, s.id).foldLeft(typing) { (typing, graph) =>
-                inner(jtpe, typing, splits, graph)
-              }
+            findParams(spec, s.id).foldLeft(typing) { (typing, graph) =>
+              inner(jtpe, typing, splits, graph)
             }
+          }
         }
       }
 

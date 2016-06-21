@@ -143,8 +143,9 @@ object Test4 {
         println
       }
     }
-    def printParamSourceAnnotations(
-        target: { def getParameterAnnotations(): Array[Array[Annotation]] }) {
+    def printParamSourceAnnotations(target: {
+      def getParameterAnnotations(): Array[Array[Annotation]]
+    }) {
       val anns = target.getParameterAnnotations().flatten
       anns foreach printSourceAnnotation
       if (anns.length > 0) {

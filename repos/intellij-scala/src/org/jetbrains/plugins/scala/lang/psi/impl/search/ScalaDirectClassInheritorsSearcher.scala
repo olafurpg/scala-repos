@@ -25,8 +25,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 24.10.2008
   */
 class ScalaDirectClassInheritorsSearcher
-    extends QueryExecutor[
-        PsiClass, DirectClassInheritorsSearch.SearchParameters] {
+    extends QueryExecutor[PsiClass,
+                          DirectClassInheritorsSearch.SearchParameters] {
   def execute(queryParameters: DirectClassInheritorsSearch.SearchParameters,
               consumer: Processor[PsiClass]): Boolean = {
     val clazz = queryParameters.getClassToProcess
@@ -105,8 +105,8 @@ class ScalaDirectClassInheritorsSearcher
               val jarFile = getJarFile(inheritor)
               if (jarFile == null) 0
               else
-                StringUtil.commonPrefixLength(
-                    jarFile.getCanonicalPath, clazzJar.getCanonicalPath)
+                StringUtil.commonPrefixLength(jarFile.getCanonicalPath,
+                                              clazzJar.getCanonicalPath)
             }
             if (!consumer.process(closestClass)) return false
         }

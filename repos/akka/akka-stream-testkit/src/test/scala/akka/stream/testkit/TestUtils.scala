@@ -31,8 +31,8 @@ object TestUtils {
     def getLocalPort: Int = s.getLocalPort
   }
 
-  def temporaryServerAddress(
-      address: String = "127.0.0.1", udp: Boolean = false): InetSocketAddress =
+  def temporaryServerAddress(address: String = "127.0.0.1",
+                             udp: Boolean = false): InetSocketAddress =
     temporaryServerAddresses(1, address, udp).head
 
   def temporaryServerAddresses(
