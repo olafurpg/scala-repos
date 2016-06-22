@@ -116,7 +116,8 @@ trait RichCompilerControl
   def askSymbolByName(fqn: String,
                       memberName: Option[String],
                       signatureString: Option[String]): Option[SymbolInfo] =
-    askOption(symbolMemberByName(fqn, memberName, signatureString).map(
+    askOption(
+        symbolMemberByName(fqn, memberName, signatureString).map(
             SymbolInfo(_))).flatten
 
   def askTypeInfoAt(p: Position): Option[TypeInfo] =
@@ -193,12 +194,13 @@ trait RichCompilerControl
   def askInspectTypeByName(name: String): Option[TypeInspectInfo] =
     askOption(typeByName(name).map(inspectType)).flatten
 
-  def askCompletePackageMember(
-      path: String, prefix: String): List[CompletionInfo] =
+  def askCompletePackageMember(path: String,
+                               prefix: String): List[CompletionInfo] =
     askOption(completePackageMember(path, prefix)).getOrElse(List.empty)
 
-  def askCompletionsAt(
-      p: Position, maxResults: Int, caseSens: Boolean): CompletionInfoList =
+  def askCompletionsAt(p: Position,
+                       maxResults: Int,
+                       caseSens: Boolean): CompletionInfoList =
     completionsAt(p, maxResults, caseSens)
 
   def askReloadAndTypeFiles(files: Iterable[SourceFile]) =
@@ -209,7 +211,8 @@ trait RichCompilerControl
 
   // force the full path of Set because nsc appears to have a conflicting Set....
   def askSymbolDesignationsInRegion(
-      p: RangePosition, tpes: List[SourceSymbol]): SymbolDesignations =
+      p: RangePosition,
+      tpes: List[SourceSymbol]): SymbolDesignations =
     askOption(
         new SemanticHighlighting(this).symbolDesignationsInRegion(p, tpes)
     ).getOrElse(SymbolDesignations(new File("."), List.empty))
@@ -273,8 +276,7 @@ class RichPresentationCompiler(
     val search: SearchService
 )(
     implicit val vfs: EnsimeVFS
-)
-    extends Global(settings, richReporter)
+) extends Global(settings, richReporter)
     with ModelBuilders
     with RichCompilerControl
     with RefactoringImpl
@@ -338,8 +340,10 @@ class RichPresentationCompiler(
 
   private def typePublicMembers(tpe: Type): Iterable[TypeMember] = {
     val members = new mutable.LinkedHashMap[Symbol, TypeMember]
-    def addTypeMember(
-        sym: Symbol, pre: Type, inherited: Boolean, viaView: Symbol): Unit = {
+    def addTypeMember(sym: Symbol,
+                      pre: Type,
+                      inherited: Boolean,
+                      viaView: Symbol): Unit = {
       try {
         val m = new TypeMember(
             sym,
@@ -390,8 +394,8 @@ class RichPresentationCompiler(
     val parents = tpe.parents
     new TypeInspectInfo(
         TypeInfo(tpe, PosNeededAvail),
-        prepareSortedInterfaceInfo(
-            typePublicMembers(tpe.asInstanceOf[Type]), parents)
+        prepareSortedInterfaceInfo(typePublicMembers(tpe.asInstanceOf[Type]),
+                                   parents)
     )
   }
 
@@ -467,24 +471,24 @@ class RichPresentationCompiler(
     }
   }
 
-  protected def filterMembersByPrefix(
-      members: List[Member],
-      prefix: String,
-      matchEntire: Boolean,
-      caseSens: Boolean): List[Member] = members.filter { m =>
-    val prefixUpper = prefix.toUpperCase
-    val sym = m.sym
-    val ns = sym.nameString
-    (((matchEntire && ns == prefix) || (!matchEntire && caseSens &&
-                ns.startsWith(prefix)) || (!matchEntire && !caseSens &&
-                ns.toUpperCase.startsWith(prefixUpper))) &&
-        !sym.nameString.contains("$"))
-  }
+  protected def filterMembersByPrefix(members: List[Member],
+                                      prefix: String,
+                                      matchEntire: Boolean,
+                                      caseSens: Boolean): List[Member] =
+    members.filter { m =>
+      val prefixUpper = prefix.toUpperCase
+      val sym = m.sym
+      val ns = sym.nameString
+      (((matchEntire && ns == prefix) || (!matchEntire && caseSens &&
+                  ns.startsWith(prefix)) || (!matchEntire && !caseSens &&
+                  ns.toUpperCase.startsWith(prefixUpper))) &&
+          !sym.nameString.contains("$"))
+    }
 
   private def noDefinitionFound(tree: Tree) = {
     logger.warn(
         "No definition found. Please report to https://github.com/ensime/ensime-server/issues/492 with description of what did you expected. symbolAt for " +
-        tree.getClass + ": " + tree)
+          tree.getClass + ": " + tree)
     Nil
   }
 
@@ -504,10 +508,12 @@ class RichPresentationCompiler(
           }
           List(locate(pos, expr))
         } else {
-          selectors.filter(_.namePos <= pos.point).sortBy(_.namePos).lastOption map {
-            sel =>
-              val tpe = stabilizedType(expr)
-              List(tpe.member(sel.name), tpe.member(sel.name.toTypeName))
+          selectors
+            .filter(_.namePos <= pos.point)
+            .sortBy(_.namePos)
+            .lastOption map { sel =>
+            val tpe = stabilizedType(expr)
+            List(tpe.member(sel.name), tpe.member(sel.name.toTypeName))
           } getOrElse Nil
         }
       case Annotated(atp, _) =>
@@ -625,17 +631,17 @@ class RichPresentationCompiler(
   }
 
   def wrapTypeMembers(p: Position): List[Member] =
-    wrap[List[Member]](
-        r => new AskTypeCompletionItem(p, r).apply(), _ => List.empty)
+    wrap[List[Member]](r => new AskTypeCompletionItem(p, r).apply(), _ =>
+          List.empty)
 
   def wrapTypedTree(source: SourceFile, forceReload: Boolean): Tree =
-    wrap[Tree](
-        r => new AskTypeItem(source, forceReload, r).apply(), t => throw t)
+    wrap[Tree](r => new AskTypeItem(source, forceReload, r).apply(), t =>
+          throw t)
 
   def wrapTypedTreeAt(position: Position): Tree =
     wrap[Tree](r => new AskTypeAtItem(position, r).apply(), t => throw t)
 
   def wrapLinkPos(sym: Symbol, source: SourceFile): Position =
-    wrap[Position](
-        r => new AskLinkPosItem(sym, source, r).apply(), t => throw t)
+    wrap[Position](r => new AskLinkPosItem(sym, source, r).apply(), t =>
+          throw t)
 }

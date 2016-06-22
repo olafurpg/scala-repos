@@ -55,8 +55,8 @@ object SVMSuite {
   }
 
   /** Binary labels, 3 features */
-  private val binaryModel = new SVMModel(
-      weights = Vectors.dense(0.1, 0.2, 0.3), intercept = 0.5)
+  private val binaryModel =
+    new SVMModel(weights = Vectors.dense(0.1, 0.2, 0.3), intercept = 0.5)
 }
 
 class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
@@ -133,12 +133,12 @@ class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
   }
 
   test("SVM local random SGD with initial weights") {
@@ -169,12 +169,12 @@ class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
   }
 
   test("SVM with invalid labels") {

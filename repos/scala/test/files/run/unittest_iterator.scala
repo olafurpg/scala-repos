@@ -5,8 +5,8 @@ object Test {
       it: Iterator[Seq[T]]) {
     val xs = it.toList
     def fail(msg: String) = "assertion failed on %s: %s".format(xs, msg)
-    assert(
-        xs.size == expectedLength, fail("expected length " + expectedLength))
+    assert(xs.size == expectedLength,
+           fail("expected length " + expectedLength))
     assert(xs.last == expectedLast, fail("expected last " + expectedLast))
   }
 

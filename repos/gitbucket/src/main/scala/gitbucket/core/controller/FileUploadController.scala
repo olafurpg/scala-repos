@@ -20,7 +20,8 @@ class FileUploadController extends ScalatraServlet with FileUploadSupport {
   post("/image") {
     execute({ (file, fileId) =>
       FileUtils.writeByteArrayToFile(
-          new java.io.File(getTemporaryDir(session.getId), fileId), file.get)
+          new java.io.File(getTemporaryDir(session.getId), fileId),
+          file.get)
       session += Keys.Session.Upload(fileId) -> file.name
     }, FileUtil.isImage)
   }
@@ -35,8 +36,8 @@ class FileUploadController extends ScalatraServlet with FileUploadSupport {
     }, FileUtil.isUploadableType)
   }
 
-  private def execute(
-      f: (FileItem, String) => Unit, mimeTypeChcker: (String) => Boolean) =
+  private def execute(f: (FileItem, String) => Unit,
+                      mimeTypeChcker: (String) => Boolean) =
     fileParams.get("file") match {
       case Some(file) if (mimeTypeChcker(file.name)) =>
         defining(FileUtil.generateFileId) { fileId =>

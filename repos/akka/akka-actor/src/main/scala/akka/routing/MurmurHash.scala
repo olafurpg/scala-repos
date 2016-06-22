@@ -131,8 +131,7 @@ object MurmurHash {
   def symmetricHash[T](xs: TraversableOnce[T], seed: Int): Int = {
     var a, b, n = 0
     var c = 1
-    xs.foreach(
-        i ⇒ {
+    xs.foreach(i ⇒ {
       val h = i.##
       a += h
       b ^= h

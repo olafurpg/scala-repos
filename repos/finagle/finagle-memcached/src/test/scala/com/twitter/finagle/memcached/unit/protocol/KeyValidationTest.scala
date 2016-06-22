@@ -13,8 +13,7 @@ class KeyValidationTest extends FunSuite {
 
   private class BasicKeyValidation(
       override val keys: Seq[Buf]
-  )
-      extends KeyValidation
+  ) extends KeyValidation
 
   test("reject invalid key that is too long") {
     val length = 251
@@ -40,7 +39,8 @@ class KeyValidationTest extends FunSuite {
       val x = intercept[IllegalArgumentException] {
         new BasicKeyValidation(Seq(bad))
       }
-      assert(x.getMessage.contains(
+      assert(
+          x.getMessage.contains(
               "key cannot have whitespace or control characters"))
     }
   }

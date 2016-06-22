@@ -15,7 +15,8 @@ object TaskSerializer {
   def fromProto(proto: Protos.MarathonTask): Task = {
 
     def required[T](name: String, maybeValue: Option[T]): T = {
-      maybeValue.getOrElse(throw new IllegalArgumentException(
+      maybeValue.getOrElse(
+          throw new IllegalArgumentException(
               s"task[${proto.getId}]: $name must be set"))
     }
 
@@ -158,8 +159,9 @@ object TaskSerializer {
         setReservation(reserved.reservation)
 
       case launchedOnR: Task.LaunchedOnReservation =>
-        setLaunched(
-            launchedOnR.appVersion, launchedOnR.status, launchedOnR.networking)
+        setLaunched(launchedOnR.appVersion,
+                    launchedOnR.status,
+                    launchedOnR.networking)
         setReservation(launchedOnR.reservation)
     }
 

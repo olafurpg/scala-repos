@@ -29,9 +29,11 @@ object PlatformBuild extends Build {
   val jprofilerLib =
     SettingKey[String]("jprofiler-lib", "The library file used by jprofiler")
   val jprofilerConf = SettingKey[String](
-      "jprofiler-conf", "The relative path to jprofiler's XML config file")
+      "jprofiler-conf",
+      "The relative path to jprofiler's XML config file")
   val jprofilerId = SettingKey[String](
-      "jprofiler-id", "The id used to find our session settings in XML")
+      "jprofiler-id",
+      "The id used to find our session settings in XML")
   val archiveDir = SettingKey[String](
       "archive-dir",
       "The temporary directory to which deleted projections will be moved")
@@ -41,7 +43,8 @@ object PlatformBuild extends Build {
   val profileTask =
     InputKey[Unit]("profile", "Runs the given project under JProfiler")
   val extractData = TaskKey[String](
-      "extract-data", "Extracts the data files used by the tests and the REPL")
+      "extract-data",
+      "Extracts the data files used by the tests and the REPL")
   val mainTest = SettingKey[String](
       "main-test",
       "The primary test class for the project (just used for surtr)")
@@ -130,16 +133,16 @@ object PlatformBuild extends Build {
       jprofilerId := "116",
       javaOptions in profileTask <<=
         (javaOptions,
-       jprofilerLib,
-       jprofilerConf,
-       jprofilerId,
-       baseDirectory) map { (opts, lib, conf, id, d) =>
-        // download jnilib if necessary. a bit sketchy, but convenient
-        Process("./jprofiler/setup-jnilib.py").!!
-        opts ++ Seq(
-            "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
-            (d, d, conf, id))
-      }
+         jprofilerLib,
+         jprofilerConf,
+         jprofilerId,
+         baseDirectory) map { (opts, lib, conf, id, d) =>
+          // download jnilib if necessary. a bit sketchy, but convenient
+          Process("./jprofiler/setup-jnilib.py").!!
+          opts ++ Seq(
+              "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
+                (d, d, conf, id))
+        }
   )
 
   val commonPluginsSettings =
@@ -155,10 +158,10 @@ object PlatformBuild extends Build {
   lazy val standalone =
     Project(id = "standalone", base = file("standalone"))
       .settings((commonAssemblySettings ++ jettySettings): _*) dependsOn
-    (common % "compile->compile;test->test",
-        yggdrasil % "compile->compile;test->test", util, bifrost,
-        muspelheim % "compile->compile;test->test", logging % "test->test",
-        auth, accounts, ingest, dvergr)
+      (common % "compile->compile;test->test",
+          yggdrasil % "compile->compile;test->test", util, bifrost,
+          muspelheim % "compile->compile;test->test", logging % "test->test",
+          auth, accounts, ingest, dvergr)
 
   lazy val platform = Project(id = "platform", base = file("."))
     .settings(
@@ -180,13 +183,14 @@ object PlatformBuild extends Build {
                ratatoskr) //, mongo, jdbc, desktop)
 
   lazy val util =
-    Project(id = "util", base = file("util")).settings(commonNexusSettings: _*) dependsOn
-    (logging % "test->test")
+    Project(id = "util", base = file("util"))
+      .settings(commonNexusSettings: _*) dependsOn
+      (logging % "test->test")
 
   lazy val common =
     Project(id = "common", base = file("common"))
       .settings(commonNexusSettings: _*) dependsOn
-    (util, logging % "test->test")
+      (util, logging % "test->test")
 
   lazy val bytecode =
     Project(id = "bytecode", base = file("bytecode"))
@@ -195,7 +199,7 @@ object PlatformBuild extends Build {
   lazy val quirrel =
     Project(id = "quirrel", base = file("quirrel"))
       .settings(commonNexusSettings: _*) dependsOn
-    (bytecode % "compile->compile;test->test", util, logging % "test->test")
+      (bytecode % "compile->compile;test->test", util, logging % "test->test")
 
   lazy val mirror =
     Project(id = "mirror", base = file("mirror"))
@@ -203,8 +207,9 @@ object PlatformBuild extends Build {
 
   lazy val niflheim = Project(id = "niflheim", base = file("niflheim"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(
-        common % "compile->compile;test->test", util, logging % "test->test")
+    .dependsOn(common % "compile->compile;test->test",
+               util,
+               logging % "test->test")
 
   lazy val yggdrasil = Project(id = "yggdrasil", base = file("yggdrasil"))
     .settings(commonAssemblySettings: _*)
@@ -214,12 +219,15 @@ object PlatformBuild extends Build {
                niflheim,
                logging % "test->test")
 
-  lazy val yggdrasilProf = Project(
-      id = "yggdrasilProf", base = file("yggdrasilProf"))
-    .settings(commonNexusSettings ++ jprofilerSettings ++ Seq(fullRunInputTask(
-                profileTask, Test, "com.precog.yggdrasil.test.Run")): _*)
-    .dependsOn(
-        yggdrasil % "compile->compile;compile->test", logging % "test->test")
+  lazy val yggdrasilProf =
+    Project(id = "yggdrasilProf", base = file("yggdrasilProf"))
+      .settings(
+          commonNexusSettings ++ jprofilerSettings ++ Seq(
+              fullRunInputTask(profileTask,
+                               Test,
+                               "com.precog.yggdrasil.test.Run")): _*)
+      .dependsOn(yggdrasil % "compile->compile;compile->test",
+                 logging % "test->test")
 
   lazy val mongo = Project(id = "mongo", base = file("mongo"))
     .settings(commonAssemblySettings: _*)
@@ -246,14 +254,14 @@ object PlatformBuild extends Build {
   lazy val muspelheim =
     Project(id = "muspelheim", base = file("muspelheim"))
       .settings(commonNexusSettings: _*) dependsOn
-    (util % "compile->compile;test->test", common, quirrel, mimir,
-        yggdrasil % "compile->compile;test->test", logging % "test->test")
+      (util % "compile->compile;test->test", common, quirrel, mimir,
+          yggdrasil % "compile->compile;test->test", logging % "test->test")
 
   lazy val surtr =
     Project(id = "surtr", base = file("surtr"))
       .settings(commonAssemblySettings: _*) dependsOn
-    (quirrel, mimir, yggdrasil, ingest,
-        muspelheim % "compile->compile;test->test", logging % "test->test")
+      (quirrel, mimir, yggdrasil, ingest,
+          muspelheim % "compile->compile;test->test", logging % "test->test")
 
   lazy val ragnarok = Project(id = "ragnarok", base = file("ragnarok"))
     .settings(commonAssemblySettings: _*)
@@ -286,8 +294,11 @@ object PlatformBuild extends Build {
                  logging % "test->test")
 
   lazy val jprofiler = Project(id = "jprofiler", base = file("jprofiler"))
-    .settings(jprofilerSettings ++ commonNexusSettings ++ Seq(fullRunInputTask(
-                profileTask, Test, "com.precog.jprofiler.Run")): _*)
+    .settings(
+        jprofilerSettings ++ commonNexusSettings ++ Seq(fullRunInputTask(
+                profileTask,
+                Test,
+                "com.precog.jprofiler.Run")): _*)
     .dependsOn(ragnarok, logging % "test->test")
 
   /// Services ///
@@ -299,7 +310,7 @@ object PlatformBuild extends Build {
   lazy val accounts =
     Project(id = "accounts", base = file("accounts"))
       .settings(commonAssemblySettings: _*) dependsOn
-    (common % "compile->compile;test->test", auth, logging % "test->test")
+      (common % "compile->compile;test->test", auth, logging % "test->test")
 
   lazy val ingest = Project(id = "ingest", base = file("ingest"))
     .settings(commonAssemblySettings: _*)
@@ -309,8 +320,9 @@ object PlatformBuild extends Build {
 
   lazy val dvergr = Project(id = "dvergr", base = file("dvergr"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(
-        common % "compile->compile;test->test", util, logging % "test->test")
+    .dependsOn(common % "compile->compile;test->test",
+               util,
+               logging % "test->test")
 
   lazy val bifrost = Project(id = "bifrost", base = file("bifrost"))
     .settings(commonAssemblySettings: _*)

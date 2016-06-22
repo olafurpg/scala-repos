@@ -45,7 +45,7 @@ object IndexModelFactory {
       //@scala.annotation.tailrec // TODO
       def gather(owner: DocTemplateEntity): Unit =
         for (m <- owner.members if m.inDefinitionTemplates.isEmpty ||
-             m.inDefinitionTemplates.head == owner) m match {
+               m.inDefinitionTemplates.head == owner) m match {
           case tpl: DocTemplateEntity =>
             result.addMember(tpl)
             gather(tpl)

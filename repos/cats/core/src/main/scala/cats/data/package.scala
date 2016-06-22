@@ -11,14 +11,14 @@ package object data {
   def NonEmptyList[A](head: A, tail: A*): NonEmptyList[A] =
     OneAnd[List, A](head, tail.toList)
 
-  def NonEmptyVector[A](
-      head: A, tail: Vector[A] = Vector.empty): NonEmptyVector[A] =
+  def NonEmptyVector[A](head: A,
+                        tail: Vector[A] = Vector.empty): NonEmptyVector[A] =
     OneAnd(head, tail)
   def NonEmptyVector[A](head: A, tail: A*): NonEmptyVector[A] =
     OneAnd(head, tail.toVector)
 
-  def NonEmptyStream[A](
-      head: A, tail: Stream[A] = Stream.empty): NonEmptyStream[A] =
+  def NonEmptyStream[A](head: A,
+                        tail: Stream[A] = Stream.empty): NonEmptyStream[A] =
     OneAnd(head, tail)
   def NonEmptyStream[A](head: A, tail: A*): NonEmptyStream[A] =
     OneAnd(head, tail.toStream)

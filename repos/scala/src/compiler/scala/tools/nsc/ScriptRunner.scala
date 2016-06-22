@@ -60,8 +60,8 @@ class ScriptRunner extends HasCompileSocket {
 
   /** Compile a script using the fsc compilation daemon.
     */
-  private def compileWithDaemon(
-      settings: GenericRunnerSettings, scriptFileIn: String) = {
+  private def compileWithDaemon(settings: GenericRunnerSettings,
+                                scriptFileIn: String) = {
     val scriptFile = Path(scriptFileIn).toAbsolute.path
     val compSettingNames =
       new Settings(sys.error).visibleSettings.toList map (_.name)
@@ -86,8 +86,8 @@ class ScriptRunner extends HasCompileSocket {
     * @return true if compilation and the handler succeeds, false otherwise.
     */
   private def withCompiledScript(
-      settings: GenericRunnerSettings, scriptFile: String)(
-      handler: String => Boolean): Boolean = {
+      settings: GenericRunnerSettings,
+      scriptFile: String)(handler: String => Boolean): Boolean = {
     def mainClass = scriptMain(settings)
 
     /* Compiles the script file, and returns the directory with the compiled

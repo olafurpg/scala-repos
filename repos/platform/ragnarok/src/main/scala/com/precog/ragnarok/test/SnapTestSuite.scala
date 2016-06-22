@@ -22,7 +22,8 @@ package ragnarok
 package test
 
 object SnapTestSuite extends PerfTestSuite {
-  query("""
+  query(
+      """
 import std::stats::*
 import std::time::*
 --agents := //8504352d-b063-400b-a10b-d6c637539469/status

@@ -124,16 +124,20 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(summary3.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary3.variance ~== summary.variance absTol 1E-5)
 
-    assert(data1(0) ~==
+    assert(
+        data1(0) ~==
           Vectors.dense(-1.31527964, 1.023470449, 0.11637768424) absTol 1E-5)
-    assert(data1(3) ~==
+    assert(
+        data1(3) ~==
           Vectors.dense(1.637735298, 0.156973995, 1.32247368462) absTol 1E-5)
     assert(
         data2(4) ~== Vectors.dense(0.865538862, -0.22604255, 0.0) absTol 1E-5)
     assert(data2(5) ~== Vectors.dense(0.0, 0.71580142, 0.0) absTol 1E-5)
-    assert(data3(1) ~==
+    assert(
+        data3(1) ~==
           Vectors.dense(-0.58333333, -0.58333333, -2.8166666666) absTol 1E-5)
-    assert(data3(5) ~==
+    assert(
+        data3(5) ~==
           Vectors.dense(-0.58333333, 2.316666666, 0.18333333333) absTol 1E-5)
   }
 
@@ -196,16 +200,20 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(summary3.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary3.variance ~== summary.variance absTol 1E-5)
 
-    assert(data1(0) ~==
+    assert(
+        data1(0) ~==
           Vectors.dense(-1.31527964, 1.023470449, 0.11637768424) absTol 1E-5)
-    assert(data1(3) ~==
+    assert(
+        data1(3) ~==
           Vectors.dense(1.637735298, 0.156973995, 1.32247368462) absTol 1E-5)
     assert(
         data2(4) ~== Vectors.dense(0.865538862, -0.22604255, 0.0) absTol 1E-5)
     assert(data2(5) ~== Vectors.dense(0.0, 0.71580142, 0.0) absTol 1E-5)
-    assert(data3(1) ~==
+    assert(
+        data3(1) ~==
           Vectors.dense(-0.58333333, -0.58333333, -2.8166666666) absTol 1E-5)
-    assert(data3(5) ~==
+    assert(
+        data3(5) ~==
           Vectors.dense(-0.58333333, 2.316666666, 0.18333333333) absTol 1E-5)
   }
 
@@ -257,8 +265,9 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(summary.mean !~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
 
-    assert(data2(4) ~== Vectors.sparse(
-            3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
+    assert(
+        data2(4) ~== Vectors
+          .sparse(3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
     assert(data2(5) ~== Vectors.sparse(3, Seq((1, 0.71580142))) absTol 1E-5)
   }
 
@@ -304,8 +313,9 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(summary.mean !~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
 
-    assert(data2(4) ~== Vectors.sparse(
-            3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
+    assert(
+        data2(4) ~== Vectors
+          .sparse(3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
     assert(data2(5) ~== Vectors.sparse(3, Seq((1, 0.71580142))) absTol 1E-5)
   }
 

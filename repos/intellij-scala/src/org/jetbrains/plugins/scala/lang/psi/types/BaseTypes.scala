@@ -21,14 +21,15 @@ object BaseTypes {
     t match {
       case ScDesignatorType(td: ScTemplateDefinition) =>
         reduce(
-            td.superTypes.flatMap(tp =>
+            td.superTypes.flatMap(
+                tp =>
                   if (!notAll)
-                    BaseTypes.get(tp, notAll, visitedAliases = visitedAliases) ++ Seq(
+                    BaseTypes
+                      .get(tp, notAll, visitedAliases = visitedAliases) ++ Seq(
                         tp)
                   else Seq(tp)))
       case ScDesignatorType(c: PsiClass) =>
-        reduce(
-            c.getSuperTypes.flatMap { p =>
+        reduce(c.getSuperTypes.flatMap { p =>
           if (!notAll)
             BaseTypes.get(ScType.create(p, c.getProject),
                           notAll,
@@ -57,8 +58,8 @@ object BaseTypes {
         BaseTypes.get(
             p.actualSubst.subst(ta.aliasedType.getOrElse(return Seq.empty)),
             visitedAliases = visitedAliases + ta)
-      case ScParameterizedType(
-          ScDesignatorType(ta: ScTypeAliasDefinition), args) =>
+      case ScParameterizedType(ScDesignatorType(ta: ScTypeAliasDefinition),
+                               args) =>
         if (visitedAliases.contains(ta)) return Seq.empty
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
             ta.typeParameters.map(tp =>
@@ -81,19 +82,17 @@ object BaseTypes {
       case p: ScParameterizedType =>
         ScType.extractClass(p.designator) match {
           case Some(td: ScTypeDefinition) =>
-            reduce(
-                td.superTypes.flatMap { tp =>
+            reduce(td.superTypes.flatMap { tp =>
               if (!notAll)
                 BaseTypes.get(p.substitutor.subst(tp),
                               notAll,
-                              visitedAliases =
-                                visitedAliases) ++ Seq(p.substitutor.subst(tp))
+                              visitedAliases = visitedAliases) ++ Seq(
+                    p.substitutor.subst(tp))
               else Seq(p.substitutor.subst(tp))
             })
           case Some(clazz) =>
             val s = p.substitutor
-            reduce(
-                clazz.getSuperTypes.flatMap { t =>
+            reduce(clazz.getSuperTypes.flatMap { t =>
               if (!notAll)
                 BaseTypes.get(s.subst(ScType.create(t, clazz.getProject)),
                               notAll,
@@ -112,31 +111,30 @@ object BaseTypes {
             if (notAll) comps
             else
               comps.flatMap(comp =>
-                    BaseTypes.get(comp, visitedAliases = visitedAliases) ++ Seq(
+                    BaseTypes
+                      .get(comp, visitedAliases = visitedAliases) ++ Seq(
                         comp)))
       case proj @ ScProjectionType(p, elem, _) =>
         val s = proj.actualSubst
         elem match {
           case td: ScTypeDefinition =>
-            reduce(
-                td.superTypes.flatMap { tp =>
+            reduce(td.superTypes.flatMap { tp =>
               if (!notAll)
-                BaseTypes.get(s.subst(tp), visitedAliases = visitedAliases) ++ Seq(
+                BaseTypes
+                  .get(s.subst(tp), visitedAliases = visitedAliases) ++ Seq(
                     s.subst(tp))
               else Seq(s.subst(tp))
             })
           case c: PsiClass =>
-            reduce(
-                c.getSuperTypes.flatMap {
-              st =>
-                {
-                  val proj = c.getProject
-                  if (!notAll)
-                    BaseTypes.get(s.subst(ScType.create(st, proj)),
-                                  visitedAliases = visitedAliases) ++ Seq(
-                        s.subst(ScType.create(st, proj)))
-                  else Seq(s.subst(ScType.create(st, proj)))
-                }
+            reduce(c.getSuperTypes.flatMap { st =>
+              {
+                val proj = c.getProject
+                if (!notAll)
+                  BaseTypes.get(s.subst(ScType.create(st, proj)),
+                                visitedAliases = visitedAliases) ++ Seq(
+                      s.subst(ScType.create(st, proj)))
+                else Seq(s.subst(ScType.create(st, proj)))
+              }
             })
           case _ => Seq.empty
         }

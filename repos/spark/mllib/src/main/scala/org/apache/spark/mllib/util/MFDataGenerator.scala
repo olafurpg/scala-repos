@@ -60,7 +60,7 @@ object MFDataGenerator {
       // scalastyle:off println
       println(
           "Usage: MFDataGenerator " +
-          "<master> <outputDir> [m] [n] [rank] [trainSampFact] [noise] [sigma] [test] [testSampFact]")
+            "<master> <outputDir> [m] [n] [rank] [trainSampFact] [noise] [sigma] [test] [testSampFact]")
       // scalastyle:on println
       System.exit(1)
     }

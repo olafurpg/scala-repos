@@ -59,12 +59,14 @@ class ScAnnotationElementType[Func <: ScAnnotation]
     new ScAnnotationStubImpl(parentStub, this, nameRef, typeTextRef)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAnnotationStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScAnnotationStub = {
     val name = dataStream.readName
     val typeText = dataStream.readName
-    new ScAnnotationStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, name, typeText)
+    new ScAnnotationStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                             this,
+                             name,
+                             typeText)
   }
 
   def indexStub(stub: ScAnnotationStub, sink: IndexSink): Unit = {

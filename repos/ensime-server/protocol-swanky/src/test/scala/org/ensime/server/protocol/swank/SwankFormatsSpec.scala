@@ -551,8 +551,11 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
     )
 
     marshal(
-        new NamedTypeMemberInfo(
-            "typeX", typeInfo, None, None, DeclaredAs.Method): EntityInfo,
+        new NamedTypeMemberInfo("typeX",
+                                typeInfo,
+                                None,
+                                None,
+                                DeclaredAs.Method): EntityInfo,
         """(:name "typeX" :type (:arrow-type nil :name "type1" :decl-as method :full-name "FOO.type1") :decl-as method)"""
     )
 
@@ -638,11 +641,12 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
 
     marshal(
         ImplicitInfos(
-            List(ImplicitParamInfo(5,
-                                   6,
-                                   symbolInfo,
-                                   List(symbolInfo, symbolInfo),
-                                   true))): ImplicitInfos,
+            List(
+                ImplicitParamInfo(5,
+                                  6,
+                                  symbolInfo,
+                                  List(symbolInfo, symbolInfo),
+                                  true))): ImplicitInfos,
         s"""((:type param :start 5 :end 6 :fun $symbolInfoStr :params ($symbolInfoStr $symbolInfoStr) :fun-is-implicit t))"""
     )
   }

@@ -36,7 +36,8 @@ object MinMembersBeforeUpWithWeaklyUpMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+                """
       akka.cluster.min-nr-of-members = 3
       akka.cluster.allow-weakly-up-members = on"""))
         .withFallback(

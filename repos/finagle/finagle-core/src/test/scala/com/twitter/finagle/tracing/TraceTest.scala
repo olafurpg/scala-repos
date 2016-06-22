@@ -25,8 +25,7 @@ class TraceTest
     }
 
   test("have a default id without parents, etc.") {
-    assert(
-        Trace.id match {
+    assert(Trace.id match {
       case TraceId(None, None, _, None, Flags(0)) => true
       case _ => false
     })
@@ -242,8 +241,11 @@ class TraceTest
         assert(Trace.tracers == List(tracer))
         Trace.record("Hello world")
         verify(tracer, times(1)).sampleTrace(currentId)
-        verify(tracer, times(1)).record(Record(
-                currentId, Time.now, Annotation.Message("Hello world"), None))
+        verify(tracer, times(1)).record(
+            Record(currentId,
+                   Time.now,
+                   Annotation.Message("Hello world"),
+                   None))
       }
     }
   }
@@ -262,11 +264,14 @@ class TraceTest
         Trace.letTracerAndNextId(tracer) {
           val currentId = Trace.id
           assert(currentId match {
-            case TraceId(
-                Some(_traceId), Some(_parentId), _, Some(_sampled), Flags(0))
+            case TraceId(Some(_traceId),
+                         Some(_parentId),
+                         _,
+                         Some(_sampled),
+                         Flags(0))
                 if (_traceId == parentId.traceId) &&
-                (_parentId == parentId.spanId) &&
-                (_sampled == parentId.sampled.get) =>
+                  (_parentId == parentId.spanId) &&
+                  (_sampled == parentId.sampled.get) =>
               true
             case _ => false
           })
@@ -295,8 +300,11 @@ class TraceTest
         assert(Trace.tracers == List(tracer))
         verify(tracer, times(1)).sampleTrace(currentId)
         Trace.record("Hello world")
-        verify(tracer, times(1)).record(Record(
-                currentId, Time.now, Annotation.Message("Hello world"), None))
+        verify(tracer, times(1)).record(
+            Record(currentId,
+                   Time.now,
+                   Annotation.Message("Hello world"),
+                   None))
       }
     }
   }
@@ -400,8 +408,8 @@ class TraceTest
       sampled <- Seq(None, Some(false), Some(true))
     } yield TraceId(traceId, parentId, spanId, sampled, flags)
 
-    for (id <- traceIds) assert(
-        Trace.idCtx.tryUnmarshal(Trace.idCtx.marshal(id)) == Return(id))
+    for (id <- traceIds)
+      assert(Trace.idCtx.tryUnmarshal(Trace.idCtx.marshal(id)) == Return(id))
   }
 
   test("trace ID serialization: throw in handle on invalid size") {

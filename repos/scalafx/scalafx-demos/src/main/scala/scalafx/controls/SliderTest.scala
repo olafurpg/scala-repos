@@ -108,8 +108,7 @@ class SliderControls(target: Slider)
   }
 
   val txfLabelFormatter = new TextField
-  txfLabelFormatter.text.onChange(
-      if (txfLabelFormatter.text.get.isEmpty) {
+  txfLabelFormatter.text.onChange(if (txfLabelFormatter.text.get.isEmpty) {
     target.labelFormatter = null
   } else {
     target.labelFormatter = new DoubleStringConverter
@@ -184,7 +183,8 @@ class SliderControls(target: Slider)
     toggleGroup = tggOrientation
   }
   rdbHorizontal.selected = (target.orientation.get() == Orientation.Horizontal)
-  target.orientation.onChange(rdbHorizontal.selected =
+  target.orientation.onChange(
+      rdbHorizontal.selected =
         (target.orientation.get() == Orientation.Horizontal))
   tggOrientation.selectedToggle.onChange {
     target.orientation =

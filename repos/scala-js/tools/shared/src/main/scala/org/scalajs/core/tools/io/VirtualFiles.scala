@@ -161,7 +161,7 @@ trait VirtualSerializedScalaJSIRFile
             e.version,
             e.supported,
             s"Failed to deserialize info of file compiled with Scala.js ${e.version}" +
-            s" (supported: ${e.supported.mkString(", ")}): $path",
+              s" (supported: ${e.supported.mkString(", ")}): $path",
             e)
 
       case e: IOException =>

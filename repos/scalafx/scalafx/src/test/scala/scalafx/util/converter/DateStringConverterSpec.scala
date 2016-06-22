@@ -41,8 +41,10 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class DateStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[
-        Date, jfxuc.DateStringConverter, Date, DateStringConverter](
+    extends AbstractStringConverterDelegateSpec[Date,
+                                                jfxuc.DateStringConverter,
+                                                Date,
+                                                DateStringConverter](
         classOf[jfxuc.DateStringConverter],
         classOf[DateStringConverter],
         classOf[Date]) {

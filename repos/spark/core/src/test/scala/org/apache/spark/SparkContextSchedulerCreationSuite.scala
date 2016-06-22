@@ -35,8 +35,8 @@ class SparkContextSchedulerCreationSuite
   def createTaskScheduler(master: String): TaskSchedulerImpl =
     createTaskScheduler(master, "client")
 
-  def createTaskScheduler(
-      master: String, deployMode: String): TaskSchedulerImpl =
+  def createTaskScheduler(master: String,
+                          deployMode: String): TaskSchedulerImpl =
     createTaskScheduler(master, deployMode, new SparkConf())
 
   def createTaskScheduler(master: String,
@@ -49,8 +49,9 @@ class SparkContextSchedulerCreationSuite
       PrivateMethod[Tuple2[SchedulerBackend, TaskScheduler]](
           'createTaskScheduler)
     val (_, sched) =
-      SparkContext invokePrivate createTaskSchedulerMethod(
-          sc, master, deployMode)
+      SparkContext invokePrivate createTaskSchedulerMethod(sc,
+                                                           master,
+                                                           deployMode)
     sched.asInstanceOf[TaskSchedulerImpl]
   }
 
@@ -157,8 +158,9 @@ class SparkContextSchedulerCreationSuite
   }
 
   test("yarn-client") {
-    testYarn(
-        "yarn", "client", "org.apache.spark.scheduler.cluster.YarnScheduler")
+    testYarn("yarn",
+             "client",
+             "org.apache.spark.scheduler.cluster.YarnScheduler")
   }
 
   def testMesos(master: String, expectedClass: Class[_], coarse: Boolean) {

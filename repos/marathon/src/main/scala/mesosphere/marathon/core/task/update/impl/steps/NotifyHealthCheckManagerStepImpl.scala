@@ -17,8 +17,9 @@ class NotifyHealthCheckManagerStepImpl @Inject()(
     extends TaskStatusUpdateStep {
   override def name: String = "notifyHealthCheckManager"
 
-  override def processUpdate(
-      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(timestamp: Timestamp,
+                             task: Task,
+                             status: TaskStatus): Future[_] = {
     // forward health changes to the health check manager
     task.launched.foreach { launched =>
       healthCheckManager.update(status, launched.appVersion)

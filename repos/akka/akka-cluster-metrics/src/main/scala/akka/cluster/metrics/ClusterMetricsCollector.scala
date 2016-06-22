@@ -114,8 +114,9 @@ private[metrics] trait ClusterMetricsMessage extends Serializable
   * Envelope adding a sender address to the cluster metrics gossip.
   */
 @SerialVersionUID(1L)
-private[metrics] final case class MetricsGossipEnvelope(
-    from: Address, gossip: MetricsGossip, reply: Boolean)
+private[metrics] final case class MetricsGossipEnvelope(from: Address,
+                                                        gossip: MetricsGossip,
+                                                        reply: Boolean)
     extends ClusterMetricsMessage
     with DeadLetterSuppression
 
@@ -229,7 +230,7 @@ private[metrics] class ClusterMetricsCollector
       (state.members diff state.unreachable) collect {
         case m
             if m.status == MemberStatus.Up ||
-            m.status == MemberStatus.WeaklyUp ⇒
+              m.status == MemberStatus.WeaklyUp ⇒
           m.address
       }
 

@@ -40,8 +40,8 @@ sealed trait Segment {
   def extend(amount: Int): Segment
 
   override def toString =
-    "Segment(%d, %s, %s, %d/%d)".format(
-        blockid, cpath, ctype, defined.cardinality, length)
+    "Segment(%d, %s, %s, %d/%d)"
+      .format(blockid, cpath, ctype, defined.cardinality, length)
 }
 
 sealed trait ValueSegment[@spec(Boolean, Long, Double) A] extends Segment {
@@ -75,7 +75,7 @@ case class ArraySegment[@spec(Boolean, Long, Double) A](blockid: Long,
   override def equals(that: Any): Boolean = that match {
     case ArraySegment(`blockid`, `cpath`, ct2, d2, values2) =>
       ctype == ct2 && defined == d2 &&
-      arrayEq[A](values, values2.asInstanceOf[Array[A]])
+        arrayEq[A](values, values2.asInstanceOf[Array[A]])
     case _ =>
       false
   }
@@ -100,8 +100,11 @@ case class ArraySegment[@spec(Boolean, Long, Double) A](blockid: Long,
   }
 }
 
-case class BooleanSegment(
-    blockid: Long, cpath: CPath, defined: BitSet, values: BitSet, length: Int)
+case class BooleanSegment(blockid: Long,
+                          cpath: CPath,
+                          defined: BitSet,
+                          values: BitSet,
+                          length: Int)
     extends ValueSegment[Boolean] {
   val ctype = CBoolean
 

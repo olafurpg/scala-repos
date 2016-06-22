@@ -9,13 +9,12 @@ package com.gravity.goose.network
 class LoggableException(msg: String, innerEx: Exception = null)
     extends Exception(msg, innerEx) {
   override lazy val getMessage = {
-    val innerMessage =
-      if (innerEx != null) {
-        "%n\tand inner Exception of type %s:%n\t\tmessage: %s".format(
-            innerEx.getClass.getName, innerEx.getMessage)
-      } else {
-        ""
-      }
+    val innerMessage = if (innerEx != null) {
+      "%n\tand inner Exception of type %s:%n\t\tmessage: %s"
+        .format(innerEx.getClass.getName, innerEx.getMessage)
+    } else {
+      ""
+    }
     getClass.getName + " ==> " + msg + innerMessage
   }
 }
@@ -26,12 +25,12 @@ class BadRequestException(url: String)
     extends LoggableException("Bad Request for URL: " + url)
 class NotAuthorizedException(url: String, statusCode: Int = 403)
     extends LoggableException(
-        "Not authorized (statusCode: %d) to access URL: %s".format(
-            statusCode, url))
+        "Not authorized (statusCode: %d) to access URL: %s".format(statusCode,
+                                                                   url))
 class ServerErrorException(url: String, statusCode: Int = 500)
     extends LoggableException(
-        "Server Error! Status code returned: %d for URL: %s".format(
-            statusCode, url))
+        "Server Error! Status code returned: %d for URL: %s".format(statusCode,
+                                                                    url))
 class UnhandledStatusCodeException(url: String, statusCode: Int)
     extends LoggableException(
         "Received HTTP statusCode: %d from URL: %s and did not know how to handle it!"
@@ -52,4 +51,5 @@ object HttpStatusValidator {
 
 class ImageFetchException(imgSrc: String, ex: Exception = null)
     extends LoggableException(
-        "Failed to fetch image file from imgSrc: " + imgSrc, ex)
+        "Failed to fetch image file from imgSrc: " + imgSrc,
+        ex)

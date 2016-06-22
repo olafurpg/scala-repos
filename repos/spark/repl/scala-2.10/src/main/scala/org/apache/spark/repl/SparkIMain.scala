@@ -116,17 +116,14 @@ class SparkIMain(initialSettings: Settings,
   @DeveloperApi
   lazy val getClassOutputDirectory = outputDir
 
-  private val virtualDirectory =
-    new PlainFile(outputDir) // "directory" for classfiles
+  private val virtualDirectory = new PlainFile(outputDir) // "directory" for classfiles
   /** Jetty server that will serve our classes to worker nodes */
   private var currentSettings: Settings = initialSettings
   private var printResults = true // whether to print result lines
   private var totalSilence = false // whether to print anything
   private var _initializeComplete = false // compiler is initialized
-  private var _isInitialized: Future[Boolean] =
-    null // set up initialization future
-  private var bindExceptions =
-    true // whether to bind the lastException variable
+  private var _isInitialized: Future[Boolean] = null // set up initialization future
+  private var bindExceptions = true // whether to bind the lastException variable
   private var _executionWrapper = "" // code to be wrapped around all lines
 
   /** We're going to go to some trouble to initialize the compiler asynchronously.
@@ -136,16 +133,13 @@ class SparkIMain(initialSettings: Settings,
     *  use a lazy val to ensure that any attempt to use the compiler object waits
     *  on the future.
     */
-  private var _classLoader: AbstractFileClassLoader =
-    null // active classloader
-  private val _compiler: Global =
-    newCompiler(settings, reporter) // our private compiler
+  private var _classLoader: AbstractFileClassLoader = null // active classloader
+  private val _compiler: Global = newCompiler(settings, reporter) // our private compiler
 
   private trait ExposeAddUrl extends URLClassLoader {
     def addNewUrl(url: URL) = this.addURL(url)
   }
-  private var _runtimeClassLoader: URLClassLoader with ExposeAddUrl =
-    null // wrapper exposing addURL
+  private var _runtimeClassLoader: URLClassLoader with ExposeAddUrl = null // wrapper exposing addURL
 
   private val nextReqId = {
     var counter = 0
@@ -337,8 +331,8 @@ class SparkIMain(initialSettings: Settings,
   // NOTE: Exposed to repl package since used by SparkILoop
   private[repl] def quietRun[T](code: String) = beQuietDuring(interpret(code))
 
-  private def logAndDiscard[T](
-      label: String, alt: => T): PartialFunction[Throwable, T] = {
+  private def logAndDiscard[T](label: String,
+                               alt: => T): PartialFunction[Throwable, T] = {
     case t: ControlThrowable => throw t
     case t: Throwable =>
       logDebug(label + ": " + unwrap(t))
@@ -393,8 +387,8 @@ class SparkIMain(initialSettings: Settings,
     * @return The compiler as a Global
     */
   @DeveloperApi
-  protected def newCompiler(
-      settings: Settings, reporter: Reporter): ReplGlobal = {
+  protected def newCompiler(settings: Settings,
+                            reporter: Reporter): ReplGlobal = {
     settings.outputDirs setSingleOutput virtualDirectory
     settings.exposeEmptyPackage.value = true
     new Global(settings, reporter) with ReplGlobal {
@@ -433,7 +427,8 @@ class SparkIMain(initialSettings: Settings,
   }
 
   private def mergeUrlsIntoClassPath(
-      platform: JavaPlatform, urls: URL*): MergedClassPath[AbstractFile] = {
+      platform: JavaPlatform,
+      urls: URL*): MergedClassPath[AbstractFile] = {
     // Collect our new jars/directories and add them to the existing set of classpaths
     val allClassPaths = (platform.classPath
           .asInstanceOf[MergedClassPath[AbstractFile]]
@@ -510,12 +505,11 @@ class SparkIMain(initialSettings: Settings,
     }
   }
   private def makeClassLoader(): AbstractFileClassLoader =
-    new TranslatingClassLoader(
-        parentClassLoader match {
+    new TranslatingClassLoader(parentClassLoader match {
       case null => ScalaClassLoader fromURLs compilerClasspath
       case p =>
-        _runtimeClassLoader =
-          new URLClassLoader(compilerClasspath, p) with ExposeAddUrl
+        _runtimeClassLoader = new URLClassLoader(compilerClasspath, p)
+        with ExposeAddUrl
         _runtimeClassLoader
     })
 
@@ -593,15 +587,17 @@ class SparkIMain(initialSettings: Settings,
   }
 
   /** Stubs for work in progress. */
-  private def handleTypeRedefinition(
-      name: TypeName, old: Request, req: Request) = {
+  private def handleTypeRedefinition(name: TypeName,
+                                     old: Request,
+                                     req: Request) = {
     for (t1 <- old.simpleNameOfType(name); t2 <- req.simpleNameOfType(name)) {
       logDebug("Redefining type '%s'\n  %s -> %s".format(name, t1, t2))
     }
   }
 
-  private def handleTermRedefinition(
-      name: TermName, old: Request, req: Request) = {
+  private def handleTermRedefinition(name: TermName,
+                                     old: Request,
+                                     req: Request) = {
     for (t1 <- old.compilerTypeOf get name; t2 <- req.compilerTypeOf get name) {
       //    Printing the types here has a tendency to cause assertion errors, like
       //   assertion failed: fatal: <refinement> has owner value x, but a class owner is required
@@ -622,7 +618,7 @@ class SparkIMain(initialSettings: Settings,
     // be what people want so I'm waiting until I can do it better.
     for {
       name <- req.definedNames filterNot
-             (x => req.definedNames contains x.companionName)
+               (x => req.definedNames contains x.companionName)
       oldReq <- definedNameMap get name.companionName
       newSym <- req.definedSymbols get name
       oldSym <- oldReq.definedSymbols get name.companionName
@@ -630,7 +626,8 @@ class SparkIMain(initialSettings: Settings,
         case Seq(s1, s2) => s1.isClass && s2.isModule
       }
     } {
-      afterTyper(replwarn(
+      afterTyper(
+          replwarn(
               s"warning: previously defined $oldSym is not a companion to $newSym."))
       replwarn(
           "Companions must be defined together; you may wish to use :paste mode for this.")
@@ -730,7 +727,8 @@ class SparkIMain(initialSettings: Settings,
   }
 
   private def requestFromLine(
-      line: String, synthetic: Boolean): Either[IR.Result, Request] = {
+      line: String,
+      synthetic: Boolean): Either[IR.Result, Request] = {
     val content = indentCode(line)
     val trees = parse(content) match {
       case None => return Left(IR.Incomplete)
@@ -739,18 +737,18 @@ class SparkIMain(initialSettings: Settings,
     }
     logDebug(
         trees map
-        (t => {
-              // [Eugene to Paul] previously it just said `t map ...`
-              // because there was an implicit conversion from Tree to a list of Trees
-              // however Martin and I have removed the conversion
-              // (it was conflicting with the new reflection API),
-              // so I had to rewrite this a bit
-              val subs = t collect { case sub => sub }
-              subs map
-              (t0 =>
-                    "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                  "\n") mkString ""
-            }) mkString "\n"
+          (t => {
+                // [Eugene to Paul] previously it just said `t map ...`
+                // because there was an implicit conversion from Tree to a list of Trees
+                // however Martin and I have removed the conversion
+                // (it was conflicting with the new reflection API),
+                // so I had to rewrite this a bit
+                val subs = t collect { case sub => sub }
+                subs map
+                (t0 =>
+                      "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                      "\n") mkString ""
+              }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -778,7 +776,7 @@ class SparkIMain(initialSettings: Settings,
              logDebug("[raw] " + raw1 + "   <--->   " + raw2)
 
              val adjustment = (raw1.reverse takeWhile
-                 (ch => (ch != ';') && (ch != '\n'))).size
+                   (ch => (ch != ';') && (ch != '\n'))).size
              val lastpos = lastpos0 - adjustment
 
              // the source code split at the laboriously determined position.
@@ -902,13 +900,14 @@ class SparkIMain(initialSettings: Settings,
            value: Any,
            modifiers: List[String] = Nil): IR.Result = {
     val bindRep = new ReadEvalPrint()
-    val run = bindRep.compile("""
+    val run = bindRep.compile(
+        """
                               |object %s {
                                 |  var value: %s = _
                               |  def set(x: Any) = value = x.asInstanceOf[%s]
                               |}
-                              """.stripMargin.format(
-            bindRep.evalName, boundType, boundType))
+                              """.stripMargin
+          .format(bindRep.evalName, boundType, boundType))
     bindRep.callEither("set", value) match {
       case Left(ex) =>
         logDebug(
@@ -917,8 +916,8 @@ class SparkIMain(initialSettings: Settings,
         IR.Error
 
       case Right(_) =>
-        val line = "%sval %s = %s.value".format(
-            modifiers map (_ + " ") mkString, name, bindRep.evalPath)
+        val line = "%sval %s = %s.value"
+          .format(modifiers map (_ + " ") mkString, name, bindRep.evalPath)
         logDebug("Interpreting: " + line)
         interpret(line)
     }
@@ -945,8 +944,9 @@ class SparkIMain(initialSettings: Settings,
 
   private def directBind(p: NamedParam): IR.Result =
     directBind(p.name, p.tpe, p.value)
-  private def directBind[T: ru.TypeTag: ClassTag](
-      name: String, value: T): IR.Result = directBind((name, value))
+  private def directBind[T: ru.TypeTag: ClassTag](name: String,
+                                                  value: T): IR.Result =
+    directBind((name, value))
 
   /**
     * Overwrites previously-bound val with a new instance.
@@ -986,8 +986,9 @@ class SparkIMain(initialSettings: Settings,
   private[repl] def quietBind(p: NamedParam): IR.Result =
     beQuietDuring(bind(p))
   private def bind(p: NamedParam): IR.Result = bind(p.name, p.tpe, p.value)
-  private def bind[T: ru.TypeTag: ClassTag](
-      name: String, value: T): IR.Result = bind((name, value))
+  private def bind[T: ru.TypeTag: ClassTag](name: String,
+                                            value: T): IR.Result =
+    bind((name, value))
   private def bindSyntheticValue(x: Any): IR.Result =
     bindValue(freshInternalVarName(), x)
   private def bindValue(x: Any): IR.Result = bindValue(freshUserVarName(), x)
@@ -1061,8 +1062,8 @@ class SparkIMain(initialSettings: Settings,
 
       val unwrapped = unwrap(t)
       withLastExceptionLock[String]({
-        directBind[Throwable]("lastException", unwrapped)(
-            tagOfThrowable, classTag[Throwable])
+        directBind[Throwable]("lastException", unwrapped)(tagOfThrowable,
+                                                          classTag[Throwable])
         util.stackTraceString(unwrapped)
       }, util.stackTraceString(unwrapped))
     }
@@ -1099,7 +1100,8 @@ class SparkIMain(initialSettings: Settings,
 
     private def evalError(path: String, ex: Throwable) =
       throw new EvalException(
-          "Failed to load '" + path + "': " + ex.getMessage, ex)
+          "Failed to load '" + path + "': " + ex.getMessage,
+          ex)
 
     private def load(path: String): Class[_] = {
       // scalastyle:off classforname
@@ -1125,8 +1127,7 @@ class SparkIMain(initialSettings: Settings,
       // val readRoot  = getRequiredModule(readPath)   // the outermost wrapper
       // MATEI: Changed this to getClass because the root object is no longer a module (Scala singleton object)
 
-      val readRoot =
-        rootMirror.getClassByName(newTypeName(readPath)) // the outermost wrapper
+      val readRoot = rootMirror.getClassByName(newTypeName(readPath)) // the outermost wrapper
       (accessPath split '.').foldLeft(readRoot: Symbol) {
         case (sym, "") => sym
         case (sym, name) => afterTyper(termMember(sym, name))
@@ -1145,7 +1146,7 @@ class SparkIMain(initialSettings: Settings,
               rest filter {
                 case (pos0, msg0) =>
                   (msg != msg0) ||
-                  (pos.lineContent.trim != pos0.lineContent.trim) || {
+                    (pos.lineContent.trim != pos0.lineContent.trim) || {
                     // same messages and same line content after whitespace removal
                     // but we want to let through multiple warnings on the same line
                     // from the same run.  The untrimmed line will be the same since
@@ -1164,8 +1165,9 @@ class SparkIMain(initialSettings: Settings,
       evalClass.getMethods filter (_.getName == name) match {
         case Array(method) => method
         case xs =>
-          sys.error("Internal error: eval object " + evalClass + ", " +
-              xs.mkString("\n", "\n", ""))
+          sys.error(
+              "Internal error: eval object " + evalClass + ", " +
+                xs.mkString("\n", "\n", ""))
       }
     private def compileAndSaveRun(label: String, code: String) = {
       showCodeIfDebugging(code)
@@ -1231,7 +1233,7 @@ class SparkIMain(initialSettings: Settings,
     def fullFlatName(name: String) =
       // lineRep.readPath + accessPath.replace('.', '$') + nme.NAME_JOIN_STRING + name
       lineRep.readPath + ".INSTANCE" + accessPath.replace('.', '$') +
-      nme.NAME_JOIN_STRING + name
+        nme.NAME_JOIN_STRING + name
 
     /** The unmangled symbol name, but supplemented with line info. */
     def disambiguated(name: Name): String = name + " (in " + lineRep + ")"
@@ -1257,8 +1259,8 @@ class SparkIMain(initialSettings: Settings,
           List(
               "def $line  = " + tquoted(originalLine),
               "def $req = %s.requestForReqId(%s).orNull".format(path, reqId),
-              "def $trees = if ($req eq null) Nil else $req.trees".format(
-                  lineRep.readName, path, reqId)
+              "def $trees = if ($req eq null) Nil else $req.trees"
+                .format(lineRep.readName, path, reqId)
           )
       }
 
@@ -1274,7 +1276,7 @@ class SparkIMain(initialSettings: Settings,
       """.stripMargin
       val postamble =
         importsTrailer + "\n}" + "\n" + "object " + lineRep.readName + " {\n" +
-        "  val INSTANCE = new " + lineRep.readName + "();\n" + "}\n"
+          "  val INSTANCE = new " + lineRep.readName + "();\n" + "}\n"
       val generate = (m: MemberHandler) => m extraCodeToEvaluate Request.this
 
       /*
@@ -1645,7 +1647,7 @@ class SparkIMain(initialSettings: Settings,
   @DeveloperApi
   def definedSymbolList =
     prevRequestList flatMap (_.definedSymbolList) filterNot
-    (s => isInternalTermName(s.name))
+      (s => isInternalTermName(s.name))
 
   // Terms with user-given names (i.e. not res0 and not synthetic)
 
@@ -1657,7 +1659,7 @@ class SparkIMain(initialSettings: Settings,
   @DeveloperApi
   def namedDefinedTerms =
     definedTerms filterNot
-    (x => isUserVarName("" + x) || directlyBoundNames(x))
+      (x => isUserVarName("" + x) || directlyBoundNames(x))
 
   private def findName(name: Name) =
     definedSymbols find (_.name == name) getOrElse NoSymbol
@@ -1845,8 +1847,9 @@ object SparkIMain {
   }
 
   class ReplReporter(intp: SparkIMain)
-      extends ConsoleReporter(
-          intp.settings, null, new ReplStrippingWriter(intp)) {
+      extends ConsoleReporter(intp.settings,
+                              null,
+                              new ReplStrippingWriter(intp)) {
     override def printMessage(msg: String) {
       // Avoiding deadlock when the compiler starts logging before
       // the lazy val is done.

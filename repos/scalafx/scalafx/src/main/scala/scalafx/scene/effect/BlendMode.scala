@@ -50,16 +50,16 @@ object BlendMode extends SFXEnumDelegateCompanion[jfxse.BlendMode, BlendMode] {
       "2.2.60")
   val COLOR_DODGE = ColorDodge
   val Darken = new BlendMode(jfxse.BlendMode.DARKEN)
-  @deprecated(
-      "Use Darken; DARKEN will be removed in a future release", "2.2.60")
+  @deprecated("Use Darken; DARKEN will be removed in a future release",
+              "2.2.60")
   val DARKEN = Darken
   val Difference = new BlendMode(jfxse.BlendMode.DIFFERENCE)
   @deprecated("Use Difference; DIFFERENCE will be removed in a future release",
               "2.2.60")
   val DIFFERENCE = Difference
   val Exclusion = new BlendMode(jfxse.BlendMode.EXCLUSION)
-  @deprecated(
-      "Use Exclusion; EXCLUSION will be removed in a future release", "2.2.60")
+  @deprecated("Use Exclusion; EXCLUSION will be removed in a future release",
+              "2.2.60")
   val EXCLUSION = Exclusion
   val Green = new BlendMode(jfxse.BlendMode.GREEN)
   @deprecated("Use Green; GREEN will be removed in a future release", "2.2.60")
@@ -69,35 +69,35 @@ object BlendMode extends SFXEnumDelegateCompanion[jfxse.BlendMode, BlendMode] {
               "2.2.60")
   val HARD_LIGHT = HardLight
   val Lighten = new BlendMode(jfxse.BlendMode.LIGHTEN)
-  @deprecated(
-      "Use Lighten; LIGHTEN will be removed in a future release", "2.2.60")
+  @deprecated("Use Lighten; LIGHTEN will be removed in a future release",
+              "2.2.60")
   val LIGHTEN = Lighten
   val Multiply = new BlendMode(jfxse.BlendMode.MULTIPLY)
-  @deprecated(
-      "Use Multiply; MULTIPLY will be removed in a future release", "2.2.60")
+  @deprecated("Use Multiply; MULTIPLY will be removed in a future release",
+              "2.2.60")
   val MULTIPLY = Multiply
   val Overlay = new BlendMode(jfxse.BlendMode.OVERLAY)
-  @deprecated(
-      "Use Overlay; OVERLAY will be removed in a future release", "2.2.60")
+  @deprecated("Use Overlay; OVERLAY will be removed in a future release",
+              "2.2.60")
   val OVERLAY = Overlay
   val Red = new BlendMode(jfxse.BlendMode.RED)
   @deprecated("Use Red; RED will be removed in a future release", "2.2.60")
   val RED = Red
   val Screen = new BlendMode(jfxse.BlendMode.SCREEN)
-  @deprecated(
-      "Use Screen; SCREEN will be removed in a future release", "2.2.60")
+  @deprecated("Use Screen; SCREEN will be removed in a future release",
+              "2.2.60")
   val SCREEN = Screen
   val SoftLight = new BlendMode(jfxse.BlendMode.SOFT_LIGHT)
   @deprecated("Use SoftLight; SOFT_LIGHT will be removed in a future release",
               "2.2.60")
   val SOFT_LIGHT = SoftLight
   val SrcAtop = new BlendMode(jfxse.BlendMode.SRC_ATOP)
-  @deprecated(
-      "Use SrcAtop; SRC_ATOP will be removed in a future release", "2.2.60")
+  @deprecated("Use SrcAtop; SRC_ATOP will be removed in a future release",
+              "2.2.60")
   val SRC_ATOP = SrcAtop
   val SrcOver = new BlendMode(jfxse.BlendMode.SRC_OVER)
-  @deprecated(
-      "Use SrcOver; SRC_OVER will be removed in a future release", "2.2.60")
+  @deprecated("Use SrcOver; SRC_OVER will be removed in a future release",
+              "2.2.60")
   val SRC_OVER = SrcOver
 
   protected override def unsortedValues: Array[BlendMode] = Array(

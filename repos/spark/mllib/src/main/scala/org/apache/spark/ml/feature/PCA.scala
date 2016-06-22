@@ -42,8 +42,8 @@ private[feature] trait PCAParams
     * The number of principal components.
     * @group param
     */
-  final val k: IntParam = new IntParam(
-      this, "k", "the number of principal components")
+  final val k: IntParam =
+    new IntParam(this, "k", "the number of principal components")
 
   /** @group getParam */
   def getK: Int = $(k)
@@ -114,9 +114,9 @@ object PCA extends DefaultParamsReadable[PCA] {
   *                          each principal component.
   */
 @Experimental
-class PCAModel private[ml](override val uid: String,
-                           val pc: DenseMatrix,
-                           val explainedVariance: DenseVector)
+class PCAModel private[ml] (override val uid: String,
+                            val pc: DenseMatrix,
+                            val explainedVariance: DenseVector)
     extends Model[PCAModel]
     with PCAParams
     with MLWritable {
@@ -205,22 +205,21 @@ object PCAModel extends MLReadable[PCAModel] {
       }
 
       val dataPath = new Path(path, "data").toString
-      val model =
-        if (hasExplainedVariance) {
-          val Row(pc: DenseMatrix, explainedVariance: DenseVector) =
-            sqlContext.read
-              .parquet(dataPath)
-              .select("pc", "explainedVariance")
-              .head()
-          new PCAModel(metadata.uid, pc, explainedVariance)
-        } else {
-          val Row(pc: DenseMatrix) =
-            sqlContext.read.parquet(dataPath).select("pc").head()
-          new PCAModel(
-              metadata.uid,
-              pc,
-              Vectors.dense(Array.empty[Double]).asInstanceOf[DenseVector])
-        }
+      val model = if (hasExplainedVariance) {
+        val Row(pc: DenseMatrix, explainedVariance: DenseVector) =
+          sqlContext.read
+            .parquet(dataPath)
+            .select("pc", "explainedVariance")
+            .head()
+        new PCAModel(metadata.uid, pc, explainedVariance)
+      } else {
+        val Row(pc: DenseMatrix) =
+          sqlContext.read.parquet(dataPath).select("pc").head()
+        new PCAModel(
+            metadata.uid,
+            pc,
+            Vectors.dense(Array.empty[Double]).asInstanceOf[DenseVector])
+      }
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }

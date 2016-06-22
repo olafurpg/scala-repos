@@ -33,8 +33,9 @@ object ValidationExample extends Specification {
     "pass when age within limits" in {
       // Age must be between 16 an 60
       import Validation.Monad._
-      val person = Person.applyJSON(
-          field("name"), validate[Int]("age") >=> min(16) >=> max(60) apply _)
+      val person =
+        Person.applyJSON(field("name"),
+                         validate[Int]("age") >=> min(16) >=> max(60) apply _)
       person(json) mustEqual Success(Person("joe", 17))
     }
   }
@@ -45,7 +46,7 @@ object ValidationExample extends Specification {
   // * a validation where result depends on more than one value
   // * parse a List with invalid values
 // FIXME enable when 2.8 no longer supported, 2.9 needs: import Validation.Monad._
-/*
+  /*
   "Range filtering" should {
     val json = JsonParser.parse(""" [{"s":10,"e":17},{"s":12,"e":13},{"s":11,"e":8}] """)
 

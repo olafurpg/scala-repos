@@ -6,8 +6,8 @@ package scalaz
   *
   * The minimal defition is either (unit, counit) or (leftAdjunct, rightAdjunct)
   */
-abstract class Adjunction[F[_], G[_]](
-    implicit val F: Functor[F], val G: Functor[G]) { self =>
+abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F],
+                                      val G: Functor[G]) { self =>
 
   /** Puts a value into the monad. */
   def unit[A](a: => A): G[F[A]] = leftAdjunct(a)(x => x)
@@ -80,15 +80,17 @@ abstract class Adjunction[F[_], G[_]](
 object Adjunction extends AdjunctionInstances {
   type -|[F[_], G[_]] = Adjunction[F, G]
 
-  def apply[F[_], G[_]](
-      implicit A: F -| G, F: Functor[F], G: Functor[F]): F -| G = A
+  def apply[F[_], G[_]](implicit A: F -| G,
+                        F: Functor[F],
+                        G: Functor[F]): F -| G = A
 }
 
 sealed abstract class AdjunctionInstances {
   import Adjunction.-|
 
   implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](
-      implicit A1: F -| G, A2: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] =
+      implicit A1: F -| G,
+      A2: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] =
     A1 compose A2
 
   import Id._

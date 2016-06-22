@@ -56,7 +56,8 @@ class EdgePartitionSuite extends SparkFunSuite {
       builder.add(e.srcId, e.dstId, e.attr)
     }
     val edgePartition = builder.toEdgePartition
-    assert(edgePartition
+    assert(
+        edgePartition
           .map(e => e.srcId + e.dstId)
           .iterator
           .map(_.copy())
@@ -70,11 +71,13 @@ class EdgePartitionSuite extends SparkFunSuite {
       builder.add(e.srcId, e.dstId, e.attr)
     }
     val edgePartition = builder.toEdgePartition
-    val filtered = edgePartition.filter(
-        et => et.srcId == 0, (vid, attr) => vid == 0 || vid == 1)
+    val filtered = edgePartition.filter(et => et.srcId == 0, (vid, attr) =>
+          vid == 0 || vid == 1)
     assert(
-        filtered.tripletIterator().toList.map(et => (et.srcId, et.dstId)) === List(
-            (0L, 1L)))
+        filtered
+          .tripletIterator()
+          .toList
+          .map(et => (et.srcId, et.dstId)) === List((0L, 1L)))
   }
 
   test("groupEdges") {
@@ -91,7 +94,11 @@ class EdgePartitionSuite extends SparkFunSuite {
     }
     val edgePartition = builder.toEdgePartition
     assert(
-        edgePartition.groupEdges(_ + _).iterator.map(_.copy()).toList === groupedEdges)
+        edgePartition
+          .groupEdges(_ + _)
+          .iterator
+          .map(_.copy())
+          .toList === groupedEdges)
   }
 
   test("innerJoin") {

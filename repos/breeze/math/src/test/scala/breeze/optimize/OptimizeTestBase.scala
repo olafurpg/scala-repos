@@ -23,8 +23,7 @@ import org.scalatest.prop._
 
 trait OptimizeTestBaseTrait {
   import org.scalacheck.Arbitrary._
-  implicit val arbVector: Arbitrary[DenseVector[Double]] = Arbitrary(
-      for {
+  implicit val arbVector: Arbitrary[DenseVector[Double]] = Arbitrary(for {
     n <- arbitrary[Int] suchThat { _ > 0 }
     d <- arbitrary[Double] map { _ % 10 }
   } yield (DenseVector.tabulate(n % 3 + 1)(i => scala.math.random * d)))
@@ -42,8 +41,7 @@ trait OptimizeTestBaseTrait {
   }
 
   implicit val arbDoubleCounter: Arbitrary[Counter[String, Double]] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       v <- arbitrary[DenseVector[Double]]
     } yield {
       val c = Counter[String, Double]()

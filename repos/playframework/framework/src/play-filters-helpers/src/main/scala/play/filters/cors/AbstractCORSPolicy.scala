@@ -140,7 +140,7 @@ private[cors] trait AbstractCORSPolicy {
        */
       if (corsConfig.exposedHeaders.nonEmpty) {
         headerBuilder +=
-          HeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS -> corsConfig.exposedHeaders
+        HeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS -> corsConfig.exposedHeaders
           .mkString(",")
       }
 
@@ -190,8 +190,7 @@ private[cors] trait AbstractCORSPolicy {
           handleInvalidCORSRequest(request)
         case Some(requestMethod) =>
           val accessControlRequestMethod = requestMethod.trim
-          val methodPredicate =
-            corsConfig.isHttpMethodAllowed // call def to get function val
+          val methodPredicate = corsConfig.isHttpMethodAllowed // call def to get function val
           /* http://www.w3.org/TR/cors/#resource-preflight-requests
            * § 6.2.5
            * If method is not a case-sensitive match for any of the
@@ -210,7 +209,8 @@ private[cors] trait AbstractCORSPolicy {
              * let header field-names be the empty list.
              */
             val accessControlRequestHeaders: List[String] = {
-              request.headers.get(HeaderNames.ACCESS_CONTROL_REQUEST_HEADERS) match {
+              request.headers
+                .get(HeaderNames.ACCESS_CONTROL_REQUEST_HEADERS) match {
                 case None => List.empty[String]
                 case Some(headerVal) =>
                   headerVal.trim
@@ -220,8 +220,7 @@ private[cors] trait AbstractCORSPolicy {
               }
             }
 
-            val headerPredicate =
-              corsConfig.isHttpHeaderAllowed // call def to get function val
+            val headerPredicate = corsConfig.isHttpHeaderAllowed // call def to get function val
             /* http://www.w3.org/TR/cors/#resource-preflight-requests
              * § 6.2.6
              * If any of the header field-names is not a ASCII case-insensitive
@@ -242,9 +241,9 @@ private[cors] trait AbstractCORSPolicy {
                  * Access-Control-Allow-Credentials header with the case-sensitive string "true" as value.
                  */
                 headerBuilder +=
-                  HeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS -> "true"
+                HeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS -> "true"
                 headerBuilder +=
-                  HeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN -> origin
+                HeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN -> origin
 
                 /* http://www.w3.org/TR/cors/#resource-implementation
                  * § 6.4
@@ -262,10 +261,10 @@ private[cors] trait AbstractCORSPolicy {
                  */
                 if (corsConfig.anyOriginAllowed) {
                   headerBuilder +=
-                    HeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN -> "*"
+                  HeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN -> "*"
                 } else {
                   headerBuilder +=
-                    HeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN -> origin
+                  HeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN -> origin
                   /* http://www.w3.org/TR/cors/#resource-implementation
                    * § 6.4
                    */
@@ -280,7 +279,7 @@ private[cors] trait AbstractCORSPolicy {
                */
               if (corsConfig.preflightMaxAge.toSeconds > 0) {
                 headerBuilder +=
-                  HeaderNames.ACCESS_CONTROL_MAX_AGE -> corsConfig.preflightMaxAge.toSeconds.toString
+                HeaderNames.ACCESS_CONTROL_MAX_AGE -> corsConfig.preflightMaxAge.toSeconds.toString
               }
 
               /* http://www.w3.org/TR/cors/#resource-preflight-requests
@@ -293,7 +292,7 @@ private[cors] trait AbstractCORSPolicy {
                * indicated by Access-Control-Request-Method (if supported) can be enough.
                */
               headerBuilder +=
-                HeaderNames.ACCESS_CONTROL_ALLOW_METHODS -> accessControlRequestMethod
+              HeaderNames.ACCESS_CONTROL_ALLOW_METHODS -> accessControlRequestMethod
 
               /* http://www.w3.org/TR/cors/#resource-preflight-requests
                * § 6.2.9
@@ -309,7 +308,7 @@ private[cors] trait AbstractCORSPolicy {
                */
               if (!accessControlRequestHeaders.isEmpty) {
                 headerBuilder +=
-                  HeaderNames.ACCESS_CONTROL_ALLOW_HEADERS -> accessControlRequestHeaders
+                HeaderNames.ACCESS_CONTROL_ALLOW_HEADERS -> accessControlRequestHeaders
                   .mkString(",")
               }
 
@@ -348,7 +347,7 @@ private[cors] trait AbstractCORSPolicy {
     val hostUri = new URI(origin.toLowerCase(Locale.ENGLISH))
     val originUri = new URI(
         (if (request.secure) "https://" else "http://") +
-        request.host.toLowerCase(Locale.ENGLISH))
+          request.host.toLowerCase(Locale.ENGLISH))
     (hostUri.getScheme, hostUri.getHost, hostUri.getPort) ==
     (originUri.getScheme, originUri.getHost, originUri.getPort)
   }

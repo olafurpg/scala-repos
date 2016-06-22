@@ -57,13 +57,14 @@ case class CreateFunction(functionName: String,
     extends NativeDDLCommand(sql)
     with Logging
 
-case class AlterTableRename(
-    oldName: TableIdentifier, newName: TableIdentifier)(sql: String)
+case class AlterTableRename(oldName: TableIdentifier,
+                            newName: TableIdentifier)(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
 case class AlterTableSetProperties(
-    tableName: TableIdentifier, properties: Map[String, String])(sql: String)
+    tableName: TableIdentifier,
+    properties: Map[String, String])(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
@@ -81,8 +82,8 @@ case class AlterTableSerDeProperties(
     extends NativeDDLCommand(sql)
     with Logging
 
-case class AlterTableStorageProperties(
-    tableName: TableIdentifier, buckets: BucketSpec)(sql: String)
+case class AlterTableStorageProperties(tableName: TableIdentifier,
+                                       buckets: BucketSpec)(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
@@ -117,7 +118,8 @@ case class AlterTableNotStoredAsDirs(tableName: TableIdentifier)(sql: String)
     with Logging
 
 case class AlterTableSkewedLocation(
-    tableName: TableIdentifier, skewedMap: Map[String, String])(sql: String)
+    tableName: TableIdentifier,
+    skewedMap: Map[String, String])(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
@@ -128,10 +130,10 @@ case class AlterTableAddPartition(
     extends NativeDDLCommand(sql)
     with Logging
 
-case class AlterTableRenamePartition(tableName: TableIdentifier,
-                                     oldPartition: TablePartitionSpec,
-                                     newPartition: TablePartitionSpec)(
-    sql: String)
+case class AlterTableRenamePartition(
+    tableName: TableIdentifier,
+    oldPartition: TablePartitionSpec,
+    newPartition: TablePartitionSpec)(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
@@ -148,13 +150,13 @@ case class AlterTableDropPartition(tableName: TableIdentifier,
     extends NativeDDLCommand(sql)
     with Logging
 
-case class AlterTableArchivePartition(
-    tableName: TableIdentifier, spec: TablePartitionSpec)(sql: String)
+case class AlterTableArchivePartition(tableName: TableIdentifier,
+                                      spec: TablePartitionSpec)(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
-case class AlterTableUnarchivePartition(
-    tableName: TableIdentifier, spec: TablePartitionSpec)(sql: String)
+case class AlterTableUnarchivePartition(tableName: TableIdentifier,
+                                        spec: TablePartitionSpec)(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
@@ -172,8 +174,8 @@ case class AlterTableSetLocation(tableName: TableIdentifier,
     with Logging
 
 case class AlterTableTouch(
-    tableName: TableIdentifier, partitionSpec: Option[TablePartitionSpec])(
-    sql: String)
+    tableName: TableIdentifier,
+    partitionSpec: Option[TablePartitionSpec])(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 
@@ -184,8 +186,8 @@ case class AlterTableCompact(tableName: TableIdentifier,
     with Logging
 
 case class AlterTableMerge(
-    tableName: TableIdentifier, partitionSpec: Option[TablePartitionSpec])(
-    sql: String)
+    tableName: TableIdentifier,
+    partitionSpec: Option[TablePartitionSpec])(sql: String)
     extends NativeDDLCommand(sql)
     with Logging
 

@@ -14,8 +14,9 @@ import scala.collection.mutable
 import org.scalajs.core.tools.sem.Semantics
 import org.scalajs.core.tools.javascript.ESLevel
 
-final class IncOptimizer(
-    semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean)
+final class IncOptimizer(semantics: Semantics,
+                         esLevel: ESLevel,
+                         considerPositions: Boolean)
     extends GenIncOptimizer(semantics, esLevel, considerPositions) {
 
   private[optimizer] object CollOps extends GenIncOptimizer.AbsCollOps {
@@ -62,8 +63,8 @@ final class IncOptimizer(
   private[optimizer] def scheduleMethod(method: MethodImpl): Unit =
     methodsToProcess += method
 
-  private[optimizer] def newMethodImpl(
-      owner: MethodContainer, encodedName: String): MethodImpl =
+  private[optimizer] def newMethodImpl(owner: MethodContainer,
+                                       encodedName: String): MethodImpl =
     new SeqMethodImpl(owner, encodedName)
 
   private[optimizer] def processAllTaggedMethods(): Unit = {

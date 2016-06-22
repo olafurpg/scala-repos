@@ -49,8 +49,8 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
       waitForBreakpoint()
       val posManager = new ScalaPositionManager(getDebugProcess)
 
-      def checkSourcePosition(
-          initialPosition: SourcePosition, location: Location) = {
+      def checkSourcePosition(initialPosition: SourcePosition,
+                              location: Location) = {
         extensions.inReadAction {
           val newPosition = posManager.getSourcePosition(location)
           Assert.assertEquals(initialPosition.getFile, newPosition.getFile)

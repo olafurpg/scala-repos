@@ -87,8 +87,8 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
       }
   }
 
-  case class InMemoryProjectionResource(
-      proj: Projection, authorities: Authorities)
+  case class InMemoryProjectionResource(proj: Projection,
+                                        authorities: Authorities)
       extends ProjectionResource {
     val mimeType = FileContent.XQuirrelData
 
@@ -106,14 +106,14 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
     }
   }
 
-  case class InMemoryBlobResource(
-      data: Array[Byte], mimeType: MimeType, authorities: Authorities)
+  case class InMemoryBlobResource(data: Array[Byte],
+                                  mimeType: MimeType,
+                                  authorities: Authorities)
       extends BlobResource {
     def byteLength = data.length.toLong
 
     def asString(implicit M: Monad[M]): OptionT[M, String] =
-      OptionT(
-          M point {
+      OptionT(M point {
         FileContent.stringTypes
           .contains(mimeType)
           .option(new String(data, "UTF-8"))
@@ -164,11 +164,12 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                 authorities: Authorities,
                 uuid: UUID) =
         new BinaryRecord(
-            new InMemoryBlobResource(data._1, data._2, authorities), uuid)
+            new InMemoryBlobResource(data._1, data._2, authorities),
+            uuid)
     }
 
-    case class JsonRecord(
-        resource: InMemoryProjectionResource, versionId: UUID)
+    case class JsonRecord(resource: InMemoryProjectionResource,
+                          versionId: UUID)
         extends Record
     object JsonRecord {
       def apply(data: Vector[JValue], authorities: Authorities, uuid: UUID) =
@@ -186,8 +187,8 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
   }
 
   class InMemoryVFS(
-      data0: Map[
-          Path, ((Array[Byte], MimeType) \/ Vector[JValue], Authorities)],
+      data0: Map[Path,
+                 ((Array[Byte], MimeType) \/ Vector[JValue], Authorities)],
       clock: Clock)(implicit M: Monad[M])
       extends VFS {
     import VFS._
@@ -213,8 +214,9 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         appendTo match {
           case Some(record @ BinaryRecord(resource, uuid)) =>
             acc + ((path, Version.Archived(uuid)) -> record) +
-            ((path, Version.Current) -> JsonRecord(
-                    Vector(values: _*), writeAs, newVersion))
+              ((path, Version.Current) -> JsonRecord(Vector(values: _*),
+                                                     writeAs,
+                                                     newVersion))
 
           case Some(rec @ JsonRecord(resource, _)) =>
             //TODO: fix the ugly
@@ -235,18 +237,27 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
               // We can discard the event IDs for the purposes of this class
               messages.map(_._2).foldLeft(acc) {
                 case (acc,
-                      IngestMessage(
-                      _, _, writeAs, records, _, _, StreamRef.Append)) =>
+                      IngestMessage(_,
+                                    _,
+                                    writeAs,
+                                    records,
+                                    _,
+                                    _,
+                                    StreamRef.Append)) =>
                   updated(acc,
                           acc.get(currentKey),
                           currentKey,
                           writeAs,
                           records.map(_.value))
 
-                case (
-                    acc,
-                    IngestMessage(
-                    _, _, writeAs, records, _, _, StreamRef.Create(id, _))) =>
+                case (acc,
+                      IngestMessage(_,
+                                    _,
+                                    writeAs,
+                                    records,
+                                    _,
+                                    _,
+                                    StreamRef.Create(id, _))) =>
                   val archiveKey = (path, Version.Archived(id))
                   val appendTo = acc
                     .get(archiveKey)
@@ -259,10 +270,14 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                           writeAs,
                           records.map(_.value))
 
-                case (
-                    acc,
-                    IngestMessage(
-                    _, _, writeAs, records, _, _, StreamRef.Replace(id, _))) =>
+                case (acc,
+                      IngestMessage(_,
+                                    _,
+                                    writeAs,
+                                    records,
+                                    _,
+                                    _,
+                                    StreamRef.Replace(id, _))) =>
                   val archiveKey = (path, Version.Archived(id))
                   acc.get(archiveKey).orElse(acc.get(currentKey)) map {
                     case rec @ JsonRecord(resource, `id`) =>
@@ -277,11 +292,11 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                     case record =>
                       // replace when id is not recognized, or when record is binary
                       acc +
-                      ((path, Version.Archived(record.versionId)) -> record) +
-                      (currentKey -> JsonRecord(
-                              Vector(records.map(_.value): _*),
-                              writeAs,
-                              id))
+                        ((path, Version.Archived(record.versionId)) -> record) +
+                        (currentKey -> JsonRecord(
+                                Vector(records.map(_.value): _*),
+                                writeAs,
+                                id))
                   } getOrElse {
                     // start a new current version
                     acc +
@@ -327,8 +342,8 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
       EitherT.right(M.point(writeAll(events).unsafePerformIO))
     }
 
-    def readResource(
-        path: Path, version: Version): EitherT[M, ResourceError, Resource] = {
+    def readResource(path: Path,
+                     version: Version): EitherT[M, ResourceError, Resource] = {
       EitherT {
         data
           .get((path, version))
@@ -342,7 +357,8 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         val childPath = path / Path(p0.elements.headOption.toList)
         val isDir = p0.length > 1
         data.get((childPath, Version.Current)) map { record =>
-          Set(PathMetadata(p0,
+          Set(
+              PathMetadata(p0,
                            if (isDir) DataDir(record.resource.mimeType)
                            else DataOnly(record.resource.mimeType)))
         } getOrElse {
@@ -365,9 +381,10 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         M point {
           val isDir = childMetadata(path).nonEmpty
           data.get((path, Version.Current)) map { record =>
-            \/.right(PathMetadata(path,
-                                  if (isDir) DataDir(record.resource.mimeType)
-                                  else DataOnly(record.resource.mimeType)))
+            \/.right(
+                PathMetadata(path,
+                             if (isDir) DataDir(record.resource.mimeType)
+                             else DataOnly(record.resource.mimeType)))
           } getOrElse {
             if (isDir) \/.right(PathMetadata(path, PathOnly))
             else \/.left(NotFound("Path not fournd: %s".format(path.path)))

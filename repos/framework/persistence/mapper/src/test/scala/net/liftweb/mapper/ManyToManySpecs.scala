@@ -122,8 +122,10 @@ object ManyToManySpec extends Specification {
 class Person extends LongKeyedMapper[Person] with IdPK with ManyToMany {
   def getSingleton = Person
   object companies
-      extends MappedManyToMany(
-          PersonCompany, PersonCompany.person, PersonCompany.company, Company)
+      extends MappedManyToMany(PersonCompany,
+                               PersonCompany.person,
+                               PersonCompany.company,
+                               Company)
 }
 object Person extends Person with LongKeyedMetaMapper[Person]
 

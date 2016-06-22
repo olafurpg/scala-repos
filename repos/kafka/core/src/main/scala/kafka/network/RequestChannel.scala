@@ -43,8 +43,8 @@ object RequestChannel extends Logging {
 
   def getShutdownReceive() = {
     val emptyRequestHeader = new RequestHeader(ApiKeys.PRODUCE.id, "", 0)
-    val emptyProduceRequest = new ProduceRequest(
-        0, 0, new HashMap[TopicPartition, ByteBuffer]())
+    val emptyProduceRequest =
+      new ProduceRequest(0, 0, new HashMap[TopicPartition, ByteBuffer]())
     RequestSend.serialize(emptyRequestHeader, emptyProduceRequest.toStruct)
   }
 
@@ -72,7 +72,8 @@ object RequestChannel extends Logging {
     // request types should only use the client-side versions which are parsed with
     // o.a.k.common.requests.AbstractRequest.getRequest()
     private val keyToNameAndDeserializerMap: Map[
-        Short, (ByteBuffer) => RequestOrResponse] = Map(
+        Short,
+        (ByteBuffer) => RequestOrResponse] = Map(
         ApiKeys.FETCH.id -> FetchRequest.readFrom,
         ApiKeys.CONTROLLED_SHUTDOWN_KEY.id -> ControlledShutdownRequest.readFrom)
 
@@ -84,20 +85,19 @@ object RequestChannel extends Logging {
 
     // if we failed to find a server-side mapping, then try using the
     // client-side request / response format
-    val header: RequestHeader =
-      if (requestObj == null) {
-        buffer.rewind
-        try RequestHeader.parse(buffer) catch {
-          case ex: Throwable =>
-            throw new InvalidRequestException(
-                s"Error parsing request header. Our best guess of the apiKey is: $requestId",
-                ex)
-        }
-      } else null
+    val header: RequestHeader = if (requestObj == null) {
+      buffer.rewind
+      try RequestHeader.parse(buffer) catch {
+        case ex: Throwable =>
+          throw new InvalidRequestException(
+              s"Error parsing request header. Our best guess of the apiKey is: $requestId",
+              ex)
+      }
+    } else null
     val body: AbstractRequest =
       if (requestObj == null)
-        try AbstractRequest.getRequest(
-            header.apiKey, header.apiVersion, buffer) catch {
+        try AbstractRequest
+          .getRequest(header.apiKey, header.apiVersion, buffer) catch {
           case ex: Throwable =>
             throw new InvalidRequestException(
                 s"Error getting request for apiKey: ${header.apiKey} and apiVersion: ${header.apiVersion}",
@@ -113,8 +113,8 @@ object RequestChannel extends Logging {
     }
 
     trace(
-        "Processor %d received request : %s".format(
-            processor, requestDesc(true)))
+        "Processor %d received request : %s".format(processor,
+                                                    requestDesc(true)))
 
     def updateRequestMetrics() {
       val endTimeMs = SystemTime.milliseconds
@@ -146,7 +146,7 @@ object RequestChannel extends Logging {
         val isFromFollower =
           requestObj.asInstanceOf[FetchRequest].isFromFollower
         metricsList ::=
-          (if (isFromFollower)
+        (if (isFromFollower)
            RequestMetrics.metricsMap(RequestMetrics.followFetchMetricName)
          else
            RequestMetrics.metricsMap(RequestMetrics.consumerFetchMetricName))
@@ -220,8 +220,8 @@ class RequestChannel(val numProcessors: Int, val queueSize: Int)
     new ArrayBlockingQueue[RequestChannel.Request](queueSize)
   private val responseQueues =
     new Array[BlockingQueue[RequestChannel.Response]](numProcessors)
-  for (i <- 0 until numProcessors) responseQueues(i) =
-    new LinkedBlockingQueue[RequestChannel.Response]()
+  for (i <- 0 until numProcessors)
+    responseQueues(i) = new LinkedBlockingQueue[RequestChannel.Response]()
 
   newGauge(
       "RequestQueueSize",
@@ -255,15 +255,21 @@ class RequestChannel(val numProcessors: Int, val queueSize: Int)
 
   /** No operation to take for the request, need to read more over the network */
   def noOperation(processor: Int, request: RequestChannel.Request) {
-    responseQueues(processor).put(new RequestChannel.Response(
-            processor, request, null, RequestChannel.NoOpAction))
+    responseQueues(processor).put(
+        new RequestChannel.Response(processor,
+                                    request,
+                                    null,
+                                    RequestChannel.NoOpAction))
     for (onResponse <- responseListeners) onResponse(processor)
   }
 
   /** Close the connection for the request */
   def closeConnection(processor: Int, request: RequestChannel.Request) {
-    responseQueues(processor).put(new RequestChannel.Response(
-            processor, request, null, RequestChannel.CloseConnectionAction))
+    responseQueues(processor).put(
+        new RequestChannel.Response(processor,
+                                    request,
+                                    null,
+                                    RequestChannel.CloseConnectionAction))
     for (onResponse <- responseListeners) onResponse(processor)
   }
 
@@ -303,11 +309,11 @@ object RequestMetrics {
 
 class RequestMetrics(name: String) extends KafkaMetricsGroup {
   val tags = Map("request" -> name)
-  val requestRate = newMeter(
-      "RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val requestRate =
+    newMeter("RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
   // time a request spent in a request queue
-  val requestQueueTimeHist = newHistogram(
-      "RequestQueueTimeMs", biased = true, tags)
+  val requestQueueTimeHist =
+    newHistogram("RequestQueueTimeMs", biased = true, tags)
   // time a request takes to be processed at the local broker
   val localTimeHist = newHistogram("LocalTimeMs", biased = true, tags)
   // time a request takes to wait on remote brokers (currently only relevant to fetch and produce requests)
@@ -315,10 +321,10 @@ class RequestMetrics(name: String) extends KafkaMetricsGroup {
   // time a request is throttled (only relevant to fetch and produce requests)
   val throttleTimeHist = newHistogram("ThrottleTimeMs", biased = true, tags)
   // time a response spent in a response queue
-  val responseQueueTimeHist = newHistogram(
-      "ResponseQueueTimeMs", biased = true, tags)
+  val responseQueueTimeHist =
+    newHistogram("ResponseQueueTimeMs", biased = true, tags)
   // time to send the response to the requester
-  val responseSendTimeHist = newHistogram(
-      "ResponseSendTimeMs", biased = true, tags)
+  val responseSendTimeHist =
+    newHistogram("ResponseSendTimeMs", biased = true, tags)
   val totalTimeHist = newHistogram("TotalTimeMs", biased = true, tags)
 }

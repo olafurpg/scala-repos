@@ -81,14 +81,14 @@ object RectangleDrawingDemo extends JFXApp {
     {
       me.eventType match {
         case MouseEvent.MousePressed => {
-            // Reset the shape
-            val p = new Point2D(me.x, me.y)
-            Updater.update(p, p)
-          }
+          // Reset the shape
+          val p = new Point2D(me.x, me.y)
+          Updater.update(p, p)
+        }
         case MouseEvent.MouseDragged => {
-            // Adjust the shape
-            Updater.update(end = new Point2D(me.x, me.y))
-          }
+          // Adjust the shape
+          Updater.update(end = new Point2D(me.x, me.y))
+        }
         case _ => {}
       }
     }

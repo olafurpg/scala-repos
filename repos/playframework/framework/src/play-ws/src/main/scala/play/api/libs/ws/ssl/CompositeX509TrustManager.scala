@@ -15,8 +15,8 @@ import java.security.GeneralSecurityException
   * A trust manager that is a composite of several smaller trust managers.   It is responsible for verifying the
   * credentials received from a peer.
   */
-class CompositeX509TrustManager(
-    trustManagers: Seq[X509TrustManager], algorithmChecker: AlgorithmChecker)
+class CompositeX509TrustManager(trustManagers: Seq[X509TrustManager],
+                                algorithmChecker: AlgorithmChecker)
     extends X509TrustManager {
 
   private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
@@ -66,8 +66,8 @@ class CompositeX509TrustManager(
     }
   }
 
-  def checkServerTrusted(
-      chain: Array[X509Certificate], authType: String): Unit = {
+  def checkServerTrusted(chain: Array[X509Certificate],
+                         authType: String): Unit = {
     logger.debug(
         s"checkServerTrusted: chain = ${debugChain(chain)}, authType = $authType")
 

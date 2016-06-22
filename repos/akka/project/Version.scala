@@ -28,8 +28,9 @@ object Version {
          |""")
         ))
 
-  def generateVersion(
-      dir: SettingKey[File], locate: File => File, template: String) =
+  def generateVersion(dir: SettingKey[File],
+                      locate: File => File,
+                      template: String) =
     Def.task[Seq[File]] {
       val file = locate(dir.value)
       val content = template.stripMargin.format(version.value)

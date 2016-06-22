@@ -255,8 +255,8 @@ class HadoopRDD[K, V](sc: SparkContext,
           theSplit.index,
           context.attemptNumber,
           jobConf)
-      reader = inputFormat.getRecordReader(
-          split.inputSplit.value, jobConf, Reporter.NULL)
+      reader = inputFormat
+        .getRecordReader(split.inputSplit.value, jobConf, Reporter.NULL)
 
       // Register an on-task-completion callback to close the input stream.
       context.addTaskCompletionListener { context =>
@@ -310,7 +310,8 @@ class HadoopRDD[K, V](sc: SparkContext,
             } catch {
               case e: java.io.IOException =>
                 logWarning(
-                    "Unable to get input size to set InputMetrics for task", e)
+                    "Unable to get input size to set InputMetrics for task",
+                    e)
             }
           }
         }
@@ -354,8 +355,8 @@ class HadoopRDD[K, V](sc: SparkContext,
     if (storageLevel.deserialized) {
       logWarning(
           "Caching NewHadoopRDDs as deserialized objects usually leads to undesired" +
-          " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
-          " Use a map transformation to make copies of the records.")
+            " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
+            " Use a map transformation to make copies of the records.")
     }
     super.persist(storageLevel)
   }
@@ -394,8 +395,8 @@ private[spark] object HadoopRDD extends Logging {
                             attemptId: Int,
                             conf: JobConf) {
     val jobID = new JobID(jobTrackerId, jobId)
-    val taId = new TaskAttemptID(
-        new TaskID(jobID, TaskType.MAP, splitId), attemptId)
+    val taId =
+      new TaskAttemptID(new TaskID(jobID, TaskType.MAP, splitId), attemptId)
 
     conf.set("mapred.tip.id", taId.getTaskID.toString)
     conf.set("mapred.task.id", taId.toString)
@@ -408,10 +409,11 @@ private[spark] object HadoopRDD extends Logging {
     * Analogous to [[org.apache.spark.rdd.MapPartitionsRDD]], but passes in an InputSplit to
     * the given function rather than the index of the partition.
     */
-  private[spark] class HadoopMapPartitionsWithSplitRDD[
-      U: ClassTag, T: ClassTag](prev: RDD[T],
-                                f: (InputSplit, Iterator[T]) => Iterator[U],
-                                preservesPartitioning: Boolean = false)
+  private[spark] class HadoopMapPartitionsWithSplitRDD[U: ClassTag,
+                                                       T: ClassTag](
+      prev: RDD[T],
+      f: (InputSplit, Iterator[T]) => Iterator[U],
+      preservesPartitioning: Boolean = false)
       extends RDD[U](prev) {
 
     override val partitioner =
@@ -446,7 +448,7 @@ private[spark] object HadoopRDD extends Logging {
     } catch {
       case e: Exception =>
         logDebug("SplitLocationInfo and other new Hadoop classes are " +
-                 "unavailable. Using the older Hadoop location info code.",
+                   "unavailable. Using the older Hadoop location info code.",
                  e)
         None
     }

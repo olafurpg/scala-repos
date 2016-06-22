@@ -131,8 +131,9 @@ trait ActorContext[T] {
     * by invoking [[akka.actor.Cancellable]] `cancel` on the returned
     * handle.
     */
-  def schedule[U](
-      delay: FiniteDuration, target: ActorRef[U], msg: U): untyped.Cancellable
+  def schedule[U](delay: FiniteDuration,
+                  target: ActorRef[U],
+                  msg: U): untyped.Cancellable
 
   /**
     * This Actor’s execution context. It can be used to run asynchronous tasks

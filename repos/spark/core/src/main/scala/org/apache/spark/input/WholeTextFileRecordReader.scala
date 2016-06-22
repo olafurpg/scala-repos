@@ -42,8 +42,9 @@ private[spark] trait Configurable extends HConfigurable {
   * out in a key-value pair, where the key is the file path and the value is the entire content of
   * the file.
   */
-private[spark] class WholeTextFileRecordReader(
-    split: CombineFileSplit, context: TaskAttemptContext, index: Integer)
+private[spark] class WholeTextFileRecordReader(split: CombineFileSplit,
+                                               context: TaskAttemptContext,
+                                               index: Integer)
     extends RecordReader[Text, Text]
     with Configurable {
 
@@ -56,8 +57,8 @@ private[spark] class WholeTextFileRecordReader(
   private[this] val key: Text = new Text(path.toString)
   private[this] var value: Text = null
 
-  override def initialize(
-      split: InputSplit, context: TaskAttemptContext): Unit = {}
+  override def initialize(split: InputSplit,
+                          context: TaskAttemptContext): Unit = {}
 
   override def close(): Unit = {}
 
@@ -73,12 +74,11 @@ private[spark] class WholeTextFileRecordReader(
       val factory = new CompressionCodecFactory(conf)
       val codec = factory.getCodec(path) // infers from file ext.
       val fileIn = fs.open(path)
-      val innerBuffer =
-        if (codec != null) {
-          ByteStreams.toByteArray(codec.createInputStream(fileIn))
-        } else {
-          ByteStreams.toByteArray(fileIn)
-        }
+      val innerBuffer = if (codec != null) {
+        ByteStreams.toByteArray(codec.createInputStream(fileIn))
+      } else {
+        ByteStreams.toByteArray(fileIn)
+      }
 
       value = new Text(innerBuffer)
       Closeables.close(fileIn, false)

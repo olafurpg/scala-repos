@@ -121,8 +121,8 @@ object VecArbitraries {
     for {
       n <- Gen.choose(0, 20)
       lst <- Gen.listOfN(n,
-                         Gen.frequency(
-                             (9, Gen.chooseNum(-1000, 1000)), (1, na.to[Int])))
+                         Gen.frequency((9, Gen.chooseNum(-1000, 1000)),
+                                       (1, na.to[Int])))
     } yield Vec(lst: _*)
 
   def vecIntWithoutNA: Gen[Vec[Int]] =
@@ -135,8 +135,8 @@ object VecArbitraries {
     for {
       n <- Gen.choose(0, 20)
       lst <- Gen.listOfN(n,
-                         Gen.frequency(
-                             (9, Gen.chooseNum(-1000, 1000)), (1, na.to[Int])))
+                         Gen.frequency((9, Gen.chooseNum(-1000, 1000)),
+                                       (1, na.to[Int])))
     } yield Vec(lst.filter(_ > 0): _*)
 
   def vecIntPWithoutNA: Gen[Vec[Int]] =

@@ -157,8 +157,10 @@ sealed abstract class SafeLong
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
 
     @tailrec
-    def loop(
-        total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong = {
+    def loop(total: SafeLong,
+             base: SafeLong,
+             k: Int,
+             mod: SafeLong): SafeLong = {
       if (k == 0) total
       else if ((k & 1) == 1)
         loop((total * base) % mod, (base * base) % mod, k >> 1, mod)

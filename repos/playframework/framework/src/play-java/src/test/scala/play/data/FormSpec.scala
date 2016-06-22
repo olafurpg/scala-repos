@@ -51,9 +51,10 @@ object FormSpec extends Specification {
       myForm hasErrors () must beEqualTo(false)
     }
     "be valid with mandatory params passed" in {
-      val req = dummyRequest(Map("id" -> Array("1234567891"),
-                                 "name" -> Array("peter"),
-                                 "dueDate" -> Array("15/12/2009")))
+      val req = dummyRequest(
+          Map("id" -> Array("1234567891"),
+              "name" -> Array("peter"),
+              "dueDate" -> Array("15/12/2009")))
       Context.current.set(
           new Context(666,
                       null,
@@ -67,9 +68,10 @@ object FormSpec extends Specification {
       myForm hasErrors () must beEqualTo(false)
     }
     "have an error due to badly formatted date" in new WithApplication() {
-      val req = dummyRequest(Map("id" -> Array("1234567891"),
-                                 "name" -> Array("peter"),
-                                 "dueDate" -> Array("2009/11e/11")))
+      val req = dummyRequest(
+          Map("id" -> Array("1234567891"),
+              "name" -> Array("peter"),
+              "dueDate" -> Array("2009/11e/11")))
       Context.current.set(
           new Context(666,
                       null,
@@ -93,9 +95,10 @@ object FormSpec extends Specification {
         GuiceApplicationBuilder()
           .configure("play.i18n.langs" -> Seq("en", "en-US", "fr"))
           .build()) {
-      val req = dummyRequest(Map("id" -> Array("1234567891"),
-                                 "name" -> Array("peter"),
-                                 "dueDate" -> Array("2009/11e/11")))
+      val req = dummyRequest(
+          Map("id" -> Array("1234567891"),
+              "name" -> Array("peter"),
+              "dueDate" -> Array("2009/11e/11")))
       Context.current.set(
           new Context(666,
                       null,
@@ -123,9 +126,10 @@ object FormSpec extends Specification {
         GuiceApplicationBuilder()
           .configure("play.i18n.langs" -> Seq("en", "en-US", "fr"))
           .build()) {
-      val req = dummyRequest(Map("id" -> Array("1234567891"),
-                                 "name" -> Array("peter"),
-                                 "dueDate" -> Array("2009/11e/11")))
+      val req = dummyRequest(
+          Map("id" -> Array("1234567891"),
+              "name" -> Array("peter"),
+              "dueDate" -> Array("2009/11e/11")))
       Context.current.set(
           new Context(666,
                       null,
@@ -167,9 +171,10 @@ object FormSpec extends Specification {
           "error.required")
     }
     "have an error due to bad value in Id field" in new WithApplication() {
-      val req = dummyRequest(Map("id" -> Array("1234567891x"),
-                                 "name" -> Array("peter"),
-                                 "dueDate" -> Array("12/12/2009")))
+      val req = dummyRequest(
+          Map("id" -> Array("1234567891x"),
+              "name" -> Array("peter"),
+              "dueDate" -> Array("12/12/2009")))
       Context.current.set(
           new Context(666,
                       null,
@@ -407,10 +412,11 @@ object FormSpec extends Specification {
 
       "get the order of the fields correct when filled from a value" in {
         render(
-            form.fill(new JavaForm(List(new JavaSubForm("a", "b"),
-                                        new JavaSubForm("c", "d"),
-                                        new JavaSubForm("e", "f"),
-                                        new JavaSubForm("g", "h")).asJava))
+            form.fill(
+                new JavaForm(List(new JavaSubForm("a", "b"),
+                                  new JavaSubForm("c", "d"),
+                                  new JavaSubForm("e", "f"),
+                                  new JavaSubForm("g", "h")).asJava))
         ) must exactly("foo[0].a=a,foo[0].b=b",
                        "foo[1].a=c,foo[1].b=d",
                        "foo[2].a=e,foo[2].b=f",

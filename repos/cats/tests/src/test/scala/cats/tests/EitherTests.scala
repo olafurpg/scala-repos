@@ -27,8 +27,8 @@ class EitherTests extends CatsSuite {
   checkAll("Either[?, ?]",
            BitraverseTests[Either]
              .bitraverse[Option, Int, Int, Int, String, String, String])
-  checkAll(
-      "Bitraverse[Either]", SerializableTests.serializable(Bitraverse[Either]))
+  checkAll("Bitraverse[Either]",
+           SerializableTests.serializable(Bitraverse[Either]))
 
   val partialOrder = eitherPartialOrder[Int, String]
   val order = implicitly[Order[Either[Int, String]]]

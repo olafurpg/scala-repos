@@ -45,19 +45,25 @@ class NetUtilTest extends WordSpec {
       assert(
           NetUtil.isPrivateAddress(InetAddress.getByName("0.0.0.0")) == false)
       assert(
-          NetUtil.isPrivateAddress(InetAddress.getByName("199.59.148.13")) == false)
+          NetUtil
+            .isPrivateAddress(InetAddress.getByName("199.59.148.13")) == false)
       assert(
           NetUtil.isPrivateAddress(InetAddress.getByName("10.0.0.0")) == true)
       assert(
-          NetUtil.isPrivateAddress(InetAddress.getByName("10.255.255.255")) == true)
+          NetUtil
+            .isPrivateAddress(InetAddress.getByName("10.255.255.255")) == true)
       assert(
-          NetUtil.isPrivateAddress(InetAddress.getByName("172.16.0.0")) == true)
+          NetUtil
+            .isPrivateAddress(InetAddress.getByName("172.16.0.0")) == true)
       assert(
-          NetUtil.isPrivateAddress(InetAddress.getByName("172.31.255.255")) == true)
+          NetUtil
+            .isPrivateAddress(InetAddress.getByName("172.31.255.255")) == true)
       assert(
-          NetUtil.isPrivateAddress(InetAddress.getByName("192.168.0.0")) == true)
+          NetUtil
+            .isPrivateAddress(InetAddress.getByName("192.168.0.0")) == true)
       assert(
-          NetUtil.isPrivateAddress(InetAddress.getByName("192.168.255.255")) == true)
+          NetUtil
+            .isPrivateAddress(InetAddress.getByName("192.168.255.255")) == true)
     }
 
     "ipToInt" in {
@@ -102,12 +108,16 @@ class NetUtilTest extends WordSpec {
     "isInetAddressInBlock" in {
       val block = NetUtil.cidrToIpBlock("192.168.0.0/16")
 
-      assert(NetUtil.isInetAddressInBlock(InetAddress.getByName("192.168.0.1"),
-                                          block) == true)
-      assert(NetUtil.isInetAddressInBlock(
-              InetAddress.getByName("192.168.255.254"), block) == true)
-      assert(NetUtil.isInetAddressInBlock(InetAddress.getByName("192.169.0.1"),
-                                          block) == false)
+      assert(
+          NetUtil.isInetAddressInBlock(InetAddress.getByName("192.168.0.1"),
+                                       block) == true)
+      assert(
+          NetUtil.isInetAddressInBlock(
+              InetAddress.getByName("192.168.255.254"),
+              block) == true)
+      assert(
+          NetUtil.isInetAddressInBlock(InetAddress.getByName("192.169.0.1"),
+                                       block) == false)
     }
 
     "isIpInBlocks" in {

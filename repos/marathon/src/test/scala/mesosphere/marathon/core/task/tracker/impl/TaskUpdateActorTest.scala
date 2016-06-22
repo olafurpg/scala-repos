@@ -207,7 +207,8 @@ class TaskUpdateActorTest
     f.updateActor.underlyingActor.operationsByTaskId should have size 1
 
     And("but the first task still does have a queue")
-    f.updateActor.underlyingActor.operationsByTaskId(task1Id) should have size 1
+    f.updateActor.underlyingActor
+      .operationsByTaskId(task1Id) should have size 1
   }
 
   test("ops for the same task are processed sequentially") {

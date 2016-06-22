@@ -42,8 +42,9 @@ object Artifact {
         ScalaCombinators,
         ScalaActors)
 
-  private def readProperty(
-      file: File, resource: String, name: String): Option[String] = {
+  private def readProperty(file: File,
+                           resource: String,
+                           name: String): Option[String] = {
     try {
       val url = new URL("jar:%s!/%s".format(file.toURI.toString, resource))
       Option(url.openStream).flatMap(it =>
@@ -101,8 +102,10 @@ object Kind {
   case object Docs extends Kind(".*-javadoc\\.jar")
 }
 
-case class Component(
-    artifact: Artifact, kind: Kind, version: Option[Version], file: File)
+case class Component(artifact: Artifact,
+                     kind: Kind,
+                     version: Option[Version],
+                     file: File)
 
 object Component {
   def discoverIn(files: Seq[File]): Seq[Component] = {

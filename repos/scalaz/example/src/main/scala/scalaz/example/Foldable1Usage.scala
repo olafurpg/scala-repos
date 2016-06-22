@@ -23,14 +23,16 @@ object Foldable1Usage extends App {
   // values using the semigroup append:
   assert(
       Foldable1[NonEmptyList].foldMap1(NonEmptyList(1, 2, 3))(identity) === 6)
-  assert(Foldable1[NonEmptyList].foldMap1(NonEmptyList("1", "2", "3"))(
-          identity) === "123")
+  assert(
+      Foldable1[NonEmptyList]
+        .foldMap1(NonEmptyList("1", "2", "3"))(identity) === "123")
   assert(NonEmptyList(1, 2, 3).foldMap1(identity) === 6)
   assert(NonEmptyList("1", "2", "3").foldMap1(identity) === "123")
 
   // or with a slightly less trivial function:
   assert(
-      Foldable1[NonEmptyList].foldMap1(NonEmptyList(1, 2, 3))(_.toString) === "123")
+      Foldable1[NonEmptyList]
+        .foldMap1(NonEmptyList(1, 2, 3))(_.toString) === "123")
   assert(NonEmptyList(1, 2, 3).foldMap1(_.toString) === "123")
 
   // Here's a simple binary tree definition.

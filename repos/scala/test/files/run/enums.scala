@@ -44,8 +44,8 @@ object Test3 {
   }
 
   def run: Int = {
-    val it = for (d <- Direction.values; if d.toString() startsWith "N") yield
-      d;
+    val it = for (d <- Direction.values; if d.toString() startsWith "N")
+      yield d;
     it.toList.length
   }
 }
@@ -140,9 +140,9 @@ object Test {
       }
     } catch {
       case exception: Throwable => {
-          Console.print(" raised exception " + exception);
-          exception.printStackTrace();
-        }
+        Console.print(" raised exception " + exception);
+        exception.printStackTrace();
+      }
     }
     Console.println;
   }

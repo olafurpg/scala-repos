@@ -6,7 +6,8 @@ import mesosphere.marathon.{MarathonScheduler, MarathonSchedulerDriverHolder, Sc
 import org.apache.mesos.SchedulerDriver
 
 class SimulatedSchedulerDriverFactory @Inject()(
-    holder: MarathonSchedulerDriverHolder, newScheduler: MarathonScheduler)
+    holder: MarathonSchedulerDriverHolder,
+    newScheduler: MarathonScheduler)
     extends SchedulerDriverFactory {
 
   override def createDriver(): SchedulerDriver = {

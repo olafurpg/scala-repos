@@ -83,8 +83,7 @@ class RestartStrategySpec
 
       val countDownLatch = new TestLatch(100)
 
-      val slaveProps = Props(
-          new Actor {
+      val slaveProps = Props(new Actor {
 
         def receive = {
           case Crash ⇒ throw new Exception("Crashing...")
@@ -105,9 +104,10 @@ class RestartStrategySpec
     }
 
     "ensure that slave restarts after number of crashes not within time range" in {
-      val boss = system.actorOf(Props(new Supervisor(OneForOneStrategy(
-                      maxNrOfRetries = 2, withinTimeRange = 500 millis)(List(
-                          classOf[Throwable])))))
+      val boss = system.actorOf(
+          Props(new Supervisor(OneForOneStrategy(maxNrOfRetries = 2,
+                                                 withinTimeRange = 500 millis)(
+                      List(classOf[Throwable])))))
 
       val restartLatch = new TestLatch
       val secondRestartLatch = new TestLatch

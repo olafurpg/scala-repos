@@ -56,7 +56,8 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
           val maybeGroup = result(groupManager.group(groupPath))
           withAuthorization(ViewGroup, maybeGroup, unknownGroup(groupPath)) {
             group =>
-              ok(jsonObjString(
+              ok(
+                  jsonObjString(
                       "tasks" -> runningTasks(group.transitiveApps.map(_.id))))
           }
         case _ =>

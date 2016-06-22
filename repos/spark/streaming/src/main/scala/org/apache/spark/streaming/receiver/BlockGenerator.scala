@@ -80,8 +80,7 @@ private[streaming] class BlockGenerator(
     receiverId: Int,
     conf: SparkConf,
     clock: Clock = new SystemClock()
-)
-    extends RateLimiter(conf)
+) extends RateLimiter(conf)
     with Logging {
 
   private case class Block(id: StreamBlockId, buffer: ArrayBuffer[Any])
@@ -109,8 +108,10 @@ private[streaming] class BlockGenerator(
   require(blockIntervalMs > 0,
           s"'spark.streaming.blockInterval' should be a positive value")
 
-  private val blockIntervalTimer = new RecurringTimer(
-      clock, blockIntervalMs, updateCurrentBuffer, "BlockGenerator")
+  private val blockIntervalTimer = new RecurringTimer(clock,
+                                                      blockIntervalMs,
+                                                      updateCurrentBuffer,
+                                                      "BlockGenerator")
   private val blockQueueSize =
     conf.getInt("spark.streaming.blockQueueSize", 10)
   private val blocksForPushing = new ArrayBlockingQueue[Block](blockQueueSize)
@@ -212,8 +213,8 @@ private[streaming] class BlockGenerator(
     * `BlockGeneratorListener.onAddData` callback will be called. Note that all the data items
     * are atomically added to the buffer, and are hence guaranteed to be present in a single block.
     */
-  def addMultipleDataWithCallback(
-      dataIterator: Iterator[Any], metadata: Any): Unit = {
+  def addMultipleDataWithCallback(dataIterator: Iterator[Any],
+                                  metadata: Any): Unit = {
     if (state == Active) {
       // Unroll iterator into a temp buffer, and wait for pushing in the process
       val tempBuffer = new ArrayBuffer[Any]

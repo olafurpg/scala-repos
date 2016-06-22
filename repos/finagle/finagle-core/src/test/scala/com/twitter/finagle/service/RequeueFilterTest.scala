@@ -32,7 +32,8 @@ class RequeueFilterTest extends FunSuite {
     }
 
     assert(minRetries * percentRequeues == stats.counter("requeues")())
-    assert(Seq(minRetries * percentRequeues) == stats.stat(
+    assert(
+        Seq(minRetries * percentRequeues) == stats.stat(
             "requeues_per_request")())
     // the budget is not considered exhausted if we only used
     // our maxRetriesPerReq
@@ -83,8 +84,7 @@ class RequeueFilterTest extends FunSuite {
                                      DefaultTimer.twitter)
 
     var numNos = 0
-    val svc = filter.andThen(
-        Service.mk { s: String =>
+    val svc = filter.andThen(Service.mk { s: String =>
       if (s == "no" && numNos == 0) {
         numNos += 1
         Future.exception(new FailedFastException(s))

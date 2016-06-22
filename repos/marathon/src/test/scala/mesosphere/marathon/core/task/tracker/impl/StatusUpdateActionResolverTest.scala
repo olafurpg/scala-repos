@@ -42,8 +42,10 @@ class StatusUpdateActionResolverTest
 
     And("a fail action is returned")
     action.getClass should be(classOf[TaskOpProcessor.Action.Fail])
-    action.asInstanceOf[TaskOpProcessor.Action.Fail].cause.getMessage should equal(
-        s"$taskId of app [$appId] does not exist")
+    action
+      .asInstanceOf[TaskOpProcessor.Action.Fail]
+      .cause
+      .getMessage should equal(s"$taskId of app [$appId] does not exist")
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()

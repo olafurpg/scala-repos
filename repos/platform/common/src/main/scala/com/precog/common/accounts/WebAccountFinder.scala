@@ -108,8 +108,9 @@ class WebAccountFinder(protocol: String,
   implicit val M: Monad[Future] = new FutureMonad(executor)
 
   def findAccountByAPIKey(apiKey: APIKey): Response[Option[AccountId]] = {
-    logger.debug("Finding account for API key " + apiKey + " with " +
-        (protocol, host, port, path, user, password).toString)
+    logger.debug(
+        "Finding account for API key " + apiKey + " with " +
+          (protocol, host, port, path, user, password).toString)
     invoke { client =>
       logger.info("Querying accounts service for API key %s".format(apiKey))
       eitherT(client.query("apiKey", apiKey).get[JValue]("/accounts/") map {
@@ -127,15 +128,15 @@ class WebAccountFinder(protocol: String,
         case res =>
           logger.error(
               "Unexpected response from accounts service for findAccountByAPIKey: " +
-              res)
+                res)
           left("Unexpected response from accounts service; unable to proceed: " +
-              res)
+                res)
       } recoverWith {
         case ex =>
           logger.error("findAccountByAPIKey for " + apiKey + "failed.", ex)
           Promise.successful(
               left("Client error accessing accounts service; unable to proceed: " +
-                  ex.getMessage))
+                    ex.getMessage))
       })
     }
   }
@@ -153,15 +154,15 @@ class WebAccountFinder(protocol: String,
         case res =>
           logger.error(
               "Unexpected response from accounts serviceon findAccountDetailsById: " +
-              res)
+                res)
           left("Unexpected response from accounts service; unable to proceed: " +
-              res)
+                res)
       } recoverWith {
         case ex =>
           logger.error("findAccountById for " + accountId + "failed.", ex)
           Promise.successful(
               left("Client error accessing accounts service; unable to proceed: " +
-                  ex.getMessage))
+                    ex.getMessage))
       })
     }
   }

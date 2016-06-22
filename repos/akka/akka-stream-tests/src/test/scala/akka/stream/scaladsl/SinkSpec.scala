@@ -21,11 +21,10 @@ class SinkSpec extends AkkaSpec {
 
     "be composable without importing modules" in {
       val probes = Array.fill(3)(TestSubscriber.manualProbe[Int])
-      val sink = Sink.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      val sink = Sink.fromGraph(GraphDSL.create() { implicit b ⇒
         val bcast = b.add(Broadcast[Int](3))
-        for (i ← 0 to 2) bcast.out(i).filter(_ == i) ~> Sink.fromSubscriber(
-            probes(i))
+        for (i ← 0 to 2)
+          bcast.out(i).filter(_ == i) ~> Sink.fromSubscriber(probes(i))
         SinkShape(bcast.in)
       })
       Source(List(0, 1, 2)).runWith(sink)
@@ -40,14 +39,15 @@ class SinkSpec extends AkkaSpec {
 
     "be composable with importing 1 module" in {
       val probes = Array.fill(3)(TestSubscriber.manualProbe[Int])
-      val sink = Sink.fromGraph(
-          GraphDSL.create(Sink.fromSubscriber(probes(0))) { implicit b ⇒ s0 ⇒
-        val bcast = b.add(Broadcast[Int](3))
-        bcast.out(0) ~> Flow[Int].filter(_ == 0) ~> s0.in
-        for (i ← 1 to 2) bcast.out(i).filter(_ == i) ~> Sink.fromSubscriber(
-            probes(i))
-        SinkShape(bcast.in)
-      })
+      val sink =
+        Sink.fromGraph(GraphDSL.create(Sink.fromSubscriber(probes(0))) {
+          implicit b ⇒ s0 ⇒
+            val bcast = b.add(Broadcast[Int](3))
+            bcast.out(0) ~> Flow[Int].filter(_ == 0) ~> s0.in
+            for (i ← 1 to 2)
+              bcast.out(i).filter(_ == i) ~> Sink.fromSubscriber(probes(i))
+            SinkShape(bcast.in)
+        })
       Source(List(0, 1, 2)).runWith(sink)
 
       val subscriptions = probes.map(_.expectSubscription())

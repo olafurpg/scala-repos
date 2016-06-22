@@ -33,7 +33,8 @@ import org.apache.spark.util.Utils
   * sequence of records returned by the mapping function of `mapWithState`.
   */
 private[streaming] case class MapWithStateRDDRecord[K, S, E](
-    var stateMap: StateMap[K, S], var mappedData: Seq[E])
+    var stateMap: StateMap[K, S],
+    var mappedData: Seq[E])
 
 private[streaming] object MapWithStateRDDRecord {
   def updateRecordWithData[K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
@@ -123,15 +124,16 @@ private[streaming] class MapWithStateRDDPartition(
   * @param batchTime        The time of the batch to which this RDD belongs to. Use to update
   * @param timeoutThresholdTime The time to indicate which keys are timeout
   */
-private[streaming] class MapWithStateRDD[
-    K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
+private[streaming] class MapWithStateRDD[K: ClassTag,
+                                         V: ClassTag,
+                                         S: ClassTag,
+                                         E: ClassTag](
     private var prevStateRDD: RDD[MapWithStateRDDRecord[K, S, E]],
     private var partitionedDataRDD: RDD[(K, V)],
     mappingFunction: (Time, K, Option[V], State[S]) => Option[E],
     batchTime: Time,
     timeoutThresholdTime: Option[Long]
-)
-    extends RDD[MapWithStateRDDRecord[K, S, E]](
+) extends RDD[MapWithStateRDDRecord[K, S, E]](
         partitionedDataRDD.sparkContext,
         List(new OneToOneDependency[MapWithStateRDDRecord[K, S, E]](
                  prevStateRDD),
@@ -155,10 +157,10 @@ private[streaming] class MapWithStateRDD[
       context: TaskContext): Iterator[MapWithStateRDDRecord[K, S, E]] = {
 
     val stateRDDPartition = partition.asInstanceOf[MapWithStateRDDPartition]
-    val prevStateRDDIterator = prevStateRDD.iterator(
-        stateRDDPartition.previousSessionRDDPartition, context)
-    val dataIterator = partitionedDataRDD.iterator(
-        stateRDDPartition.partitionedDataRDDPartition, context)
+    val prevStateRDDIterator = prevStateRDD
+      .iterator(stateRDDPartition.previousSessionRDDPartition, context)
+    val dataIterator = partitionedDataRDD
+      .iterator(stateRDDPartition.partitionedDataRDDPartition, context)
 
     val prevRecord =
       if (prevStateRDDIterator.hasNext) Some(prevStateRDDIterator.next())
@@ -169,8 +171,7 @@ private[streaming] class MapWithStateRDD[
         mappingFunction,
         batchTime,
         timeoutThresholdTime,
-        removeTimedoutData =
-          doFullScan // remove timedout data only when full scan is enabled
+        removeTimedoutData = doFullScan // remove timedout data only when full scan is enabled
     )
     Iterator(newRecord)
   }
@@ -216,8 +217,11 @@ private[streaming] object MapWithStateRDD {
     val noOpFunc = (time: Time, key: K, value: Option[V], state: State[S]) =>
       None
 
-    new MapWithStateRDD[K, V, S, E](
-        stateRDD, emptyDataRDD, noOpFunc, updateTime, None)
+    new MapWithStateRDD[K, V, S, E](stateRDD,
+                                    emptyDataRDD,
+                                    noOpFunc,
+                                    updateTime,
+                                    None)
   }
 
   def createFromRDD[K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
@@ -245,7 +249,10 @@ private[streaming] object MapWithStateRDD {
     val noOpFunc = (time: Time, key: K, value: Option[V], state: State[S]) =>
       None
 
-    new MapWithStateRDD[K, V, S, E](
-        stateRDD, emptyDataRDD, noOpFunc, updateTime, None)
+    new MapWithStateRDD[K, V, S, E](stateRDD,
+                                    emptyDataRDD,
+                                    noOpFunc,
+                                    updateTime,
+                                    None)
   }
 }

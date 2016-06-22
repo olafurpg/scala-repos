@@ -26,9 +26,10 @@ trait MockSbt {
                            "main",
                            "main-settings",
                            "process",
-                           "sbt").map(n =>
+                           "sbt").map(
+        n =>
           new File(TestUtils.getIvyCachePath +
-              s"/org.scala-sbt/$n/jars/$n-0.13.5.jar"))
+                s"/org.scala-sbt/$n/jars/$n-0.13.5.jar"))
     val scala210 = ScalaSdkVersion._2_10
     val scalaLibraryJars = Seq(
         TestUtils.getScalaLibraryPath(scala210),

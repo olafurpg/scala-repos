@@ -12,8 +12,8 @@ import akka.stream.testkit.ScriptedTest
 
 class FlowGroupedSpec extends AkkaSpec with ScriptedTest {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   "A Grouped" must {
 

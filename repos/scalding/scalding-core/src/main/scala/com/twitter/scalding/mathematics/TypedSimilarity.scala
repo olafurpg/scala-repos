@@ -119,8 +119,8 @@ trait TypedSimilarity[N, E, S] extends Serializable {
 }
 
 object TypedSimilarity extends Serializable {
-  private def maybeWithReducers[T <: WithReducers[T]](
-      withReds: T, reds: Option[Int]) =
+  private def maybeWithReducers[T <: WithReducers[T]](withReds: T,
+                                                      reds: Option[Int]) =
     reds match {
       case Some(i) => withReds.withReducers(i)
       case None => withReds
@@ -278,8 +278,10 @@ class ExactInCosine[N](reducers: Int = -1)(
   * see: http://arxiv.org/pdf/1206.2082v2.pdf for more details
   */
 class DiscoInCosine[N](
-    minCos: Double, delta: Double, boundedProb: Double, reducers: Int = -1)(
-    implicit override val nodeOrdering: Ordering[N])
+    minCos: Double,
+    delta: Double,
+    boundedProb: Double,
+    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, InDegree, Double] {
 
   // The probability of being more than delta error is approx:
@@ -301,14 +303,16 @@ class DiscoInCosine[N](
       (e.from, (e.to, e.data.degree))
     }.group.withReducers(reducers)
 
-    TypedSimilarity.discoCosineSimilarity(
-        smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+    TypedSimilarity
+      .discoCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
   }
 }
 
 class DimsumInCosine[N](
-    minCos: Double, delta: Double, boundedProb: Double, reducers: Int = -1)(
-    implicit override val nodeOrdering: Ordering[N])
+    minCos: Double,
+    delta: Double,
+    boundedProb: Double,
+    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, (Weight, L2Norm), Double] {
 
   // The probability of being more than delta error is approx:
@@ -330,7 +334,7 @@ class DimsumInCosine[N](
       (e.from, (e.to, e.data._1.weight, e.data._2.norm))
     }.group.withReducers(reducers)
 
-    TypedSimilarity.dimsumCosineSimilarity(
-        smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+    TypedSimilarity
+      .dimsumCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
   }
 }

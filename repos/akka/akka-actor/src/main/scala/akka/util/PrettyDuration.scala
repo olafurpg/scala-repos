@@ -19,8 +19,9 @@ object PrettyDuration {
     * JAVA API
     * Selects most apropriate TimeUnit for given duration and formats it accordingly
     */
-  def format(
-      duration: Duration, includeNanos: Boolean, precision: Int): String =
+  def format(duration: Duration,
+             includeNanos: Boolean,
+             precision: Int): String =
     duration.pretty(includeNanos, precision)
 
   implicit class PrettyPrintableDuration(val duration: Duration)

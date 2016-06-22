@@ -28,8 +28,8 @@ class ScalaReadWriteAccessDetector extends ReadWriteAccessDetector {
       case _ => false
     }
   }
-  def getReferenceAccess(
-      referencedElement: PsiElement, reference: PsiReference): Access =
+  def getReferenceAccess(referencedElement: PsiElement,
+                         reference: PsiReference): Access =
     getExpressionAccess(reference.getElement)
 
   def isDeclarationWriteAccess(element: PsiElement): Boolean = {

@@ -20,15 +20,18 @@ object MetricSpace extends MetricSpace0 {
     * Returns `true` iff the distance between `x` and `y` is less than or equal
     * to `tolerance`.
     */
-  def closeTo[V, @sp(Int, Long, Float, Double) R](
-      x: V, y: V, tolerance: Double)(
-      implicit R: IsReal[R], metric: MetricSpace[V, R]): Boolean =
+  def closeTo[V, @sp(Int, Long, Float, Double) R](x: V,
+                                                  y: V,
+                                                  tolerance: Double)(
+      implicit R: IsReal[R],
+      metric: MetricSpace[V, R]): Boolean =
     R.toDouble(metric.distance(x, y)) <= tolerance
 }
 
 private[algebra] trait MetricSpace0 {
   implicit def realMetricSpace[@sp(Int, Long, Float, Double) R](
-      implicit R0: IsReal[R], R1: Rng[R]): MetricSpace[R, R] =
+      implicit R0: IsReal[R],
+      R1: Rng[R]): MetricSpace[R, R] =
     new MetricSpace[R, R] {
       def distance(v: R, w: R): R = R0.abs(R1.minus(v, w))
     }

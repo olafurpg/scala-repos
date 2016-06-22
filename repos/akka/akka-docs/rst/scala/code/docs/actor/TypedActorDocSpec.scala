@@ -121,7 +121,8 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
     //#typed-actor-create1
     //#typed-actor-create2
     val otherSquarer: Squarer = TypedActor(system).typedActorOf(
-        TypedProps(classOf[Squarer], new SquarerImpl("foo")), "name")
+        TypedProps(classOf[Squarer], new SquarerImpl("foo")),
+        "name")
     //#typed-actor-create2
 
     //#typed-actor-calls
@@ -160,8 +161,8 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
   "proxy any ActorRef" in {
     val actorRefToRemoteActor: ActorRef = system.deadLetters
     //#typed-actor-remote
-    val typedActor: Foo with Bar = TypedActor(system).typedActorOf(
-        TypedProps[FooBar], actorRefToRemoteActor)
+    val typedActor: Foo with Bar = TypedActor(system)
+      .typedActorOf(TypedProps[FooBar], actorRefToRemoteActor)
     //Use "typedActor" as a FooBar
     //#typed-actor-remote
   }

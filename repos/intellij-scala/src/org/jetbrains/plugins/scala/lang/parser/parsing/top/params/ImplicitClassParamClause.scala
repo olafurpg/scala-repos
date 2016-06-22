@@ -30,12 +30,12 @@ object ImplicitClassParamClause {
         //Look for implicit
         builder.getTokenType match {
           case ScalaTokenTypes.kIMPLICIT => {
-              //It's ok
-              builder.advanceLexer //Ate implicit
-            }
+            //It's ok
+            builder.advanceLexer //Ate implicit
+          }
           case _ => {
-              builder error ErrMsg("wrong.parameter")
-            }
+            builder error ErrMsg("wrong.parameter")
+          }
         }
         //ok, let's parse parameters
         if (!(ClassParam parse builder)) {

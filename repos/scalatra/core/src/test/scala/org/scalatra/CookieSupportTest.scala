@@ -39,8 +39,8 @@ class CookieSupportServlet extends ScalatraServlet {
 
   post("/remove-cookie") {
     cookies -= "somecookie"
-    response.setHeader(
-        "Somecookie-Is-Defined", cookies.get("somecookie").isDefined.toString)
+    response.setHeader("Somecookie-Is-Defined",
+                       cookies.get("somecookie").isDefined.toString)
   }
 
   post("/remove-cookie-with-path") {

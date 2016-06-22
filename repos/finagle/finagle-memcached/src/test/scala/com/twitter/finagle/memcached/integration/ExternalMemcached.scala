@@ -28,8 +28,7 @@ private[memcached] object InternalMemcached {
           address.getOrElse(
               new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
       )
-      Some(
-          new TestMemcachedServer {
+      Some(new TestMemcachedServer {
         val address =
           server.start().boundAddress.asInstanceOf[InetSocketAddress]
         def stop() { server.stop(true) }
@@ -91,8 +90,7 @@ private[memcached] object ExternalMemcached { self =>
         processes :+= proc
 
         if (waitForPort(addr.getPort))
-          Some(
-              new TestMemcachedServer {
+          Some(new TestMemcachedServer {
             val address = addr
             def stop() {
               proc.destroy()

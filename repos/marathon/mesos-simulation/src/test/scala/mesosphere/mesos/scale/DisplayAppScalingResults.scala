@@ -12,8 +12,11 @@ object DisplayAppScalingResults {
     val appInfos: Seq[JsObject] =
       ScalingTestResultFiles.readJson[Seq[JsObject]](fileName)
 
-    val header = IndexedSeq(
-        "relative time (ms)", "staged", "running", "newRunning/s", "instances")
+    val header = IndexedSeq("relative time (ms)",
+                            "staged",
+                            "running",
+                            "newRunning/s",
+                            "instances")
     var lastTimestamp: Long = 0
     var lastRunning: Long = 0
     val rows = appInfos.map { jsObject: JsObject =>

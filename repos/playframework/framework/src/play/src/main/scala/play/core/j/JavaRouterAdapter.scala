@@ -23,8 +23,9 @@ class JavaRouterAdapter @Inject()(underlying: play.api.routing.Router)
   def documentation() =
     asScala.documentation.map {
       case (httpMethod, pathPattern, controllerMethodInvocation) =>
-        new RouteDocumentation(
-            httpMethod, pathPattern, controllerMethodInvocation)
+        new RouteDocumentation(httpMethod,
+                               pathPattern,
+                               controllerMethodInvocation)
     }.asJava
   def asScala = underlying
 }

@@ -57,8 +57,8 @@ object TimePathedSource extends java.io.Serializable {
           case None => None
           case Some(newInit) if newInit.contains(init) =>
             sys.error(
-                "DateRange expansion ill-behaved: %s -> %s -> %s -> %s".format(
-                    init, expanded, subset, newInit))
+                "DateRange expansion ill-behaved: %s -> %s -> %s -> %s"
+                  .format(init, expanded, subset, newInit))
           case Some(newInit) => minifyRec(newInit, expander, vertractor)
         }
     }

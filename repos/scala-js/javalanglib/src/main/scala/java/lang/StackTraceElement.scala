@@ -28,9 +28,9 @@ final class StackTraceElement(declaringClass: String,
   override def equals(that: Any): scala.Boolean = that match {
     case that: StackTraceElement =>
       (getFileName == that.getFileName) &&
-      (getLineNumber == that.getLineNumber) &&
-      (getClassName == that.getClassName) &&
-      (getMethodName == that.getMethodName)
+        (getLineNumber == that.getLineNumber) &&
+        (getClassName == that.getClassName) &&
+        (getMethodName == that.getMethodName)
     case _ =>
       false
   }

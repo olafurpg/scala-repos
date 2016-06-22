@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TransformSpec
     extends SimpleSFXDelegateSpec[jfxst.Transform, Transform](
-        classOf[jfxst.Transform], classOf[Transform]) {
+        classOf[jfxst.Transform],
+        classOf[Transform]) {
 
   override def getScalaClassInstance = new Transform(getJavaClassInstance) {}
 

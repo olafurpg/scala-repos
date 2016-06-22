@@ -24,7 +24,8 @@ private[timeline] final class EntryRepo(coll: Coll, userMax: Int) {
 
   def findRecent(typ: String, since: DateTime) =
     coll
-      .find(BSONDocument(
+      .find(
+          BSONDocument(
               "typ" -> typ,
               "date" -> BSONDocument("$gt" -> since)
           ))

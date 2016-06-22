@@ -19,7 +19,9 @@ object ServiceRegistrySpec extends MultiNodeConfig {
   val node2 = role("node-2")
   val node3 = role("node-3")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
@@ -94,8 +96,10 @@ class ServiceRegistrySpec
       }
 
       probe.within(10.seconds) {
-        probe.expectMsgType[BindingChanged].services.map(_.path.name) should be(
-            Set("a1", "a2"))
+        probe
+          .expectMsgType[BindingChanged]
+          .services
+          .map(_.path.name) should be(Set("a1", "a2"))
         registry.tell(Lookup("a"), probe.ref)
         probe.expectMsgType[Bindings].services.map(_.path.name) should be(
             Set("a1", "a2"))
@@ -116,8 +120,10 @@ class ServiceRegistrySpec
       }
 
       probe.within(10.seconds) {
-        probe.expectMsgType[BindingChanged].services.map(_.path.name) should be(
-            Set("a1"))
+        probe
+          .expectMsgType[BindingChanged]
+          .services
+          .map(_.path.name) should be(Set("a1"))
         registry.tell(Lookup("a"), probe.ref)
         probe.expectMsgType[Bindings].services.map(_.path.name) should be(
             Set("a1"))

@@ -22,8 +22,8 @@ class SbtPluginLayoutFactory extends RepositoryLayoutFactory {
       case SbtRepositoryLayout.LAYOUT_NAME =>
         SbtRepositoryLayout
       case _ =>
-        throw new NoRepositoryLayoutException(
-            repository, "Not an sbt-plugin repository")
+        throw new NoRepositoryLayoutException(repository,
+                                              "Not an sbt-plugin repository")
     }
   }
   def getPriority: Float = 100.0f

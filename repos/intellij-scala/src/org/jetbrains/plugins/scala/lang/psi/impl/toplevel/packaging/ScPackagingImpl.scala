@@ -127,10 +127,9 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
   def declaredElements = {
     val _prefix = prefix
     val packageName = getPackageName
-    val topRefName =
-      if (packageName.indexOf(".") != -1) {
-        packageName.substring(0, packageName.indexOf("."))
-      } else packageName
+    val topRefName = if (packageName.indexOf(".") != -1) {
+      packageName.substring(0, packageName.indexOf("."))
+    } else packageName
     val top =
       if (_prefix.length > 0) _prefix + "." + topRefName else topRefName
     val p = ScPackageImpl(
@@ -170,12 +169,14 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     }
 
     if (lastParent != null && lastParent.getContext == this) {
-      if (!super [ScImportsHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+      if (!super[ScImportsHolder]
+            .processDeclarations(processor, state, lastParent, place))
+        return false
 
       if (ScalaFileImpl.isProcessLocalClasses(lastParent) &&
-          !super [ScDeclarationSequenceHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+          !super[ScDeclarationSequenceHolder]
+            .processDeclarations(processor, state, lastParent, place))
+        return false
     }
 
     true
@@ -192,11 +193,12 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     if (isExplicit) {
       val startOffset =
         findChildByType[PsiElement](ScalaTokenTypes.tLBRACE).getTextRange.getEndOffset -
-        getTextRange.getStartOffset
+          getTextRange.getStartOffset
       val text = getText
-      val endOffset =
-        if (text.apply(text.length - 1) == '}') { text.length - 1 } else
-          text.length
+      val endOffset = if (text.apply(text.length - 1) == '}') {
+        text.length - 1
+      } else
+        text.length
       text.substring(startOffset, endOffset)
     } else {
       val text = getText

@@ -12,8 +12,7 @@ import io.prediction.controller.Params // ADDED
 // ADDED CustomPreparatorParams case class
 case class CustomPreparatorParams(
     filepath: String
-)
-    extends Params
+) extends Params
 
 class Preparator(pp: CustomPreparatorParams) // ADDED CustomPreparatorParams
     extends PPreparator[TrainingData, PreparedData] {
@@ -28,5 +27,4 @@ class Preparator(pp: CustomPreparatorParams) // ADDED CustomPreparatorParams
 
 class PreparedData(
     val ratings: RDD[Rating]
-)
-    extends Serializable
+) extends Serializable

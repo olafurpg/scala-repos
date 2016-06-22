@@ -130,7 +130,7 @@ class VecStatsCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val data = v.contents
         v.countif(_ > 0.5) must_==
-          data.filter(_ > 0.5).foldLeft(0)((x, y) => x + 1)
+        data.filter(_ > 0.5).foldLeft(0)((x, y) => x + 1)
       }
     }
 
@@ -140,7 +140,7 @@ class VecStatsCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val data = v.contents.filter(!_.isNaN)
         v.countif(_ > 0.5) must_==
-          data.filter(_ > 0.5).foldLeft(0)((x, y) => x + 1)
+        data.filter(_ > 0.5).foldLeft(0)((x, y) => x + 1)
       }
     }
 
@@ -470,7 +470,7 @@ class VecStatsCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Long]) =>
         val data = v.contents
         v.countif(_ > 0) must_==
-          data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
+        data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
       }
     }
 
@@ -480,7 +480,7 @@ class VecStatsCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Long]) =>
         val data = v.contents.filter(_ != Long.MinValue)
         v.countif(_ > 0) must_==
-          data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
+        data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
       }
     }
 
@@ -776,7 +776,7 @@ class VecStatsCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Int]) =>
         val data = v.contents
         v.countif(_ > 0) must_==
-          data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
+        data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
       }
     }
 
@@ -786,7 +786,7 @@ class VecStatsCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Int]) =>
         val data = v.contents.filter(_ != Int.MinValue)
         v.countif(_ > 0) must_==
-          data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
+        data.filter(_ > 0).foldLeft(0)((x, y) => x + 1)
       }
     }
 

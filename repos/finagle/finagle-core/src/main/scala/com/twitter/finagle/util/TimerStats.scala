@@ -37,12 +37,13 @@ private[finagle] object TimerStats {
         val deltaMillis = nowMillis - nextAtMillis
         nextAtMillis = nowMillis + tickDuration.inMilliseconds
         deviation.add(deltaMillis)
-        hwt.newTimeout(
-            this, tickDuration.inMilliseconds, TimeUnit.MILLISECONDS)
+        hwt
+          .newTimeout(this, tickDuration.inMilliseconds, TimeUnit.MILLISECONDS)
       }
     }
-    hwt.newTimeout(
-        timerTask, tickDuration.inMilliseconds, TimeUnit.MILLISECONDS)
+    hwt.newTimeout(timerTask,
+                   tickDuration.inMilliseconds,
+                   TimeUnit.MILLISECONDS)
   }
 
   /**
@@ -85,8 +86,7 @@ private[finagle] object TimerStats {
 
     def bucketTimeouts(hashedWheelBucket: Object): Int = {
       bucketHeadField.map { headField =>
-        val head =
-          headField.get(hashedWheelBucket) // this is a HashedWheelTimeout
+        val head = headField.get(hashedWheelBucket) // this is a HashedWheelTimeout
         if (head == null) {
           0
         } else {
@@ -125,7 +125,7 @@ private[finagle] object TimerStats {
         hwt.newTimeout(this, nextRunAt().inMilliseconds, TimeUnit.MILLISECONDS)
       }
     }
-    hwt.newTimeout(
-        timerTask, nextRunAt().inMilliseconds, TimeUnit.MILLISECONDS)
+    hwt
+      .newTimeout(timerTask, nextRunAt().inMilliseconds, TimeUnit.MILLISECONDS)
   }
 }

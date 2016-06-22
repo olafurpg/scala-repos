@@ -4,7 +4,7 @@ import scala.tools.partest._
 object Test extends DirectTest {
   override def extraSettings: String =
     "-usejavacp -Ystop-after:parser -Yshow-member-pos \"\" -d " +
-    testOutput.path
+      testOutput.path
   override def show() = compile()
   override def code = """
 class A(val a: Int = 1) {

@@ -20,7 +20,7 @@ object Bits {
   private[this] val _areTypedArraysSupported = {
     // Here we use `assumingES6` to dce the 4 subsequent tests
     assumingES6 || js.DynamicImplicits.truthValue(global.ArrayBuffer &&
-        global.Int32Array && global.Float32Array && global.Float64Array)
+          global.Int32Array && global.Float32Array && global.Float64Array)
   }
 
   @inline
@@ -174,8 +174,11 @@ object Bits {
     (hi.toLong << 32) | (lo.toLong & 0xffffffffL)
   }
 
-  @inline private def decodeIEEE754(
-      ebits: Int, fbits: Int, s: Boolean, e: Int, f: Double): Double = {
+  @inline private def decodeIEEE754(ebits: Int,
+                                    fbits: Int,
+                                    s: Boolean,
+                                    e: Int,
+                                    f: Double): Double = {
 
     import Math.pow
 
@@ -200,8 +203,9 @@ object Bits {
     }
   }
 
-  @inline private def encodeIEEE754(
-      ebits: Int, fbits: Int, v: Double): (Boolean, Int, Double) = {
+  @inline private def encodeIEEE754(ebits: Int,
+                                    fbits: Int,
+                                    v: Double): (Boolean, Int, Double) = {
 
     import Math._
 

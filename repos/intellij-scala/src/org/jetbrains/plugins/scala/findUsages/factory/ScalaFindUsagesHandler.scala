@@ -30,8 +30,8 @@ import _root_.scala.collection.mutable
   * User: Alexander Podkhalyuzin
   * Date: 17.08.2009
   */
-class ScalaFindUsagesHandler(
-    element: PsiElement, factory: ScalaFindUsagesHandlerFactory)
+class ScalaFindUsagesHandler(element: PsiElement,
+                             factory: ScalaFindUsagesHandlerFactory)
     extends FindUsagesHandler(element) {
 
   override def getPrimaryElements: Array[PsiElement] = Array(element)
@@ -116,7 +116,8 @@ class ScalaFindUsagesHandler(
               Array(IS_GETTER, SETTER)
             case _ => Array.empty
           }
-          a.map(role =>
+          a.map(
+              role =>
                 t.getTypedDefinitionWrapper(isStatic = false,
                                             isInterface = false,
                                             role = role,
@@ -140,8 +141,8 @@ class ScalaFindUsagesHandler(
                                             isSingleFile,
                                             this)
       case _ =>
-        super.getFindUsagesDialog(
-            isSingleFile, toShowInNewTab, mustOpenInNewTab)
+        super
+          .getFindUsagesDialog(isSingleFile, toShowInNewTab, mustOpenInNewTab)
     }
   }
 
@@ -217,8 +218,7 @@ class ScalaFindUsagesHandler(
           val res = new mutable.HashSet[PsiClass]()
           ClassInheritorsSearch
             .search(clazz, true)
-            .forEach(
-                new Processor[PsiClass] {
+            .forEach(new Processor[PsiClass] {
               def process(t: PsiClass): Boolean = {
                 t match {
                   case p: PsiClassWrapper =>
@@ -238,8 +238,8 @@ class ScalaFindUsagesHandler(
     inReadAction {
       element match {
         case function: ScFunction if !function.isLocal =>
-          for (elem <- ScalaOverridingMemberSearcher.search(
-                          function, deep = true)) {
+          for (elem <- ScalaOverridingMemberSearcher.search(function,
+                                                            deep = true)) {
             val processed =
               super.processElementUsages(elem, processor, options)
             if (!processed) return false
@@ -251,5 +251,6 @@ class ScalaFindUsagesHandler(
   }
 
   override def isSearchForTextOccurencesAvailable(
-      psiElement: PsiElement, isSingleFile: Boolean): Boolean = !isSingleFile
+      psiElement: PsiElement,
+      isSingleFile: Boolean): Boolean = !isSingleFile
 }

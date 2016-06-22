@@ -91,8 +91,8 @@ object Statistics {
     * Java-friendly version of [[corr()]]
     */
   @Since("1.4.1")
-  def corr(
-      x: JavaRDD[java.lang.Double], y: JavaRDD[java.lang.Double]): Double =
+  def corr(x: JavaRDD[java.lang.Double],
+           y: JavaRDD[java.lang.Double]): Double =
     corr(x.rdd.asInstanceOf[RDD[Double]], y.rdd.asInstanceOf[RDD[Double]])
 
   /**
@@ -234,7 +234,8 @@ object Statistics {
   def kolmogorovSmirnovTest(data: JavaDoubleRDD,
                             distName: String,
                             params: Double*): KolmogorovSmirnovTestResult = {
-    kolmogorovSmirnovTest(
-        data.rdd.asInstanceOf[RDD[Double]], distName, params: _*)
+    kolmogorovSmirnovTest(data.rdd.asInstanceOf[RDD[Double]],
+                          distName,
+                          params: _*)
   }
 }

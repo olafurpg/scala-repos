@@ -89,13 +89,13 @@ object SupervisorSpec {
 
   class Mailbox(settings: ActorSystem.Settings, config: Config)
       extends MailboxType {
-    override def create(
-        owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
+    override def create(owner: Option[ActorRef],
+                        system: Option[ActorSystem]): MessageQueue =
       throw failure
   }
 
-  val config =
-    ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+      """
 akka.actor.serialize-messages = off
 error-mailbox {
   mailbox-type = "akka.actor.SupervisorSpec$Mailbox"
@@ -122,8 +122,9 @@ class SupervisorSpec
     Await.result((supervisor ? props).mapTo[ActorRef], timeout.duration)
 
   def temporaryActorAllForOne = {
-    val supervisor = system.actorOf(Props(new Supervisor(AllForOneStrategy(
-                    maxNrOfRetries = 0)(List(classOf[Exception])))))
+    val supervisor = system.actorOf(
+        Props(new Supervisor(AllForOneStrategy(maxNrOfRetries = 0)(
+                    List(classOf[Exception])))))
     val temporaryActor = child(supervisor, Props(new PingPongActor(testActor)))
 
     (temporaryActor, supervisor)
@@ -131,8 +132,9 @@ class SupervisorSpec
 
   def singleActorAllForOne = {
     val supervisor = system.actorOf(
-        Props(new Supervisor(AllForOneStrategy(
-                    maxNrOfRetries = 3, withinTimeRange = DilatedTimeout)(
+        Props(
+            new Supervisor(AllForOneStrategy(maxNrOfRetries = 3,
+                                             withinTimeRange = DilatedTimeout)(
                     List(classOf[Exception])))))
     val pingpong = child(supervisor, Props(new PingPongActor(testActor)))
 
@@ -141,8 +143,9 @@ class SupervisorSpec
 
   def singleActorOneForOne = {
     val supervisor = system.actorOf(
-        Props(new Supervisor(OneForOneStrategy(
-                    maxNrOfRetries = 3, withinTimeRange = DilatedTimeout)(
+        Props(
+            new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
+                                             withinTimeRange = DilatedTimeout)(
                     List(classOf[Exception])))))
     val pingpong = child(supervisor, Props(new PingPongActor(testActor)))
 
@@ -151,30 +154,33 @@ class SupervisorSpec
 
   def multipleActorsAllForOne = {
     val supervisor = system.actorOf(
-        Props(new Supervisor(AllForOneStrategy(
-                    maxNrOfRetries = 3, withinTimeRange = DilatedTimeout)(
+        Props(
+            new Supervisor(AllForOneStrategy(maxNrOfRetries = 3,
+                                             withinTimeRange = DilatedTimeout)(
                     List(classOf[Exception])))))
-    val pingpong1, pingpong2, pingpong3 = child(
-        supervisor, Props(new PingPongActor(testActor)))
+    val pingpong1, pingpong2, pingpong3 =
+      child(supervisor, Props(new PingPongActor(testActor)))
 
     (pingpong1, pingpong2, pingpong3, supervisor)
   }
 
   def multipleActorsOneForOne = {
     val supervisor = system.actorOf(
-        Props(new Supervisor(OneForOneStrategy(
-                    maxNrOfRetries = 3, withinTimeRange = DilatedTimeout)(
+        Props(
+            new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
+                                             withinTimeRange = DilatedTimeout)(
                     List(classOf[Exception])))))
-    val pingpong1, pingpong2, pingpong3 = child(
-        supervisor, Props(new PingPongActor(testActor)))
+    val pingpong1, pingpong2, pingpong3 =
+      child(supervisor, Props(new PingPongActor(testActor)))
 
     (pingpong1, pingpong2, pingpong3, supervisor)
   }
 
   def nestedSupervisorsAllForOne = {
     val topSupervisor = system.actorOf(
-        Props(new Supervisor(AllForOneStrategy(
-                    maxNrOfRetries = 3, withinTimeRange = DilatedTimeout)(
+        Props(
+            new Supervisor(AllForOneStrategy(maxNrOfRetries = 3,
+                                             withinTimeRange = DilatedTimeout)(
                     List(classOf[Exception])))))
     val pingpong1 = child(topSupervisor, Props(new PingPongActor(testActor)))
 
@@ -184,8 +190,8 @@ class SupervisorSpec
             new Supervisor(
                 AllForOneStrategy(maxNrOfRetries = 3,
                                   withinTimeRange = DilatedTimeout)(Nil))))
-    val pingpong2, pingpong3 = child(
-        middleSupervisor, Props(new PingPongActor(testActor)))
+    val pingpong2, pingpong3 =
+      child(middleSupervisor, Props(new PingPongActor(testActor)))
 
     (pingpong1, pingpong2, pingpong3, topSupervisor)
   }
@@ -198,7 +204,8 @@ class SupervisorSpec
   override def beforeEach() = {}
 
   def ping(pingPongActor: ActorRef) = {
-    Await.result(pingPongActor.?(Ping)(DilatedTimeout), DilatedTimeout) should ===(
+    Await
+      .result(pingPongActor.?(Ping)(DilatedTimeout), DilatedTimeout) should ===(
         PongMessage)
     expectMsg(Timeout, PingMessage)
   }
@@ -240,8 +247,8 @@ class SupervisorSpec
         }
         def receive = {
           case "crash" ⇒ {
-              testActor ! "crashed"; throw new RuntimeException("Expected")
-            }
+            testActor ! "crashed"; throw new RuntimeException("Expected")
+          }
           case "ping" ⇒ sender() ! "pong"
         }
       }
@@ -412,10 +419,9 @@ class SupervisorSpec
     "attempt restart when exception during restart" in {
       val inits = new AtomicInteger(0)
       val supervisor = system.actorOf(
-          Props(new Supervisor(OneForOneStrategy(
-                      maxNrOfRetries = 3,
-                      withinTimeRange =
-                        10 seconds)(classOf[Exception] :: Nil))))
+          Props(new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
+                                                 withinTimeRange = 10 seconds)(
+                      classOf[Exception] :: Nil))))
 
       val dyingProps = Props(new Actor {
         val init = inits.getAndIncrement()
@@ -464,9 +470,9 @@ class SupervisorSpec
             testActor ! "child restarted"
           def receive = {
             case l: TestLatch ⇒ {
-                Await.ready(l, 5 seconds);
-                throw new IllegalStateException("OHNOES")
-              }
+              Await.ready(l, 5 seconds);
+              throw new IllegalStateException("OHNOES")
+            }
             case "test" ⇒ sender() ! "child green"
           }
         }), "child"))

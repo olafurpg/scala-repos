@@ -45,8 +45,8 @@ object Literal {
     case d: BigDecimal =>
       Literal(Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale))
     case d: java.math.BigDecimal =>
-      Literal(
-          Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale()))
+      Literal(Decimal(d),
+              DecimalType(Math.max(d.precision, d.scale), d.scale()))
     case d: Decimal =>
       Literal(d, DecimalType(Math.max(d.precision, d.scale), d.scale))
     case t: Timestamp =>
@@ -181,7 +181,7 @@ case class Literal protected (value: Any, dataType: DataType)
   override def equals(other: Any): Boolean = other match {
     case o: Literal =>
       dataType.equals(o.dataType) && (value == null && null == o.value ||
-          value != null && value.equals(o.value))
+            value != null && value.equals(o.value))
     case _ => false
   }
 
@@ -214,7 +214,7 @@ case class Literal protected (value: Any, dataType: DataType)
         case FloatType =>
           val v = value.asInstanceOf[Float]
           if (v.isNaN || v.isInfinite) {
-            super [CodegenFallback].genCode(ctx, ev)
+            super[CodegenFallback].genCode(ctx, ev)
           } else {
             ev.isNull = "false"
             ev.value = s"${value}f"
@@ -223,7 +223,7 @@ case class Literal protected (value: Any, dataType: DataType)
         case DoubleType =>
           val v = value.asInstanceOf[Double]
           if (v.isNaN || v.isInfinite) {
-            super [CodegenFallback].genCode(ctx, ev)
+            super[CodegenFallback].genCode(ctx, ev)
           } else {
             ev.isNull = "false"
             ev.value = s"${value}D"
@@ -243,7 +243,7 @@ case class Literal protected (value: Any, dataType: DataType)
           ""
         // eval() version may be faster for non-primitive types
         case other =>
-          super [CodegenFallback].genCode(ctx, ev)
+          super[CodegenFallback].genCode(ctx, ev)
       }
     }
   }

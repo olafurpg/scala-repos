@@ -44,10 +44,12 @@ import scala.annotation.tailrec
   * @author ghik
   */
 class HoconObjectEntryMover extends LineMover {
-  override def checkAvailable(
-      editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean =
+  override def checkAvailable(editor: Editor,
+                              file: PsiFile,
+                              info: MoveInfo,
+                              down: Boolean): Boolean =
     super.checkAvailable(editor, file, info, down) &&
-    !editor.getSelectionModel.hasSelection && (file match {
+      !editor.getSelectionModel.hasSelection && (file match {
           case hoconFile: HoconPsiFile =>
             checkAvailableHocon(editor, hoconFile, info, down)
           case _ =>
@@ -139,7 +141,7 @@ class HoconObjectEntryMover extends LineMover {
           .map(_.enclosingObjectField)
           .filter(of =>
                 field.parent.exists(pp => edgeLine(of) == edgeLine(pp)) &&
-                canInsert(of))
+                  canInsert(of))
           .map(of =>
                 (of, of.keyedField.fieldsInPathForward.map(keyString).toList))
       } else None
@@ -191,8 +193,9 @@ class HoconObjectEntryMover extends LineMover {
               new LineRange(sourceRange.endLine, endLine(enclosingField) + 1)
             else
               new LineRange(startLine(enclosingField), sourceRange.startLine)
-          val mod = PrefixModification(
-              objField.getTextOffset, 0, prefixToAdd.mkString("", ".", "."))
+          val mod = PrefixModification(objField.getTextOffset,
+                                       0,
+                                       prefixToAdd.mkString("", ".", "."))
           (sourceRange, targetRange, Some(mod))
       } orElse fieldToDescendInto(objField).map {
         case (adjacentField, prefixToRemove) =>
@@ -246,8 +249,9 @@ class HoconObjectEntryMover extends LineMover {
     rangesOpt.isDefined
   }
 
-  override def beforeMove(
-      editor: Editor, info: MoveInfo, down: Boolean): Unit =
+  override def beforeMove(editor: Editor,
+                          info: MoveInfo,
+                          down: Boolean): Unit =
     info.getUserData(PrefixModKey).foreach {
       case PrefixModification(offset, length, replacement) =>
         // we need to move caret manually when adding prefix exactly at caret position

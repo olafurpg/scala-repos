@@ -39,9 +39,9 @@ package object util {
     * @param ignoreSerialVersionUID this is not a safe thing to do, but sometimes...
     * @return
     */
-  def nonstupidObjectInputStream(stream: InputStream,
-                                 ignoreSerialVersionUID: Boolean =
-                                   false): ObjectInputStream = {
+  def nonstupidObjectInputStream(
+      stream: InputStream,
+      ignoreSerialVersionUID: Boolean = false): ObjectInputStream = {
     new ObjectInputStream(stream) with SerializableLogging {
       @throws[IOException]
       @throws[ClassNotFoundException]
@@ -58,18 +58,17 @@ package object util {
 
       // from http://stackoverflow.com/questions/1816559/make-java-runtime-ignore-serialversionuids
       override protected def readClassDescriptor(): ObjectStreamClass = {
-        var resultClassDescriptor =
-          super.readClassDescriptor(); // initially streams descriptor
+        var resultClassDescriptor = super.readClassDescriptor(); // initially streams descriptor
         if (ignoreSerialVersionUID) {
 
-          var localClass: Class[_] =
-            null; // the class in the local JVM that this descriptor represents.
+          var localClass: Class[_] = null; // the class in the local JVM that this descriptor represents.
           try {
             localClass = Class.forName(resultClassDescriptor.getName)
           } catch {
             case e: ClassNotFoundException =>
               logger.error(
-                  "No local class for " + resultClassDescriptor.getName, e)
+                  "No local class for " + resultClassDescriptor.getName,
+                  e)
               return resultClassDescriptor
           }
 
@@ -86,8 +85,7 @@ package object util {
               s.append(" stream serialVersionUID = ").append(streamSUID)
               val e = new InvalidClassException(s.toString())
               logger.error("Potentially Fatal Deserialization Operation.", e);
-              resultClassDescriptor =
-                localClassDescriptor; // Use local class descriptor for deserialization
+              resultClassDescriptor = localClassDescriptor; // Use local class descriptor for deserialization
             }
           }
         }

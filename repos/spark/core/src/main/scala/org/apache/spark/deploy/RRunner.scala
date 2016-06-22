@@ -46,7 +46,8 @@ object RRunner {
       // but kept here for backward compatibility.
       var cmd = sys.props.getOrElse("spark.sparkr.r.command", "Rscript")
       cmd = sys.props.getOrElse("spark.r.command", cmd)
-      if (sys.props.getOrElse("spark.submit.deployMode", "client") == "client") {
+      if (sys.props
+            .getOrElse("spark.submit.deployMode", "client") == "client") {
         cmd = sys.props.getOrElse("spark.r.driver.command", cmd)
       }
       cmd
@@ -55,12 +56,11 @@ object RRunner {
     // Check if the file path exists.
     // If not, change directory to current working directory for YARN cluster mode
     val rF = new File(rFile)
-    val rFileNormalized =
-      if (!rF.exists()) {
-        new Path(rFile).getName
-      } else {
-        rFile
-      }
+    val rFileNormalized = if (!rF.exists()) {
+      new Path(rFile).getName
+    } else {
+      rFile
+    }
 
     // Launch a SparkR backend server for the R process to connect to; this will let it see our
     // Java system properties etc.
@@ -90,11 +90,13 @@ object RRunner {
         env.put("R_PROFILE_USER",
                 Seq(rPackageDir(0), "SparkR", "profile", "general.R")
                   .mkString(File.separator))
-        builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
+        builder
+          .redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
         val process = builder.start()
 
-        new RedirectThread(
-            process.getInputStream, System.out, "redirect R output").start()
+        new RedirectThread(process.getInputStream,
+                           System.out,
+                           "redirect R output").start()
 
         process.waitFor()
       } finally {

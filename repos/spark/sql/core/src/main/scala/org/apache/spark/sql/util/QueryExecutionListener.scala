@@ -58,8 +58,9 @@ trait QueryExecutionListener {
     * @param exception the exception that failed this query.
     */
   @DeveloperApi
-  def onFailure(
-      funcName: String, qe: QueryExecution, exception: Exception): Unit
+  def onFailure(funcName: String,
+                qe: QueryExecution,
+                exception: Exception): Unit
 }
 
 /**
@@ -68,7 +69,7 @@ trait QueryExecutionListener {
   * Manager for [[QueryExecutionListener]]. See [[org.apache.spark.sql.SQLContext.listenerManager]].
   */
 @Experimental
-class ExecutionListenerManager private[sql]() extends Logging {
+class ExecutionListenerManager private[sql] () extends Logging {
 
   /**
     * Registers the specified [[QueryExecutionListener]].
@@ -94,8 +95,9 @@ class ExecutionListenerManager private[sql]() extends Logging {
     listeners.clear()
   }
 
-  private[sql] def onSuccess(
-      funcName: String, qe: QueryExecution, duration: Long): Unit = {
+  private[sql] def onSuccess(funcName: String,
+                             qe: QueryExecution,
+                             duration: Long): Unit = {
     readLock {
       withErrorHandling { listener =>
         listener.onSuccess(funcName, qe, duration)
@@ -103,8 +105,9 @@ class ExecutionListenerManager private[sql]() extends Logging {
     }
   }
 
-  private[sql] def onFailure(
-      funcName: String, qe: QueryExecution, exception: Exception): Unit = {
+  private[sql] def onFailure(funcName: String,
+                             qe: QueryExecution,
+                             exception: Exception): Unit = {
     readLock {
       withErrorHandling { listener =>
         listener.onFailure(funcName, qe, exception)

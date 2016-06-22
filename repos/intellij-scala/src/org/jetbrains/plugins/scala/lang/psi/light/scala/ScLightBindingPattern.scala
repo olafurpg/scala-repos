@@ -27,7 +27,7 @@ class ScLightBindingPattern(rt: ScType, val b: ScBindingPattern)
     Success(rt, Some(this))
 
   override def getOriginalElement: PsiElement =
-    super [ScBindingPattern].getOriginalElement
+    super[ScBindingPattern].getOriginalElement
 
   override def toString: String = b.toString
 

@@ -20,8 +20,9 @@ object ByNameParameter extends AnnotatorPart[ScExpression] {
 
   def kind = classOf[ScExpression]
 
-  def annotate(
-      exp: ScExpression, holder: AnnotationHolder, typeAware: Boolean) {
+  def annotate(exp: ScExpression,
+               holder: AnnotationHolder,
+               typeAware: Boolean) {
     if (!ScalaProjectSettings
           .getInstance(exp.getProject)
           .isShowArgumentsToByNameParams) return
@@ -30,8 +31,7 @@ object ByNameParameter extends AnnotatorPart[ScExpression] {
           .getInstance(exp.getProject)
           .isIncludeBlockExpressions && exp.isInstanceOf[ScBlockExpr]) return
 
-    val parameter =
-      ScalaPsiUtil.parameterOf(exp) //.orElse(conversionParameterOf(exp))
+    val parameter = ScalaPsiUtil.parameterOf(exp) //.orElse(conversionParameterOf(exp))
 
     parameter.filter(_.isByName).foreach { p =>
       val attributes = new TextAttributes()

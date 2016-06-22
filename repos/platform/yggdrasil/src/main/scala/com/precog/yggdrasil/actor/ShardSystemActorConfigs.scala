@@ -99,8 +99,8 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
 trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
   type YggConfig <: KafkaIngestActorProjectionSystemConfig
 
-  def ingestFailureLog(
-      checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog
+  def ingestFailureLog(checkpoint: YggCheckpoint,
+                       logRoot: File): IngestFailureLog
 
   override def initIngestActor(
       actorSystem: ActorSystem,
@@ -117,21 +117,20 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
 
       actorSystem.actorOf(
           Props(
-              new KafkaShardIngestActor(shardId = yggConfig.shardId,
-                                        initialCheckpoint = checkpoint,
-                                        consumer = consumer,
-                                        topic = yggConfig.kafkaTopic,
-                                        permissionsFinder = permissionsFinder,
-                                        routingActor = routingActor,
-                                        ingestFailureLog =
-                                          ingestFailureLog(checkpoint,
-                                                           conf.failureLogRoot),
-                                        fetchBufferSize = conf.bufferSize,
-                                        idleDelay = yggConfig.batchStoreDelay,
-                                        ingestTimeout = conf.batchTimeout,
-                                        maxCacheSize = conf.maxParallel,
-                                        maxConsecutiveFailures =
-                                          conf.maxConsecutiveFailures) {
+              new KafkaShardIngestActor(
+                  shardId = yggConfig.shardId,
+                  initialCheckpoint = checkpoint,
+                  consumer = consumer,
+                  topic = yggConfig.kafkaTopic,
+                  permissionsFinder = permissionsFinder,
+                  routingActor = routingActor,
+                  ingestFailureLog = ingestFailureLog(checkpoint,
+                                                      conf.failureLogRoot),
+                  fetchBufferSize = conf.bufferSize,
+                  idleDelay = yggConfig.batchStoreDelay,
+                  ingestTimeout = conf.batchTimeout,
+                  maxCacheSize = conf.maxParallel,
+                  maxConsecutiveFailures = conf.maxConsecutiveFailures) {
 
             implicit val M = new FutureMonad(
                 ExecutionContext.defaultExecutionContext(actorSystem))

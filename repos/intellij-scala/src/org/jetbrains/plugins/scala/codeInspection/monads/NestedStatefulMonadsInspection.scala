@@ -23,7 +23,7 @@ final class NestedStatefulMonadsInspection
       call.getType().getOrAny match {
         case outer @ ScParameterizedType(_, typeArgs)
             if isStatefulMonadType(outer, project) &&
-            typeArgs.exists(isStatefulMonadType(_, project)) =>
+              typeArgs.exists(isStatefulMonadType(_, project)) =>
           holder.registerProblem(call, Annotation)
         case _ =>
       }

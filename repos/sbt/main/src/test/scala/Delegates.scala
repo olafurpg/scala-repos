@@ -75,13 +75,15 @@ object Delegates extends Properties("delegates") {
             .map(scope => Scope.display(scope, "_"))
             .mkString("\n\t")) |: f(scope, delegates)
     }: _*)
-  def alwaysGlobal(
-      s: Scope, ds: Seq[Scope], axis: Scope => ScopeAxis[_]): Prop =
+  def alwaysGlobal(s: Scope,
+                   ds: Seq[Scope],
+                   axis: Scope => ScopeAxis[_]): Prop =
     (axis(s) != Global) || all(ds map { d =>
       (axis(d) == Global): Prop
     }: _*)
-  def globalCombinations(
-      s: Scope, ds: Seq[Scope], axis: Scope => ScopeAxis[_]): Prop = {
+  def globalCombinations(s: Scope,
+                         ds: Seq[Scope],
+                         axis: Scope => ScopeAxis[_]): Prop = {
     val value = axis(s)
     val mods = List[Scope => Scope](_.copy(project = Global),
                                     _.copy(config = Global),

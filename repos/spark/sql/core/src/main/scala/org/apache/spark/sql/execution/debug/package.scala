@@ -83,8 +83,8 @@ package object debug {
         initialValue
       }
 
-      def addInPlace(
-          v1: HashSet[String], v2: HashSet[String]): HashSet[String] = {
+      def addInPlace(v1: HashSet[String],
+                     v2: HashSet[String]): HashSet[String] = {
         v1 ++= v2
         v1
       }
@@ -146,8 +146,9 @@ package object debug {
       child.asInstanceOf[CodegenSupport].produce(ctx, this)
     }
 
-    override def doConsume(
-        ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+    override def doConsume(ctx: CodegenContext,
+                           input: Seq[ExprCode],
+                           row: String): String = {
       consume(ctx, input)
     }
   }

@@ -18,8 +18,7 @@ class WebServerImpl(
     val system: ActorSystem,
     val mat: Materializer,
     val timeout: Timeout
-)
-    extends WebServer
+) extends WebServer
     with DocJarReading {
   import system.dispatcher
 

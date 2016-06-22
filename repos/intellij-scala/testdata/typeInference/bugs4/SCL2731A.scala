@@ -5,7 +5,9 @@ object test1 {
   object SeqExtractor extends SeqFactory[Seq]
   val ss: Seq[String] = null
   ss match {
-    case SeqExtractor(a) => /*start*/ a /*end*/
+    case SeqExtractor(a) =>
+      /*start*/
+      a /*end*/
   }
 }
 //String

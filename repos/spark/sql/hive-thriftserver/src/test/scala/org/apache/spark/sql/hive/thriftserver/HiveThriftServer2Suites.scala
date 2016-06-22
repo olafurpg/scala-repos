@@ -372,7 +372,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
         // to demonstrate that cancellation works.
         val f = Future {
           statement.executeQuery("SELECT COUNT(*) FROM test_map " +
-              List.fill(10)("join test_map").mkString(" "))
+                List.fill(10)("join test_map").mkString(" "))
         }
         // Note that this is slightly race-prone: if the cancel is issued before the statement
         // begins executing then we'll fail with a timeout. As a result, this fixed delay is set
@@ -390,7 +390,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
           val sf = Future {
             statement.executeQuery(
                 "SELECT COUNT(*) FROM test_map " +
-                List.fill(4)("join test_map").mkString(" ")
+                  List.fill(4)("join test_map").mkString(" ")
             )
           }
           // Similarly, this is also slightly race-prone on fast machines where the query above
@@ -434,7 +434,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
 
       queries.foreach(statement.execute)
 
-      statement.executeQuery("""
+      statement.executeQuery(
+          """
               |INSERT INTO TABLE addJar SELECT 'k1' as key FROM smallKV limit 1
             """.stripMargin)
 
@@ -534,7 +535,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-11043 check operation log root directory") {
     val expectedLine =
       "Operation log root directory is created: " +
-      operationLogPath.getAbsoluteFile
+        operationLogPath.getAbsoluteFile
     assert(
         Source.fromFile(logPath).getLines().exists(_.contains(expectedLine)))
   }
@@ -688,12 +689,11 @@ abstract class HiveThriftServer2Test
   protected def extraConf: Seq[String] = Nil
 
   protected def serverStartCommand(port: Int) = {
-    val portConf =
-      if (mode == ServerMode.binary) {
-        ConfVars.HIVE_SERVER2_THRIFT_PORT
-      } else {
-        ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT
-      }
+    val portConf = if (mode == ServerMode.binary) {
+      ConfVars.HIVE_SERVER2_THRIFT_PORT
+    } else {
+      ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT
+    }
 
     val driverClassPath = {
       // Writes a temporary log4j.properties and prepend it to driver classpath, so that it
@@ -791,8 +791,8 @@ abstract class HiveThriftServer2Test
 
     // Ensures that the following "tail" command won't fail.
     logPath.createNewFile()
-    val successLines = Seq(
-        THRIFT_BINARY_SERVICE_LIVE, THRIFT_HTTP_SERVICE_LIVE)
+    val successLines =
+      Seq(THRIFT_BINARY_SERVICE_LIVE, THRIFT_HTTP_SERVICE_LIVE)
 
     logTailingProcess = {
       val command =

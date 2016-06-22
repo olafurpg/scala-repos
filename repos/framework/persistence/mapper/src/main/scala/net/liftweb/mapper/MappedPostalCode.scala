@@ -95,8 +95,9 @@ abstract class MappedTimeZone[T <: Mapper[T]](owner: T)
   }
 
   override def _toForm: Box[Elem] =
-    Full(SHtml.select(MappedTimeZone.timeZoneList, Full(this.get), set) %
-        ("id" -> fieldId))
+    Full(
+        SHtml.select(MappedTimeZone.timeZoneList, Full(this.get), set) %
+          ("id" -> fieldId))
 }
 
 object MappedTimeZone {
@@ -119,8 +120,8 @@ abstract class MappedCountry[T <: Mapper[T]](owner: T)
   }
 }
 
-abstract class MappedPostalCode[T <: Mapper[T]](
-    owner: T, country: MappedCountry[T])
+abstract class MappedPostalCode[T <: Mapper[T]](owner: T,
+                                                country: MappedCountry[T])
     extends MappedString[T](owner, 32) {
   override def setFilter = notNull _ :: toUpper _ :: trim _ :: super.setFilter
 

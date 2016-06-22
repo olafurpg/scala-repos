@@ -26,7 +26,7 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
   override def toEventJson(data: JObject): JObject = {
     try {
       val version: String = data.values("version").toString
-/*
+      /*
       if (!supportedAPI.contains(version)) {
         throw new ConnectorException(
           s"Supported segment.io API versions: [2]. got [$version]"
@@ -168,7 +168,7 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
     common.user_id.orElse(common.anonymous_id) match {
       case Some(userId) ⇒
         ("event" → typ) ~ ("entityType" → "user") ~ ("entityId" → userId) ~
-        ("eventTime" → common.timestamp)
+          ("eventTime" → common.timestamp)
 
       case None ⇒
         throw new ConnectorException(

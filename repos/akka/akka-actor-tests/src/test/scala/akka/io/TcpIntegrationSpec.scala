@@ -51,8 +51,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort from client side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       clientHandler.send(clientConnection, Abort)
       clientHandler.expectMsg(Aborted)
@@ -74,8 +76,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort from server side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       serverHandler.send(serverConnection, Abort)
       serverHandler.expectMsg(Aborted)
@@ -97,8 +101,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort via PoisonPill from client side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       clientHandler.send(clientConnection, PoisonPill)
       verifyActorTermination(clientConnection)
@@ -120,8 +126,10 @@ class TcpIntegrationSpec extends AkkaSpec("""
     "properly handle connection abort via PoisonPill from server side after chit-chat" in new TestSetup {
       val (clientHandler, clientConnection, serverHandler, serverConnection) =
         establishNewClientConnection()
-      chitchat(
-          clientHandler, clientConnection, serverHandler, serverConnection)
+      chitchat(clientHandler,
+               clientConnection,
+               serverHandler,
+               serverConnection)
 
       serverHandler.send(serverConnection, PoisonPill)
       verifyActorTermination(serverConnection)
@@ -140,14 +148,18 @@ class TcpIntegrationSpec extends AkkaSpec("""
       clientHandler.send(clientConnection,
                          Write(ByteString("Captain on the bridge!"), Aye))
       clientHandler.expectMsg(Aye)
-      serverHandler.expectMsgType[Received].data.decodeString("ASCII") should ===(
-          "Captain on the bridge!")
+      serverHandler
+        .expectMsgType[Received]
+        .data
+        .decodeString("ASCII") should ===("Captain on the bridge!")
 
       serverHandler.send(serverConnection,
                          Write(ByteString("For the king!"), Yes))
       serverHandler.expectMsg(Yes)
-      clientHandler.expectMsgType[Received].data.decodeString("ASCII") should ===(
-          "For the king!")
+      clientHandler
+        .expectMsgType[Received]
+        .data
+        .decodeString("ASCII") should ===("For the king!")
 
       serverHandler.send(serverConnection, Close)
       serverHandler.expectMsg(Closed)

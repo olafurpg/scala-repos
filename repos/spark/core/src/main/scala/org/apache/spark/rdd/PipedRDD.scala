@@ -74,8 +74,8 @@ private[spark] class PipedRDD[T: ClassTag](
     }
   }
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[String] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[String] = {
     val pb = new ProcessBuilder(command.asJava)
     // Add the environmental variables to the process.
     val currentEnvVars = pb.environment()
@@ -121,7 +121,7 @@ private[spark] class PipedRDD[T: ClassTag](
       } catch {
         case e: Exception =>
           logError("Unable to setup task working directory: " + e.getMessage +
-                   " (" + taskDirectory + ")",
+                     " (" + taskDirectory + ")",
                    e)
       }
     }
@@ -186,18 +186,17 @@ private[spark] class PipedRDD[T: ClassTag](
       }
 
       def hasNext(): Boolean = {
-        val result =
-          if (lines.hasNext) {
-            true
-          } else {
-            val exitStatus = proc.waitFor()
-            cleanup()
-            if (exitStatus != 0) {
-              throw new IllegalStateException(
-                  s"Subprocess exited with status $exitStatus")
-            }
-            false
+        val result = if (lines.hasNext) {
+          true
+        } else {
+          val exitStatus = proc.waitFor()
+          cleanup()
+          if (exitStatus != 0) {
+            throw new IllegalStateException(
+                s"Subprocess exited with status $exitStatus")
           }
+          false
+        }
         propagateChildException()
         result
       }

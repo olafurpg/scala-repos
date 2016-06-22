@@ -184,8 +184,7 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
         }
       }))
 
-      val childProps = Props(
-          new Actor {
+      val childProps = Props(new Actor {
         def receive = {
           case "hit" ⇒ sender() ! self.path.name
           case "end" ⇒ context.stop(self)

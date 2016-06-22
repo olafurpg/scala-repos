@@ -74,8 +74,8 @@ class SystemJSTest {
     assertEquals("/", get("file.separator"))
     assertEquals(":", get("path.separator"))
     assertEquals("\n", get("line.separator"))
-    assertEquals(
-        linkingInfo.linkerVersion.getOrElse(null), get("java.vm.version"))
+    assertEquals(linkingInfo.linkerVersion.getOrElse(null),
+                 get("java.vm.version"))
 
     // Defined in Build.scala and added via __ScalaJSEnv in ScalaJSPluginInternal
 
@@ -86,8 +86,9 @@ class SystemJSTest {
     if (compliantAsInstanceOf) {
       try {
         Int.box(5).asInstanceOf[String]
-        fail("Invalid class cast succeeded in presence of " +
-            "\"compliant-asinstanceofs\" flag.")
+        fail(
+            "Invalid class cast succeeded in presence of " +
+              "\"compliant-asinstanceofs\" flag.")
       } catch {
         case _: ClassCastException => // As expected
       }

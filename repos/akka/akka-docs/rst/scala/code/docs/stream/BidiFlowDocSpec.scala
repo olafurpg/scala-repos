@@ -45,8 +45,7 @@ object BidiFlowDocSpec {
   }
   //#codec-impl
 
-  val codecVerbose = BidiFlow.fromGraph(
-      GraphDSL.create() { b =>
+  val codecVerbose = BidiFlow.fromGraph(GraphDSL.create() { b =>
     // construct and add the top flow, going outbound
     val outbound = b.add(Flow[Message].map(toBytes))
     // construct and add the bottom flow, going inbound
@@ -136,14 +135,12 @@ object BidiFlowDocSpec {
   })
   //#framing
 
-  val chopUp = BidiFlow.fromGraph(
-      GraphDSL.create() { b =>
+  val chopUp = BidiFlow.fromGraph(GraphDSL.create() { b =>
     val f = Flow[ByteString].mapConcat(_.map(ByteString(_)))
     BidiShape.fromFlows(b.add(f), b.add(f))
   })
 
-  val accumulate = BidiFlow.fromGraph(
-      GraphDSL.create() { b =>
+  val accumulate = BidiFlow.fromGraph(GraphDSL.create() { b =>
     val f =
       Flow[ByteString].grouped(1000).map(_.fold(ByteString.empty)(_ ++ _))
     BidiShape.fromFlows(b.add(f), b.add(f))

@@ -52,8 +52,8 @@ trait EvaluatorMethodsModule[M[+ _]]
       case _ => None
     }
 
-    def transRValue[A <: SourceType](
-        rvalue: RValue, target: TransSpec[A]): TransSpec[A] = {
+    def transRValue[A <: SourceType](rvalue: RValue,
+                                     target: TransSpec[A]): TransSpec[A] = {
       rValueToCValue(rvalue) map { cvalue =>
         trans.ConstLiteral(cvalue, target)
       } getOrElse {
@@ -73,9 +73,10 @@ trait EvaluatorMethodsModule[M[+ _]]
       }
     }
 
-    def transFromBinOp[A <: SourceType](
-        op: BinaryOperation, ctx: MorphContext)(
-        left: TransSpec[A], right: TransSpec[A]): TransSpec[A] = op match {
+    def transFromBinOp[A <: SourceType](op: BinaryOperation,
+                                        ctx: MorphContext)(
+        left: TransSpec[A],
+        right: TransSpec[A]): TransSpec[A] = op match {
       case Eq => trans.Equal[A](left, right)
       case NotEq => op1ForUnOp(Comp).spec(ctx)(trans.Equal[A](left, right))
       case instructions.WrapObject => WrapObjectDynamic(left, right)
@@ -94,26 +95,31 @@ trait EvaluatorMethodsModule[M[+ _]]
       } get
 
     def buildJoinKeySpec(sharedLength: Int): TransSpec1 = {
-      val components = for (i <- 0 until sharedLength) yield
-        trans.WrapArray(DerefArrayStatic(SourceKey.Single, CPathIndex(i))): TransSpec1
+      val components = for (i <- 0 until sharedLength)
+        yield
+          trans
+            .WrapArray(DerefArrayStatic(SourceKey.Single, CPathIndex(i))): TransSpec1
 
       components reduceLeft { trans.InnerArrayConcat(_, _) }
     }
 
-    def buildWrappedJoinSpec(
-        idMatch: IdentityMatch, valueKeys: Set[Int] = Set.empty)(
+    def buildWrappedJoinSpec(idMatch: IdentityMatch,
+                             valueKeys: Set[Int] = Set.empty)(
         spec: (TransSpec2, TransSpec2) => TransSpec2): TransSpec2 = {
       val leftIdentitySpec = DerefObjectStatic(Leaf(SourceLeft), paths.Key)
       val rightIdentitySpec = DerefObjectStatic(Leaf(SourceRight), paths.Key)
 
-      val sharedDerefs = for ((i, _) <- idMatch.sharedIndices) yield
-        trans.WrapArray(DerefArrayStatic(leftIdentitySpec, CPathIndex(i)))
+      val sharedDerefs = for ((i, _) <- idMatch.sharedIndices)
+        yield
+          trans.WrapArray(DerefArrayStatic(leftIdentitySpec, CPathIndex(i)))
 
-      val unsharedLeft = for (i <- idMatch.leftIndices) yield
-        trans.WrapArray(DerefArrayStatic(leftIdentitySpec, CPathIndex(i)))
+      val unsharedLeft = for (i <- idMatch.leftIndices)
+        yield
+          trans.WrapArray(DerefArrayStatic(leftIdentitySpec, CPathIndex(i)))
 
-      val unsharedRight = for (i <- idMatch.rightIndices) yield
-        trans.WrapArray(DerefArrayStatic(rightIdentitySpec, CPathIndex(i)))
+      val unsharedRight = for (i <- idMatch.rightIndices)
+        yield
+          trans.WrapArray(DerefArrayStatic(rightIdentitySpec, CPathIndex(i)))
 
       val derefs: Seq[TransSpec2] =
         sharedDerefs ++ unsharedLeft ++ unsharedRight
@@ -138,14 +144,14 @@ trait EvaluatorMethodsModule[M[+ _]]
               "sort-" + key)
         }
 
-      val keyValueSpec = InnerObjectConcat(
-          wrappedValueSpec, wrappedIdentitySpec)
+      val keyValueSpec =
+        InnerObjectConcat(wrappedValueSpec, wrappedIdentitySpec)
 
       if (valueKeySpecs.isEmpty) {
         keyValueSpec
       } else {
-        InnerObjectConcat(
-            keyValueSpec, OuterObjectConcat(valueKeySpecs.toList: _*))
+        InnerObjectConcat(keyValueSpec,
+                          OuterObjectConcat(valueKeySpecs.toList: _*))
       }
     }
 
@@ -154,8 +160,8 @@ trait EvaluatorMethodsModule[M[+ _]]
       val leftIdentitySpec = DerefObjectStatic(Leaf(SourceLeft), paths.Key)
       val rightIdentitySpec = DerefObjectStatic(Leaf(SourceRight), paths.Key)
 
-      val newIdentitySpec = InnerArrayConcat(
-          leftIdentitySpec, rightIdentitySpec)
+      val newIdentitySpec =
+        InnerArrayConcat(leftIdentitySpec, rightIdentitySpec)
 
       val wrappedIdentitySpec =
         trans.WrapObject(newIdentitySpec, paths.Key.name)

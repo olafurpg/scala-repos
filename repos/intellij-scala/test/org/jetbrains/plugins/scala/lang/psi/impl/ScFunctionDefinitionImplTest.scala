@@ -24,8 +24,8 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
   }
 
   def testTailRecursionWithCurring() {
-    assertRecursionTypeIs(
-        "def f(n: Int)(x:Int)(y:Int): Int = f(n + 1)(x)(y)", TailRecursion)
+    assertRecursionTypeIs("def f(n: Int)(x:Int)(y:Int): Int = f(n + 1)(x)(y)",
+                          TailRecursion)
   }
 
   def testTailRecursionWithTypeParam() {
@@ -33,48 +33,48 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
   }
 
   def testReturn() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Int = return f(n + 1)", TailRecursion)
+    assertRecursionTypeIs("def f(n: Int): Int = return f(n + 1)",
+                          TailRecursion)
   }
 
   def testAndAnd() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = n > 0 && f(n)", TailRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = n > 0 && f(n)",
+                          TailRecursion)
   }
 
   def testAndAnd2() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = f(n) && n > 0", OrdinaryRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = f(n) && n > 0",
+                          OrdinaryRecursion)
   }
 
   def testAndAnd3() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = f(n) && f(n-1)", OrdinaryRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = f(n) && f(n-1)",
+                          OrdinaryRecursion)
   }
 
   def testOrOr() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = n > 0 || f(n)", TailRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = n > 0 || f(n)",
+                          TailRecursion)
   }
 
   def testOrOr2() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = f(n) || n > 0", OrdinaryRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = f(n) || n > 0",
+                          OrdinaryRecursion)
   }
 
   def testOrOr3() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = f(n) || f(n-1)", OrdinaryRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = f(n) || f(n-1)",
+                          OrdinaryRecursion)
   }
 
   def testIf() {
-    assertRecursionTypeIs(
-        "def f(n: Int) {if (true) {f(n + 1)}}", TailRecursion)
+    assertRecursionTypeIs("def f(n: Int) {if (true) {f(n + 1)}}",
+                          TailRecursion)
   }
 
   def testOtherInfixOperator() {
-    assertRecursionTypeIs(
-        "def f(n: Int): Boolean = n > 0 ** f(n)", OrdinaryRecursion)
+    assertRecursionTypeIs("def f(n: Int): Boolean = n > 0 ** f(n)",
+                          OrdinaryRecursion)
   }
 
   def testDeeperInfixOperator() {
@@ -104,13 +104,13 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
                  "f[A](n - 1)(body)")
   }
 
-  private def assertUsages(
-      @Language("Scala") code: String, expected: String*) {
+  private def assertUsages(@Language("Scala") code: String,
+                           expected: String*) {
     assertEquals(expected, parse(code).returnUsages().map(_.getText).toSeq)
   }
 
-  private def assertRecursionTypeIs(
-      @Language("Scala") code: String, expectation: RecursionType) {
+  private def assertRecursionTypeIs(@Language("Scala") code: String,
+                                    expectation: RecursionType) {
     assertEquals(expectation, parse(code).recursionType)
   }
 

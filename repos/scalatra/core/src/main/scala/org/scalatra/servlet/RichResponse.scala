@@ -30,8 +30,8 @@ case class RichResponse(res: HttpServletResponse) {
       }
 
     def iterator: Iterator[(String, String)] =
-      for (name <- res.getHeaderNames.asScala.iterator) yield
-        (name, res.getHeaders(name).asScala mkString ", ")
+      for (name <- res.getHeaderNames.asScala.iterator)
+        yield (name, res.getHeaders(name).asScala mkString ", ")
 
     def +=(kv: (String, String)): this.type = {
       res.setHeader(kv._1, kv._2)

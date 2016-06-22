@@ -31,7 +31,9 @@ object ClusterClientSpec extends MultiNodeConfig {
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -342,7 +344,7 @@ class ClusterClientSpec
         val sys2 = ActorSystem(system.name,
                                ConfigFactory
                                  .parseString("akka.remote.netty.tcp.port=" +
-                                     Cluster(system).selfAddress.port.get)
+                                       Cluster(system).selfAddress.port.get)
                                  .withFallback(system.settings.config))
         Cluster(sys2).join(Cluster(sys2).selfAddress)
         val service2 =

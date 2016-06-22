@@ -162,8 +162,8 @@ object PartialFunction {
 
   /** Composite function produced by `PartialFunction#orElse` method
     */
-  private class OrElse[-A, +B](
-      f1: PartialFunction[A, B], f2: PartialFunction[A, B])
+  private class OrElse[-A, +B](f1: PartialFunction[A, B],
+                               f2: PartialFunction[A, B])
       extends scala.runtime.AbstractPartialFunction[A, B]
       with Serializable {
     def isDefinedAt(x: A) = f1.isDefinedAt(x) || f2.isDefinedAt(x)

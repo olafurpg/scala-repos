@@ -64,7 +64,8 @@ trait HttpPipeliningSpec
       req.path match {
         case "/long" =>
           Accumulator.done(
-              Results.Ok.chunked(Source
+              Results.Ok.chunked(
+                  Source
                     .tick(initialDelay = 50.milliseconds,
                           interval = 50.milliseconds,
                           tick = "chunk")

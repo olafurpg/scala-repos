@@ -57,8 +57,8 @@ class AtmosphereSpecServlet(
     case t: Throwable => t.printStackTrace()
   }
 
-  override def handle(
-      request: HttpServletRequest, response: HttpServletResponse) {
+  override def handle(request: HttpServletRequest,
+                      response: HttpServletResponse) {
     withRequestResponse(request, response) {
       println(request.headers)
       println("routeBasePath: " + routeBasePath(request))

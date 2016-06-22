@@ -26,13 +26,13 @@ private[persistence] object Eventsourced {
   }
 
   /** forces actor to stash incoming commands until all these invocations are handled */
-  private final case class StashingHandlerInvocation(
-      evt: Any, handler: Any ⇒ Unit)
+  private final case class StashingHandlerInvocation(evt: Any,
+                                                     handler: Any ⇒ Unit)
       extends PendingHandlerInvocation
 
   /** does not force the actor to stash commands; Originates from either `persistAsync` or `defer` calls */
-  private final case class AsyncHandlerInvocation(
-      evt: Any, handler: Any ⇒ Unit)
+  private final case class AsyncHandlerInvocation(evt: Any,
+                                                  handler: Any ⇒ Unit)
       extends PendingHandlerInvocation
 }
 
@@ -128,7 +128,7 @@ private[persistence] trait Eventsourced
         log.error(
             cause,
             "Exception in receiveRecover when replaying event type [{}] with sequence number [{}] for " +
-            "persistenceId [{}].",
+              "persistenceId [{}].",
             evt.getClass.getName,
             lastSequenceNr,
             persistenceId)
@@ -136,7 +136,7 @@ private[persistence] trait Eventsourced
         log.error(
             cause,
             "Persistence failure when replaying events for persistenceId [{}]. " +
-            "Last known sequence number [{}]",
+              "Last known sequence number [{}]",
             persistenceId,
             lastSequenceNr)
     }
@@ -154,8 +154,9 @@ private[persistence] trait Eventsourced
     * @param cause failure cause.
     * @param event the event that was to be persisted
     */
-  protected def onPersistFailure(
-      cause: Throwable, event: Any, seqNr: Long): Unit = {
+  protected def onPersistFailure(cause: Throwable,
+                                 event: Any,
+                                 seqNr: Long): Unit = {
     log.error(
         cause,
         "Failed to persist event type [{}] with sequence number [{}] for persistenceId [{}].",
@@ -172,8 +173,9 @@ private[persistence] trait Eventsourced
     * @param cause failure cause
     * @param event the event that was to be persisted
     */
-  protected def onPersistRejected(
-      cause: Throwable, event: Any, seqNr: Long): Unit = {
+  protected def onPersistRejected(cause: Throwable,
+                                  event: Any,
+                                  seqNr: Long): Unit = {
     log.warning(
         "Rejected to persist event type [{}] with sequence number [{}] for persistenceId [{}] due to [{}].",
         event.getClass.getName,
@@ -206,8 +208,8 @@ private[persistence] trait Eventsourced
   }
 
   /** INTERNAL API. */
-  override protected[akka] def aroundReceive(
-      receive: Receive, message: Any): Unit =
+  override protected[akka] def aroundReceive(receive: Receive,
+                                             message: Any): Unit =
     currentState.stateReceive(receive, message)
 
   /** INTERNAL API. */
@@ -219,8 +221,8 @@ private[persistence] trait Eventsourced
   }
 
   /** INTERNAL API. */
-  override protected[akka] def aroundPreRestart(
-      reason: Throwable, message: Option[Any]): Unit = {
+  override protected[akka] def aroundPreRestart(reason: Throwable,
+                                                message: Option[Any]): Unit = {
     try {
       internalStash.unstashAll()
       unstashAll(unstashFilterPredicate)
@@ -363,7 +365,8 @@ private[persistence] trait Eventsourced
   def persist[A](event: A)(handler: A ⇒ Unit): Unit = {
     pendingStashingPersistInvocations += 1
     pendingInvocations addLast StashingHandlerInvocation(
-        event, handler.asInstanceOf[Any ⇒ Unit])
+        event,
+        handler.asInstanceOf[Any ⇒ Unit])
     eventBatch ::= AtomicWrite(
         PersistentRepr(event,
                        persistenceId = persistenceId,
@@ -385,14 +388,16 @@ private[persistence] trait Eventsourced
       events.foreach { event ⇒
         pendingStashingPersistInvocations += 1
         pendingInvocations addLast StashingHandlerInvocation(
-            event, handler.asInstanceOf[Any ⇒ Unit])
+            event,
+            handler.asInstanceOf[Any ⇒ Unit])
       }
       eventBatch ::= AtomicWrite(
-          events.map(PersistentRepr.apply(_,
-                                          persistenceId = persistenceId,
-                                          sequenceNr = nextSequenceNr(),
-                                          writerUuid = writerUuid,
-                                          sender = sender())))
+          events.map(
+              PersistentRepr.apply(_,
+                                   persistenceId = persistenceId,
+                                   sequenceNr = nextSequenceNr(),
+                                   writerUuid = writerUuid,
+                                   sender = sender())))
     }
   }
 
@@ -425,7 +430,8 @@ private[persistence] trait Eventsourced
     */
   def persistAsync[A](event: A)(handler: A ⇒ Unit): Unit = {
     pendingInvocations addLast AsyncHandlerInvocation(
-        event, handler.asInstanceOf[Any ⇒ Unit])
+        event,
+        handler.asInstanceOf[Any ⇒ Unit])
     eventBatch ::= AtomicWrite(
         PersistentRepr(event,
                        persistenceId = persistenceId,
@@ -446,14 +452,16 @@ private[persistence] trait Eventsourced
     if (events.nonEmpty) {
       events.foreach { event ⇒
         pendingInvocations addLast AsyncHandlerInvocation(
-            event, handler.asInstanceOf[Any ⇒ Unit])
+            event,
+            handler.asInstanceOf[Any ⇒ Unit])
       }
       eventBatch ::= AtomicWrite(
-          events.map(PersistentRepr(_,
-                                    persistenceId = persistenceId,
-                                    sequenceNr = nextSequenceNr(),
-                                    writerUuid = writerUuid,
-                                    sender = sender())))
+          events.map(
+              PersistentRepr(_,
+                             persistenceId = persistenceId,
+                             sequenceNr = nextSequenceNr(),
+                             writerUuid = writerUuid,
+                             sender = sender())))
     }
 
   @deprecated("use persistAllAsync instead", "2.4")
@@ -482,7 +490,8 @@ private[persistence] trait Eventsourced
       handler(event)
     } else {
       pendingInvocations addLast AsyncHandlerInvocation(
-          event, handler.asInstanceOf[Any ⇒ Unit])
+          event,
+          handler.asInstanceOf[Any ⇒ Unit])
       eventBatch = NonPersistentRepr(event, sender()) :: eventBatch
     }
   }
@@ -556,11 +565,15 @@ private[persistence] trait Eventsourced
             setLastSequenceNr(metadata.sequenceNr)
             // Since we are recovering we can ignore the receive behavior from the stack
             Eventsourced. super.aroundReceive(
-                recoveryBehavior, SnapshotOffer(metadata, snapshot))
+                recoveryBehavior,
+                SnapshotOffer(metadata, snapshot))
         }
         changeState(recovering(recoveryBehavior))
-        journal ! ReplayMessages(
-            lastSequenceNr + 1L, toSnr, replayMax, persistenceId, self)
+        journal ! ReplayMessages(lastSequenceNr + 1L,
+                                 toSnr,
+                                 replayMax,
+                                 persistenceId,
+                                 self)
       case other ⇒
         stashInternally(other)
     }

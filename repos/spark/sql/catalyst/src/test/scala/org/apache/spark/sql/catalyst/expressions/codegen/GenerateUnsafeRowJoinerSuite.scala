@@ -74,8 +74,9 @@ class GenerateUnsafeRowJoinerSuite extends SparkFunSuite {
     }
   }
 
-  private def testConcatOnce(
-      numFields1: Int, numFields2: Int, candidateTypes: Seq[DataType]) {
+  private def testConcatOnce(numFields1: Int,
+                             numFields2: Int,
+                             candidateTypes: Seq[DataType]) {
     info(s"schema size $numFields1, $numFields2")
     val random = new Random()
     val schema1 =
@@ -112,14 +113,15 @@ class GenerateUnsafeRowJoinerSuite extends SparkFunSuite {
         assert(output.isNullAt(i) === row1.isNullAt(i))
         if (!output.isNullAt(i)) {
           assert(
-              output.get(i, mergedSchema(i).dataType) === row1.get(
-                  i, mergedSchema(i).dataType))
+              output.get(i, mergedSchema(i).dataType) === row1
+                .get(i, mergedSchema(i).dataType))
         }
       } else {
         assert(output.isNullAt(i) === row2.isNullAt(i - schema1.size))
         if (!output.isNullAt(i)) {
-          assert(output.get(i, mergedSchema(i).dataType) === row2.get(
-                  i - schema1.size, mergedSchema(i).dataType))
+          assert(
+              output.get(i, mergedSchema(i).dataType) === row2
+                .get(i - schema1.size, mergedSchema(i).dataType))
         }
       }
     }

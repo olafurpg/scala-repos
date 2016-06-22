@@ -41,8 +41,12 @@ object TestStore {
       tconv: TupleConverter[(K, V)]) = {
     val startBatch = inBatcher.batchOf(Timestamp(0)).prev
     val endBatch = inBatcher.batchOf(Timestamp(lastTime)).next
-    new TestStore[K, V](
-        store, inBatcher, startBatch, initStore, endBatch, pruning)
+    new TestStore[K, V](store,
+                        inBatcher,
+                        startBatch,
+                        initStore,
+                        endBatch,
+                        pruning)
   }
 }
 
@@ -102,7 +106,8 @@ class TestStore[K, V](store: String,
 
   /** Instances may choose to write out the last or just compute it from the stream */
   override def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit = {
+      implicit flowDef: FlowDef,
+      mode: Mode): Unit = {
     val out = batches(batchID)
     lastVals.write(TypedSink[(K, V)](out))
     writtenBatches = writtenBatches + batchID

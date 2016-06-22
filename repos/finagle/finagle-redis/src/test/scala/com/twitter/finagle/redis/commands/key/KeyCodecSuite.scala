@@ -54,7 +54,8 @@ final class KeyCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode one key to EXPIREAT at future timestamp", CodecTest) {
-    assert(codec(wrap("EXPIREAT moo 100\r\n")) == List(
+    assert(
+        codec(wrap("EXPIREAT moo 100\r\n")) == List(
             ExpireAt(moo, Time.fromMilliseconds(100 * 1000))))
   }
 
@@ -63,8 +64,8 @@ final class KeyCodecSuite extends RedisRequestTest {
     val time = Time.now + 10.seconds
     unwrap(codec(wrap("EXPIREAT foo %d\r\n".format(time.inSeconds)))) {
       case ExpireAt(foo, timestamp) => {
-          assert(timestamp.inSeconds == time.inSeconds)
-        }
+        assert(timestamp.inSeconds == time.inSeconds)
+      }
     }
   }
 
@@ -112,7 +113,8 @@ final class KeyCodecSuite extends RedisRequestTest {
 
   test("Correctly encode one key to PEXPIREAT at a future timestamp",
        CodecTest) {
-    assert(codec(wrap("PEXPIREAT boo 100000\r\n")) == List(
+    assert(
+        codec(wrap("PEXPIREAT boo 100000\r\n")) == List(
             PExpireAt(boo, Time.fromMilliseconds(100000))))
   }
 
@@ -122,8 +124,8 @@ final class KeyCodecSuite extends RedisRequestTest {
     val time = Time.now + 10.seconds
     unwrap(codec(wrap("PEXPIREAT foo %d\r\n".format(time.inMilliseconds)))) {
       case PExpireAt(foo, timestamp) => {
-          assert(timestamp.inMilliseconds == time.inMilliseconds)
-        }
+        assert(timestamp.inMilliseconds == time.inMilliseconds)
+      }
     }
   }
 

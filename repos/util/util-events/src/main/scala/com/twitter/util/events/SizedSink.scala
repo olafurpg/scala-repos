@@ -65,7 +65,7 @@ object SizedSink {
   * @param milliTime gets the current time in millis from the epoch.
   *          This is exposed to allow for more control in tests.
   */
-class SizedSink private[events](capacity: Int, milliTime: () => Long)
+class SizedSink private[events] (capacity: Int, milliTime: () => Long)
     extends Sink {
   import SizedSink._
 

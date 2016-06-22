@@ -124,8 +124,8 @@ final class GBTRegressor @Since("1.4.0")(
       this,
       "lossType",
       "Loss function which GBT" +
-      " tries to minimize (case-insensitive). Supported options:" +
-      s" ${GBTRegressor.supportedLossTypes.mkString(", ")}",
+        " tries to minimize (case-insensitive). Supported options:" +
+        s" ${GBTRegressor.supportedLossTypes.mkString(", ")}",
       (value: String) =>
         GBTRegressor.supportedLossTypes.contains(value.toLowerCase))
 
@@ -188,7 +188,7 @@ object GBTRegressor {
   */
 @Since("1.4.0")
 @Experimental
-final class GBTRegressionModel private[ml](
+final class GBTRegressionModel private[ml] (
     override val uid: String,
     private val _trees: Array[DecisionTreeRegressionModel],
     private val _treeWeights: Array[Double],
@@ -201,7 +201,7 @@ final class GBTRegressionModel private[ml](
   require(
       _trees.length == _treeWeights.length,
       "GBTRegressionModel given trees, treeWeights of" +
-      s" non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
+        s" non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
 
   /**
     * Construct a GBTRegressionModel
@@ -264,14 +264,16 @@ private[ml] object GBTRegressionModel {
     require(
         oldModel.algo == OldAlgo.Regression,
         "Cannot convert GradientBoostedTreesModel" +
-        s" with algo=${oldModel.algo} (old API) to GBTRegressionModel (new API).")
+          s" with algo=${oldModel.algo} (old API) to GBTRegressionModel (new API).")
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)
     }
     val uid =
       if (parent != null) parent.uid else Identifiable.randomUID("gbtr")
-    new GBTRegressionModel(
-        parent.uid, newTrees, oldModel.treeWeights, numFeatures)
+    new GBTRegressionModel(parent.uid,
+                           newTrees,
+                           oldModel.treeWeights,
+                           numFeatures)
   }
 }

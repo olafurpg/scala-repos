@@ -74,15 +74,15 @@ object ClusterShardingCustomShardAllocationSpec {
         requester: ActorRef,
         shardId: ShardRegion.ShardId,
         currentShardAllocations: Map[
-            ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]])
-      : Future[ActorRef] = {
+            ActorRef,
+            immutable.IndexedSeq[ShardRegion.ShardId]]): Future[ActorRef] = {
       (ref ? AllocateReq).mapTo[ActorRef]
     }
 
-    override def rebalance(
-        currentShardAllocations: Map[
-            ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]],
-        rebalanceInProgress: Set[ShardRegion.ShardId])
+    override def rebalance(currentShardAllocations: Map[
+                               ActorRef,
+                               immutable.IndexedSeq[ShardRegion.ShardId]],
+                           rebalanceInProgress: Set[ShardRegion.ShardId])
       : Future[Set[ShardRegion.ShardId]] = {
       (ref ? RebalanceReq).mapTo[Set[String]]
     }
@@ -173,14 +173,14 @@ abstract class ClusterShardingCustomShardAllocationSpec(
   }
 
   def startSharding(): Unit = {
-    ClusterSharding(system).start(
-        typeName = "Entity",
-        entityProps = Props[Entity],
-        settings = ClusterShardingSettings(system),
-        extractEntityId = extractEntityId,
-        extractShardId = extractShardId,
-        allocationStrategy = TestAllocationStrategy(allocator),
-        handOffStopMessage = PoisonPill)
+    ClusterSharding(system).start(typeName = "Entity",
+                                  entityProps = Props[Entity],
+                                  settings = ClusterShardingSettings(system),
+                                  extractEntityId = extractEntityId,
+                                  extractShardId = extractShardId,
+                                  allocationStrategy =
+                                    TestAllocationStrategy(allocator),
+                                  handOffStopMessage = PoisonPill)
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
@@ -232,7 +232,8 @@ abstract class ClusterShardingCustomShardAllocationSpec(
       enterBarrier("second-started")
 
       runOn(first) {
-        system.actorSelection(node(second) / "system" / "sharding" / "Entity") ! Identify(
+        system
+          .actorSelection(node(second) / "system" / "sharding" / "Entity") ! Identify(
             None)
         val secondRegion = expectMsgType[ActorIdentity].ref.get
         allocator ! UseRegion(secondRegion)

@@ -81,8 +81,9 @@ class VectorSlicerSuite
       new AttributeGroup("features", attrs.asInstanceOf[Array[Attribute]])
 
     val resultAttrs = Array("f1", "f4").map(defaultAttr.withName)
-    val resultAttrGroup = new AttributeGroup(
-        "expected", resultAttrs.asInstanceOf[Array[Attribute]])
+    val resultAttrGroup =
+      new AttributeGroup("expected",
+                         resultAttrs.asInstanceOf[Array[Attribute]])
 
     val rdd =
       sc.parallelize(data.zip(expected)).map { case (a, b) => Row(a, b) }

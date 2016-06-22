@@ -23,15 +23,16 @@ import org.apache.commons.math3.distribution.{FDistribution => ApacheFDistributi
   *
   * @author stucchio
   */
-class FDistribution(
-    numeratorDegreesOfFreedom: Double, denominatorDegreesOfFreedom: Double)
+class FDistribution(numeratorDegreesOfFreedom: Double,
+                    denominatorDegreesOfFreedom: Double)
     extends ApacheContinuousDistribution /* with Moments[Double,Double] */ {
   //Moments not implemented cause I can't find the entropy of it
   protected final val inner = new ApacheFDistribution(
-      numeratorDegreesOfFreedom, denominatorDegreesOfFreedom)
+      numeratorDegreesOfFreedom,
+      denominatorDegreesOfFreedom)
   def mode =
     ((numeratorDegreesOfFreedom - 2) / numeratorDegreesOfFreedom) *
-    (denominatorDegreesOfFreedom / (denominatorDegreesOfFreedom + 2))
+      (denominatorDegreesOfFreedom / (denominatorDegreesOfFreedom + 2))
 }
 
 object FDistribution

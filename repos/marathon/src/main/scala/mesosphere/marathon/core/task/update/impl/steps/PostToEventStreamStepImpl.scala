@@ -26,8 +26,9 @@ class PostToEventStreamStepImpl @Inject()(
 
   override def name: String = "postTaskStatusEvent"
 
-  override def processUpdate(
-      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(timestamp: Timestamp,
+                             task: Task,
+                             status: TaskStatus): Future[_] = {
 
     status.getState match {
       case Terminated(_) =>
@@ -45,8 +46,9 @@ class PostToEventStreamStepImpl @Inject()(
     Future.successful(())
   }
 
-  private[this] def postEvent(
-      timestamp: Timestamp, status: TaskStatus, task: Task): Unit = {
+  private[this] def postEvent(timestamp: Timestamp,
+                              status: TaskStatus,
+                              task: Task): Unit = {
     val taskId = task.taskId
     task.launched.foreach { launched =>
       log.info(

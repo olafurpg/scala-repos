@@ -16,12 +16,13 @@ class ScalaCaseClauseRemover extends ScalaUnwrapper {
   override def isApplicableTo(e: PsiElement): Boolean =
     forCaseClause(e)(_ => true)(false)
 
-  override def doUnwrap(
-      element: PsiElement, context: ScalaUnwrapContext): Unit =
+  override def doUnwrap(element: PsiElement,
+                        context: ScalaUnwrapContext): Unit =
     forCaseClause(element)(context.delete(_)) {}
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]): PsiElement =
+      e: PsiElement,
+      toExtract: util.List[PsiElement]): PsiElement =
     forCaseClause[PsiElement](e) { cl =>
       super.collectAffectedElements(cl, toExtract)
       cl

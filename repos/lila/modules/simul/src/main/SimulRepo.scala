@@ -150,6 +150,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
       .void
 
   def cleanup =
-    simulColl.remove(createdSelect ++ BSONDocument("createdAt" -> BSONDocument(
+    simulColl.remove(
+        createdSelect ++ BSONDocument("createdAt" -> BSONDocument(
                 "$lt" -> (DateTime.now minusMinutes 60))))
 }

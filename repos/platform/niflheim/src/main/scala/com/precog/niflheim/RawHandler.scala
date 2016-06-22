@@ -49,7 +49,9 @@ object RawHandler {
   }
 }
 
-class RawReader private[niflheim](val id: Long, val log: File, rs: Seq[JValue])
+class RawReader private[niflheim] (val id: Long,
+                                   val log: File,
+                                   rs: Seq[JValue])
     extends StorageReader {
   // TODO: weakrefs?
   @volatile protected[this] var rows = mutable.ArrayBuffer.empty[JValue] ++ rs
@@ -104,8 +106,10 @@ class RawReader private[niflheim](val id: Long, val log: File, rs: Seq[JValue])
   }
 }
 
-class RawHandler private[niflheim](
-    id: Long, log: File, rs: Seq[JValue], private var os: OutputStream)
+class RawHandler private[niflheim] (id: Long,
+                                    log: File,
+                                    rs: Seq[JValue],
+                                    private var os: OutputStream)
     extends RawReader(id, log, rs) {
   def write(eventid: Long, values: Seq[JValue]) {
     if (!values.isEmpty) {

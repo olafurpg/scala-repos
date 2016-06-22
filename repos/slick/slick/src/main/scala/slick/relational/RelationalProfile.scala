@@ -40,8 +40,8 @@ trait RelationalProfile
     type BaseColumnType[T] = self.BaseColumnType[T]
     val MappedColumnType = self.MappedColumnType
 
-    @deprecated(
-        "Use an explicit conversion to an Option column with `.?`", "3.0")
+    @deprecated("Use an explicit conversion to an Option column with `.?`",
+                "3.0")
     implicit def columnToOptionColumn[T: BaseTypedType](
         c: Rep[T]): Rep[Option[T]] = c.?
     implicit def valueToConstColumn[T: TypedType](v: T): LiteralColumn[T] =
@@ -49,8 +49,8 @@ trait RelationalProfile
     implicit def columnToOrdered[T: TypedType](c: Rep[T]): ColumnOrdered[T] =
       ColumnOrdered[T](c, Ordering())
     implicit def tableQueryToTableQueryExtensionMethods[
-        T <: RelationalProfile#Table[_], U](
-        q: Query[T, U, Seq] with TableQuery[T])
+        T <: RelationalProfile#Table[_],
+        U](q: Query[T, U, Seq] with TableQuery[T])
       : TableQueryExtensionMethods[T, U] =
       new TableQueryExtensionMethods[T, U](q)
 
@@ -97,8 +97,12 @@ trait RelationalProfile
       * key matches the parameter value. */
     def findBy[P](f: (T => Rep[P]))(
         implicit ashape: Shape[ColumnsShapeLevel, Rep[P], P, Rep[P]],
-        pshape: Shape[ColumnsShapeLevel, P, P, _]): CompiledFunction[
-        Rep[P] => Query[T, U, Seq], Rep[P], P, Query[T, U, Seq], Seq[U]] = {
+        pshape: Shape[ColumnsShapeLevel, P, P, _])
+      : CompiledFunction[Rep[P] => Query[T, U, Seq],
+                         Rep[P],
+                         P,
+                         Query[T, U, Seq],
+                         Seq[U]] = {
       import self.api._
       Compiled { (p: Rep[P]) =>
         (q: Query[T, U, Seq]).filter(table =>
@@ -116,9 +120,11 @@ trait RelationalProfile
       val mp: MappedProjection[T, P]) {
     def fastPath(
         fpf: (TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
-                  M, T])): MappedProjection[T, P] = mp.genericFastPath {
-      case tm @ TypeMappingResultConverter(
-          _: ProductResultConverter[_, _], _, _) =>
+                  M,
+                  T])): MappedProjection[T, P] = mp.genericFastPath {
+      case tm @ TypeMappingResultConverter(_: ProductResultConverter[_, _],
+                                           _,
+                                           _) =>
         fpf(tm.asInstanceOf[TypeMappingResultConverter[M, T, _]])
       case tm => tm
     }
@@ -158,8 +164,9 @@ trait RelationalTableComponent { self: RelationalProfile =>
 
   val columnOptions: ColumnOptions = new ColumnOptions {}
 
-  abstract class Table[T](
-      _tableTag: Tag, _schemaName: Option[String], _tableName: String)
+  abstract class Table[T](_tableTag: Tag,
+                          _schemaName: Option[String],
+                          _tableName: String)
       extends AbstractTable[T](_tableTag, _schemaName, _tableName) { table =>
     final type TableElementType = T
 
@@ -182,8 +189,8 @@ trait RelationalTableComponent { self: RelationalProfile =>
       if (tt == null)
         throw new NullPointerException(
             "implicit TypedType[C] for column[C] is null. " +
-            "This may be an initialization order problem. " +
-            "When using a MappedColumnType, you may want to change it from a val to a lazy val or def.")
+              "This may be an initialization order problem. " +
+              "When using a MappedColumnType, you may want to change it from a val to a lazy val or def.")
       new Rep.TypedRep[C] {
         override def toNode =
           Select((tableTag match {
@@ -204,13 +211,14 @@ trait RelationalSequenceComponent { self: RelationalProfile =>
 
   def buildSequenceSchemaDescription(seq: Sequence[_]): SchemaDescription
 
-  class Sequence[T] private[Sequence](val name: String,
-                                      val _minValue: Option[T],
-                                      val _maxValue: Option[T],
-                                      val _increment: Option[T],
-                                      val _start: Option[T],
-                                      val _cycle: Boolean)(
-      implicit val tpe: TypedType[T], val integral: Integral[T]) { seq =>
+  class Sequence[T] private[Sequence] (val name: String,
+                                       val _minValue: Option[T],
+                                       val _maxValue: Option[T],
+                                       val _increment: Option[T],
+                                       val _start: Option[T],
+                                       val _cycle: Boolean)(
+      implicit val tpe: TypedType[T],
+      val integral: Integral[T]) { seq =>
 
     def min(v: T) =
       new Sequence[T](name, Some(v), _maxValue, _increment, _start, _cycle)
@@ -239,14 +247,14 @@ trait RelationalSequenceComponent { self: RelationalProfile =>
 }
 
 trait RelationalTypesComponent { self: RelationalProfile =>
-  type ColumnType [T] <: TypedType[T]
-  type BaseColumnType [T] <: ColumnType[T] with BaseTypedType[T]
+  type ColumnType[T] <: TypedType[T]
+  type BaseColumnType[T] <: ColumnType[T] with BaseTypedType[T]
 
   val MappedColumnType: MappedColumnTypeFactory
 
   trait MappedColumnTypeFactory {
-    def base[T: ClassTag, U: BaseColumnType](
-        tmap: T => U, tcomap: U => T): BaseColumnType[T]
+    def base[T: ClassTag, U: BaseColumnType](tmap: T => U,
+                                             tcomap: U => T): BaseColumnType[T]
 
     protected[this] def assertNonNullType(t: BaseColumnType[_]): Unit =
       if (t == null)
@@ -278,7 +286,7 @@ trait RelationalActionComponent extends BasicActionComponent {
 
   //////////////////////////////////////////////////////////// Insert Actions
 
-  type InsertActionExtensionMethods [T] <: InsertActionExtensionMethodsImpl[T]
+  type InsertActionExtensionMethods[T] <: InsertActionExtensionMethodsImpl[T]
 
   def createInsertActionExtensionMethods[T](
       compiled: CompiledInsert): InsertActionExtensionMethods[T]

@@ -95,8 +95,8 @@ trait SerializationSupport {
       .setUid(uniqueAddress.uid)
 
   def uniqueAddressFromProto(uniqueAddress: dm.UniqueAddress): UniqueAddress =
-    UniqueAddress(
-        addressFromProto(uniqueAddress.getAddress), uniqueAddress.getUid)
+    UniqueAddress(addressFromProto(uniqueAddress.getAddress),
+                  uniqueAddress.getUid)
 
   def resolveActorRef(path: String): ActorRef =
     system.provider.resolveActorRef(path)

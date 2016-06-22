@@ -38,7 +38,7 @@ import org.apache.spark.sql.sources.HadoopFsRelation
   * @since 1.4.0
   */
 @Experimental
-final class DataFrameWriter private[sql](df: DataFrame) {
+final class DataFrameWriter private[sql] (df: DataFrame) {
 
   /**
     * Specifies the behavior when data or table already exists. Options include:
@@ -70,8 +70,9 @@ final class DataFrameWriter private[sql](df: DataFrame) {
       case "ignore" => SaveMode.Ignore
       case "error" | "default" => SaveMode.ErrorIfExists
       case _ =>
-        throw new IllegalArgumentException(s"Unknown save mode: $saveMode. " +
-            "Accepted modes are 'overwrite', 'append', 'ignore', 'error'.")
+        throw new IllegalArgumentException(
+            s"Unknown save mode: $saveMode. " +
+              "Accepted modes are 'overwrite', 'append', 'ignore', 'error'.")
     }
     this
   }
@@ -172,8 +173,9 @@ final class DataFrameWriter private[sql](df: DataFrame) {
     * @since 2.0
     */
   @scala.annotation.varargs
-  def bucketBy(
-      numBuckets: Int, colName: String, colNames: String*): DataFrameWriter = {
+  def bucketBy(numBuckets: Int,
+               colName: String,
+               colNames: String*): DataFrameWriter = {
     this.numBuckets = Option(numBuckets)
     this.bucketColumnNames = Option(colName +: colNames)
     this
@@ -209,12 +211,12 @@ final class DataFrameWriter private[sql](df: DataFrame) {
     */
   def save(): Unit = {
     assertNotBucketed()
-    val dataSource = DataSource(
-        df.sqlContext,
-        className = source,
-        partitionColumns = partitioningColumns.getOrElse(Nil),
-        bucketSpec = getBucketSpec,
-        options = extraOptions.toMap)
+    val dataSource = DataSource(df.sqlContext,
+                                className = source,
+                                partitionColumns =
+                                  partitioningColumns.getOrElse(Nil),
+                                bucketSpec = getBucketSpec,
+                                options = extraOptions.toMap)
 
     dataSource.write(mode, df)
   }
@@ -292,7 +294,8 @@ final class DataFrameWriter private[sql](df: DataFrame) {
     }.getOrElse(df.logicalPlan)
 
     df.sqlContext
-      .executePlan(InsertIntoTable(
+      .executePlan(
+          InsertIntoTable(
               UnresolvedRelation(tableIdent),
               partitions.getOrElse(Map.empty[String, Option[String]]),
               input,
@@ -318,8 +321,8 @@ final class DataFrameWriter private[sql](df: DataFrame) {
 
   private def getBucketSpec: Option[BucketSpec] = {
     if (sortColumnNames.isDefined) {
-      require(
-          numBuckets.isDefined, "sortBy must be used together with bucketBy")
+      require(numBuckets.isDefined,
+              "sortBy must be used together with bucketBy")
     }
 
     for {
@@ -334,7 +337,7 @@ final class DataFrameWriter private[sql](df: DataFrame) {
             .nonEmpty) {
         throw new AnalysisException(
             s"bucketBy columns '${bucketColumnNames.get.mkString(", ")}' should not be part of " +
-            s"partitionBy columns '${partitioningColumns.get.mkString(", ")}'")
+              s"partitionBy columns '${partitioningColumns.get.mkString(", ")}'")
       }
 
       BucketSpec(n,
@@ -354,7 +357,7 @@ final class DataFrameWriter private[sql](df: DataFrame) {
       .find(df.sqlContext.sessionState.analyzer.resolver(_, columnName))
       .getOrElse(throw new AnalysisException(
               s"$columnType column $columnName not found in " +
-              s"existing columns (${validColumnNames.mkString(", ")})"))
+                s"existing columns (${validColumnNames.mkString(", ")})"))
   }
 
   private def assertNotBucketed(): Unit = {
@@ -427,8 +430,9 @@ final class DataFrameWriter private[sql](df: DataFrame) {
     *                             should be included.
     * @since 1.4.0
     */
-  def jdbc(
-      url: String, table: String, connectionProperties: Properties): Unit = {
+  def jdbc(url: String,
+           table: String,
+           connectionProperties: Properties): Unit = {
     val props = new Properties()
     extraOptions.foreach {
       case (key, value) =>

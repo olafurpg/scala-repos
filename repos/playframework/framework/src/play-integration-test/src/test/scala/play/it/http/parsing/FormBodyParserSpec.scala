@@ -30,8 +30,9 @@ class FormBodyParserSpec extends PlaySpecification {
 
     case class User(name: String, age: Int)
 
-    val userForm = Form(mapping("name" -> nonEmptyText, "age" -> number)(
-            User.apply)(User.unapply))
+    val userForm = Form(
+        mapping("name" -> nonEmptyText, "age" -> number)(User.apply)(
+            User.unapply))
 
     "bind JSON requests" in new WithApplication() {
       parse(Json.obj("name" -> "Alice", "age" -> 42),

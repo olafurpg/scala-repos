@@ -41,5 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class PasswordFieldSpec
     extends SimpleSFXDelegateSpec[jfxsc.PasswordField, PasswordField](
-        classOf[jfxsc.PasswordField], classOf[PasswordField])
+        classOf[jfxsc.PasswordField],
+        classOf[PasswordField])
     with RunOnApplicationThread

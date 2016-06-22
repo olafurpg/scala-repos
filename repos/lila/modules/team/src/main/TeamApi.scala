@@ -140,7 +140,8 @@ final class TeamApi(cached: Cached,
 
   def doQuit(team: Team, userId: String): Funit =
     belongsTo(team.id, userId) ?? {
-      MemberRepo.remove(team.id, userId) >> TeamRepo.incMembers(team.id, -1) >>-
+      MemberRepo.remove(team.id, userId) >> TeamRepo
+        .incMembers(team.id, -1) >>-
       (cached.teamIdsCache invalidate userId)
     }
 
@@ -157,7 +158,7 @@ final class TeamApi(cached: Cached,
   // delete for ever, with members but not forums
   def delete(team: Team): Funit =
     $remove(team) >> MemberRepo.removeByteam(team.id) >>-
-    (indexer ! RemoveTeam(team.id))
+      (indexer ! RemoveTeam(team.id))
 
   def belongsTo(teamId: String, userId: String): Boolean =
     cached.teamIds(userId) contains teamId

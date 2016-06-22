@@ -107,8 +107,9 @@ private object PoolSlot {
       .actorPublisher[HttpRequest](
           Props(new FlowInportActor(self)).withDeploy(Deploy.local))
       .via(connectionFlow)
-      .toMat(Sink.actorSubscriber[HttpResponse](Props(new FlowOutportActor(
-                      self)).withDeploy(Deploy.local)))(Keep.both)
+      .toMat(Sink.actorSubscriber[HttpResponse](
+              Props(new FlowOutportActor(self)).withDeploy(Deploy.local)))(
+          Keep.both)
       .named("SlotProcessorInternalConnectionFlow")
 
     override def requestStrategy = ZeroRequestStrategy
@@ -193,8 +194,8 @@ private object PoolSlot {
         val (entity, whenCompleted) =
           HttpEntity.captureTermination(response.entity)
         val delivery = ResponseDelivery(
-            ResponseContext(
-                requestContext, Success(response withEntity entity)))
+            ResponseContext(requestContext,
+                            Success(response withEntity entity)))
         import fm.executionContext
         val requestCompleted = SlotEvent.RequestCompletedFuture(
             whenCompleted.map(_ ⇒ SlotEvent.RequestCompleted(slotIx)))
@@ -216,10 +217,10 @@ private object PoolSlot {
           (error match {
             case Some(err) ⇒
               ResponseDelivery(
-                  ResponseContext(
-                      firstContext.get,
-                      Failure(new UnexpectedDisconnectException(
-                              "Unexpected (early) disconnect", err))))
+                  ResponseContext(firstContext.get,
+                                  Failure(new UnexpectedDisconnectException(
+                                          "Unexpected (early) disconnect",
+                                          err))))
             case _ ⇒
               ResponseDelivery(
                   ResponseContext(firstContext.get,
@@ -229,9 +230,9 @@ private object PoolSlot {
         } else {
           inflightRequests.map { rc ⇒
             if (rc.retriesLeft == 0) {
-              val reason =
-                error.fold[Throwable](new UnexpectedDisconnectException(
-                        "Unexpected disconnect"))(conforms)
+              val reason = error.fold[Throwable](
+                  new UnexpectedDisconnectException("Unexpected disconnect"))(
+                  conforms)
               connInport ! ActorPublisherMessage.Cancel
               ResponseDelivery(ResponseContext(rc, Failure(reason)))
             } else

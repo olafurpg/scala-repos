@@ -18,8 +18,8 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
 
   def quot(a: BigInteger, b: BigInteger): BigInteger = a divide b
   def mod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
-  override def quotmod(
-      a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
+  override def quotmod(a: BigInteger,
+                       b: BigInteger): (BigInteger, BigInteger) = {
     val Array(d, r) = a.divideAndRemainder(b)
     (d, r)
   }

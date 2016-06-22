@@ -70,12 +70,12 @@ object EvolutionsSpec extends Specification {
       val broken = evolutions.scripts(Seq(c1, a2, a3))
       val fixed = evolutions.scripts(Seq(a1, a2, a3))
 
-      evolutions.evolve(broken, autocommit = true) must throwAn[
-          InconsistentDatabase]
+      evolutions
+        .evolve(broken, autocommit = true) must throwAn[InconsistentDatabase]
 
       // inconsistent until resolved
-      evolutions.evolve(fixed, autocommit = true) must throwAn[
-          InconsistentDatabase]
+      evolutions
+        .evolve(fixed, autocommit = true) must throwAn[InconsistentDatabase]
 
       evolutions.resolve(1)
 
@@ -101,7 +101,8 @@ object EvolutionsSpec extends Specification {
     trait ProvideHelperForTesting {
       this: WithEvolutions =>
       Evolutions.withEvolutions(
-          database, SimpleEvolutionsReader.forDefault(a1, a2, a3)) {
+          database,
+          SimpleEvolutionsReader.forDefault(a1, a2, a3)) {
         // Check that there's data in the database
         val resultSet = executeQuery("select * from test")
         resultSet.next must beTrue

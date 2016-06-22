@@ -17,27 +17,28 @@ object PlayTime {
   def apply(user: User): Fu[User.PlayTime] = user.playTime match {
     case Some(pt) => fuccess(pt)
     case None => {
-        gameTube.coll
-          .find(BSONDocument(
-                  Game.BSONFields.playerUids -> user.id,
-                  Game.BSONFields.status -> BSONDocument(
-                      "$gte" -> chess.Status.Mate.id)
-              ))
-          .projection(BSONDocument(
-                  moveTimeField -> true,
-                  tvField -> true
-              ))
-          .cursor[BSONDocument]()
-          .enumerate() |>>>
-        (Iteratee.fold(User.PlayTime(0, 0)) {
-              case (pt, doc) =>
-                val t =
-                  doc.getAs[ByteArray](moveTimeField) ?? { times =>
-                    BinaryFormat.moveTime.read(times).sum
-                  } / 10
-                val isTv = doc.get(tvField).isDefined
-                User.PlayTime(pt.total + t, pt.tv + isTv.fold(t, 0))
-            })
-      }.addEffect { UserRepo.setPlayTime(user, _) }
+      gameTube.coll
+        .find(
+            BSONDocument(
+                Game.BSONFields.playerUids -> user.id,
+                Game.BSONFields.status -> BSONDocument(
+                    "$gte" -> chess.Status.Mate.id)
+            ))
+        .projection(BSONDocument(
+                moveTimeField -> true,
+                tvField -> true
+            ))
+        .cursor[BSONDocument]()
+        .enumerate() |>>>
+      (Iteratee.fold(User.PlayTime(0, 0)) {
+            case (pt, doc) =>
+              val t =
+                doc.getAs[ByteArray](moveTimeField) ?? { times =>
+                  BinaryFormat.moveTime.read(times).sum
+                } / 10
+              val isTv = doc.get(tvField).isDefined
+              User.PlayTime(pt.total + t, pt.tv + isTv.fold(t, 0))
+          })
+    }.addEffect { UserRepo.setPlayTime(user, _) }
   }
 }

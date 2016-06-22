@@ -87,7 +87,7 @@ class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll {
       case e @ (_: NotSerializableException | _: SparkException) =>
         throw new TestException(
             s"Expected ReturnStatementInClosureException, but got $e.\n" +
-            "This means the closure provided by user is not actually cleaned.")
+              "This means the closure provided by user is not actually cleaned.")
     }
   }
 
@@ -173,8 +173,10 @@ class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll {
       ds.reduceByKeyAndWindow(reduceF, Seconds(1), Seconds(2), 5)
     }
     expectCorrectException {
-      ds.reduceByKeyAndWindow(
-          reduceF, Seconds(1), Seconds(2), new HashPartitioner(5))
+      ds.reduceByKeyAndWindow(reduceF,
+                              Seconds(1),
+                              Seconds(2),
+                              new HashPartitioner(5))
     }
     expectCorrectException {
       ds.reduceByKeyAndWindow(reduceF, reduceF, Seconds(2))

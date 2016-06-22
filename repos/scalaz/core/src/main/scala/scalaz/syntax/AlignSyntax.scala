@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Align` */
-final class AlignOps[F[_], A] private[syntax](val self: F[A])(
+final class AlignOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Align[F])
     extends Ops[F[A]] {
   ////

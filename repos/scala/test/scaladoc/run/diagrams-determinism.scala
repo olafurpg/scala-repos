@@ -69,11 +69,12 @@ object Test extends ScaladocModelTest {
 
     // 2. check the order in the diagram: this node, subclasses, and then implicit conversions
     def assertRightOrder(template: DocTemplateEntity, diagram: Diagram) =
-      for ((node, subclasses) <- diagram.edges) assert(
-          subclasses == subclasses.filter(_.isThisNode) ::: subclasses.filter(
-              node => node.isNormalNode || node.isOutsideNode) ::: subclasses
-            .filter(_.isImplicitNode),
-          "Diagram order for " + template + ": " + subclasses)
+      for ((node, subclasses) <- diagram.edges)
+        assert(subclasses == subclasses
+                 .filter(_.isThisNode) ::: subclasses.filter(node =>
+                     node.isNormalNode || node.isOutsideNode) ::: subclasses
+                 .filter(_.isImplicitNode),
+               "Diagram order for " + template + ": " + subclasses)
 
     val base = rootPackage
       ._package("scala")

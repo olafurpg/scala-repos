@@ -68,8 +68,8 @@ abstract class IdeClient(compilerName: String,
       else {
         val decapitalizedText =
           text.charAt(0).toLower.toString + text.substring(1)
-        "%s: %s [%s]".format(
-            compilerName, decapitalizedText, modules.mkString(", "))
+        "%s: %s [%s]"
+          .format(compilerName, decapitalizedText, modules.mkString(", "))
       }
     context.processMessage(
         new ProgressMessage(formattedText, done.getOrElse(-1.0F)))

@@ -28,8 +28,12 @@ class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
                               scType: ScType,
                               project: Project,
                               array: ArrayBuffer[LookupElement]) =
-    super.addLookupItems(
-        Array("scala.Array"), context, variant, scType, project, array)
+    super.addLookupItems(Array("scala.Array"),
+                         context,
+                         variant,
+                         scType,
+                         project,
+                         array)
 
   override def getResult(exprs: Array[Expression],
                          context: ExpressionContext,

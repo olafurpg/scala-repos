@@ -32,7 +32,8 @@ object RFormulaExample {
 
     // $example on$
     val dataset = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (7, "US", 18, 1.0),
               (8, "CA", 12, 0.0),
               (9, "NZ", 15, 0.0)

@@ -158,8 +158,7 @@ trait PerfTestSuite extends Logging {
             }
 
           case None =>
-            withPrinter(
-                _.println(config.format match {
+            withPrinter(_.println(config.format match {
               case OutputFormat.Legible =>
                 result.toPrettyString
 

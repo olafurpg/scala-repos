@@ -122,7 +122,8 @@ object ScSyntheticPackage {
             def getSubPackages(scope: GlobalSearchScope) = Array.empty
             def getContainer: PsiQualifiedNamedElement = null
             def findClassByShortName(
-                name: String, scope: GlobalSearchScope): Array[PsiClass] =
+                name: String,
+                scope: GlobalSearchScope): Array[PsiClass] =
               Array.empty
           }
         case None => null
@@ -141,7 +142,8 @@ object ScSyntheticPackage {
             Array.empty //todo: ?
 
           def findClassByShortName(
-              name: String, scope: GlobalSearchScope): Array[PsiClass] = {
+              name: String,
+              scope: GlobalSearchScope): Array[PsiClass] = {
             getClasses.filter(_.name == name)
           }
 

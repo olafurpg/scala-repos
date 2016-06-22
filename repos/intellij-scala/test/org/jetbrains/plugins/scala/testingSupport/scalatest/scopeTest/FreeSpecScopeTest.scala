@@ -40,8 +40,9 @@ trait FreeSpecScopeTest extends FreeSpecGenerator {
         checkConfigAndSettings(_, "ComplexFreeSpec", testNames: _*),
         root =>
           checkResultTreeHasExactNamedPath(root, path1: _*) &&
-          checkResultTreeHasExactNamedPath(root, path2: _*) &&
-          checkResultTreeDoesNotHaveNodes(
-              root, "Innermost scope", "Outer scope 3"))
+            checkResultTreeHasExactNamedPath(root, path2: _*) &&
+            checkResultTreeDoesNotHaveNodes(root,
+                                            "Innermost scope",
+                                            "Outer scope 3"))
   }
 }

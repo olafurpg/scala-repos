@@ -55,8 +55,8 @@ final class NIHDBPerfTestRunner[T](val timer: Timer[T],
                                    val apiKey: APIKey,
                                    val optimize: Boolean,
                                    _rootDir: Option[File],
-                                   testTimeout: Duration = Duration(
-                                       120, "seconds"))
+                                   testTimeout: Duration =
+                                     Duration(120, "seconds"))
     extends EvaluatingPerfTestRunner[Future, T]
     with SecureVFSModule[Future, Slice]
     with ActorVFSModule
@@ -102,8 +102,9 @@ final class NIHDBPerfTestRunner[T](val timer: Timer[T],
   val accountFinder = new StaticAccountFinder[Future]("", "")
   val apiKeyManager = new InMemoryAPIKeyManager[Future](yggConfig.clock)
   val accessControl = new DirectAPIKeyFinder(apiKeyManager)
-  val permissionsFinder = new PermissionsFinder(
-      accessControl, accountFinder, new org.joda.time.Instant())
+  val permissionsFinder = new PermissionsFinder(accessControl,
+                                                accountFinder,
+                                                new org.joda.time.Instant())
 
   val storageTimeout = Timeout(testTimeout)
 
@@ -124,19 +125,21 @@ final class NIHDBPerfTestRunner[T](val timer: Timer[T],
                                             yggConfig.cookThreshold,
                                             yggConfig.storageTimeout)
   val projectionsActor = actorSystem.actorOf(
-      Props(new PathRoutingActor(yggConfig.dataDir,
-                                 yggConfig.storageTimeout.duration,
-                                 yggConfig.quiescenceTimeout,
-                                 1000,
-                                 yggConfig.clock)))
+      Props(
+          new PathRoutingActor(yggConfig.dataDir,
+                               yggConfig.storageTimeout.duration,
+                               yggConfig.quiescenceTimeout,
+                               1000,
+                               yggConfig.clock)))
 
-  val actorVFS = new ActorVFS(
-      projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
-  val vfs = new SecureVFS(
-      actorVFS, permissionsFinder, jobManager, yggConfig.clock)
+  val actorVFS = new ActorVFS(projectionsActor,
+                              yggConfig.storageTimeout,
+                              yggConfig.storageTimeout)
+  val vfs =
+    new SecureVFS(actorVFS, permissionsFinder, jobManager, yggConfig.clock)
 
-  def Evaluator[N[+ _]](N0: Monad[N])(
-      implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] = {
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                      nm: N ~> Future): EvaluatorLike[N] = {
     new Evaluator[N](N0) {
       type YggConfig = self.YggConfig
       val yggConfig = self.yggConfig

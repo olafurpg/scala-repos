@@ -44,8 +44,10 @@ object LazyTuple3 extends LazyTuple3Instances {
 }
 
 object LazyTuple4 extends LazyTuple4Instances {
-  def apply[A, B, C, D](
-      a: => A, b: => B, c: => C, d: => D): LazyTuple4[A, B, C, D] =
+  def apply[A, B, C, D](a: => A,
+                        b: => B,
+                        c: => C,
+                        d: => D): LazyTuple4[A, B, C, D] =
     new LazyTuple4[A, B, C, D] {
       def _1 = a
       def _2 = b
@@ -72,8 +74,10 @@ object LazyTuple {
       def _3 = c
     }
 
-  def lazyTuple4[A, B, C, D](
-      a: => A, b: => B, c: => C, d: => D): LazyTuple4[A, B, C, D] =
+  def lazyTuple4[A, B, C, D](a: => A,
+                             b: => B,
+                             c: => C,
+                             d: => D): LazyTuple4[A, B, C, D] =
     new LazyTuple4[A, B, C, D] {
       def _1 = a
 
@@ -88,11 +92,12 @@ object LazyTuple {
 sealed abstract class LazyTuple2Instances0 {
   implicit val lazyTuple2Instance: Bitraverse[LazyTuple2] =
     new Bitraverse[LazyTuple2] {
-      override def bimap[A, B, C, D](fab: LazyTuple2[A, B])(
-          f: A => C, g: B => D): LazyTuple2[C, D] =
+      override def bimap[A, B, C, D](
+          fab: LazyTuple2[A, B])(f: A => C, g: B => D): LazyTuple2[C, D] =
         LazyTuple.lazyTuple2(f(fab._1), g(fab._2))
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(
-          f: A => G[C], g: B => G[D]): G[LazyTuple2[C, D]] = {
+          f: A => G[C],
+          g: B => G[D]): G[LazyTuple2[C, D]] = {
         Applicative[G].apply2(f(fab._1), g(fab._2))(LazyTuple.lazyTuple2(_, _))
       }
     }
@@ -121,22 +126,24 @@ sealed abstract class LazyTuple2Instances0 {
 
 sealed abstract class LazyTuple2Instances extends LazyTuple2Instances0 {
 
-  implicit def lazyTuple2Show[A1, A2](
-      implicit A1: Show[A1], A2: Show[A2]): Show[LazyTuple2[A1, A2]] =
+  implicit def lazyTuple2Show[A1, A2](implicit A1: Show[A1],
+                                      A2: Show[A2]): Show[LazyTuple2[A1, A2]] =
     new LazyTuple2Show[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
     }
 
   implicit def lazyTuple2Order[A1, A2](
-      implicit A1: Order[A1], A2: Order[A2]): Order[LazyTuple2[A1, A2]] =
+      implicit A1: Order[A1],
+      A2: Order[A2]): Order[LazyTuple2[A1, A2]] =
     new LazyTuple2Order[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
     }
 
   implicit def lazyTuple2Monoid[A1, A2](
-      implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[LazyTuple2[A1, A2]] =
+      implicit A1: Monoid[A1],
+      A2: Monoid[A2]): Monoid[LazyTuple2[A1, A2]] =
     new LazyTuple2Monoid[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -207,7 +214,8 @@ sealed abstract class LazyTuple3Instances extends LazyTuple3Instances0 {
     }
 
   implicit def lazyTuple3Monad[A1, A2](
-      implicit A1: Monoid[A1], A2: Monoid[A2]): Monad[LazyTuple3[A1, A2, ?]] =
+      implicit A1: Monoid[A1],
+      A2: Monoid[A2]): Monad[LazyTuple3[A1, A2, ?]] =
     new LazyTuple3Monad[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -338,8 +346,8 @@ private trait LazyTuple4Semigroup[A1, A2, A3, A4]
   implicit def _2: Semigroup[A2]
   implicit def _3: Semigroup[A3]
   implicit def _4: Semigroup[A4]
-  def append(
-      f1: LazyTuple4[A1, A2, A3, A4], f2: => LazyTuple4[A1, A2, A3, A4]) =
+  def append(f1: LazyTuple4[A1, A2, A3, A4],
+             f2: => LazyTuple4[A1, A2, A3, A4]) =
     LazyTuple4(
         _1.append(f1._1, f2._1),
         _2.append(f1._2, f2._2),
@@ -368,10 +376,10 @@ private trait LazyTuple4Equal[A1, A2, A3, A4]
   implicit def _2: Equal[A2]
   implicit def _3: Equal[A3]
   implicit def _4: Equal[A4]
-  override def equal(
-      f1: LazyTuple4[A1, A2, A3, A4], f2: LazyTuple4[A1, A2, A3, A4]) =
+  override def equal(f1: LazyTuple4[A1, A2, A3, A4],
+                     f2: LazyTuple4[A1, A2, A3, A4]) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-    _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4)
 }
 
 private trait LazyTuple2Show[A1, A2] extends Show[LazyTuple2[A1, A2]] {

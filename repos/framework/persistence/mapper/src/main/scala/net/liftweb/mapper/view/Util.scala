@@ -45,7 +45,8 @@ object Util {
     * argument.
     */
   def bindFields[T <: Mapper[T]](
-      mapper: T, nsfn: MappedField[_, T] => NodeSeq): NodeSeq => NodeSeq = {
+      mapper: T,
+      nsfn: MappedField[_, T] => NodeSeq): NodeSeq => NodeSeq = {
     case xml.Elem(_, name, _, _, _ *) =>
       mapper.fieldByName(name) match {
         case Full(field) => nsfn(field)
@@ -85,23 +86,22 @@ object Util {
     "^" #> { ns: NodeSeq =>
       val fieldsAttribute = (ns \ "@fields")
 
-      val bind: Seq[CssSel] =
-        if (fieldsAttribute.nonEmpty) {
-          for {
-            fieldName <- fieldsAttribute.text.split("\\s+")
-            // the following hackery is brought to you by the Scala compiler not
-            // properly typing MapperField[_, T] in the context of the for
-            // comprehension
-            fieldBind <- fieldBindIfWanted(fieldName)
-          } yield {
-            ".field" #> fieldBind
-          }
-        } else {
-          mapper.formFields.filter(filter).map {
-            case field: MappedField[_, T] =>
-              ".field" #> fn(field)
-          }
+      val bind: Seq[CssSel] = if (fieldsAttribute.nonEmpty) {
+        for {
+          fieldName <- fieldsAttribute.text.split("\\s+")
+          // the following hackery is brought to you by the Scala compiler not
+          // properly typing MapperField[_, T] in the context of the for
+          // comprehension
+          fieldBind <- fieldBindIfWanted(fieldName)
+        } yield {
+          ".field" #> fieldBind
         }
+      } else {
+        mapper.formFields.filter(filter).map {
+          case field: MappedField[_, T] =>
+            ".field" #> fn(field)
+        }
+      }
 
       bind.map(_ (ns))
     }

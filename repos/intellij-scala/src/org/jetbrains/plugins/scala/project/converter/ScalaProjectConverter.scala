@@ -71,7 +71,8 @@ private object ScalaProjectConverter {
   private def scalaCompilerSettingsIn(
       context: ConversionContext): Map[String, ScalaCompilerSettings] =
     modulesIn(context)
-      .flatMap(module =>
+      .flatMap(
+          module =>
             ScalaFacetData
               .findIn(module)
               .toSeq
@@ -110,8 +111,9 @@ private object ScalaProjectConverter {
 
     val profiles = sortedSettingsToModules.zipWithIndex.map {
       case ((settings, modules), i) =>
-        new ScalaCompilerSettingsProfile(
-            "Profile " + i, modules.toSeq, settings)
+        new ScalaCompilerSettingsProfile("Profile " + i,
+                                         modules.toSeq,
+                                         settings)
     }
 
     val defaultSettings =

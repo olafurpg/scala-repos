@@ -10,8 +10,8 @@ import scala.collection.{breakOut, immutable}
 
 abstract class Dns {
   def cached(name: String): Option[Dns.Resolved] = None
-  def resolve(name: String)(
-      system: ActorSystem, sender: ActorRef): Option[Dns.Resolved] = {
+  def resolve(name: String)(system: ActorSystem,
+                            sender: ActorRef): Option[Dns.Resolved] = {
     val ret = cached(name)
     if (ret.isEmpty) IO(Dns)(system).tell(Dns.Resolve(name), sender)
     ret
@@ -55,8 +55,8 @@ object Dns extends ExtensionId[DnsExt] with ExtensionIdProvider {
     Dns(system).cache.cached(name)
   }
 
-  def resolve(name: String)(
-      system: ActorSystem, sender: ActorRef): Option[Resolved] = {
+  def resolve(name: String)(system: ActorSystem,
+                            sender: ActorRef): Option[Resolved] = {
     Dns(system).cache.resolve(name)(system, sender)
   }
 
@@ -74,7 +74,7 @@ object Dns extends ExtensionId[DnsExt] with ExtensionIdProvider {
 class DnsExt(system: ExtendedActorSystem) extends IO.Extension {
   val Settings = new Settings(system.settings.config.getConfig("akka.io.dns"))
 
-  class Settings private[DnsExt](_config: Config) {
+  class Settings private[DnsExt] (_config: Config) {
 
     import _config._
 

@@ -53,7 +53,8 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(List(
+      dets should ===(
+          List(
               ("conversion", "\"sample\"", "StringToTest")
           ))
     }
@@ -74,7 +75,8 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(List(
+      dets should ===(
+          List(
               ("param", "\"sample\"", "StringToTest", List("myThing"), true),
               ("conversion", "\"sample\"", "StringToTest")
           ))

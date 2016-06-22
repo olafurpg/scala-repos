@@ -20,8 +20,8 @@ class BigDecimalConvertTest {
     assertEquals(1.toByte, BigDecimal.ONE.byteValue())
     assertEquals(BigDecimal.valueOf(255).byteValue(), -1.toByte)
     assertEquals(BigDecimal.ONE.byteValueExact(), 1.toByte)
-    expectThrows(
-        classOf[ArithmeticException], BigDecimal.valueOf(255).byteValueExact())
+    expectThrows(classOf[ArithmeticException],
+                 BigDecimal.valueOf(255).byteValueExact())
   }
 
   @Test def testDoubleValueNeg(): Unit = {
@@ -272,8 +272,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "-0.00000000000000000000000000000000000000000000000000000" +
-      "0000000000000012380964839238475457356735674573563567890295784902768" +
-      "787678287"
+        "0000000000000012380964839238475457356735674573563567890295784902768" +
+        "787678287"
     assertTrue(aNumber.toPlainString() == result)
   }
 
@@ -283,8 +283,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "-1238096483923847545735673567457356356789029578490276878" +
-      "7678287000000000000000000000000000000000000000000000000000000000000" +
-      "00000000000"
+        "7678287000000000000000000000000000000000000000000000000000000000000" +
+        "00000000000"
     assertTrue(aNumber.toPlainString() == result)
   }
 
@@ -294,8 +294,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "0.000000000000000000000000000000000000000000000000000000" +
-      "0000000000000123809648392384754573567356745735635678902957849027687" +
-      "87678287"
+        "0000000000000123809648392384754573567356745735635678902957849027687" +
+        "87678287"
     assertTrue(aNumber.toPlainString() == result)
   }
 
@@ -305,8 +305,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "12380964839238475457356735674573563567890295784902768787" +
-      "6782870000000000000000000000000000000000000000000000000000000000000" +
-      "0000000000"
+        "6782870000000000000000000000000000000000000000000000000000000000000" +
+        "0000000000"
     assertTrue(aNumber.toPlainString() == result)
   }
 

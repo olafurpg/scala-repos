@@ -17,12 +17,12 @@ package rules
 import scala.language.higherKinds
 
 trait Monad[+A] extends Functor[A] {
-  type M [+A] <: Monad[A]
+  type M[+A] <: Monad[A]
   def flatMap[B](f: A => M[B]): M[B]
 }
 
 trait Monads extends UnitFunctors {
-  type M [+A] <: Monad[A]
+  type M[+A] <: Monad[A]
 
   trait Monad[+A] extends Functor[A] with rules.Monad[A] {
     this: M[A] =>

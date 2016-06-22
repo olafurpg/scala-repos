@@ -27,7 +27,8 @@ abstract class TransportParams[A <: Stack.Parameterized[A]](
     * a system-level value will be used).
     */
   def sendBufferSize(size: StorageUnit): A =
-    self.configured(self
+    self.configured(
+        self
           .params[Transport.BufferSizes]
           .copy(send = Some(size.inBytes.toInt)))
 
@@ -36,7 +37,8 @@ abstract class TransportParams[A <: Stack.Parameterized[A]](
     * a system-level value will be used).
     */
   def receiveBufferSize(size: StorageUnit): A =
-    self.configured(self
+    self.configured(
+        self
           .params[Transport.BufferSizes]
           .copy(recv = Some(size.inBytes.toInt)))
 

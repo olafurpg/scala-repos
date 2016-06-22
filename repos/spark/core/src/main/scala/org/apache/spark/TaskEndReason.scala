@@ -234,7 +234,7 @@ case class TaskCommitDenied(jobID: Int, partitionID: Int, attemptNumber: Int)
     extends TaskFailedReason {
   override def toErrorString: String =
     s"TaskCommitDenied (Driver denied task commit)" +
-    s" for job: $jobID, partition: $partitionID, attemptNumber: $attemptNumber"
+      s" for job: $jobID, partition: $partitionID, attemptNumber: $attemptNumber"
 
   /**
     * If a task failed because its attempt to commit was denied, do not count this failure
@@ -255,12 +255,11 @@ case class ExecutorLostFailure(execId: String,
                                reason: Option[String])
     extends TaskFailedReason {
   override def toErrorString: String = {
-    val exitBehavior =
-      if (exitCausedByApp) {
-        "caused by one of the running tasks"
-      } else {
-        "unrelated to the running tasks"
-      }
+    val exitBehavior = if (exitCausedByApp) {
+      "caused by one of the running tasks"
+    } else {
+      "unrelated to the running tasks"
+    }
     s"ExecutorLostFailure (executor ${execId} exited ${exitBehavior})" +
     reason.map { r =>
       s" Reason: $r"

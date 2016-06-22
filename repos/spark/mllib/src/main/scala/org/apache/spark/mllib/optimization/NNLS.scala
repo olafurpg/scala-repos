@@ -62,8 +62,9 @@ private[spark] object NNLS {
     * direction, however, while this method only uses a conjugate gradient direction if the last
     * iteration did not cause a previously-inactive constraint to become active.
     */
-  def solve(
-      ata: Array[Double], atb: Array[Double], ws: Workspace): Array[Double] = {
+  def solve(ata: Array[Double],
+            atb: Array[Double],
+            ws: Workspace): Array[Double] = {
     ws.wipe()
 
     val n = atb.length

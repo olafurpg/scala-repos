@@ -47,9 +47,10 @@ class FileUploadExamplesSpec extends RoutingSpec {
 
         val done = allPartsF.map { allParts =>
           // You would have some better validation/unmarshalling here
-          db.create(Video(file = allParts("file").asInstanceOf[File],
-                          title = allParts("title").asInstanceOf[String],
-                          author = allParts("author").asInstanceOf[String]))
+          db.create(
+              Video(file = allParts("file").asInstanceOf[File],
+                    title = allParts("title").asInstanceOf[String],
+                    author = allParts("author").asInstanceOf[String]))
         }
 
         // when processing have finished create a response for the user

@@ -76,17 +76,15 @@ class WholeTextFileRecordReaderSuite
                                fileName: String,
                                contents: Array[Byte],
                                compress: Boolean) = {
-    val out =
-      if (compress) {
-        val codec = new GzipCodec
-        val path =
-          s"${inputDir.toString}/$fileName${codec.getDefaultExtension}"
-        codec.createOutputStream(
-            new DataOutputStream(new FileOutputStream(path)))
-      } else {
-        val path = s"${inputDir.toString}/$fileName"
-        new DataOutputStream(new FileOutputStream(path))
-      }
+    val out = if (compress) {
+      val codec = new GzipCodec
+      val path = s"${inputDir.toString}/$fileName${codec.getDefaultExtension}"
+      codec.createOutputStream(
+          new DataOutputStream(new FileOutputStream(path)))
+    } else {
+      val path = s"${inputDir.toString}/$fileName"
+      new DataOutputStream(new FileOutputStream(path))
+    }
     out.write(contents, 0, contents.length)
     out.close()
   }

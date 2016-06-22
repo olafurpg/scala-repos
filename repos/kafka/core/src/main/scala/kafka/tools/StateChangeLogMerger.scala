@@ -108,13 +108,14 @@ object StateChangeLogMerger extends Logging {
         (options.has(filesOpt) && options.has(regexOpt))) {
       System.err.println(
           "Provide arguments to exactly one of the two options \"" + filesOpt +
-          "\" or \"" + regexOpt + "\"")
+            "\" or \"" + regexOpt + "\"")
       parser.printHelpOn(System.err)
       System.exit(1)
     }
     if (options.has(partitionsOpt) && !options.has(topicOpt)) {
-      System.err.println("The option \"" + topicOpt +
-          "\" needs to be provided an argument when specifying partition ids")
+      System.err.println(
+          "The option \"" + topicOpt +
+            "\" needs to be provided an argument when specifying partition ids")
       parser.printHelpOn(System.err)
       System.exit(1)
     }
@@ -160,8 +161,8 @@ object StateChangeLogMerger extends Logging {
       * 4. Flush the output buffer at the end. (The buffer will also be automatically flushed every K bytes.)
       */
     val pqueue = new mutable.PriorityQueue[LineIterator]()(dateBasedOrdering)
-    val output: OutputStream = new BufferedOutputStream(
-        System.out, 1024 * 1024)
+    val output: OutputStream =
+      new BufferedOutputStream(System.out, 1024 * 1024)
     val lineIterators = files.map(io.Source.fromFile(_).getLines)
     var lines: List[LineIterator] = List()
 

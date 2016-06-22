@@ -28,9 +28,9 @@ private[launchqueue] object LaunchQueueActor {
   *
   * The methods of that interface are translated to messages in the [[LaunchQueueDelegate]] implementation.
   */
-private[impl] class LaunchQueueActor(
-    launchQueueConfig: LaunchQueueConfig,
-    appActorProps: (AppDefinition, Int) => Props)
+private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
+                                     appActorProps: (AppDefinition,
+                                                     Int) => Props)
     extends Actor
     with ActorLogging {
   import LaunchQueueDelegate._
@@ -86,7 +86,8 @@ private[impl] class LaunchQueueActor(
         case Some(actorRef) =>
           val deferredMessages: Vector[DeferredMessage] =
             suspendedLaunchersMessages(actorRef) :+ DeferredMessage(
-                sender(), ConfirmPurge)
+                sender(),
+                ConfirmPurge)
           suspendedLaunchersMessages += actorRef -> deferredMessages
           suspendedLauncherPathIds += appId
           actorRef ! AppTaskLauncherActor.Stop
@@ -103,8 +104,9 @@ private[impl] class LaunchQueueActor(
 
           suspendedLaunchersMessages.get(actorRef) match {
             case None =>
-              log.warning(
-                  "Got unexpected terminated for app {}: {}", pathId, actorRef)
+              log.warning("Got unexpected terminated for app {}: {}",
+                          pathId,
+                          actorRef)
             case Some(deferredMessages) =>
               deferredMessages.foreach(msg =>
                     self.tell(msg.message, msg.sender))
@@ -113,8 +115,8 @@ private[impl] class LaunchQueueActor(
               suspendedLaunchersMessages -= actorRef
           }
         case None =>
-          log.warning(
-              "Don't know anything about terminated actor: {}", actorRef)
+          log.warning("Don't know anything about terminated actor: {}",
+                      actorRef)
       }
   }
 
@@ -135,8 +137,8 @@ private[impl] class LaunchQueueActor(
       deferMessageToSuspendedActor(msg, app.id)
   }
 
-  private[this] def deferMessageToSuspendedActor(
-      msg: Any, appId: PathId): Unit = {
+  private[this] def deferMessageToSuspendedActor(msg: Any,
+                                                 appId: PathId): Unit = {
     val actorRef = launchers(appId)
     val deferredMessages: Vector[DeferredMessage] =
       suspendedLaunchersMessages(actorRef) :+ DeferredMessage(sender(), msg)
@@ -195,10 +197,10 @@ private[impl] class LaunchQueueActor(
       launchers.get(app.id).foreach(_.forward(msg))
   }
 
-  private[this] def createAppTaskLauncher(
-      app: AppDefinition, initialCount: Int): ActorRef = {
-    val actorRef = context.actorOf(
-        appActorProps(app, initialCount), s"$childSerial-${app.id.safePath}")
+  private[this] def createAppTaskLauncher(app: AppDefinition,
+                                          initialCount: Int): ActorRef = {
+    val actorRef = context.actorOf(appActorProps(app, initialCount),
+                                   s"$childSerial-${app.id.safePath}")
     childSerial += 1
     launchers += app.id -> actorRef
     launcherRefs += actorRef -> app.id

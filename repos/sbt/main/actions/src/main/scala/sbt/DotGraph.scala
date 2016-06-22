@@ -57,13 +57,15 @@ object DotGraph {
     import scala.collection.mutable.{HashMap, HashSet}
     val mappedGraph = new HashMap[String, HashSet[String]]
     for ((key, values) <- relation.forwardMap; keyString = keyToString(key);
-         value <- values) mappedGraph.getOrElseUpdate(
-        keyString, new HashSet[String]) += valueToString(value)
+         value <- values)
+      mappedGraph
+        .getOrElseUpdate(keyString, new HashSet[String]) += valueToString(
+          value)
 
     val mappings = for {
       (dependsOn, dependants) <- mappedGraph.toSeq
       dependant <- dependants if dependant != dependsOn &&
-      !dependsOn.isEmpty && !dependant.isEmpty
+        !dependsOn.isEmpty && !dependant.isEmpty
     } yield "\"" + dependant + "\" -> \"" + dependsOn + "\""
 
     val lines = ("digraph " + graphName + " {") +: mappings :+ "}"

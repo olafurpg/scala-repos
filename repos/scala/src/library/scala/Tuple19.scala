@@ -32,8 +32,8 @@ package scala
   *  @param  _18   Element 18 of this Tuple19
   *  @param  _19   Element 19 of this Tuple19
   */
-@deprecatedInheritance(
-    "Tuples will be made final in a future version.", "2.11.0")
+@deprecatedInheritance("Tuples will be made final in a future version.",
+                       "2.11.0")
 case class Tuple19[+T1,
                    +T2,
                    +T3,
@@ -92,6 +92,6 @@ case class Tuple19[+T1,
                       T19] {
   override def toString() =
     "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," +
-    _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + "," + _12 + "," + _13 +
-    "," + _14 + "," + _15 + "," + _16 + "," + _17 + "," + _18 + "," + _19 + ")"
+      _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + "," + _12 + "," + _13 +
+      "," + _14 + "," + _15 + "," + _16 + "," + _17 + "," + _18 + "," + _19 + ")"
 }

@@ -156,8 +156,9 @@ object BitVector extends BitVectorOps {
       }
     }
 
-  implicit def canTraverseKeyValuePairs: CanTraverseKeyValuePairs[
-      BitVector, Int, Boolean] =
+  implicit def canTraverseKeyValuePairs: CanTraverseKeyValuePairs[BitVector,
+                                                                  Int,
+                                                                  Boolean] =
     new CanTraverseKeyValuePairs[BitVector, Int, Boolean] {
       def isTraversableAgain(from: BitVector): Boolean = true
 
@@ -195,8 +196,8 @@ object BitVector extends BitVectorOps {
       }
 
       /**Maps all active key-value pairs from the given collection. */
-      def mapActive(
-          from: BitVector, fn: (Int, Boolean) => V2): DenseVector[V2] = {
+      def mapActive(from: BitVector,
+                    fn: (Int, Boolean) => V2): DenseVector[V2] = {
         map(from, fn)
       }
     }

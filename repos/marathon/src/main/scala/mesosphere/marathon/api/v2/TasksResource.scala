@@ -71,7 +71,7 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
         (appId, task) <- tasks
         app <- appIdsToApps(appId) if isAuthorized(ViewApp, app)
         if statusSet.isEmpty ||
-        task.mesosStatus.exists(s => statusSet(s.getState))
+          task.mesosStatus.exists(s => statusSet(s.getState))
       } yield {
         EnrichedTask(
             appId,
@@ -81,7 +81,8 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
         )
       }
 
-      ok(jsonObjString(
+      ok(
+          jsonObjString(
               "tasks" -> enrichedTasks
           ))
     }

@@ -16,8 +16,8 @@ trait LoggerMessageQueueSemantics
 /**
   * INTERNAL API
   */
-private[akka] class LoggerMailboxType(
-    settings: ActorSystem.Settings, config: Config)
+private[akka] class LoggerMailboxType(settings: ActorSystem.Settings,
+                                      config: Config)
     extends MailboxType
     with ProducesMessageQueue[LoggerMailbox] {
 

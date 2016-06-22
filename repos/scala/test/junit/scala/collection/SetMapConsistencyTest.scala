@@ -67,24 +67,24 @@ class SetMapConsistencyTest {
   }
 
   def boxMlm[A] =
-    new BoxMutableMap[A, cm.ListMap[A, Int]](
-        new cm.ListMap[A, Int], "mutable.ListMap")
+    new BoxMutableMap[A, cm.ListMap[A, Int]](new cm.ListMap[A, Int],
+                                             "mutable.ListMap")
 
   def boxMhm[A] =
-    new BoxMutableMap[A, cm.HashMap[A, Int]](
-        new cm.HashMap[A, Int], "mutable.HashMap")
+    new BoxMutableMap[A, cm.HashMap[A, Int]](new cm.HashMap[A, Int],
+                                             "mutable.HashMap")
 
   def boxMohm[A] =
-    new BoxMutableMap[A, cm.OpenHashMap[A, Int]](
-        new cm.OpenHashMap[A, Int], "mutable.OpenHashMap")
+    new BoxMutableMap[A, cm.OpenHashMap[A, Int]](new cm.OpenHashMap[A, Int],
+                                                 "mutable.OpenHashMap")
 
   def boxMtm[A: Ordering] =
-    new BoxMutableMap[A, cm.TreeMap[A, Int]](
-        new cm.TreeMap[A, Int], "mutable.TreeMap")
+    new BoxMutableMap[A, cm.TreeMap[A, Int]](new cm.TreeMap[A, Int],
+                                             "mutable.TreeMap")
 
   def boxMarm[A <: AnyRef] =
-    new BoxMutableMap[A, cm.AnyRefMap[A, Int]](
-        new cm.AnyRefMap[A, Int](_ => -1), "mutable.AnyRefMap") {
+    new BoxMutableMap[A, cm.AnyRefMap[A, Int]](new cm.AnyRefMap[A, Int](_ =>
+              -1), "mutable.AnyRefMap") {
       private def arm: cm.AnyRefMap[A, Int] =
         m.asInstanceOf[cm.AnyRefMap[A, Int]]
       override def adders = 3
@@ -109,8 +109,8 @@ class SetMapConsistencyTest {
     }
 
   def boxMjm =
-    new BoxMutableMap[Long, cm.LongMap[Int]](
-        new cm.LongMap[Int](_ => -1), "mutable.LongMap") {
+    new BoxMutableMap[Long, cm.LongMap[Int]](new cm.LongMap[Int](_ => -1),
+                                             "mutable.LongMap") {
       private def lm: cm.LongMap[Int] = m.asInstanceOf[cm.LongMap[Int]]
       override def adders = 3
       override def subbers = 1
@@ -135,7 +135,8 @@ class SetMapConsistencyTest {
 
   def boxJavaM[A] =
     new BoxMutableMap[A, cm.Map[A, Int]](
-        (new java.util.HashMap[A, Int]).asScala, "java.util.HashMap") {
+        (new java.util.HashMap[A, Int]).asScala,
+        "java.util.HashMap") {
       override def adders = 3
       override def subbers = 1
     }
@@ -177,24 +178,24 @@ class SetMapConsistencyTest {
   }
 
   def boxIhm[A] =
-    new BoxImmutableMap[A, ci.HashMap[A, Int]](
-        new ci.HashMap[A, Int], "immutable.HashMap")
+    new BoxImmutableMap[A, ci.HashMap[A, Int]](new ci.HashMap[A, Int],
+                                               "immutable.HashMap")
 
   def boxIim =
-    new BoxImmutableMap[Int, ci.IntMap[Int]](
-        ci.IntMap.empty[Int], "immutable.IntMap")
+    new BoxImmutableMap[Int, ci.IntMap[Int]](ci.IntMap.empty[Int],
+                                             "immutable.IntMap")
 
   def boxIjm =
-    new BoxImmutableMap[Long, ci.LongMap[Int]](
-        ci.LongMap.empty[Int], "immutable.LongMap")
+    new BoxImmutableMap[Long, ci.LongMap[Int]](ci.LongMap.empty[Int],
+                                               "immutable.LongMap")
 
   def boxIlm[A] =
-    new BoxImmutableMap[A, ci.ListMap[A, Int]](
-        new ci.ListMap[A, Int], "immutable.ListMap")
+    new BoxImmutableMap[A, ci.ListMap[A, Int]](new ci.ListMap[A, Int],
+                                               "immutable.ListMap")
 
   def boxItm[A: Ordering] =
-    new BoxImmutableMap[A, ci.TreeMap[A, Int]](
-        new ci.TreeMap[A, Int], "immutable.TreeMap")
+    new BoxImmutableMap[A, ci.TreeMap[A, Int]](new ci.TreeMap[A, Int],
+                                               "immutable.TreeMap")
 
   // Mutable set wrappers placed into the same framework (everything returns 0)
 
@@ -241,8 +242,8 @@ class SetMapConsistencyTest {
     new BoxMutableSet[A, cm.TreeSet[A]](new cm.TreeSet[A], "mutable.TreeSet")
 
   def boxJavaS[A] =
-    new BoxMutableSet[A, cm.Set[A]](
-        (new java.util.HashSet[A]).asScala, "java.util.HashSet") {
+    new BoxMutableSet[A, cm.Set[A]]((new java.util.HashSet[A]).asScala,
+                                    "java.util.HashSet") {
       override def adders = 3
       override def subbers = 1
     }
@@ -282,16 +283,16 @@ class SetMapConsistencyTest {
     new BoxImmutableSet[Int, ci.BitSet](ci.BitSet.empty, "immutable.BitSet")
 
   def boxIhs[A] =
-    new BoxImmutableSet[A, ci.HashSet[A]](
-        ci.HashSet.empty[A], "mutable.HashSet")
+    new BoxImmutableSet[A, ci.HashSet[A]](ci.HashSet.empty[A],
+                                          "mutable.HashSet")
 
   def boxIls[A] =
-    new BoxImmutableSet[A, ci.ListSet[A]](
-        ci.ListSet.empty[A], "mutable.ListSet")
+    new BoxImmutableSet[A, ci.ListSet[A]](ci.ListSet.empty[A],
+                                          "mutable.ListSet")
 
   def boxIts[A: Ordering] =
-    new BoxImmutableSet[A, ci.TreeSet[A]](
-        ci.TreeSet.empty[A], "mutable.TreeSet")
+    new BoxImmutableSet[A, ci.TreeSet[A]](ci.TreeSet.empty[A],
+                                          "mutable.TreeSet")
 
   // Random operations on maps
   def churn[A](map1: MapBox[A],
@@ -387,8 +388,10 @@ class SetMapConsistencyTest {
   val smallKeys = Array(0, 1, 42, 9127)
   val intKeys = smallKeys ++ Array(-1, Int.MaxValue, Int.MinValue, -129385)
   val longKeys =
-    intKeys.map(_.toLong) ++ Array(
-        Long.MaxValue, Long.MinValue, 1397198789151L, -41402148014L)
+    intKeys.map(_.toLong) ++ Array(Long.MaxValue,
+                                   Long.MinValue,
+                                   1397198789151L,
+                                   -41402148014L)
   val stringKeys = intKeys.map(_.toString) ++ Array("", null)
   val anyKeys =
     stringKeys.filter(_ != null) ++ Array(0L) ++ Array(true) ++ Array(math.Pi)
@@ -406,12 +409,9 @@ class SetMapConsistencyTest {
         () => boxIlm[Int],
         () => boxItm[Int]
     )
-    assert(
-        maps
-          .sliding(2)
-          .forall { ms =>
-        churn(ms(0)(), ms(1)(), intKeys, 2000)
-      })
+    assert(maps.sliding(2).forall { ms =>
+      churn(ms(0)(), ms(1)(), intKeys, 2000)
+    })
   }
 
   @Test
@@ -427,12 +427,9 @@ class SetMapConsistencyTest {
         () => boxIhm[Long],
         () => boxIlm[Long]
     )
-    assert(
-        maps
-          .sliding(2)
-          .forall { ms =>
-        churn(ms(0)(), ms(1)(), longKeys, 10000)
-      })
+    assert(maps.sliding(2).forall { ms =>
+      churn(ms(0)(), ms(1)(), longKeys, 10000)
+    })
   }
 
   @Test
@@ -446,12 +443,9 @@ class SetMapConsistencyTest {
         () => boxIhm[String],
         () => boxIlm[String]
     )
-    assert(
-        maps
-          .sliding(2)
-          .forall { ms =>
-        churn(ms(0)(), ms(1)(), stringKeys, 5000)
-      })
+    assert(maps.sliding(2).forall { ms =>
+      churn(ms(0)(), ms(1)(), stringKeys, 5000)
+    })
   }
 
   @Test
@@ -464,12 +458,9 @@ class SetMapConsistencyTest {
         () => boxIhm[Any],
         () => boxIlm[Any]
     )
-    assert(
-        maps
-          .sliding(2)
-          .forall { ms =>
-        churn(ms(0)(), ms(1)(), anyKeys, 10000)
-      })
+    assert(maps.sliding(2).forall { ms =>
+      churn(ms(0)(), ms(1)(), anyKeys, 10000)
+    })
   }
 
   @Test
@@ -486,12 +477,9 @@ class SetMapConsistencyTest {
         () => boxIls[Int],
         () => boxIts[Int]
     )
-    assert(
-        sets
-          .sliding(2)
-          .forall { ms =>
-        churn(ms(0)(), ms(1)(), smallKeys, 1000, valuer = _ => 0)
-      })
+    assert(sets.sliding(2).forall { ms =>
+      churn(ms(0)(), ms(1)(), smallKeys, 1000, valuer = _ => 0)
+    })
   }
 
   @Test
@@ -504,12 +492,9 @@ class SetMapConsistencyTest {
         () => boxIhs[Any],
         () => boxIls[Any]
     )
-    assert(
-        sets
-          .sliding(2)
-          .forall { ms =>
-        churn(ms(0)(), ms(1)(), anyKeys, 10000, valuer = _ => 0)
-      })
+    assert(sets.sliding(2).forall { ms =>
+      churn(ms(0)(), ms(1)(), anyKeys, 10000, valuer = _ => 0)
+    })
   }
 
   @Test
@@ -543,10 +528,12 @@ class SetMapConsistencyTest {
       val lm2 = new LongMap[String](_.toString)
       lm2 += (5L -> "fish", 0L -> "unicorn")
       val hm2 = (new HashMap[Long, String]) ++= lm2
-      List(Long.MinValue, 0L, 1L, 5L).forall(i =>
+      List(Long.MinValue, 0L, 1L, 5L).forall(
+          i =>
             lm2.get(i) == hm2.get(i) && lm2.getOrElse(i, "") == hm2.getOrElse(
-                i, "") && lm2(i) == hm2.get(i).getOrElse(i.toString) &&
-            lm2.getOrNull(i) == hm2.get(i).orNull)
+                i,
+                "") && lm2(i) == hm2.get(i).getOrElse(i.toString) &&
+              lm2.getOrNull(i) == hm2.get(i).orNull)
     }
   }
 
@@ -593,10 +580,10 @@ class SetMapConsistencyTest {
       List(null, "cod", "sparrow", "Rarity").forall(
           i =>
             arm2.get(i) == hm2.get(i) &&
-            arm2.getOrElse(i, "") == hm2.getOrElse(i, "") && arm2(i) == hm2
+              arm2.getOrElse(i, "") == hm2.getOrElse(i, "") && arm2(i) == hm2
               .get(i)
               .getOrElse(if (i == null) "null" else i.toString) &&
-            arm2.getOrNull(i) == hm2.get(i).orNull)
+              arm2.getOrNull(i) == hm2.get(i).orNull)
     }
   }
 
@@ -655,8 +642,7 @@ class SetMapConsistencyTest {
       if (it.hasNext) Some(it.next)
       else None
     }
-    assert(
-        f() match {
+    assert(f() match {
       case Some((a, b)) if (a == null || b == null) => false
       case _ => true
     })
@@ -666,7 +652,7 @@ class SetMapConsistencyTest {
   def testSI8264() {
     val hs =
       Set(-2147483648, 1, -45023380, -1, 1971207058, -54312241, -234243394) -
-      -1
+        -1
     assert(hs.toList.toSet == hs)
     assert(hs == hs.toList.toSet)
   }

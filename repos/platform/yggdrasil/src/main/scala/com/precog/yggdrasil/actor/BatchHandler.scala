@@ -48,7 +48,8 @@ class BatchCompleteNotifier(p: Promise[BatchComplete]) extends Actor {
       self ! PoisonPill
 
     case other =>
-      p.complete(Left(new RuntimeException(
+      p.complete(
+          Left(new RuntimeException(
                   "Received non-complete notification: " + other.toString)))
       self ! PoisonPill
   }
@@ -101,8 +102,9 @@ class BatchHandler(ingestActor: ActorRef,
       if (remaining == 0) self ! PoisonPill
 
     case PathOpFailure(path, err) =>
-      logger.error("Failure during batch update on %s:\n  %s".format(
-              path, err.toString))
+      logger.error(
+          "Failure during batch update on %s:\n  %s".format(path,
+                                                            err.toString))
       self ! PoisonPill
 
     case ArchiveComplete(path) =>
@@ -117,8 +119,9 @@ class BatchHandler(ingestActor: ActorRef,
   override def postStop() = {
     // if the ingest isn't complete by the timeout, ask the requestor to retry
     if (remaining != 0) {
-      logger.info("Sending incomplete with %d remaining to %s".format(
-              remaining, requestor))
+      logger.info(
+          "Sending incomplete with %d remaining to %s".format(remaining,
+                                                              requestor))
       ingestActor ! BatchFailed(requestor, checkpoint)
     } else {
       // update the metadatabase, by way of notifying the ingest actor

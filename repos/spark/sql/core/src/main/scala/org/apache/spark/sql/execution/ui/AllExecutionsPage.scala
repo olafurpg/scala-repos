@@ -47,12 +47,12 @@ private[ui] class AllExecutionsPage(parent: SQLTab)
       }
       if (listener.getCompletedExecutions.nonEmpty) {
         _content ++=
-          new CompletedExecutionTable(parent,
-                                      "Completed Queries",
-                                      currentTime,
-                                      listener.getCompletedExecutions
-                                        .sortBy(_.submissionTime)
-                                        .reverse).toNodeSeq
+        new CompletedExecutionTable(parent,
+                                    "Completed Queries",
+                                    currentTime,
+                                    listener.getCompletedExecutions
+                                      .sortBy(_.submissionTime)
+                                      .reverse).toNodeSeq
       }
       if (listener.getFailedExecutions.nonEmpty) {
         _content ++= new FailedExecutionTable(parent,
@@ -83,8 +83,8 @@ private[ui] abstract class ExecutionTable(
 
   protected def header: Seq[String]
 
-  protected def row(
-      currentTime: Long, executionUIData: SQLExecutionUIData): Seq[Node] = {
+  protected def row(currentTime: Long,
+                    executionUIData: SQLExecutionUIData): Seq[Node] = {
     val submissionTime = executionUIData.submissionTime
     val duration =
       executionUIData.completionTime.getOrElse(currentTime) - submissionTime
@@ -131,17 +131,16 @@ private[ui] abstract class ExecutionTable(
   }
 
   private def descriptionCell(execution: SQLExecutionUIData): Seq[Node] = {
-    val details =
-      if (execution.details.nonEmpty) {
-        <span onclick="this.parentNode.querySelector('.stage-details').classList.toggle('collapsed')"
+    val details = if (execution.details.nonEmpty) {
+      <span onclick="this.parentNode.querySelector('.stage-details').classList.toggle('collapsed')"
             class="expand-details">
         +details
       </span> ++ <div class="stage-details collapsed">
         <pre>{execution.details}</pre>
       </div>
-      } else {
-        Nil
-      }
+    } else {
+      Nil
+    }
 
     val desc = {
       <a href={executionURL(execution.executionId)}>{execution.description}</a>
@@ -152,25 +151,23 @@ private[ui] abstract class ExecutionTable(
 
   private def detailCell(physicalPlan: String): Seq[Node] = {
     val isMultiline = physicalPlan.indexOf('\n') >= 0
-    val summary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+    val summary = StringEscapeUtils.escapeHtml4(if (isMultiline) {
       physicalPlan.substring(0, physicalPlan.indexOf('\n'))
     } else {
       physicalPlan
     })
-    val details =
-      if (isMultiline) {
-        // scalastyle:off
-        <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
+    val details = if (isMultiline) {
+      // scalastyle:off
+      <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
             class="expand-details">
         +details
       </span> ++ <div class="stacktrace-details collapsed">
           <pre>{physicalPlan}</pre>
         </div>
-        // scalastyle:on
-      } else {
-        ""
-      }
+      // scalastyle:on
+    } else {
+      ""
+    }
     <td>{summary}{details}</td>
   }
 
@@ -204,8 +201,10 @@ private[ui] class RunningExecutionTable(
                            showFailedJobs = true) {
 
   override protected def header: Seq[String] =
-    baseHeader ++ Seq(
-        "Running Jobs", "Succeeded Jobs", "Failed Jobs", "Detail")
+    baseHeader ++ Seq("Running Jobs",
+                      "Succeeded Jobs",
+                      "Failed Jobs",
+                      "Detail")
 }
 
 private[ui] class CompletedExecutionTable(

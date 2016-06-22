@@ -53,8 +53,7 @@ class MappingUfuncBenchmark
     })
 
   def timeMappingUfuncArrayInPlace(reps: Int) =
-    runWith(reps, { randomArray(2048 * 2048) })(
-        (arr: DenseVector[Double]) => {
+    runWith(reps, { randomArray(2048 * 2048) })((arr: DenseVector[Double]) => {
       val data = arr.data
       var i = 0
       while (i < data.length) {
@@ -72,8 +71,7 @@ class MappingUfuncBenchmark
   // Group 3: harder
 
   def timeMappingUfuncArrayHarder(reps: Int) =
-    runWith(reps, { randomArray(2048 * 2048) })(
-        (arr: DenseVector[Double]) => {
+    runWith(reps, { randomArray(2048 * 2048) })((arr: DenseVector[Double]) => {
       val data = arr.data
       val nd = new Array[Double](data.length)
       var i = 0
@@ -115,8 +113,7 @@ class MappingUfuncBenchmark
   // Group 4: harder inplace
 
   def timeMappingUfuncArrayHarderInlineInPlace(reps: Int) =
-    runWith(reps, { randomArray(2048 * 2048) })(
-        (arr: DenseVector[Double]) => {
+    runWith(reps, { randomArray(2048 * 2048) })((arr: DenseVector[Double]) => {
       val data = arr.data
       var i = 0
       while (i < data.length) {
@@ -138,8 +135,7 @@ class MappingUfuncBenchmark
     })
 
   def timeMappingUfuncArrayHarderInPlace(reps: Int) =
-    runWith(reps, { randomArray(2048 * 2048) })(
-        (arr: DenseVector[Double]) => {
+    runWith(reps, { randomArray(2048 * 2048) })((arr: DenseVector[Double]) => {
       val data = arr.data
       var i = 0
       while (i < data.length) {

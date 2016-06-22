@@ -49,8 +49,8 @@ object LineErrorsSpecs
       bindRoot(tree, tree)
 
       val result = shakeTree(tree)
-      result.errors.map(e => e.loc.lineNum -> e.loc.colNum) mustEqual Set(
-          3 -> 2, 7 -> 2)
+      result.errors
+        .map(e => e.loc.lineNum -> e.loc.colNum) mustEqual Set(3 -> 2, 7 -> 2)
     }
   }
 }

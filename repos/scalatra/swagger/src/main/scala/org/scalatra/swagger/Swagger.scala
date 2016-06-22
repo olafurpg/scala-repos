@@ -81,13 +81,15 @@ object Swagger {
 
   def collectModels[T: Manifest](alreadyKnown: Set[Model]): Set[Model] =
     collectModels(Reflector.scalaTypeOf[T], alreadyKnown)
-  private[swagger] def collectModels(tpe: ScalaType,
-                                     alreadyKnown: Set[Model],
-                                     known: Set[ScalaType] =
-                                       Set.empty): Set[Model] = {
+  private[swagger] def collectModels(
+      tpe: ScalaType,
+      alreadyKnown: Set[Model],
+      known: Set[ScalaType] = Set.empty): Set[Model] = {
     if (tpe.isMap)
       collectModels(tpe.typeArgs.head, alreadyKnown, tpe.typeArgs.toSet) ++ collectModels(
-          tpe.typeArgs.last, alreadyKnown, tpe.typeArgs.toSet)
+          tpe.typeArgs.last,
+          alreadyKnown,
+          tpe.typeArgs.toSet)
     else if (tpe.isCollection || tpe.isOption) {
       val ntpe = tpe.typeArgs.head
       if (!known.contains(ntpe))
@@ -104,7 +106,8 @@ object Swagger {
             val propModels = descriptor.properties.filterNot(p =>
                   p.isPrimitive || ctorModels.exists(_.name == p.name))
             val subModels =
-              (ctorModels.map(_.argType) ++ propModels.map(_.returnType)).toSet -- known
+              (ctorModels.map(_.argType) ++ propModels
+                    .map(_.returnType)).toSet -- known
             val topLevel = for {
               tl <- subModels + descriptor.erasure
               if !(tl.isCollection || tl.isMap || tl.isOption)
@@ -128,19 +131,20 @@ object Swagger {
   def modelToSwagger[T](implicit mf: Manifest[T]): Option[Model] =
     modelToSwagger(Reflector.scalaTypeOf[T])
 
-  private[this] def toModelProperty(descr: ClassDescriptor,
-                                    position: Option[Int] = None,
-                                    required: Boolean = true,
-                                    description: Option[String] = None,
-                                    allowableValues: String = "")(
-      prop: PropertyDescriptor) = {
+  private[this] def toModelProperty(
+      descr: ClassDescriptor,
+      position: Option[Int] = None,
+      required: Boolean = true,
+      description: Option[String] = None,
+      allowableValues: String = "")(prop: PropertyDescriptor) = {
     val ctorParam =
       if (!prop.returnType.isOption)
         descr.mostComprehensive.find(_.name == prop.name)
       else None
     //    if (descr.simpleName == "Pet") println("converting property: " + prop)
     val mp = ModelProperty(
-        DataType.fromScalaType(if (prop.returnType.isOption)
+        DataType.fromScalaType(
+            if (prop.returnType.isOption)
               prop.returnType.typeArgs.head
             else prop.returnType),
         if (position.isDefined && position.forall(_ >= 0)) position.get
@@ -171,11 +175,13 @@ object Swagger {
                               annot.required(),
                               annot.description().blankOption,
                               annot.allowableValues()) _
-            descr.properties.find(_.mangledName == f.getName) map asModelProperty
+            descr.properties
+              .find(_.mangledName == f.getName) map asModelProperty
 
           case f: Field =>
             val asModelProperty = toModelProperty(descr) _
-            descr.properties.find(_.mangledName == f.getName) map asModelProperty
+            descr.properties
+              .find(_.mangledName == f.getName) map asModelProperty
         }
 
       val result =
@@ -197,7 +203,8 @@ object Swagger {
   }
 
   private def convertToAllowableValues(
-      csvString: String, paramType: String = null): AllowableValues = {
+      csvString: String,
+      paramType: String = null): AllowableValues = {
     if (csvString.toLowerCase.startsWith("range[")) {
       val ranges = csvString.substring(6, csvString.length() - 1).split(",")
       buildAllowableRangeValues(ranges, csvString, inclusive = true)
@@ -210,7 +217,8 @@ object Swagger {
       } else {
         val params = csvString.split(",").toList
         implicit val format = DefaultJsonFormats.GenericFormat(
-            DefaultReaders.StringReader, DefaultWriters.StringWriter)
+            DefaultReaders.StringReader,
+            DefaultWriters.StringWriter)
         paramType match {
           case null => AllowableValues.AllowableValuesList(params)
           case "string" => AllowableValues.AllowableValuesList(params)
@@ -253,8 +261,9 @@ object Swagger {
 /**
   * An instance of this class is used to hold the API documentation.
   */
-class Swagger(
-    val swaggerVersion: String, val apiVersion: String, val apiInfo: ApiInfo)
+class Swagger(val swaggerVersion: String,
+              val apiVersion: String,
+              val apiInfo: ApiInfo)
     extends SwaggerEngine[Api] {
   private[this] val logger = Logger[this.type]
 
@@ -274,21 +283,22 @@ class Swagger(
     val endpoints: List[Endpoint] =
       s.endpoints(resourcePath) collect { case m: Endpoint => m }
     _docs +=
-      listingPath -> Api(apiVersion,
-                         swaggerVersion,
-                         resourcePath,
-                         description,
-                         (produces ::: endpoints.flatMap(
-                                 _.operations.flatMap(_.produces))).distinct,
-                         (consumes ::: endpoints.flatMap(
-                                 _.operations.flatMap(_.consumes))).distinct,
-                         (protocols ::: endpoints.flatMap(
-                                 _.operations.flatMap(_.protocols))).distinct,
-                         endpoints,
-                         s.models.toMap,
-                         (authorizations ::: endpoints.flatMap(_.operations
-                                   .flatMap(_.authorizations))).distinct,
-                         0)
+    listingPath -> Api(
+        apiVersion,
+        swaggerVersion,
+        resourcePath,
+        description,
+        (produces ::: endpoints
+              .flatMap(_.operations.flatMap(_.produces))).distinct,
+        (consumes ::: endpoints
+              .flatMap(_.operations.flatMap(_.consumes))).distinct,
+        (protocols ::: endpoints
+              .flatMap(_.operations.flatMap(_.protocols))).distinct,
+        endpoints,
+        s.models.toMap,
+        (authorizations ::: endpoints.flatMap(
+                _.operations.flatMap(_.authorizations))).distinct,
+        0)
   }
 }
 
@@ -315,8 +325,9 @@ case class ResourceListing(apiVersion: String,
                            authorizations: List[AuthorizationType] = Nil,
                            info: Option[ApiInfo] = None)
 
-case class ApiListingReference(
-    path: String, description: Option[String] = None, position: Int = 0)
+case class ApiListingReference(path: String,
+                               description: Option[String] = None,
+                               position: Int = 0)
 
 case class Api(apiVersion: String,
                swaggerVersion: String,
@@ -494,7 +505,7 @@ object DataType {
 
   private[this] def isCollection(klass: Class[_]) =
     classOf[collection.Traversable[_]].isAssignableFrom(klass) ||
-    classOf[java.util.Collection[_]].isAssignableFrom(klass)
+      classOf[java.util.Collection[_]].isAssignableFrom(klass)
 }
 
 case class ApiInfo(title: String,
@@ -518,26 +529,26 @@ object AllowableValues {
   def empty = AnyValue
 }
 
-case class Parameter(
-    name: String,
-    `type`: DataType,
-    description: Option[String] = None,
-    notes: Option[String] = None,
-    paramType: ParamType.ParamType = ParamType.Query,
-    defaultValue: Option[String] = None,
-    allowableValues: AllowableValues = AllowableValues.AnyValue,
-    required: Boolean = true,
-    //                     allowMultiple: Boolean = false,
-    paramAccess: Option[String] = None,
-    position: Int = 0)
+case class Parameter(name: String,
+                     `type`: DataType,
+                     description: Option[String] = None,
+                     notes: Option[String] = None,
+                     paramType: ParamType.ParamType = ParamType.Query,
+                     defaultValue: Option[String] = None,
+                     allowableValues: AllowableValues =
+                       AllowableValues.AnyValue,
+                     required: Boolean = true,
+                     //                     allowMultiple: Boolean = false,
+                     paramAccess: Option[String] = None,
+                     position: Int = 0)
 
-case class ModelProperty(
-    `type`: DataType,
-    position: Int = 0,
-    required: Boolean = false,
-    description: Option[String] = None,
-    allowableValues: AllowableValues = AllowableValues.AnyValue,
-    items: Option[ModelRef] = None)
+case class ModelProperty(`type`: DataType,
+                         position: Int = 0,
+                         required: Boolean = false,
+                         description: Option[String] = None,
+                         allowableValues: AllowableValues =
+                           AllowableValues.AnyValue,
+                         items: Option[ModelRef] = None)
 
 case class Model(id: String,
                  name: String,
@@ -560,8 +571,9 @@ case class ModelRef(`type`: String,
                     qualifiedType: Option[String] = None)
 
 case class LoginEndpoint(url: String)
-case class TokenRequestEndpoint(
-    url: String, clientIdName: String, clientSecretName: String)
+case class TokenRequestEndpoint(url: String,
+                                clientIdName: String,
+                                clientSecretName: String)
 case class TokenEndpoint(url: String, tokenName: String)
 
 trait AuthorizationType {
@@ -583,8 +595,8 @@ case class ImplicitGrant(loginEndpoint: LoginEndpoint, tokenName: String)
     extends GrantType {
   def `type` = "implicit"
 }
-case class AuthorizationCodeGrant(
-    tokenRequestEndpoint: TokenRequestEndpoint, tokenEndpoint: TokenEndpoint)
+case class AuthorizationCodeGrant(tokenRequestEndpoint: TokenRequestEndpoint,
+                                  tokenEndpoint: TokenEndpoint)
     extends GrantType {
   def `type` = "authorization_code"
 }

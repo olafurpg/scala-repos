@@ -115,8 +115,8 @@ class HikariCPConfig(dbConfig: DatabaseConfig, configuration: PlayConfig) {
 
     val dataSourceConfig = config.get[PlayConfig]("dataSource")
     dataSourceConfig.underlying.root().keySet().asScala.foreach { key =>
-      hikariConfig.addDataSourceProperty(
-          key, dataSourceConfig.get[String](key))
+      hikariConfig.addDataSourceProperty(key,
+                                         dataSourceConfig.get[String](key))
     }
 
     def toMillis(duration: Duration) = {

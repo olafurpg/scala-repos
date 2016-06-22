@@ -52,8 +52,8 @@ class TupleTest {
     val obj = js.Tuple2(42, "foobar")
 
     assertTrue((obj: Any).isInstanceOf[js.Array[_]])
-    assertJSArrayEquals(
-        js.Array(42, "foobar"), obj.asInstanceOf[js.Array[Any]])
+    assertJSArrayEquals(js.Array(42, "foobar"),
+                        obj.asInstanceOf[js.Array[Any]])
   }
 
   @Test def should_be_able_to_cast_from_a_JS_array_instance(): Unit = {
@@ -100,8 +100,8 @@ class TupleTest {
     assertEquals(3, scalaObj._3)
     assertEquals(3, t3IsInt)
     assertTrue((jsObj: Any).isInstanceOf[js.Array[_]])
-    assertJSArrayEquals(
-        js.Array("1", "2", 3), jsObj.asInstanceOf[js.Array[Any]])
+    assertJSArrayEquals(js.Array("1", "2", 3),
+                        jsObj.asInstanceOf[js.Array[Any]])
   }
 
   @Test def should_support_tuple_of_4(): Unit = {
@@ -113,8 +113,8 @@ class TupleTest {
     assertEquals(4, scalaObj._4)
     assertEquals(4, t4IsInt)
     assertTrue((jsObj: Any).isInstanceOf[js.Array[_]])
-    assertJSArrayEquals(
-        js.Array("1", "2", "3", 4), jsObj.asInstanceOf[js.Array[Any]])
+    assertJSArrayEquals(js.Array("1", "2", "3", 4),
+                        jsObj.asInstanceOf[js.Array[Any]])
   }
 
   @Test def should_support_tuple_of_5(): Unit = {
@@ -126,8 +126,8 @@ class TupleTest {
     assertEquals(5, scalaObj._5)
     assertEquals(5, t5IsInt)
     assertTrue((jsObj: Any).isInstanceOf[js.Array[_]])
-    assertJSArrayEquals(
-        js.Array("1", "2", "3", "4", 5), jsObj.asInstanceOf[js.Array[Any]])
+    assertJSArrayEquals(js.Array("1", "2", "3", "4", 5),
+                        jsObj.asInstanceOf[js.Array[Any]])
   }
 
   @Test def should_support_tuple_of_6(): Unit = {
@@ -266,8 +266,19 @@ class TupleTest {
   }
 
   @Test def should_support_tuple_of_13(): Unit = {
-    val jsObj = js.Tuple13(
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", 13)
+    val jsObj = js.Tuple13("1",
+                           "2",
+                           "3",
+                           "4",
+                           "5",
+                           "6",
+                           "7",
+                           "8",
+                           "9",
+                           "10",
+                           "11",
+                           "12",
+                           13)
     val scalaObj: (String,
                    String,
                    String,
@@ -287,10 +298,20 @@ class TupleTest {
     assertEquals(13, scalaObj._13)
     assertEquals(13, t13IsInt)
     assertTrue((jsObj: Any).isInstanceOf[js.Array[_]])
-    assertJSArrayEquals(
-        js.Array(
-            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", 13),
-        jsObj.asInstanceOf[js.Array[Any]])
+    assertJSArrayEquals(js.Array("1",
+                                 "2",
+                                 "3",
+                                 "4",
+                                 "5",
+                                 "6",
+                                 "7",
+                                 "8",
+                                 "9",
+                                 "10",
+                                 "11",
+                                 "12",
+                                 13),
+                        jsObj.asInstanceOf[js.Array[Any]])
   }
 
   @Test def should_support_tuple_of_14(): Unit = {

@@ -61,7 +61,8 @@ object ClassPathMemoryConsumptionTester {
     * Prints usage information
     */
   private def usage(): Unit =
-    println("""Use classpath and sourcepath options like in the case of e.g. 'scala' command.
+    println(
+        """Use classpath and sourcepath options like in the case of e.g. 'scala' command.
                | There's also one additional option:
                | -requiredInstances <int value> Determine how many times classpath should be loaded
              """.stripMargin.trim)

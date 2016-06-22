@@ -24,8 +24,9 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Expand boolean use to 'if else'"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val returnStmt: ScReturnStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScReturnStmt], false)
     if (returnStmt == null) return false
@@ -62,9 +63,8 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
 
     expr.append("{ return true } else { return false }")
 
-    val newReturnStmt: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+    val newReturnStmt: ScExpression = ScalaPsiElementFactory
+      .createExpressionFromText(expr.toString(), element.getManager)
 
     inWriteAction {
       returnStmt.replaceExpression(newReturnStmt, true)

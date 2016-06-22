@@ -37,8 +37,8 @@ object InterpreterSupervisionSpec {
     }
   }
 
-  case class OneToManyTestStage(
-      decider: Supervision.Decider, absorbTermination: Boolean = false)
+  case class OneToManyTestStage(decider: Supervision.Decider,
+                                absorbTermination: Boolean = false)
       extends PushPullStage[Int, Int] {
     var buf: List[Int] = Nil
     def onPush(elem: Int, ctx: Context[Int]): SyncDirective = {
@@ -283,7 +283,8 @@ class InterpreterSupervisionSpec
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
-        upstream.onNext(-5) // this will trigger failure of next requestOne (pull)
+        upstream
+          .onNext(-5) // this will trigger failure of next requestOne (pull)
         lastEvents() should be(Set(OnNext(99)))
 
         downstream.requestOne() // boom
@@ -291,8 +292,9 @@ class InterpreterSupervisionSpec
       }
     }
 
-    "resume when Filter throws" in new OneBoundedSetup[Int](Seq(Filter(
-                (x: Int) ⇒ if (x == 0) throw TE else true, resumingDecider))) {
+    "resume when Filter throws" in new OneBoundedSetup[Int](
+        Seq(Filter((x: Int) ⇒
+                  if (x == 0) throw TE else true, resumingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
       upstream.onNext(2)

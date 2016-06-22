@@ -36,7 +36,8 @@ private[spark] case class IndirectTaskResult[T](blockId: BlockId, size: Int)
 
 /** A TaskResult that contains the task's return value and accumulator updates. */
 private[spark] class DirectTaskResult[T](
-    var valueBytes: ByteBuffer, var accumUpdates: Seq[AccumulableInfo])
+    var valueBytes: ByteBuffer,
+    var accumUpdates: Seq[AccumulableInfo])
     extends TaskResult[T]
     with Externalizable {
 

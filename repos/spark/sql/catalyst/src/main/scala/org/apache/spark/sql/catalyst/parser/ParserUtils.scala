@@ -88,7 +88,7 @@ object ParserUtils {
         remainingNodes.partition(_.text.toUpperCase == clauseName)
       remainingNodes =
         nonMatches ++
-        (if (matches.nonEmpty) matches.tail else Nil)
+          (if (matches.nonEmpty) matches.tail else Nil)
       matches.headOption
     }
 
@@ -102,12 +102,13 @@ object ParserUtils {
   }
 
   def getClause(clauseName: String, nodeList: Seq[ASTNode]): ASTNode = {
-    getClauseOption(clauseName, nodeList).getOrElse(sys.error(
+    getClauseOption(clauseName, nodeList).getOrElse(
+        sys.error(
             s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
   }
 
-  def getClauseOption(
-      clauseName: String, nodeList: Seq[ASTNode]): Option[ASTNode] = {
+  def getClauseOption(clauseName: String,
+                      nodeList: Seq[ASTNode]): Option[ASTNode] = {
     nodeList.filter { case ast: ASTNode => ast.text == clauseName } match {
       case Seq(oneMatch) => Some(oneMatch)
       case Seq() => None
@@ -123,8 +124,9 @@ object ParserUtils {
       case Seq(databaseName, table) =>
         TableIdentifier(table, Some(databaseName))
       case other =>
-        sys.error("Hive only supports tables names like 'tableName' " +
-            s"or 'databaseName.tableName', found '$other'")
+        sys.error(
+            "Hive only supports tables names like 'tableName' " +
+              s"or 'databaseName.tableName', found '$other'")
     }
   }
 
@@ -162,8 +164,8 @@ object ParserUtils {
       StructField(cleanIdentifier(fieldName),
                   nodeToDataType(dataType),
                   nullable = true)
-    case Token(
-        "TOK_TABCOL", Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
+    case Token("TOK_TABCOL",
+               Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
       val meta = new MetadataBuilder()
         .putString("comment", unquoteString(comment.text))
         .build()

@@ -5,14 +5,12 @@ import scala.collection.mutable.HashSet
 import scala.collection.parallel.mutable.ParHashSet
 
 object Test extends App {
-  test(
-      new Creator {
+  test(new Creator {
     def create[A] = new HashSet[A]
     def hashSetType = "HashSet"
   })
 
-  test(
-      new Creator {
+  test(new Creator {
     def create[A] = new ParHashSet[A]
     def hashSetType = "ParHashSet"
   })
@@ -22,11 +20,11 @@ object Test extends App {
     val h1 = creator.create[Int]
     for (i <- 0 until 20) h1 += i
     println(
-        (for (i <- 0 until 20) yield
-          i + " " + (h1 contains i)).toList.sorted mkString (","))
+        (for (i <- 0 until 20)
+          yield i + " " + (h1 contains i)).toList.sorted mkString (","))
     println(
-        (for (i <- 20 until 40) yield
-          i + " " + (h1 contains i)).toList.sorted mkString (","))
+        (for (i <- 20 until 40)
+          yield i + " " + (h1 contains i)).toList.sorted mkString (","))
     println(h1.toList.sorted mkString ",")
     println
 
@@ -36,11 +34,11 @@ object Test extends App {
     for (i <- 0 until 20) h2 += "" + i
     println("null " + (h2 contains null))
     println(
-        (for (i <- 0 until 20) yield
-          i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
+        (for (i <- 0 until 20)
+          yield i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
     println(
-        (for (i <- 20 until 40) yield
-          i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
+        (for (i <- 20 until 40)
+          yield i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
     println((h2.toList map { x =>
           "" + x
         }).sorted mkString ",")
@@ -49,8 +47,8 @@ object Test extends App {
     h2 -= "" + 0
     println("null " + (h2 contains null))
     println(
-        (for (i <- 0 until 20) yield
-          i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
+        (for (i <- 0 until 20)
+          yield i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
     println
   }
 

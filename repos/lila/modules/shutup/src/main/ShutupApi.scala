@@ -86,7 +86,8 @@ final class ShutupApi(coll: Coll,
       coll
         .update(
             BSONDocument("_id" -> userRecord.userId),
-            BSONDocument("$unset" -> BSONDocument(
+            BSONDocument(
+                "$unset" -> BSONDocument(
                     TextType.PublicForumMessage.key -> true,
                     TextType.TeamForumMessage.key -> true,
                     TextType.PrivateMessage.key -> true,

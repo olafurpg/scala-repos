@@ -63,7 +63,8 @@ object SafeDeleteProcessorUtil {
                 if (justPrivates) {
                   if (parent.equals(inheritor.getExtendsList) ||
                       parent.equals(inheritor.getImplementsList)) {
-                    usages.add(new SafeDeleteExtendsClassUsageInfo(
+                    usages.add(
+                        new SafeDeleteExtendsClassUsageInfo(
                             element.asInstanceOf[PsiJavaCodeReferenceElement],
                             psiClass,
                             inheritor))
@@ -86,17 +87,23 @@ object SafeDeleteProcessorUtil {
             case _ => true
           }
 
-          val usagesToAdd =
-            if (shouldDelete) {
-              val isInImport =
-                PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt]) != null
-              if (isInImport)
-                Seq(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                        element, psiClass, true)) // delete without review
-              else
-                Seq(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                        element, psiClass, false)) // delete with review
-            } else Seq() // don't delete
+          val usagesToAdd = if (shouldDelete) {
+            val isInImport =
+              PsiTreeUtil
+                .getParentOfType(element, classOf[ScImportStmt]) != null
+            if (isInImport)
+              Seq(
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
+                      element,
+                      psiClass,
+                      true)) // delete without review
+            else
+              Seq(
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
+                      element,
+                      psiClass,
+                      false)) // delete with review
+          } else Seq() // don't delete
 
           usages.addAll(usagesToAdd)
         }
@@ -109,8 +116,8 @@ object SafeDeleteProcessorUtil {
     false // TODO
   }
 
-  def findTypeParameterExternalUsages(
-      typeParameter: PsiTypeParameter, usages: util.Collection[UsageInfo]) {
+  def findTypeParameterExternalUsages(typeParameter: PsiTypeParameter,
+                                      usages: util.Collection[UsageInfo]) {
     val owner: PsiTypeParameterListOwner = typeParameter.getOwner
     if (owner != null) {
       val index: Int =
@@ -122,8 +129,10 @@ object SafeDeleteProcessorUtil {
               val typeArgs: Array[PsiTypeElement] =
                 referenceElement.getParameterList.getTypeParameterElements
               if (typeArgs.length > index) {
-                usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                        typeArgs(index), typeParameter, true))
+                usages.add(
+                    new SafeDeleteReferenceJavaDeleteUsageInfo(typeArgs(index),
+                                                               typeParameter,
+                                                               true))
               }
             case _ =>
           }
@@ -140,8 +149,10 @@ object SafeDeleteProcessorUtil {
     val references: util.Collection[PsiReference] =
       referenceSearch(psiMethod).findAll
     if (psiMethod.isConstructor) {
-      return findConstructorUsages(
-          psiMethod, references, usages, allElementsToDelete)
+      return findConstructorUsages(psiMethod,
+                                   references,
+                                   usages,
+                                   allElementsToDelete)
     }
     val overridingElements: Array[PsiNamedElement] =
       ScalaOverridingMemberSearcher.search(psiMethod)
@@ -153,12 +164,14 @@ object SafeDeleteProcessorUtil {
           !isInside(element, overridingMethods.map(x => x: PsiElement))) {
         val isReferenceInImport =
           PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt]) != null
-        usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                element, psiMethod, isReferenceInImport))
+        usages.add(
+            new SafeDeleteReferenceJavaDeleteUsageInfo(element,
+                                                       psiMethod,
+                                                       isReferenceInImport))
       }
     }
-    val methodToReferences: util.HashMap[
-        PsiNamedElement, util.Collection[PsiReference]] =
+    val methodToReferences: util.HashMap[PsiNamedElement,
+                                         util.Collection[PsiReference]] =
       new util.HashMap[PsiNamedElement, util.Collection[PsiReference]]
     for (overridingMethod <- overridingMethods) {
       val overridingReferences: util.Collection[PsiReference] =
@@ -176,8 +189,7 @@ object SafeDeleteProcessorUtil {
         case x: PsiMethod =>
           usages.add(new SafeDeleteOverridingMethodUsageInfo(x, psiMethod))
         case x: ScNamedElement =>
-          val info =
-            new SafeDeleteUsageInfo(x, psiMethod) // TODO SafeDeleteOverridingMemberUsageInfo
+          val info = new SafeDeleteUsageInfo(x, psiMethod) // TODO SafeDeleteOverridingMemberUsageInfo
           usages.add(info)
       }
     }
@@ -209,8 +221,8 @@ object SafeDeleteProcessorUtil {
       originalReferences: util.Collection[PsiReference],
       usages: util.List[UsageInfo],
       allElementsToDelete: Array[PsiElement]): Condition[PsiElement] = {
-    val constructorsToRefs: util.HashMap[
-        PsiMethod, util.Collection[PsiReference]] =
+    val constructorsToRefs: util.HashMap[PsiMethod,
+                                         util.Collection[PsiReference]] =
       new util.HashMap[PsiMethod, util.Collection[PsiReference]]
     val newConstructors: util.HashSet[PsiMethod] = new util.HashSet[PsiMethod]
     if (isTheOnlyEmptyDefaultConstructor(constructor)) return null
@@ -229,8 +241,8 @@ object SafeDeleteProcessorUtil {
               !constructorsToRefs.containsKey(overridingConstructor)) {
             val overridingConstructorReferences: util.Collection[PsiReference] =
               referenceSearch(overridingConstructor).findAll
-            constructorsToRefs.put(
-                overridingConstructor, overridingConstructorReferences)
+            constructorsToRefs
+              .put(overridingConstructor, overridingConstructorReferences)
             passConstructors.add(overridingConstructor)
           }
         }
@@ -265,8 +277,8 @@ object SafeDeleteProcessorUtil {
       originalMethod: PsiMethod,
       originalReferences: util.Collection[PsiReference],
       overridingMethods: util.Collection[PsiMethod],
-      methodToReferences: util.HashMap[
-          PsiMethod, util.Collection[PsiReference]],
+      methodToReferences: util.HashMap[PsiMethod,
+                                       util.Collection[PsiReference]],
       usages: util.List[UsageInfo],
       allElementsToDelete: Array[PsiElement]): util.Set[PsiMethod] = {
     val validOverriding: util.Set[PsiMethod] =
@@ -293,7 +305,9 @@ object SafeDeleteProcessorUtil {
             }
           }
           if (!anyOverridingRefs && isMultipleInterfacesImplementation(
-                  overridingMethod, originalMethod, allElementsToDelete)) {
+                  overridingMethod,
+                  originalMethod,
+                  allElementsToDelete)) {
             anyOverridingRefs = true
             multipleInterfaceImplementations.add(overridingMethod)
           }
@@ -304,8 +318,10 @@ object SafeDeleteProcessorUtil {
               val element: PsiElement = reference.getElement
               if (!isInside(element, allElementsToDelete) &&
                   !isInside(element, overridingMethods)) {
-                usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                        element, originalMethod, false))
+                usages.add(
+                    new SafeDeleteReferenceJavaDeleteUsageInfo(element,
+                                                               originalMethod,
+                                                               false))
                 validOverriding.clear()
               }
             }
@@ -390,15 +406,15 @@ object SafeDeleteProcessorUtil {
       privateModifierList.setModifierProperty(PsiModifier.PRIVATE, true)
     } catch {
       case e: IncorrectOperationException => {
-          LOG.assertTrue(false)
-          return false
-        }
+        LOG.assertTrue(false)
+        return false
+      }
     }
     for (reference <- references) {
       val element: PsiElement = reference.getElement
       if (!isInside(element, allElementsToDelete) &&
-          !isInside(element, deleted) && !facade.getResolveHelper.isAccessible(
-              method, privateModifierList, element, null, null)) {
+          !isInside(element, deleted) && !facade.getResolveHelper
+            .isAccessible(method, privateModifierList, element, null, null)) {
         return false
       }
     }
@@ -423,14 +439,16 @@ object SafeDeleteProcessorUtil {
                   new SafeDeleteFieldWriteReference(assignExpr, psiField))
             case _ =>
               val range: TextRange = reference.getRangeInElement
-              usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
+              usages.add(
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
                       reference.getElement,
                       psiField,
                       range.getStartOffset,
                       range.getEndOffset,
                       false,
                       PsiTreeUtil.getParentOfType(
-                          element, classOf[PsiImportStaticStatement]) != null))
+                          element,
+                          classOf[PsiImportStaticStatement]) != null))
           }
         }
         true
@@ -439,8 +457,8 @@ object SafeDeleteProcessorUtil {
     isInsideDeleted
   }
 
-  def findParameterUsages(
-      parameter: PsiParameter, usages: util.List[UsageInfo]) {
+  def findParameterUsages(parameter: PsiParameter,
+                          usages: util.List[UsageInfo]) {
     val method: PsiMethod =
       parameter.getDeclarationScope.asInstanceOf[PsiMethod]
     val index: Int = method.getParameterList.getParameterIndex(parameter)
@@ -464,14 +482,18 @@ object SafeDeleteProcessorUtil {
             val args: Array[PsiExpression] = argList.getExpressions
             if (index < args.length) {
               if (!parameter.isVarArgs) {
-                usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                        args(index), parameter, true))
+                usages.add(
+                    new SafeDeleteReferenceJavaDeleteUsageInfo(args(index),
+                                                               parameter,
+                                                               true))
               } else {
                 {
                   var i: Int = index
                   while (i < args.length) {
-                    usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                            args(i), parameter, true))
+                    usages.add(
+                        new SafeDeleteReferenceJavaDeleteUsageInfo(args(i),
+                                                                   parameter,
+                                                                   true))
                     i += 1
                   }
                 }
@@ -491,8 +513,10 @@ object SafeDeleteProcessorUtil {
                 newText.append(
                     parameters.map(_.getType.getCanonicalText).mkString(","))
                 newText.append(")*/")
-                usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                        element, parameter, true) {
+                usages.add(
+                    new SafeDeleteReferenceJavaDeleteUsageInfo(element,
+                                                               parameter,
+                                                               true) {
                   override def deleteElement() {
                     val javadocMethodReference: PsiDocMethodOrFieldRef#MyReference =
                       element.getReference
@@ -515,8 +539,10 @@ object SafeDeleteProcessorUtil {
         val docTag: PsiDocTag =
           PsiTreeUtil.getParentOfType(element, classOf[PsiDocTag])
         if (docTag != null) {
-          usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                  docTag, parameter, true))
+          usages.add(
+              new SafeDeleteReferenceJavaDeleteUsageInfo(docTag,
+                                                         parameter,
+                                                         true))
           return true
         }
         var isSafeDelete: Boolean = false
@@ -536,8 +562,10 @@ object SafeDeleteProcessorUtil {
             }
           case _ =>
         }
-        usages.add(new SafeDeleteReferenceJavaDeleteUsageInfo(
-                element, parameter, isSafeDelete))
+        usages.add(
+            new SafeDeleteReferenceJavaDeleteUsageInfo(element,
+                                                       parameter,
+                                                       isSafeDelete))
         true
       }
     })

@@ -81,8 +81,9 @@ class ScalaRefCountHolder private () {
     }
   }
 
-  def analyze(
-      analyze: Runnable, dirtyScope: TextRange, file: PsiFile): Boolean = {
+  def analyze(analyze: Runnable,
+              dirtyScope: TextRange,
+              file: PsiFile): Boolean = {
     myState.compareAndSet(State.READY, State.VIRGIN)
     if (!myState.compareAndSet(State.VIRGIN, State.WRITE)) return false
     try {

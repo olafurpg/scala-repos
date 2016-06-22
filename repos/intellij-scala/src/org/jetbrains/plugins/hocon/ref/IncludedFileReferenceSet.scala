@@ -51,15 +51,16 @@ class IncludedFileReferenceSet(text: String,
     if (relative) !forcedAbsolute
     else fromClasspath
 
-  override def createFileReference(
-      range: TextRange, index: Int, text: String): FileReference =
+  override def createFileReference(range: TextRange,
+                                   index: Int,
+                                   text: String): FileReference =
     new IncludedFileReference(this, range, index, text)
 
   override def getReferenceCompletionFilter: Condition[PsiFileSystemItem] =
     new Condition[PsiFileSystemItem] {
       def value(item: PsiFileSystemItem): Boolean =
         item.isDirectory || item.getName.endsWith(ConfExt) ||
-        item.getName.endsWith(JsonExt) || item.getName.endsWith(PropsExt)
+          item.getName.endsWith(JsonExt) || item.getName.endsWith(PropsExt)
     }
 
   // code mostly based on similar bits in `FileReferenceSet` and `PsiFileReferenceHelper`
@@ -149,14 +150,16 @@ object IncludedFileReference {
   }
 }
 
-class IncludedFileReference(
-    refSet: FileReferenceSet, range: TextRange, index: Int, text: String)
+class IncludedFileReference(refSet: FileReferenceSet,
+                            range: TextRange,
+                            index: Int,
+                            text: String)
     extends FileReference(refSet, range, index, text) {
 
   private def lacksExtension(text: String) =
     isLast && text.nonEmpty && text != "." && text != ".." && text != "/" &&
-    !text.endsWith(ConfExt) && !text.endsWith(JsonExt) &&
-    !text.endsWith(PropsExt)
+      !text.endsWith(ConfExt) && !text.endsWith(JsonExt) &&
+      !text.endsWith(PropsExt)
 
   override def innerResolve(caseSensitive: Boolean,
                             containingFile: PsiFile): Array[ResolveResult] = {

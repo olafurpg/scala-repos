@@ -42,7 +42,10 @@ private[ml] trait NaiveBayesParams extends PredictorParams {
     * @group param
     */
   final val smoothing: DoubleParam = new DoubleParam(
-      this, "smoothing", "The smoothing parameter.", ParamValidators.gtEq(0))
+      this,
+      "smoothing",
+      "The smoothing parameter.",
+      ParamValidators.gtEq(0))
 
   /** @group getParam */
   final def getSmoothing: Double = $(smoothing)
@@ -57,7 +60,7 @@ private[ml] trait NaiveBayesParams extends PredictorParams {
       this,
       "modelType",
       "The model type " +
-      "which is a string (case-sensitive). Supported options: multinomial (default) and bernoulli.",
+        "which is a string (case-sensitive). Supported options: multinomial (default) and bernoulli.",
       ParamValidators.inArray[String](
           OldNaiveBayes.supportedModelTypes.toArray))
 
@@ -131,9 +134,9 @@ object NaiveBayes extends DefaultParamsReadable[NaiveBayes] {
   */
 @Since("1.5.0")
 @Experimental
-class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
-                                  @Since("1.5.0") val pi: Vector,
-                                  @Since("1.5.0") val theta: Matrix)
+class NaiveBayesModel private[ml] (@Since("1.5.0") override val uid: String,
+                                   @Since("1.5.0") val pi: Vector,
+                                   @Since("1.5.0") val theta: Matrix)
     extends ProbabilisticClassificationModel[Vector, NaiveBayesModel]
     with NaiveBayesParams
     with MLWritable {
@@ -172,8 +175,7 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
   }
 
   private def bernoulliCalculation(features: Vector) = {
-    features.foreachActive(
-        (_, value) =>
+    features.foreachActive((_, value) =>
           if (value != 0.0 && value != 1.0) {
         throw new SparkException(
             s"Bernoulli naive Bayes requires 0 or 1 feature values but found $features.")
@@ -215,15 +217,16 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
         }
         dv
       case sv: SparseVector =>
-        throw new RuntimeException("Unexpected error in NaiveBayesModel:" +
-            " raw2probabilityInPlace encountered SparseVector")
+        throw new RuntimeException(
+            "Unexpected error in NaiveBayesModel:" +
+              " raw2probabilityInPlace encountered SparseVector")
     }
   }
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): NaiveBayesModel = {
-    copyValues(
-        new NaiveBayesModel(uid, pi, theta).setParent(this.parent), extra)
+    copyValues(new NaiveBayesModel(uid, pi, theta).setParent(this.parent),
+               extra)
   }
 
   @Since("1.5.0")
@@ -240,8 +243,8 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
 object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
 
   /** Convert a model from the old API */
-  private[ml] def fromOld(
-      oldModel: OldNaiveBayesModel, parent: NaiveBayes): NaiveBayesModel = {
+  private[ml] def fromOld(oldModel: OldNaiveBayesModel,
+                          parent: NaiveBayes): NaiveBayesModel = {
     val uid = if (parent != null) parent.uid else Identifiable.randomUID("nb")
     val labels = Vectors.dense(oldModel.labels)
     val pi = Vectors.dense(oldModel.pi)

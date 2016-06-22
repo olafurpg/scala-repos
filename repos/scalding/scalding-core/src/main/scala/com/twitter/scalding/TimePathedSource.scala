@@ -62,8 +62,9 @@ object TimePathedSource {
   /**
     * Gives the write path based on daterange end.
     */
-  def writePathFor(
-      pattern: String, dateRange: DateRange, tz: TimeZone): String = {
+  def writePathFor(pattern: String,
+                   dateRange: DateRange,
+                   tz: TimeZone): String = {
     assert(pattern != "/*", "Pattern must not be /*")
     assert(pattern.takeRight(2) == "/*", "Pattern must end with /* " + pattern)
     val stripped = pattern.dropRight(2)
@@ -71,8 +72,9 @@ object TimePathedSource {
   }
 }
 
-abstract class TimeSeqPathedSource(
-    val patterns: Seq[String], val dateRange: DateRange, val tz: TimeZone)
+abstract class TimeSeqPathedSource(val patterns: Seq[String],
+                                   val dateRange: DateRange,
+                                   val tz: TimeZone)
     extends FileSource {
 
   override def hdfsPaths = patterns.flatMap { pattern: String =>
@@ -119,13 +121,13 @@ abstract class TimeSeqPathedSource(
 
   override def toString =
     "TimeSeqPathedSource(" + patterns.mkString(",") + ", " + dateRange + ", " +
-    tz + ")"
+      tz + ")"
 
   override def equals(that: Any) =
     (that != null) && (this.getClass == that.getClass) &&
-    this.patterns == that.asInstanceOf[TimeSeqPathedSource].patterns &&
-    this.dateRange == that.asInstanceOf[TimeSeqPathedSource].dateRange &&
-    this.tz == that.asInstanceOf[TimeSeqPathedSource].tz
+      this.patterns == that.asInstanceOf[TimeSeqPathedSource].patterns &&
+      this.dateRange == that.asInstanceOf[TimeSeqPathedSource].dateRange &&
+      this.tz == that.asInstanceOf[TimeSeqPathedSource].tz
 
   override def hashCode =
     patterns.hashCode + 31 * dateRange.hashCode + (31 ^ 2) * tz.hashCode
@@ -136,8 +138,9 @@ abstract class TimeSeqPathedSource(
   * THIS MEANS YOU MUST END WITH A / followed by * to match a file
   * For writing, we write to the directory specified by the END time.
   */
-abstract class TimePathedSource(
-    val pattern: String, dateRange: DateRange, tz: TimeZone)
+abstract class TimePathedSource(val pattern: String,
+                                dateRange: DateRange,
+                                tz: TimeZone)
     extends TimeSeqPathedSource(Seq(pattern), dateRange, tz) {
 
   //Write to the path defined by the end time:

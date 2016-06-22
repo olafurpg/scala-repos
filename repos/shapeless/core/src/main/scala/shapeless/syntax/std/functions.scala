@@ -29,8 +29,8 @@ package std
 object function {
   import ops.function._
 
-  implicit def fnHListOps[F, T <: HList, R](
-      t: F)(implicit fnHLister: FnToProduct.Aux[F, T => R]) =
+  implicit def fnHListOps[F, T <: HList, R](t: F)(
+      implicit fnHLister: FnToProduct.Aux[F, T => R]) =
     new FnHListOps[T => R] {
       def toProduct = fnHLister(t)
     }

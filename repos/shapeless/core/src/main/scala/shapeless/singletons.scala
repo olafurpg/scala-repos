@@ -65,8 +65,8 @@ trait WitnessWith[TC[_]] extends Witness {
 
 trait LowPriorityWitnessWith {
   implicit def apply2[H, TC2[_ <: H, _], S <: H, T](t: T): WitnessWith.Lt[
-      ({ type λ[X] = TC2[S, X] })#λ, T] = macro SingletonTypeMacros
-    .convertInstanceImpl2[H, TC2, S]
+      ({ type λ[X] = TC2[S, X] })#λ,
+      T] = macro SingletonTypeMacros.convertInstanceImpl2[H, TC2, S]
 }
 
 object WitnessWith extends LowPriorityWitnessWith {
@@ -309,8 +309,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
       case SingletonSymbolType(c) => mkSingletonSymbol(c)
 
       case _ =>
-        c.abort(
-            c.enclosingPosition, s"Type argument $tpe is not a singleton type")
+        c.abort(c.enclosingPosition,
+                s"Type argument $tpe is not a singleton type")
     }
 
   def materializeImpl[T: WeakTypeTag]: Tree = {
@@ -332,7 +332,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
 
       case (tpe, tree)
           if tree.symbol.isTerm && tree.symbol.asTerm.isStable &&
-          !isValueClass(tree.symbol) =>
+            !isValueClass(tree.symbol) =>
         val sym = tree.symbol.asTerm
         val pre =
           if (sym.owner.isClass) c.internal.thisType(sym.owner) else NoPrefix
@@ -366,7 +366,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
     val tc = tcTag.tpe.typeConstructor
     val tcParam = tc.typeParams(1)
     val tcTpe = c.internal.polyType(
-        List(tcParam), appliedType(tc, List(tTpe, tcParam.asType.toType)))
+        List(tcParam),
+        appliedType(tc, List(tTpe, tcParam.asType.toType)))
     convertInstanceImplNatAux(i, tcTpe)
   }
 
@@ -397,7 +398,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
     }
 
   def convertInstanceImpl2[H, TC2[_ <: H, _], S <: H](t: Tree)(
-      implicit tc2Tag: WeakTypeTag[TC2[_, _]], sTag: WeakTypeTag[S]): Tree =
+      implicit tc2Tag: WeakTypeTag[TC2[_, _]],
+      sTag: WeakTypeTag[S]): Tree =
     extractResult(t) { (sTpe, value) =>
       val tc2 = tc2Tag.tpe.typeConstructor
       val s = sTag.tpe

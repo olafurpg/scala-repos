@@ -65,8 +65,8 @@ class ResourceUtilTest
       .newBuilder()
       .setPersistence(Persistence.newBuilder().setId("persistenceId"))
       .build()
-    val resourceWithReservation = MTH.scalarResource(
-        "disk", 1024, "role", Some(reservationInfo), Some(disk))
+    val resourceWithReservation = MTH
+      .scalarResource("disk", 1024, "role", Some(reservationInfo), Some(disk))
     val resourceWithoutReservation =
       MTH.scalarResource("disk", 1024, "role", None, None)
 
@@ -206,8 +206,8 @@ class ResourceUtilTest
       .newBuilder()
       .setPersistence(Persistence.newBuilder().setId("persistenceId"))
       .build()
-    val resource = MTH.scalarResource(
-        "disk", 1024, "role", Some(reservationInfo), Some(disk))
+    val resource = MTH
+      .scalarResource("disk", 1024, "role", Some(reservationInfo), Some(disk))
     val resourceString =
       ResourceUtil.displayResources(Seq(resource), maxRanges = 10)
     resourceString should equal(

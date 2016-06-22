@@ -50,7 +50,8 @@ final class QaApi(questionColl: Coll,
           val q2 = q
             .copy(title = data.title, body = data.body, tags = data.tags)
             .editNow
-          questionColl.update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
+          questionColl
+            .update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
         }
       }
 
@@ -150,7 +151,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(id: QuestionId) =
       questionColl.remove(BSONDocument("_id" -> id)) >>
-      (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
+        (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
 
     def removeComment(id: QuestionId, c: CommentId) = questionColl.update(
         BSONDocument("_id" -> id),
@@ -233,7 +234,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(a: Answer): Fu[Unit] =
       answerColl.remove(BSONDocument("_id" -> a.id)) >>
-      (question recountAnswers a.questionId).void
+        (question recountAnswers a.questionId).void
 
     def remove(id: AnswerId): Fu[Unit] = findById(id) flatMap { _ ?? remove }
 
@@ -295,8 +296,8 @@ final class QaApi(questionColl: Coll,
     }
 
     def remove(questionId: QuestionId, commentId: CommentId) =
-      question.removeComment(questionId, commentId) >> answer.removeComment(
-          questionId, commentId)
+      question.removeComment(questionId, commentId) >> answer
+        .removeComment(questionId, commentId)
 
     private implicit val commentBSONHandler = Macros.handler[Comment]
   }
@@ -315,7 +316,8 @@ final class QaApi(questionColl: Coll,
         .aggregate(Project(BSONDocument("tags" -> BSONBoolean(true))),
                    List(Unwind("tags"),
                         Group(BSONBoolean(true))("tags" -> AddToSet("tags"))))
-        .map(_.documents.headOption
+        .map(
+            _.documents.headOption
               .flatMap(_.getAs[List[String]]("tags"))
               .getOrElse(List.empty[String])
               .map(_.toLowerCase)

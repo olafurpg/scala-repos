@@ -39,8 +39,13 @@ case class SampleClassC(a: SampleClassA,
                         d: SampleClassB,
                         e: SampleClassB)
 case class SampleClassD(a: Option[SampleClassC])
-case class SampleClassE(
-    a: String, b: Boolean, c: Short, d: Int, e: Long, f: Float, g: Double)
+case class SampleClassE(a: String,
+                        b: Boolean,
+                        c: Short,
+                        d: Int,
+                        e: Long,
+                        f: Float,
+                        g: Double)
 case class SampleClassF(a: Option[Int])
 case class SampleClassG(a: java.util.Date)
 
@@ -102,7 +107,8 @@ class MacrosUnitTests extends WordSpec with Matchers {
   }
 
   def shouldRoundTripOther[T: IsCaseClass: TupleSetter: TupleConverter](
-      te: TupleEntry, t: T) {
+      te: TupleEntry,
+      t: T) {
     val inter = mgConv(te)
     inter shouldBe t
     mgSet(inter) shouldBe te
@@ -240,9 +246,10 @@ class MacrosUnitTests extends WordSpec with Matchers {
   "MacroGenerated TupleSetter and TupleConverter" should {
     "round trip class -> tupleentry -> class" in {
       shouldRoundTrip(SampleClassA(100, "onehundred"))
-      shouldRoundTrip(SampleClassB(SampleClassA(100, "onehundred"),
-                                   SampleClassA(-1, "zero"),
-                                   "what"))
+      shouldRoundTrip(
+          SampleClassB(SampleClassA(100, "onehundred"),
+                       SampleClassA(-1, "zero"),
+                       "what"))
       val a = SampleClassA(73, "hrmA1")
       val b = SampleClassB(a, a, "hrmB1")
       val c =
@@ -349,14 +356,16 @@ class MacrosUnitTests extends WordSpec with Matchers {
     "Case Class should form expected Fields with Options" in {
       val fields = Macros.toFields[SampleClassD]
       assert(fields.size === 19)
-      assert(fields.getTypes === Array
+      assert(
+          fields.getTypes === Array
             .fill[java.lang.reflect.Type](19)(classOf[java.lang.Object]))
     }
 
     "Case Class should form expected Fields with Unknown types" in {
       val fields = Macros.toFieldsWithUnknown[SampleClassG]
       assert(fields.size === 1)
-      assert(fields.getTypes === Array[java.lang.reflect.Type](
+      assert(
+          fields.getTypes === Array[java.lang.reflect.Type](
               classOf[java.util.Date]))
     }
 

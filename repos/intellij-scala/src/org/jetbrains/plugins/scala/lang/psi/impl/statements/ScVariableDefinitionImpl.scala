@@ -21,8 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScVariableDefinitionImpl private (
-    stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
+class ScVariableDefinitionImpl private (stub: StubElement[ScVariable],
+                                        nodeType: IElementType,
+                                        node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScVariableDefinition {
   override def accept(visitor: PsiElementVisitor) {

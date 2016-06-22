@@ -81,8 +81,8 @@ private[round] final class Socket(gameId: String,
   override def postStop() {
     super.postStop()
     lilaBus.unsubscribe(self)
-    lilaBus.publish(
-        lila.hub.actorApi.round.SocketEvent.Stop(gameId), 'roundDoor)
+    lilaBus
+      .publish(lila.hub.actorApi.round.SocketEvent.Stop(gameId), 'roundDoor)
   }
 
   private def refreshSubscriptions {
@@ -161,8 +161,7 @@ private[round] final class Socket(gameId: String,
     case eventList: EventList => notify(eventList.events)
 
     case lila.chat.actorApi.ChatLine(chatId, line) =>
-      notify(
-          List(line match {
+      notify(List(line match {
         case l: lila.chat.UserLine =>
           Event.UserMessage(l, chatId endsWith "/w")
         case l: lila.chat.PlayerLine => Event.PlayerMessage(l)

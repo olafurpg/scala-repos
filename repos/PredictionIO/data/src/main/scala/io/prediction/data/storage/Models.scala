@@ -69,7 +69,8 @@ class ModelSerializer
           }
       }, {
         case i: Model =>
-          JObject(JField("id", JString(i.id)) :: JField(
+          JObject(
+              JField("id", JString(i.id)) :: JField(
                   "models",
                   JString(BaseEncoding.base64.encode(i.models))) :: Nil)
       }))

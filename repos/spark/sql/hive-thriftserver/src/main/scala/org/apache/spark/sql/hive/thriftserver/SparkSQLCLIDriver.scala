@@ -187,13 +187,13 @@ private[hive] object SparkSQLCLIDriver extends Logging {
       } else {
         logWarning(
             "WARNING: Directory for Hive history file: " + historyDirectory +
-            " does not exist.   History will not be available during this session.")
+              " does not exist.   History will not be available during this session.")
       }
     } catch {
       case e: Exception =>
         logWarning(
             "WARNING: Encountered an error while trying to initialize Hive's " +
-            "history file.  History will not be available during this session.")
+              "history file.  History will not be available during this session.")
         logWarning(e.getMessage)
     }
 
@@ -205,8 +205,9 @@ private[hive] object SparkSQLCLIDriver extends Logging {
             h.flush()
           } catch {
             case e: IOException =>
-              logWarning("WARNING: Failed to write command history file: " +
-                  e.getMessage)
+              logWarning(
+                  "WARNING: Failed to write command history file: " +
+                    e.getMessage)
           }
         case _ =>
       }
@@ -232,7 +233,9 @@ private[hive] object SparkSQLCLIDriver extends Logging {
     def promptWithCurrentDB: String = s"$prompt$currentDB"
     def continuedPromptWithDBSpaces: String =
       continuedPrompt + ReflectionUtils.invokeStatic(
-          classOf[CliDriver], "spacesForString", classOf[String] -> currentDB)
+          classOf[CliDriver],
+          "spacesForString",
+          classOf[String] -> currentDB)
 
     var currentPrompt = promptWithCurrentDB
     var line = reader.readLine(currentPrompt + "> ")
@@ -344,8 +347,8 @@ private[hive] class SparkSQLCLIDriver extends CliDriver with Logging {
 
           val res = new JArrayList[String]()
 
-          if (HiveConf.getBoolVar(
-                  conf, HiveConf.ConfVars.HIVE_CLI_PRINT_HEADER)) {
+          if (HiveConf.getBoolVar(conf,
+                                  HiveConf.ConfVars.HIVE_CLI_PRINT_HEADER)) {
             // Print the column names.
             Option(driver.getSchema.getFieldSchemas).foreach { fields =>
               out.println(fields.asScala.map(_.getName).mkString("\t"))

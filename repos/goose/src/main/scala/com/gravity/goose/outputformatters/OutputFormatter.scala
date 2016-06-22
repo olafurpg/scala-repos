@@ -78,14 +78,14 @@ trait OutputFormatter {
   def convertToText(topNode: Element): String = topNode match {
     case null => ""
     case node => {
-        (node
-          .children()
-          .map((e: Element) => {
-            StringEscapeUtils.unescapeHtml(e.text).trim
-          }))
-          .toList
-          .mkString("\n\n")
-      }
+      (node
+        .children()
+        .map((e: Element) => {
+          StringEscapeUtils.unescapeHtml(e.text).trim
+        }))
+        .toList
+        .mkString("\n\n")
+    }
   }
 
   /**
@@ -159,11 +159,11 @@ trait OutputFormatter {
 
     item.childNodes().foreach {
       case childText: TextNode => {
-          sb.append(childText.getWholeText)
-        }
+        sb.append(childText.getWholeText)
+      }
       case childElement: Element => {
-          sb.append(childElement.outerHtml())
-        }
+        sb.append(childElement.outerHtml())
+      }
       case _ =>
     }
 
@@ -195,21 +195,21 @@ trait OutputFormatter {
           }
         } catch {
           case e: IllegalArgumentException => {
-              logger.error(e.getMessage)
-            }
+            logger.error(e.getMessage)
+          }
         }
       }
 
       Option(topNode.getElementsByTag("p").first()).foreach {
         case firstModdedNode: Element => {
-            // check for open parens as the first paragraph, e.g. businessweek4.txt (IT)
-            val trimmed = firstModdedNode.text().trim()
-            if (trimmed.startsWith("(") && trimmed.endsWith(")")) {
-              logger.trace(
-                  "Removing parenthesis paragraph that is first paragraph")
-              firstModdedNode.remove()
-            }
+          // check for open parens as the first paragraph, e.g. businessweek4.txt (IT)
+          val trimmed = firstModdedNode.text().trim()
+          if (trimmed.startsWith("(") && trimmed.endsWith(")")) {
+            logger.trace(
+                "Removing parenthesis paragraph that is first paragraph")
+            firstModdedNode.remove()
           }
+        }
       }
     }
   }

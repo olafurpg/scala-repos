@@ -10,7 +10,7 @@ import scala.annotation.tailrec
   * describe the origins of the failure to aid in debugging and flags
   * mark attributes of the Failure (e.g. Restartable).
   */
-final class Failure private[finagle](
+final class Failure private[finagle] (
     private[finagle] val why: String,
     val cause: Option[Throwable] = None,
     val flags: Long = 0L,
@@ -112,7 +112,7 @@ final class Failure private[finagle](
     a match {
       case that: Failure =>
         this.why.equals(that.why) && this.cause.equals(that.cause) &&
-        this.flags.equals(that.flags) && this.sources.equals(that.sources)
+          this.flags.equals(that.flags) && this.sources.equals(that.sources)
       case _ => false
     }
   }
@@ -173,8 +173,10 @@ object Failure {
             logLevel: Level = Level.WARNING): Failure =
     if (cause == null) new Failure("unknown", None, flags, logLevel = logLevel)
     else if (cause.getMessage == null)
-      new Failure(
-          cause.getClass.getName, Some(cause), flags, logLevel = logLevel)
+      new Failure(cause.getClass.getName,
+                  Some(cause),
+                  flags,
+                  logLevel = logLevel)
     else new Failure(cause.getMessage, Some(cause), flags, logLevel = logLevel)
 
   /**
@@ -272,8 +274,10 @@ object Failure {
     * Create a new [[Restartable]] failure with the given message and cause.
     */
   def rejected(why: String, cause: Throwable): Failure =
-    new Failure(
-        why, Option(cause), Failure.Restartable, logLevel = Level.DEBUG)
+    new Failure(why,
+                Option(cause),
+                Failure.Restartable,
+                logLevel = Level.DEBUG)
 
   /**
     * A default [[Restartable]] failure.

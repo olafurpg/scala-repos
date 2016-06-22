@@ -35,7 +35,7 @@ import org.apache.spark.sql.execution.QueryExecution
   * @since 2.0.0
   */
 @Experimental
-class KeyValueGroupedDataset[K, V] private[sql](
+class KeyValueGroupedDataset[K, V] private[sql] (
     kEncoder: Encoder[K],
     vEncoder: Encoder[V],
     val queryExecution: QueryExecution,
@@ -132,8 +132,8 @@ class KeyValueGroupedDataset[K, V] private[sql](
     *
     * @since 1.6.0
     */
-  def flatMapGroups[U](
-      f: FlatMapGroupsFunction[K, V, U], encoder: Encoder[U]): Dataset[U] = {
+  def flatMapGroups[U](f: FlatMapGroupsFunction[K, V, U],
+                       encoder: Encoder[U]): Dataset[U] = {
     flatMapGroups((key, data) => f.call(key, data.asJava).asScala)(encoder)
   }
 
@@ -176,8 +176,8 @@ class KeyValueGroupedDataset[K, V] private[sql](
     *
     * @since 1.6.0
     */
-  def mapGroups[U](
-      f: MapGroupsFunction[K, V, U], encoder: Encoder[U]): Dataset[U] = {
+  def mapGroups[U](f: MapGroupsFunction[K, V, U],
+                   encoder: Encoder[U]): Dataset[U] = {
     mapGroups((key, data) => f.call(key, data.asJava))(encoder)
   }
 
@@ -226,15 +226,14 @@ class KeyValueGroupedDataset[K, V] private[sql](
     val encoders = columns.map(_.encoder)
     val namedColumns =
       columns.map(_.withInputType(resolvedVEncoder, dataAttributes).named)
-    val keyColumn =
-      if (resolvedKEncoder.flat) {
-        assert(groupingAttributes.length == 1)
-        groupingAttributes.head
-      } else {
-        Alias(CreateStruct(groupingAttributes), "key")()
-      }
-    val aggregate = Aggregate(
-        groupingAttributes, keyColumn +: namedColumns, logicalPlan)
+    val keyColumn = if (resolvedKEncoder.flat) {
+      assert(groupingAttributes.length == 1)
+      groupingAttributes.head
+    } else {
+      Alias(CreateStruct(groupingAttributes), "key")()
+    }
+    val aggregate =
+      Aggregate(groupingAttributes, keyColumn +: namedColumns, logicalPlan)
     val execution = new QueryExecution(sqlContext, aggregate)
 
     new Dataset(sqlContext,

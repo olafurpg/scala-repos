@@ -89,7 +89,8 @@ class SharedLeveldbJournalSpec
 
       system.actorOf(Props[SharedLeveldbStore], "store")
       val storePath =
-        RootActorPath(system
+        RootActorPath(
+            system
               .asInstanceOf[ExtendedActorSystem]
               .provider
               .getDefaultAddress) / "user" / "store"

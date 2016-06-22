@@ -33,15 +33,15 @@ trait OptionInstances extends OptionInstances1 {
         case Some(a) => f(b, a)
       }
 
-    def foldRight[A, B](
-        fa: Option[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+    def foldRight[A, B](fa: Option[A], lb: Eval[B])(
+        f: (A, Eval[B]) => Eval[B]): Eval[B] =
       fa match {
         case None => lb
         case Some(a) => f(a, lb)
       }
 
-    def traverse[G[_]: Applicative, A, B](
-        fa: Option[A])(f: A => G[B]): G[Option[B]] =
+    def traverse[G[_]: Applicative, A, B](fa: Option[A])(
+        f: A => G[B]): G[Option[B]] =
       fa match {
         case None => Applicative[G].pure(None)
         case Some(a) => Applicative[G].map(f(a))(Some(_))

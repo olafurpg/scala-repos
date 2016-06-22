@@ -60,7 +60,7 @@ object FingerTreeTest extends SpecLite {
       val asStream = tree.toStream
       val splitTree = tree.split(_ > index)
       (splitTree._1.toStream, splitTree._2.toStream) must_===
-        (asStream.splitAt(index))
+      (asStream.splitAt(index))
   }
 
   "replacing last element works correctly" ! forAll {
@@ -91,7 +91,7 @@ object FingerTreeTest extends SpecLite {
 
   "foldLeft snoc is identity" ! forAll { (tree: SequenceTree[Int]) =>
     tree.foldLeft(FingerTree.empty(SizeReducer[Int]))(_ :+ _).toStream must_==
-      (tree.toStream)
+    (tree.toStream)
   }
 
   "foldLeft cons is reverse" ! forAll { (tree: SequenceTree[Int]) =>
@@ -114,7 +114,7 @@ object FingerTreeTest extends SpecLite {
         streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i =>
               Some(i * 2))
       tree.map(_.toStream) getOrElse (Stream.empty) must_===
-        (streamToTree(intStream.take(20).map(_ * 2)).toStream)
+      (streamToTree(intStream.take(20).map(_ * 2)).toStream)
     }
 
     "traverseTree through the option effect yielding none" in {
@@ -129,7 +129,7 @@ object FingerTreeTest extends SpecLite {
         streamToTree(intStream.take(32 * 1024))
           .traverseTree[Option, Int, Int](x => Some(x))
       tree.map(_.toStream.take(100)) getOrElse Stream.empty must_===
-        (intStream.take(100))
+      (intStream.take(100))
     }
   }
 
@@ -144,8 +144,7 @@ object FingerTreeTest extends SpecLite {
     case class TestInstance(arr: Array[Int], index: Int)
 
     implicit def myGen: Arbitrary[TestInstance] =
-      Arbitrary(
-          for {
+      Arbitrary(for {
         arr <- arbitrary[Array[Int]] if arr.nonEmpty
         m <- Gen.choose(0, arr.length - 1)
       } yield TestInstance(arr, m))
@@ -168,7 +167,7 @@ object FingerTreeTest extends SpecLite {
 
   "viewr works correctly" ! forAll { (tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
-    tree.viewr.fold[Boolean](
-        true, (i, x) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+    tree.viewr.fold[Boolean](true, (i, x) =>
+          (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
   }
 }

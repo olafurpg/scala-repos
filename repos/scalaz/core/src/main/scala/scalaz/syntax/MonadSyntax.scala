@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Monad` */
-final class MonadOps[F[_], A] private[syntax](val self: F[A])(
+final class MonadOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Monad[F])
     extends Ops[F[A]] {
   ////

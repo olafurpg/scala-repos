@@ -44,8 +44,12 @@ object CubicCurveTo {
             x: Double,
             y: Double) =
     new CubicCurveTo(
-        new jfxss.CubicCurveTo(
-            controlX1, controlY1, controlX2, controlY2, x, y))
+        new jfxss.CubicCurveTo(controlX1,
+                               controlY1,
+                               controlX2,
+                               controlY2,
+                               x,
+                               y))
 }
 
 class CubicCurveTo(

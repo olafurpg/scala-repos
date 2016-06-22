@@ -53,8 +53,9 @@ trait WikiControllerBase extends ControllerBase {
                 page,
                 getWikiPageList(repository.owner, repository.name),
                 repository,
-                hasWritePermission(
-                    repository.owner, repository.name, context.loginAccount),
+                hasWritePermission(repository.owner,
+                                   repository.name,
+                                   context.loginAccount),
                 getWikiPage(repository.owner, repository.name, "_Sidebar"),
                 getWikiPage(repository.owner, repository.name, "_Footer"))
     } getOrElse redirect(
@@ -69,8 +70,9 @@ trait WikiControllerBase extends ControllerBase {
                 page,
                 getWikiPageList(repository.owner, repository.name),
                 repository,
-                hasWritePermission(
-                    repository.owner, repository.name, context.loginAccount),
+                hasWritePermission(repository.owner,
+                                   repository.name,
+                                   context.loginAccount),
                 getWikiPage(repository.owner, repository.name, "_Sidebar"),
                 getWikiPage(repository.owner, repository.name, "_Footer"))
     } getOrElse redirect(
@@ -111,21 +113,22 @@ trait WikiControllerBase extends ControllerBase {
     }
   })
 
-  get("/:owner/:repository/wiki/_compare/:commitId")(referrersOnly { repository =>
-    val Array(from, to) = params("commitId").split("\\.\\.\\.")
+  get("/:owner/:repository/wiki/_compare/:commitId")(referrersOnly {
+    repository =>
+      val Array(from, to) = params("commitId").split("\\.\\.\\.")
 
-    using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
-      git =>
-        html.compare(None,
-                     from,
-                     to,
-                     JGitUtil.getDiffs(git, from, to, true),
-                     repository,
-                     hasWritePermission(repository.owner,
-                                        repository.name,
-                                        context.loginAccount),
-                     flash.get("info"))
-    }
+      using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
+        git =>
+          html.compare(None,
+                       from,
+                       to,
+                       JGitUtil.getDiffs(git, from, to, true),
+                       repository,
+                       hasWritePermission(repository.owner,
+                                          repository.name,
+                                          context.loginAccount),
+                       flash.get("info"))
+      }
   })
 
   get("/:owner/:repository/wiki/:page/_revert/:commitId")(
@@ -166,8 +169,7 @@ trait WikiControllerBase extends ControllerBase {
     }
   })
 
-  get("/:owner/:repository/wiki/:page/_edit")(
-      collaboratorsOnly { repository =>
+  get("/:owner/:repository/wiki/:page/_edit")(collaboratorsOnly { repository =>
     val pageName = StringUtil.urlDecode(params("page"))
     html.edit(pageName,
               getWikiPage(repository.owner, repository.name, pageName),
@@ -257,16 +259,15 @@ trait WikiControllerBase extends ControllerBase {
       }
   })
 
-  get("/:owner/:repository/wiki/_pages")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/wiki/_pages")(referrersOnly { repository =>
     html.pages(getWikiPageList(repository.owner, repository.name),
                repository,
-               hasWritePermission(
-                   repository.owner, repository.name, context.loginAccount))
+               hasWritePermission(repository.owner,
+                                  repository.name,
+                                  context.loginAccount))
   })
 
-  get("/:owner/:repository/wiki/_history")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/wiki/_history")(referrersOnly { repository =>
     using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
       git =>
         JGitUtil.getCommitLog(git, "master") match {
@@ -276,8 +277,7 @@ trait WikiControllerBase extends ControllerBase {
     }
   })
 
-  get("/:owner/:repository/wiki/_blob/*")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/wiki/_blob/*")(referrersOnly { repository =>
     val path = multiParams("splat").head
 
     getFileContent(repository.owner, repository.name, path).map { bytes =>
@@ -296,8 +296,9 @@ trait WikiControllerBase extends ControllerBase {
   }
 
   private def pagename: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] =
       if (value.exists("\\/:*?\"<>|".contains(_))) {
         Some(s"${name} contains invalid character.")
       } else if (notReservedPageName(value) &&
@@ -312,8 +313,9 @@ trait WikiControllerBase extends ControllerBase {
     !(Array[String]("_Sidebar", "_Footer") contains value)
 
   private def conflictForNew: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] = {
       targetWikiPage.map { _ =>
         "Someone has created the wiki since you started. Please reload this page and re-apply your changes."
       }
@@ -321,8 +323,9 @@ trait WikiControllerBase extends ControllerBase {
   }
 
   private def conflictForEdit: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] = {
       targetWikiPage.filter(_.id != params("id")).map { _ =>
         "Someone has edited the wiki since you started. Please reload this page and re-apply your changes."
       }

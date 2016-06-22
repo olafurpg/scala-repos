@@ -60,8 +60,11 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
       state: ResolveState,
       lastParent: PsiElement,
       place: PsiElement): Boolean = {
-    super [ScTypeParametersOwner].processDeclarations(
-        processor, state, lastParent, place) && super [ScTemplateDefinition]
+    super[ScTypeParametersOwner].processDeclarations(
+        processor,
+        state,
+        lastParent,
+        place) && super[ScTemplateDefinition]
       .processDeclarationsForTemplateBody(processor, state, lastParent, place)
   }
 
@@ -69,8 +72,8 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super [ScTemplateDefinition].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScTemplateDefinition]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def isInterface: Boolean = true
@@ -91,8 +94,9 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
     val res = new ArrayBuffer[PsiMethod]()
     res ++= getConstructors
     TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
-      this.processPsiMethodsForNode(
-          node, isStatic = false, isInterface = true)(res += _)
+      this.processPsiMethodsForNode(node,
+                                    isStatic = false,
+                                    isInterface = true)(res += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {

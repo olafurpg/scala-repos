@@ -25,14 +25,14 @@ trait ArrowLaws[F[_, _]]
   def arrowExtension[A, B, C](g: A => B): IsEq[F[(A, C), (B, C)]] =
     F.lift(g).first[C] <-> F.lift(g split identity[C])
 
-  def arrowFunctor[A, B, C, D](
-      f: F[A, B], g: F[B, C]): IsEq[F[(A, D), (C, D)]] =
+  def arrowFunctor[A, B, C, D](f: F[A, B],
+                               g: F[B, C]): IsEq[F[(A, D), (C, D)]] =
     (f andThen g).first[D] <-> (f.first[D] andThen g.first[D])
 
-  def arrowExchange[A, B, C, D](
-      f: F[A, B], g: C => D): IsEq[F[(A, C), (B, D)]] =
+  def arrowExchange[A, B, C, D](f: F[A, B],
+                                g: C => D): IsEq[F[(A, C), (B, D)]] =
     (f.first[C] andThen F.lift(identity[B] _ split g)) <->
-    (F.lift(identity[A] _ split g) andThen f.first[D])
+      (F.lift(identity[A] _ split g) andThen f.first[D])
 
   def arrowUnit[A, B, C](f: F[A, B]): IsEq[F[(A, C), B]] =
     (f.first[C] andThen F.lift(fst[B, C])) <-> (F.lift(fst[A, C]) andThen f)
@@ -40,7 +40,7 @@ trait ArrowLaws[F[_, _]]
   def arrowAssociation[A, B, C, D](
       f: F[A, B]): IsEq[F[((A, C), D), (B, (C, D))]] =
     (f.first[C].first[D] andThen F.lift(assoc[B, C, D])) <->
-    (F.lift(assoc[A, C, D]) andThen f.first[(C, D)])
+      (F.lift(assoc[A, C, D]) andThen f.first[(C, D)])
 
   private def fst[A, B](p: (A, B)): A = p._1
 

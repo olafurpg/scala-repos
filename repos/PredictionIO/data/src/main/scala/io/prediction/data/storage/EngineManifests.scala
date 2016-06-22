@@ -102,8 +102,10 @@ class EngineManifestSerializer
         case enginemanifest: EngineManifest =>
           JObject(
               JField("id", JString(enginemanifest.id)) :: JField(
-                  "version", JString(enginemanifest.version)) :: JField(
-                  "name", JString(enginemanifest.name)) :: JField(
+                  "version",
+                  JString(enginemanifest.version)) :: JField(
+                  "name",
+                  JString(enginemanifest.name)) :: JField(
                   "description",
                   enginemanifest.description
                     .map(x => JString(x))

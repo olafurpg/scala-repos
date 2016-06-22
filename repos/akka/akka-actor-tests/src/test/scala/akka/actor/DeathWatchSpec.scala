@@ -19,8 +19,7 @@ class LocalDeathWatchSpec
 
 object DeathWatchSpec {
   def props(target: ActorRef, testActor: ActorRef) =
-    Props(
-        new Actor {
+    Props(new Actor {
       context.watch(target)
       def receive = {
         case t: Terminated ⇒ testActor forward WrappedTerminated(t)
@@ -48,11 +47,12 @@ trait DeathWatchSpec {
   import DeathWatchSpec._
 
   lazy val supervisor = system.actorOf(
-      Props(new Supervisor(SupervisorStrategy.defaultStrategy)), "watchers")
+      Props(new Supervisor(SupervisorStrategy.defaultStrategy)),
+      "watchers")
 
   def startWatching(target: ActorRef) =
-    Await.result(
-        (supervisor ? props(target, testActor)).mapTo[ActorRef], 3 seconds)
+    Await.result((supervisor ? props(target, testActor)).mapTo[ActorRef],
+                 3 seconds)
 
   "The Death Watch" must {
     def expectTerminationOf(actorRef: ActorRef) =
@@ -98,8 +98,7 @@ trait DeathWatchSpec {
     "notify with _current_ monitors with one Terminated message when an Actor is stopped" in {
       val terminal = system.actorOf(Props.empty)
       val monitor1, monitor3 = startWatching(terminal)
-      val monitor2 = system.actorOf(
-          Props(new Actor {
+      val monitor2 = system.actorOf(Props(new Actor {
         context.watch(terminal)
         context.unwatch(terminal)
         def receive = {
@@ -126,8 +125,9 @@ trait DeathWatchSpec {
       filterException[ActorKilledException] {
         val supervisor = system.actorOf(Props(new Supervisor(OneForOneStrategy(
                         maxNrOfRetries = 2)(List(classOf[Exception])))))
-        val terminalProps =
-          Props(new Actor { def receive = { case x ⇒ sender() ! x } })
+        val terminalProps = Props(new Actor {
+          def receive = { case x ⇒ sender() ! x }
+        })
         val terminal =
           Await.result((supervisor ? terminalProps).mapTo[ActorRef],
                        timeout.duration)
@@ -211,13 +211,15 @@ trait DeathWatchSpec {
     }
 
     "only notify when watching" in {
-      val subject =
-        system.actorOf(Props(new Actor { def receive = Actor.emptyBehavior }))
+      val subject = system.actorOf(Props(new Actor {
+        def receive = Actor.emptyBehavior
+      }))
 
       testActor
         .asInstanceOf[InternalActorRef]
-        .sendSystemMessage(DeathWatchNotification(
-                subject, existenceConfirmed = true, addressTerminated = false))
+        .sendSystemMessage(DeathWatchNotification(subject,
+                                                  existenceConfirmed = true,
+                                                  addressTerminated = false))
 
       // the testActor is not watching subject and will not receive a Terminated msg
       expectNoMsg

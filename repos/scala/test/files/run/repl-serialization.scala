@@ -44,8 +44,8 @@ object Test {
     val virtualFile: AbstractFile = extract.value.getClass.getClassLoader
       .asInstanceOf[AbstractFileClassLoader]
       .root
-    val newLoader = new AbstractFileClassLoader(
-        virtualFile, getClass.getClassLoader)
+    val newLoader =
+      new AbstractFileClassLoader(virtualFile, getClass.getClassLoader)
 
     def deserializeInNewLoader(string: Array[Byte]): AnyRef = {
       val bis = new ByteArrayInputStream(string)

@@ -35,8 +35,8 @@ object SnapshotExample extends App {
   }
 
   val system = ActorSystem("example")
-  val persistentActor = system.actorOf(
-      Props(classOf[ExamplePersistentActor]), "persistentActor-3-scala")
+  val persistentActor = system
+    .actorOf(Props(classOf[ExamplePersistentActor]), "persistentActor-3-scala")
 
   persistentActor ! "a"
   persistentActor ! "b"

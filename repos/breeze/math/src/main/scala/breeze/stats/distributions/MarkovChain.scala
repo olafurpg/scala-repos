@@ -141,8 +141,8 @@ object MarkovChain {
     /**
       * Tupleization of nearly-transition kernels to produce a transition kernel for tuples
       */
-    def promoteTuple[A, B, C, D](
-        k1: (A, B) => Rand[C], k2: (C, B) => Rand[D]) = { (t: (A, B)) =>
+    def promoteTuple[A, B, C, D](k1: (A, B) => Rand[C],
+                                 k2: (C, B) => Rand[D]) = { (t: (A, B)) =>
       for (c <- k1(t._1, t._2);
            d <- k2(c, t._2)) yield (c, d);
     }
@@ -202,8 +202,8 @@ object MarkovChain {
       * @param proposal the <b>symmetric</b> proposal distribution generator
       *
       */
-    def metropolis[T](proposal: T => Rand[T])(
-        logMeasure: T => Double)(implicit rand: RandBasis = Rand) = { t: T =>
+    def metropolis[T](proposal: T => Rand[T])(logMeasure: T => Double)(
+        implicit rand: RandBasis = Rand) = { t: T =>
       for (next <- proposal(t);
            newLL = logMeasure(next);
            oldLL = logMeasure(t);
@@ -318,8 +318,9 @@ object MarkovChain {
     * @param init guess
     * @return a slice sampler
     */
-  def slice(
-      init: Double, logMeasure: Double => Double, valid: Double => Boolean) = {
+  def slice(init: Double,
+            logMeasure: Double => Double,
+            valid: Double => Boolean) = {
     MarkovChain(init)(Kernels.slice(logMeasure, valid));
   }
 }

@@ -52,8 +52,9 @@ case class ScUndefinedType(tpt: ScTypeParameterType) extends NonValueType {
   * to resolve generics. It's important if two local type
   * inferences work together.
   */
-case class ScAbstractType(
-    tpt: ScTypeParameterType, lower: ScType, upper: ScType)
+case class ScAbstractType(tpt: ScTypeParameterType,
+                          lower: ScType,
+                          upper: ScType)
     extends NonValueType {
   private var hash: Int = -1
 
@@ -86,7 +87,7 @@ case class ScAbstractType(
     obj match {
       case ScAbstractType(oTpt, oLower, oUpper) =>
         lower.equals(oLower) && upper.equals(oUpper) &&
-        tpt.args.equals(oTpt.args)
+          tpt.args.equals(oTpt.args)
       case _ => false
     }
   }
@@ -151,10 +152,10 @@ case class ScAbstractType(
               tpt
                 .recursiveVarianceUpdateModifiable(newData, update, variance)
                 .asInstanceOf[ScTypeParameterType],
-              lower.recursiveVarianceUpdateModifiable(
-                  newData, update, -variance),
-              upper.recursiveVarianceUpdateModifiable(
-                  newData, update, variance))
+              lower
+                .recursiveVarianceUpdateModifiable(newData, update, -variance),
+              upper
+                .recursiveVarianceUpdateModifiable(newData, update, variance))
         } catch {
           case cce: ClassCastException => throw new RecursiveUpdateException
         }

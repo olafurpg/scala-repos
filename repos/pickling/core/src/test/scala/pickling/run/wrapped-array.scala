@@ -22,8 +22,8 @@ class WrappedArrayTest extends FunSuite {
         implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]]
 
       def pickle(coll: WrappedArray.ofRef[AnyRef], builder: PBuilder): Unit = {
-        builder.beginEntry(
-            coll, implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]])
+        builder.beginEntry(coll,
+                           implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]])
 
         builder.beginCollection(coll.size)
         coll.foreach { (elem: AnyRef) =>
@@ -31,8 +31,7 @@ class WrappedArrayTest extends FunSuite {
             val elemClass = elem.getClass
             // TODO: allow passing in ClassLoader to picklers selected from registry
             val classLoader: ClassLoader = elemClass.getClassLoader
-            val elemTag =
-              FastTypeTag.mkRaw(elemClass, mirror) // slow: `mkRaw` is called for each element
+            val elemTag = FastTypeTag.mkRaw(elemClass, mirror) // slow: `mkRaw` is called for each element
             val pickler = internal.currentRuntime.picklers
               .genPickler(classLoader, elemClass, elemTag)
               .asInstanceOf[Pickler[AnyRef]]

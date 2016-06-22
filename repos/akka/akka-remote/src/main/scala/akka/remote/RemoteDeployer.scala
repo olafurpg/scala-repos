@@ -20,8 +20,8 @@ final case class RemoteScope(node: Address) extends Scope {
 /**
   * INTERNAL API
   */
-private[akka] class RemoteDeployer(
-    _settings: ActorSystem.Settings, _pm: DynamicAccess)
+private[akka] class RemoteDeployer(_settings: ActorSystem.Settings,
+                                   _pm: DynamicAccess)
     extends Deployer(_settings, _pm) {
   override def parseConfig(path: String, config: Config): Option[Deploy] = {
 

@@ -52,9 +52,9 @@ case class TrustStoreConfig(storeType: String = KeyStore.getDefaultType,
   * @param algorithm The algoritm to use.
   * @param keyStoreConfigs The key stores to use.
   */
-case class KeyManagerConfig(
-    algorithm: String = KeyManagerFactory.getDefaultAlgorithm,
-    keyStoreConfigs: Seq[KeyStoreConfig] = Nil)
+case class KeyManagerConfig(algorithm: String =
+                              KeyManagerFactory.getDefaultAlgorithm,
+                            keyStoreConfigs: Seq[KeyStoreConfig] = Nil)
 
 /**
   * The trust manager config.
@@ -62,9 +62,9 @@ case class KeyManagerConfig(
   * @param algorithm The algorithm to use.
   * @param trustStoreConfigs The trust stores to use.
   */
-case class TrustManagerConfig(
-    algorithm: String = TrustManagerFactory.getDefaultAlgorithm,
-    trustStoreConfigs: Seq[TrustStoreConfig] = Nil)
+case class TrustManagerConfig(algorithm: String =
+                                TrustManagerFactory.getDefaultAlgorithm,
+                              trustStoreConfigs: Seq[TrustStoreConfig] = Nil)
 
 /**
   * SSL debug configuration.
@@ -89,15 +89,16 @@ case class SSLDebugConfig(all: Boolean = false,
     */
   def enabled =
     all || ssl || certpath || ocsp || record.isDefined ||
-    handshake.isDefined || keygen || session || defaultctx || sslctx ||
-    sessioncache || keymanager || trustmanager || pluggability
+      handshake.isDefined || keygen || session || defaultctx || sslctx ||
+      sessioncache || keymanager || trustmanager || pluggability
 
   def withAll = this.copy(all = true)
 
   def withCertPath = this.copy(certpath = true)
 
   def withOcsp =
-    this.withCertPath.copy(ocsp = true) // technically a part of certpath, only available in 1.7+
+    this.withCertPath
+      .copy(ocsp = true) // technically a part of certpath, only available in 1.7+
 
   def withRecord(plaintext: Boolean = false, packet: Boolean = false) = {
     this.copy(record = Some(SSLDebugRecordOptions(plaintext, packet)))
@@ -129,14 +130,14 @@ case class SSLDebugConfig(all: Boolean = false,
 /**
   * SSL handshake debugging options.
   */
-case class SSLDebugHandshakeOptions(
-    data: Boolean = false, verbose: Boolean = false)
+case class SSLDebugHandshakeOptions(data: Boolean = false,
+                                    verbose: Boolean = false)
 
 /**
   * SSL record debugging options.
   */
-case class SSLDebugRecordOptions(
-    plaintext: Boolean = false, packet: Boolean = false)
+case class SSLDebugRecordOptions(plaintext: Boolean = false,
+                                 packet: Boolean = false)
 
 /**
   * Configuration for specifying loose (potentially dangerous) ssl config.
@@ -178,8 +179,8 @@ case class SSLConfig(
     checkRevocation: Option[Boolean] = None,
     revocationLists: Option[Seq[URL]] = None,
     enabledCipherSuites: Option[Seq[String]] = None,
-    enabledProtocols: Option[Seq[String]] =
-      Some(Seq("TLSv1.2", "TLSv1.1", "TLSv1")),
+    enabledProtocols: Option[Seq[String]] = Some(
+        Seq("TLSv1.2", "TLSv1.1", "TLSv1")),
     disabledSignatureAlgorithms: Seq[String] = Seq("MD2", "MD4", "MD5"),
     disabledKeyAlgorithms: Seq[String] =
       Seq("RSA keySize < 2048", "DSA keySize < 2048", "EC keySize < 224"),
@@ -281,14 +282,13 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
           Some(SSLDebugRecordOptions(plaintext = plaintext, packet = packet))
         } else None
 
-      val handshake =
-        if (config.get[Boolean]("handshake")) {
-          val data = config.get[Boolean]("data")
-          val verbose = config.get[Boolean]("verbose")
-          Some(SSLDebugHandshakeOptions(data = data, verbose = verbose))
-        } else {
-          None
-        }
+      val handshake = if (config.get[Boolean]("handshake")) {
+        val data = config.get[Boolean]("data")
+        val verbose = config.get[Boolean]("verbose")
+        Some(SSLDebugHandshakeOptions(data = data, verbose = verbose))
+      } else {
+        None
+      }
 
       val keygen = config.get[Boolean]("keygen")
       val session = config.get[Boolean]("session")

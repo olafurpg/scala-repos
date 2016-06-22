@@ -139,8 +139,9 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
     aclChangeListener.init()
   }
 
-  override def authorize(
-      session: Session, operation: Operation, resource: Resource): Boolean = {
+  override def authorize(session: Session,
+                         operation: Operation,
+                         resource: Resource): Boolean = {
     val principal = session.principal
     val host = session.clientAddress.getHostAddress
     val acls =
@@ -148,8 +149,8 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
           new Resource(resource.resourceType, Resource.WildCardResource))
 
     //check if there is any Deny acl match that would disallow this operation.
-    val denyMatch = aclMatch(
-        session, operation, resource, principal, host, Deny, acls)
+    val denyMatch =
+      aclMatch(session, operation, resource, principal, host, Deny, acls)
 
     //if principal is allowed to read or write we allow describe by default, the reverse does not apply to Deny.
     val ops =
@@ -164,8 +165,8 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
     //when no acls are found or if no deny acls are found and at least one allow acls matches.
     val authorized =
       isSuperUser(operation, resource, principal, host) ||
-      isEmptyAclAndAuthorized(operation, resource, principal, host, acls) ||
-      (!denyMatch && allowMatch)
+        isEmptyAclAndAuthorized(operation, resource, principal, host, acls) ||
+        (!denyMatch && allowMatch)
 
     logAuditMessage(principal, authorized, operation, resource, host)
     authorized
@@ -202,12 +203,13 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
                        permissionType: PermissionType,
                        acls: Set[Acl]): Boolean = {
     acls
-      .find(acl =>
+      .find(
+          acl =>
             acl.permissionType == permissionType &&
-            (acl.principal == principal ||
-                acl.principal == Acl.WildCardPrincipal) &&
-            (operations == acl.operation || acl.operation == All) &&
-            (acl.host == host || acl.host == Acl.WildCardHost))
+              (acl.principal == principal ||
+                    acl.principal == Acl.WildCardPrincipal) &&
+              (operations == acl.operation || acl.operation == All) &&
+              (acl.host == host || acl.host == Acl.WildCardHost))
       .map { acl: Acl =>
         authorizerLogger.debug(
             s"operation = $operations on resource = $resource from host = $host is $permissionType based on acl = $acl")
@@ -226,8 +228,8 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
     }
   }
 
-  override def removeAcls(
-      aclsTobeRemoved: Set[Acl], resource: Resource): Boolean = {
+  override def removeAcls(aclsTobeRemoved: Set[Acl],
+                          resource: Resource): Boolean = {
     inWriteLock(lock) {
       updateResourceAcls(resource) { currentAcls =>
         currentAcls -- aclsTobeRemoved
@@ -327,15 +329,13 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
     while (!writeComplete && retries <= maxUpdateRetries) {
       val newAcls = getNewAcls(currentVersionedAcls.acls)
       val data = Json.encode(Acl.toJsonCompatibleMap(newAcls))
-      val (updateSucceeded, updateVersion) =
-        if (!newAcls.isEmpty) {
-          updatePath(path, data, currentVersionedAcls.zkVersion)
-        } else {
-          trace(
-              s"Deleting path for $resource because it had no ACLs remaining")
-          (zkUtils.conditionalDeletePath(path, currentVersionedAcls.zkVersion),
-           0)
-        }
+      val (updateSucceeded, updateVersion) = if (!newAcls.isEmpty) {
+        updatePath(path, data, currentVersionedAcls.zkVersion)
+      } else {
+        trace(s"Deleting path for $resource because it had no ACLs remaining")
+        (zkUtils.conditionalDeletePath(path, currentVersionedAcls.zkVersion),
+         0)
+      }
 
       if (!updateSucceeded) {
         trace(
@@ -370,11 +370,12 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
     * Updates a zookeeper path with an expected version. If the topic does not exist, it will create it.
     * Returns if the update was successful and the new version.
     */
-  private def updatePath(
-      path: String, data: String, expectedVersion: Int): (Boolean, Int) = {
+  private def updatePath(path: String,
+                         data: String,
+                         expectedVersion: Int): (Boolean, Int) = {
     try {
-      zkUtils.conditionalUpdatePersistentPathIfExists(
-          path, data, expectedVersion)
+      zkUtils
+        .conditionalUpdatePersistentPathIfExists(path, data, expectedVersion)
     } catch {
       case e: ZkNoNodeException =>
         try {
@@ -413,7 +414,7 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
   private def updateAclChangedFlag(resource: Resource) {
     zkUtils.createSequentialPersistentPath(
         SimpleAclAuthorizer.AclChangedZkPath +
-        "/" + SimpleAclAuthorizer.AclChangedPrefix,
+          "/" + SimpleAclAuthorizer.AclChangedPrefix,
         resource.toString)
   }
 

@@ -12,8 +12,8 @@ trait Zip[F[_]] { self =>
   // derived functions
 
   /**The composition of Zip `F` and `G`, `[x]F[G[x]]`, is a Zip (if F is a Functor) */
-  def compose[G[_]](
-      implicit T0: Functor[F], G0: Zip[G]): Zip[λ[α => F[G[α]]]] =
+  def compose[G[_]](implicit T0: Functor[F],
+                    G0: Zip[G]): Zip[λ[α => F[G[α]]]] =
     new CompositionZip[F, G] {
       implicit def T = T0
       implicit def F = self
@@ -27,8 +27,8 @@ trait Zip[F[_]] { self =>
       implicit def G = G0
     }
 
-  def zipWith[A, B, C](
-      fa: => F[A], fb: => F[B])(f: (A, B) => C)(implicit F: Functor[F]): F[C] =
+  def zipWith[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C)(
+      implicit F: Functor[F]): F[C] =
     F.map(zip(fa, fb)) {
       case (a, b) => f(a, b)
     }
@@ -55,14 +55,14 @@ trait Zip[F[_]] { self =>
   trait ZipLaw {
 
     /** Zipping preserves structure. */
-    def zipPreservation[A](fa: F[A])(
-        implicit FA: Equal[F[A]], F: Functor[F]): Boolean = {
+    def zipPreservation[A](fa: F[A])(implicit FA: Equal[F[A]],
+                                     F: Functor[F]): Boolean = {
       val fab = zip(fa, fa)
       FA.equal(F.map(fab)(_._1), fa) && FA.equal(F.map(fab)(_._2), fa)
     }
 
-    def zipSymmetric[A, B](fa: F[A], fb: F[B])(
-        implicit FA: Equal[F[A]], F: Functor[F]) =
+    def zipSymmetric[A, B](fa: F[A], fb: F[B])(implicit FA: Equal[F[A]],
+                                               F: Functor[F]) =
       FA.equal(F.map(zip(fa, fb))(_._1), F.map(zip(fb, fa))(_._2))
   }
   def zipLaw = new ZipLaw {}

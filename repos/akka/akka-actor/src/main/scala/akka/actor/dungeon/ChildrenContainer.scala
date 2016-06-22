@@ -71,8 +71,8 @@ private[akka] object ChildrenContainer {
 
   trait EmptyChildrenContainer extends ChildrenContainer {
     val emptyStats = immutable.TreeMap.empty[String, ChildStats]
-    override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer =
+    override def add(name: String,
+                     stats: ChildRestartStats): ChildrenContainer =
       new NormalChildrenContainer(emptyStats.updated(name, stats))
     override def remove(child: ActorRef): ChildrenContainer = this
     override def getByName(name: String): Option[ChildRestartStats] = None
@@ -99,8 +99,8 @@ private[akka] object ChildrenContainer {
     * empty state while calling handleChildTerminated() for the last time.
     */
   object TerminatedChildrenContainer extends EmptyChildrenContainer {
-    override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer = this
+    override def add(name: String,
+                     stats: ChildRestartStats): ChildrenContainer = this
     override def reserve(name: String): ChildrenContainer =
       throw new IllegalStateException(
           "cannot reserve actor name '" + name + "': already terminated")
@@ -118,8 +118,8 @@ private[akka] object ChildrenContainer {
   class NormalChildrenContainer(val c: immutable.TreeMap[String, ChildStats])
       extends ChildrenContainer {
 
-    override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer =
+    override def add(name: String,
+                     stats: ChildRestartStats): ChildrenContainer =
       new NormalChildrenContainer(c.updated(name, stats))
 
     override def remove(child: ActorRef): ChildrenContainer =
@@ -182,8 +182,8 @@ private[akka] object ChildrenContainer {
       reason: SuspendReason)
       extends ChildrenContainer {
 
-    override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer =
+    override def add(name: String,
+                     stats: ChildRestartStats): ChildrenContainer =
       copy(c.updated(name, stats))
 
     override def remove(child: ActorRef): ChildrenContainer = {

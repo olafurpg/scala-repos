@@ -123,8 +123,9 @@ object MetricEvaluator {
 
   def apply[EI, Q, P, A, R](
       metric: Metric[EI, Q, P, A, R]): MetricEvaluator[EI, Q, P, A, R] = {
-    new MetricEvaluator[EI, Q, P, A, R](
-        metric, Seq[Metric[EI, Q, P, A, _]](), None)
+    new MetricEvaluator[EI, Q, P, A, R](metric,
+                                        Seq[Metric[EI, Q, P, A, _]](),
+                                        None)
   }
 
   case class NameParams(name: String, params: Params) {

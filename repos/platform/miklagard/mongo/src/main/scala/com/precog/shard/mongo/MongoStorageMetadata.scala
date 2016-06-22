@@ -33,8 +33,8 @@ import com.precog.yggdrasil.metadata._
 
 import com.weiglewilczek.slf4s.Logging
 
-class MongoStorageMetadataSource(
-    mongo: Mongo)(implicit asyncContext: ExecutionContext)
+class MongoStorageMetadataSource(mongo: Mongo)(
+    implicit asyncContext: ExecutionContext)
     extends StorageMetadataSource[Future] {
   def userMetadataView(apiKey: APIKey): StorageMetadata[Future] =
     new MongoStorageMetadata(mongo)

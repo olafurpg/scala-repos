@@ -55,15 +55,16 @@ final class Env(config: Config,
                                  )),
                              name = ActorName)
 
-  lazy val socketHandler = new SocketHandler(
-      hub = hub, lobby = lobby, socket = socket, blocking = blocking)
+  lazy val socketHandler = new SocketHandler(hub = hub,
+                                             lobby = lobby,
+                                             socket = socket,
+                                             blocking = blocking)
 
   lazy val history = new History[actorApi.Messadata](ttl = MessageTtl)
 
   private val abortListener = new AbortListener(seekApi = seekApi)
 
-  system.actorOf(
-      Props(new Actor {
+  system.actorOf(Props(new Actor {
     system.lilaBus.subscribe(self, 'abortGame)
     def receive = {
       case lila.game.actorApi.AbortedBy(pov) if pov.game.isCorrespondence =>
@@ -75,13 +76,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "lobby" boot new Env(config = lila.common.PlayApp loadConfig "lobby",
-                         db = lila.db.Env.current,
-                         hub = lila.hub.Env.current,
-                         onStart = lila.game.Env.current.onStart,
-                         blocking =
-                           lila.relation.Env.current.api.fetchBlocking,
-                         playban = lila.playban.Env.current.api.currentBan _,
-                         system = lila.common.PlayApp.system,
-                         scheduler = lila.common.PlayApp.scheduler)
+    "lobby" boot new Env(
+        config = lila.common.PlayApp loadConfig "lobby",
+        db = lila.db.Env.current,
+        hub = lila.hub.Env.current,
+        onStart = lila.game.Env.current.onStart,
+        blocking = lila.relation.Env.current.api.fetchBlocking,
+        playban = lila.playban.Env.current.api.currentBan _,
+        system = lila.common.PlayApp.system,
+        scheduler = lila.common.PlayApp.scheduler)
 }

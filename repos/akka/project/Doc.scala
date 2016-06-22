@@ -24,17 +24,17 @@ object Scaladoc extends AutoPlugin {
     settingKey[Boolean]("Validate generated scaladoc diagrams")
 
   override lazy val projectSettings = {
-    inTask(doc)(Seq(
+    inTask(doc)(
+        Seq(
             scalacOptions in Compile <++=
               (version, baseDirectory in ThisBuild) map scaladocOptions,
             autoAPIMappings := CliOptions.scaladocAutoAPI.get
         )) ++ Seq(validateDiagrams in Compile := true) ++ CliOptions.scaladocDiagramsEnabled
-      .ifTrue(
-        doc in Compile := {
-      val docs = (doc in Compile).value
-      if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
-      docs
-    })
+      .ifTrue(doc in Compile := {
+        val docs = (doc in Compile).value
+        if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
+        docs
+      })
   }
 
   def scaladocOptions(ver: String, base: File): List[String] = {
@@ -67,7 +67,8 @@ object Scaladoc extends AutoPlugin {
                         "<div class=\"toggleContainer block diagram-container\" id=\"inheritance-diagram-container\">")) catch {
                 case e: Exception =>
                   throw new IllegalStateException(
-                      "Scaladoc verification failed for file '" + f + "'", e)
+                      "Scaladoc verification failed for file '" + f + "'",
+                      e)
               } finally source.close()
               hd
             } else false
@@ -108,7 +109,8 @@ object UnidocRoot extends AutoPlugin {
   override def trigger = noTrigger
 
   val akkaSettings = UnidocRoot.CliOptions.genjavadocEnabled
-    .ifTrue(Seq(
+    .ifTrue(
+        Seq(
             javacOptions in (JavaUnidoc, unidoc) ++= Seq("-Xdoclint:none"),
             // genjavadoc needs to generate synthetic methods since the java code uses them
             scalacOptions += "-P:genjavadoc:suppressSynthetic=false",

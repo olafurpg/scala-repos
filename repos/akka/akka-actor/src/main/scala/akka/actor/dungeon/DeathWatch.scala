@@ -56,8 +56,8 @@ private[akka] trait DeathWatch {
         watching = removeFromSet(actor, watching)
       }
       if (!isTerminating) {
-        self.tell(
-            Terminated(actor)(existenceConfirmed, addressTerminated), actor)
+        self.tell(Terminated(actor)(existenceConfirmed, addressTerminated),
+                  actor)
         terminatedQueuedFor(actor)
       }
     }
@@ -71,13 +71,13 @@ private[akka] trait DeathWatch {
   //   when all actor references have uid, i.e. actorFor is removed
   private def watchingContains(subject: ActorRef): Boolean =
     watching.contains(subject) ||
-    (subject.path.uid != ActorCell.undefinedUid &&
-        watching.contains(new UndefinedUidActorRef(subject)))
+      (subject.path.uid != ActorCell.undefinedUid &&
+            watching.contains(new UndefinedUidActorRef(subject)))
 
   // TODO this should be removed and be replaced with `set - subject`
   //   when all actor references have uid, i.e. actorFor is removed
-  private def removeFromSet(
-      subject: ActorRef, set: Set[ActorRef]): Set[ActorRef] =
+  private def removeFromSet(subject: ActorRef,
+                            set: Set[ActorRef]): Set[ActorRef] =
     if (subject.path.uid != ActorCell.undefinedUid)
       (set - subject) - new UndefinedUidActorRef(subject)
     else set filterNot (_.path == subject.path)
@@ -154,8 +154,8 @@ private[akka] trait DeathWatch {
       publish(
           Warning(self.path.toString,
                   clazz(actor),
-                  "BUG: illegal Watch(%s,%s) for %s".format(
-                      watchee, watcher, self)))
+                  "BUG: illegal Watch(%s,%s) for %s"
+                    .format(watchee, watcher, self)))
     }
   }
 
@@ -179,8 +179,8 @@ private[akka] trait DeathWatch {
       publish(
           Warning(self.path.toString,
                   clazz(actor),
-                  "BUG: illegal Unwatch(%s,%s) for %s".format(
-                      watchee, watcher, self)))
+                  "BUG: illegal Unwatch(%s,%s) for %s"
+                    .format(watchee, watcher, self)))
     }
   }
 

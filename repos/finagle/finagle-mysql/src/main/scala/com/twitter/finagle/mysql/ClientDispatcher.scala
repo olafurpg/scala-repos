@@ -31,8 +31,7 @@ case class LostSyncException(underlying: Throwable)
 private[mysql] class PrepareCache(
     svc: Service[Request, Result],
     max: Int = 20
-)
-    extends ServiceProxy[Request, Result](svc) {
+) extends ServiceProxy[Request, Result](svc) {
 
   private[this] val fn = {
     val listener = new RemovalListener[Request, Future[Result]] {
@@ -106,8 +105,7 @@ object ClientDispatcher {
 class ClientDispatcher(
     trans: Transport[Packet, Packet],
     handshake: HandshakeInit => Try[HandshakeResponse]
-)
-    extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans) {
+) extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans) {
   import ClientDispatcher._
 
   override def apply(req: Request): Future[Result] =

@@ -40,8 +40,8 @@ trait StdCodecs {
   implicit def RawBitSetCodec: Codec[RawBitSet]
   implicit def IndexedSeqCodec[A](
       implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]]
-  implicit def ArrayCodec[A](
-      implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]]
+  implicit def ArrayCodec[A](implicit elemCodec: Codec[A],
+                             m: Manifest[A]): Codec[Array[A]]
 
   def codecForCType(cType: CType): Codec[_] = cType match {
     case cType: CValueType[_] => codecForCValueType(cType)
@@ -85,7 +85,7 @@ trait RowFormatCodecs extends StdCodecs { self: RowFormat =>
   implicit def IndexedSeqCodec[A](
       implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]] =
     Codec.IndexedSeqCodec(elemCodec)
-  implicit def ArrayCodec[A](
-      implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]] =
+  implicit def ArrayCodec[A](implicit elemCodec: Codec[A],
+                             m: Manifest[A]): Codec[Array[A]] =
     Codec.ArrayCodec(elemCodec)(m)
 }

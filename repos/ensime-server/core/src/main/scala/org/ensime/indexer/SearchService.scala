@@ -29,8 +29,7 @@ class SearchService(
 )(
     implicit actorSystem: ActorSystem,
     vfs: EnsimeVFS
-)
-    extends ClassfileIndexer
+) extends ClassfileIndexer
     with FileChangeListener
     with SLF4JLogging {
 
@@ -117,8 +116,8 @@ class SearchService(
     }
 
     // index all the given bases and return number of rows written
-    def indexBases(
-        bases: Set[FileObject], checks: Seq[FileCheck]): Future[Int] = {
+    def indexBases(bases: Set[FileObject],
+                   checks: Seq[FileCheck]): Future[Int] = {
       log.info("Indexing bases...")
       val checksLookup: Map[String, FileCheck] =
         checks.map(check => (check.filename -> check)).toMap
@@ -191,8 +190,8 @@ class SearchService(
   private val blacklist = Set("sun/", "sunw/", "com/sun/")
   private val ignore = Set("$$", "$worker$")
   import org.ensime.util.RichFileObject._
-  private def extractSymbols(
-      container: FileObject, f: FileObject): List[FqnSymbol] = {
+  private def extractSymbols(container: FileObject,
+                             f: FileObject): List[FqnSymbol] = {
     f.pathWithinArchive match {
       case Some(relative) if blacklist.exists(relative.startsWith) => Nil
       case _ =>
@@ -278,8 +277,8 @@ class SearchService(
    * the list of symbols is non-empty.
    */
 
-  val backlogActor = actorSystem.actorOf(
-      Props(new IndexingQueueActor(this)), "ClassfileIndexer")
+  val backlogActor = actorSystem
+    .actorOf(Props(new IndexingQueueActor(this)), "ClassfileIndexer")
 
   // deletion in both Lucene and H2 is really slow, batching helps
   def deleteInBatches(

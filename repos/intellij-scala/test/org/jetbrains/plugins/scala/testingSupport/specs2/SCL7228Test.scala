@@ -21,8 +21,10 @@ abstract class SCL7228Test extends Specs2TestCase {
                       1,
                       "SCL7228Test.scala",
                       checkConfigAndSettings(_, "SCL7228Test"),
-                      checkResultTreeHasExactNamedPath(
-                          _, "[root]", "SCL7228Test", "foo (bar)"),
+                      checkResultTreeHasExactNamedPath(_,
+                                                       "[root]",
+                                                       "SCL7228Test",
+                                                       "foo (bar)"),
                       debug = true)
   }
 }

@@ -83,7 +83,8 @@ trait Controller
     */
   implicit def request2lang(implicit request: RequestHeader): Lang = {
     play.api.Play.privateMaybeApplication
-      .map(app =>
+      .map(
+          app =>
             play.api.i18n.Messages
               .messagesApiCache(app)
               .preferred(request)

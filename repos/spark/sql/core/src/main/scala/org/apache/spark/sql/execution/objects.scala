@@ -28,8 +28,8 @@ import org.apache.spark.sql.types.ObjectType
   * Helper functions for physical operators that work with user defined objects.
   */
 trait ObjectOperator extends SparkPlan {
-  def generateToObject(
-      objExpr: Expression, inputSchema: Seq[Attribute]): InternalRow => Any = {
+  def generateToObject(objExpr: Expression,
+                       inputSchema: Seq[Attribute]): InternalRow => Any = {
     val objectProjection =
       GenerateSafeProjection.generate(objExpr :: Nil, inputSchema)
     (i: InternalRow) =>
@@ -153,18 +153,18 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
   * iterators containing all elements in the group from left and right side.
   * The result of this function is encoded and flattened before being output.
   */
-case class CoGroup(
-    func: (Any, Iterator[Any], Iterator[Any]) => TraversableOnce[Any],
-    keyDeserializer: Expression,
-    leftDeserializer: Expression,
-    rightDeserializer: Expression,
-    serializer: Seq[NamedExpression],
-    leftGroup: Seq[Attribute],
-    rightGroup: Seq[Attribute],
-    leftAttr: Seq[Attribute],
-    rightAttr: Seq[Attribute],
-    left: SparkPlan,
-    right: SparkPlan)
+case class CoGroup(func: (Any, Iterator[Any],
+                          Iterator[Any]) => TraversableOnce[Any],
+                   keyDeserializer: Expression,
+                   leftDeserializer: Expression,
+                   rightDeserializer: Expression,
+                   serializer: Seq[NamedExpression],
+                   leftGroup: Seq[Attribute],
+                   rightGroup: Seq[Attribute],
+                   leftAttr: Seq[Attribute],
+                   rightAttr: Seq[Attribute],
+                   left: SparkPlan,
+                   right: SparkPlan)
     extends BinaryNode
     with ObjectOperator {
 

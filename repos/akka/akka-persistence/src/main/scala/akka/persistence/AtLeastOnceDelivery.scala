@@ -53,8 +53,9 @@ object AtLeastOnceDelivery {
     * Information about a message that has not been confirmed. Included in [[UnconfirmedWarning]]
     * and [[AtLeastOnceDeliverySnapshot]].
     */
-  case class UnconfirmedDelivery(
-      deliveryId: Long, destination: ActorPath, message: Any) {
+  case class UnconfirmedDelivery(deliveryId: Long,
+                                 destination: ActorPath,
+                                 message: Any) {
 
     /**
       * Java API
@@ -72,8 +73,10 @@ object AtLeastOnceDelivery {
     * INTERNAL API
     */
   private[akka] object Internal {
-    case class Delivery(
-        destination: ActorPath, message: Any, timestamp: Long, attempt: Int)
+    case class Delivery(destination: ActorPath,
+                        message: Any,
+                        timestamp: Long,
+                        attempt: Int)
     case object RedeliveryTick extends NotInfluenceReceiveTimeout
   }
 }
@@ -188,8 +191,9 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
   private def startRedeliverTask(): Unit = {
     val interval = redeliverInterval / 2
     redeliverTask = Some(
-        context.system.scheduler.schedule(
-            interval, interval, self, RedeliveryTick)(context.dispatcher))
+        context.system.scheduler
+          .schedule(interval, interval, self, RedeliveryTick)(
+              context.dispatcher))
   }
 
   private def nextDeliverySequenceNr(): Long = {
@@ -223,11 +227,12 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
           s"Too many unconfirmed messages, maximum allowed is [$maxUnconfirmedMessages]")
 
     val deliveryId = nextDeliverySequenceNr()
-    val now =
-      if (recoveryRunning) { System.nanoTime() - redeliverInterval.toNanos } else
-        System.nanoTime()
-    val d = Delivery(
-        destination, deliveryIdToMessage(deliveryId), now, attempt = 0)
+    val now = if (recoveryRunning) {
+      System.nanoTime() - redeliverInterval.toNanos
+    } else
+      System.nanoTime()
+    val d =
+      Delivery(destination, deliveryIdToMessage(deliveryId), now, attempt = 0)
 
     if (recoveryRunning) unconfirmed = unconfirmed.updated(deliveryId, d)
     else send(deliveryId, d, now)
@@ -259,8 +264,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
     require(
         !isWildcardSelection,
         "Delivering to wildcard actor selections is not supported by AtLeastOnceDelivery. " +
-        "Introduce an mediator Actor which this AtLeastOnceDelivery Actor will deliver the messages to," +
-        "and will handle the logic of fan-out and collecting individual confirmations, until it can signal confirmation back to this Actor.")
+          "Introduce an mediator Actor which this AtLeastOnceDelivery Actor will deliver the messages to," +
+          "and will handle the logic of fan-out and collecting individual confirmations, until it can signal confirmation back to this Actor.")
     deliver(ActorPath.fromString(destination.toSerializationFormat))(
         deliveryIdToMessage)
   }
@@ -295,8 +300,9 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
         send(deliveryId, delivery, now)
 
         if (delivery.attempt == warnAfterNumberOfUnconfirmedAttempts)
-          warnings :+= UnconfirmedDelivery(
-              deliveryId, delivery.destination, delivery.message)
+          warnings :+= UnconfirmedDelivery(deliveryId,
+                                           delivery.destination,
+                                           delivery.message)
     }
 
     if (warnings.nonEmpty) self ! UnconfirmedWarning(warnings)
@@ -305,7 +311,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
   private def send(deliveryId: Long, d: Delivery, timestamp: Long): Unit = {
     context.actorSelection(d.destination) ! d.message
     unconfirmed = unconfirmed.updated(
-        deliveryId, d.copy(timestamp = timestamp, attempt = d.attempt + 1))
+        deliveryId,
+        d.copy(timestamp = timestamp, attempt = d.attempt + 1))
   }
 
   /**
@@ -339,8 +346,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
   /**
     * INTERNAL API
     */
-  override protected[akka] def aroundPreRestart(
-      reason: Throwable, message: Option[Any]): Unit = {
+  override protected[akka] def aroundPreRestart(reason: Throwable,
+                                                message: Option[Any]): Unit = {
     redeliverTask.foreach(_.cancel())
     super.aroundPreRestart(reason, message)
   }
@@ -362,8 +369,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
   /**
     * INTERNAL API
     */
-  override protected[akka] def aroundReceive(
-      receive: Receive, message: Any): Unit =
+  override protected[akka] def aroundReceive(receive: Receive,
+                                             message: Any): Unit =
     message match {
       case RedeliveryTick ⇒
         redeliverOverdue()

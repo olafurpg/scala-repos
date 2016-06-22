@@ -161,19 +161,19 @@ private class ReqRepFilter
 
     val msg = couldDispatch match {
       case CanDispatch.No => { tag: Int =>
-          Message.Treq(tag, Some(Trace.id), BufChannelBuffer(req.body))
-        }
+        Message.Treq(tag, Some(Trace.id), BufChannelBuffer(req.body))
+      }
 
       case CanDispatch.Yes | CanDispatch.Unknown => { tag: Int =>
-          val contexts = Contexts.broadcast.marshal().map {
-            case (k, v) => (BufChannelBuffer(k), BufChannelBuffer(v))
-          }
-          Message.Tdispatch(tag,
-                            contexts.toSeq,
-                            req.destination,
-                            Dtab.local,
-                            BufChannelBuffer(req.body))
+        val contexts = Contexts.broadcast.marshal().map {
+          case (k, v) => (BufChannelBuffer(k), BufChannelBuffer(v))
         }
+        Message.Tdispatch(tag,
+                          contexts.toSeq,
+                          req.destination,
+                          Dtab.local,
+                          BufChannelBuffer(req.body))
+      }
     }
 
     if (couldDispatch != CanDispatch.Unknown) svc(msg).transform(reply)

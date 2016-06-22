@@ -154,12 +154,14 @@ class CoarseMesosSchedulerBackendSuite
   test("mesos assigns tasks round-robin on offers") {
     val executorCores = 4
     val maxCores = executorCores * 2
-    setBackend(Map("spark.executor.cores" -> executorCores.toString,
-                   "spark.cores.max" -> maxCores.toString))
+    setBackend(
+        Map("spark.executor.cores" -> executorCores.toString,
+            "spark.cores.max" -> maxCores.toString))
 
     val executorMemory = backend.executorMemory(sc)
-    offerResources(List((executorMemory * 2, executorCores * 2),
-                        (executorMemory * 2, executorCores * 2)))
+    offerResources(
+        List((executorMemory * 2, executorCores * 2),
+             (executorMemory * 2, executorCores * 2)))
 
     verifyTaskLaunched("o1")
     verifyTaskLaunched("o2")
@@ -220,8 +222,10 @@ class CoarseMesosSchedulerBackendSuite
     when(driver.start()).thenReturn(Protos.Status.DRIVER_RUNNING)
     val securityManager = mock[SecurityManager]
 
-    val backend = new CoarseMesosSchedulerBackend(
-        taskScheduler, sc, "master", securityManager) {
+    val backend = new CoarseMesosSchedulerBackend(taskScheduler,
+                                                  sc,
+                                                  "master",
+                                                  securityManager) {
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -253,8 +257,8 @@ class CoarseMesosSchedulerBackendSuite
     }
   }
 
-  private def offerResources(
-      offers: List[(Int, Int)], startId: Int = 1): Unit = {
+  private def offerResources(offers: List[(Int, Int)],
+                             startId: Int = 1): Unit = {
     val mesosOffers = offers.zipWithIndex.map {
       case (offer, i) =>
         createOffer(s"o${i + startId}", s"s${i + startId}", offer._1, offer._2)
@@ -273,8 +277,9 @@ class CoarseMesosSchedulerBackendSuite
     captor.getValue
   }
 
-  private def createTaskStatus(
-      taskId: String, slaveId: String, state: TaskState): TaskStatus = {
+  private def createTaskStatus(taskId: String,
+                               slaveId: String,
+                               state: TaskState): TaskStatus = {
     TaskStatus
       .newBuilder()
       .setTaskId(TaskID.newBuilder().setValue(taskId).build())
@@ -299,8 +304,10 @@ class CoarseMesosSchedulerBackendSuite
     TaskID.newBuilder().setValue(taskId).build()
   }
 
-  private def createOffer(
-      offerId: String, slaveId: String, mem: Int, cpu: Int): Offer = {
+  private def createOffer(offerId: String,
+                          slaveId: String,
+                          mem: Int,
+                          cpu: Int): Offer = {
     val builder = Offer.newBuilder()
     builder
       .addResourcesBuilder()
@@ -327,8 +334,10 @@ class CoarseMesosSchedulerBackendSuite
       endpoint: RpcEndpointRef): CoarseMesosSchedulerBackend = {
     val securityManager = mock[SecurityManager]
 
-    val backend = new CoarseMesosSchedulerBackend(
-        taskScheduler, sc, "master", securityManager) {
+    val backend = new CoarseMesosSchedulerBackend(taskScheduler,
+                                                  sc,
+                                                  "master",
+                                                  securityManager) {
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -379,7 +388,9 @@ class CoarseMesosSchedulerBackendSuite
     externalShuffleClient = mock[MesosExternalShuffleClient]
     driverEndpoint = mock[RpcEndpointRef]
 
-    backend = createSchedulerBackend(
-        taskScheduler, driver, externalShuffleClient, driverEndpoint)
+    backend = createSchedulerBackend(taskScheduler,
+                                     driver,
+                                     externalShuffleClient,
+                                     driverEndpoint)
   }
 }

@@ -94,7 +94,8 @@ class EndToEndTest extends FunSuite with StringClient with StringServer {
           case RemoteInfo.Available(Some(u), _, _, _, _) =>
             assert(u != serverC.boundAddress)
           case _ =>
-            fail("Exception remote info did not have upstream address filled in!")
+            fail(
+                "Exception remote info did not have upstream address filled in!")
         }
         Future.exception(e)
       }
@@ -353,12 +354,13 @@ class EndToEndTest extends FunSuite with StringClient with StringServer {
     val addr = Address(server.boundAddress.asInstanceOf[InetSocketAddress])
     val client = ClientBuilder
       .stackClientOfCodec(StringCodec.client)
-      .configured(DefaultPool.Param(
-                                    /* low        */ 1,
-                                    /* high       */ 1,
-                                    /* bufferSize */ 0,
-                                    /* idleTime   */ 5.seconds,
-                                    /* maxWaiters */ 1))
+      .configured(
+          DefaultPool.Param(
+                            /* low        */ 1,
+                            /* high       */ 1,
+                            /* bufferSize */ 0,
+                            /* idleTime   */ 5.seconds,
+                            /* maxWaiters */ 1))
       .configured(Stats(mem))
       .configured(Retries.Policy(RetryPolicy.tries(1)))
       .newService(Name.bound(addr), "testClient")

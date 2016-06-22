@@ -78,8 +78,8 @@ object ColumnarTestUtils {
     columnTypes.map(makeRandomValue(_))
   }
 
-  def makeUniqueRandomValues[JvmType](
-      columnType: ColumnType[JvmType], count: Int): Seq[JvmType] = {
+  def makeUniqueRandomValues[JvmType](columnType: ColumnType[JvmType],
+                                      count: Int): Seq[JvmType] = {
 
     Iterator
       .iterate(HashSet.empty[JvmType]) { set =>

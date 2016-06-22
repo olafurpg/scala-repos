@@ -57,9 +57,11 @@ class ScalaChangeSignatureUsageProcessor
         }
 
         val overriders =
-          OverridingMethodsSearch.search(method).findAll.asScala.toSeq ++ ScalaOverridingMemberSearcher
+          OverridingMethodsSearch
             .search(method)
-            .toSeq
+            .findAll
+            .asScala
+            .toSeq ++ ScalaOverridingMemberSearcher.search(method).toSeq
         val methods = (method +: overriders ++: synthetics).map {
           case isWrapper(m) => m
           case other => other
@@ -79,8 +81,9 @@ class ScalaChangeSignatureUsageProcessor
             val usageInfo = ScalaNamedElementUsageInfo(named)
             if (usageInfo != null) results += usageInfo
 
-            findMethodRefUsages(
-                named, results, searchInJava = synthetics.contains(named))
+            findMethodRefUsages(named,
+                                results,
+                                searchInJava = synthetics.contains(named))
           case _ =>
         }
       case _ =>
@@ -88,8 +91,8 @@ class ScalaChangeSignatureUsageProcessor
     results.toArray
   }
 
-  override def shouldPreviewUsages(
-      changeInfo: ChangeInfo, usages: Array[UsageInfo]): Boolean = false
+  override def shouldPreviewUsages(changeInfo: ChangeInfo,
+                                   usages: Array[UsageInfo]): Boolean = false
 
   override def processPrimaryMethod(changeInfo: ChangeInfo): Boolean =
     changeInfo match {
@@ -98,8 +101,8 @@ class ScalaChangeSignatureUsageProcessor
           case f: ScFunction =>
             processNamedElementUsage(changeInfo, FunUsageInfo(f))
           case pc: ScPrimaryConstructor =>
-            processNamedElementUsage(
-                changeInfo, PrimaryConstructorUsageInfo(pc))
+            processNamedElementUsage(changeInfo,
+                                     PrimaryConstructorUsageInfo(pc))
           case _ =>
         }
         true
@@ -120,15 +123,13 @@ class ScalaChangeSignatureUsageProcessor
           val text = element.getText
           element match {
             case _: ScVariableDefinition | _: ScPatternDefinition =>
-              val newElement =
-                ScalaPsiElementFactory.createDefinitionWithContext(
-                    text, element.getContext, element)
+              val newElement = ScalaPsiElementFactory
+                .createDefinitionWithContext(text, element.getContext, element)
               element.getParent.addAfter(newElement, element)
               element.delete()
             case _: ScVariableDeclaration | _: ScValueDeclaration =>
-              val newElement =
-                ScalaPsiElementFactory.createDeclarationFromText(
-                    text, element.getContext, element)
+              val newElement = ScalaPsiElementFactory
+                .createDeclarationFromText(text, element.getContext, element)
               element.getParent.addAfter(newElement, element)
               element.delete()
             case _ =>
@@ -161,7 +162,7 @@ class ScalaChangeSignatureUsageProcessor
         val exprsToAdd = exprs.take(numberOfParamsToAdd(idx))
         val text =
           defaultArg.getMethodExpression.getText +
-          exprsToAdd.map(_.getText).mkString("(", ", ", ")")
+            exprsToAdd.map(_.getText).mkString("(", ", ", ")")
         val newDefaultArg = JavaPsiFacade
           .getElementFactory(call.getProject)
           .createExpressionFromText(text, defaultArg.getContext)
@@ -209,8 +210,8 @@ class ScalaChangeSignatureUsageProcessor
       case ScalaNamedElementUsageInfo(u: OverriderValUsageInfo) =>
         ConflictsUtil.addBindingPatternConflicts(u.namedElement, info, result)
       case javaOverriderUsage: OverriderUsageInfo =>
-        ConflictsUtil.addJavaOverriderConflicts(
-            javaOverriderUsage, info, result)
+        ConflictsUtil
+          .addJavaOverriderConflicts(javaOverriderUsage, info, result)
       case p: PatternUsageInfo =>
         ConflictsUtil.addUnapplyUsagesConflicts(p, info, result)
       case _ =>
@@ -235,7 +236,8 @@ class ScalaChangeSignatureUsageProcessor
   }
 
   private def processNamedElementUsage(
-      change: ChangeInfo, usage: ScalaNamedElementUsageInfo): Unit = {
+      change: ChangeInfo,
+      usage: ScalaNamedElementUsageInfo): Unit = {
     usage.namedElement match {
       case fun: ScFunction if fun.isConstructor =>
         handleVisibility(change, usage)
@@ -306,7 +308,7 @@ class ScalaChangeSignatureUsageProcessor
       param = parameters(oldIdx)
       newName = paramInfo.getName
       if oldName == param.name /*skip overriders with other param name*/ &&
-      newName != param.name
+        newName != param.name
     } {
       addParameterUsages(param, oldIdx, newName, results)
     }

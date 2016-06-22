@@ -6,16 +6,16 @@ object PomTest extends Build {
   lazy val custom = config("custom")
   lazy val root =
     Project("root", file("root")) configs (custom) settings
-    (TaskKey[Unit]("check-pom") <<= checkPom, libraryDependencies ++= Seq(
-            "a" % "a" % "1.0",
-            "b" % "b" % "1.0" % "runtime,optional",
-            "c" % "c" % "1.0" % "optional",
-            "d" % "d" % "1.0" % "test",
-            "e" % "e" % "1.0" % "custom",
-            "f" % "f" % "1.0" % "custom,optional,runtime",
-            "g" % "g" % "1.0" % "custom,runtime" classifier "foo",
-            "h" % "h" % "1.0" % "custom,optional,runtime" classifier "foo"
-        ))
+      (TaskKey[Unit]("check-pom") <<= checkPom, libraryDependencies ++= Seq(
+              "a" % "a" % "1.0",
+              "b" % "b" % "1.0" % "runtime,optional",
+              "c" % "c" % "1.0" % "optional",
+              "d" % "d" % "1.0" % "test",
+              "e" % "e" % "1.0" % "custom",
+              "f" % "f" % "1.0" % "custom,optional,runtime",
+              "g" % "g" % "1.0" % "custom,runtime" classifier "foo",
+              "h" % "h" % "1.0" % "custom,optional,runtime" classifier "foo"
+          ))
 
   def checkPom = makePom map { pom =>
     val expected = Seq(
@@ -40,7 +40,7 @@ object PomTest extends Build {
           java.lang.Boolean.parseBoolean((dep \\ "optional").text)
         assert(opt == actualOpt,
                "Invalid 'optional' section '" + (dep \\ "optional") +
-               "' for " + id + ", expected optional=" + opt)
+                 "' for " + id + ", expected optional=" + opt)
 
         val actualScope = (dep \\ "scope") match {
           case Seq() => None; case x => Some(x.text)
@@ -50,10 +50,10 @@ object PomTest extends Build {
         }
         assert(actualScope == scope,
                "Invalid 'scope' section '" + (dep \\ "scope") + "' for " + id +
-               ", expected scope=" + scope)
+                 ", expected scope=" + scope)
         assert(actualClassifier == classifier,
                "Invalid 'classifier' section '" + (dep \\ "classifier") +
-               "' for " + id + ", expected classifier=" + classifier)
+                 "' for " + id + ", expected classifier=" + classifier)
     }
   }
 }

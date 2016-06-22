@@ -19,8 +19,8 @@ abstract class ImplicitProcessor(kinds: Set[Value], withoutPrecedence: Boolean)
     with PrecedenceHelper[String] {
   protected val precedence: util.HashMap[String, Int] =
     new util.HashMap[String, Int]()
-  protected val levelMap: util.HashMap[
-      String, util.HashSet[ScalaResolveResult]] =
+  protected val levelMap: util.HashMap[String,
+                                       util.HashSet[ScalaResolveResult]] =
     new util.HashMap[String, util.HashSet[ScalaResolveResult]]()
 
   protected def getQualifiedName(result: ScalaResolveResult): String = {
@@ -87,8 +87,8 @@ abstract class ImplicitProcessor(kinds: Set[Value], withoutPrecedence: Boolean)
     res
   }
 
-  override protected def filterNot(
-      p: ScalaResolveResult, n: ScalaResolveResult): Boolean = {
+  override protected def filterNot(p: ScalaResolveResult,
+                                   n: ScalaResolveResult): Boolean = {
     getQualifiedName(p) == getQualifiedName(n) && super.filterNot(p, n)
   }
 

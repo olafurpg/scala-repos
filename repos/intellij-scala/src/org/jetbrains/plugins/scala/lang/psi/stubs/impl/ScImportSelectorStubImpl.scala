@@ -18,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScImportSelector](parent, elemType)
     with ScImportSelectorStub {
   var referenceText: StringRef = _
@@ -28,8 +28,8 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
   var aliasImport: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            refText: String,
            importedName: String,
            isAliasedImport: Boolean) {
@@ -54,7 +54,9 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
       if (referenceText == StringRef.fromString("")) null
       else
         ScalaPsiElementFactory.createReferenceFromText(
-            StringRef.toString(referenceText), getPsi, null)
+            StringRef.toString(referenceText),
+            getPsi,
+            null)
     myReference = new SofterReference[ScStableCodeReferenceElement](res)
     res
   }

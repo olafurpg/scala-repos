@@ -44,15 +44,16 @@ import org.apache.spark.util.{MutableURLClassLoader, RpcUtils, Utils}
   * Used to test the case where a BlockManager evicts the task result (or dies) before the
   * TaskResult is retrieved.
   */
-private class ResultDeletingTaskResultGetter(
-    sparkEnv: SparkEnv, scheduler: TaskSchedulerImpl)
+private class ResultDeletingTaskResultGetter(sparkEnv: SparkEnv,
+                                             scheduler: TaskSchedulerImpl)
     extends TaskResultGetter(sparkEnv, scheduler) {
   var removedResult = false
 
   @volatile var removeBlockSuccessfully = false
 
-  override def enqueueSuccessfulTask(
-      taskSetManager: TaskSetManager, tid: Long, serializedData: ByteBuffer) {
+  override def enqueueSuccessfulTask(taskSetManager: TaskSetManager,
+                                     tid: Long,
+                                     serializedData: ByteBuffer) {
     if (!removedResult) {
       // Only remove the result once, since we'd like to test the case where the task eventually
       // succeeds.
@@ -94,8 +95,9 @@ private class MyTaskResultGetter(env: SparkEnv, scheduler: TaskSchedulerImpl)
 
   def taskResults: Seq[DirectTaskResult[_]] = _taskResults
 
-  override def enqueueSuccessfulTask(
-      tsm: TaskSetManager, tid: Long, data: ByteBuffer): Unit = {
+  override def enqueueSuccessfulTask(tsm: TaskSetManager,
+                                     tid: Long,
+                                     data: ByteBuffer): Unit = {
     // work on a copy since the super class still needs to use the buffer
     val newBuffer = data.duplicate()
     _taskResults += env.closureSerializer
@@ -187,8 +189,8 @@ class TaskResultGetterSuite
         |public class MyException extends Exception {
         |}
       """.stripMargin)
-    val excFile = TestUtils.createCompiledClass(
-        "MyException", srcDir, excSource, Seq.empty)
+    val excFile = TestUtils
+      .createCompiledClass("MyException", srcDir, excSource, Seq.empty)
     val jarFile =
       new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
     TestUtils.createJar(Seq(excFile), jarFile, directoryPrefix = Some("repro"))

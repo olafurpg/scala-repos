@@ -84,8 +84,8 @@ trait BasicRuntimeReducerEstimator extends HistoryReducerEstimator {
 
   def runtimeEstimationScheme: RuntimeEstimationScheme
 
-  def estimateReducers(
-      info: FlowStrategyInfo, history: Seq[FlowStepHistory]): Option[Int] = {
+  def estimateReducers(info: FlowStrategyInfo,
+                       history: Seq[FlowStepHistory]): Option[Int] = {
     val reduceTimes: Seq[Seq[Double]] = getReduceTimes(history)
 
     LOG.info(s"""|
@@ -126,8 +126,8 @@ trait InputScaledRuntimeReducerEstimator extends HistoryReducerEstimator {
 
   def runtimeEstimationScheme: RuntimeEstimationScheme
 
-  def estimateReducers(
-      info: FlowStrategyInfo, history: Seq[FlowStepHistory]): Option[Int] = {
+  def estimateReducers(info: FlowStrategyInfo,
+                       history: Seq[FlowStepHistory]): Option[Int] = {
     val reduceTimes: Seq[Seq[Double]] = getReduceTimes(history)
 
     LOG.info(s"""|
@@ -176,8 +176,8 @@ trait InputScaledRuntimeReducerEstimator extends HistoryReducerEstimator {
 }
 
 trait RuntimeReducerEstimator extends HistoryReducerEstimator {
-  def estimateReducers(
-      info: FlowStrategyInfo, history: Seq[FlowStepHistory]): Option[Int] = {
+  def estimateReducers(info: FlowStrategyInfo,
+                       history: Seq[FlowStepHistory]): Option[Int] = {
     val estimationScheme =
       RuntimeReducerEstimator.getRuntimeEstimationScheme(info.step.getConfig)
 
@@ -197,8 +197,8 @@ trait RuntimeReducerEstimator extends HistoryReducerEstimator {
           def runtimeEstimationScheme = estimationScheme
           def historyService = history
         }
-        ReducerEstimatorStepStrategy.estimatorMonoid.plus(
-            inputScaledEstimator, basicEstimator)
+        ReducerEstimatorStepStrategy.estimatorMonoid
+          .plus(inputScaledEstimator, basicEstimator)
       }
 
     combinedEstimator.estimateReducers(info)

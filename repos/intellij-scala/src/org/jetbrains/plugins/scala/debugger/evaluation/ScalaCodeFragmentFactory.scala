@@ -72,8 +72,8 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
       }
       null
     }
-    fragment.putCopyableUserData(
-        ScalaRuntimeTypeEvaluator.KEY, evaluateType: (ScExpression) => ScType)
+    fragment.putCopyableUserData(ScalaRuntimeTypeEvaluator.KEY,
+                                 evaluateType: (ScExpression) => ScType)
     fragment
   }
 
@@ -97,8 +97,8 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
   def isContextAccepted(contextElement: PsiElement): Boolean = {
     if (contextElement.isInstanceOf[PsiCodeBlock]) {
       return contextElement.getContext != null &&
-      contextElement.getContext.getContext != null &&
-      contextElement.getContext.getContext.getLanguage == ScalaFileType.SCALA_LANGUAGE
+        contextElement.getContext.getContext != null &&
+        contextElement.getContext.getContext.getLanguage == ScalaFileType.SCALA_LANGUAGE
     }
     if (contextElement == null) return false
     contextElement.getLanguage == ScalaFileType.SCALA_LANGUAGE
@@ -108,8 +108,8 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
 
   def getEvaluatorBuilder: EvaluatorBuilder = ScalaEvaluatorBuilder
 
-  private def wrapContext(
-      project: Project, originalContext: PsiElement): PsiElement = {
+  private def wrapContext(project: Project,
+                          originalContext: PsiElement): PsiElement = {
     if (project.isDefault) return originalContext
     var context: PsiElement = originalContext
     val session: XDebugSession =
@@ -124,18 +124,23 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
           markupVariablesText(markupMap)
         val offset: Int = variablesText.length - 1
         val textWithImports: TextWithImportsImpl = new TextWithImportsImpl(
-            CodeFragmentKind.CODE_BLOCK, variablesText, "", getFileType)
-        val codeFragment: JavaCodeFragment = createCodeFragmentInner(
-            textWithImports, context, project)
-        codeFragment.accept(new ScalaRecursiveElementVisitor() {
-          override def visitPatternDefinition(pat: ScPatternDefinition): Unit = {
-            val bindingPattern = pat.bindings.head
-            val name: String = bindingPattern.name
-            bindingPattern.putUserData(
-                CodeFragmentFactoryContextWrapper.LABEL_VARIABLE_VALUE_KEY,
-                reverseMap.getOrElse(name, null))
-          }
-        })
+            CodeFragmentKind.CODE_BLOCK,
+            variablesText,
+            "",
+            getFileType)
+        val codeFragment: JavaCodeFragment =
+          createCodeFragmentInner(textWithImports, context, project)
+        codeFragment
+          .accept(new ScalaRecursiveElementVisitor() {
+            override def visitPatternDefinition(
+                pat: ScPatternDefinition): Unit = {
+              val bindingPattern = pat.bindings.head
+              val name: String = bindingPattern.name
+              bindingPattern.putUserData(
+                  CodeFragmentFactoryContextWrapper.LABEL_VARIABLE_VALUE_KEY,
+                  reverseMap.getOrElse(name, null))
+            }
+          })
         val newContext: PsiElement = codeFragment.findElementAt(offset)
         if (newContext != null) {
           context = newContext

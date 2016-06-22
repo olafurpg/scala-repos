@@ -45,8 +45,7 @@ class ReadOnlyObjectProperty[T <: Any](
     with SFXDelegate[jfxbp.ReadOnlyObjectProperty[T]] {
 
   def this(bean: Object, name: String, value: T) =
-    this(
-        new jfxbp.ReadOnlyObjectPropertyBase[T]() {
+    this(new jfxbp.ReadOnlyObjectPropertyBase[T]() {
       def getBean = bean
       def getName = name
       override def get = value

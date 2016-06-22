@@ -28,8 +28,9 @@ private[nio] object GenDataViewBuffer {
     val viewCapacity =
       (byteBufferLimit - byteBufferPos) / newDataViewBuffer.bytesPerElem
     val byteLength = viewCapacity * newDataViewBuffer.bytesPerElem
-    val dataView = newDataView(
-        byteArray.buffer, byteArray.byteOffset + byteBufferPos, byteLength)
+    val dataView = newDataView(byteArray.buffer,
+                               byteArray.byteOffset + byteBufferPos,
+                               byteLength)
     newDataViewBuffer(dataView,
                       0,
                       viewCapacity,
@@ -42,8 +43,9 @@ private[nio] object GenDataViewBuffer {
    * the buffer's length, even if byteLength == 0.
    */
   @inline
-  private def newDataView(
-      buffer: ArrayBuffer, byteOffset: Int, byteLength: Int): DataView = {
+  private def newDataView(buffer: ArrayBuffer,
+                          byteOffset: Int,
+                          byteLength: Int): DataView = {
     if (byteLength == 0)
       lit(buffer = buffer, byteOffset = byteOffset, byteLength = byteLength)
         .asInstanceOf[DataView]
@@ -75,8 +77,8 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
   @inline
   def generic_duplicate()(
       implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType = {
-    val result = newDataViewBuffer(
-        _dataView, position, limit, isReadOnly, isBigEndian)
+    val result =
+      newDataViewBuffer(_dataView, position, limit, isReadOnly, isBigEndian)
     result._mark = _mark
     result
   }
@@ -84,8 +86,8 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
   @inline
   def generic_asReadOnlyBuffer()(
       implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType = {
-    val result = newDataViewBuffer(
-        _dataView, position, limit, true, isBigEndian)
+    val result =
+      newDataViewBuffer(_dataView, position, limit, true, isBigEndian)
     result._mark = _mark
     result
   }
@@ -97,8 +99,8 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
 
     val dataView = _dataView
     val bytesPerElem = newDataViewBuffer.bytesPerElem
-    val byteArray = new Int8Array(
-        dataView.buffer, dataView.byteOffset, dataView.byteLength)
+    val byteArray =
+      new Int8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength)
     val pos = position
     val lim = limit
     byteArray.set(byteArray.subarray(bytesPerElem * pos, bytesPerElem * lim))

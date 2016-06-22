@@ -41,10 +41,12 @@ class NewScalaTypeDefinitionAction
     builder.addKind("Object", Icons.OBJECT, ScalaFileTemplateUtil.SCALA_OBJECT)
     builder.addKind("Trait", Icons.TRAIT, ScalaFileTemplateUtil.SCALA_TRAIT)
 
-    for (template <- FileTemplateManager.getInstance(project).getAllTemplates) {
+    for (template <- FileTemplateManager
+                      .getInstance(project)
+                      .getAllTemplates) {
       if (isScalaTemplate(template) && checkPackageExists(directory)) {
-        builder.addKind(
-            template.getName, Icons.FILE_TYPE_LOGO, template.getName)
+        builder
+          .addKind(template.getName, Icons.FILE_TYPE_LOGO, template.getName)
       }
     }
 

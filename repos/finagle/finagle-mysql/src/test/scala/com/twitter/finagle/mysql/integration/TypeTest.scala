@@ -25,13 +25,13 @@ class NumericTypeTest extends FunSuite with IntegrationClient {
         PRIMARY KEY (`smallint`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"""))
 
-    Await.ready(c.query("""INSERT INTO `numeric` (`smallint`,
+    Await.ready(
+        c.query("""INSERT INTO `numeric` (`smallint`,
         `tinyint`, `mediumint`, `int`,
         `bigint`, `float`, `double`, `decimal`, `bit`)
         VALUES (1, 2, 3, 4, 5, 1.61, 1.618, 1.61803398875, 1);"""))
 
-    val textEncoded = Await.result(
-        c.query("SELECT * FROM `numeric`") map {
+    val textEncoded = Await.result(c.query("SELECT * FROM `numeric`") map {
       case rs: ResultSet if rs.rows.size > 0 => rs.rows(0)
       case v =>
         fail("expected a ResultSet with 1 row but received: %s".format(v))
@@ -119,7 +119,8 @@ class NumericTypeTest extends FunSuite with IntegrationClient {
 @RunWith(classOf[JUnitRunner])
 class BlobTypeTest extends FunSuite with IntegrationClient {
   for (c <- client) {
-    Await.ready(c.query("""CREATE TEMPORARY TABLE `blobs` (
+    Await.ready(
+        c.query("""CREATE TEMPORARY TABLE `blobs` (
         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
         `char` char(5) DEFAULT NULL,
         `varchar` varchar(10) DEFAULT NULL,
@@ -144,8 +145,7 @@ class BlobTypeTest extends FunSuite with IntegrationClient {
         VALUES (1, 'a', 'b', 'c', 'd', 'e', X'66',
         X'67', X'68', X'6970', X'6A', 'small', '1');"""))
 
-    val textEncoded = Await.result(
-        c.query("SELECT * FROM `blobs`") map {
+    val textEncoded = Await.result(c.query("SELECT * FROM `blobs`") map {
       case rs: ResultSet if rs.rows.size > 0 => rs.rows(0)
       case v =>
         fail("expected a ResultSet with 1 row but received: %s".format(v))
@@ -256,7 +256,8 @@ class BlobTypeTest extends FunSuite with IntegrationClient {
 @RunWith(classOf[JUnitRunner])
 class DateTimeTypeTest extends FunSuite with IntegrationClient {
   for (c <- client) {
-    Await.ready(c.query("""CREATE TEMPORARY TABLE `datetime` (
+    Await.ready(
+        c.query("""CREATE TEMPORARY TABLE `datetime` (
         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
         `date` date NOT NULL,
         `datetime` datetime NOT NULL,
@@ -271,8 +272,7 @@ class DateTimeTypeTest extends FunSuite with IntegrationClient {
         VALUES (1, '2013-11-02', '2013-11-02 19:56:24',
         '2013-11-02 19:56:36', '19:56:32', '2013');"""))
 
-    val textEncoded = Await.result(
-        c.query("SELECT * FROM `datetime`") map {
+    val textEncoded = Await.result(c.query("SELECT * FROM `datetime`") map {
       case rs: ResultSet if rs.rows.size > 0 => rs.rows(0)
       case v =>
         fail("expected a ResultSet with 1 row but received: %s".format(v))
@@ -296,12 +296,12 @@ class DateTimeTypeTest extends FunSuite with IntegrationClient {
       }
     }
 
-    val timestampValueLocal = new TimestampValue(
-        TimeZone.getDefault(), TimeZone.getDefault())
-    val timestampValueUTC = new TimestampValue(
-        TimeZone.getDefault(), TimeZone.getTimeZone("UTC"))
-    val timestampValueEST = new TimestampValue(
-        TimeZone.getDefault(), TimeZone.getTimeZone("EST"))
+    val timestampValueLocal =
+      new TimestampValue(TimeZone.getDefault(), TimeZone.getDefault())
+    val timestampValueUTC =
+      new TimestampValue(TimeZone.getDefault(), TimeZone.getTimeZone("UTC"))
+    val timestampValueEST =
+      new TimestampValue(TimeZone.getDefault(), TimeZone.getTimeZone("EST"))
 
     for ((repr, secs) <- Seq(("datetime", 24), ("timestamp", 36))) {
       test("extract %s from %s in local time".format(repr, rowType)) {

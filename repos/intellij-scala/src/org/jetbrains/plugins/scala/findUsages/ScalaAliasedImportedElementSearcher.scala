@@ -33,8 +33,7 @@ class ScalaAliasedImportedElementSearcher
       named <- target
       name <- Option(named.name) if !StringUtil.isEmptyOrSpaces(name)
     } {
-      val scope: SearchScope =
-        inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
+      val scope: SearchScope = inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
       val collector: SearchRequestCollector = parameters.getOptimizer
       val session: SearchSession = collector.getSearchSession
       collector.searchWord(name,
@@ -56,28 +55,31 @@ class ScalaAliasedImportedElementSearcher
       importStatement.importedName
     }
 
-    def processTextOccurrence(
-        element: PsiElement,
-        offsetInElement: Int,
-        consumer: Processor[PsiReference]): Boolean = inReadAction {
-      val alias: String = getAlias(element)
-      if (alias == null) return true
-      val reference: PsiReference = element.getReference
-      if (reference == null) {
-        return true
+    def processTextOccurrence(element: PsiElement,
+                              offsetInElement: Int,
+                              consumer: Processor[PsiReference]): Boolean =
+      inReadAction {
+        val alias: String = getAlias(element)
+        if (alias == null) return true
+        val reference: PsiReference = element.getReference
+        if (reference == null) {
+          return true
+        }
+        if (!reference.isReferenceTo(myTarget)) {
+          return true
+        }
+        val collector: SearchRequestCollector =
+          new SearchRequestCollector(mySession)
+        val fileScope: SearchScope =
+          new LocalSearchScope(element.getContainingFile)
+        collector.searchWord(alias,
+                             fileScope,
+                             UsageSearchContext.IN_CODE,
+                             true,
+                             myTarget)
+        PsiSearchHelper.SERVICE
+          .getInstance(element.getProject)
+          .processRequests(collector, consumer)
       }
-      if (!reference.isReferenceTo(myTarget)) {
-        return true
-      }
-      val collector: SearchRequestCollector =
-        new SearchRequestCollector(mySession)
-      val fileScope: SearchScope =
-        new LocalSearchScope(element.getContainingFile)
-      collector.searchWord(
-          alias, fileScope, UsageSearchContext.IN_CODE, true, myTarget)
-      PsiSearchHelper.SERVICE
-        .getInstance(element.getProject)
-        .processRequests(collector, consumer)
-    }
   }
 }

@@ -50,8 +50,10 @@ private[spark] class ShuffleMapTask(
     partition: Partition,
     @transient private var locs: Seq[TaskLocation],
     _initialAccums: Seq[Accumulator[_]])
-    extends Task[MapStatus](
-        stageId, stageAttemptId, partition.index, _initialAccums)
+    extends Task[MapStatus](stageId,
+                            stageAttemptId,
+                            partition.index,
+                            _initialAccums)
     with Logging {
 
   /** A constructor used only in test suites. This does not require passing in an RDD. */
@@ -79,7 +81,8 @@ private[spark] class ShuffleMapTask(
       val manager = SparkEnv.get.shuffleManager
       writer =
         manager.getWriter[Any, Any](dep.shuffleHandle, partitionId, context)
-      writer.write(rdd
+      writer.write(
+          rdd
             .iterator(partition, context)
             .asInstanceOf[Iterator[_ <: Product2[Any, Any]]])
       writer.stop(success = true).get

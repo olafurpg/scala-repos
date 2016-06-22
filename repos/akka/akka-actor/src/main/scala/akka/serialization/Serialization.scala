@@ -47,8 +47,8 @@ object Serialization {
     * Serialization information needed for serializing local actor refs.
     * INTERNAL API
     */
-  private[akka] final case class Information(
-      address: Address, system: ActorSystem)
+  private[akka] final case class Information(address: Address,
+                                             system: ActorSystem)
 
   /**
     * The serialized path of an actorRef, based on the current transport serialization information.
@@ -77,7 +77,8 @@ object Serialization {
           path.toSerializationFormatWithAddress(address)
         else {
           val provider = originalSystem.provider
-          path.toSerializationFormatWithAddress(provider
+          path.toSerializationFormatWithAddress(
+              provider
                 .getExternalAddressFor(address)
                 .getOrElse(provider.getDefaultAddress))
         }
@@ -115,7 +116,7 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
         case _: NoSuchElementException ⇒
           throw new NotSerializableException(
               s"Cannot find serializer with id [$serializerId]. The most probable reason is that the configuration entry " +
-              "akka.actor.serializers is not in synch between the two systems.")
+                "akka.actor.serializers is not in synch between the two systems.")
       }
       serializer.fromBinary(bytes, clazz).asInstanceOf[T]
     }
@@ -125,14 +126,15 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
     * using the optional type hint to the Serializer.
     * Returns either the resulting object or an Exception if one was thrown.
     */
-  def deserialize(
-      bytes: Array[Byte], serializerId: Int, manifest: String): Try[AnyRef] =
+  def deserialize(bytes: Array[Byte],
+                  serializerId: Int,
+                  manifest: String): Try[AnyRef] =
     Try {
       val serializer = try serializerByIdentity(serializerId) catch {
         case _: NoSuchElementException ⇒
           throw new NotSerializableException(
               s"Cannot find serializer with id [$serializerId]. The most probable reason is that the configuration entry " +
-              "akka.actor.serializers is not in synch between the two systems.")
+                "akka.actor.serializers is not in synch between the two systems.")
       }
       serializer match {
         case s2: SerializerWithStringManifest ⇒ s2.fromBinary(bytes, manifest)
@@ -181,8 +183,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
         def unique(
             possibilities: immutable.Seq[(Class[_], Serializer)]): Boolean =
           possibilities.size == 1 ||
-          (possibilities forall (_._1 isAssignableFrom possibilities(0)._1)) ||
-          (possibilities forall (_._2 == possibilities(0)._2))
+            (possibilities forall (_._1 isAssignableFrom possibilities(0)._1)) ||
+            (possibilities forall (_._2 == possibilities(0)._2))
 
         val ser = bindings filter { _._1 isAssignableFrom clazz } match {
           case Seq() ⇒
@@ -190,8 +192,9 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
                 "No configured serialization-bindings for class [%s]" format clazz.getName)
           case possibilities ⇒
             if (!unique(possibilities))
-              log.warning("Multiple serializers found for " + clazz +
-                  ", choosing first: " + possibilities)
+              log.warning(
+                  "Multiple serializers found for " + clazz +
+                    ", choosing first: " + possibilities)
             possibilities(0)._2
         }
         serializerMap.putIfAbsent(clazz, ser) match {
@@ -199,8 +202,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
             if (shouldWarnAboutJavaSerializer(clazz, ser)) {
               log.warning(
                   "Using the default Java serializer for class [{}] which is not recommended because of " +
-                  "performance implications. Use another serializer or disable this warning using the setting " +
-                  "'akka.actor.warn-about-java-serializer-usage'",
+                    "performance implications. Use another serializer or disable this warning using the setting " +
+                    "'akka.actor.warn-about-java-serializer-usage'",
                   clazz.getName)
             }
             log.debug("Using serializer[{}] for message [{}]",
@@ -229,8 +232,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
     * By default always contains the following mapping: "java" -> akka.serialization.JavaSerializer
     */
   private val serializers: Map[String, Serializer] =
-    for ((k: String, v: String) ← settings.Serializers) yield
-      k -> serializerOf(v).get
+    for ((k: String, v: String) ← settings.Serializers)
+      yield k -> serializerOf(v).get
 
   /**
     *  bindings is a Seq of tuple representing the mapping from Class to Serializer.
@@ -238,8 +241,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
     */
   private[akka] val bindings: immutable.Seq[ClassSerializer] = sort(
       for ((k: String, v: String) ← settings.SerializationBindings
-           if v != "none" && checkGoogleProtobuf(k)) yield
-        (system.dynamicAccess.getClassFor[Any](k).get, serializers(v)))
+           if v != "none" && checkGoogleProtobuf(k))
+        yield (system.dynamicAccess.getClassFor[Any](k).get, serializers(v)))
     .to[immutable.Seq]
 
   // com.google.protobuf serialization binding is only used if the class can be loaded,
@@ -248,7 +251,7 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
   // include "com.google.protobuf.GeneratedMessage" = proto in configured serialization-bindings.
   private def checkGoogleProtobuf(className: String): Boolean =
     (!className.startsWith("com.google.protobuf") ||
-        system.dynamicAccess.getClassFor[Any](className).isSuccess)
+          system.dynamicAccess.getClassFor[Any](className).isSuccess)
 
   /**
     * Sort so that subtypes always precede their supertypes, but without
@@ -284,8 +287,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
   private val isJavaSerializationWarningEnabled =
     settings.config.getBoolean("akka.actor.warn-about-java-serializer-usage")
 
-  private def shouldWarnAboutJavaSerializer(
-      serializedClass: Class[_], serializer: Serializer) = {
+  private def shouldWarnAboutJavaSerializer(serializedClass: Class[_],
+                                            serializer: Serializer) = {
     isJavaSerializationWarningEnabled &&
     serializer.isInstanceOf[JavaSerializer] &&
     !serializedClass.getName.startsWith("akka.") &&

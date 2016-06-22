@@ -91,8 +91,10 @@ trait ScType {
             case 1 => (true, upper)
             case 0 =>
               (true,
-               ScSkolemizedType(
-                   s"_$$${ index += 1; index }", Nil, lower, upper))
+               ScSkolemizedType(s"_$$${ index += 1; index }",
+                                Nil,
+                                lower,
+                                upper))
           }
         case _ => (false, tp)
       }
@@ -153,8 +155,7 @@ trait ScType {
     val set: mutable.HashSet[ScAbstractType] =
       new mutable.HashSet[ScAbstractType]
 
-    recursiveUpdate(
-        tp => {
+    recursiveUpdate(tp => {
       tp match {
         case a: ScAbstractType => set += a
         case _ =>
@@ -233,8 +234,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   )
 
   @tailrec
-  def extractClass(
-      t: ScType, project: Option[Project] = None): Option[PsiClass] = {
+  def extractClass(t: ScType,
+                   project: Option[Project] = None): Option[PsiClass] = {
     t match {
       case p @ ScParameterizedType(t1, _) =>
         extractClass(t1, project) //performance improvement
@@ -244,8 +245,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
 
   def extractClassType(t: ScType,
                        project: Option[Project] = None,
-                       visitedAlias: HashSet[ScTypeAlias] =
-                         HashSet.empty): Option[(PsiClass, ScSubstitutor)] = {
+                       visitedAlias: HashSet[ScTypeAlias] = HashSet.empty)
+    : Option[(PsiClass, ScSubstitutor)] = {
     t match {
       case n: NonValueType =>
         extractClassType(n.inferValueType, project, visitedAlias)
@@ -264,8 +265,9 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
             if (visitedAlias.contains(t)) return None
             val result = t.aliasedType(TypingContext.empty)
             if (result.isEmpty) return None
-            extractClassType(
-                proj.actualSubst.subst(result.get), project, visitedAlias + t)
+            extractClassType(proj.actualSubst.subst(result.get),
+                             project,
+                             visitedAlias + t)
           case _ => None
         }
       case ScExistentialType(quantified, _) =>
@@ -308,8 +310,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
           case t: ScTypeAliasDefinition if withoutAliases =>
             val result = t.aliasedType(TypingContext.empty)
             if (result.isEmpty) return None
-            extractDesignated(
-                proj.actualSubst.subst(result.get), withoutAliases)
+            extractDesignated(proj.actualSubst.subst(result.get),
+                              withoutAliases)
           case _ => Some((proj.actualElement, proj.actualSubst))
         }
       case p @ ScParameterizedType(t1, _) =>
@@ -405,9 +407,9 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   // TODO perhaps we need to choose the lower bound if we are in a contravariant position. We get away
   //      with this as we currently only rely on this method to determine covariant types: the parameter
   //      types of FunctionN, or the elements of TupleN
-  def expandAliases(tp: ScType,
-                    visited: HashSet[ScType] =
-                      HashSet.empty): TypeResult[ScType] = {
+  def expandAliases(
+      tp: ScType,
+      visited: HashSet[ScType] = HashSet.empty): TypeResult[ScType] = {
     if (visited contains tp) return Success(tp, None)
     tp match {
       case proj @ ScProjectionType(p, elem, _) =>
@@ -425,8 +427,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
         expandAliases(at.upper, visited + tp) // ugly hack for SCL-3592
       case ScDesignatorType(t: ScType) => expandAliases(t, visited + tp)
       case ScDesignatorType(ta: ScTypeAliasDefinition) =>
-        expandAliases(
-            ta.aliasedType(TypingContext.empty).getOrNothing, visited + tp)
+        expandAliases(ta.aliasedType(TypingContext.empty).getOrNothing,
+                      visited + tp)
       case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
         t.upperBound.flatMap(expandAliases(_, visited + tp))
       case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
@@ -485,8 +487,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   def designator(element: PsiNamedElement): ScType = {
     element match {
       case td: ScClass =>
-        StdType.QualNameToType.getOrElse(
-            td.qualifiedName, new ScDesignatorType(element))
+        StdType.QualNameToType
+          .getOrElse(td.qualifiedName, new ScDesignatorType(element))
       case _ =>
         val clazzOpt = element match {
           case p: ScClassParameter => Option(p.containingClass)
@@ -494,24 +496,26 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
             element.getContext match {
               case _: ScTemplateBody | _: ScEarlyDefinitions =>
                 Option(
-                    ScalaPsiUtil.contextOfType(
-                        element, strict = true, classOf[ScTemplateDefinition]))
+                    ScalaPsiUtil.contextOfType(element,
+                                               strict = true,
+                                               classOf[ScTemplateDefinition]))
               case _ => None
             }
         }
 
         clazzOpt match {
           case Some(clazz) =>
-            ScProjectionType(
-                ScThisType(clazz), element, superReference = false)
+            ScProjectionType(ScThisType(clazz),
+                             element,
+                             superReference = false)
           case _ => new ScDesignatorType(element)
         }
     }
   }
 
-  def ofNamedElement(named: PsiElement,
-                     s: ScSubstitutor =
-                       ScSubstitutor.empty): Option[ScType] = {
+  def ofNamedElement(
+      named: PsiElement,
+      s: ScSubstitutor = ScSubstitutor.empty): Option[ScType] = {
     val baseType = named match {
       case p: ScPrimaryConstructor => None
       case e: ScFunction if e.isConstructor => None

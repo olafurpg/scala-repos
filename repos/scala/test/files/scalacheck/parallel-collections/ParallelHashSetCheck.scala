@@ -54,8 +54,8 @@ class IntParallelHashSetCheck(val tasksupport: TaskSupport)
       println("could not match data structure type: " + ds.getClass)
   }
 
-  override def checkDataStructureInvariants(
-      orig: Traversable[Int], ds: AnyRef) = ds match {
+  override def checkDataStructureInvariants(orig: Traversable[Int],
+                                            ds: AnyRef) = ds match {
     // case pm: ParHashSet[t] if 1 == 0 =>
     //   // for an example of how not to write code proceed below
     //   val invs = pm.brokenInvariants

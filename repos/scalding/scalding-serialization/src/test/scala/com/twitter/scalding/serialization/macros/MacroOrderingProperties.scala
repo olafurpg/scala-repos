@@ -135,8 +135,11 @@ case class TestCC(a: Int,
                   aBB: ByteBuffer)
     extends SealedTraitTest
 
-case class TestCaseClassB(
-    a: Int, b: Long, c: Option[Int], d: Double, e: Option[String])
+case class TestCaseClassB(a: Int,
+                          b: Long,
+                          c: Option[Int],
+                          d: Double,
+                          e: Option[String])
     extends SealedTraitTest
 
 case class TestCaseClassD(a: Int) extends SealedTraitTest

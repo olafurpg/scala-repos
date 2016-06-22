@@ -26,8 +26,10 @@ class ModuleExtDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[ModuleExtData] =
-    new ModuleExtDataService.Importer(
-        toImport, projectData, project, modelsProvider)
+    new ModuleExtDataService.Importer(toImport,
+                                      projectData,
+                                      project,
+                                      modelsProvider)
 }
 
 object ModuleExtDataService {
@@ -35,8 +37,10 @@ object ModuleExtDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[ModuleExtData](
-          dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[ModuleExtData](dataToImport,
+                                              projectData,
+                                              project,
+                                              modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
@@ -87,8 +91,8 @@ object ModuleExtDataService {
       sdk.flatMap(SdkUtils.findProjectSdk).foreach(model.setSdk)
     }
 
-    private def configureLanguageLevel(
-        module: Module, javacOptions: Seq[String]): Unit = {
+    private def configureLanguageLevel(module: Module,
+                                       javacOptions: Seq[String]): Unit = {
       val model = getModifiableRootModel(module)
       val moduleSdk = Option(model.getSdk)
       val languageLevel = SdkUtils
@@ -101,8 +105,8 @@ object ModuleExtDataService {
       }
     }
 
-    private def configureJavacOptions(
-        module: Module, javacOptions: Seq[String]): Unit = {
+    private def configureJavacOptions(module: Module,
+                                      javacOptions: Seq[String]): Unit = {
       for {
         targetPos <- Option(javacOptions.indexOf("-target")).filterNot(_ == -1)
         targetValue <- javacOptions.lift(targetPos + 1)

@@ -64,8 +64,8 @@ class QueryCompiler(val phases: Vector[Phase]) extends Logging {
   def runBefore(before: Phase, state: CompilerState): CompilerState =
     runPhases(phases.iterator.takeWhile(_.name != before.name), state)
 
-  protected[this] def runPhases(
-      it: Iterator[Phase], state: CompilerState): CompilerState = {
+  protected[this] def runPhases(it: Iterator[Phase],
+                                state: CompilerState): CompilerState = {
     if (logger.isDebugEnabled)
       state.symbolNamer.use { logger.debug("Source:", state.tree) }
     if (benchmarkLogger.isDebugEnabled) {
@@ -105,8 +105,8 @@ class QueryCompiler(val phases: Vector[Phase]) extends Logging {
       s2
     }
 
-  protected[this] def detectRebuiltLeafs(
-      n1: Node, n2: Node): Set[RefId[Dumpable]] = {
+  protected[this] def detectRebuiltLeafs(n1: Node,
+                                         n2: Node): Set[RefId[Dumpable]] = {
     if (n1 eq n2) Set.empty
     else {
       val chres = n1.children.iterator
@@ -238,8 +238,11 @@ class CompilerState private (val compiler: QueryCompiler,
 
   /** Return a new `CompilerState` with the given mapping of phase to phase state */
   def +[S, P <: Phase { type State = S }](t: (P, S)) =
-    new CompilerState(
-        compiler, symbolNamer, tree, state + (t._1.name -> t._2), wellTyped)
+    new CompilerState(compiler,
+                      symbolNamer,
+                      tree,
+                      state + (t._1.name -> t._2),
+                      wellTyped)
 
   /** Return a new `CompilerState` which encapsulates the specified AST */
   def withNode(tree: Node) =

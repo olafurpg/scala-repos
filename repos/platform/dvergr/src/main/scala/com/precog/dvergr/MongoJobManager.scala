@@ -70,11 +70,12 @@ trait ManagedMongoJobManagerModule {
   }
 }
 
-case class MongoJobManagerSettings(
-    queryTimeout: Timeout, jobs: String, messages: String)
+case class MongoJobManagerSettings(queryTimeout: Timeout,
+                                   jobs: String,
+                                   messages: String)
 object MongoJobManagerSettings {
-  val default: MongoJobManagerSettings = MongoJobManagerSettings(
-      5000, "jobs", "jog_messages")
+  val default: MongoJobManagerSettings =
+    MongoJobManagerSettings(5000, "jobs", "jog_messages")
 }
 
 final class MongoJobManager(
@@ -113,8 +114,9 @@ final class MongoJobManager(
     val job = Job(id, apiKey, name, jobType, data, state)
     database(insert(job.serialize.asInstanceOf[JObject]).into(settings.jobs)) map {
       _ =>
-        logger.info("Job %s created in %f ms".format(
-                id, (System.nanoTime - start) / 1000000.0))
+        logger.info(
+            "Job %s created in %f ms"
+              .format(id, (System.nanoTime - start) / 1000000.0))
         job
     }
   }
@@ -142,7 +144,8 @@ final class MongoJobManager(
     nextMessageId(jobId) flatMap { statusId =>
       prevStatusId match {
         case Some(prevId) =>
-          database(selectAndUpdate(settings.jobs)
+          database(
+              selectAndUpdate(settings.jobs)
                 .set(JPath("status") set statusId)
                 .where("id" === jobId && "status" === prevId)) flatMap {
             case Some(_) => // Success
@@ -150,8 +153,8 @@ final class MongoJobManager(
               val message = Status.toMessage(status)
               database(insert(message.serialize.asInstanceOf[JObject])
                     .into(settings.messages)) map { _ =>
-                logger.trace("Job %s updated in %f ms".format(
-                        jobId, (System.nanoTime - start) / 1000.0))
+                logger.trace("Job %s updated in %f ms"
+                      .format(jobId, (System.nanoTime - start) / 1000.0))
                 Right(status)
               }
 
@@ -210,8 +213,9 @@ final class MongoJobManager(
         }.toList)
   }
 
-  def addMessage(
-      jobId: JobId, channel: String, value: JValue): Future[Message] = {
+  def addMessage(jobId: JobId,
+                 channel: String,
+                 value: JValue): Future[Message] = {
     nextMessageId(jobId) flatMap { id =>
       val message = Message(jobId, id, channel, value)
       database {

@@ -30,8 +30,7 @@ class ServerActor(
     config: EnsimeConfig,
     protocol: Protocol,
     interface: String = "127.0.0.1"
-)
-    extends Actor
+) extends Actor
     with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
@@ -69,15 +68,18 @@ class ServerActor(
     // this is a bit ugly in a couple of ways
     // 1) web server creates handlers in the top domain
     // 2) We have to manually capture the failure to write the port file and lift the error to a failure.
-    val webserver = new WebServerImpl(project, broadcaster)(
-        config, context.system, mat, timeout)
+    val webserver = new WebServerImpl(project, broadcaster)(config,
+                                                            context.system,
+                                                            mat,
+                                                            timeout)
 
     // async start the HTTP Server
     val selfRef = self
     val preferredHttpPort = PortUtil.port(config.cacheDir, "http")
     Http()(context.system)
-      .bindAndHandle(
-          webserver.route, interface, preferredHttpPort.getOrElse(0))
+      .bindAndHandle(webserver.route,
+                     interface,
+                     preferredHttpPort.getOrElse(0))
       .onComplete {
         case Failure(ex) =>
           log.error(s"Error binding http endpoint ${ex.getMessage}", ex)
@@ -91,8 +93,8 @@ class ServerActor(
             PortUtil.writePort(config.cacheDir, addr.getPort, "http")
           } catch {
             case ex: Throwable =>
-              log.error(
-                  s"Error initializing http endpoint ${ex.getMessage}", ex)
+              log.error(s"Error initializing http endpoint ${ex.getMessage}",
+                        ex)
               selfRef ! ShutdownRequest(
                   s"http endpoint failed to initialise: ${ex.getMessage}",
                   isError = true)

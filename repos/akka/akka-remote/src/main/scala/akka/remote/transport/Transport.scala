@@ -20,8 +20,8 @@ object Transport {
     * hostname, etc.).
     */
   @SerialVersionUID(1L)
-  final case class InvalidAssociationException(
-      msg: String, cause: Throwable = null)
+  final case class InvalidAssociationException(msg: String,
+                                               cause: Throwable = null)
       extends AkkaException(msg, cause)
       with NoStackTrace
 

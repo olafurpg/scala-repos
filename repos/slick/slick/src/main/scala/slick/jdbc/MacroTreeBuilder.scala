@@ -30,8 +30,8 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
     * eg java.lang.String becomes
     * Select(Select(Select(Ident(nme.ROOTPKG), "java"), "lang"), "String")
     */
-  private def createClassTreeFromString(
-      classString: String, generator: String => Name): Tree = {
+  private def createClassTreeFromString(classString: String,
+                                        generator: String => Name): Tree = {
     val tokens = classString.split('.').toList
     val packages = tokens.dropRight(1) map (TermName(_))
     val classType = generator(tokens.last)
@@ -53,40 +53,41 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
   )
 
   //Some commonly used trees that are created on demand
-  lazy val GetResultTypeTree = createClassTreeFromString(
-      "slick.jdbc.GetResult", TypeName(_))
-  lazy val SetParameterTypeTree = createClassTreeFromString(
-      "slick.jdbc.SetParameter", TypeName(_))
-  lazy val TypedStaticQueryTypeTree = createClassTreeFromString(
-      "slick.jdbc.TypedStaticQuery", TypeName(_))
-  lazy val GetResultTree = createClassTreeFromString(
-      "slick.jdbc.GetResult", TermName(_))
-  lazy val SetParameterTree = createClassTreeFromString(
-      "slick.jdbc.SetParameter", TermName(_))
-  lazy val ImplicitlyTree = createClassTreeFromString(
-      "scala.Predef.implicitly", TermName(_))
-  lazy val HeterogenousTree = createClassTreeFromString(
-      "slick.collection.heterogeneous", TermName(_))
-  lazy val VectorTree = createClassTreeFromString(
-      "scala.collection.immutable.Vector", TermName(_))
+  lazy val GetResultTypeTree =
+    createClassTreeFromString("slick.jdbc.GetResult", TypeName(_))
+  lazy val SetParameterTypeTree =
+    createClassTreeFromString("slick.jdbc.SetParameter", TypeName(_))
+  lazy val TypedStaticQueryTypeTree =
+    createClassTreeFromString("slick.jdbc.TypedStaticQuery", TypeName(_))
+  lazy val GetResultTree =
+    createClassTreeFromString("slick.jdbc.GetResult", TermName(_))
+  lazy val SetParameterTree =
+    createClassTreeFromString("slick.jdbc.SetParameter", TermName(_))
+  lazy val ImplicitlyTree =
+    createClassTreeFromString("scala.Predef.implicitly", TermName(_))
+  lazy val HeterogenousTree =
+    createClassTreeFromString("slick.collection.heterogeneous", TermName(_))
+  lazy val VectorTree =
+    createClassTreeFromString("scala.collection.immutable.Vector", TermName(_))
   lazy val GetNoResultTree = createClassTreeFromString(
-      "slick.jdbc.TypedStaticQuery.GetNoResult", TermName(_))
+      "slick.jdbc.TypedStaticQuery.GetNoResult",
+      TermName(_))
 
   /**
     * Creates the tree for GetResult[] of the tsql macro
     */
   def rconvTree(resultTypes: Vector[ClassTag[_]]) = {
-    val resultTypeTrees = resultTypes.map(
-        _.runtimeClass.getCanonicalName match {
-      case "int" => TypeTree(typeOf[Int])
-      case "byte" => TypeTree(typeOf[Byte])
-      case "long" => TypeTree(typeOf[Long])
-      case "short" => TypeTree(typeOf[Short])
-      case "float" => TypeTree(typeOf[Float])
-      case "double" => TypeTree(typeOf[Double])
-      case "boolean" => TypeTree(typeOf[Boolean])
-      case x => TypeTree(c.mirror.staticClass(x).selfType)
-    })
+    val resultTypeTrees =
+      resultTypes.map(_.runtimeClass.getCanonicalName match {
+        case "int" => TypeTree(typeOf[Int])
+        case "byte" => TypeTree(typeOf[Byte])
+        case "long" => TypeTree(typeOf[Long])
+        case "short" => TypeTree(typeOf[Short])
+        case "float" => TypeTree(typeOf[Float])
+        case "double" => TypeTree(typeOf[Double])
+        case "boolean" => TypeTree(typeOf[Boolean])
+        case x => TypeTree(c.mirror.staticClass(x).selfType)
+      })
 
     resultTypes.size match {
       case 0 => implicitTree(TypeTree(typeOf[Int]), GetResultTypeTree)
@@ -119,10 +120,11 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
             ),
             List(
                 Function(
-                    List(ValDef(Modifiers(Flag.PARAM),
-                                TermName("p"),
-                                TypeTree(),
-                                EmptyTree)),
+                    List(
+                        ValDef(Modifiers(Flag.PARAM),
+                               TermName("p"),
+                               TypeTree(),
+                               EmptyTree)),
                     Block(
                         zipped.map { tup =>
                           val (i: Int, typ: Tree) = tup
@@ -134,7 +136,8 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                         zipped.foldRight[Tree](zero) { (tup, prev) =>
                           val (i: Int, typ: Tree) = tup
                           Block(
-                              List(ValDef(
+                              List(
+                                  ValDef(
                                       Modifiers(),
                                       TermName("pv" + i),
                                       TypeTree(),
@@ -224,12 +227,12 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                       ),
                       Block(
                           remaining.toList map
-                          (sp =>
-                                Apply(
-                                    Select(sp.tree, TermName("apply")),
-                                    List(Ident(TermName("u")),
-                                         Ident(TermName("pp")))
-                              )),
+                            (sp =>
+                                  Apply(
+                                      Select(sp.tree, TermName("apply")),
+                                      List(Ident(TermName("u")),
+                                           Ident(TermName("pp")))
+                                )),
                           Literal(Constant(()))
                       )
                   )
@@ -239,8 +242,8 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
     }
   }
 
-  lazy val queryParts: Tree = Apply(
-      Select(VectorTree, TermName("apply")), interpolationResultParams._1)
+  lazy val queryParts: Tree =
+    Apply(Select(VectorTree, TermName("apply")), interpolationResultParams._1)
 
   def staticQueryString: String = interpolationResultParams._1 match {
     case Literal(Constant(s: String)) :: Nil => s

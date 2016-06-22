@@ -32,8 +32,9 @@ import org.apache.spark.scheduler.cluster.ExecutorInfo
 
 private case class ReviveOffers()
 
-private case class StatusUpdate(
-    taskId: Long, state: TaskState, serializedData: ByteBuffer)
+private case class StatusUpdate(taskId: Long,
+                                state: TaskState,
+                                serializedData: ByteBuffer)
 
 private case class KillTask(taskId: Long, interruptThread: Boolean)
 
@@ -104,8 +105,9 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
   * master all run in the same JVM. It sits behind a TaskSchedulerImpl and handles launching tasks
   * on a single Executor (created by the LocalBackend) running locally.
   */
-private[spark] class LocalBackend(
-    conf: SparkConf, scheduler: TaskSchedulerImpl, val totalCores: Int)
+private[spark] class LocalBackend(conf: SparkConf,
+                                  scheduler: TaskSchedulerImpl,
+                                  val totalCores: Int)
     extends SchedulerBackend
     with ExecutorBackend
     with Logging {
@@ -136,8 +138,8 @@ private[spark] class LocalBackend(
 
   override def start() {
     val rpcEnv = SparkEnv.get.rpcEnv
-    val executorEndpoint = new LocalEndpoint(
-        rpcEnv, userClassPath, scheduler, this, totalCores)
+    val executorEndpoint =
+      new LocalEndpoint(rpcEnv, userClassPath, scheduler, this, totalCores)
     localEndpoint =
       rpcEnv.setupEndpoint("LocalBackendEndpoint", executorEndpoint)
     listenerBus.post(
@@ -162,13 +164,15 @@ private[spark] class LocalBackend(
   override def defaultParallelism(): Int =
     scheduler.conf.getInt("spark.default.parallelism", totalCores)
 
-  override def killTask(
-      taskId: Long, executorId: String, interruptThread: Boolean) {
+  override def killTask(taskId: Long,
+                        executorId: String,
+                        interruptThread: Boolean) {
     localEndpoint.send(KillTask(taskId, interruptThread))
   }
 
-  override def statusUpdate(
-      taskId: Long, state: TaskState, serializedData: ByteBuffer) {
+  override def statusUpdate(taskId: Long,
+                            state: TaskState,
+                            serializedData: ByteBuffer) {
     localEndpoint.send(StatusUpdate(taskId, state, serializedData))
   }
 

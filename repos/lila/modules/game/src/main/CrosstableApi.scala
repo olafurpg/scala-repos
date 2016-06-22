@@ -20,7 +20,9 @@ final class CrosstableApi(coll: Coll) {
   }
 
   def apply(u1: String, u2: String): Fu[Option[Crosstable]] =
-    coll.find(select(u1, u2)).one[Crosstable] orElse create(u1, u2) recoverWith lila.db
+    coll
+      .find(select(u1, u2))
+      .one[Crosstable] orElse create(u1, u2) recoverWith lila.db
       .recoverDuplicateKey(_ => coll.find(select(u1, u2)).one[Crosstable])
 
   def nbGames(u1: String, u2: String): Fu[Int] =

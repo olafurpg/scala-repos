@@ -129,8 +129,9 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
   }
 
   // Returns the median KS 'D' statistic between two samples, over (m) sampling trials
-  def medianKSD(
-      data1: => Iterator[Int], data2: => Iterator[Int], m: Int = 5): Double = {
+  def medianKSD(data1: => Iterator[Int],
+                data2: => Iterator[Int],
+                m: Int = 5): Double = {
     val t = Array
       .fill[Double](m) {
         val (c1, c2) = cumulants(data1.take(sampleSize).toArray,
@@ -271,14 +272,16 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
 
     // Array iterator (indexable type)
     d = medianKSD(
-        gaps(sampler.sample(
+        gaps(
+            sampler.sample(
                 Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
         gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
 
     // ArrayBuffer iterator (indexable type)
     d = medianKSD(gaps(
-                      sampler.sample(Iterator
+                      sampler.sample(
+                          Iterator
                             .from(0)
                             .take(20 * sampleSize)
                             .to[ArrayBuffer]
@@ -288,7 +291,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
 
     // List iterator (non-indexable type)
     d = medianKSD(
-        gaps(sampler.sample(
+        gaps(
+            sampler.sample(
                 Iterator.from(0).take(20 * sampleSize).toList.iterator)),
         gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
@@ -442,14 +446,16 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
 
     // Array iterator (indexable type)
     d = medianKSD(
-        gaps(sampler.sample(
+        gaps(
+            sampler.sample(
                 Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
         gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
 
     // ArrayBuffer iterator (indexable type)
     d = medianKSD(gaps(
-                      sampler.sample(Iterator
+                      sampler.sample(
+                          Iterator
                             .from(0)
                             .take(20 * sampleSize)
                             .to[ArrayBuffer]
@@ -459,7 +465,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
 
     // List iterator (non-indexable type)
     d = medianKSD(
-        gaps(sampler.sample(
+        gaps(
+            sampler.sample(
                 Iterator.from(0).take(20 * sampleSize).toList.iterator)),
         gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D

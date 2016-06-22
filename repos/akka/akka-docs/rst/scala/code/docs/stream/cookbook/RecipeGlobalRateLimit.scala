@@ -23,8 +23,10 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       def props(maxAvailableTokens: Int,
                 tokenRefreshPeriod: FiniteDuration,
                 tokenRefreshAmount: Int): Props =
-        Props(new Limiter(
-                maxAvailableTokens, tokenRefreshPeriod, tokenRefreshAmount))
+        Props(
+            new Limiter(maxAvailableTokens,
+                        tokenRefreshPeriod,
+                        tokenRefreshAmount))
     }
 
     class Limiter(val maxAvailableTokens: Int,

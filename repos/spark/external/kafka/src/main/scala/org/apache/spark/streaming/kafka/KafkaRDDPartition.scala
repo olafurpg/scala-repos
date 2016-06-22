@@ -34,8 +34,7 @@ private[kafka] class KafkaRDDPartition(
     val untilOffset: Long,
     val host: String,
     val port: Int
-)
-    extends Partition {
+) extends Partition {
 
   /** Number of messages this partition refers to */
   def count(): Long = untilOffset - fromOffset

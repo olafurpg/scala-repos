@@ -41,9 +41,11 @@ object MutablizingAdaptor {
     else VectorSpaceAdaptor(vs)
   }
 
-  def ensureMutable[V, S](
-      vs: InnerProductVectorSpace[V, S]): MutablizingAdaptor[
-      InnerProductVectorSpace, MutableInnerProductVectorSpace, V, S] = {
+  def ensureMutable[V, S](vs: InnerProductVectorSpace[V, S])
+    : MutablizingAdaptor[InnerProductVectorSpace,
+                         MutableInnerProductVectorSpace,
+                         V,
+                         S] = {
     if (vs.isInstanceOf[MutableInnerProductVectorSpace[_, _]])
       IdentityWrapper[MutableInnerProductVectorSpace, V, S](
           vs.asInstanceOf[MutableInnerProductVectorSpace[V, S]])
@@ -248,8 +250,10 @@ object MutablizingAdaptor {
 
   case class InnerProductSpaceAdaptor[V, S](
       val underlying: InnerProductVectorSpace[V, S])
-      extends MutablizingAdaptor[
-          InnerProductVectorSpace, MutableInnerProductVectorSpace, V, S] {
+      extends MutablizingAdaptor[InnerProductVectorSpace,
+                                 MutableInnerProductVectorSpace,
+                                 V,
+                                 S] {
     type Wrapper = Ref[V]
 
     def wrap(v: V): Wrapper = Ref(v)
@@ -387,8 +391,9 @@ object MutablizingAdaptor {
 //
 //      override implicit def subVS: OpSub.Impl2[Wrapper, S, Wrapper] = liftOp(u.subVS)
 
-        override def close(
-            a: Wrapper, b: Wrapper, tolerance: Double): Boolean =
+        override def close(a: Wrapper,
+                           b: Wrapper,
+                           tolerance: Double): Boolean =
           u.close(a.value, b.value, tolerance)
 
         implicit def dotVV: OpMulInner.Impl2[Wrapper, Wrapper, S] =
@@ -562,8 +567,9 @@ object MutablizingAdaptor {
         implicit def subVV: OpSub.Impl2[Wrapper, Wrapper, Wrapper] =
           liftOpV(u.subVV)
 
-        override def close(
-            a: Wrapper, b: Wrapper, tolerance: Double): Boolean =
+        override def close(a: Wrapper,
+                           b: Wrapper,
+                           tolerance: Double): Boolean =
           u.close(a.value, b.value, tolerance)
 
         // default implementations
@@ -732,8 +738,9 @@ object MutablizingAdaptor {
         implicit def subVV: OpSub.Impl2[Wrapper, Wrapper, Wrapper] =
           liftOpV(u.subVV)
 
-        override def close(
-            a: Wrapper, b: Wrapper, tolerance: Double): Boolean =
+        override def close(a: Wrapper,
+                           b: Wrapper,
+                           tolerance: Double): Boolean =
           u.close(a.value, b.value, tolerance)
 
         // default implementations
@@ -803,8 +810,10 @@ object MutablizingAdaptor {
             }
           }
 
-        implicit def mapActiveValues: CanMapActiveValues[
-            Wrapper, S, S, Wrapper] =
+        implicit def mapActiveValues: CanMapActiveValues[Wrapper,
+                                                         S,
+                                                         S,
+                                                         Wrapper] =
           new CanMapActiveValues[Wrapper, S, S, Wrapper] {
             override def apply(from: Wrapper, fn: (S) => S): Wrapper = {
               from.map(canMapActive(_, fn))
@@ -889,8 +898,9 @@ object MutablizingAdaptor {
         implicit def subVV: OpSub.Impl2[Wrapper, Wrapper, Wrapper] =
           liftOpV(u.subVV)
 
-        override def close(
-            a: Wrapper, b: Wrapper, tolerance: Double): Boolean =
+        override def close(a: Wrapper,
+                           b: Wrapper,
+                           tolerance: Double): Boolean =
           u.close(a.value, b.value, tolerance)
 
         // default implementations

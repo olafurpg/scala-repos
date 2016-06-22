@@ -121,8 +121,8 @@ trait Metalevels { self: Reifier =>
         inlinees foreach
         (inlinee =>
               symtab.symAliases(inlinee) foreach
-              (alias =>
-                    inlineableBindings(alias) = symtab.symBinding(inlinee)))
+                (alias =>
+                      inlineableBindings(alias) = symtab.symBinding(inlinee)))
         val symtab1 = symtab -- inlinees
         if (reifyDebug)
           println(
@@ -130,18 +130,25 @@ trait Metalevels { self: Reifier =>
                 .format(inlinees.length,
                         inlinees map (inlinee =>
                               symtab.symName(inlinee)) mkString
-                        (", ")))
+                          (", ")))
         withinSplice {
-          super.transform(TreeSplice(ReifiedTree(
-                      universe, mirror, symtab1, rtree, tpe, rtpe, concrete)))
+          super.transform(
+              TreeSplice(
+                  ReifiedTree(universe,
+                              mirror,
+                              symtab1,
+                              rtree,
+                              tpe,
+                              rtpe,
+                              concrete)))
         }
       case TreeSplice(splicee) =>
         if (reifyDebug) println("entering splice: " + splicee)
         val breaches =
           splicee filter
-          (sub =>
-                sub.hasSymbolField && sub.symbol != NoSymbol &&
-                sub.symbol.metalevel > 0)
+            (sub =>
+                  sub.hasSymbolField && sub.symbol != NoSymbol &&
+                    sub.symbol.metalevel > 0)
         if (!insideSplice && breaches.nonEmpty) {
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments above
@@ -150,7 +157,8 @@ trait Metalevels { self: Reifier =>
           if (reifyDebug)
             println(
                 "metalevel breach in %s: %s".format(
-                    tree, (breaches map (_.symbol)).distinct mkString ", "))
+                    tree,
+                    (breaches map (_.symbol)).distinct mkString ", "))
           CannotReifyRuntimeSplice(tree)
         } else {
           withinSplice { super.transform(tree) }

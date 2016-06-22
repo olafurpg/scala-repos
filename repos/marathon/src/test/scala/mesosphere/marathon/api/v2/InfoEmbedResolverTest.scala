@@ -53,9 +53,10 @@ class InfoEmbedResolverTest
       When(s"embed=${prefix}failures")
       val resolved = InfoEmbedResolver.resolveApp(Set(s"${prefix}failures"))
       Then("it should resolve correctly")
-      resolved should be(Set(AppInfo.Embed.Tasks,
-                             AppInfo.Embed.Deployments,
-                             AppInfo.Embed.LastTaskFailure))
+      resolved should be(
+          Set(AppInfo.Embed.Tasks,
+              AppInfo.Embed.Deployments,
+              AppInfo.Embed.LastTaskFailure))
     }
   }
 

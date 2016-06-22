@@ -44,8 +44,8 @@ class DeflateCompressor extends Compressor {
   override final def flush(): ByteString = flushWithBuffer(newTempBuffer())
   override final def finish(): ByteString = finishWithBuffer(newTempBuffer())
 
-  protected def compressWithBuffer(
-      input: ByteString, buffer: Array[Byte]): ByteString = {
+  protected def compressWithBuffer(input: ByteString,
+                                   buffer: Array[Byte]): ByteString = {
     require(deflater.needsInput())
     deflater.setInput(input.toArray)
     drainDeflater(deflater, buffer)
@@ -80,10 +80,10 @@ private[http] object DeflateCompressor {
   val MinBufferSize = 1024
 
   @tailrec
-  def drainDeflater(deflater: Deflater,
-                    buffer: Array[Byte],
-                    result: ByteStringBuilder =
-                      new ByteStringBuilder()): ByteString = {
+  def drainDeflater(
+      deflater: Deflater,
+      buffer: Array[Byte],
+      result: ByteStringBuilder = new ByteStringBuilder()): ByteString = {
     val len = deflater.deflate(buffer)
     if (len > 0) {
       result ++= ByteString.fromArray(buffer, 0, len)
@@ -107,8 +107,9 @@ class DeflateDecompressor(
     }
 
     override def afterInflate = inflateState
-    override def afterBytesRead(
-        buffer: Array[Byte], offset: Int, length: Int): Unit = {}
+    override def afterBytesRead(buffer: Array[Byte],
+                                offset: Int,
+                                length: Int): Unit = {}
 
     startWith(inflateState)
   }

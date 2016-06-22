@@ -21,8 +21,7 @@ trait $operator {
   def $inc[A: Writes](pairs: (String, A)*) =
     Json.obj("$inc" -> Json.obj(wrap(pairs): _*))
   def $incBson(pairs: (String, Int)*) =
-    BSONDocument(
-        "$inc" -> BSONDocument(pairs map {
+    BSONDocument("$inc" -> BSONDocument(pairs map {
       case (k, v) => k -> BSONInteger(v)
     }))
   def $push[A: Writes](field: String, value: A) =

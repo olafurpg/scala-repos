@@ -23,7 +23,7 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) =
     check(project, editor, element).isDefined &&
-    IntentionAvailabilityChecker.checkIntention(this, element)
+      IntentionAvailabilityChecker.checkIntention(this, element)
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     if (element == null || !element.isValid) return
@@ -86,9 +86,11 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
     oneLinerExpr.map { expr => () =>
       {
         val replacement = ScalaPsiElementFactory.createExpressionFromText(
-            "{\n%s}".format(expr.getText), expr.getManager)
-        CodeEditUtil.replaceChild(
-            expr.getParent.getNode, expr.getNode, replacement.getNode)
+            "{\n%s}".format(expr.getText),
+            expr.getManager)
+        CodeEditUtil.replaceChild(expr.getParent.getNode,
+                                  expr.getNode,
+                                  replacement.getNode)
       }
     }
   }

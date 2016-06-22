@@ -103,8 +103,8 @@ trait BaseBlockStoreTestModule[M[+ _]]
       Order[List[JValue]].contramap((_: JArray).elements)
 
     def getBlockAfter(
-        id: Option[JArray], colSelection: Option[Set[ColumnRef]])(
-        implicit M: Monad[M]) = M.point {
+        id: Option[JArray],
+        colSelection: Option[Set[ColumnRef]])(implicit M: Monad[M]) = M.point {
       @tailrec
       def findBlockAfter(id: JArray, blocks: Stream[Slice]): Option[Slice] = {
         blocks.filterNot(_.isEmpty) match {
@@ -141,8 +141,8 @@ trait BaseBlockStoreTestModule[M[+ _]]
 
         BlockProjectionData[JArray, Slice](
             s0.toJson(0).getOrElse(JUndefined) \ "key" --> classOf[JArray],
-            s0.toJson(s0.size - 1).getOrElse(JUndefined) \ "key" --> classOf[
-                JArray],
+            s0.toJson(s0.size - 1)
+              .getOrElse(JUndefined) \ "key" --> classOf[JArray],
             s0)
       }
     }

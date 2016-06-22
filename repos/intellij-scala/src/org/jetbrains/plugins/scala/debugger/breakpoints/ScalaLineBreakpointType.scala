@@ -39,7 +39,8 @@ import scala.collection.JavaConverters._
   */
 class ScalaLineBreakpointType
     extends JavaLineBreakpointType(
-        "scala-line", ScalaBundle.message("line.breakpoints.tab.title")) {
+        "scala-line",
+        ScalaBundle.message("line.breakpoints.tab.title")) {
 
   override def getDisplayName: String =
     ScalaBundle.message("line.breakpoints.tab.title")
@@ -79,8 +80,8 @@ class ScalaLineBreakpointType
   }
 
   @NotNull
-  override def computeVariants(
-      @NotNull project: Project, @NotNull position: XSourcePosition)
+  override def computeVariants(@NotNull project: Project,
+                               @NotNull position: XSourcePosition)
     : JList[JavaLineBreakpointType#JavaBreakpointVariant] = {
     val emptyList =
       Collections.emptyList[JavaLineBreakpointType#JavaBreakpointVariant]
@@ -116,7 +117,9 @@ class ScalaLineBreakpointType
     for ((lambda, ord) <- lambdas.zipWithIndex) {
       res =
         res :+ new ExactScalaBreakpointVariant(
-            XSourcePositionImpl.createByElement(lambda), lambda, ordinal)
+            XSourcePositionImpl.createByElement(lambda),
+            lambda,
+            ordinal)
       ordinal += 1
     }
 
@@ -190,8 +193,9 @@ class ScalaLineBreakpointType
 
   override def getPriority: Int = super.getPriority + 1
 
-  private class ExactScalaBreakpointVariant(
-      position: XSourcePosition, element: PsiElement, lambdaOrdinal: Integer)
+  private class ExactScalaBreakpointVariant(position: XSourcePosition,
+                                            element: PsiElement,
+                                            lambdaOrdinal: Integer)
       extends ExactJavaBreakpointVariant(position, element, lambdaOrdinal) {
 
     private val isLambda = lambdaOrdinal != null && lambdaOrdinal >= 0

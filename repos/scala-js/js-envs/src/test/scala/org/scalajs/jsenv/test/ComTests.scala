@@ -68,8 +68,8 @@ trait ComTests extends AsyncTests {
 
     for (i <- 0 until 10) assertEquals(s"msg: $i", com.receive())
 
-    assertThrowClosed(
-        "Expect receive to throw after closing of channel", com.receive())
+    assertThrowClosed("Expect receive to throw after closing of channel",
+                      com.receive())
 
     com.close()
     com.await(DefaultTimeout)
@@ -160,8 +160,8 @@ trait ComTests extends AsyncTests {
 
       assertEquals(baseLen * factor, reply.length)
 
-      for (j <- 0 until factor) assertEquals(
-          baseMsg, reply.substring(j * baseLen, (j + 1) * baseLen))
+      for (j <- 0 until factor)
+        assertEquals(baseMsg, reply.substring(j * baseLen, (j + 1) * baseLen))
 
       com.send(reply + reply)
     }

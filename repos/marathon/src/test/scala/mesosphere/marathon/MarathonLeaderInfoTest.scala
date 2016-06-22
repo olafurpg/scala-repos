@@ -20,8 +20,8 @@ class MarathonLeaderInfoTest
     lazy val eventStream = new EventStream()
     lazy val metrics = new MarathonLeaderInfoMetrics(
         new Metrics(new MetricRegistry))
-    lazy val leaderInfo = new MarathonLeaderInfo(
-        maybeCandidate, leader, eventStream, metrics)
+    lazy val leaderInfo =
+      new MarathonLeaderInfo(maybeCandidate, leader, eventStream, metrics)
 
     def verifyNoMoreInteractions(): Unit = {
       Mockito.verifyNoMoreInteractions(candidate)

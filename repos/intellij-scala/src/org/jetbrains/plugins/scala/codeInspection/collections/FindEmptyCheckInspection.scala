@@ -36,8 +36,8 @@ object FindIsEmpty extends SimplificationType() {
       case CheckIsEmpty(qual `.find` (cond), s, e) if qual != null =>
         val start = Math.min(s, qual.end)
         val end = Math.max(e, expr.end)
-        val notExistsText = invocationText(
-            negation = true, qual, "exists", cond)
+        val notExistsText =
+          invocationText(negation = true, qual, "exists", cond)
         Some(replace(expr).withText(notExistsText).highlightRange(start, end))
       case _ => None
     }

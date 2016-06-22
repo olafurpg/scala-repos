@@ -33,17 +33,19 @@ object WebSpecSpecBoot {
     LiftRules.addToPackages("net.liftweb.mockweb")
 
     LiftRules.statelessRewrite.append {
-      case RewriteRequest(
-          ParsePath(List("test", "stateless"), _, _, _), _, _) => {
-          RewriteResponse(List("stateless", "works"))
-        }
+      case RewriteRequest(ParsePath(List("test", "stateless"), _, _, _),
+                          _,
+                          _) => {
+        RewriteResponse(List("stateless", "works"))
+      }
     }
 
     LiftRules.statefulRewrite.append {
-      case RewriteRequest(
-          ParsePath(List("test", "stateful"), _, _, _), _, _) => {
-          RewriteResponse(List("stateful", "works"))
-        }
+      case RewriteRequest(ParsePath(List("test", "stateful"), _, _, _),
+                          _,
+                          _) => {
+        RewriteResponse(List("stateful", "works"))
+      }
     }
   }
 }
@@ -54,8 +56,8 @@ object WebSpecSpecBoot {
 object WebSpecSpecRest extends RestHelper {
   serve {
     case "api" :: "info" :: Nil JsonGet req => {
-        ("version" -> "1.0") ~ ("name" -> "WebSpec")
-      }
+      ("version" -> "1.0") ~ ("name" -> "WebSpec")
+    }
   }
 }
 

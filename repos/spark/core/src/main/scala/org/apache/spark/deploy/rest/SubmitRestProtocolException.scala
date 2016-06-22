@@ -20,8 +20,8 @@ package org.apache.spark.deploy.rest
 /**
   * An exception thrown in the REST application submission protocol.
   */
-private[rest] class SubmitRestProtocolException(
-    message: String, cause: Throwable = null)
+private[rest] class SubmitRestProtocolException(message: String,
+                                                cause: Throwable = null)
     extends Exception(message, cause)
 
 /**
@@ -33,6 +33,6 @@ private[rest] class SubmitRestMissingFieldException(message: String)
 /**
   * An exception thrown if the REST client cannot reach the REST server.
   */
-private[deploy] class SubmitRestConnectionException(
-    message: String, cause: Throwable)
+private[deploy] class SubmitRestConnectionException(message: String,
+                                                    cause: Throwable)
     extends SubmitRestProtocolException(message, cause)

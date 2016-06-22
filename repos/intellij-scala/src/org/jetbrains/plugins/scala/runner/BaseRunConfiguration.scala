@@ -21,7 +21,9 @@ abstract class BaseRunConfiguration(
     val configurationFactory: ConfigurationFactory,
     val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory) {
+        name,
+        new RunConfigurationModule(project),
+        configurationFactory) {
   def mainClass: String
   val defaultJavaOptions = "-Djline.terminal=NONE"
   val useJavaCp = "-usejavacp"

@@ -16,8 +16,8 @@ import scala.annotation._
 @implicitNotFound(
     "Cannot write an instance of ${A} to HTTP response. Try to define a Writeable[${A}]"
 )
-class Writeable[-A](
-    val transform: A => ByteString, val contentType: Option[String]) {
+class Writeable[-A](val transform: A => ByteString,
+                    val contentType: Option[String]) {
   def toEntity(a: A): HttpEntity = HttpEntity.Strict(transform(a), contentType)
   def map[B](f: B => A): Writeable[B] =
     new Writeable(b => transform(f(b)), contentType)
@@ -50,7 +50,8 @@ trait LowPriorityWriteables {
     * `Writeable` for `play.twirl.api.Content` values.
     */
   implicit def writeableOf_Content[C <: play.twirl.api.Content](
-      implicit codec: Codec, ct: ContentTypeOf[C]): Writeable[C] = {
+      implicit codec: Codec,
+      ct: ContentTypeOf[C]): Writeable[C] = {
     Writeable(content => codec.encode(content.body))
   }
 }
@@ -93,7 +94,8 @@ trait DefaultWriteables extends LowPriorityWriteables {
     import java.net.URLEncoder
     Writeable(
         formData =>
-          codec.encode(formData
+          codec.encode(
+              formData
                 .map(item =>
                       item._2.map(c =>
                             item._1 + "=" + URLEncoder.encode(c, "UTF-8")))

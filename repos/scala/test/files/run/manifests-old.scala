@@ -98,7 +98,7 @@ object Test {
 
   def testVariancesVia[T: Manifest, U: Manifest] = assert(
       typeCompare[T, U] == SUB &&
-      showsCovariance[T, U, List] && showsInvariance[T, U, Set],
+        showsCovariance[T, U, List] && showsInvariance[T, U, Set],
       "testVariancesVia"
   )
 

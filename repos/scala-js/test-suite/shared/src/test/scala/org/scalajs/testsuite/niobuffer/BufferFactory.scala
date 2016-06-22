@@ -165,8 +165,9 @@ object BufferFactory {
   trait WrappedBufferFactory extends BufferFactory {
     protected def baseWrap(array: Array[ElementType]): BufferType
 
-    protected def baseWrap(
-        array: Array[ElementType], offset: Int, length: Int): BufferType
+    protected def baseWrap(array: Array[ElementType],
+                           offset: Int,
+                           length: Int): BufferType
 
     def allocBuffer(capacity: Int): BufferType =
       baseWrap(new Array[ElementType](capacity))
@@ -186,8 +187,9 @@ object BufferFactory {
   }
 
   trait WrappedTypedArrayBufferFactory extends WrappedBufferFactory {
-    protected def baseWrap(
-        array: Array[ElementType], offset: Int, length: Int): BufferType = {
+    protected def baseWrap(array: Array[ElementType],
+                           offset: Int,
+                           length: Int): BufferType = {
       val buf = baseWrap(array)
       buf.limit(offset + length).position(offset)
       buf

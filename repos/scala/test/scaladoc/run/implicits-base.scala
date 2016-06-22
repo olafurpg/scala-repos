@@ -16,7 +16,8 @@ object Test extends ScaladocModelTest {
 
     def isShadowed(mbr: MemberEntity): Boolean =
       mbr.byConversion
-        .map(_.source.implicitsShadowing
+        .map(
+            _.source.implicitsShadowing
               .get(mbr)
               .map(_.isShadowed)
               .getOrElse(false))
@@ -87,7 +88,8 @@ object Test extends ScaladocModelTest {
     assert(conv.constraints.length == 2)
     assert(conv._member("convToManifestA").resultType.name == "T")
     assert(conv._member("convToTraversableOps").resultType.name == "T")
-    assert(conv
+    assert(
+        conv
           ._member("convToTraversableOps")
           .flags
           .toString
@@ -142,7 +144,8 @@ object Test extends ScaladocModelTest {
     assert(conv.constraints.length == 0)
     assert(conv._member("convToManifestA").resultType.name == "Double")
     assert(conv._member("convToTraversableOps").resultType.name == "Double")
-    assert(conv
+    assert(
+        conv
           ._member("convToTraversableOps")
           .flags
           .toString

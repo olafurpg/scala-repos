@@ -74,7 +74,8 @@ class XorTests extends CatsSuite {
   checkAll("Bitraverse[Xor]", SerializableTests.serializable(Bitraverse[Xor]))
 
   test("catchOnly catches matching exceptions") {
-    assert(Xor
+    assert(
+        Xor
           .catchOnly[NumberFormatException] { "foo".toInt }
           .isInstanceOf[Xor.Left[NumberFormatException]])
   }

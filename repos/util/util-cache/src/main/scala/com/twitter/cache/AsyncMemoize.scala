@@ -10,13 +10,13 @@ object AsyncMemoize {
     *
     * Does not guarantee that `fn` will be computed exactly once for each key.
     */
-  def apply[A, B](
-      fn: A => Future[B], cache: FutureCache[A, B]): A => Future[B] =
+  def apply[A, B](fn: A => Future[B],
+                  cache: FutureCache[A, B]): A => Future[B] =
     new MemoizedFunction(fn, cache)
 }
 
-private[cache] class MemoizedFunction[A, B](
-    fn: A => Future[B], cache: FutureCache[A, B])
+private[cache] class MemoizedFunction[A, B](fn: A => Future[B],
+                                            cache: FutureCache[A, B])
     extends (A => Future[B]) {
 
   def apply(a: A): Future[B] = cache.getOrElseUpdate(a) {

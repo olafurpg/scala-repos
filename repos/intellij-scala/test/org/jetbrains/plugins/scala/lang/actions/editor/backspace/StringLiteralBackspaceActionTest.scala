@@ -22,7 +22,7 @@ class StringLiteralBackspaceActionTest
   }
 
   def testSimpleInterpolated() {
-    checkGeneratedTextAfterBackspace(
-        s"""val x = s"$CARET_MARKER"""", s"val x = s$CARET_MARKER")
+    checkGeneratedTextAfterBackspace(s"""val x = s"$CARET_MARKER"""",
+                                     s"val x = s$CARET_MARKER")
   }
 }

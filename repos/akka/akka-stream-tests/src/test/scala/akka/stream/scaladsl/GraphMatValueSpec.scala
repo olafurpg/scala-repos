@@ -93,15 +93,16 @@ class GraphMatValueSpec extends AkkaSpec {
         }
 
         "work properly with nesting and reusing" in {
-          val compositeSource1 = Source.fromGraph(
-              GraphDSL.create(foldFeedbackSource, foldFeedbackSource)(
-                  Keep.both) { implicit b ⇒ (s1, s2) ⇒
-            val zip = b.add(ZipWith[Int, Int, Int](_ + _))
+          val compositeSource1 =
+            Source.fromGraph(GraphDSL.create(foldFeedbackSource,
+                                             foldFeedbackSource)(Keep.both) {
+              implicit b ⇒ (s1, s2) ⇒
+                val zip = b.add(ZipWith[Int, Int, Int](_ + _))
 
-            s1.out.mapAsync(4)(identity) ~> zip.in0
-            s2.out.mapAsync(4)(identity).map(_ * 100) ~> zip.in1
-            SourceShape(zip.out)
-          })
+                s1.out.mapAsync(4)(identity) ~> zip.in0
+                s2.out.mapAsync(4)(identity).map(_ * 100) ~> zip.in1
+                SourceShape(zip.out)
+            })
 
           val compositeSource2 = Source.fromGraph(
               GraphDSL.create(compositeSource1, compositeSource1)(Keep.both) {
@@ -134,12 +135,13 @@ class GraphMatValueSpec extends AkkaSpec {
         }
 
         "work also when the source’s module is copied and the graph is extended before using the matValSrc" in {
-          val foldFlow: Flow[Int, Int, Future[Int]] = Flow.fromGraph(
-              GraphDSL.create(foldSink) { implicit builder ⇒ fold ⇒
-            val map = builder.add(Flow[Future[Int]].mapAsync(4)(identity))
-            builder.materializedValue ~> map
-            FlowShape(fold.in, map.outlet)
-          })
+          val foldFlow: Flow[Int, Int, Future[Int]] =
+            Flow.fromGraph(GraphDSL.create(foldSink) {
+              implicit builder ⇒ fold ⇒
+                val map = builder.add(Flow[Future[Int]].mapAsync(4)(identity))
+                builder.materializedValue ~> map
+                FlowShape(fold.in, map.outlet)
+            })
 
           Await.result(Source(1 to 10).via(foldFlow).runWith(Sink.head),
                        3.seconds) should ===(55)
@@ -152,11 +154,11 @@ class GraphMatValueSpec extends AkkaSpec {
             Source.empty.mapMaterializedValue(_ ⇒ done = true) ~> Sink.ignore
             ClosedShape
           }
-          val r = RunnableGraph.fromGraph(
-              GraphDSL.create(Sink.ignore) { implicit b ⇒ (s) ⇒
-            b.add(g)
-            Source(1 to 10) ~> s
-            ClosedShape
+          val r = RunnableGraph.fromGraph(GraphDSL.create(Sink.ignore) {
+            implicit b ⇒ (s) ⇒
+              b.add(g)
+              Source(1 to 10) ~> s
+              ClosedShape
           })
           r.run().futureValue should ===(akka.Done)
           done should ===(true)

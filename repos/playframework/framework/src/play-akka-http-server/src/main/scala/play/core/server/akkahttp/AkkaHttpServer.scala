@@ -54,20 +54,23 @@ class AkkaHttpServer(config: ServerConfig,
   implicit val mat = materializer
 
   private def createServerBinding(
-      port: Int, connectionContext: ConnectionContext): Http.ServerBinding = {
+      port: Int,
+      connectionContext: ConnectionContext): Http.ServerBinding = {
     // Listen for incoming connections and handle them with the `handleRequest` method.
 
     // TODO: pass in Inet.SocketOption, ServerSettings and LoggerAdapter params?
-    val serverSource: Source[
-        Http.IncomingConnection, Future[Http.ServerBinding]] = Http().bind(
+    val serverSource: Source[Http.IncomingConnection,
+                             Future[Http.ServerBinding]] = Http().bind(
         interface = config.address,
         port = port,
         connectionContext = connectionContext)
 
     val connectionSink: Sink[Http.IncomingConnection, _] = Sink.foreach {
       connection: Http.IncomingConnection =>
-        connection.handleWithAsyncHandler(handleRequest(
-                connection.remoteAddress, _, connectionContext.isSecure))
+        connection.handleWithAsyncHandler(
+            handleRequest(connection.remoteAddress,
+                          _,
+                          connectionContext.isSecure))
     }
 
     val bindingFuture: Future[Http.ServerBinding] =
@@ -182,8 +185,8 @@ class AkkaHttpServer(config: ServerConfig,
 
         websocket(taggedRequestHeader).map {
           case Left(result) =>
-            modelConversion.convertResult(
-                taggedRequestHeader, result, request.protocol)
+            modelConversion
+              .convertResult(taggedRequestHeader, result, request.protocol)
           case Right(flow) =>
             WebSocketHandler.handleWebSocket(upgrade, flow, 16384)
         }
@@ -217,19 +220,18 @@ class AkkaHttpServer(config: ServerConfig,
     val actionAccumulator: Accumulator[ByteString, Result] = action(
         taggedRequestHeader)
 
-    val source =
-      if (request.header[Expect].contains(Expect.`100-continue`)) {
-        // If we expect 100 continue, then we must not feed the source into the accumulator until the accumulator
-        // requests demand.  This is due to a semantic mismatch between Play and Akka-HTTP, Play signals to continue
-        // by requesting demand, Akka-HTTP signals to continue by attaching a sink to the source. See
-        // https://github.com/akka/akka/issues/17782 for more details.
-        requestBodySource
-          .map(source =>
-                Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
-          .orElse(Some(Source.empty))
-      } else {
-        requestBodySource
-      }
+    val source = if (request.header[Expect].contains(Expect.`100-continue`)) {
+      // If we expect 100 continue, then we must not feed the source into the accumulator until the accumulator
+      // requests demand.  This is due to a semantic mismatch between Play and Akka-HTTP, Play signals to continue
+      // by requesting demand, Akka-HTTP signals to continue by attaching a sink to the source. See
+      // https://github.com/akka/akka/issues/17782 for more details.
+      requestBodySource
+        .map(source =>
+              Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
+        .orElse(Some(Source.empty))
+    } else {
+      requestBodySource
+    }
 
     val resultFuture: Future[Result] = source match {
       case None => actionAccumulator.run()
@@ -238,8 +240,8 @@ class AkkaHttpServer(config: ServerConfig,
     val responseFuture: Future[HttpResponse] = resultFuture.map { result =>
       val cleanedResult: Result =
         ServerResultUtils.cleanFlashCookie(taggedRequestHeader, result)
-      modelConversion.convertResult(
-          taggedRequestHeader, cleanedResult, request.protocol)
+      modelConversion
+        .convertResult(taggedRequestHeader, cleanedResult, request.protocol)
     }
     responseFuture
   }

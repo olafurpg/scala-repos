@@ -17,12 +17,12 @@ trait SystemSettingsService {
       settings.baseUrl.foreach(x =>
             props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
       settings.information.foreach(x => props.setProperty(Information, x))
-      props.setProperty(
-          AllowAccountRegistration, settings.allowAccountRegistration.toString)
-      props.setProperty(
-          AllowAnonymousAccess, settings.allowAnonymousAccess.toString)
-      props.setProperty(
-          IsCreateRepoOptionPublic, settings.isCreateRepoOptionPublic.toString)
+      props.setProperty(AllowAccountRegistration,
+                        settings.allowAccountRegistration.toString)
+      props.setProperty(AllowAnonymousAccess,
+                        settings.allowAnonymousAccess.toString)
+      props.setProperty(IsCreateRepoOptionPublic,
+                        settings.isCreateRepoOptionPublic.toString)
       props.setProperty(Gravatar, settings.gravatar.toString)
       props.setProperty(Notification, settings.notification.toString)
       settings.activityLogLimit.foreach(x =>
@@ -42,8 +42,8 @@ trait SystemSettingsService {
           smtp.fromName.foreach(props.setProperty(SmtpFromName, _))
         }
       }
-      props.setProperty(
-          LdapAuthentication, settings.ldapAuthentication.toString)
+      props.setProperty(LdapAuthentication,
+                        settings.ldapAuthentication.toString)
       if (settings.ldapAuthentication) {
         settings.ldap.map { ldap =>
           props.setProperty(LdapHost, ldap.host)
@@ -215,8 +215,9 @@ object SystemSettingsService {
   private val LdapSsl = "ldap.ssl"
   private val LdapKeystore = "ldap.keystore"
 
-  private def getValue[A: ClassTag](
-      props: java.util.Properties, key: String, default: A): A =
+  private def getValue[A: ClassTag](props: java.util.Properties,
+                                    key: String,
+                                    default: A): A =
     defining(props.getProperty(key)) { value =>
       if (value == null || value.isEmpty) default
       else convertType(value).asInstanceOf[A]

@@ -64,10 +64,16 @@ class SliceMatrix[
 
 object SliceMatrix {
   implicit def canMapKeyValuePairs[K1, K2, V, V2: ClassTag: Zero]
-    : CanMapKeyValuePairs[
-        SliceMatrix[K1, K2, V], (Int, Int), V, V2, DenseMatrix[V2]] = {
-    new CanMapKeyValuePairs[
-        SliceMatrix[K1, K2, V], (Int, Int), V, V2, DenseMatrix[V2]] {
+    : CanMapKeyValuePairs[SliceMatrix[K1, K2, V],
+                          (Int, Int),
+                          V,
+                          V2,
+                          DenseMatrix[V2]] = {
+    new CanMapKeyValuePairs[SliceMatrix[K1, K2, V],
+                            (Int, Int),
+                            V,
+                            V2,
+                            DenseMatrix[V2]] {
       override def map(from: SliceMatrix[K1, K2, V],
                        fn: ((Int, Int), V) => V2): DenseMatrix[V2] = {
         DenseMatrix.tabulate(from.rows, from.cols)((i, j) =>
@@ -84,8 +90,8 @@ object SliceMatrix {
   implicit def canMapValues[K1, K2, V, V2: ClassTag: Zero]
     : CanMapValues[SliceMatrix[K1, K2, V], V, V2, DenseMatrix[V2]] = {
     new CanMapValues[SliceMatrix[K1, K2, V], V, V2, DenseMatrix[V2]] {
-      override def apply(
-          from: SliceMatrix[K1, K2, V], fn: (V) => V2): DenseMatrix[V2] = {
+      override def apply(from: SliceMatrix[K1, K2, V],
+                         fn: (V) => V2): DenseMatrix[V2] = {
         DenseMatrix.tabulate(from.rows, from.cols)((i, j) => fn(from(i, j)))
       }
     }

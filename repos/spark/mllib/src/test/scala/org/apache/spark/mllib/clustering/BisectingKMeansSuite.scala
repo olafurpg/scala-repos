@@ -30,8 +30,8 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(bkm0.getMaxIterations === 20)
     assert(bkm0.getMinDivisibleClusterSize === 1.0)
     val bkm1 = new BisectingKMeans()
-    assert(
-        bkm0.getSeed === bkm1.getSeed, "The default seed should be constant.")
+    assert(bkm0.getSeed === bkm1.getSeed,
+           "The default seed should be constant.")
   }
 
   test("setter/getter") {
@@ -46,7 +46,9 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val minSize = 2.0
     assert(bkm.getMinDivisibleClusterSize !== minSize)
     assert(
-        bkm.setMinDivisibleClusterSize(minSize).getMinDivisibleClusterSize === minSize)
+        bkm
+          .setMinDivisibleClusterSize(minSize)
+          .getMinDivisibleClusterSize === minSize)
     val seed = 10L
     assert(bkm.getSeed !== seed)
     assert(bkm.setSeed(seed).getSeed === seed)
@@ -119,7 +121,8 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
       .setSeed(1L)
     val model = bkm.run(data)
     assert(model.k === 3)
-    assert(model.predict(Vectors.dense(-100)) === model.predict(
+    assert(
+        model.predict(Vectors.dense(-100)) === model.predict(
             Vectors.dense(-97)))
     assert(model.predict(Vectors.dense(7)) !== model.predict(Vectors.dense(8)))
 
@@ -136,7 +139,8 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val bkm = new BisectingKMeans().setK(3).setMaxIterations(1).setSeed(1L)
     val model = bkm.run(data)
     assert(model.k === 3)
-    assert(model.predict(Vectors.dense(-100)) === model.predict(
+    assert(
+        model.predict(Vectors.dense(-100)) === model.predict(
             Vectors.dense(-97)))
     assert(model.predict(Vectors.dense(7)) !== model.predict(Vectors.dense(8)))
   }

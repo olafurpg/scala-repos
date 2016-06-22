@@ -42,8 +42,8 @@ package object template {
     }
   }
 
-  def usingTempDirectoryWithHandler[T, Z](
-      prefix: String, suffix: Option[String] = None)(
+  def usingTempDirectoryWithHandler[T, Z](prefix: String,
+                                          suffix: Option[String] = None)(
       handler1: PartialFunction[Throwable, T],
       handler2: PartialFunction[Throwable, Z])(block: File => T): T = {
     val directory = FileUtil.createTempDirectory(prefix, suffix.orNull, true)

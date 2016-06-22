@@ -74,8 +74,8 @@ object Scalajsp {
     binarySupported.foreach(v => println(s"* $v"))
   }
 
-  private def displayFileContent(
-      vfile: VirtualScalaJSIRFile, opts: Options): Unit = {
+  private def displayFileContent(vfile: VirtualScalaJSIRFile,
+                                 opts: Options): Unit = {
     if (opts.infos) new InfoPrinter(stdout).print(vfile.info)
     else new IRTreePrinter(stdout).printTopLevelTree(vfile.tree)
 

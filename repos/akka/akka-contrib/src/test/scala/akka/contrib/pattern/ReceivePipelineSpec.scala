@@ -119,18 +119,18 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
     }
 
     "support any number of interceptors" in {
-      val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+      val replier = system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+              with AdderInterceptor with ToStringInterceptor))
       replier ! 8
       expectMsg("List(18, 19, 20)")
     }
 
     "delegate messages unhandled by interceptors to the inner behavior" in {
 
-      val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+      val replier = system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+              with AdderInterceptor with ToStringInterceptor))
       replier ! 8L // unhandled by all interceptors but still replied
       expectMsg(8L)
       replier ! Set(8F) // unhandled by all but ToString Interceptor, so replied as String
@@ -139,18 +139,18 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
 
     "let any interceptor to explicitly ignore some messages" in {
 
-      val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+      val replier = system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+              with AdderInterceptor with ToStringInterceptor))
       replier ! "explicitly ignored"
       replier ! 8L // unhandled by all interceptors but still replied
       expectMsg(8L)
     }
 
     "support changing behavior without losing the interceptions" in {
-      val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+      val replier = system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+              with AdderInterceptor with ToStringInterceptor))
       replier ! 8
       expectMsg("List(18, 19, 20)")
       replier ! "become"

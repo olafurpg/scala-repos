@@ -67,8 +67,9 @@ class Logger(out: PrintStream, logLevel: Logger.Level) extends LoggerProxy {
     for (logLevel <- Logger.Level(level)) log(logLevel, message)
   }
 
-  def printLog(
-      label: String, message: String, separator: String = NewLine): Unit =
+  def printLog(label: String,
+               message: String,
+               separator: String = NewLine): Unit =
     out.synchronized {
       for (line <- message.split(separator)) {
         out.print(label)

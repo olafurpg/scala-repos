@@ -15,24 +15,27 @@ private[report] final class ReportApi {
   def create(setup: ReportSetup, by: User): Funit = !by.troll ?? {
     Reason(setup.reason)
       .fold[Funit](fufail(s"Invalid report reason ${setup.reason}")) {
-      reason =>
-        val user = setup.user
-        val report = Report.make(user = setup.user,
-                                 reason = reason,
-                                 text = setup.text,
-                                 createdBy = by)
-        !isAlreadySlain(report, user) ?? {
-          lila.mon.mod.report.create(reason.name)
-          if (by.id == UserRepo.lichessId)
-            reportTube.coll.update(
-                selectRecent(user, reason),
-                Json.obj("$set" ->
-                    (reportTube.toMongo(report).get - "processedBy" - "_id"))
-            ) flatMap { res =>
-              (res.n == 0) ?? $insert(report)
-            } else $insert(report)
-        }
-    } >>- monitorUnprocessed
+        reason =>
+          val user = setup.user
+          val report = Report.make(user = setup.user,
+                                   reason = reason,
+                                   text = setup.text,
+                                   createdBy = by)
+          !isAlreadySlain(report, user) ?? {
+            lila.mon.mod.report.create(reason.name)
+            if (by.id == UserRepo.lichessId)
+              reportTube.coll.update(
+                  selectRecent(user, reason),
+                  Json.obj(
+                      "$set" ->
+                        (reportTube
+                              .toMongo(report)
+                              .get - "processedBy" - "_id"))
+              ) flatMap { res =>
+                (res.n == 0) ?? $insert(report)
+              } else $insert(report)
+          }
+      } >>- monitorUnprocessed
   }
 
   private def monitorUnprocessed = nbUnprocessed foreach { nb =>
@@ -41,8 +44,8 @@ private[report] final class ReportApi {
 
   private def isAlreadySlain(report: Report, user: User) =
     (report.isCheat && user.engine) ||
-    (report.isAutomatic && report.isOther && user.troll) ||
-    (report.isTrollOrInsult && user.troll)
+      (report.isAutomatic && report.isOther && user.troll) ||
+      (report.isTrollOrInsult && user.troll)
 
   def autoCheatPrintReport(userId: String): Funit = {
     UserRepo byId userId zip UserRepo.lichess flatMap {
@@ -86,7 +89,8 @@ private[report] final class ReportApi {
   }
 
   def autoBoostReport(userId: String, accompliceId: String): Funit = {
-    UserRepo.byId(userId) zip UserRepo.byId(accompliceId) zip UserRepo.lichess flatMap {
+    UserRepo.byId(userId) zip UserRepo
+      .byId(accompliceId) zip UserRepo.lichess flatMap {
       case ((Some(user), Some(accomplice)), Some(lichess)) =>
         create(ReportSetup(user = user,
                            reason = "boost",

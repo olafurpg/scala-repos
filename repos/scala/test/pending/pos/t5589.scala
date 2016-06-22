@@ -8,7 +8,7 @@ class A {
   // Last one fails.
   def f4(x: Either[Int, (String, Int)]) =
     for ((y1, y2) <- x.right) yield ((y1, y2))
-/**
+  /**
 ./a.scala:5: error: constructor cannot be instantiated to expected type;
  found   : (T1, T2)
  required: Either[Nothing,(String, Int)]

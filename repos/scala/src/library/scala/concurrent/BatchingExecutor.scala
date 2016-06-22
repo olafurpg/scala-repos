@@ -110,7 +110,8 @@ private[concurrent] trait BatchingExecutor extends Executor {
         case null =>
           unbatchedExecute(new Batch(List(runnable))) // If we aren't in batching mode yet, enqueue batch
         case some =>
-          _tasksLocal.set(runnable :: some) // If we are already in batching mode, add to batch
+          _tasksLocal
+            .set(runnable :: some) // If we are already in batching mode, add to batch
       }
     } else
       unbatchedExecute(runnable) // If not batchable, just delegate to underlying

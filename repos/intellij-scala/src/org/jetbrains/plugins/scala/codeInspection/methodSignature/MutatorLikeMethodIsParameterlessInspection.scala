@@ -17,9 +17,9 @@ class MutatorLikeMethodIsParameterlessInspection
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunction
         if f.hasMutatorLikeName && f.isParameterless && !f.hasUnitResultType &&
-        f.superMethods.isEmpty && !isUndescoreFunction(f) =>
-      holder.registerProblem(
-          f.nameId, getDisplayName, new AddEmptyParentheses(f))
+          f.superMethods.isEmpty && !isUndescoreFunction(f) =>
+      holder
+        .registerProblem(f.nameId, getDisplayName, new AddEmptyParentheses(f))
   }
 
   private def isUndescoreFunction(f: ScFunction): Boolean = f match {

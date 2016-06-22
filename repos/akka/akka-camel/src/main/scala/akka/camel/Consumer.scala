@@ -36,11 +36,13 @@ trait Consumer extends Actor with CamelSupport {
   }
 
   private[this] def register() {
-    camel.supervisor ! Register(
-        self,
-        endpointUri,
-        Some(ConsumerConfig(
-                activationTimeout, replyTimeout, autoAck, onRouteDefinition)))
+    camel.supervisor ! Register(self,
+                                endpointUri,
+                                Some(
+                                    ConsumerConfig(activationTimeout,
+                                                   replyTimeout,
+                                                   autoAck,
+                                                   onRouteDefinition)))
   }
 
   /**
@@ -80,8 +82,9 @@ trait Consumer extends Actor with CamelSupport {
     * return a custom route definition handler. The [[akka.dispatch.Mapper]] is not allowed to close over 'this', meaning it is
     * not allowed to refer to the actor instance itself, since that can easily cause concurrent shared state issues.
     */
-  def getRouteDefinitionHandler: Mapper[
-      RouteDefinition, ProcessorDefinition[_]] = identityRouteMapper
+  def getRouteDefinitionHandler: Mapper[RouteDefinition,
+                                        ProcessorDefinition[_]] =
+    identityRouteMapper
 }
 
 /**
@@ -115,6 +118,8 @@ private[camel] object ConsumerConfig {
             autoAck: Boolean,
             onRouteDefinition: RouteDefinition ⇒ ProcessorDefinition[_])
     : ConsumerConfig =
-    new ConsumerConfig(
-        activationTimeout, replyTimeout, autoAck, onRouteDefinition)
+    new ConsumerConfig(activationTimeout,
+                       replyTimeout,
+                       autoAck,
+                       onRouteDefinition)
 }

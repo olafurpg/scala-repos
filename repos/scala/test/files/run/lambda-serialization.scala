@@ -21,7 +21,8 @@ object Test {
 
     val specializedLambda = (p: Int) => List(p, c).length
     assert(serializeDeserialize(specializedLambda).apply(42) == 2)
-    assert(serializeDeserialize(serializeDeserialize(specializedLambda))
+    assert(
+        serializeDeserialize(serializeDeserialize(specializedLambda))
           .apply(42) == 2)
   }
 

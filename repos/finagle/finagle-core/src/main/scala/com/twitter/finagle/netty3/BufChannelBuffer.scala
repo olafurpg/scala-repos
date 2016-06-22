@@ -236,8 +236,8 @@ private class BufChannelBuffer(val buf: Buf, endianness: ByteOrder)
     if (index + length > buf.length)
       throw new IndexOutOfBoundsException("index + length > buf.length")
 
-    val bcb = new BufChannelBuffer(
-        buf.slice(index, index + length), endianness)
+    val bcb =
+      new BufChannelBuffer(buf.slice(index, index + length), endianness)
     bcb.writerIndex(length)
     bcb
   }
@@ -251,8 +251,8 @@ private class BufChannelBuffer(val buf: Buf, endianness: ByteOrder)
     if (index + length > buf.length)
       throw new IndexOutOfBoundsException("index + length > buf.length")
 
-    val bcb = new BufChannelBuffer(
-        buf.slice(index, index + length), endianness)
+    val bcb =
+      new BufChannelBuffer(buf.slice(index, index + length), endianness)
     bcb.writerIndex(length)
     bcb
   }
@@ -292,10 +292,10 @@ private class BufChannelBuffer(val buf: Buf, endianness: ByteOrder)
     endianness match {
       case ByteOrder.BIG_ENDIAN =>
         ((bytes(0) & 0xff) << 16) | ((bytes(1) & 0xff) << 8) |
-        (bytes(2) & 0xff)
+          (bytes(2) & 0xff)
       case ByteOrder.LITTLE_ENDIAN =>
         (bytes(0) & 0xff) | ((bytes(1) & 0xff) << 8) |
-        ((bytes(2) & 0xff) << 16)
+          ((bytes(2) & 0xff) << 16)
     }
   }
 
@@ -309,10 +309,10 @@ private class BufChannelBuffer(val buf: Buf, endianness: ByteOrder)
     endianness match {
       case ByteOrder.BIG_ENDIAN =>
         ((bytes(0) & 0xff) << 24) | ((bytes(1) & 0xff) << 16) |
-        ((bytes(2) & 0xff) << 8) | (bytes(3) & 0xff)
+          ((bytes(2) & 0xff) << 8) | (bytes(3) & 0xff)
       case ByteOrder.LITTLE_ENDIAN =>
         (bytes(0) & 0xff) | ((bytes(1) & 0xff) << 8) |
-        ((bytes(2) & 0xff) << 16) | ((bytes(3) & 0xff) << 24)
+          ((bytes(2) & 0xff) << 16) | ((bytes(3) & 0xff) << 24)
     }
   }
 
@@ -326,9 +326,9 @@ private class BufChannelBuffer(val buf: Buf, endianness: ByteOrder)
     endianness match {
       case ByteOrder.BIG_ENDIAN =>
         ((bytes(0) & 0xff).toLong << 56) | ((bytes(1) & 0xff).toLong << 48) |
-        ((bytes(2) & 0xff).toLong << 40) | ((bytes(3) & 0xff).toLong << 32) |
-        ((bytes(4) & 0xff).toLong << 24) | ((bytes(5) & 0xff).toLong << 16) |
-        ((bytes(6) & 0xff).toLong << 8) | (bytes(7) & 0xff).toLong
+          ((bytes(2) & 0xff).toLong << 40) | ((bytes(3) & 0xff).toLong << 32) |
+          ((bytes(4) & 0xff).toLong << 24) | ((bytes(5) & 0xff).toLong << 16) |
+          ((bytes(6) & 0xff).toLong << 8) | (bytes(7) & 0xff).toLong
       case ByteOrder.LITTLE_ENDIAN =>
         (bytes(0) & 0xff).toLong | ((bytes(1) & 0xff).toLong << 8) |
         ((bytes(2) & 0xff).toLong << 16) | ((bytes(3) & 0xff).toLong << 24)
@@ -355,8 +355,8 @@ private class BufChannelBuffer(val buf: Buf, endianness: ByteOrder)
 
     val offset = readerIndex()
     readerIndex(offset + length)
-    val bcb = new BufChannelBuffer(
-        buf.slice(offset, offset + length), endianness)
+    val bcb =
+      new BufChannelBuffer(buf.slice(offset, offset + length), endianness)
     bcb.writerIndex(length)
     bcb
   }

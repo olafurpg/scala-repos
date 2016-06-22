@@ -102,14 +102,14 @@ object WrappedSerialization {
   private val confKey =
     "com.twitter.scalding.serialization.WrappedSerialization"
 
-  def rawSetBinary(
-      bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) = {
+  def rawSetBinary(bufs: Iterable[ClassSerialization[_]],
+                   fn: (String, String) => Unit) = {
     fn(confKey, bufs.map {
       case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
     }.mkString(","))
   }
-  def setBinary(
-      conf: Configuration, bufs: Iterable[ClassSerialization[_]]): Unit =
+  def setBinary(conf: Configuration,
+                bufs: Iterable[ClassSerialization[_]]): Unit =
     rawSetBinary(bufs, { case (k, v) => conf.set(k, v) })
 
   def getBinary(conf: Configuration): Map[Class[_], Serialization[_]] =

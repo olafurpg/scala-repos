@@ -48,19 +48,22 @@ object PluginDiscovery {
     val allAutoPlugins =
       (defaultAutoPlugins ++ detectedAutoPugins.modules) map {
         case (name, value) =>
-          DetectedAutoPlugin(
-              name, value, sbt.Plugins.hasAutoImportGetter(value, loader))
+          DetectedAutoPlugin(name,
+                             value,
+                             sbt.Plugins.hasAutoImportGetter(value, loader))
       }
-    new DetectedPlugins(
-        discover[Plugin](Plugins), allAutoPlugins, discover[Build](Builds))
+    new DetectedPlugins(discover[Plugin](Plugins),
+                        allAutoPlugins,
+                        discover[Build](Builds))
   }
 
   /** Discovers the sbt-plugin-related top-level modules from the provided source `analysis`. */
   def discoverSourceAll(analysis: CompileAnalysis): DiscoveredNames = {
     def discover[T](implicit classTag: reflect.ClassTag[T]): Seq[String] =
       sourceModuleNames(analysis, classTag.runtimeClass.getName)
-    new DiscoveredNames(
-        discover[Plugin], discover[AutoPlugin], discover[Build])
+    new DiscoveredNames(discover[Plugin],
+                        discover[AutoPlugin],
+                        discover[Build])
   }
 
   // TODO: for 0.14.0, consider consolidating into a single file, which would make the classpath search 4x faster
@@ -69,14 +72,16 @@ object PluginDiscovery {
     import Paths._
     val files =
       writeDescriptor(names.plugins, dir, Plugins) :: writeDescriptor(
-          names.autoPlugins, dir, AutoPlugins) :: writeDescriptor(
-          names.builds, dir, Builds) :: Nil
+          names.autoPlugins,
+          dir,
+          AutoPlugins) :: writeDescriptor(names.builds, dir, Builds) :: Nil
     files.flatMap(_.toList)
   }
 
   /** Stores the module `names` in `dir / path`, one per line, unless `names` is empty and then the file is deleted and `None` returned. */
-  def writeDescriptor(
-      names: Seq[String], dir: File, path: String): Option[File] = {
+  def writeDescriptor(names: Seq[String],
+                      dir: File,
+                      path: String): Option[File] = {
     val descriptor: File = new File(dir, path)
     if (names.isEmpty) {
       IO.delete(descriptor)
@@ -96,12 +101,12 @@ object PluginDiscovery {
                               resourceName: String,
                               subclasses: String*): Seq[String] =
     (binaryModuleNames(data(classpath), loader, resourceName) ++
-        (analyzed(classpath) flatMap
-            (a => sourceModuleNames(a, subclasses: _*)))).distinct
+          (analyzed(classpath) flatMap
+                (a => sourceModuleNames(a, subclasses: _*)))).distinct
 
   /** Discovers top-level modules in `analysis` that inherit from any of `subclasses`. */
-  def sourceModuleNames(
-      analysis: CompileAnalysis, subclasses: String*): Seq[String] = {
+  def sourceModuleNames(analysis: CompileAnalysis,
+                        subclasses: String*): Seq[String] = {
     val subclassSet = subclasses.toSet
     val ds = Discovery(subclassSet, Set.empty)(Tests.allDefs(analysis))
     ds.flatMap {
@@ -120,9 +125,11 @@ object PluginDiscovery {
                         loader: ClassLoader,
                         resourceName: String): Seq[String] = {
     import collection.JavaConversions._
-    loader.getResources(resourceName).toSeq.filter(onClasspath(classpath)) flatMap {
-      u =>
-        IO.readLinesURL(u).map(_.trim).filter(!_.isEmpty)
+    loader
+      .getResources(resourceName)
+      .toSeq
+      .filter(onClasspath(classpath)) flatMap { u =>
+      IO.readLinesURL(u).map(_.trim).filter(!_.isEmpty)
     }
   }
 
@@ -130,15 +137,18 @@ object PluginDiscovery {
   def onClasspath(classpath: Seq[File])(url: URL): Boolean =
     IO.urlAsFile(url) exists (classpath.contains _)
 
-  private[sbt] def binarySourceModules[T](
-      data: PluginData, loader: ClassLoader, resourceName: String)(
+  private[sbt] def binarySourceModules[T](data: PluginData,
+                                          loader: ClassLoader,
+                                          resourceName: String)(
       implicit classTag: reflect.ClassTag[T]): DetectedModules[T] = {
     val classpath = data.classpath
     val namesAndValues =
       if (classpath.isEmpty) Nil
       else {
-        val names = binarySourceModuleNames(
-            classpath, loader, resourceName, classTag.runtimeClass.getName)
+        val names = binarySourceModuleNames(classpath,
+                                            loader,
+                                            resourceName,
+                                            classTag.runtimeClass.getName)
         loadModules[T](data, names, loader)
       }
     new DetectedModules(namesAndValues)
@@ -155,8 +165,8 @@ object PluginDiscovery {
       case e: LinkageError => incompatiblePlugins(data, e)
     }
 
-  private[this] def incompatiblePlugins(
-      data: PluginData, t: LinkageError): Nothing = {
+  private[this] def incompatiblePlugins(data: PluginData,
+                                        t: LinkageError): Nothing = {
     val evicted =
       data.report.toList.flatMap(_.configurations.flatMap(_.evicted))
     val evictedModules = evicted map { id =>

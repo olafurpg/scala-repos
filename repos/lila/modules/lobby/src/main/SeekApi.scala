@@ -86,9 +86,11 @@ final class SeekApi(coll: Coll,
   def archive(seek: Seek, gameId: String) = {
     val archiveDoc =
       Seek.seekBSONHandler.write(seek) ++ BSONDocument(
-          "gameId" -> gameId, "archivedAt" -> DateTime.now)
-    coll.remove(BSONDocument("_id" -> seek.id)).void >> cache.clear >> archiveColl
-      .insert(archiveDoc)
+          "gameId" -> gameId,
+          "archivedAt" -> DateTime.now)
+    coll
+      .remove(BSONDocument("_id" -> seek.id))
+      .void >> cache.clear >> archiveColl.insert(archiveDoc)
   }
 
   def findArchived(gameId: String): Fu[Option[Seek]] =
@@ -96,7 +98,8 @@ final class SeekApi(coll: Coll,
 
   def removeBy(seekId: String, userId: String) =
     coll
-      .remove(BSONDocument(
+      .remove(
+          BSONDocument(
               "_id" -> seekId,
               "user.id" -> userId
           ))

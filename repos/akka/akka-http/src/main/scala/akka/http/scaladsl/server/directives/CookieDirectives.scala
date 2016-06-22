@@ -43,8 +43,7 @@ trait CookieDirectives {
     * Adds a [[Set-Cookie]] response header expiring the given cookies.
     */
   def deleteCookie(first: HttpCookie, more: HttpCookie*): Directive0 =
-    respondWithHeaders(
-        (first :: more.toList).map { c ⇒
+    respondWithHeaders((first :: more.toList).map { c ⇒
       `Set-Cookie`(
           c.copy(value = "deleted", expires = Some(DateTime.MinValue)))
     })
@@ -52,8 +51,9 @@ trait CookieDirectives {
   /**
     * Adds a [[Set-Cookie]] response header expiring the cookie with the given properties.
     */
-  def deleteCookie(
-      name: String, domain: String = "", path: String = ""): Directive0 =
+  def deleteCookie(name: String,
+                   domain: String = "",
+                   path: String = ""): Directive0 =
     deleteCookie(
         HttpCookie(name, "", domain = domain.toOption, path = path.toOption))
 }

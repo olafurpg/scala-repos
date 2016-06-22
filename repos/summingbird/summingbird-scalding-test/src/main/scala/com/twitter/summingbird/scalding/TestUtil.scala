@@ -31,11 +31,11 @@ object TestUtil {
   def simpleTimeExtractor[T <: (Long, _)]: TimeExtractor[T] =
     TimeExtractor(_._1)
 
-  def compareMaps[K, V: Group](original: Iterable[Any],
-                               inMemory: Map[K, V],
-                               produced: Map[K, V],
-                               name: String)(
-      implicit batcher: Batcher): Boolean = {
+  def compareMaps[K, V: Group](
+      original: Iterable[Any],
+      inMemory: Map[K, V],
+      produced: Map[K, V],
+      name: String)(implicit batcher: Batcher): Boolean = {
     val diffMap = Group.minus(inMemory, produced)
     val wrong = Monoid.isNonZero(diffMap)
     if (wrong) {
@@ -63,12 +63,14 @@ object TestUtil {
       println("input size: " + original.size)
       println(
           "input batches: " +
-          testStore.batcher.batchOf(Timestamp(original.size)))
+            testStore.batcher.batchOf(Timestamp(original.size)))
       println("producer extra keys: " + (produced.keySet -- inMemory.keySet))
       println("producer missing keys: " + (inMemory.keySet -- produced.keySet))
       println("written batches: " + testStore.writtenBatches)
-      println("earliest unwritten time: " +
-          testStore.batcher.earliestTimeOf(testStore.writtenBatches.max.next))
+      println(
+          "earliest unwritten time: " +
+            testStore.batcher.earliestTimeOf(
+                testStore.writtenBatches.max.next))
       println("Difference: " + diffMap)
     }
     !wrong

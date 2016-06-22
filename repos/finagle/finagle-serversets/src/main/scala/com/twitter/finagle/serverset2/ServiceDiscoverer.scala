@@ -17,8 +17,8 @@ private[serverset2] object ServiceDiscoverer {
     * Each entry in `ents` is paired with the product of all weights for that
     * entry in `vecs`.
     */
-  def zipWithWeights(
-      ents: Seq[Entry], vecs: Set[Vector]): Seq[(Entry, Double)] = {
+  def zipWithWeights(ents: Seq[Entry],
+                     vecs: Set[Vector]): Seq[(Entry, Double)] = {
     ents map { ent =>
       val w = vecs.foldLeft(1.0) { case (w, vec) => w * vec.weightOf(ent) }
       ent -> w
@@ -112,8 +112,8 @@ private[serverset2] class ServiceDiscoverer(
     * which only reports unhealthy when the rawHealth has been unhealthy for
     * a long enough time (as defined by the stabilization epoch).
     */
-  private[serverset2] val health: Var[ClientHealth] = HealthStabilizer(
-      rawHealth, healthStabilizationEpoch, statsReceiver)
+  private[serverset2] val health: Var[ClientHealth] =
+    HealthStabilizer(rawHealth, healthStabilizationEpoch, statsReceiver)
 
   /**
     * Activity to keep a hydrated list of Entrys or Vectors for a given ZK path.

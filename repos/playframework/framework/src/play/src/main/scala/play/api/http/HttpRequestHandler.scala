@@ -53,10 +53,10 @@ object HttpRequestHandler {
                                  play.core.j.JavaHttpRequestHandlerAdapter,
                                  play.http.DefaultHttpRequestHandler,
                                  JavaCompatibleHttpRequestHandler](
-        environment,
-        PlayConfig(configuration),
-        "play.http.requestHandler",
-        "RequestHandler")
+          environment,
+          PlayConfig(configuration),
+          "play.http.requestHandler",
+          "RequestHandler")
 
     val javaComponentsBindings = Seq(
         BindingKey(classOf[play.core.j.JavaHandlerComponents])
@@ -240,8 +240,10 @@ class JavaCompatibleHttpRequestHandler @Inject()(
     configuration: HttpConfiguration,
     filters: HttpFilters,
     components: JavaHandlerComponents)
-    extends DefaultHttpRequestHandler(
-        router, errorHandler, configuration, filters.filters: _*) {
+    extends DefaultHttpRequestHandler(router,
+                                      errorHandler,
+                                      configuration,
+                                      filters.filters: _*) {
 
   override def routeRequest(request: RequestHeader): Option[Handler] = {
     super.routeRequest(request) match {

@@ -31,8 +31,7 @@ object Mux
   private[finagle] abstract class ProtoTracing(
       process: String,
       val role: Stack.Role
-  )
-      extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
+  ) extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
     val description = s"Mux specific $process traces"
 
     private[this] val tracingFilter =
@@ -73,10 +72,10 @@ object Mux
         .prepend(PayloadSizeFilter.module(_.body.length, _.body.length))
   }
 
-  case class Client(
-      stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Client.stack,
-      params: Stack.Params =
-        StackClient.defaultParams + ProtocolLibrary("mux"))
+  case class Client(stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
+                      Client.stack,
+                    params: Stack.Params =
+                      StackClient.defaultParams + ProtocolLibrary("mux"))
       extends StdStackClient[mux.Request, mux.Response, Client]
       with WithDefaultLoadBalancer[Client] {
 
@@ -116,12 +115,12 @@ object Mux
 
   val client = Client()
 
-  def newService(
-      dest: Name, label: String): Service[mux.Request, mux.Response] =
+  def newService(dest: Name,
+                 label: String): Service[mux.Request, mux.Response] =
     client.newService(dest, label)
 
-  def newClient(
-      dest: Name, label: String): ServiceFactory[mux.Request, mux.Response] =
+  def newClient(dest: Name,
+                label: String): ServiceFactory[mux.Request, mux.Response] =
     client.newClient(dest, label)
 
   private[finagle] class ServerProtoTracing
@@ -135,10 +134,10 @@ object Mux
         .prepend(PayloadSizeFilter.module(_.body.length, _.body.length))
   }
 
-  case class Server(
-      stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Server.stack,
-      params: Stack.Params =
-        StackServer.defaultParams + ProtocolLibrary("mux"))
+  case class Server(stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
+                      Server.stack,
+                    params: Stack.Params =
+                      StackServer.defaultParams + ProtocolLibrary("mux"))
       extends StdStackServer[mux.Request, mux.Response, Server] {
 
     protected def copy1(

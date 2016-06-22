@@ -76,8 +76,8 @@ object NewInstanceInjector extends Injector {
   * @param fallback The injector to fallback to if no component can be found.
   * @param components The components that this injector provides.
   */
-class SimpleInjector(
-    fallback: Injector, components: Map[Class[_], Any] = Map.empty)
+class SimpleInjector(fallback: Injector,
+                     components: Map[Class[_], Any] = Map.empty)
     extends Injector {
 
   /**

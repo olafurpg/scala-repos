@@ -186,8 +186,12 @@ object BinaryFormat {
 
     private def posAt(x: Int, y: Int) = Pos.posAt(x + 1, y + 1)
 
-    private def doRead(
-        b1: Int, b2: Int, b3: Int, b4: Int, b5: Int, b6: Option[Int]) =
+    private def doRead(b1: Int,
+                       b2: Int,
+                       b3: Int,
+                       b4: Int,
+                       b5: Int,
+                       b6: Option[Int]) =
       CastleLastMoveTime(
           castles =
             Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
@@ -212,8 +216,7 @@ object BinaryFormat {
       def posInt(pos: Pos): Int = (pieces get pos).fold(0) { piece =>
         piece.color.fold(0, 8) + roleToInt(piece.role)
       }
-      ByteArray(
-          groupedPos map {
+      ByteArray(groupedPos map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
       })
     }

@@ -23,8 +23,9 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Split into 2 'if's"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -83,9 +84,8 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
         .append(elseBranch.getText)
     }
 
-    val newIfStmt: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+    val newIfStmt: ScExpression = ScalaPsiElementFactory
+      .createExpressionFromText(expr.toString(), element.getManager)
     val diff =
       newIfStmt
         .asInstanceOf[ScIfStmt]
@@ -93,7 +93,7 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
         .get
         .getTextRange
         .getStartOffset -
-      newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
+        newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, removeParenthesis = true)

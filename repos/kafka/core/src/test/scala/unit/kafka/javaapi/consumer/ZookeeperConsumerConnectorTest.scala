@@ -72,8 +72,8 @@ class ZookeeperConsumerConnectorTest
     // create a consumer
     val consumerConfig1 = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, group, consumer1))
-    val zkConsumerConnector1 = new ZookeeperConsumerConnector(
-        consumerConfig1, true)
+    val zkConsumerConnector1 =
+      new ZookeeperConsumerConnector(consumerConfig1, true)
     val topicMessageStreams1 = zkConsumerConnector1.createMessageStreams(
         toJavaMap(Map(topic -> numNodes * numParts / 2)),
         new StringDecoder(),
@@ -126,10 +126,11 @@ class ZookeeperConsumerConnectorTest
     messages
   }
 
-  def getMessages(nMessagesPerThread: Int,
-                  jTopicMessageStreams: java.util.Map[
-                      String, java.util.List[KafkaStream[String, String]]])
-    : List[String] = {
+  def getMessages(
+      nMessagesPerThread: Int,
+      jTopicMessageStreams: java.util.Map[
+          String,
+          java.util.List[KafkaStream[String, String]]]): List[String] = {
     var messages: List[String] = Nil
     import scala.collection.JavaConversions._
     val topicMessageStreams = jTopicMessageStreams.mapValues(_.toList)

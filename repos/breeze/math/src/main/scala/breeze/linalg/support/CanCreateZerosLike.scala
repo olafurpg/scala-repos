@@ -37,8 +37,8 @@ object CanCreateZerosLike {
     }
   }
 
-  class OpMapValues[From, A, To](
-      implicit op: Semiring[A], map: CanMapValues[From, A, A, To])
+  class OpMapValues[From, A, To](implicit op: Semiring[A],
+                                 map: CanMapValues[From, A, A, To])
       extends CanCreateZerosLike[From, To] {
     def apply(v: From) = map(v, _ => op.zero)
   }

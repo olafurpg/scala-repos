@@ -49,8 +49,8 @@ object DesktopShardServer
                   apiKeyFinder: APIKeyFinder[Future],
                   jobManager: JobManager[Future]) = {
     val rootAPIKey = config[String]("security.masterAccount.apiKey")
-    val accountFinder = new StaticAccountFinder(
-        "desktop", rootAPIKey, Some("/"))
+    val accountFinder =
+      new StaticAccountFinder("desktop", rootAPIKey, Some("/"))
     val platform = platformFactory(config.detach("queryExecutor"),
                                    apiKeyFinder,
                                    accountFinder,

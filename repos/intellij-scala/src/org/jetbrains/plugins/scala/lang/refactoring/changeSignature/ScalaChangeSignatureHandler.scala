@@ -27,17 +27,18 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
 
   def invokeWithDialog(project: Project, fun: ScMethodLike) {
     UsageTrigger.trigger(ScalaChangeSignatureHandler.id)
-    val dialog = new ScalaChangeSignatureDialog(
-        project, new ScalaMethodDescriptor(fun))
+    val dialog =
+      new ScalaChangeSignatureDialog(project, new ScalaMethodDescriptor(fun))
     dialog.show()
   }
 
-  private def invokeOnElement(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
+  private def invokeOnElement(project: Project,
+                              editor: Editor,
+                              element: PsiElement): Unit = {
     def showErrorHint(message: String) = {
       val name = ChangeSignatureHandler.REFACTORING_NAME
-      CommonRefactoringUtil.showErrorHint(
-          project, editor, message, name, HelpID.CHANGE_SIGNATURE)
+      CommonRefactoringUtil
+        .showErrorHint(project, editor, message, name, HelpID.CHANGE_SIGNATURE)
     }
     def isSupportedFor(fun: ScMethodLike): Boolean = {
       fun match {
@@ -80,8 +81,8 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
           case _ =>
         }
 
-        val newMethod = SuperMethodWarningUtil.checkSuperMethod(
-            method, RefactoringBundle.message("to.refactor"))
+        val newMethod = SuperMethodWarningUtil
+          .checkSuperMethod(method, RefactoringBundle.message("to.refactor"))
         unwrapMethod(newMethod) match {
           case Some(fun: ScMethodLike) =>
             if (isSupportedFor(fun)) invokeWithDialog(project, fun)
@@ -145,7 +146,7 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
           c.constructor match {
             case Some(constr)
                 if PsiTreeUtil.isAncestor(c.nameId, element, false) ||
-                PsiTreeUtil.isAncestor(constr, element, false) =>
+                  PsiTreeUtil.isAncestor(constr, element, false) =>
               constr
             case _ => null
           }

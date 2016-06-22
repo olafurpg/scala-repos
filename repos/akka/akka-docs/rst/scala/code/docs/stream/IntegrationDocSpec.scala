@@ -28,8 +28,8 @@ import akka.stream.scaladsl.Flow
 object IntegrationDocSpec {
   import TwitterStreamQuickstartDocSpec._
 
-  val config =
-    ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+      """
     #//#blocking-dispatcher-config
     blocking-dispatcher {
       executor = "thread-pool-executor"
@@ -171,7 +171,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     import ActorAttributes.supervisionStrategy
     import Supervision.resumingDecider
 
-    val emailAddresses: Source[String, NotUsed] = authors.via(Flow[Author]
+    val emailAddresses: Source[String, NotUsed] = authors.via(
+        Flow[Author]
           .mapAsync(4)(author => addressSystem.lookupEmail(author.handle))
           .withAttributes(supervisionStrategy(resumingDecider)))
     //#email-addresses-mapAsync-supervision
@@ -312,8 +313,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
     val service = new SometimesSlowService
 
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(
-            system).withInputBuffer(initialSize = 4, maxSize = 4))
+    implicit val materializer = ActorMaterializer(
+        ActorMaterializerSettings(system).withInputBuffer(initialSize = 4,
+                                                          maxSize = 4))
 
     Source(List("a", "B", "C", "D", "e", "F", "g", "H", "i", "J"))
       .map(elem => { println(s"before: $elem"); elem })
@@ -344,8 +346,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
     val service = new SometimesSlowService
 
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(
-            system).withInputBuffer(initialSize = 4, maxSize = 4))
+    implicit val materializer = ActorMaterializer(
+        ActorMaterializerSettings(system).withInputBuffer(initialSize = 4,
+                                                          maxSize = 4))
 
     Source(List("a", "B", "C", "D", "e", "F", "g", "H", "i", "J"))
       .map(elem => { println(s"before: $elem"); elem })

@@ -28,11 +28,13 @@ trait Config extends Logging {
     rgx.findFirstIn(value) match {
       case Some(t) =>
         if (!t.equals(value))
-          throw new InvalidConfigException(prop + " " + value +
-              " is illegal, contains a character other than ASCII alphanumerics, '.', '_' and '-'")
+          throw new InvalidConfigException(
+              prop + " " + value +
+                " is illegal, contains a character other than ASCII alphanumerics, '.', '_' and '-'")
       case None =>
-        throw new InvalidConfigException(prop + " " + value +
-            " is illegal, contains a character other than ASCII alphanumerics, '.', '_' and '-'")
+        throw new InvalidConfigException(
+            prop + " " + value +
+              " is illegal, contains a character other than ASCII alphanumerics, '.', '_' and '-'")
     }
   }
 }

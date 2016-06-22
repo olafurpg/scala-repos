@@ -12,8 +12,8 @@ package simple {
   import play.api.mvc._
   import scala.concurrent.{ExecutionContext, Future}
 
-  class LoggingFilter @Inject()(
-      implicit val mat: Materializer, ec: ExecutionContext)
+  class LoggingFilter @Inject()(implicit val mat: Materializer,
+                                ec: ExecutionContext)
       extends Filter {
 
     def apply(nextFilter: RequestHeader => Future[Result])(
@@ -47,8 +47,7 @@ package httpfilters {
   class Filters @Inject()(
       gzip: GzipFilter,
       log: LoggingFilter
-  )
-      extends HttpFilters {
+  ) extends HttpFilters {
 
     val filters = Seq(gzip, log)
   }

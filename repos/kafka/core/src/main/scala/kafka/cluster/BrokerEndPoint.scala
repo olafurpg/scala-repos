@@ -44,8 +44,8 @@ object BrokerEndPoint {
     * BrokerEndPoint URI is host:port or [ipv6_host]:port
     * Note that unlike EndPoint (or listener) this URI has no security information.
     */
-  def createBrokerEndPoint(
-      brokerId: Int, connectionString: String): BrokerEndPoint = {
+  def createBrokerEndPoint(brokerId: Int,
+                           connectionString: String): BrokerEndPoint = {
     parseHostPort(connectionString).map {
       case (host, port) => new BrokerEndPoint(brokerId, host, port)
     }.getOrElse {

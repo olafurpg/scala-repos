@@ -103,8 +103,8 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
   * Transport errors are considered fatal; the service will be
   * released after any error.
   */
-class SerialServerDispatcher[Req, Rep](
-    trans: Transport[Rep, Req], service: Service[Req, Rep])
+class SerialServerDispatcher[Req, Rep](trans: Transport[Rep, Req],
+                                       service: Service[Req, Rep])
     extends GenSerialServerDispatcher[Req, Rep, Rep, Req](trans) {
 
   trans.onClose ensure {

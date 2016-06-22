@@ -58,7 +58,8 @@ class StringConverterSpec extends FlatSpec {
       case "f" => false
       case _ =>
         throw new java.text.ParseException(
-            "'%s' can not be converted to a boolean".format(s), 0)
+            "'%s' can not be converted to a boolean".format(s),
+            0)
     }
   }
 
@@ -69,8 +70,8 @@ class StringConverterSpec extends FlatSpec {
 
   // HELPER METHODS - BEGIN
 
-  private def testIrregularStringConversion[T](
-      converter: StringConverter[T], isNumberFormat: Boolean) {
+  private def testIrregularStringConversion[T](converter: StringConverter[T],
+                                               isNumberFormat: Boolean) {
     it should "not convert a Irregular String" in {
       if (isNumberFormat) {
         intercept[NumberFormatException] {
@@ -84,8 +85,8 @@ class StringConverterSpec extends FlatSpec {
     }
   }
 
-  private def testNullStringConversion[T](
-      converter: StringConverter[T], isNumberFormat: Boolean) {
+  private def testNullStringConversion[T](converter: StringConverter[T],
+                                          isNumberFormat: Boolean) {
     it should "not convert a Null String" in {
       if (isNumberFormat) {
         intercept[NumberFormatException] {
@@ -104,8 +105,8 @@ class StringConverterSpec extends FlatSpec {
                                 value: T,
                                 converterName: String,
                                 typeName: String) {
-    converterName should "convert '%s' in a %s and vice-versa".format(
-        string, typeName) in {
+    converterName should "convert '%s' in a %s and vice-versa"
+      .format(string, typeName) in {
       val numericValue = converter.fromString(string)
       numericValue should equal(value)
       converter.toString(numericValue) should equal(string)

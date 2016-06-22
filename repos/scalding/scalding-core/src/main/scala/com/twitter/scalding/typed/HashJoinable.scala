@@ -62,7 +62,9 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
 
       //Construct the new TypedPipe
       TypedPipe.from[(K, R)](newPipe.project('key, 'value), ('key, 'value))(
-          fd, mode, tuple2Converter)
+          fd,
+          mode,
+          tuple2Converter)
     })
 
   /**
@@ -113,8 +115,8 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
     * For map and flatMap we can't definitively infer if it is OK to skip the forceToDisk.
     * Thus we just go ahead and forceToDisk in those two cases - users can opt out if needed.
     */
-  private def canSkipEachOperation(
-      eachOperation: Operation[_], mode: Mode): Boolean = {
+  private def canSkipEachOperation(eachOperation: Operation[_],
+                                   mode: Mode): Boolean = {
     eachOperation match {
       case f: FlatMapFunction[_, _] =>
         f.getFunction match {

@@ -81,8 +81,9 @@ class ModuleDependencyNode(val data: ModuleDependencyData)
 
 class LibraryDependencyNode(val data: LibraryDependencyData)
     extends Node[LibraryDependencyData] {
-  def this(
-      ownerModule: ModuleData, library: LibraryData, level: LibraryLevel) {
+  def this(ownerModule: ModuleData,
+           library: LibraryData,
+           level: LibraryLevel) {
     this(new LibraryDependencyData(ownerModule, library, level))
   }
 

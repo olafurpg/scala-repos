@@ -52,8 +52,8 @@ private[columnar] trait CompressionScheme {
 
   def encoder[T <: AtomicType](columnType: NativeColumnType[T]): Encoder[T]
 
-  def decoder[T <: AtomicType](
-      buffer: ByteBuffer, columnType: NativeColumnType[T]): Decoder[T]
+  def decoder[T <: AtomicType](buffer: ByteBuffer,
+                               columnType: NativeColumnType[T]): Decoder[T]
 }
 
 private[columnar] trait WithCompressionSchemes {

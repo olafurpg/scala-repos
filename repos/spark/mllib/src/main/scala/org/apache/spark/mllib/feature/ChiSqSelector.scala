@@ -137,7 +137,8 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
     def save(sc: SparkContext, model: ChiSqSelectorModel, path: String): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
-      val metadata = compact(render(
+      val metadata = compact(
+          render(
               ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))

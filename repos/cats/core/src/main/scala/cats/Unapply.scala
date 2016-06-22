@@ -15,7 +15,7 @@ package cats
   */
 trait Unapply[TC[_ [_]], MA] extends Serializable {
   // a type constructor which is properly kinded for the type class
-  type M [_]
+  type M[_]
   // the type applied to the type constructor to make an MA
   type A
 

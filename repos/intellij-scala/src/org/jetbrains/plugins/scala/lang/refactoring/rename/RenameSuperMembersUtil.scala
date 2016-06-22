@@ -77,10 +77,10 @@ object RenameSuperMembersUtil {
 
   /* @param supermembers contains only maximal supermembers
    */
-  private def afterChoosingSuperMember(superMembers: Seq[PsiNamedElement],
-                                       element: PsiNamedElement,
-                                       editor: Editor)(
-      action: PsiNamedElement => Unit): Unit = {
+  private def afterChoosingSuperMember(
+      superMembers: Seq[PsiNamedElement],
+      element: PsiNamedElement,
+      editor: Editor)(action: PsiNamedElement => Unit): Unit = {
     if (superMembers.isEmpty) {
       action(element)
       return
@@ -90,9 +90,11 @@ object RenameSuperMembersUtil {
       allElements.map(PsiTreeUtil.getParentOfType(_, classOf[PsiClass], false))
     val oneSuperClass = superMembers.size == 1
     val renameAllMarkerObject = ScalaPsiElementFactory.createObjectWithContext(
-        "object RenameAll", classes.last.getContainingFile, classes.last)
-    val additional =
-      if (oneSuperClass) Nil else Seq((renameAllMarkerObject, null)) //option for rename all
+        "object RenameAll",
+        classes.last.getContainingFile,
+        classes.last)
+    val additional = if (oneSuperClass) Nil
+    else Seq((renameAllMarkerObject, null)) //option for rename all
     val classesToNamed = additional ++: Map(classes.zip(allElements): _*)
     val selection = classesToNamed.keys.head
 
@@ -103,7 +105,7 @@ object RenameSuperMembersUtil {
           val mainOne = classesToNamed(classes(0))
           superMembersToRename.clear()
           superMembersToRename ++=
-            classes.dropRight(1).drop(1).map(classesToNamed)
+          classes.dropRight(1).drop(1).map(classesToNamed)
           action(mainOne)
         }
         false
@@ -113,49 +115,55 @@ object RenameSuperMembersUtil {
     val renameBase = ScalaBundle.message("rename.base.member")
     val renameOnlyCurrent = ScalaBundle.message("rename.only.current.member")
     val name = ScalaNamesUtil.scalaName(superMembers.last)
-    val title =
-      if (oneSuperClass) {
-        val overimpl = ScalaPsiUtil.nameContext(superMembers(0)) match {
-          case decl: ScDeclaration => "implements"
-          case _ => "overrides"
-        }
-        val qualName = classes(0) match {
-          case td: ScTypeDefinition => td.qualifiedName
-          case cl => cl.getQualifiedName
-        }
-        s"$name $overimpl member of $qualName"
-      } else ScalaBundle.message("rename.has.multiple.base.members", name)
+    val title = if (oneSuperClass) {
+      val overimpl = ScalaPsiUtil.nameContext(superMembers(0)) match {
+        case decl: ScDeclaration => "implements"
+        case _ => "overrides"
+      }
+      val qualName = classes(0) match {
+        case td: ScTypeDefinition => td.qualifiedName
+        case cl => cl.getQualifiedName
+      }
+      s"$name $overimpl member of $qualName"
+    } else ScalaBundle.message("rename.has.multiple.base.members", name)
 
     val popup = NavigationUtil.getPsiElementPopup(
-        classesToNamed.keys.toArray, new PsiClassListCellRenderer() {
-      override def getIcon(element: PsiElement): Icon = {
-        if (element == renameAllMarkerObject || oneSuperClass) null
-        else super.getIcon(element)
-      }
+        classesToNamed.keys.toArray,
+        new PsiClassListCellRenderer() {
+          override def getIcon(element: PsiElement): Icon = {
+            if (element == renameAllMarkerObject || oneSuperClass) null
+            else super.getIcon(element)
+          }
 
-      override def getElementText(clazz: PsiClass): String = {
-        if (clazz == renameAllMarkerObject) return renameAllText
-        def classKind = clazz match {
-          case _: ScObject => "object"
-          case _: ScTrait => "trait"
-          case _ => "class"
-        }
-        if (clazz == classes.last) renameOnlyCurrent
-        else if (oneSuperClass) renameBase
-        else
-          ScalaBundle.message(
-              "rename.only.in", classKind, ScalaNamesUtil.scalaName(clazz))
-      }
+          override def getElementText(clazz: PsiClass): String = {
+            if (clazz == renameAllMarkerObject) return renameAllText
+            def classKind = clazz match {
+              case _: ScObject => "object"
+              case _: ScTrait => "trait"
+              case _ => "class"
+            }
+            if (clazz == classes.last) renameOnlyCurrent
+            else if (oneSuperClass) renameBase
+            else
+              ScalaBundle.message("rename.only.in",
+                                  classKind,
+                                  ScalaNamesUtil.scalaName(clazz))
+          }
 
-      override def getContainerText(clazz: PsiClass, name: String): String = {
-        if (clazz == renameAllMarkerObject || clazz == classes.last ||
-            oneSuperClass) null //don't show package name
-        else super.getContainerText(clazz, name)
-      }
-    }, title, processor, selection)
+          override def getContainerText(clazz: PsiClass,
+                                        name: String): String = {
+            if (clazz == renameAllMarkerObject || clazz == classes.last ||
+                oneSuperClass) null //don't show package name
+            else super.getContainerText(clazz, name)
+          }
+        },
+        title,
+        processor,
+        selection)
 
     if (ApplicationManager.getApplication.isUnitTestMode) {
-      processor.execute(if (oneSuperClass) classes(0)
+      processor.execute(
+          if (oneSuperClass) classes(0)
           else renameAllMarkerObject) //in unit tests uses base member or all base members
       return
     }
@@ -164,8 +172,8 @@ object RenameSuperMembersUtil {
   }
 
   @NotNull
-  def allSuperMembers(
-      named: ScNamedElement, withSelfType: Boolean): Seq[PsiNamedElement] = {
+  def allSuperMembers(named: ScNamedElement,
+                      withSelfType: Boolean): Seq[PsiNamedElement] = {
     val member = ScalaPsiUtil.nameContext(named) match {
       case m: ScMember => m
       case _ => return Seq()
@@ -181,8 +189,8 @@ object RenameSuperMembersUtil {
   }
 
   @NotNull
-  def allSuperTypes(
-      named: ScNamedElement, withSelfType: Boolean): Seq[PsiNamedElement] = {
+  def allSuperTypes(named: ScNamedElement,
+                    withSelfType: Boolean): Seq[PsiNamedElement] = {
     val typeAlias = ScalaPsiUtil.nameContext(named) match {
       case t: ScTypeAlias => t
       case _ => return Seq()

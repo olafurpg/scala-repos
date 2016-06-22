@@ -22,8 +22,8 @@ trait BigDecimalIsField extends Field[BigDecimal] {
 
   def quot(a: BigDecimal, b: BigDecimal): BigDecimal = a.quot(b)
   def mod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
-  override def quotmod(
-      a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
+  override def quotmod(a: BigDecimal,
+                       b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
   def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
     import java.math.BigInteger
 
@@ -100,7 +100,8 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
       if (x < Double.MaxValue) BigDecimal(Math.sqrt(x.toDouble), x.mc)
       else
         approxSqrt(x / Double.MaxValue) * BigDecimal(
-            Math.sqrt(Double.MaxValue), x.mc)
+            Math.sqrt(Double.MaxValue),
+            x.mc)
 
     @tailrec def loop(x: BigDecimal, y: BigDecimal): BigDecimal =
       if (x == y) y else loop(y, ((n / y) + y) / two)

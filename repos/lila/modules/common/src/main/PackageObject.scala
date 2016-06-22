@@ -105,10 +105,9 @@ trait WithPlay { self: PackageObject =>
 
   implicit def LilaFuMonoid[A: Monoid]: Monoid[Fu[A]] =
     Monoid.instance((x, y) =>
-                      x zip y map {
-                        case (a, b) => a ⊹ b
-                    },
-                    fuccess(∅[A]))
+          x zip y map {
+        case (a, b) => a ⊹ b
+    }, fuccess(∅[A]))
 
   implicit def LilaFuZero[A: Zero]: Zero[Fu[A]] =
     Zero.instance(fuccess(zero[A]))
@@ -123,7 +122,9 @@ trait WithPlay { self: PackageObject =>
       t: M[Fu[A]]) {
 
     def sequenceFu(implicit cbf: scala.collection.generic.CanBuildFrom[
-            M[Fu[A]], A, M[A]]) =
+            M[Fu[A]],
+            A,
+            M[A]]) =
       Future sequence t
   }
 
@@ -163,8 +164,8 @@ trait WithPlay { self: PackageObject =>
     def flatFold[B](fail: Exception => Fu[B], succ: A => Fu[B]): Fu[B] =
       fua flatMap succ recoverWith { case e: Exception => fail(e) }
 
-    def logFailure(
-        logger: => lila.log.Logger, msg: Exception => String): Fu[A] =
+    def logFailure(logger: => lila.log.Logger,
+                   msg: Exception => String): Fu[A] =
       addFailureEffect { e =>
         logger.warn(msg(e), e)
       }
@@ -175,9 +176,9 @@ trait WithPlay { self: PackageObject =>
 
     def addFailureEffect(effect: Exception => Unit) =
       fua ~
-      (_ onFailure {
-            case e: Exception => effect(e)
-          })
+        (_ onFailure {
+              case e: Exception => effect(e)
+            })
 
     def addEffects(fail: Exception => Unit, succ: A => Unit): Fu[A] =
       fua andThen {
@@ -216,7 +217,8 @@ trait WithPlay { self: PackageObject =>
     def withTimeout(duration: FiniteDuration, error: => Throwable)(
         implicit system: akka.actor.ActorSystem): Fu[A] = {
       Future firstCompletedOf Seq(
-          fua, akka.pattern.after(duration, system.scheduler)(fufail(error)))
+          fua,
+          akka.pattern.after(duration, system.scheduler)(fufail(error)))
     }
 
     def chronometer = lila.common.Chronometer(fua)

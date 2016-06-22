@@ -53,8 +53,8 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("List[Int]", VectorSpaceLaws[List[Int], Int].module)
   checkAll("Vector[Int]", VectorSpaceLaws[Vector[Int], Int].module)
-  checkAll(
-      "List[Rational]", VectorSpaceLaws[List[Rational], Rational].vectorSpace)
+  checkAll("List[Rational]",
+           VectorSpaceLaws[List[Rational], Rational].vectorSpace)
   checkAll("Vector[Rational]",
            VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
 
@@ -80,8 +80,8 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Array[Int]", GroupLaws[Array[Int]].monoid)
 
   checkAll("Seq[String]",
-           PartialGroupLaws[Seq[String]](
-               spire.optional.genericEq.generic, implicitly).semigroupoid)
+           PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic,
+                                         implicitly).semigroupoid)
   checkAll("Seq[Int]", PartialGroupLaws[Seq[Int]].groupoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
@@ -129,9 +129,10 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
   checkAll("Order[Unit]", OrderLaws[Unit].order)
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
-  checkAll("LatticePartialOrder[Int]",
-           LatticePartialOrderLaws[Int].boundedLatticePartialOrder(
-               intMinMaxLattice, implicitly[Order[Int]]))
+  checkAll(
+      "LatticePartialOrder[Int]",
+      LatticePartialOrderLaws[Int]
+        .boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
   checkAll(
       "Map[Int, Int]",

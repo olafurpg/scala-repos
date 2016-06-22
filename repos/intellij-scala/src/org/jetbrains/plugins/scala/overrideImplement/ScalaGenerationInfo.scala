@@ -36,8 +36,9 @@ class ScalaGenerationInfo(classMember: ClassMember)
 
   override def getPsiMember: PsiMember = myMember
 
-  override def insert(
-      aClass: PsiClass, anchor: PsiElement, before: Boolean): Unit = {
+  override def insert(aClass: PsiClass,
+                      anchor: PsiElement,
+                      before: Boolean): Unit = {
     val templDef = aClass match {
       case td: ScTemplateDefinition => td
       case _ => return
@@ -51,7 +52,10 @@ class ScalaGenerationInfo(classMember: ClassMember)
         val substitutor = member.substitutor
         val needsOverride = member.isOverride || toAddOverrideToImplemented
         val m = ScalaPsiElementFactory.createOverrideImplementType(
-            alias, substitutor, alias.getManager, needsOverride)
+            alias,
+            substitutor,
+            alias.getManager,
+            needsOverride)
         val added = templDef.addMember(m, Option(anchor))
         myMember = added
         TypeAdjuster.markToAdjust(added)
@@ -83,8 +87,8 @@ class ScalaGenerationInfo(classMember: ClassMember)
     }
   }
 
-  override def findInsertionAnchor(
-      aClass: PsiClass, leaf: PsiElement): PsiElement = {
+  override def findInsertionAnchor(aClass: PsiClass,
+                                   leaf: PsiElement): PsiElement = {
     aClass match {
       case td: ScTemplateDefinition =>
         ScalaOIUtil.getAnchor(leaf.getTextRange.getStartOffset, td).orNull
@@ -144,19 +148,19 @@ object ScalaGenerationInfo {
               statements(0).getTextRange.getStartOffset,
               statements(statements.length - 1).getTextRange.getEndOffset)
           editor.getCaretModel.moveToOffset(range.getStartOffset)
-          editor.getSelectionModel.setSelection(
-              range.getStartOffset, range.getEndOffset)
+          editor.getSelectionModel
+            .setSelection(range.getStartOffset, range.getEndOffset)
         }
       case _ =>
         val range = body.getTextRange
         editor.getCaretModel.moveToOffset(range.getStartOffset)
-        editor.getSelectionModel.setSelection(
-            range.getStartOffset, range.getEndOffset)
+        editor.getSelectionModel
+          .setSelection(range.getStartOffset, range.getEndOffset)
     }
   }
 
-  private def callSuperText(
-      td: ScTemplateDefinition, method: PsiMethod): String = {
+  private def callSuperText(td: ScTemplateDefinition,
+                            method: PsiMethod): String = {
     val superOrSelfQual: String = td.selfType match {
       case None => "super."
       case Some(st: ScType) =>
@@ -217,18 +221,20 @@ object ScalaGenerationInfo {
 
     val method = member.getElement
 
-    properties.setProperty(
-        FileTemplate.ATTRIBUTE_RETURN_TYPE, ScType.presentableText(returnType))
-    properties.setProperty(
-        FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE, standardValue)
-    properties.setProperty(
-        FileTemplate.ATTRIBUTE_CALL_SUPER, callSuperText(td, method))
+    properties.setProperty(FileTemplate.ATTRIBUTE_RETURN_TYPE,
+                           ScType.presentableText(returnType))
+    properties
+      .setProperty(FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE, standardValue)
+    properties.setProperty(FileTemplate.ATTRIBUTE_CALL_SUPER,
+                           callSuperText(td, method))
     properties.setProperty(
         "Q_MARK",
         ScalaGenerationInfo.defaultValue(returnType, td.getContainingFile))
 
     ScalaFileTemplateUtil.setClassAndMethodNameProperties(
-        properties, method.containingClass, method)
+        properties,
+        method.containingClass,
+        method)
 
     template.getText(properties)
   }
@@ -245,7 +251,11 @@ object ScalaGenerationInfo {
 
     val needsOverride = !isImplement || toAddOverrideToImplemented
     val m = ScalaPsiElementFactory.createOverrideImplementMethod(
-        sign, method.getManager, needsOverride, needsInferType, body)
+        sign,
+        method.getManager,
+        needsOverride,
+        needsInferType,
+        body)
     val added = td.addMember(m, Option(anchor))
     TypeAdjuster.markToAdjust(added)
     added.asInstanceOf[ScFunction]

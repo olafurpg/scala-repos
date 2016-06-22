@@ -24,8 +24,9 @@ abstract class ScalaPluginVersionVerifier {
 
 object ScalaPluginVersionVerifier {
 
-  class Version(
-      private val major: Int, private val minor: Int, private val build: Int)
+  class Version(private val major: Int,
+                private val minor: Int,
+                private val build: Int)
       extends Ordered[Version]
       with Serializable {
     def compare(that: Version) =
@@ -108,9 +109,9 @@ class ScalaPluginVersionVerifierApplicationComponent
                     PluginManager.getPlugin(pluginLoader.getPluginId)
                   val message =
                     s"Plugin ${plugin.getName} of version ${plugin.getVersion} is " +
-                    s"icompatible with Scala plugin of version $version. Do you want to disable ${plugin.getName} plugin?\n" +
-                    s"""<p/><a href="Yes">Yes, disable it</a>\n""" +
-                    s"""<p/><a href="No">No, leave it enabled</a>"""
+                      s"icompatible with Scala plugin of version $version. Do you want to disable ${plugin.getName} plugin?\n" +
+                      s"""<p/><a href="Yes">Yes, disable it</a>\n""" +
+                      s"""<p/><a href="No">No, leave it enabled</a>"""
                   if (ApplicationManager.getApplication.isUnitTestMode) {
                     ScalaPluginVersionVerifierApplicationComponent.LOG.error(
                         message)
@@ -171,8 +172,7 @@ class ScalaPluginVersionVerifierApplicationComponent
       }
       ScalaPluginUpdater.askUpdatePluginBranch()
     }
-    SwingUtilities.invokeLater(
-        new Runnable {
+    SwingUtilities.invokeLater(new Runnable {
       def run() {
         ScalaPluginUpdater.upgradeRepo()
         checkVersion()

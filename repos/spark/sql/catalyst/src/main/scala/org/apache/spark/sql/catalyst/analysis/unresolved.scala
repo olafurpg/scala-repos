@@ -30,16 +30,18 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * Thrown when an invalid attempt is made to access a property of a tree that has yet to be fully
   * resolved.
   */
-class UnresolvedException[TreeType <: TreeNode[_]](
-    tree: TreeType, function: String)
+class UnresolvedException[TreeType <: TreeNode[_]](tree: TreeType,
+                                                   function: String)
     extends errors.TreeNodeException(
-        tree, s"Invalid call to $function on unresolved object", null)
+        tree,
+        s"Invalid call to $function on unresolved object",
+        null)
 
 /**
   * Holds the name of a relation that has yet to be looked up in a [[Catalog]].
   */
-case class UnresolvedRelation(
-    tableIdentifier: TableIdentifier, alias: Option[String] = None)
+case class UnresolvedRelation(tableIdentifier: TableIdentifier,
+                              alias: Option[String] = None)
     extends LeafNode {
 
   /** Returns a `.` separated name for this relation. */
@@ -146,8 +148,9 @@ object UnresolvedAttribute {
   }
 }
 
-case class UnresolvedFunction(
-    name: String, children: Seq[Expression], isDistinct: Boolean)
+case class UnresolvedFunction(name: String,
+                              children: Seq[Expression],
+                              isDistinct: Boolean)
     extends Expression
     with Unevaluable {
 
@@ -201,8 +204,8 @@ case class UnresolvedStar(target: Option[Seq[String]])
     extends Star
     with Unevaluable {
 
-  override def expand(
-      input: LogicalPlan, resolver: Resolver): Seq[NamedExpression] = {
+  override def expand(input: LogicalPlan,
+                      resolver: Resolver): Seq[NamedExpression] = {
 
     // First try to expand assuming it is table.*.
     val expandedAttributes: Seq[Attribute] = target match {
@@ -235,7 +238,7 @@ case class UnresolvedStar(target: Option[Seq[String]])
         case _ =>
           throw new AnalysisException(
               "Can only star expand struct data types. Attribute: `" +
-              target.get + "`")
+                target.get + "`")
       }
     } else {
       val from = input.inputSet.map(_.name).mkString(", ")
@@ -298,8 +301,8 @@ case class ResolvedStar(expressions: Seq[NamedExpression])
     with Unevaluable {
   override def newInstance(): NamedExpression =
     throw new UnresolvedException(this, "newInstance")
-  override def expand(
-      input: LogicalPlan, resolver: Resolver): Seq[NamedExpression] =
+  override def expand(input: LogicalPlan,
+                      resolver: Resolver): Seq[NamedExpression] =
     expressions
   override def toString: String =
     expressions.mkString("ResolvedStar(", ", ", ")")

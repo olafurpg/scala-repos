@@ -26,8 +26,9 @@ import org.scalatest.prop.Checkers
 class CredentialsTest extends FunSuite with Checkers {
   test("parse a simple auth file") {
     val content = "username: root\npassword: hellokitty\n"
-    assert(Credentials(content) == Map("username" -> "root",
-                                       "password" -> "hellokitty"))
+    assert(
+        Credentials(content) == Map("username" -> "root",
+                                    "password" -> "hellokitty"))
   }
 
   test("parse a more complex auth file") {
@@ -57,8 +58,9 @@ password  : last_0f-the/international:playboys
 
   test("handle \r\n line breaks") {
     val content = "username: root\r\npassword: hellokitty\r\n"
-    assert(Credentials(content) == Map("username" -> "root",
-                                       "password" -> "hellokitty"))
+    assert(
+        Credentials(content) == Map("username" -> "root",
+                                    "password" -> "hellokitty"))
   }
 
   test("handle special chars") {

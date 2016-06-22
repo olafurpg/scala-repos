@@ -31,8 +31,8 @@ object BucketizerExample {
     val sqlContext = new SQLContext(sc)
 
     // $example on$
-    val splits = Array(
-        Double.NegativeInfinity, -0.5, 0.0, 0.5, Double.PositiveInfinity)
+    val splits =
+      Array(Double.NegativeInfinity, -0.5, 0.0, 0.5, Double.PositiveInfinity)
 
     val data = Array(-0.5, -0.3, 0.0, 0.2)
     val dataFrame =

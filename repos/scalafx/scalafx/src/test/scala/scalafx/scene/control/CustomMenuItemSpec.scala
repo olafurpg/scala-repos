@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CustomMenuItemSpec
     extends SimpleSFXDelegateSpec[jfxsc.CustomMenuItem, CustomMenuItem](
-        classOf[jfxsc.CustomMenuItem], classOf[CustomMenuItem])
+        classOf[jfxsc.CustomMenuItem],
+        classOf[CustomMenuItem])

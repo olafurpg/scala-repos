@@ -69,7 +69,7 @@ object LogisticRegressionDataGenerator {
       // scalastyle:off println
       println(
           "Usage: LogisticRegressionGenerator " +
-          "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
+            "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
       // scalastyle:on println
       System.exit(1)
     }

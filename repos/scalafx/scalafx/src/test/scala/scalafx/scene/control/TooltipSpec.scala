@@ -41,7 +41,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class TooltipSpec
     extends SimpleSFXDelegateSpec[jfxsc.Tooltip, Tooltip](
-        classOf[jfxsc.Tooltip], classOf[Tooltip])
+        classOf[jfxsc.Tooltip],
+        classOf[Tooltip])
     with RunOnApplicationThread {
 
   it should "generate a new Tooltip from a String" in {

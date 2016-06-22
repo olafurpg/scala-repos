@@ -174,8 +174,7 @@ trait MongoPlatformSpecs
       with MongoColumnarTableModuleConfig
 
   object yggConfig extends YggConfig {
-    override val maxSliceSize =
-      1000 // 10 was waaaaay too small, and we have other specs that cover that case
+    override val maxSliceSize = 1000 // 10 was waaaaay too small, and we have other specs that cover that case
   }
 
   override def controlTimeout =
@@ -184,8 +183,8 @@ trait MongoPlatformSpecs
   def includeIdField = false
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        asyncContext, yggConfig.maxEvalDuration)
+    new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
+                                          yggConfig.maxEvalDuration)
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
   with ExceptionQueryLogger[Future, instructions.Line]
@@ -203,8 +202,9 @@ trait MongoPlatformSpecs
 
     def dbAuthParams = Map.empty
     def mongo = self.mongo
-    override def load(
-        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+    override def load(table: Table,
+                      apiKey: APIKey,
+                      tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
       val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
         case orig: StrColumn =>
@@ -236,8 +236,8 @@ trait MongoPlatformSpecs
   override def map(fs: => Fragments): Fragments =
     (Step { startup() }) ^ fs ^ (Step { shutdown() })
 
-  def Evaluator[N[+ _]](
-      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                      nm: N ~> Future) =
     new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
       with ExceptionQueryLogger[N, instructions.Line]
@@ -247,8 +247,7 @@ trait MongoPlatformSpecs
       }
       class YggConfig extends EvaluatorConfig {
         val idSource = new FreshAtomicIdSource
-        val maxSliceSize =
-          1000 // 10 was waaaaay too small, and we have other specs that cover that case
+        val maxSliceSize = 1000 // 10 was waaaaay too small, and we have other specs that cover that case
       }
       val yggConfig = new YggConfig
       def freshIdScanner = self.freshIdScanner

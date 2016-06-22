@@ -93,7 +93,7 @@ trait PhaseAssembly { self: Global =>
      */
     def compilerPhaseList(): List[SubComponent] =
       nodes.values.toList filter (_.level > 0) sortBy
-      (x => (x.level, x.phasename)) flatMap (_.phaseobj) flatten
+        (x => (x.level, x.phasename)) flatMap (_.phaseobj) flatten
 
     /* Test if there are cycles in the graph, assign levels to the nodes
      * and collapse hard links into nodes
@@ -164,7 +164,7 @@ trait PhaseAssembly { self: Global =>
               rerun = true
               informProgress(
                   "promote the dependency of " + edge.frm.phasename + ": " +
-                  edge.to.phasename + " => " + hl.frm.phasename)
+                    edge.to.phasename + " => " + hl.frm.phasename)
               edge.to = hl.frm
               hl.frm.before += edge
             }
@@ -251,7 +251,7 @@ trait PhaseAssembly { self: Global =>
             } else {
               globalError(
                   "[phase assembly, after dependency on terminal phase not allowed: " +
-                  fromnode.phasename + " => " + phsname + "]")
+                    fromnode.phasename + " => " + phsname + "]")
             }
           }
           for (phsname <- phs.runsBefore) {
@@ -261,7 +261,7 @@ trait PhaseAssembly { self: Global =>
             } else {
               globalError(
                   "[phase assembly, before dependency on parser phase not allowed: " +
-                  phsname + " => " + fromnode.phasename + "]")
+                    phsname + " => " + fromnode.phasename + "]")
             }
           }
         case Some(phsname) =>
@@ -271,7 +271,7 @@ trait PhaseAssembly { self: Global =>
           } else {
             globalError(
                 "[phase assembly, right after dependency on terminal phase not allowed: " +
-                fromnode.phasename + " => " + phsname + "]")
+                  fromnode.phasename + " => " + phsname + "]")
           }
       }
     }
@@ -288,8 +288,9 @@ trait PhaseAssembly { self: Global =>
     val fatnodes = new mutable.HashSet[graph.Node]()
     sbuf.append("digraph G {\n")
     for (edge <- graph.edges) {
-      sbuf.append("\"" + edge.frm.allPhaseNames + "(" + edge.frm.level + ")" +
-          "\"->\"" + edge.to.allPhaseNames + "(" + edge.to.level + ")" + "\"")
+      sbuf.append(
+          "\"" + edge.frm.allPhaseNames + "(" + edge.frm.level + ")" +
+            "\"->\"" + edge.to.allPhaseNames + "(" + edge.to.level + ")" + "\"")
       if (!edge.frm.phaseobj.get.head.internal) extnodes += edge.frm
       edge.frm.phaseobj foreach
       (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.frm)
@@ -299,12 +300,14 @@ trait PhaseAssembly { self: Global =>
       sbuf.append(s""" [color="$color"]\n""")
     }
     for (node <- extnodes) {
-      sbuf.append("\"" + node.allPhaseNames + "(" + node.level + ")" +
-          "\" [color=\"#00ff00\"]\n")
+      sbuf.append(
+          "\"" + node.allPhaseNames + "(" + node.level + ")" +
+            "\" [color=\"#00ff00\"]\n")
     }
     for (node <- fatnodes) {
-      sbuf.append("\"" + node.allPhaseNames + "(" + node.level + ")" +
-          "\" [color=\"#0000ff\"]\n")
+      sbuf.append(
+          "\"" + node.allPhaseNames + "(" + node.level + ")" +
+            "\" [color=\"#0000ff\"]\n")
     }
     sbuf.append("}\n")
     import reflect.io._

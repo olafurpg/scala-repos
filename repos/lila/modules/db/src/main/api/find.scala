@@ -8,9 +8,9 @@ import reactivemongo.api._
 
 object $find {
 
-  def one[A: TubeInColl](q: JsObject,
-                         modifier: QueryBuilder => QueryBuilder =
-                           identity): Fu[Option[A]] =
+  def one[A: TubeInColl](
+      q: JsObject,
+      modifier: QueryBuilder => QueryBuilder = identity): Fu[Option[A]] =
     one(modifier($query(q)))
 
   def one[A: TubeInColl](q: QueryBuilder): Fu[Option[A]] =
@@ -59,7 +59,8 @@ object $find {
   def apply[A: TubeInColl](b: QueryBuilder, nb: Int): Fu[List[A]] =
     b.toList[Option[A]](nb.some) map (_.flatten)
 
-  def apply[A: TubeInColl](
-      b: QueryBuilder, nb: Int, readPreference: ReadPreference): Fu[List[A]] =
+  def apply[A: TubeInColl](b: QueryBuilder,
+                           nb: Int,
+                           readPreference: ReadPreference): Fu[List[A]] =
     b.toList[Option[A]](nb.some, readPreference) map (_.flatten)
 }

@@ -57,8 +57,8 @@ object JarJSModuleID {
 
 /** A JavaScript module that we depend on, but is provided externally or
   *  by the project itself */
-final case class ProvidedJSModuleID(
-    jsDep: JSDependency, configurations: Option[String])
+final case class ProvidedJSModuleID(jsDep: JSDependency,
+                                    configurations: Option[String])
     extends JSModuleID {
 
   protected def withConfigs(configs: Option[String]): JSModuleID =

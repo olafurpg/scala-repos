@@ -267,8 +267,7 @@ trait ExecutorScheduler { self: Scheduler =>
 class ThreadPoolScheduler(
     val name: String,
     val executorFactory: ThreadFactory => ExecutorService
-)
-    extends Scheduler
+) extends Scheduler
     with ExecutorScheduler {
   def this(name: String) = this(name, Executors.newCachedThreadPool(_))
 }
@@ -285,8 +284,7 @@ class ThreadPoolScheduler(
 class BridgedThreadPoolScheduler(
     val name: String,
     val executorFactory: ThreadFactory => ExecutorService
-)
-    extends Scheduler
+) extends Scheduler
     with ExecutorScheduler {
   private[this] val local = new LocalScheduler
 
@@ -295,8 +293,7 @@ class BridgedThreadPoolScheduler(
   override def submit(r: Runnable) {
     if (Thread.currentThread.getThreadGroup == threadGroup) local.submit(r)
     else
-      try executor.execute(
-          new Runnable {
+      try executor.execute(new Runnable {
         def run() {
           BridgedThreadPoolScheduler.this.submit(r)
         }

@@ -105,8 +105,8 @@ object Account {
         collection.breakOut): String
   }
 
-  def newAccountPermissions(
-      accountId: AccountId, accountPath: Path): Set[Permission] = {
+  def newAccountPermissions(accountId: AccountId,
+                            accountPath: Path): Set[Permission] = {
     // Path is "/" so that an account may read data it wrote no matter what path it exists under. 
     // See AccessControlSpec, NewGrantRequest
     Set[Permission](

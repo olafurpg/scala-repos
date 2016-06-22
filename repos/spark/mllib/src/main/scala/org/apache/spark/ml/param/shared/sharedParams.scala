@@ -238,8 +238,8 @@ private[ml] trait HasInputCols extends Params {
     * Param for input column names.
     * @group param
     */
-  final val inputCols: StringArrayParam = new StringArrayParam(
-      this, "inputCols", "input column names")
+  final val inputCols: StringArrayParam =
+    new StringArrayParam(this, "inputCols", "input column names")
 
   /** @group getParam */
   final def getInputCols: Array[String] = $(inputCols)
@@ -291,8 +291,8 @@ private[ml] trait HasFitIntercept extends Params {
     * Param for whether to fit an intercept term.
     * @group param
     */
-  final val fitIntercept: BooleanParam = new BooleanParam(
-      this, "fitIntercept", "whether to fit an intercept term")
+  final val fitIntercept: BooleanParam =
+    new BooleanParam(this, "fitIntercept", "whether to fit an intercept term")
 
   setDefault(fitIntercept, true)
 
@@ -385,7 +385,9 @@ private[ml] trait HasTol extends Params {
     * @group param
     */
   final val tol: DoubleParam = new DoubleParam(
-      this, "tol", "the convergence tolerance for iterative algorithms")
+      this,
+      "tol",
+      "the convergence tolerance for iterative algorithms")
 
   /** @group getParam */
   final def getTol: Double = $(tol)

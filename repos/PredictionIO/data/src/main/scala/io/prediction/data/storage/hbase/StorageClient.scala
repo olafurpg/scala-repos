@@ -53,23 +53,24 @@ class StorageClient(val config: StorageClientConfig)
       error(
           "HBase master is not running (ZooKeeper ensemble: " + conf.get(
               "hbase.zookeeper.quorum") + "). Please make sure that HBase " +
-          "is running properly, and that the configuration is pointing at the " +
-          "correct ZooKeeper ensemble.")
+            "is running properly, and that the configuration is pointing at the " +
+            "correct ZooKeeper ensemble.")
       throw e
     case e: ZooKeeperConnectionException =>
       error(
           "Cannot connect to ZooKeeper (ZooKeeper ensemble: " + conf.get(
               "hbase.zookeeper.quorum") + "). Please make sure that the " +
-          "configuration is pointing at the correct ZooKeeper ensemble. By " +
-          "default, HBase manages its own ZooKeeper, so if you have not " +
-          "configured HBase to use an external ZooKeeper, that means your " +
-          "HBase is not started or configured properly.")
+            "configuration is pointing at the correct ZooKeeper ensemble. By " +
+            "default, HBase manages its own ZooKeeper, so if you have not " +
+            "configured HBase to use an external ZooKeeper, that means your " +
+            "HBase is not started or configured properly.")
       throw e
     case e: Exception => {
-        error("Failed to connect to HBase." +
+      error(
+          "Failed to connect to HBase." +
             " Please check if HBase is running properly.")
-        throw e
-      }
+      throw e
+    }
   }
 
   val connection = HConnectionManager.createConnection(conf)

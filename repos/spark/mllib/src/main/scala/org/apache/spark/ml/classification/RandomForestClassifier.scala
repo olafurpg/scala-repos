@@ -41,8 +41,9 @@ import org.apache.spark.sql.functions._
 @Experimental
 final class RandomForestClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends ProbabilisticClassifier[
-        Vector, RandomForestClassifier, RandomForestClassificationModel]
+    extends ProbabilisticClassifier[Vector,
+                                    RandomForestClassifier,
+                                    RandomForestClassificationModel]
     with RandomForestParams
     with TreeClassifierParams {
 
@@ -110,8 +111,8 @@ final class RandomForestClassifier @Since("1.4.0")(
         case None =>
           throw new IllegalArgumentException(
               "RandomForestClassifier was given input" +
-              s" with invalid label column ${$(labelCol)}, without the number of classes" +
-              " specified. See StringIndexer.")
+                s" with invalid label column ${$(labelCol)}, without the number of classes" +
+                " specified. See StringIndexer.")
         // TODO: Automatically index labels: SPARK-7126
       }
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
@@ -120,8 +121,11 @@ final class RandomForestClassifier @Since("1.4.0")(
                                         OldAlgo.Classification,
                                         getOldImpurity)
     val trees = RandomForest
-      .run(
-          oldDataset, strategy, getNumTrees, getFeatureSubsetStrategy, getSeed)
+      .run(oldDataset,
+           strategy,
+           getNumTrees,
+           getFeatureSubsetStrategy,
+           getSeed)
       .map(_.asInstanceOf[DecisionTreeClassificationModel])
     val numFeatures = oldDataset.first().features.size
     new RandomForestClassificationModel(trees, numFeatures, numClasses)
@@ -157,13 +161,13 @@ object RandomForestClassifier {
   */
 @Since("1.4.0")
 @Experimental
-final class RandomForestClassificationModel private[ml](
+final class RandomForestClassificationModel private[ml] (
     @Since("1.5.0") override val uid: String,
     private val _trees: Array[DecisionTreeClassificationModel],
     @Since("1.6.0") override val numFeatures: Int,
     @Since("1.5.0") override val numClasses: Int)
-    extends ProbabilisticClassificationModel[
-        Vector, RandomForestClassificationModel]
+    extends ProbabilisticClassificationModel[Vector,
+                                             RandomForestClassificationModel]
     with TreeEnsembleModel
     with Serializable {
 
@@ -227,14 +231,16 @@ final class RandomForestClassificationModel private[ml](
       case sv: SparseVector =>
         throw new RuntimeException(
             "Unexpected error in RandomForestClassificationModel:" +
-            " raw2probabilityInPlace encountered SparseVector")
+              " raw2probabilityInPlace encountered SparseVector")
     }
   }
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): RandomForestClassificationModel = {
-    copyValues(new RandomForestClassificationModel(
-                   uid, _trees, numFeatures, numClasses),
+    copyValues(new RandomForestClassificationModel(uid,
+                                                   _trees,
+                                                   numFeatures,
+                                                   numClasses),
                extra).setParent(parent)
   }
 
@@ -278,7 +284,7 @@ private[ml] object RandomForestClassificationModel {
     require(
         oldModel.algo == OldAlgo.Classification,
         "Cannot convert RandomForestModel" +
-        s" with algo=${oldModel.algo} (old API) to RandomForestClassificationModel (new API).")
+          s" with algo=${oldModel.algo} (old API) to RandomForestClassificationModel (new API).")
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeClassificationModel.fromOld(tree, null, categoricalFeatures)

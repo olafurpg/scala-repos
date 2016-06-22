@@ -80,17 +80,17 @@ class StatsReceiverTest extends FunSuite {
                 1.second)
     verify(receiver, times(1)).stat("2", "chainz")
 
-    Await.ready(
-        Stat.timeFuture(receiver.stat("2", "chainz"), TimeUnit.MINUTES) {
-      Future.Unit
-    }, 1.second)
+    Await
+      .ready(Stat.timeFuture(receiver.stat("2", "chainz"), TimeUnit.MINUTES) {
+        Future.Unit
+      }, 1.second)
     verify(receiver, times(2)).stat("2", "chainz")
 
     val stat = receiver.stat("2", "chainz")
     verify(receiver, times(3)).stat("2", "chainz")
 
-    Await.result(
-        Stat.timeFuture(stat, TimeUnit.HOURS) { Future.Unit }, 1.second)
+    Await.result(Stat.timeFuture(stat, TimeUnit.HOURS) { Future.Unit },
+                 1.second)
     verify(receiver, times(3)).stat("2", "chainz")
   }
 
@@ -151,8 +151,8 @@ class StatsReceiverTest extends FunSuite {
     assert(
         "BlacklistStatsReceiver(NullStatsReceiver)" == new BlacklistStatsReceiver(
             NullStatsReceiver, { _ =>
-      false
-    }).toString)
+          false
+        }).toString)
 
     val inMem = new InMemoryStatsReceiver()
     assert("InMemoryStatsReceiver" == inMem.toString)

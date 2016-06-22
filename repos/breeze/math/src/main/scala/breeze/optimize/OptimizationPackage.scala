@@ -11,8 +11,9 @@ import breeze.util.Implicits._
   * @author dlwh
   */
 trait OptimizationPackage[Function, Vector] {
-  def minimize(
-      fn: Function, init: Vector, options: OptimizationOption*): Vector
+  def minimize(fn: Function,
+               init: Vector,
+               options: OptimizationOption*): Vector
 }
 
 trait IterableOptimizationPackage[Function, Vector, State]
@@ -51,10 +52,10 @@ object OptimizationPackage {
   class SecondOrderOptimizationPackage[Vector, Hessian](
       )(implicit space: MutableFiniteCoordinateField[Vector, _, Double],
         mult: OpMulMatrix.Impl2[Hessian, Vector, Vector])
-      extends IterableOptimizationPackage[SecondOrderFunction[Vector, Hessian],
-                                          Vector,
-                                          TruncatedNewtonMinimizer[
-                                              Vector, Hessian]#State] {
+      extends IterableOptimizationPackage[
+          SecondOrderFunction[Vector, Hessian],
+          Vector,
+          TruncatedNewtonMinimizer[Vector, Hessian]#State] {
     def minimize(fn: SecondOrderFunction[Vector, Hessian],
                  init: Vector,
                  options: OptimizationOption*): Vector = {
@@ -70,7 +71,9 @@ object OptimizationPackage {
         throw new UnsupportedOperationException(
             "Can't use L1 with second order optimizer right now")
       val minimizer = new TruncatedNewtonMinimizer[Vector, Hessian](
-          params.maxIterations, params.tolerance, params.regularization)
+          params.maxIterations,
+          params.tolerance,
+          params.regularization)
       minimizer.iterations(fn, init)
     }
   }
@@ -151,7 +154,8 @@ trait OptimizationPackageLowPriority {
       require(!params.useL1,
               "Sorry, we can't use L1 with immutable objects right now...")
       val lbfgs: LBFGS[Wrapper] = new LBFGS[Wrapper](
-          tolerance = params.tolerance, maxIter = params.maxIterations)
+          tolerance = params.tolerance,
+          maxIter = params.maxIterations)
       val res = lbfgs.minimize(
           DiffFunction.withL2Regularization(wrapped, params.regularization),
           wrap(init))

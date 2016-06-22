@@ -140,10 +140,10 @@ class EnsembleGridPane extends EnsembleExample {
     }
     GridPane.setConstraints(imageView, 2, 1)
 
-    val rowInfo = new RowConstraints(
-        minHeight = 50, prefHeight = 50, maxHeight = 50)
-    val colInfo = new ColumnConstraints(
-        minWidth = 140, prefWidth = 140, maxWidth = 140)
+    val rowInfo =
+      new RowConstraints(minHeight = 50, prefHeight = 50, maxHeight = 50)
+    val colInfo =
+      new ColumnConstraints(minWidth = 140, prefWidth = 140, maxWidth = 140)
 
     val grid2 = new GridPane {
       padding = Insets(18)
@@ -165,9 +165,9 @@ class EnsembleGridPane extends EnsembleExample {
     val grid3Caption = new Label {
       text =
         "The example below shows GridPane content placement by " +
-        "influencing row and column percentages.  " +
-        "Also, grid lines are made visible in this example.  " +
-        "The lines can be helpful in debugging."
+          "influencing row and column percentages.  " +
+          "Also, grid lines are made visible in this example.  " +
+          "The lines can be helpful in debugging."
       wrapText = true
     }
 

@@ -70,8 +70,8 @@ sealed trait CPath { self =>
   }
 
   def dropPrefix(p: CPath): Option[CPath] = {
-    def remainder(
-        nodes: List[CPathNode], toDrop: List[CPathNode]): Option[CPath] = {
+    def remainder(nodes: List[CPathNode],
+                  toDrop: List[CPathNode]): Option[CPath] = {
       nodes match {
         case x :: xs =>
           toDrop match {
@@ -122,20 +122,20 @@ sealed trait CPath { self =>
           case x @ CPathIndex(index) =>
             expand0(current :+ x, tail, jvalue(index))
           case x @ CPathField(name) if (isRegex(name)) => {
-              val R = name.r
-              jvalue match {
-                case JObject(fields) =>
-                  fields.toList.flatMap {
-                    case (R(name), value) =>
-                      val expandedNode = CPathField(name)
-                      expand0(current :+ expandedNode, tail, value)
+            val R = name.r
+            jvalue match {
+              case JObject(fields) =>
+                fields.toList.flatMap {
+                  case (R(name), value) =>
+                    val expandedNode = CPathField(name)
+                    expand0(current :+ expandedNode, tail, value)
 
-                    case _ => Nil
-                  }
+                  case _ => Nil
+                }
 
-                case _ => Nil
-              }
+              case _ => Nil
             }
+          }
 
           case x @ CPathField(name) =>
             expand0(current :+ x, tail, jvalue \ name)
@@ -283,8 +283,7 @@ object CPath {
           filtered groupBy { case PathWithLeaf(path, _) => path.head }
 
         def recurse[A](paths: Seq[PathWithLeaf[A]]) =
-          inner(
-              paths map {
+          inner(paths map {
             case PathWithLeaf(path, v) => PathWithLeaf(path.tail, v)
           })
 

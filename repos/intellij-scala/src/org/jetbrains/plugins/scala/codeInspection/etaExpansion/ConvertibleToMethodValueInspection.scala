@@ -65,9 +65,10 @@ class ConvertibleToMethodValueInspection
   }
 
   private def allArgsUnderscores(args: Seq[ScExpression]): Boolean = {
-    args.nonEmpty && args.forall(arg =>
+    args.nonEmpty && args.forall(
+        arg =>
           arg.isInstanceOf[ScUnderscoreSection] &&
-          ScUnderScoreSectionUtil.isUnderscore(arg))
+            ScUnderScoreSectionUtil.isUnderscore(arg))
   }
 
   private def onlyStableValuesUsed(qual: ScExpression): Boolean = {
@@ -89,8 +90,9 @@ class ConvertibleToMethodValueInspection
     }
   }
 
-  private def registerProblem(
-      holder: ProblemsHolder, expr: ScExpression, hint: String) {
+  private def registerProblem(holder: ProblemsHolder,
+                              expr: ScExpression,
+                              hint: String) {
     possibleReplacements(expr).find(isSuitableForReplace(expr, _)).foreach {
       replacement =>
         holder.registerProblem(
@@ -113,10 +115,12 @@ class ConvertibleToMethodValueInspection
       case _ => Seq.empty
     }
 
-  private def isSuitableForReplace(
-      oldExpr: ScExpression, newExprText: String): Boolean = {
+  private def isSuitableForReplace(oldExpr: ScExpression,
+                                   newExprText: String): Boolean = {
     val newExpr = ScalaPsiElementFactory.createExpressionWithContextFromText(
-        newExprText, oldExpr.getContext, oldExpr)
+        newExprText,
+        oldExpr.getContext,
+        oldExpr)
     oldExpr.expectedType(fromUnderscore = false) match {
       case Some(expectedType) if ScFunctionType.isFunctionType(expectedType) =>
         def conformsExpected(expr: ScExpression): Boolean =
@@ -143,15 +147,16 @@ class ConvertibleToMethodValueInspection
   }
 }
 
-class ConvertibleToMethodValueQuickFix(
-    expr: ScExpression, replacement: String, hint: String)
+class ConvertibleToMethodValueQuickFix(expr: ScExpression,
+                                       replacement: String,
+                                       hint: String)
     extends AbstractFixOnPsiElement(hint, expr) {
 
   def doApplyFix(project: Project) {
     val scExpr = getElement
     if (!scExpr.isValid) return
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        replacement, scExpr.getManager)
+    val newExpr = ScalaPsiElementFactory
+      .createExpressionFromText(replacement, scExpr.getManager)
     scExpr.replaceExpression(newExpr, removeParenthesis = true)
   }
 }

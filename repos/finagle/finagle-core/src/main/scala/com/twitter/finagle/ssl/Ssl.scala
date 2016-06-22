@@ -93,7 +93,7 @@ object Ssl {
     *
     * N.B.: This is probably a bad idea for anything but testing!
     */
-  def clientWithoutCertificateValidation(
-      peerHost: String, peerPort: Int): Engine =
+  def clientWithoutCertificateValidation(peerHost: String,
+                                         peerPort: Int): Engine =
     JSSE.clientWithoutCertificateValidation(peerHost, peerPort)
 }

@@ -47,10 +47,10 @@ object Definitions {
                                  BoxedDoubleClass)
   val HijackedClasses = HijackedBoxedClasses + StringClass
 
-  val AncestorsOfStringClass = Set(
-      CharSequenceClass, ComparableClass, SerializableClass)
-  val AncestorsOfHijackedNumberClasses = Set(
-      NumberClass, ComparableClass, SerializableClass)
+  val AncestorsOfStringClass =
+    Set(CharSequenceClass, ComparableClass, SerializableClass)
+  val AncestorsOfHijackedNumberClasses =
+    Set(NumberClass, ComparableClass, SerializableClass)
   val AncestorsOfBoxedBooleanClass = Set(ComparableClass, SerializableClass)
 
   val AncestorsOfHijackedClasses =
@@ -62,8 +62,8 @@ object Definitions {
   val ThrowableClass = "jl_Throwable"
 
   val PseudoArrayClass = "s_Array"
-  val AncestorsOfPseudoArrayClass = Set(
-      ObjectClass, SerializableClass, CloneableClass)
+  val AncestorsOfPseudoArrayClass =
+    Set(ObjectClass, SerializableClass, CloneableClass)
 
   val ExportedConstructorsName = "__exportedInits"
 
@@ -117,9 +117,9 @@ object Definitions {
         "scala_Long" -> "J",
         "scala_Float" -> "F",
         "scala_Double" -> "D"
-    ) ++ (for (index <- 2 to 22) yield
-          s"scala_Tuple$index" -> ("T" + index)) ++
-    (for (index <- 0 to 22) yield s"scala_Function$index" -> ("F" + index))
+    ) ++ (for (index <- 2 to 22)
+          yield s"scala_Tuple$index" -> ("T" + index)) ++
+      (for (index <- 0 to 22) yield s"scala_Function$index" -> ("F" + index))
 
   private val decompressedClasses: Map[String, String] =
     compressedClasses map { case (a, b) => (b, a) }

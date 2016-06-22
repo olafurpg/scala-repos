@@ -80,7 +80,8 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     val inputReadMethod = create(input.READ_METHOD)
     assert(executorRunTime.name === Some(EXECUTOR_RUN_TIME))
     assert(updatedBlockStatuses.name === Some(UPDATED_BLOCK_STATUSES))
-    assert(shuffleRemoteBlocksRead.name === Some(
+    assert(
+        shuffleRemoteBlocksRead.name === Some(
             shuffleRead.REMOTE_BLOCKS_FETCHED))
     assert(inputReadMethod.name === Some(input.READ_METHOD))
     assert(executorRunTime.value.isInstanceOf[Long])
@@ -144,9 +145,11 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     assert(OUTPUT_METRICS_PREFIX.startsWith(METRICS_PREFIX))
     assert(accums.forall(_.name.get.startsWith(METRICS_PREFIX)))
     // assert they all start with the expected prefixes
-    assert(shuffleReadAccums.forall(
+    assert(
+        shuffleReadAccums.forall(
             _.name.get.startsWith(SHUFFLE_READ_METRICS_PREFIX)))
-    assert(shuffleWriteAccums.forall(
+    assert(
+        shuffleWriteAccums.forall(
             _.name.get.startsWith(SHUFFLE_WRITE_METRICS_PREFIX)))
     assert(inputAccums.forall(_.name.get.startsWith(INPUT_METRICS_PREFIX)))
     assert(outputAccums.forall(_.name.get.startsWith(OUTPUT_METRICS_PREFIX)))
@@ -233,7 +236,8 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
       assert(
           secondStageAccum.value.get.asInstanceOf[Long] === numPartitions * 10)
       assert(
-          thirdStageAccum.value.get.asInstanceOf[Long] === numPartitions * 2 * 100)
+          thirdStageAccum.value.get
+            .asInstanceOf[Long] === numPartitions * 2 * 100)
     }
     rdd.count()
   }

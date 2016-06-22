@@ -28,7 +28,8 @@ private[remote] trait UdpHandlers extends CommonHandlers {
       listener: HandleEventListener,
       msg: ChannelBuffer,
       remoteSocketAddress: InetSocketAddress): Unit = {
-    transport.udpConnectionTable.putIfAbsent(remoteSocketAddress, listener) match {
+    transport.udpConnectionTable
+      .putIfAbsent(remoteSocketAddress, listener) match {
       case null ⇒ listener notify InboundPayload(ByteString(msg.array()))
       case oldReader ⇒
         throw new NettyTransportException(
@@ -77,8 +78,8 @@ private[remote] class UdpServerHandler(
 /**
   * INTERNAL API
   */
-private[remote] class UdpClientHandler(
-    _transport: NettyTransport, remoteAddress: Address)
+private[remote] class UdpClientHandler(_transport: NettyTransport,
+                                       remoteAddress: Address)
     extends ClientHandler(_transport, remoteAddress)
     with UdpHandlers {
 

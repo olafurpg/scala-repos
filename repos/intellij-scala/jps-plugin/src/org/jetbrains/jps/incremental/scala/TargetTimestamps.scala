@@ -26,7 +26,8 @@ class TargetTimestamps(context: CompileContext) {
   def set(target: ModuleBuildTarget, timestamp: Long) {
     val file = timestampFile(target)
 
-    using(new DataOutputStream(
+    using(
+        new DataOutputStream(
             new BufferedOutputStream(new FileOutputStream(file)))) { out =>
       out.writeLong(timestamp)
     }

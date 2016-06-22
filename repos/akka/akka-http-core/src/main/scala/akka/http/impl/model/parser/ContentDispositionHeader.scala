@@ -20,7 +20,7 @@ private[parser] trait ContentDispositionHeader {
         ignoreCase("inline") ~ OWS ~ push(ContentDispositionTypes.inline) | ignoreCase(
             "attachment") ~ OWS ~ push(ContentDispositionTypes.attachment) | ignoreCase(
             "form-data") ~ OWS ~ push(ContentDispositionTypes.`form-data`) | `disp-ext-type` ~>
-        (ContentDispositionTypes.Ext(_)))
+          (ContentDispositionTypes.Ext(_)))
 
   def `disp-ext-type` = rule { token }
 

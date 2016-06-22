@@ -42,7 +42,7 @@ object CommonCompareBinary {
                        inputStreamB: InputStream,
                        lenB: Int): Boolean =
     (lenA > minSizeForFulBinaryCompare && (lenA == lenB) &&
-        inputStreamA.markSupported && inputStreamB.markSupported) && {
+          inputStreamA.markSupported && inputStreamB.markSupported) && {
       inputStreamA.mark(lenA)
       inputStreamB.mark(lenB)
 
@@ -80,8 +80,7 @@ object TreeOrderedBuf {
         case _: NoLengthCalculationAvailable[_] => None
         case const: ConstantLengthCalculation[_] => None
         case f: FastLengthCalculation[_] =>
-          Some(
-              q"""
+          Some(q"""
         _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(${f
             .asInstanceOf[FastLengthCalculation[c.type]]
             .t})
@@ -322,8 +321,8 @@ abstract class TreeOrderedBuf[C <: Context] {
   val ctx: C
   val tpe: ctx.Type
   // Expected byte buffers to be in values a and b respestively, the tree has the value of the result
-  def compareBinary(
-      inputStreamA: ctx.TermName, inputStreamB: ctx.TermName): ctx.Tree
+  def compareBinary(inputStreamA: ctx.TermName,
+                    inputStreamB: ctx.TermName): ctx.Tree
   // expects the thing to be tested on in the indiciated TermName
   def hash(element: ctx.TermName): ctx.Tree
 

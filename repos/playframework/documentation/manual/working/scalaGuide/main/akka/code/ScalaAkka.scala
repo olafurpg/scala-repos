@@ -62,8 +62,9 @@ package scalaguide.akka {
         contentAsString(controller.getConfig(FakeRequest())) must_== "foo"
       }
 
-      "allow binding actor factories" in new WithApplication(_.bindings(
-              new factorymodules.MyModule).configure("my.config" -> "foo")) {
+      "allow binding actor factories" in new WithApplication(
+          _.bindings(new factorymodules.MyModule)
+            .configure("my.config" -> "foo")) {
         _ =>
         import play.api.inject.bind
         import akka.actor._
@@ -91,8 +92,8 @@ package scalaguide.akka {
         //#schedule-actor
         import scala.concurrent.duration._
 
-        val cancellable = system.scheduler.schedule(
-            0.microseconds, 300.microseconds, testActor, "tick")
+        val cancellable = system.scheduler
+          .schedule(0.microseconds, 300.microseconds, testActor, "tick")
         //#schedule-actor
         ok
       }
@@ -245,8 +246,8 @@ package scalaguide.akka {
       }
     }
 
-    class ConfiguredChildActor @Inject()(
-        configuration: Configuration, @Assisted key: String)
+    class ConfiguredChildActor @Inject()(configuration: Configuration,
+                                         @Assisted key: String)
         extends Actor {
       import ConfiguredChildActor._
 
@@ -270,8 +271,7 @@ package scalaguide.akka {
 
     class ParentActor @Inject()(
         childFactory: ConfiguredChildActor.Factory
-    )
-        extends Actor
+    ) extends Actor
         with InjectedActorSupport {
       import ParentActor._
 

@@ -31,8 +31,8 @@ import com.precog.yggdrasil.metadata._
 
 import com.weiglewilczek.slf4s.Logging
 
-class JDBCStorageMetadataSource(
-    dbMap: Map[String, String])(implicit asyncContext: ExecutionContext)
+class JDBCStorageMetadataSource(dbMap: Map[String, String])(
+    implicit asyncContext: ExecutionContext)
     extends StorageMetadataSource[Future] {
   def userMetadataView(apiKey: APIKey): StorageMetadata[Future] =
     new JDBCStorageMetadata(dbMap)

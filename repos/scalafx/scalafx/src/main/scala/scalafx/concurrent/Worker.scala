@@ -51,16 +51,16 @@ object Worker {
       * Indicates that this Worker has failed, usually due to some unexpected condition having occurred. 
       */
     val Failed = new State(jfxc.Worker.State.FAILED)
-    @deprecated(
-        "Use Failed; FAILED will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Failed; FAILED will be removed in a future release",
+                "8.0.60-R10")
     val FAILED = Failed
 
     /**
       * Indicates that the Worker has not yet been executed and is ready to be executed, or that it has been reinitialized. 
       */
     val Ready = new State(jfxc.Worker.State.READY)
-    @deprecated(
-        "Use Ready; READY will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Ready; READY will be removed in a future release",
+                "8.0.60-R10")
     val READY = Ready
 
     /**

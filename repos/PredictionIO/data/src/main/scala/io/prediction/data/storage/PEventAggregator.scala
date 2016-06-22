@@ -89,8 +89,7 @@ private[prediction] case class EventOp(
     val deleteEntity: Option[DeleteEntity] = None,
     val firstUpdated: Option[DateTime] = None,
     val lastUpdated: Option[DateTime] = None
-)
-    extends Serializable {
+) extends Serializable {
 
   def ++(that: EventOp): EventOp = {
     val firstUp = (this.firstUpdated ++ that.firstUpdated).reduceOption {
@@ -105,8 +104,7 @@ private[prediction] case class EventOp(
     EventOp(
         setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
         unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
-        deleteEntity =
-          (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _),
+        deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _),
         firstUpdated = firstUp,
         lastUpdated = lastUp
     )
@@ -157,33 +155,33 @@ private[prediction] object EventOp {
     val t = e.eventTime.getMillis
     e.event match {
       case "$set" => {
-          val fields =
-            e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
+        val fields =
+          e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
 
-          EventOp(
-              setProp = Some(SetProp(fields = fields, t = t)),
-              firstUpdated = Some(e.eventTime),
-              lastUpdated = Some(e.eventTime)
-          )
-        }
+        EventOp(
+            setProp = Some(SetProp(fields = fields, t = t)),
+            firstUpdated = Some(e.eventTime),
+            lastUpdated = Some(e.eventTime)
+        )
+      }
       case "$unset" => {
-          val fields = e.properties.fields.mapValues(jv => t).map(identity)
-          EventOp(
-              unsetProp = Some(UnsetProp(fields = fields)),
-              firstUpdated = Some(e.eventTime),
-              lastUpdated = Some(e.eventTime)
-          )
-        }
+        val fields = e.properties.fields.mapValues(jv => t).map(identity)
+        EventOp(
+            unsetProp = Some(UnsetProp(fields = fields)),
+            firstUpdated = Some(e.eventTime),
+            lastUpdated = Some(e.eventTime)
+        )
+      }
       case "$delete" => {
-          EventOp(
-              deleteEntity = Some(DeleteEntity(t)),
-              firstUpdated = Some(e.eventTime),
-              lastUpdated = Some(e.eventTime)
-          )
-        }
+        EventOp(
+            deleteEntity = Some(DeleteEntity(t)),
+            firstUpdated = Some(e.eventTime),
+            lastUpdated = Some(e.eventTime)
+        )
+      }
       case _ => {
-          EventOp()
-        }
+        EventOp()
+      }
     }
   }
 }

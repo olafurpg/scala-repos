@@ -71,7 +71,7 @@ class PartitionTopicInfo(
 
   override def toString(): String =
     topic + ":" + partitionId.toString + ": fetched offset = " +
-    fetchedOffset.get + ": consumed offset = " + consumedOffset.get
+      fetchedOffset.get + ": consumed offset = " + consumedOffset.get
 }
 
 object PartitionTopicInfo {

@@ -27,7 +27,8 @@ class StorageClient(val config: StorageClientConfig)
   override val prefix = "HDFS"
   val conf = new Configuration
   val fs = FileSystem.get(conf)
-  fs.setWorkingDirectory(new Path(
+  fs.setWorkingDirectory(
+      new Path(
           config.properties.getOrElse("PATH", config.properties("HOSTS"))))
   val client = fs
 }

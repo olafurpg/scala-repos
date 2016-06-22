@@ -42,7 +42,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class AnimationSpec
     extends SimpleSFXDelegateSpec[jfxa.Animation, Animation](
-        classOf[jfxa.Animation], classOf[Animation])
+        classOf[jfxa.Animation],
+        classOf[Animation])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance =

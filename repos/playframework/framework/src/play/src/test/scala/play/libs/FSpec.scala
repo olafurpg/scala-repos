@@ -315,17 +315,20 @@ object FSpec extends Specification with ExecutionSpecification {
 
     "throw a promise timeout exception" in {
       //F.Promise.timeout().get(15, SECONDS) must throwA[TimeoutException] // Too slow to run for normal testing
-      F.Promise.timeout(2).get(1, SECONDS) must throwA[
-          F.PromiseTimeoutException]
-      F.Promise.timeout(2, MILLISECONDS).get(1, SECONDS) must throwA[
-          F.PromiseTimeoutException]
+      F.Promise
+        .timeout(2)
+        .get(1, SECONDS) must throwA[F.PromiseTimeoutException]
+      F.Promise
+        .timeout(2, MILLISECONDS)
+        .get(1, SECONDS) must throwA[F.PromiseTimeoutException]
     }
 
     "combine a sequence of promises from a vararg" in {
       mustExecute(3) { ec =>
         import F.Promise.pure
-        F.Promise.sequence[Int](ec, pure(1), pure(2), pure(3)).get(5, SECONDS) must equalTo(
-            Arrays.asList(1, 2, 3))
+        F.Promise
+          .sequence[Int](ec, pure(1), pure(2), pure(3))
+          .get(5, SECONDS) must equalTo(Arrays.asList(1, 2, 3))
       }
     }
 

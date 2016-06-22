@@ -30,11 +30,14 @@ trait IterablePicklers {
         TravPickler.oneArgumentTagExtractor(tpe)
       } _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.List", generator)
+        "scala.collection.immutable.List",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.$colon$colon", generator)
+        "scala.collection.immutable.$colon$colon",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.Nil.type", generator)
+        "scala.collection.immutable.Nil.type",
+        generator)
   }
 
   // Register Iterable runtime pickler
@@ -45,7 +48,8 @@ trait IterablePicklers {
       TravPickler.oneArgumentTagExtractor(tpe)
     } _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.Iterable", generator)
+        "scala.collection.Iterable",
+        generator)
   }
 }
 
@@ -67,8 +71,8 @@ object TravPickler {
   }
 
   /** Creates a pickling generator that can be registered at runtime. */
-  def generate[T, C](
-      cbf: CanBuildFrom[C, T, C], asTraversable: C => Traversable[_])(
+  def generate[T, C](cbf: CanBuildFrom[C, T, C],
+                     asTraversable: C => Traversable[_])(
       elementTagExtractor: AppliedType => FastTypeTag[T])(
       tpe: AppliedType): AbstractPicklerUnpickler[C] = {
     // TODO - we need to construct all the things we need from the tag to create a pickler/unpickler

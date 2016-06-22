@@ -90,7 +90,8 @@ private[spark] abstract class Task[T](
       try {
         Utils.tryLogNonFatalError {
           // Release memory used by this thread for unrolling blocks
-          SparkEnv.get.blockManager.memoryStore.releaseUnrollMemoryForThisTask()
+          SparkEnv.get.blockManager.memoryStore
+            .releaseUnrollMemoryForThisTask()
           // Notify any tasks waiting for execution memory to be freed to wake up and try to
           // acquire memory again. This makes impossible the scenario where a task sleeps forever
           // because there are no other tasks left to notify it. Since this is safe to do but may
@@ -244,8 +245,7 @@ private[spark] object Task {
     }
 
     // Create a sub-buffer for the rest of the data, which is the serialized Task object
-    val subBuffer =
-      serializedTask.slice() // ByteBufferInputStream will have read just up to task
+    val subBuffer = serializedTask.slice() // ByteBufferInputStream will have read just up to task
     (taskFiles, taskJars, subBuffer)
   }
 }

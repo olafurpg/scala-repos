@@ -35,9 +35,9 @@ class QuickSort[Coll](a: Coll) {
 }
 
 class FilterMap[Repr](a: Repr) {
-  def filterMap[A, B, That](
-      f: A => Option[B])(implicit ev0: Repr => TraversableLike[A, Repr],
-                         cbf: CanBuildFrom[Repr, B, That]): That = {
+  def filterMap[A, B, That](f: A => Option[B])(
+      implicit ev0: Repr => TraversableLike[A, Repr],
+      cbf: CanBuildFrom[Repr, B, That]): That = {
     a.flatMap(e => f(e).toSeq)
   }
 }

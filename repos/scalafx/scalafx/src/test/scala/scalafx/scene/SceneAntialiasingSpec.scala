@@ -43,7 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SceneAntialiasingSpec
     extends SimpleSFXDelegateSpec[jfxs.SceneAntialiasing, SceneAntialiasing](
-        classOf[jfxs.SceneAntialiasing], classOf[SceneAntialiasing]) {
+        classOf[jfxs.SceneAntialiasing],
+        classOf[SceneAntialiasing]) {
 
   override protected def getScalaClassInstance = SceneAntialiasing.Balanced
   override protected def getJavaClassInstance = jfxs.SceneAntialiasing.DISABLED

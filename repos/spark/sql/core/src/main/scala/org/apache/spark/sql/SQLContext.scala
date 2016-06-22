@@ -65,7 +65,7 @@ import org.apache.spark.util.Utils
   * @groupname Ungrouped Support functions for language integrated queries
   * @since 1.0.0
   */
-class SQLContext private[sql](
+class SQLContext private[sql] (
     @transient val sparkContext: SparkContext,
     @transient protected[sql] val cacheManager: CacheManager,
     @transient private[sql] val listener: SQLListener,
@@ -96,9 +96,9 @@ class SQLContext private[sql](
         case Some(rootSQLContext) =>
           val errMsg =
             "Only one SQLContext/HiveContext may be running in this JVM. " +
-            s"It is recommended to use SQLContext.getOrCreate to get the instantiated " +
-            s"SQLContext/HiveContext. To ignore this error, " +
-            s"set ${SQLConf.ALLOW_MULTIPLE_CONTEXTS.key} = true in SparkConf."
+              s"It is recommended to use SQLContext.getOrCreate to get the instantiated " +
+              s"SQLContext/HiveContext. To ignore this error, " +
+              s"set ${SQLConf.ALLOW_MULTIPLE_CONTEXTS.key} = true in SparkConf."
           throw new SparkException(errMsg)
         case None => // OK
       }
@@ -257,8 +257,8 @@ class SQLContext private[sql](
     */
   @Experimental
   @transient
-  lazy val emptyDataFrame: DataFrame = createDataFrame(
-      sparkContext.emptyRDD[Row], StructType(Nil))
+  lazy val emptyDataFrame: DataFrame =
+    createDataFrame(sparkContext.emptyRDD[Row], StructType(Nil))
 
   /**
     * A collection of methods for registering user-defined functions (UDF).
@@ -447,20 +447,19 @@ class SQLContext private[sql](
     * Creates a DataFrame from an RDD[Row]. User can specify whether the input rows should be
     * converted to Catalyst rows.
     */
-  private[sql] def createDataFrame(
-      rowRDD: RDD[Row], schema: StructType, needsConversion: Boolean) = {
+  private[sql] def createDataFrame(rowRDD: RDD[Row],
+                                   schema: StructType,
+                                   needsConversion: Boolean) = {
     // TODO: use MutableProjection when rowRDD is another DataFrame and the applied
     // schema differs from the existing schema on any field data type.
-    val catalystRows =
-      if (needsConversion) {
-        val converter =
-          CatalystTypeConverters.createToCatalystConverter(schema)
-        rowRDD.map(converter(_).asInstanceOf[InternalRow])
-      } else {
-        rowRDD.map { r: Row =>
-          InternalRow.fromSeq(r.toSeq)
-        }
+    val catalystRows = if (needsConversion) {
+      val converter = CatalystTypeConverters.createToCatalystConverter(schema)
+      rowRDD.map(converter(_).asInstanceOf[InternalRow])
+    } else {
+      rowRDD.map { r: Row =>
+        InternalRow.fromSeq(r.toSeq)
       }
+    }
     val logicalPlan = LogicalRDD(schema.toAttributes, catalystRows)(self)
     Dataset.newDataFrame(this, logicalPlan)
   }
@@ -491,8 +490,8 @@ class SQLContext private[sql](
     * Creates a DataFrame from an RDD[Row]. User can specify whether the input rows should be
     * converted to Catalyst rows.
     */
-  private[sql] def internalCreateDataFrame(
-      catalystRows: RDD[InternalRow], schema: StructType) = {
+  private[sql] def internalCreateDataFrame(catalystRows: RDD[InternalRow],
+                                           schema: StructType) = {
     // TODO: use MutableProjection when rowRDD is another DataFrame and the applied
     // schema differs from the existing schema on any field data type.
     val logicalPlan = LogicalRDD(schema.toAttributes, catalystRows)(self)
@@ -523,8 +522,8 @@ class SQLContext private[sql](
     * @since 1.6.0
     */
   @DeveloperApi
-  def createDataFrame(
-      rows: java.util.List[Row], schema: StructType): DataFrame = {
+  def createDataFrame(rows: java.util.List[Row],
+                      schema: StructType): DataFrame = {
     Dataset.newDataFrame(
         self,
         LocalRelation.fromExternalRows(schema.toAttributes, rows.asScala))
@@ -570,8 +569,8 @@ class SQLContext private[sql](
     * @group dataframes
     * @since 1.6.0
     */
-  def createDataFrame(
-      data: java.util.List[_], beanClass: Class[_]): DataFrame = {
+  def createDataFrame(data: java.util.List[_],
+                      beanClass: Class[_]): DataFrame = {
     val attrSeq = getSchema(beanClass)
     val className = beanClass.getName
     val beanInfo = Introspector.getBeanInfo(beanClass)
@@ -616,8 +615,9 @@ class SQLContext private[sql](
     * @since 1.3.0
     */
   @Experimental
-  def createExternalTable(
-      tableName: String, path: String, source: String): DataFrame = {
+  def createExternalTable(tableName: String,
+                          path: String,
+                          source: String): DataFrame = {
     createExternalTable(tableName, source, Map("path" -> path))
   }
 
@@ -709,10 +709,11 @@ class SQLContext private[sql](
     * Registers the given [[DataFrame]] as a temporary table in the catalog. Temporary tables exist
     * only during the lifetime of this instance of SQLContext.
     */
-  private[sql] def registerDataFrameAsTable(
-      df: DataFrame, tableName: String): Unit = {
+  private[sql] def registerDataFrameAsTable(df: DataFrame,
+                                            tableName: String): Unit = {
     sessionState.catalog.registerTable(
-        sessionState.sqlParser.parseTableIdentifier(tableName), df.logicalPlan)
+        sessionState.sqlParser.parseTableIdentifier(tableName),
+        df.logicalPlan)
   }
 
   /**
@@ -749,8 +750,10 @@ class SQLContext private[sql](
     */
   @Experimental
   def range(start: Long, end: Long): Dataset[Long] = {
-    range(
-        start, end, step = 1, numPartitions = sparkContext.defaultParallelism)
+    range(start,
+          end,
+          step = 1,
+          numPartitions = sparkContext.defaultParallelism)
   }
 
   /**
@@ -780,8 +783,9 @@ class SQLContext private[sql](
             end: Long,
             step: Long,
             numPartitions: Int): Dataset[Long] = {
-    new Dataset(
-        this, Range(start, end, step, numPartitions), implicits.newLongEncoder)
+    new Dataset(this,
+                Range(start, end, step, numPartitions),
+                implicits.newLongEncoder)
   }
 
   /**
@@ -897,7 +901,8 @@ class SQLContext private[sql](
     * Apply a schema defined by the schemaString to an RDD. It is only used by PySpark.
     */
   protected[sql] def applySchemaToPythonRDD(
-      rdd: RDD[Array[Any]], schemaString: String): DataFrame = {
+      rdd: RDD[Array[Any]],
+      schemaString: String): DataFrame = {
     val schema = parseDataType(schemaString).asInstanceOf[StructType]
     applySchemaToPythonRDD(rdd, schema)
   }
@@ -905,8 +910,8 @@ class SQLContext private[sql](
   /**
     * Apply a schema defined by the schema to an RDD. It is only used by PySpark.
     */
-  protected[sql] def applySchemaToPythonRDD(
-      rdd: RDD[Array[Any]], schema: StructType): DataFrame = {
+  protected[sql] def applySchemaToPythonRDD(rdd: RDD[Array[Any]],
+                                            schema: StructType): DataFrame = {
 
     val rowRdd = rdd.map(r =>
           python.EvaluatePython.fromJava(r, schema).asInstanceOf[InternalRow])
@@ -926,8 +931,7 @@ class SQLContext private[sql](
   // Register a successfully instantiated context to the singleton. This should be at the end of
   // the class definition so that the singleton is updated only if there is no exception in the
   // construction of the instance.
-  sparkContext.addSparkListener(
-      new SparkListener {
+  sparkContext.addSparkListener(new SparkListener {
     override def onApplicationEnd(
         applicationEnd: SparkListenerApplicationEnd): Unit = {
       SQLContext.clearInstantiatedContext()

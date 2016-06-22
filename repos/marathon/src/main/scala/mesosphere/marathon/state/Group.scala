@@ -175,8 +175,8 @@ case class Group(id: PathId,
     val graph = new DefaultDirectedGraph[AppDefinition, DefaultEdge](
         classOf[DefaultEdge])
     for (app <- transitiveApps) graph.addVertex(app)
-    for ((app, dependent) <- applicationDependencies) graph.addEdge(
-        app, dependent)
+    for ((app, dependent) <- applicationDependencies)
+      graph.addEdge(app, dependent)
     new UnmodifiableDirectedGraph(graph)
   }
 
@@ -263,7 +263,8 @@ object Group {
     new Validator[Group] {
       override def apply(group: Group): Result = {
         maxApps.filter(group.transitiveApps.size > _).map { num =>
-          Failure(Set(RuleViolation(
+          Failure(
+              Set(RuleViolation(
                       group,
                       s"""This Marathon instance may only handle up to $num Apps!
                 |(Override with command line option --max_apps)""".stripMargin,

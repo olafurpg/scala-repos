@@ -40,7 +40,8 @@ object Event {
     def deserialize(buf: Buf): Try[Event]
 
     protected def serializeTrace(
-        traceId: Long, spanId: Long): (Option[Long], Option[Long]) = {
+        traceId: Long,
+        spanId: Long): (Option[Long], Option[Long]) = {
       val sid = if (spanId == NoSpanId) None else Some(spanId)
       val tid = if (traceId == NoTraceId) None else Some(traceId)
       (tid, sid)

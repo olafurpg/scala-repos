@@ -25,8 +25,8 @@ import org.apache.spark.deploy.yarn.{ApplicationMaster, YarnSparkHadoopUtil}
 import org.apache.spark.scheduler.TaskSchedulerImpl
 import org.apache.spark.util.Utils
 
-private[spark] class YarnClusterSchedulerBackend(
-    scheduler: TaskSchedulerImpl, sc: SparkContext)
+private[spark] class YarnClusterSchedulerBackend(scheduler: TaskSchedulerImpl,
+                                                 sc: SparkContext)
     extends YarnSchedulerBackend(scheduler, sc) {
 
   override def start() {
@@ -63,7 +63,7 @@ private[spark] class YarnClusterSchedulerBackend(
     } catch {
       case e: Exception =>
         logInfo("Error while building AM log links, so AM" +
-                " logs link will not appear in application UI",
+                  " logs link will not appear in application UI",
                 e)
     }
     driverLogs

@@ -5,11 +5,11 @@ import akka.persistence.{PersistenceSpec, PluginCleanup}
 
 class LeveldbJournalNoAtomicPersistMultipleEventsSpec
     extends JournalSpec(
-        config = PersistenceSpec.config(
-            "leveldb",
-            "LeveldbJournalNoAtomicPersistMultipleEventsSpec",
-            extraConfig =
-              Some("akka.persistence.journal.leveldb.native = off")))
+        config = PersistenceSpec
+          .config("leveldb",
+                  "LeveldbJournalNoAtomicPersistMultipleEventsSpec",
+                  extraConfig =
+                    Some("akka.persistence.journal.leveldb.native = off")))
     with PluginCleanup {
 
   /**

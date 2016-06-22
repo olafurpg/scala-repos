@@ -20,23 +20,23 @@ object MavenRepositorySystemFactory {
   def newRepositorySystemImpl: RepositorySystem = {
     // For now we just log Aether instantiation issues.  These should probably cause fatal errors.
     val locator = MavenRepositorySystemUtils.newServiceLocator()
-    locator.setErrorHandler(
-        new DefaultServiceLocator.ErrorHandler {
-      override def serviceCreationFailed(
-          tpe: Class[_], impl: Class[_], exception: Throwable): Unit = {
+    locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler {
+      override def serviceCreationFailed(tpe: Class[_],
+                                         impl: Class[_],
+                                         exception: Throwable): Unit = {
         Message.error(s"Failed to create $tpe, of class $impl")
       }
     })
     // Here we register the Ivy <-> Aether transport bridge
-    locator.addService(
-        classOf[TransporterFactory], classOf[MyTransportFactory])
+    locator
+      .addService(classOf[TransporterFactory], classOf[MyTransportFactory])
     // This connects the download mechanism to our transports.  Why is it needed? no clue.
     locator.addService(classOf[RepositoryConnectorFactory],
                        classOf[BasicRepositoryConnectorFactory])
 
     // Plugins cause issues here, as their layout is super odd.  Here we inject a new plugin layout
-    locator.addService(
-        classOf[RepositoryLayoutFactory], classOf[SbtPluginLayoutFactory])
+    locator.addService(classOf[RepositoryLayoutFactory],
+                       classOf[SbtPluginLayoutFactory])
 
     // Here we add the metadata services so aether will automatically add maven-metadata.xml files.
     locator.addService(classOf[MetadataGeneratorFactory],

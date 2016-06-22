@@ -89,7 +89,7 @@ object svd extends UFunc {
       (3 * scala.math.min(m, n) * scala.math.min(m, n) + scala.math.max(
               scala.math.max(m, n),
               4 * scala.math.min(m, n) * scala.math.min(m, n) +
-              4 * scala.math.min(m, n)))
+                4 * scala.math.min(m, n)))
     val work = new Array[Double](workSize)
     val info = new intW(0)
     val cm = copy(mat)
@@ -147,7 +147,7 @@ object svd extends UFunc {
       (3 * scala.math.min(m, n) * scala.math.min(m, n) + scala.math.max(
               scala.math.max(m, n),
               4 * scala.math.min(m, n) * scala.math.min(m, n) +
-              4 * scala.math.min(m, n)))
+                4 * scala.math.min(m, n)))
     val work = new Array[Float](workSize)
     val info = new intW(0)
     val cm = copy(mat)
@@ -363,7 +363,7 @@ object svd extends UFunc {
           if (eigenVal < 0.0)
             throw new IllegalStateException(
                 "encountered negative eigenvalue, " +
-                "please make sure your multiplication operators are applied to the same matrix.")
+                  "please make sure your multiplication operators are applied to the same matrix.")
           val eigenVec = eigenVectors(i * n until i * n + n)
           mp(i) = (scala.math.sqrt(eigenVal), eigenVec)
         }
@@ -403,7 +403,7 @@ object svd extends UFunc {
       if (k >= mt.cols || k >= mt.rows) {
         throw new IllegalArgumentException(
             "The desired number of singular values is greater " +
-            "than or equal to min(mt.cols, mt.rows). Please use the full svd.")
+              "than or equal to min(mt.cols, mt.rows). Please use the full svd.")
       }
 
       val svdImpl = svd.Svd_Sparse_Impl[CSCMatrix[Double], CSCMatrix[Double]]

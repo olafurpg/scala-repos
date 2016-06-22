@@ -70,8 +70,7 @@ object EstimatorTransformerParamExample {
       .put(lr.regParam -> 0.1, lr.threshold -> 0.55) // Specify multiple Params.
 
     // One can also combine ParamMaps.
-    val paramMap2 =
-      ParamMap(lr.probabilityCol -> "myProbability") // Change output column name
+    val paramMap2 = ParamMap(lr.probabilityCol -> "myProbability") // Change output column name
     val paramMapCombined = paramMap ++ paramMap2
 
     // Now learn a new model using the paramMapCombined parameters.
@@ -82,7 +81,8 @@ object EstimatorTransformerParamExample {
 
     // Prepare test data.
     val test = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (1.0, Vectors.dense(-1.0, 1.5, 1.3)),
               (0.0, Vectors.dense(3.0, 2.0, -0.1)),
               (1.0, Vectors.dense(0.0, 2.2, -1.5))

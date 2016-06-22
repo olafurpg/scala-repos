@@ -70,8 +70,7 @@ final case class ClusterRouterGroupSettings(
       routeesPaths.head == "")
     throw new IllegalArgumentException("routeesPaths must be defined")
 
-  routeesPaths.foreach(
-      p ⇒
+  routeesPaths.foreach(p ⇒
         p match {
       case RelativeActorPath(elements) ⇒ // good
       case _ ⇒
@@ -163,8 +162,8 @@ private[akka] trait ClusterRouterSettingsBase {
   * [[akka.routing.RoundRobinGroup]] or custom routers.
   */
 @SerialVersionUID(1L)
-final case class ClusterRouterGroup(
-    local: Group, settings: ClusterRouterGroupSettings)
+final case class ClusterRouterGroup(local: Group,
+                                    settings: ClusterRouterGroupSettings)
     extends Group
     with ClusterRouterConfigBase {
 
@@ -201,8 +200,8 @@ final case class ClusterRouterGroup(
   * [[akka.routing.RoundRobinGroup]] or custom routers.
   */
 @SerialVersionUID(1L)
-final case class ClusterRouterPool(
-    local: Pool, settings: ClusterRouterPoolSettings)
+final case class ClusterRouterPool(local: Pool,
+                                   settings: ClusterRouterPoolSettings)
     extends Pool
     with ClusterRouterConfigBase {
 
@@ -214,8 +213,8 @@ final case class ClusterRouterPool(
   /**
     * INTERNAL API
     */
-  override private[akka] def newRoutee(
-      routeeProps: Props, context: ActorContext): Routee = {
+  override private[akka] def newRoutee(routeeProps: Props,
+                                       context: ActorContext): Routee = {
     val name = "c" + childNameCounter.incrementAndGet
     val ref = context
       .asInstanceOf[ActorCell]
@@ -276,7 +275,7 @@ private[akka] trait ClusterRouterConfigBase extends RouterConfig {
   // Intercept ClusterDomainEvent and route them to the ClusterRouterActor
   override def isManagementMessage(msg: Any): Boolean =
     (msg.isInstanceOf[ClusterDomainEvent]) ||
-    msg.isInstanceOf[CurrentClusterState] || super.isManagementMessage(msg)
+      msg.isInstanceOf[CurrentClusterState] || super.isManagementMessage(msg)
 }
 
 /**
@@ -346,7 +345,7 @@ private[akka] class ClusterRouterGroupActor(
     case other ⇒
       throw ActorInitializationException(
           "ClusterRouterGroupActor can only be used with group, not " +
-          other.getClass)
+            other.getClass)
   }
 
   override def receive = clusterReceive orElse super.receive
@@ -366,7 +365,8 @@ private[akka] class ClusterRouterGroupActor(
       case Some((address, path)) ⇒
         val routee = group.routeeFor(address + path, context)
         usedRouteePaths = usedRouteePaths.updated(
-            address, usedRouteePaths.getOrElse(address, Set.empty) + path)
+            address,
+            usedRouteePaths.getOrElse(address, Set.empty) + path)
         // must register each one, since registered routees are used in selectDeploymentTarget
         cell.addRoutee(routee)
 
@@ -421,7 +421,7 @@ private[akka] trait ClusterRouterActor {
       !cell.routerConfig.isInstanceOf[Group])
     throw ActorInitializationException(
         "Cluster router actor can only be used with Pool or Group, not with " +
-        cell.routerConfig.getClass)
+          cell.routerConfig.getClass)
 
   def cluster: Cluster = Cluster(context.system)
 
@@ -440,8 +440,8 @@ private[akka] trait ClusterRouterActor {
 
   def isAvailable(m: Member): Boolean =
     (m.status == MemberStatus.Up || m.status == MemberStatus.WeaklyUp) &&
-    satisfiesRole(m.roles) &&
-    (settings.allowLocalRoutees || m.address != cluster.selfAddress)
+      satisfiesRole(m.roles) &&
+      (settings.allowLocalRoutees || m.address != cluster.selfAddress)
 
   private def satisfiesRole(memberRoles: Set[String]): Boolean =
     settings.useRole match {

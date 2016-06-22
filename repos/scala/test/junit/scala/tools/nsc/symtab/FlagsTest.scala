@@ -16,18 +16,17 @@ class FlagsTest {
   def sym = NoSymbol.newTermSymbol(nme.EMPTY)
 
   def withFlagMask[A](mask: Long)(body: => A): A =
-    enteringPhase(
-        new Phase(NoPhase) {
+    enteringPhase(new Phase(NoPhase) {
       override def flagMask = mask
       def name = ""
       def run() = ()
     })(body)
 
   def testTimedFlag(flag: Long, test: Symbol => Boolean, enabling: Boolean) = {
-    assertEquals(
-        withFlagMask(InitialFlags)(test(sym.setFlag(flag))), !enabling)
-    assertEquals(
-        withFlagMask(InitialFlags | flag)(test(sym.setFlag(flag))), enabling)
+    assertEquals(withFlagMask(InitialFlags)(test(sym.setFlag(flag))),
+                 !enabling)
+    assertEquals(withFlagMask(InitialFlags | flag)(test(sym.setFlag(flag))),
+                 enabling)
   }
 
   def testLate(flag: Long, test: Symbol => Boolean) =
@@ -99,8 +98,8 @@ class FlagsTest {
     val lateFlags = lateable << LateShift
     val allButLateable = AllFlags & ~lateable
 
-    assertEquals(
-        withFlagMask(AllFlags)(sym.setFlag(AllFlags).flags), allButNegatable)
+    assertEquals(withFlagMask(AllFlags)(sym.setFlag(AllFlags).flags),
+                 allButNegatable)
     assertEquals(withFlagMask(AllFlags)(sym.setFlag(allButLateable).flags),
                  allButNegatable)
 

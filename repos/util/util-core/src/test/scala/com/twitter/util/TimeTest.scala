@@ -19,8 +19,12 @@ trait TimeLikeSpec[T <: TimeLike[T]]
   import ops._
 
   "Top, Bottom, Undefined, Nanoseconds(_), Finite(_)" should {
-    val easyVs = Seq(
-        Zero, Top, Bottom, Undefined, fromNanoseconds(1), fromNanoseconds(-1))
+    val easyVs = Seq(Zero,
+                     Top,
+                     Bottom,
+                     Undefined,
+                     fromNanoseconds(1),
+                     fromNanoseconds(-1))
     val vs =
       easyVs ++ Seq(fromNanoseconds(Long.MaxValue - 1),
                     fromNanoseconds(Long.MinValue + 1))
@@ -234,7 +238,8 @@ trait TimeLikeSpec[T <: TimeLike[T]]
       assert(Undefined.moreOrLessEquals(Top, Duration.Zero) == false)
       assert(Undefined.moreOrLessEquals(fromSeconds(0), Duration.Top) == false)
       assert(
-          Undefined.moreOrLessEquals(fromSeconds(0), Duration.Undefined) == true)
+          Undefined
+            .moreOrLessEquals(fromSeconds(0), Duration.Undefined) == true)
     }
 
     "Undefined on diff" in {
@@ -306,8 +311,8 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "round to itself" in {
-      for (s <- Seq(Long.MinValue, -1, 1, Long.MaxValue); t = s.nanoseconds) assert(
-          t.floor(t.inNanoseconds.nanoseconds) == t)
+      for (s <- Seq(Long.MinValue, -1, 1, Long.MaxValue); t = s.nanoseconds)
+        assert(t.floor(t.inNanoseconds.nanoseconds) == t)
     }
   }
 
@@ -392,7 +397,8 @@ with Eventually with IntegrationPatience {
       assert(t0 == t1)
       assert(t0.hashCode == t1.hashCode)
       val pairs = List((t0, "foo"), (t1, "bar"))
-      assert(pairs.groupBy { case (time: Time, value: String) => time } == Map(
+      assert(
+          pairs.groupBy { case (time: Time, value: String) => time } == Map(
               t0 -> pairs))
     }
 
@@ -596,7 +602,8 @@ with Eventually with IntegrationPatience {
       val tolerance = 2.microseconds // we permit 1us slop
 
       forAll { i: Int =>
-        assert(Time
+        assert(
+            Time
               .fromSeconds(i)
               .moreOrLessEquals(Time.fromFractionalSeconds(i.toDouble),
                                 tolerance))
@@ -606,7 +613,8 @@ with Eventually with IntegrationPatience {
         val magic = 9223372036854775L // cribbed from Time.fromMicroseconds
         val microseconds = d * 1.second.inMicroseconds
         whenever(microseconds > -magic && microseconds < magic) {
-          assert(Time
+          assert(
+              Time
                 .fromMicroseconds(microseconds.toLong)
                 .moreOrLessEquals(Time.fromFractionalSeconds(d), tolerance))
         }
@@ -614,7 +622,8 @@ with Eventually with IntegrationPatience {
 
       forAll { l: Long =>
         val seconds: Double = l.toDouble / 1.second.inNanoseconds
-        assert(Time
+        assert(
+            Time
               .fromFractionalSeconds(seconds)
               .moreOrLessEquals(Time.fromNanoseconds(l), tolerance))
       }
@@ -633,7 +642,9 @@ with Eventually with IntegrationPatience {
 
       val currentTimeMicros = System.currentTimeMillis() * 1000
       assert(
-          Time.fromMicroseconds(currentTimeMicros).inNanoseconds == currentTimeMicros.microseconds.inNanoseconds)
+          Time
+            .fromMicroseconds(currentTimeMicros)
+            .inNanoseconds == currentTimeMicros.microseconds.inNanoseconds)
     }
 
     "fromMillis" in {
@@ -649,7 +660,9 @@ with Eventually with IntegrationPatience {
 
       val currentTimeMs = System.currentTimeMillis
       assert(
-          Time.fromMilliseconds(currentTimeMs).inNanoseconds == currentTimeMs * 1000000L)
+          Time
+            .fromMilliseconds(currentTimeMs)
+            .inNanoseconds == currentTimeMs * 1000000L)
     }
 
     "until" in {

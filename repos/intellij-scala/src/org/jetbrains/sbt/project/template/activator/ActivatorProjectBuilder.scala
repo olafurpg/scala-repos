@@ -29,7 +29,8 @@ import org.jetbrains.sbt.project.template.activator.ActivatorRepoProcessor.DocDa
   */
 class ActivatorProjectBuilder
     extends AbstractExternalModuleBuilder[SbtProjectSettings](
-        SbtProjectSystem.Id, new SbtProjectSettings) {
+        SbtProjectSystem.Id,
+        new SbtProjectSettings) {
   //TODO Refactor me
   private var allTemplates: Map[String, DocData] = Map.empty
   private val repoProcessor = new ActivatorCachedRepoProcessor
@@ -142,7 +143,7 @@ class ActivatorProjectBuilder
 
   private def downloadTemplateList() {
     doWithProgress({ allTemplates = repoProcessor.extractRepoData() },
-    "Downloading list of templates...")
+                   "Downloading list of templates...")
   }
 
   private def doWithProgress(body: => Unit, title: String) {

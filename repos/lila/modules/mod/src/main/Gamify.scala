@@ -18,7 +18,8 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
     val lastId = HistoryMonth.makeId(until.getYear, until.getMonthOfYear)
     historyColl
       .find(BSONDocument())
-      .sort(BSONDocument(
+      .sort(
+          BSONDocument(
               "year" -> -1,
               "month" -> -1
           ))
@@ -37,8 +38,9 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
   private implicit val modMixedBSONHandler = Macros.handler[ModMixed]
   private implicit val historyMonthBSONHandler = Macros.handler[HistoryMonth]
 
-  private def buildHistoryAfter(
-      afterYear: Int, afterMonth: Int, until: DateTime): Funit =
+  private def buildHistoryAfter(afterYear: Int,
+                                afterMonth: Int,
+                                until: DateTime): Funit =
     (afterYear to until.getYear).flatMap { year =>
       ((year == afterYear).fold(afterMonth + 1, 1) to (year == until.getYear)
             .fold(until.getMonthOfYear, 12)).map { month =>
@@ -56,8 +58,9 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
       .map(_.flatten)
       .flatMap {
         _.map { month =>
-          historyColl.update(
-              BSONDocument("_id" -> month._id), month, upsert = true)
+          historyColl.update(BSONDocument("_id" -> month._id),
+                             month,
+                             upsert = true)
         }.sequenceFu
       }
       .void
@@ -74,8 +77,8 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
         },
       timeToLive = 10 seconds)
 
-  private def mixedLeaderboard(
-      after: DateTime, before: Option[DateTime]): Fu[List[ModMixed]] =
+  private def mixedLeaderboard(after: DateTime,
+                               before: Option[DateTime]): Fu[List[ModMixed]] =
     actionLeaderboard(after, before) zip reportLeaderboard(after, before) map {
       case (actions, reports) =>
         actions.map(_.modId) intersect reports.map(_.modId) map { modId =>
@@ -92,25 +95,28 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
 
   private val notLichess = BSONDocument("$ne" -> "lichess")
 
-  private def actionLeaderboard(
-      after: DateTime, before: Option[DateTime]): Fu[List[ModCount]] =
+  private def actionLeaderboard(after: DateTime,
+                                before: Option[DateTime]): Fu[List[ModCount]] =
     logColl
       .aggregate(
-          Match(BSONDocument(
+          Match(
+              BSONDocument(
                   "date" -> dateRange(after, before),
                   "mod" -> notLichess
               )),
           List(GroupField("mod")("nb" -> SumValue(1)), Sort(Descending("nb"))))
       .map {
         _.documents.flatMap { obj =>
-          obj.getAs[String]("_id") |@| obj.getAs[Int]("nb") apply ModCount.apply
+          obj.getAs[String]("_id") |@| obj
+            .getAs[Int]("nb") apply ModCount.apply
         }
       }
 
-  private def reportLeaderboard(
-      after: DateTime, before: Option[DateTime]): Fu[List[ModCount]] =
+  private def reportLeaderboard(after: DateTime,
+                                before: Option[DateTime]): Fu[List[ModCount]] =
     reportColl
-      .aggregate(Match(BSONDocument(
+      .aggregate(Match(
+                     BSONDocument(
                          "createdAt" -> dateRange(after, before),
                          "processedBy" -> notLichess
                      )),
@@ -118,15 +124,18 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
                       Sort(Descending("nb"))))
       .map {
         _.documents.flatMap { obj =>
-          obj.getAs[String]("_id") |@| obj.getAs[Int]("nb") apply ModCount.apply
+          obj.getAs[String]("_id") |@| obj
+            .getAs[Int]("nb") apply ModCount.apply
         }
       }
 }
 
 object Gamify {
 
-  case class HistoryMonth(
-      _id: String, year: Int, month: Int, champion: ModMixed) {
+  case class HistoryMonth(_id: String,
+                          year: Int,
+                          month: Int,
+                          champion: ModMixed) {
     def date = new DateTime(year, month, 1, 0, 0)
   }
   object HistoryMonth {
@@ -143,8 +152,9 @@ object Gamify {
     def apply(p: String) = List(Day, Week, Month).find(_.name == p)
   }
 
-  case class Leaderboards(
-      daily: List[ModMixed], weekly: List[ModMixed], monthly: List[ModMixed]) {
+  case class Leaderboards(daily: List[ModMixed],
+                          weekly: List[ModMixed],
+                          monthly: List[ModMixed]) {
     def apply(period: Period) = period match {
       case Period.Day => daily
       case Period.Week => weekly

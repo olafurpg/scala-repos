@@ -24,8 +24,10 @@ trait HeaderDirectives {
       try f(header).map(Right.apply) catch {
         case NonFatal(e) ⇒
           Some(
-              Left(MalformedHeaderRejection(
-                      header.name, e.getMessage.nullAsEmpty, Some(e))))
+              Left(
+                  MalformedHeaderRejection(header.name,
+                                           e.getMessage.nullAsEmpty,
+                                           Some(e))))
     }
 
     extract(_.request.headers.collectFirst(Function.unlift(protectedF))).flatMap {
@@ -101,8 +103,7 @@ trait HeaderDirectives {
   def optionalHeaderValueByName(
       headerName: String): Directive1[Option[String]] = {
     val lowerCaseName = headerName.toLowerCase
-    extract(
-        _.request.headers.collectFirst {
+    extract(_.request.headers.collectFirst {
       case HttpHeader(`lowerCaseName`, value) ⇒ value
     })
   }

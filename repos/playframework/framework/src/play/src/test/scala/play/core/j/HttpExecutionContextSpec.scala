@@ -19,14 +19,18 @@ object HttpExecutionContextSpec
 
     "propagate the context ClassLoader and Http.Context" in {
       val classLoader = new ClassLoader() {}
-      val httpContext = new Http.Context(
-          1, null, null, Map.empty.asJava, Map.empty.asJava, Map.empty.asJava)
-      val hec = new HttpExecutionContext(
-          classLoader, httpContext, ExecutionContext.global)
+      val httpContext = new Http.Context(1,
+                                         null,
+                                         null,
+                                         Map.empty.asJava,
+                                         Map.empty.asJava,
+                                         Map.empty.asJava)
+      val hec = new HttpExecutionContext(classLoader,
+                                         httpContext,
+                                         ExecutionContext.global)
 
       val hecFromThread = new LinkedBlockingQueue[ExecutionContext]()
-      hec.execute(
-          new Runnable {
+      hec.execute(new Runnable {
         def run() = {
           hecFromThread.offer(
               HttpExecutionContext.fromThread(ExecutionContext.global))

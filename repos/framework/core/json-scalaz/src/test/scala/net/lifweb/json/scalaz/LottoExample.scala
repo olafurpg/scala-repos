@@ -23,7 +23,7 @@ object LottoExample extends Specification {
       if (xs.length != x) Fail("len", xs.length + " != " + x) else xs.success
 
   // FIXME enable when 2.8 no longer supported, 2.9 needs: import Validation.Monad._
-/*
+  /*
   // Note 'apply _' is not needed on Scala 2.8.1 >=
   implicit def winnerJSON: JSONR[Winner] =
     Winner.applyJSON(field("winner-id"), validate[List[Int]]("numbers") >=> len(6) apply _)

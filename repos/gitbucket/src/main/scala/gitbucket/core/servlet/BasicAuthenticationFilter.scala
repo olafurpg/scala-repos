@@ -25,8 +25,9 @@ class BasicAuthenticationFilter
 
   def destroy(): Unit = {}
 
-  def doFilter(
-      req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
+  def doFilter(req: ServletRequest,
+               res: ServletResponse,
+               chain: FilterChain): Unit = {
     val request = req.asInstanceOf[HttpServletRequest]
     val response = res.asInstanceOf[HttpServletResponse]
 
@@ -36,7 +37,7 @@ class BasicAuthenticationFilter
 
     val isUpdating =
       request.getRequestURI.endsWith("/git-receive-pack") ||
-      "service=git-receive-pack".equals(request.getQueryString)
+        "service=git-receive-pack".equals(request.getQueryString)
     val settings = loadSystemSettings()
 
     try {
@@ -45,19 +46,26 @@ class BasicAuthenticationFilter
         .map {
           case GitRepositoryRouting(_, _, filter) =>
             // served by plug-ins
-            pluginRepository(
-                request, wrappedResponse, chain, settings, isUpdating, filter)
+            pluginRepository(request,
+                             wrappedResponse,
+                             chain,
+                             settings,
+                             isUpdating,
+                             filter)
         }
         .getOrElse {
           // default repositories
-          defaultRepository(
-              request, wrappedResponse, chain, settings, isUpdating)
+          defaultRepository(request,
+                            wrappedResponse,
+                            chain,
+                            settings,
+                            isUpdating)
         }
     } catch {
       case ex: Exception => {
-          logger.error("error", ex)
-          requireAuth(response)
-        }
+        logger.error("error", ex)
+        requireAuth(response)
+      }
     }
   }
 
@@ -101,43 +109,43 @@ class BasicAuthenticationFilter
             repositoryOwner,
             repositoryName.replaceFirst("\\.wiki\\.git$|\\.git$", "")) match {
           case Some(repository) => {
-              if (!isUpdating && !repository.repository.isPrivate &&
-                  settings.allowAnonymousAccess) {
+            if (!isUpdating && !repository.repository.isPrivate &&
+                settings.allowAnonymousAccess) {
+              chain.doFilter(request, response)
+            } else {
+              val passed = for {
+                auth <- Option(request.getHeader("Authorization"))
+                Array(username, password) = decodeAuthHeader(auth)
+                  .split(":", 2)
+                account <- authenticate(settings, username, password)
+              } yield
+                if (isUpdating || repository.repository.isPrivate) {
+                  if (hasWritePermission(repository.owner,
+                                         repository.name,
+                                         Some(account))) {
+                    request
+                      .setAttribute(Keys.Request.UserName, account.userName)
+                    true
+                  } else false
+                } else true
+
+              if (passed.getOrElse(false)) {
                 chain.doFilter(request, response)
               } else {
-                val passed = for {
-                  auth <- Option(request.getHeader("Authorization"))
-                  Array(username, password) = decodeAuthHeader(auth).split(
-                      ":", 2)
-                  account <- authenticate(settings, username, password)
-                } yield
-                  if (isUpdating || repository.repository.isPrivate) {
-                    if (hasWritePermission(repository.owner,
-                                           repository.name,
-                                           Some(account))) {
-                      request.setAttribute(
-                          Keys.Request.UserName, account.userName)
-                      true
-                    } else false
-                  } else true
-
-                if (passed.getOrElse(false)) {
-                  chain.doFilter(request, response)
-                } else {
-                  requireAuth(response)
-                }
+                requireAuth(response)
               }
             }
+          }
           case None => {
-              logger.debug(
-                  s"Repository ${repositoryOwner}/${repositoryName} is not found.")
-              response.sendError(HttpServletResponse.SC_NOT_FOUND)
-            }
+            logger.debug(
+                s"Repository ${repositoryOwner}/${repositoryName} is not found.")
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+          }
         }
       case _ => {
-          logger.debug(s"Not enough path arguments: ${request.paths}")
-          response.sendError(HttpServletResponse.SC_NOT_FOUND)
-        }
+        logger.debug(s"Not enough path arguments: ${request.paths}")
+        response.sendError(HttpServletResponse.SC_NOT_FOUND)
+      }
     }
   }
 

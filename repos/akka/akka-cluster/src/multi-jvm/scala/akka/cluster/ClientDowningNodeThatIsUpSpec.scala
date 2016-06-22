@@ -19,7 +19,8 @@ final case class ClientDowningNodeThatIsUpMultiNodeConfig(
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 

@@ -46,7 +46,8 @@ object traversable {
     }
 
     implicit def hlistFromTraversable[OutH, OutT <: HList](
-        implicit flt: FromTraversable[OutT], oc: Typeable[OutH]) =
+        implicit flt: FromTraversable[OutT],
+        oc: Typeable[OutH]) =
       new FromTraversable[OutH :: OutT] {
         def apply(l: GenTraversable[_]): Option[OutH :: OutT] =
           if (l.isEmpty) None

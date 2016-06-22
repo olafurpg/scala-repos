@@ -29,8 +29,9 @@ object LocalConcurrencySpec {
 
     def receive = {
       case s: String ⇒
-        val update = Replicator.Update(
-            Updater.key, ORSet.empty[String], Replicator.WriteLocal)(_ + s)
+        val update = Replicator.Update(Updater.key,
+                                       ORSet.empty[String],
+                                       Replicator.WriteLocal)(_ + s)
         replicator ! update
     }
   }
@@ -48,7 +49,8 @@ class LocalConcurrencySpec(_system: ActorSystem)
     this(
         ActorSystem(
             "LocalConcurrencySpec",
-            ConfigFactory.parseString("""
+            ConfigFactory.parseString(
+                """
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port=0
       """)))

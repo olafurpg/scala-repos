@@ -75,7 +75,9 @@ private[feature] trait Word2VecBase
     * @group param
     */
   final val numPartitions = new IntParam(
-      this, "numPartitions", "number of partitions for sentences of words")
+      this,
+      "numPartitions",
+      "number of partitions for sentences of words")
   setDefault(numPartitions -> 1)
 
   /** @group getParam */
@@ -91,7 +93,7 @@ private[feature] trait Word2VecBase
       this,
       "minCount",
       "the minimum number of times a token must " +
-      "appear to be included in the word2vec model's vocabulary")
+        "appear to be included in the word2vec model's vocabulary")
   setDefault(minCount -> 5)
 
   /** @group getParam */
@@ -104,8 +106,8 @@ private[feature] trait Word2VecBase
     * Validate and transform the input schema.
     */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
-    SchemaUtils.checkColumnType(
-        schema, $(inputCol), new ArrayType(StringType, true))
+    SchemaUtils
+      .checkColumnType(schema, $(inputCol), new ArrayType(StringType, true))
     SchemaUtils.appendColumn(schema, $(outputCol), new VectorUDT)
   }
 }
@@ -184,7 +186,7 @@ object Word2Vec extends DefaultParamsReadable[Word2Vec] {
   * Model fitted by [[Word2Vec]].
   */
 @Experimental
-class Word2VecModel private[ml](
+class Word2VecModel private[ml] (
     override val uid: String,
     @transient private val wordVectors: feature.Word2VecModel)
     extends Model[Word2VecModel]
@@ -281,8 +283,8 @@ object Word2VecModel extends MLReadable[Word2VecModel] {
   private[Word2VecModel] class Word2VecModelWriter(instance: Word2VecModel)
       extends MLWriter {
 
-    private case class Data(
-        wordIndex: Map[String, Int], wordVectors: Seq[Float])
+    private case class Data(wordIndex: Map[String, Int],
+                            wordVectors: Seq[Float])
 
     override protected def saveImpl(path: String): Unit = {
       DefaultParamsWriter.saveMetadata(instance, path, sc)

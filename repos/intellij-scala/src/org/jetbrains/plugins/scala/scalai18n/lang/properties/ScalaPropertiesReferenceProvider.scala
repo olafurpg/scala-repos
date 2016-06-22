@@ -16,7 +16,8 @@ class ScalaPropertiesReferenceProvider extends PsiReferenceProvider {
   }
 
   def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     object PossibleKey {
       def unapply(lit: ScLiteral): Option[String] = {
         if (!lit.isString || lit.isMultiLineString ||

@@ -121,7 +121,7 @@ private[spark] abstract class ImpurityCalculator(val stats: Array[Double])
     require(
         stats.length == other.stats.length,
         s"Two ImpurityCalculator instances cannot be added with different counts sizes." +
-        s"  Sizes are ${stats.length} and ${other.stats.length}.")
+          s"  Sizes are ${stats.length} and ${other.stats.length}.")
     var i = 0
     val len = other.stats.length
     while (i < len) {
@@ -139,7 +139,7 @@ private[spark] abstract class ImpurityCalculator(val stats: Array[Double])
     require(
         stats.length == other.stats.length,
         s"Two ImpurityCalculator instances cannot be subtracted with different counts sizes." +
-        s"  Sizes are ${stats.length} and ${other.stats.length}.")
+          s"  Sizes are ${stats.length} and ${other.stats.length}.")
     var i = 0
     val len = other.stats.length
     while (i < len) {
@@ -178,8 +178,9 @@ private[spark] abstract class ImpurityCalculator(val stats: Array[Double])
         }
     }
     if (result._1 < 0) {
-      throw new RuntimeException("ImpurityCalculator internal error:" +
-          " indexOfLargestArrayElement failed")
+      throw new RuntimeException(
+          "ImpurityCalculator internal error:" +
+            " indexOfLargestArrayElement failed")
     }
     result._1
   }
@@ -191,8 +192,8 @@ private[spark] object ImpurityCalculator {
     * Create an [[ImpurityCalculator]] instance of the given impurity type and with
     * the given stats.
     */
-  def getCalculator(
-      impurity: String, stats: Array[Double]): ImpurityCalculator = {
+  def getCalculator(impurity: String,
+                    stats: Array[Double]): ImpurityCalculator = {
     impurity match {
       case "gini" => new GiniCalculator(stats)
       case "entropy" => new EntropyCalculator(stats)

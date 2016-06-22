@@ -122,7 +122,7 @@ class WriterTTests extends CatsSuite {
 
   implicit val iso = CartesianTests.Isomorphisms
     .invariant[WriterT[ListWrapper, ListWrapper[Int], ?]](
-      WriterT.writerTFunctor(ListWrapper.functor))
+        WriterT.writerTFunctor(ListWrapper.functor))
 
   // We have varying instances available depending on `F` and `L`.
   // We also battle some inference issues with `Id`.

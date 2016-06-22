@@ -41,7 +41,7 @@ object quickSelect extends UFunc {
           var right = x.length - 1
           require(position >= left && position <= right,
                   "Invalid position specification: " + position +
-                  " with array length: " + x.length)
+                    " with array length: " + x.length)
 
           while (pivotIndex != position && right >= left) {
             val rand = Rand.randInt(right - left + 1)
@@ -102,13 +102,13 @@ object quickSelect extends UFunc {
         val coll = view(rawx)
         var pivotIndex = -1
 
-        def implQuickSelectSort(
-            x: mutable.IndexedSeq[T], position: Int): Unit = {
+        def implQuickSelectSort(x: mutable.IndexedSeq[T],
+                                position: Int): Unit = {
           var left = 0
           var right = x.length - 1
           require(position >= left && position <= right,
                   "Invalid position specification: " + position +
-                  " with coll length: " + x.length)
+                    " with coll length: " + x.length)
 
           while (pivotIndex != position && right >= left) {
             val rand = Rand.randInt(right - left + 1)
@@ -182,7 +182,7 @@ object quickSelectImpl extends UFunc {
           var right = x.length - 1
           require(position >= left && position <= right,
                   "Invalid position specification: " + position +
-                  " with array length: " + x.length)
+                    " with array length: " + x.length)
 
           while (pivotIndex != position && right >= left) {
             val rand = Rand.randInt(right - left + 1)

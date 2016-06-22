@@ -14,7 +14,8 @@ trait MappedToBase extends Any {
 
 object MappedToBase {
   implicit def mappedToIsomorphism[E <: MappedToBase]: Isomorphism[
-      E, E#Underlying] = macro mappedToIsomorphismMacroImpl[E]
+      E,
+      E#Underlying] = macro mappedToIsomorphismMacroImpl[E]
 
   def mappedToIsomorphismMacroImpl[E <: MappedToBase](c: Context)(
       implicit e: c.WeakTypeTag[E]): c.Expr[Isomorphism[E, E#Underlying]] = {

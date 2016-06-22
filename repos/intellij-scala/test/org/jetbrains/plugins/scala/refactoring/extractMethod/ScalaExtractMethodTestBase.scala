@@ -30,8 +30,9 @@ abstract class ScalaExtractMethodTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     val startOffset = fileText.indexOf(startMarker)
     assert(
         startOffset != -1,
@@ -49,7 +50,8 @@ abstract class ScalaExtractMethodTestBase
 
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
     val editor = fileEditorManager.openTextEditor(
-        new OpenFileDescriptor(getProjectAdapter, file, startOffset), false)
+        new OpenFileDescriptor(getProjectAdapter, file, startOffset),
+        false)
     editor.getSelectionModel.setSelection(startOffset, endOffset)
 
     var res: String = null
@@ -67,7 +69,7 @@ abstract class ScalaExtractMethodTestBase
         assert(assertion = false,
                message =
                  e.getMessage + "\n" +
-                 e.getStackTrace.map(_.toString).mkString("  \n"))
+                   e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 
     val text = lastPsi.getText

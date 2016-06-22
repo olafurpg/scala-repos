@@ -27,8 +27,8 @@ object CoproductTest extends SpecLite {
     def invariantfunctor[F[_]: Comonad: Traverse: Contravariant,
                          G[_]: Comonad: Traverse: Contravariant] =
       InvariantFunctor[Coproduct[F, G, ?]]
-    def invariantfunctor[
-        F[_]: Functor: Contravariant, G[_]: Functor: Contravariant] =
+    def invariantfunctor[F[_]: Functor: Contravariant,
+                         G[_]: Functor: Contravariant] =
       InvariantFunctor[Coproduct[F, G, ?]]
     def functor[F[_]: Comonad: Traverse, G[_]: Comonad: Traverse] =
       Functor[Coproduct[F, G, ?]]

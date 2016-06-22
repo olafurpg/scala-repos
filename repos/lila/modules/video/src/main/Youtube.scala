@@ -6,8 +6,10 @@ import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.Play.current
 
-private[video] final class Youtube(
-    url: String, apiKey: String, max: Int, api: VideoApi) {
+private[video] final class Youtube(url: String,
+                                   apiKey: String,
+                                   max: Int,
+                                   api: VideoApi) {
 
   import Youtube._
 
@@ -26,7 +28,7 @@ private[video] final class Youtube(
             Metadata(views = ~parseIntOption(entry.statistics.viewCount),
                      likes =
                        ~parseIntOption(entry.statistics.likeCount) -
-                       ~parseIntOption(entry.statistics.dislikeCount),
+                         ~parseIntOption(entry.statistics.dislikeCount),
                      description = entry.snippet.description,
                      duration = Some(entry.contentDetails.seconds),
                      publishedAt = entry.snippet.publishedAt.flatMap { at =>
@@ -73,11 +75,12 @@ object Youtube {
                                   statistics: Statistics,
                                   contentDetails: ContentDetails)
 
-  private[video] case class Snippet(
-      description: Option[String], publishedAt: Option[String])
+  private[video] case class Snippet(description: Option[String],
+                                    publishedAt: Option[String])
 
-  private[video] case class Statistics(
-      viewCount: String, likeCount: String, dislikeCount: String)
+  private[video] case class Statistics(viewCount: String,
+                                       likeCount: String,
+                                       dislikeCount: String)
 
   private val iso8601Formatter =
     org.joda.time.format.ISOPeriodFormat.standard()

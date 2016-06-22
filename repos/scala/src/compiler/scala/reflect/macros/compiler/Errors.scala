@@ -31,7 +31,7 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
   def MacroImplAmbiguousError() =
     implRefError(
         "macro implementation reference is ambiguous: makes sense both as\n" +
-        "a macro bundle method reference and a vanilla object method reference")
+          "a macro bundle method reference and a vanilla object method reference")
 
   def MacroBundleNonStaticError() =
     bundleRefError("macro bundles must be static")
@@ -47,8 +47,8 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     def MacroImplReferenceWrongShapeError() =
       implRefError(
           "macro implementation reference has wrong shape. required:\n" +
-          "macro [<static object>].<method name>[[<type args>]] or\n" +
-          "macro [<macro bundle>].<method name>[[<type args>]]")
+            "macro [<static object>].<method name>[[<type args>]] or\n" +
+            "macro [<macro bundle>].<method name>[[<type args>]]")
 
     def MacroImplWrongNumberOfTypeArgumentsError() = {
       val diagnostic =
@@ -98,9 +98,9 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
                          untype: Boolean) = {
       def preprocess(tpe: Type) = if (untype) untypeMetalevel(tpe) else tpe
       var pssPart = (pss map
-          (ps =>
-                ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
-                ("(", ", ", ")"))).mkString
+            (ps =>
+                  ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
+                    ("(", ", ", ")"))).mkString
       if (abbreviate) pssPart = abbreviateCoreAliases(pssPart)
       var retPart = preprocess(restpe).toString
       if (abbreviate || macroDdef.tpt.tpe == null)
@@ -147,23 +147,23 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     private def compatibilityError(message: String) =
       implRefError(
           s"${macroImplementationWording} has incompatible shape:" +
-          "\n required: " +
-          showMeth(rparamss, rret, abbreviate = true, untype = false) +
-          "\n or      : " +
-          showMeth(rparamss, rret, abbreviate = true, untype = true) +
-          "\n found   : " +
-          showMeth(aparamss, aret, abbreviate = false, untype = false) + "\n" +
-          message)
+            "\n required: " +
+            showMeth(rparamss, rret, abbreviate = true, untype = false) +
+            "\n or      : " +
+            showMeth(rparamss, rret, abbreviate = true, untype = true) +
+            "\n found   : " +
+            showMeth(aparamss, aret, abbreviate = false, untype = false) + "\n" +
+            message)
 
     def MacroImplParamssMismatchError() =
       compatibilityError("number of parameter sections differ")
 
-    def MacroImplExtraParamsError(
-        aparams: List[Symbol], rparams: List[Symbol]) =
+    def MacroImplExtraParamsError(aparams: List[Symbol],
+                                  rparams: List[Symbol]) =
       compatibilityError(lengthMsg("value", "found", aparams(rparams.length)))
 
-    def MacroImplMissingParamsError(
-        aparams: List[Symbol], rparams: List[Symbol]) =
+    def MacroImplMissingParamsError(aparams: List[Symbol],
+                                    rparams: List[Symbol]) =
       compatibilityError(
           abbreviateCoreAliases(
               lengthMsg("value", "required", rparams(aparams.length))))
@@ -180,23 +180,24 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
 
     def MacroImplVarargMismatchError(aparam: Symbol, rparam: Symbol) = {
       def fail(paramName: Name) =
-        compatibilityError("types incompatible for parameter " + paramName +
-            ": corresponding is not a vararg parameter")
+        compatibilityError(
+            "types incompatible for parameter " + paramName +
+              ": corresponding is not a vararg parameter")
       if (isRepeated(rparam) && !isRepeated(aparam)) fail(rparam.name)
       if (!isRepeated(rparam) && isRepeated(aparam)) fail(aparam.name)
     }
 
-    def MacroImplTargMismatchError(
-        atargs: List[Type], atparams: List[Symbol]) =
+    def MacroImplTargMismatchError(atargs: List[Type],
+                                   atparams: List[Symbol]) =
       compatibilityError(
           NotWithinBoundsErrorMessage("",
                                       atargs,
                                       atparams,
                                       macroDebugVerbose ||
-                                      settings.explaintypes.value))
+                                        settings.explaintypes.value))
 
-    def MacroImplTparamInstantiationError(
-        atparams: List[Symbol], e: NoInstance) = {
+    def MacroImplTparamInstantiationError(atparams: List[Symbol],
+                                          e: NoInstance) = {
       val badps = atparams map (_.defString) mkString ", "
       compatibilityError(
           f"type parameters $badps cannot be instantiated%n${e.getMessage}")

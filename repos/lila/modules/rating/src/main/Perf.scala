@@ -31,12 +31,13 @@ case class Perf(glicko: Glicko,
     glicko.sanityCheck option add(glicko, date)
   }
 
-  def addOrReset(monitor: lila.mon.IncPath, msg: => String)(
-      r: Rating, date: DateTime): Perf = add(r, date) | {
-    lila.log("rating").error(s"Crazy Glicko2 $msg")
-    lila.mon.incPath(monitor)()
-    add(Glicko.default, date)
-  }
+  def addOrReset(monitor: lila.mon.IncPath,
+                 msg: => String)(r: Rating, date: DateTime): Perf =
+    add(r, date) | {
+      lila.log("rating").error(s"Crazy Glicko2 $msg")
+      lila.mon.incPath(monitor)()
+      add(Glicko.default, date)
+    }
 
   def toRating =
     new Rating(math.max(Glicko.minRating, glicko.rating),

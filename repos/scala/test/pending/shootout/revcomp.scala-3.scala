@@ -123,27 +123,27 @@ final class FastaOutputStream(in: OutputStream)
     sequence match {
       case (header, lines) => {
 
-          write(header); write(nl)
+        write(header); write(nl)
 
-          val k = if (lines.isEmpty) 0 else lines.top.length
-          val LineLength = 60
-          val isSplitLine = k < LineLength
-          var isFirstLine = true
+        val k = if (lines.isEmpty) 0 else lines.top.length
+        val LineLength = 60
+        val isSplitLine = k < LineLength
+        var isFirstLine = true
 
-          while (!lines.isEmpty) {
-            val line = lines.pop
-            inplaceComplementReverse(line)
+        while (!lines.isEmpty) {
+          val line = lines.pop
+          inplaceComplementReverse(line)
 
-            if (isSplitLine) {
-              if (isFirstLine) { write(line); isFirstLine = false } else {
-                write(line, 0, LineLength - k); write(nl);
-                write(line, LineLength - k, k)
-              }
-            } else { write(line); write(nl) }
-          }
-
-          if (isSplitLine && !isFirstLine) write(nl)
+          if (isSplitLine) {
+            if (isFirstLine) { write(line); isFirstLine = false } else {
+              write(line, 0, LineLength - k); write(nl);
+              write(line, LineLength - k, k)
+            }
+          } else { write(line); write(nl) }
         }
+
+        if (isSplitLine && !isFirstLine) write(nl)
+      }
     }
   }
 }

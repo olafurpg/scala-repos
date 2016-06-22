@@ -54,7 +54,8 @@ class SourceMapTest {
           e.getFileName.replace('\\', '/')
 
         val trace0 = e.getStackTrace.toList
-        val trace1 = trace0.dropWhile(normFileName(_).endsWith(
+        val trace1 = trace0.dropWhile(
+            normFileName(_).endsWith(
                 "/scala/scalajs/runtime/StackTrace.scala"))
         val trace2 = trace1.dropWhile(
             normFileName(_).endsWith("/java/lang/Throwables.scala"))
@@ -62,20 +63,19 @@ class SourceMapTest {
         val topSte = trace2.head
         assertTrue(normFileName(topSte).contains("/SourceMapTest.scala"))
 
-        val throwSte =
-          if (topSte.getLineNumber == 19) {
-            // line where `case class TestException is written` above
-            val throwSte = trace2.tail.head
-            assertTrue(normFileName(throwSte).contains("/SourceMapTest.scala"))
-            throwSte
-          } else {
-            /* In fullOpt, it may happen that the constructor of
-             * TestException is inlined, in which case there is no trace of
-             * it anymore. The first stack element in SourceMapTest.scala is
-             * therefore the one we're interested in.
-             */
-            topSte
-          }
+        val throwSte = if (topSte.getLineNumber == 19) {
+          // line where `case class TestException is written` above
+          val throwSte = trace2.tail.head
+          assertTrue(normFileName(throwSte).contains("/SourceMapTest.scala"))
+          throwSte
+        } else {
+          /* In fullOpt, it may happen that the constructor of
+           * TestException is inlined, in which case there is no trace of
+           * it anymore. The first stack element in SourceMapTest.scala is
+           * therefore the one we're interested in.
+           */
+          topSte
+        }
 
         assertEquals(lineNo, throwSte.getLineNumber)
     }
@@ -242,12 +242,18 @@ trait Writer {
         /**/
         /**/
         s.charAt(i) match {
-          case '\\' => /**/ sb.append("\\\\") /**/
+          case '\\' =>
+            /**/
+            sb.append("\\\\") /**/
           case '"' => sb.append("\\\"")
-          case '/' => /**/ sb.append("\\/") /**/
+          case '/' =>
+            /**/
+            sb.append("\\/") /**/
           case '\b' => sb.append("\\b")
           case '\t' => sb.append("\\t")
-          case '\n' => /**/ sb.append("\\n") /**/
+          case '\n' =>
+            /**/
+            sb.append("\\n") /**/
           case '\f' => sb.append("\\f")
           case '\r' => sb.append("\\r")
           case c =>
@@ -368,11 +374,21 @@ class Json extends Writer2 {
       case c if 'a'.toInt <= c && c <= 'z'.toInt => Letter
       case c if 'A'.toInt <= c && c <= 'Z'.toInt => Letter
       case c if '0'.toInt <= c && c <= '9'.toInt => Digit
-      case '-' => /**/ Minus
-      case ',' => /**/ Comma
-      case '"' => /**/ Quote
-      case ':' => /**/ Colon
-      case '{' => /**/ Lbra
+      case '-' =>
+        /**/
+        Minus
+      case ',' =>
+        /**/
+        Comma
+      case '"' =>
+        /**/
+        Quote
+      case ':' =>
+        /**/
+        Colon
+      case '{' =>
+        /**/
+        Lbra
       case '}' => Rbra
       case '[' => Larr
       case ']' => Rarr
@@ -423,18 +439,17 @@ class Json extends Writer2 {
         /**/
         ch = s.charAt(pos) /**/
         /**/
-        chKind =
-          /***/ if (ch < 255) {
+        chKind = /***/ if (ch < 255) {
 
-            /**/
-            /**/ /***/
-            charKind(ch)
-          } else {
+          /**/
+          /**/ /***/
+          charKind(ch)
+        } else {
 
-            /**/
-            /**/ /***/
-            Other
-          } /**/
+          /**/
+          /**/ /***/
+          Other
+        } /**/
         pos += 1
         if (ch == '\n'.toInt) {
           chLinePos += 1
@@ -477,27 +492,25 @@ class Json extends Writer2 {
     def handleDigit() {
       val first = chMark
       getDigits()
-      val k1 =
-        if (ch == '.'.toInt) {
+      val k1 = if (ch == '.'.toInt) {
+        chNext()
+        getDigits()
+        BIGNUMBER
+      } else {
+        NUMBER
+      }
+      val k2 = if (ch == 'E'.toInt || ch == 'e'.toInt) {
+        chNext()
+        if (ch == '+'.toInt) {
           chNext()
-          getDigits()
-          BIGNUMBER
-        } else {
-          NUMBER
-        }
-      val k2 =
-        if (ch == 'E'.toInt || ch == 'e'.toInt) {
+        } else if (ch == '-'.toInt) {
           chNext()
-          if (ch == '+'.toInt) {
-            chNext()
-          } else if (ch == '-'.toInt) {
-            chNext()
-          }
-          getDigits()
-          FLOATNUMBER
-        } else {
-          k1
         }
+        getDigits()
+        FLOATNUMBER
+      } else {
+        k1
+      }
 
       /**/
       tokenKind = k2 /**/
@@ -643,7 +656,9 @@ class Json extends Writer2 {
 
         /**/
         tokenKind match {
-          case COMMA => /**/ tokenNext()
+          case COMMA =>
+            /**/
+            tokenNext()
           case RARR => // do nothing
           case _ => tokenError("Expecting , or ]")
         }

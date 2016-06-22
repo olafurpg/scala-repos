@@ -21,8 +21,7 @@ import com.twitter.finagle.{Service, Status, NotShardableException, ShardNotAvai
 class ShardingService[Req, Rep](
     distributor: Distributor[Service[Req, Rep]],
     hash: Req => Option[Long]
-)
-    extends Service[Req, Rep] {
+) extends Service[Req, Rep] {
 
   def apply(request: Req): Future[Rep] = {
     hash(request) map { hash =>

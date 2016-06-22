@@ -182,12 +182,12 @@ object EventFilter {
     * `null` does NOT work (passing `null` disables the
     * source filter).''
     */
-  def apply[A <: Throwable: ClassTag](message: String = null,
-                                      source: String = null,
-                                      start: String = "",
-                                      pattern: String = null,
-                                      occurrences: Int =
-                                        Int.MaxValue): EventFilter =
+  def apply[A <: Throwable: ClassTag](
+      message: String = null,
+      source: String = null,
+      start: String = "",
+      pattern: String = null,
+      occurrences: Int = Int.MaxValue): EventFilter =
     ErrorFilter(implicitly[ClassTag[A]].runtimeClass,
                 Option(source),
                 if (message ne null) Left(message)
@@ -321,8 +321,8 @@ final case class ErrorFilter(throwable: Class[_],
     event match {
       case Error(cause, src, _, msg) if throwable isInstance cause ⇒
         (msg == null && cause.getMessage == null &&
-            cause.getStackTrace.length == 0) || doMatch(src, msg) ||
-        doMatch(src, cause.getMessage)
+              cause.getStackTrace.length == 0) || doMatch(src, msg) ||
+          doMatch(src, cause.getMessage)
       case _ ⇒ false
     }
   }
@@ -509,8 +509,8 @@ final case class DebugFilter(override val source: Option[String],
   *
   * If the partial function is defined and returns true, filter the event.
   */
-final case class CustomEventFilter(
-    test: PartialFunction[LogEvent, Boolean])(occurrences: Int)
+final case class CustomEventFilter(test: PartialFunction[LogEvent, Boolean])(
+    occurrences: Int)
     extends EventFilter(occurrences) {
   def matches(event: LogEvent) = {
     test.isDefinedAt(event) && test(event)
@@ -593,12 +593,12 @@ class TestEventListener extends Logging.DefaultLogger {
   def removeFilter(filter: EventFilter) {
     @scala.annotation.tailrec
     def removeFirst(list: List[EventFilter],
-                    zipped: List[EventFilter] =
-                      Nil): List[EventFilter] = list match {
-      case head :: tail if head == filter ⇒ tail.reverse_:::(zipped)
-      case head :: tail ⇒ removeFirst(tail, head :: zipped)
-      case Nil ⇒ filters // filter not found, just return original list
-    }
+                    zipped: List[EventFilter] = Nil): List[EventFilter] =
+      list match {
+        case head :: tail if head == filter ⇒ tail.reverse_:::(zipped)
+        case head :: tail ⇒ removeFirst(tail, head :: zipped)
+        case Nil ⇒ filters // filter not found, just return original list
+      }
     filters = removeFirst(filters)
   }
 }

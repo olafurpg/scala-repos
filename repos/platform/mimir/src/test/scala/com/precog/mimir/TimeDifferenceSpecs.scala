@@ -178,8 +178,11 @@ trait TimeDifferenceSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
         }
 
-      result2 must contain(
-          -30024690, -43673890, -12983796, -71409896, 12797729)
+      result2 must contain(-30024690,
+                           -43673890,
+                           -12983796,
+                           -71409896,
+                           12797729)
     }
     "compute difference of ms" in {
       val input =
@@ -330,8 +333,11 @@ trait TimeDifferenceSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
         }
 
-      result2 must contain(
-          -30024690, -43673890, -12983796, -71409896, 12797729)
+      result2 must contain(-30024690,
+                           -43673890,
+                           -12983796,
+                           -71409896,
+                           12797729)
     }
     "compute difference of ms" in {
       val input =
@@ -730,8 +736,16 @@ trait TimeDifferenceSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
-      result2 must contain(
-          -274, 849, -58, -588, 403, -384, 1167, -30, 699, 813)
+      result2 must contain(-274,
+                           849,
+                           -58,
+                           -588,
+                           403,
+                           -384,
+                           1167,
+                           -30,
+                           699,
+                           813)
     }
     "compute difference of hours" in {
       val input =
@@ -750,8 +764,16 @@ trait TimeDifferenceSpecs[M[+ _]]
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
         }
 
-      result2 must contain(
-          9672, -737, -14130, -9219, 20388, -1405, 19517, 16795, -6582, 28025)
+      result2 must contain(9672,
+                           -737,
+                           -14130,
+                           -9219,
+                           20388,
+                           -1405,
+                           19517,
+                           16795,
+                           -6582,
+                           28025)
     }
     "compute difference of minutes" in {
       val input =

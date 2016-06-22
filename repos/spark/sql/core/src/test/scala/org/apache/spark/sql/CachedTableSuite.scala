@@ -146,16 +146,14 @@ class CachedTableSuite
     sqlContext.cacheTable("testData")
 
     assertCached(sqlContext.table("testData"))
-    assert(
-        sqlContext.table("testData").queryExecution.withCachedData match {
+    assert(sqlContext.table("testData").queryExecution.withCachedData match {
       case _: InMemoryRelation => true
       case _ => false
     })
 
     sqlContext.uncacheTable("testData")
     assert(!sqlContext.isCached("testData"))
-    assert(
-        sqlContext.table("testData").queryExecution.withCachedData match {
+    assert(sqlContext.table("testData").queryExecution.withCachedData match {
       case _: InMemoryRelation => false
       case _ => true
     })
@@ -172,7 +170,8 @@ class CachedTableSuite
     assertCached(sqlContext.table("testData"))
 
     assertResult(
-        1, "InMemoryRelation not found, testData should have been cached") {
+        1,
+        "InMemoryRelation not found, testData should have been cached") {
       sqlContext
         .table("testData")
         .queryExecution
@@ -185,14 +184,19 @@ class CachedTableSuite
 
     sqlContext.cacheTable("testData")
     assertResult(
-        0, "Double InMemoryRelations found, cacheTable() is not idempotent") {
+        0,
+        "Double InMemoryRelations found, cacheTable() is not idempotent") {
       sqlContext
         .table("testData")
         .queryExecution
         .withCachedData
         .collect {
-          case r @ InMemoryRelation(
-              _, _, _, _, _: InMemoryColumnarTableScan, _) =>
+          case r @ InMemoryRelation(_,
+                                    _,
+                                    _,
+                                    _,
+                                    _: InMemoryColumnarTableScan,
+                                    _) =>
             r
         }
         .size
@@ -220,8 +224,8 @@ class CachedTableSuite
   test("SELECT star from cached table") {
     sql("SELECT * FROM testData").registerTempTable("selectStar")
     sqlContext.cacheTable("selectStar")
-    checkAnswer(
-        sql("SELECT * FROM selectStar WHERE key = 1"), Seq(Row(1, "1")))
+    checkAnswer(sql("SELECT * FROM selectStar WHERE key = 1"),
+                Seq(Row(1, "1")))
     sqlContext.uncacheTable("selectStar")
   }
 
@@ -393,8 +397,7 @@ class CachedTableSuite
     * Verifies that the plan for `df` contains `expected` number of Exchange operators.
     */
   private def verifyNumExchanges(df: DataFrame, expected: Int): Unit = {
-    assert(
-        df.queryExecution.executedPlan.collect {
+    assert(df.queryExecution.executedPlan.collect {
       case e: ShuffleExchange => e
     }.size == expected)
   }
@@ -410,7 +413,8 @@ class CachedTableSuite
     assertCached(sqlContext.table("orderedTable"))
     // Should not have an exchange as the query is already sorted on the group by key.
     verifyNumExchanges(
-        sql("SELECT key, count(*) FROM orderedTable GROUP BY key"), 0)
+        sql("SELECT key, count(*) FROM orderedTable GROUP BY key"),
+        0)
     checkAnswer(
         sql("SELECT key, count(*) FROM orderedTable GROUP BY key ORDER BY key"),
         sql("SELECT key, count(*) FROM testData3x GROUP BY key ORDER BY key")
@@ -429,7 +433,8 @@ class CachedTableSuite
 
         // Joining them should result in no exchanges.
         verifyNumExchanges(
-            sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"), 0)
+            sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"),
+            0)
         checkAnswer(
             sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"),
             sql("SELECT * FROM testData t1 JOIN testData2 t2 ON t1.key = t2.a"))

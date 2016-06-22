@@ -105,15 +105,15 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
         result match {
           case Right(
-              ((Intersection(
-                InclusiveLower(readIntervalLower), ExclusiveUpper(_)),
+              ((Intersection(InclusiveLower(readIntervalLower),
+                             ExclusiveUpper(_)),
                 _),
                _)) => {
-              //readInterval should start from the last written interval in the store
-              val start: Timestamp =
-                batcher.earliestTimeOf(testStore.initBatch.next)
-              implicitly[Ordering[Timestamp]].equiv(readIntervalLower, start)
-            }
+            //readInterval should start from the last written interval in the store
+            val start: Timestamp =
+              batcher.earliestTimeOf(testStore.initBatch.next)
+            implicitly[Ordering[Timestamp]].equiv(readIntervalLower, start)
+          }
           case Right(_) => false
           case Left(_) => interval == Empty()
         }
@@ -136,14 +136,14 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
         result match {
           case Right(
-              ((Intersection(
-                InclusiveLower(_), ExclusiveUpper(readIntervalUpper)),
+              ((Intersection(InclusiveLower(_),
+                             ExclusiveUpper(readIntervalUpper)),
                 _),
                _)) => {
-              //readInterval should start from the last written interval in the store
-              implicitly[Ordering[Timestamp]]
-                .lteq(readIntervalUpper, interval.upper.upper)
-            }
+            //readInterval should start from the last written interval in the store
+            implicitly[Ordering[Timestamp]]
+              .lteq(readIntervalUpper, interval.upper.upper)
+          }
           case Right(_) => false
           case Left(_) => interval == Empty()
         }
@@ -237,10 +237,10 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
           mergeResult match {
             case Left(l) => {
-                l.mkString
-                  .contains("readTimespan is not convering at least one batch")
-                  .label("fail with right reason")
-              }
+              l.mkString
+                .contains("readTimespan is not convering at least one batch")
+                .label("fail with right reason")
+            }
             case Right(_) =>
               false.label(
                   "should fail when readTimespan is not covering at least one batch")

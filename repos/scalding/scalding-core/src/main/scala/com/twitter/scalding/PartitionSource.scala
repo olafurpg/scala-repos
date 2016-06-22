@@ -52,27 +52,28 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
         throw new InvalidSourceException(
             "Using PartitionSource for input not yet implemented")
       case Write => {
-          mode match {
-            case Local(_) => {
-                val localTap = new FileTap(localScheme, basePath, sinkMode)
-                openWritesThreshold match {
-                  case Some(threshold) =>
-                    new LPartitionTap(localTap, partition, threshold)
-                  case None => new LPartitionTap(localTap, partition)
-                }
-              }
-            case hdfsMode @ Hdfs(_, _) => {
-                val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
-                getHPartitionTap(hfsTap)
-              }
-            case hdfsTest @ HadoopTest(_, _) => {
-                val hfsTap = createHfsTap(
-                    hdfsScheme, hdfsTest.getWritePathFor(this), sinkMode)
-                getHPartitionTap(hfsTap)
-              }
-            case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
+        mode match {
+          case Local(_) => {
+            val localTap = new FileTap(localScheme, basePath, sinkMode)
+            openWritesThreshold match {
+              case Some(threshold) =>
+                new LPartitionTap(localTap, partition, threshold)
+              case None => new LPartitionTap(localTap, partition)
+            }
           }
+          case hdfsMode @ Hdfs(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
+            getHPartitionTap(hfsTap)
+          }
+          case hdfsTest @ HadoopTest(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme,
+                                      hdfsTest.getWritePathFor(this),
+                                      sinkMode)
+            getHPartitionTap(hfsTap)
+          }
+          case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
         }
+      }
     }
   }
 

@@ -52,8 +52,8 @@ trait Codec[Req, Rep] {
     * good understanding of finagle internals to implement correctly.
     * Proceed with care.
     */
-  def newClientTransport(
-      ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+  def newClientTransport(ch: Channel,
+                         statsReceiver: StatsReceiver): Transport[Any, Any] =
     new ChannelTransport(ch)
 
   final def newClientDispatcher(
@@ -74,8 +74,8 @@ trait Codec[Req, Rep] {
       transport: Transport[Any, Any],
       service: Service[Req, Rep]
   ): Closable =
-    new SerialServerDispatcher[Req, Rep](
-        Transport.cast[Rep, Req](transport), service)
+    new SerialServerDispatcher[Req, Rep](Transport.cast[Rep, Req](transport),
+                                         service)
 
   /**
     * Is this Codec OK for failfast? This is a temporary hack to

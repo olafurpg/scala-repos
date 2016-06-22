@@ -43,7 +43,7 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
   * @param modelType The type of NB model to fit  can be "multinomial" or "bernoulli"
   */
 @Since("0.9.0")
-class NaiveBayesModel private[spark](
+class NaiveBayesModel private[spark] (
     @Since("1.0.0") val labels: Array[Double],
     @Since("0.9.0") val pi: Array[Double],
     @Since("0.9.0") val theta: Array[Array[Double]],
@@ -55,11 +55,12 @@ class NaiveBayesModel private[spark](
   import NaiveBayes.{Bernoulli, Multinomial, supportedModelTypes}
 
   private val piVector = new DenseVector(pi)
-  private val thetaMatrix = new DenseMatrix(
-      labels.length, theta(0).length, theta.flatten, true)
+  private val thetaMatrix =
+    new DenseMatrix(labels.length, theta(0).length, theta.flatten, true)
 
-  private[mllib] def this(
-      labels: Array[Double], pi: Array[Double], theta: Array[Array[Double]]) =
+  private[mllib] def this(labels: Array[Double],
+                          pi: Array[Double],
+                          theta: Array[Array[Double]]) =
     this(labels, pi, theta, NaiveBayes.Multinomial)
 
   /** A Java-friendly constructor that takes three Iterable parameters. */
@@ -150,8 +151,7 @@ class NaiveBayesModel private[spark](
   }
 
   private def bernoulliCalculation(testData: Vector) = {
-    testData.foreachActive(
-        (_, value) =>
+    testData.foreachActive((_, value) =>
           if (value != 0.0 && value != 1.0) {
         throw new SparkException(
             s"Bernoulli naive Bayes requires 0 or 1 feature values but found $testData.")
@@ -206,8 +206,8 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
       val metadata = compact(
           render(
               ("class" -> thisClassName) ~ ("version" -> thisFormatVersion) ~
-              ("numFeatures" -> data.theta(0).length) ~
-              ("numClasses" -> data.pi.length)))
+                ("numFeatures" -> data.theta(0).length) ~
+                ("numClasses" -> data.pi.length)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
 
       // Create Parquet data.
@@ -256,8 +256,8 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
       val metadata = compact(
           render(
               ("class" -> thisClassName) ~ ("version" -> thisFormatVersion) ~
-              ("numFeatures" -> data.theta(0).length) ~
-              ("numClasses" -> data.pi.length)))
+                ("numFeatures" -> data.theta(0).length) ~
+                ("numClasses" -> data.pi.length)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
 
       // Create Parquet data.
@@ -300,20 +300,20 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
       case _ =>
         throw new Exception(
             s"NaiveBayesModel.load did not recognize model with (className, format version):" +
-            s"($loadedClassName, $version).  Supported:\n" +
-            s"  ($classNameV1_0, 1.0)")
+              s"($loadedClassName, $version).  Supported:\n" +
+              s"  ($classNameV1_0, 1.0)")
     }
     assert(model.pi.length == numClasses,
            s"NaiveBayesModel.load expected $numClasses classes," +
-           s" but class priors vector pi had ${model.pi.length} elements")
+             s" but class priors vector pi had ${model.pi.length} elements")
     assert(
         model.theta.length == numClasses,
         s"NaiveBayesModel.load expected $numClasses classes," +
-        s" but class conditionals array theta had ${model.theta.length} elements")
+          s" but class conditionals array theta had ${model.theta.length} elements")
     assert(model.theta.forall(_.length == numFeatures),
            s"NaiveBayesModel.load expected $numFeatures features," +
-           s" but class conditionals array theta had elements of size:" +
-           s" ${model.theta.map(_.length).mkString(",")}")
+             s" but class conditionals array theta had elements of size:" +
+             s" ${model.theta.map(_.length).mkString(",")}")
     model
   }
 }
@@ -327,8 +327,8 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
   * Bernoulli NB ([[http://tinyurl.com/p7c96j6]]). The input feature values must be nonnegative.
   */
 @Since("0.9.0")
-class NaiveBayes private (
-    private var lambda: Double, private var modelType: String)
+class NaiveBayes private (private var lambda: Double,
+                          private var modelType: String)
     extends Serializable
     with Logging {
 

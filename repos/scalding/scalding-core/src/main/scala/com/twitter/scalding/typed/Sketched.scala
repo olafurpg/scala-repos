@@ -28,12 +28,12 @@ import CMSHasherImplicits._
   * This class is generally only created by users
   * with the TypedPipe.sketch method
   */
-case class Sketched[K, V](pipe: TypedPipe[(K, V)],
-                          numReducers: Int,
-                          delta: Double,
-                          eps: Double,
-                          seed: Int)(
-    implicit serialization: K => Array[Byte], ordering: Ordering[K])
+case class Sketched[K, V](
+    pipe: TypedPipe[(K, V)],
+    numReducers: Int,
+    delta: Double,
+    eps: Double,
+    seed: Int)(implicit serialization: K => Array[Byte], ordering: Ordering[K])
     extends MustHaveReducers {
 
   def serialize(k: K): Array[Byte] = serialization(k)
@@ -68,8 +68,9 @@ case class Sketched[K, V](pipe: TypedPipe[(K, V)],
 }
 
 case class SketchJoined[K: Ordering, V, V2, R](
-    left: Sketched[K, V], right: TypedPipe[(K, V2)], numReducers: Int)(
-    joiner: (K, V, Iterable[V2]) => Iterator[R])
+    left: Sketched[K, V],
+    right: TypedPipe[(K, V2)],
+    numReducers: Int)(joiner: (K, V, Iterable[V2]) => Iterator[R])
     extends MustHaveReducers {
 
   def reducers = Some(numReducers)
@@ -84,7 +85,9 @@ case class SketchJoined[K: Ordering, V, V2, R](
         val maxPerReducer =
           (cms.totalCount / numReducers) * maxReducerFraction + 1
         val maxReplicas =
-          (cms.frequency(Bytes(left.serialize(k))).estimate.toDouble / maxPerReducer)
+          (cms.frequency(Bytes(left.serialize(k)))
+                .estimate
+                .toDouble / maxPerReducer)
         //if the frequency is 0, maxReplicas.ceil will be 0 so we will filter out this key entirely
         //if it's < maxPerReducer, the ceil will round maxReplicas up to 1 to ensure we still see it
         val replicas = fn(maxReplicas.ceil.toInt.min(numReducers))
@@ -117,8 +120,8 @@ case class SketchJoined[K: Ordering, V, V2, R](
 
     kord match {
       case kos: OrderedSerialization[_] =>
-        new OrderedSerialization2(
-            ordSer[Int], kos.asInstanceOf[OrderedSerialization[K]])
+        new OrderedSerialization2(ordSer[Int],
+                                  kos.asInstanceOf[OrderedSerialization[K]])
       case _ => Ordering.Tuple2[Int, K]
     }
   }

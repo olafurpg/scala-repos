@@ -37,16 +37,17 @@ class FilteredScanSource extends RelationProvider {
   }
 }
 
-case class SimpleFilteredScan(
-    from: Int, to: Int)(@transient val sqlContext: SQLContext)
+case class SimpleFilteredScan(from: Int, to: Int)(
+    @transient val sqlContext: SQLContext)
     extends BaseRelation
     with PrunedFilteredScan {
 
   override def schema: StructType =
     StructType(
         StructField("a", IntegerType, nullable = false) :: StructField(
-            "b", IntegerType, nullable = false) :: StructField(
-            "c", StringType, nullable = false) :: Nil)
+            "b",
+            IntegerType,
+            nullable = false) :: StructField("c", StringType, nullable = false) :: Nil)
 
   override def unhandledFilters(filters: Array[Filter]): Array[Filter] = {
     def unhandled(filter: Filter): Boolean = {
@@ -70,8 +71,8 @@ case class SimpleFilteredScan(
     filters.filter(unhandled)
   }
 
-  override def buildScan(
-      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
+  override def buildScan(requiredColumns: Array[String],
+                         filters: Array[Filter]): RDD[Row] = {
     val rowBuilders = requiredColumns.map {
       case "a" =>
         (i: Int) =>
@@ -150,7 +151,7 @@ case class SimpleFilteredScan(
     def eval(a: Int) = {
       val c =
         (a - 1 + 'a').toChar.toString * 5 +
-        (a - 1 + 'a').toChar.toString.toUpperCase * 5
+          (a - 1 + 'a').toChar.toString.toUpperCase * 5
       filters.forall(translateFilterOnA(_)(a)) &&
       filters.forall(translateFilterOnC(_)(c))
     }
@@ -158,8 +159,10 @@ case class SimpleFilteredScan(
     sqlContext.sparkContext
       .parallelize(from to to)
       .filter(eval)
-      .map(i =>
-            Row.fromSeq(rowBuilders
+      .map(
+          i =>
+            Row.fromSeq(
+                rowBuilders
                   .map(_ (i))
                   .reduceOption(_ ++ _)
                   .getOrElse(Seq.empty)))
@@ -196,11 +199,12 @@ class FilteredScanSuite
 
   sqlTest("SELECT * FROM oneToTenFiltered",
           (1 to 10)
-            .map(i =>
+            .map(
+                i =>
                   Row(i,
                       i * 2,
                       (i - 1 + 'a').toChar.toString * 5 +
-                      (i - 1 + 'a').toChar.toString.toUpperCase * 5))
+                        (i - 1 + 'a').toChar.toString.toUpperCase * 5))
             .toSeq)
 
   sqlTest("SELECT a, b FROM oneToTenFiltered",
@@ -211,14 +215,14 @@ class FilteredScanSuite
 
   sqlTest("SELECT a FROM oneToTenFiltered", (1 to 10).map(i => Row(i)).toSeq)
 
-  sqlTest(
-      "SELECT b FROM oneToTenFiltered", (1 to 10).map(i => Row(i * 2)).toSeq)
+  sqlTest("SELECT b FROM oneToTenFiltered",
+          (1 to 10).map(i => Row(i * 2)).toSeq)
 
   sqlTest("SELECT a * 2 FROM oneToTenFiltered",
           (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest(
-      "SELECT A AS b FROM oneToTenFiltered", (1 to 10).map(i => Row(i)).toSeq)
+  sqlTest("SELECT A AS b FROM oneToTenFiltered",
+          (1 to 10).map(i => Row(i)).toSeq)
 
   sqlTest(
       "SELECT x.b, y.a FROM oneToTenFiltered x JOIN oneToTenFiltered y ON x.a = y.b",
@@ -263,36 +267,48 @@ class FilteredScanSuite
   sqlTest("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%eE%'",
           Seq(Row(5, 5 * 2, "e" * 5 + "E" * 5)))
 
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE A = 1", 1, Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE A = 1",
+               1,
+               Set("a", "b", "c"))
   testPushDown("SELECT a FROM oneToTenFiltered WHERE A = 1", 1, Set("a"))
   testPushDown("SELECT b FROM oneToTenFiltered WHERE A = 1", 1, Set("b"))
-  testPushDown(
-      "SELECT a, b FROM oneToTenFiltered WHERE A = 1", 1, Set("a", "b"))
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE a = 1", 1, Set("a", "b", "c"))
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE 1 = a", 1, Set("a", "b", "c"))
+  testPushDown("SELECT a, b FROM oneToTenFiltered WHERE A = 1",
+               1,
+               Set("a", "b"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE a = 1",
+               1,
+               Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE 1 = a",
+               1,
+               Set("a", "b", "c"))
 
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE a > 1", 9, Set("a", "b", "c"))
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE a >= 2", 9, Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE a > 1",
+               9,
+               Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE a >= 2",
+               9,
+               Set("a", "b", "c"))
 
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE 1 < a", 9, Set("a", "b", "c"))
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE 2 <= a", 9, Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE 1 < a",
+               9,
+               Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE 2 <= a",
+               9,
+               Set("a", "b", "c"))
 
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE 1 > a", 0, Set("a", "b", "c"))
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE 2 >= a", 2, Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE 1 > a",
+               0,
+               Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE 2 >= a",
+               2,
+               Set("a", "b", "c"))
 
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE a < 1", 0, Set("a", "b", "c"))
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE a <= 2", 2, Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE a < 1",
+               0,
+               Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE a <= 2",
+               2,
+               Set("a", "b", "c"))
 
   testPushDown("SELECT * FROM oneToTenFiltered WHERE a > 1 AND a < 10",
                8,
@@ -302,8 +318,9 @@ class FilteredScanSuite
                3,
                Set("a", "b", "c"))
 
-  testPushDown(
-      "SELECT * FROM oneToTenFiltered WHERE a = 20", 0, Set("a", "b", "c"))
+  testPushDown("SELECT * FROM oneToTenFiltered WHERE a = 20",
+               0,
+               Set("a", "b", "c"))
   testPushDown("SELECT * FROM oneToTenFiltered WHERE b = 1",
                10,
                Set("a", "b", "c"),
@@ -340,8 +357,9 @@ class FilteredScanSuite
                0,
                Set("a", "b", "c"))
 
-  testPushDown(
-      "SELECT c FROM oneToTenFiltered WHERE c = 'aaaaaAAAAA'", 1, Set("c"))
+  testPushDown("SELECT c FROM oneToTenFiltered WHERE c = 'aaaaaAAAAA'",
+               1,
+               Set("c"))
   testPushDown(
       "SELECT c FROM oneToTenFiltered WHERE c IN ('aaaaaAAAAA', 'foo')",
       1,
@@ -349,8 +367,9 @@ class FilteredScanSuite
 
   // Filters referencing multiple columns are not convertible, all referenced columns must be
   // required.
-  testPushDown(
-      "SELECT c FROM oneToTenFiltered WHERE A + b > 9", 10, Set("a", "b", "c"))
+  testPushDown("SELECT c FROM oneToTenFiltered WHERE A + b > 9",
+               10,
+               Set("a", "b", "c"))
 
   // A query with an inconvertible filter, an unhandled filter, and a handled filter.
   testPushDown("""SELECT a
@@ -366,8 +385,10 @@ class FilteredScanSuite
   def testPushDown(sqlString: String,
                    expectedCount: Int,
                    requiredColumnNames: Set[String]): Unit = {
-    testPushDown(
-        sqlString, expectedCount, requiredColumnNames, Set.empty[Filter])
+    testPushDown(sqlString,
+                 expectedCount,
+                 requiredColumnNames,
+                 Set.empty[Filter])
   }
 
   def testPushDown(sqlString: String,
@@ -377,8 +398,8 @@ class FilteredScanSuite
 
     test(s"PushDown Returns $expectedCount: $sqlString") {
       // These tests check a particular plan, disable whole stage codegen.
-      caseInsensitiveContext.conf.setConf(
-          SQLConf.WHOLESTAGE_CODEGEN_ENABLED, false)
+      caseInsensitiveContext.conf
+        .setConf(SQLConf.WHOLESTAGE_CODEGEN_ENABLED, false)
       try {
         val queryExecution = sql(sqlString).queryExecution
         val rawPlan = queryExecution.executedPlan.collect {
@@ -396,13 +417,15 @@ class FilteredScanSuite
         }.get
 
         assert(
-            relation.unhandledFilters(FiltersPushed.list.toArray).toSet === expectedUnhandledFilters)
+            relation
+              .unhandledFilters(FiltersPushed.list.toArray)
+              .toSet === expectedUnhandledFilters)
 
         if (rawCount != expectedCount) {
           fail(
               s"Wrong # of results for pushed filter. Got $rawCount, Expected $expectedCount\n" +
-              s"Filters pushed: ${FiltersPushed.list.mkString(",")}\n" +
-              queryExecution)
+                s"Filters pushed: ${FiltersPushed.list.mkString(",")}\n" +
+                queryExecution)
         }
       } finally {
         caseInsensitiveContext.conf.setConf(

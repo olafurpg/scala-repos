@@ -50,14 +50,14 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
 
   test("a && a => a") {
     checkCondition(Literal(1) < 'a && Literal(1) < 'a, Literal(1) < 'a)
-    checkCondition(
-        Literal(1) < 'a && Literal(1) < 'a && Literal(1) < 'a, Literal(1) < 'a)
+    checkCondition(Literal(1) < 'a && Literal(1) < 'a && Literal(1) < 'a,
+                   Literal(1) < 'a)
   }
 
   test("a || a => a") {
     checkCondition(Literal(1) < 'a || Literal(1) < 'a, Literal(1) < 'a)
-    checkCondition(
-        Literal(1) < 'a || Literal(1) < 'a || Literal(1) < 'a, Literal(1) < 'a)
+    checkCondition(Literal(1) < 'a || Literal(1) < 'a || Literal(1) < 'a,
+                   Literal(1) < 'a)
   }
 
   test(
@@ -70,11 +70,11 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
 
     val input =
       ('a === 'b && 'b > 3 && 'c > 2) || ('a === 'b && 'c < 1 && 'a === 5) ||
-      ('a === 'b && 'b < 5 && 'a > 1)
+        ('a === 'b && 'b < 5 && 'a > 1)
 
     val expected =
       'a === 'b &&
-      (('b > 3 && 'c > 2) || ('c < 1 && 'a === 5) || ('b < 5 && 'a > 1))
+        (('b > 3 && 'c > 2) || ('c < 1 && 'a === 5) || ('b < 5 && 'a > 1))
 
     checkCondition(input, expected)
   }
@@ -87,11 +87,11 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
 
     checkCondition('a < 2 && ('a < 2 || 'a > 3 || 'b > 5), 'a < 2)
 
-    checkCondition(
-        ('a < 2 || 'b > 3) && ('a < 2 || 'c > 5), 'a < 2 || ('b > 3 && 'c > 5))
+    checkCondition(('a < 2 || 'b > 3) && ('a < 2 || 'c > 5),
+                   'a < 2 || ('b > 3 && 'c > 5))
 
     checkCondition(('a === 'b || 'b > 3) && ('a === 'b || 'a > 3) &&
-                   ('a === 'b || 'a < 5),
+                     ('a === 'b || 'a < 5),
                    'a === 'b || 'b > 3 && 'a > 3 && 'a < 5)
   }
 

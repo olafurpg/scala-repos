@@ -38,7 +38,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class MenuButtonSpec
     extends SimpleSFXDelegateSpec[jfxsc.MenuButton, MenuButton](
-        classOf[jfxsc.MenuButton], classOf[MenuButton])
+        classOf[jfxsc.MenuButton],
+        classOf[MenuButton])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance =

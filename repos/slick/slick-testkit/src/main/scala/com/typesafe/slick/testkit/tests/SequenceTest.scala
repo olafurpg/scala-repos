@@ -46,11 +46,13 @@ class SequenceTest extends AsyncTest[JdbcTestDB] {
         values(s1).map(_ shouldBe List(1, 2, 3, 4, 5)),
         values(s2).map(_ shouldBe List(3, 4, 5, 6, 7)),
         values(s3).map(_ shouldBe List(3, 5, 7, 9, 11)),
-        ifCap(scap.sequenceMin, scap.sequenceMax, scap.sequenceCycle)(seq(
+        ifCap(scap.sequenceMin, scap.sequenceMax, scap.sequenceCycle)(
+            seq(
                 values(s4).map(_ shouldBe List(3, 4, 5, 2, 3)),
                 values(s5).map(_ shouldBe List(3, 2, 5, 4, 3))
             )),
-        ifCap(scap.sequenceMin, scap.sequenceMax, scap.sequenceLimited)(seq(
+        ifCap(scap.sequenceMin, scap.sequenceMax, scap.sequenceLimited)(
+            seq(
                 values(s6, 3).map(_ shouldBe List(3, 4, 5)),
                 values(s6, 1, false).failed
             ))

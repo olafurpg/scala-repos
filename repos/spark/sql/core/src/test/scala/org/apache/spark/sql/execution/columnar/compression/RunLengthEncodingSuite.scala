@@ -31,8 +31,8 @@ class RunLengthEncodingSuite extends SparkFunSuite {
   testRunLengthEncoding(new LongColumnStats, LONG)
   testRunLengthEncoding(new StringColumnStats, STRING)
 
-  def testRunLengthEncoding[T <: AtomicType](
-      columnStats: ColumnStats, columnType: NativeColumnType[T]) {
+  def testRunLengthEncoding[T <: AtomicType](columnStats: ColumnStats,
+                                             columnType: NativeColumnType[T]) {
 
     val typeName = columnType.getClass.getSimpleName.stripSuffix("$")
 
@@ -41,10 +41,11 @@ class RunLengthEncodingSuite extends SparkFunSuite {
       // Tests encoder
       // -------------
 
-      val builder = TestCompressibleColumnBuilder(
-          columnStats, columnType, RunLengthEncoding)
-      val (values, rows) = makeUniqueValuesAndSingleValueRows(
-          columnType, uniqueValueCount)
+      val builder = TestCompressibleColumnBuilder(columnStats,
+                                                  columnType,
+                                                  RunLengthEncoding)
+      val (values, rows) =
+        makeUniqueValuesAndSingleValueRows(columnType, uniqueValueCount)
       val inputSeq = inputRuns.flatMap {
         case (index, run) =>
           Seq.fill(run)(index)

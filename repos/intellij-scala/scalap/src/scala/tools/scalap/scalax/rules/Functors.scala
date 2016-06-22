@@ -18,38 +18,38 @@ import scala.language.higherKinds
 import scala.language.implicitConversions
 
 trait Functor[+A] {
-  type M [+A] <: Functor[A]
+  type M[+A] <: Functor[A]
   def map[B](f: A => B): M[B]
 }
 
 trait Filter[+A] {
-  type M [+A] <: Filter[A]
+  type M[+A] <: Filter[A]
   def filter(f: A => Boolean): M[A]
 }
 
 trait Plus[+A] {
-  type M [+A] <: Plus[A]
+  type M[+A] <: Plus[A]
   def plus[B >: A](other: => M[B]): M[B]
 }
 
 trait OrElse[+A] {
-  type M [+A] <: OrElse[A]
+  type M[+A] <: OrElse[A]
   def orElse[B >: A](other: => M[B]): M[B]
 }
 
 trait Units {
-  type M [+A]
+  type M[+A]
   def unit: M[Unit]
   def unit[A](a: => A): M[A]
 }
 
 trait Zero {
-  type M [+A]
+  type M[+A]
   def zero: M[Nothing]
 }
 
 trait Functors {
-  type M [+A] <: Functor[A]
+  type M[+A] <: Functor[A]
 
   trait Functor[+A] extends rules.Functor[A] {
     this: M[A] =>
@@ -74,7 +74,7 @@ trait UnitFunctors extends Units with Functors {
 }
 
 trait Monoidals extends UnitFunctors {
-  type M [+A] <: Monoidal[A]
+  type M[+A] <: Monoidal[A]
 
   implicit def app[A, B](fab: M[A => B]) = (fa: M[A]) => fa applyTo fab
   implicit def appUnit[A, B](a2b: A => B) = app(unit(a2b))

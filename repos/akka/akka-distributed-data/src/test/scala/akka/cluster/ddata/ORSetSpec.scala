@@ -256,16 +256,16 @@ class ORSetSpec extends WordSpec with Matchers {
       val thisDot2 = VersionVector(TreeMap(nodeB -> 5L, nodeC -> 2L))
       val thisVvector = VersionVector(
           TreeMap(nodeA -> 3L, nodeB -> 5L, nodeC -> 2L, nodeD -> 7L))
-      val thisSet =
-        new ORSet(elementsMap = Map("K1" -> thisDot1, "K2" -> thisDot2),
-                  vvector = thisVvector)
+      val thisSet = new ORSet(elementsMap =
+                                Map("K1" -> thisDot1, "K2" -> thisDot2),
+                              vvector = thisVvector)
       val thatDot1 = VersionVector(nodeA, 3L)
       val thatDot2 = VersionVector(nodeB, 6L)
       val thatVvector = VersionVector(
           TreeMap(nodeA -> 3L, nodeB -> 6L, nodeC -> 1L, nodeD -> 8L))
-      val thatSet =
-        new ORSet(elementsMap = Map("K1" -> thatDot1, "K2" -> thatDot2),
-                  vvector = thatVvector)
+      val thatSet = new ORSet(elementsMap =
+                                Map("K1" -> thatDot1, "K2" -> thatDot2),
+                              vvector = thatVvector)
 
       val expectedDots =
         Map("K1" -> VersionVector(nodeA, 3L),
@@ -371,8 +371,7 @@ class ORSetSpec extends WordSpec with Matchers {
       val msg: Any = Changed(ORSetKey[String]("key"))(s1)
       msg match {
         case c @ Changed(ORSetKey("key")) ⇒
-          val ORSet(elements3) =
-            c.dataValue // `unapply(a: ReplicatedData)` is used here
+          val ORSet(elements3) = c.dataValue // `unapply(a: ReplicatedData)` is used here
           // if `unapply(a: ReplicatedData)` isn't defined the next line doesn't compile:
           //   type mismatch; found : scala.collection.immutable.Set[A] where type A required: Set[Any] Note: A <: Any,
           //   but trait Set is invariant in type A. You may wish to investigate a wildcard type such as _ <: Any. (SLS 3.2.10)

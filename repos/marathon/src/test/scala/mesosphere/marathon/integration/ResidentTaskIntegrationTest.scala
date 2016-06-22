@@ -83,8 +83,8 @@ class ResidentTaskIntegrationTest
 
   test("resident task is launched completely on reserved resources") { f =>
     Given("A resident app")
-    val app = f.residentApp(portDefinitions =
-          Seq.empty /* prevent problems by randomized port assignment */ )
+    val app = f.residentApp(
+        portDefinitions = Seq.empty /* prevent problems by randomized port assignment */ )
 
     When("A task is launched")
     f.createSuccessfully(app)
@@ -103,7 +103,8 @@ class ResidentTaskIntegrationTest
     When("the app is suspended")
     f.suspendSuccessfully(app.id)
 
-    Then("there are no used resources anymore but there are the same reserved resources")
+    Then(
+        "there are no used resources anymore but there are the same reserved resources")
     val state2: RestResult[ITMesosState] = mesos.state
 
     withClue("used_resources") {
@@ -243,15 +244,16 @@ class ResidentTaskIntegrationTest
     val disk: Double = 1.0
     val persistentVolumeSize: Long = 2
 
-    val itMesosResources = ITResources(
-        "mem" -> mem, "cpus" -> cpus, "disk" -> (disk + persistentVolumeSize))
+    val itMesosResources = ITResources("mem" -> mem,
+                                       "cpus" -> cpus,
+                                       "disk" -> (disk + persistentVolumeSize))
 
     def residentApp(containerPath: String = "persistent-volume",
                     cmd: String = "sleep 1000",
                     instances: Int = 1,
                     backoffDuration: FiniteDuration = 1.hour,
-                    portDefinitions: Seq[PortDefinition] =
-                      PortDefinitions(0)): AppDefinition = {
+                    portDefinitions: Seq[PortDefinition] = PortDefinitions(0))
+      : AppDefinition = {
 
       val appId: PathId = PathId(
           s"/$testBasePath/app-${IdGenerator.generate()}")
@@ -302,8 +304,8 @@ class ResidentTaskIntegrationTest
       app
     }
 
-    def scaleToSuccessfully(
-        appId: PathId, instances: Int): Iterable[ITEnrichedTask] = {
+    def scaleToSuccessfully(appId: PathId,
+                            instances: Int): Iterable[ITEnrichedTask] = {
       val result =
         marathon.updateApp(appId, AppUpdate(instances = Some(instances)))
       result.code should be(200) // OK

@@ -148,25 +148,25 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
         Array(0.10, 0.10, 0.70, 0.10) // label 2
     ).map(_.map(math.log))
 
-    val testData = NaiveBayesSuite.generateNaiveBayesInput(
-        pi, theta, nPoints, 42, Multinomial)
+    val testData = NaiveBayesSuite
+      .generateNaiveBayesInput(pi, theta, nPoints, 42, Multinomial)
     val testRDD = sc.parallelize(testData, 2)
     testRDD.cache()
 
     val model = NaiveBayes.train(testRDD, 1.0, Multinomial)
     validateModelFit(pi, theta, model)
 
-    val validationData = NaiveBayesSuite.generateNaiveBayesInput(
-        pi, theta, nPoints, 17, Multinomial)
+    val validationData = NaiveBayesSuite
+      .generateNaiveBayesInput(pi, theta, nPoints, 17, Multinomial)
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
 
     // Test posteriors
     validationData.map(_.features).foreach { features =>
@@ -184,12 +184,12 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     * @param testData input to compute posterior probabilities for
     * @return posterior class probabilities (in order of labels) for input
     */
-  private def expectedMultinomialProbabilities(
-      model: NaiveBayesModel, testData: Vector) = {
+  private def expectedMultinomialProbabilities(model: NaiveBayesModel,
+                                               testData: Vector) = {
     val piVector = new BDV(model.pi)
     // model.theta is row-major; treat it as col-major representation of transpose, and transpose:
-    val thetaMatrix = new BDM(
-        model.theta(0).length, model.theta.length, model.theta.flatten).t
+    val thetaMatrix =
+      new BDM(model.theta(0).length, model.theta.length, model.theta.flatten).t
     val logClassProbs: BV[Double] =
       piVector + (thetaMatrix * testData.toBreeze)
     val classProbs = logClassProbs.toArray.map(math.exp)
@@ -239,25 +239,25 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
               0.30) // label 2
     ).map(_.map(math.log))
 
-    val testData = NaiveBayesSuite.generateNaiveBayesInput(
-        pi, theta, nPoints, 45, Bernoulli)
+    val testData = NaiveBayesSuite
+      .generateNaiveBayesInput(pi, theta, nPoints, 45, Bernoulli)
     val testRDD = sc.parallelize(testData, 2)
     testRDD.cache()
 
     val model = NaiveBayes.train(testRDD, 1.0, Bernoulli)
     validateModelFit(pi, theta, model)
 
-    val validationData = NaiveBayesSuite.generateNaiveBayesInput(
-        pi, theta, nPoints, 20, Bernoulli)
+    val validationData = NaiveBayesSuite
+      .generateNaiveBayesInput(pi, theta, nPoints, 20, Bernoulli)
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
+                       validationData)
 
     // Test prediction on Array.
-    validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+    validatePrediction(validationData.map(row => model.predict(row.features)),
+                       validationData)
 
     // Test posteriors
     validationData.map(_.features).foreach { features =>
@@ -275,11 +275,11 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     * @param testData input to compute posterior probabilities for
     * @return posterior class probabilities (in order of labels) for input
     */
-  private def expectedBernoulliProbabilities(
-      model: NaiveBayesModel, testData: Vector) = {
+  private def expectedBernoulliProbabilities(model: NaiveBayesModel,
+                                             testData: Vector) = {
     val piVector = new BDV(model.pi)
-    val thetaMatrix = new BDM(
-        model.theta(0).length, model.theta.length, model.theta.flatten).t
+    val thetaMatrix =
+      new BDM(model.theta(0).length, model.theta.length, model.theta.flatten).t
     val negThetaMatrix = new BDM(
         model.theta(0).length,
         model.theta.length,

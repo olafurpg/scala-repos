@@ -20,7 +20,8 @@ class EvalTest extends WordSpec {
     }
 
     "apply(new File(...))" in {
-      assert((new Eval)
+      assert(
+          (new Eval)
             .apply[Int](TempFile.fromResourcePath("/OnePlusOne.scala")) == 2)
     }
 
@@ -42,8 +43,9 @@ class EvalTest extends WordSpec {
       val className = e.fileToClassName(sourceFile)
       val processedSource = e.sourceForString(
           Source.fromFile(sourceFile).getLines().mkString("\n"))
-      val fullClassName = "Evaluator__%s_%s.class".format(
-          className, e.uniqueId(processedSource, None))
+      val fullClassName =
+        "Evaluator__%s_%s.class".format(className,
+                                        e.uniqueId(processedSource, None))
       val targetFileName = f.getAbsolutePath() + File.separator + fullClassName
       val targetFile = new File(targetFileName)
       assert(targetFile.exists)
@@ -62,8 +64,9 @@ class EvalTest extends WordSpec {
       val className = e.fileToClassName(sourceFile)
       val processedSource = e.sourceForString(
           Source.fromFile(sourceFile).getLines().mkString("\n"))
-      val fullClassName = "Evaluator__%s_%s.class".format(
-          className, e.uniqueId(processedSource, None))
+      val fullClassName =
+        "Evaluator__%s_%s.class".format(className,
+                                        e.uniqueId(processedSource, None))
       val targetFileName = f.getAbsolutePath() + File.separator + fullClassName
       val targetFile = new File(targetFileName)
       assert(targetFile.exists)
@@ -99,7 +102,8 @@ class EvalTest extends WordSpec {
     }
 
     "apply(InputStream)" in {
-      assert((new Eval).apply[Int](
+      assert(
+          (new Eval).apply[Int](
               getClass.getResourceAsStream("/OnePlusOne.scala")) == 2)
     }
 
@@ -180,20 +184,20 @@ class EvalTest extends WordSpec {
         val eval = new Eval {
           @volatile var errors: Seq[(String, String)] = Nil
 
-          override lazy val compilerMessageHandler: Option[Reporter] = Some(
-              new AbstractReporter {
-            override val settings: Settings = compilerSettings
-            override def displayPrompt(): Unit = ()
-            override def display(pos: Position,
-                                 msg: String,
-                                 severity: this.type#Severity): Unit = {
-              errors = errors :+ ((msg, severity.toString))
-            }
-            override def reset() = {
-              super.reset()
-              errors = Nil
-            }
-          })
+          override lazy val compilerMessageHandler: Option[Reporter] =
+            Some(new AbstractReporter {
+              override val settings: Settings = compilerSettings
+              override def displayPrompt(): Unit = ()
+              override def display(pos: Position,
+                                   msg: String,
+                                   severity: this.type#Severity): Unit = {
+                errors = errors :+ ((msg, severity.toString))
+              }
+              override def reset() = {
+                super.reset()
+                errors = Nil
+              }
+            })
         }
       }
 

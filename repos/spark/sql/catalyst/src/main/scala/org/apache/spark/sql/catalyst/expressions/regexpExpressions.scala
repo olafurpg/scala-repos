@@ -100,7 +100,8 @@ case class Like(left: Expression, right: Expression)
         s"""
           ${eval.code}
           boolean ${ev.isNull} = ${eval.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = $pattern.matcher(${eval.value}.toString()).matches();
           }
@@ -108,7 +109,8 @@ case class Like(left: Expression, right: Expression)
       } else {
         s"""
           boolean ${ev.isNull} = true;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
         """
       }
     } else {
@@ -151,7 +153,8 @@ case class RLike(left: Expression, right: Expression)
         s"""
           ${eval.code}
           boolean ${ev.isNull} = ${eval.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = $pattern.matcher(${eval.value}.toString()).find(0);
           }
@@ -159,7 +162,8 @@ case class RLike(left: Expression, right: Expression)
       } else {
         s"""
           boolean ${ev.isNull} = true;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
         """
       }
     } else {
@@ -210,8 +214,9 @@ case class StringSplit(str: Expression, pattern: Expression)
   *
   * NOTE: this expression is not THREAD-SAFE, as it has some internal mutable status.
   */
-case class RegExpReplace(
-    subject: Expression, regexp: Expression, rep: Expression)
+case class RegExpReplace(subject: Expression,
+                         regexp: Expression,
+                         rep: Expression)
     extends TernaryExpression
     with ImplicitCastInputTypes {
 
@@ -266,12 +271,15 @@ case class RegExpReplace(
     val classNameStringBuffer =
       classOf[java.lang.StringBuffer].getCanonicalName
 
-    ctx.addMutableState(
-        "UTF8String", termLastRegex, s"${termLastRegex} = null;")
-    ctx.addMutableState(
-        classNamePattern, termPattern, s"${termPattern} = null;")
-    ctx.addMutableState(
-        "String", termLastReplacement, s"${termLastReplacement} = null;")
+    ctx.addMutableState("UTF8String",
+                        termLastRegex,
+                        s"${termLastRegex} = null;")
+    ctx.addMutableState(classNamePattern,
+                        termPattern,
+                        s"${termPattern} = null;")
+    ctx.addMutableState("String",
+                        termLastReplacement,
+                        s"${termLastReplacement} = null;")
     ctx.addMutableState("UTF8String",
                         termLastReplacementInUTF8,
                         s"${termLastReplacementInUTF8} = null;")
@@ -310,8 +318,9 @@ case class RegExpReplace(
   *
   * NOTE: this expression is not THREAD-SAFE, as it has some internal mutable status.
   */
-case class RegExpExtract(
-    subject: Expression, regexp: Expression, idx: Expression)
+case class RegExpExtract(subject: Expression,
+                         regexp: Expression,
+                         idx: Expression)
     extends TernaryExpression
     with ImplicitCastInputTypes {
   def this(s: Expression, r: Expression) = this(s, r, Literal(1))
@@ -347,10 +356,12 @@ case class RegExpExtract(
     val termPattern = ctx.freshName("pattern")
     val classNamePattern = classOf[Pattern].getCanonicalName
 
-    ctx.addMutableState(
-        "UTF8String", termLastRegex, s"${termLastRegex} = null;")
-    ctx.addMutableState(
-        classNamePattern, termPattern, s"${termPattern} = null;")
+    ctx.addMutableState("UTF8String",
+                        termLastRegex,
+                        s"${termLastRegex} = null;")
+    ctx.addMutableState(classNamePattern,
+                        termPattern,
+                        s"${termPattern} = null;")
 
     nullSafeCodeGen(ctx, ev, (subject, regexp, idx) => {
       s"""

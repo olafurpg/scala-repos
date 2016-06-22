@@ -113,7 +113,7 @@ private[spark] object DecisionTreeMetadata extends Logging {
     val numFeatures = input.map(_.features.size).take(1).headOption.getOrElse {
       throw new IllegalArgumentException(
           s"DecisionTree requires size of input RDD > 0, " +
-          s"but was given by empty one.")
+            s"but was given by empty one.")
     }
     val numExamples = input.count()
     val numClasses = strategy.algo match {
@@ -125,7 +125,7 @@ private[spark] object DecisionTreeMetadata extends Logging {
     if (maxPossibleBins < strategy.maxBins) {
       logWarning(
           s"DecisionTree reducing maxBins from ${strategy.maxBins} to $maxPossibleBins" +
-          s" (= number of training instances)")
+            s" (= number of training instances)")
     }
 
     // We check the number of bins here against maxPossibleBins.
@@ -140,9 +140,9 @@ private[spark] object DecisionTreeMetadata extends Logging {
       require(
           maxCategoriesPerFeature <= maxPossibleBins,
           s"DecisionTree requires maxBins (= $maxPossibleBins) to be at least as large as the " +
-          s"number of values in each categorical feature, but categorical feature $maxCategory " +
-          s"has $maxCategoriesPerFeature values. Considering remove this and other categorical " +
-          "features with a large number of values, or add more training examples.")
+            s"number of values in each categorical feature, but categorical feature $maxCategory " +
+            s"has $maxCategoriesPerFeature values. Considering remove this and other categorical " +
+            "features with a large number of values, or add more training examples.")
     }
 
     val unorderedFeatures = new mutable.HashSet[Int]()
@@ -220,8 +220,8 @@ private[spark] object DecisionTreeMetadata extends Logging {
   /**
     * Version of [[DecisionTreeMetadata#buildMetadata]] for DecisionTree.
     */
-  def buildMetadata(
-      input: RDD[LabeledPoint], strategy: Strategy): DecisionTreeMetadata = {
+  def buildMetadata(input: RDD[LabeledPoint],
+                    strategy: Strategy): DecisionTreeMetadata = {
     buildMetadata(input, strategy, numTrees = 1, featureSubsetStrategy = "all")
   }
 

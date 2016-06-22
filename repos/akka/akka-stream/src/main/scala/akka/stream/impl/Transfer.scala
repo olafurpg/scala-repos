@@ -130,8 +130,8 @@ private[akka] object NotInitialized extends TransferState {
 /**
   * INTERNAL API
   */
-private[akka] case class WaitingForUpstreamSubscription(
-    remaining: Int, andThen: TransferPhase)
+private[akka] case class WaitingForUpstreamSubscription(remaining: Int,
+                                                        andThen: TransferPhase)
     extends TransferState {
   def isReady = false
   def isCompleted = false
@@ -173,7 +173,8 @@ private[akka] trait Pump {
     require(waitForUpstream >= 1,
             s"waitForUpstream must be >= 1 (was $waitForUpstream)")
     transferState = WaitingForUpstreamSubscription(
-        waitForUpstream, TransferPhase(transferState)(currentAction))
+        waitForUpstream,
+        TransferPhase(transferState)(currentAction))
   }
 
   def gotUpstreamSubscription(): Unit = {

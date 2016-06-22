@@ -1162,11 +1162,10 @@ class FutureTest
         }
       }
 
-      testSequence("flatMap",
-                   (a, next) =>
-                     a flatMap { _ =>
-                       next()
-                   })
+      testSequence("flatMap", (a, next) =>
+            a flatMap { _ =>
+          next()
+      })
       testSequence("before", (a, next) => a before next())
 
       "flatMap (values)" should {
@@ -1657,8 +1656,8 @@ class FutureTest
     }
   }
 
-  test(
-      "ConstFuture", new MkConst { def apply[A](r: Try[A]) = Future.const(r) })
+  test("ConstFuture",
+       new MkConst { def apply[A](r: Try[A]) = Future.const(r) })
   test("Promise", new MkConst { def apply[A](r: Try[A]) = new Promise(r) })
 
   "Future.apply" should {

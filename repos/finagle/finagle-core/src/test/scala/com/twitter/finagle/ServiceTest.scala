@@ -63,8 +63,9 @@ class ServiceTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("ServiceFactory.const should resolve immediately to the given service" +
-      "resolve immediately to the given service") {
+  test(
+      "ServiceFactory.const should resolve immediately to the given service" +
+        "resolve immediately to the given service") {
     val service = mock[Service[String, String]]
     when(service.close(any)) thenReturn Future.Done
     when(service("ok")) thenReturn Future.value("ko")
@@ -110,8 +111,7 @@ class ServiceTest extends FunSuite with MockitoSugar {
 
     val underlyingFactory = new ServiceFactory[Unit, Unit] {
       def apply(conn: ClientConnection) =
-        Future.value(
-            new Service[Unit, Unit] {
+        Future.value(new Service[Unit, Unit] {
           def apply(request: Unit): Future[Unit] = Future.Unit
           override def close(deadline: Time) = {
             serviceCloseCalled = true

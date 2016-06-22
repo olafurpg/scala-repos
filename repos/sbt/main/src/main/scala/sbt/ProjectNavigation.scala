@@ -44,15 +44,17 @@ final class ProjectNavigation(s: State) {
   def selectProject(uri: URI, to: String): State =
     if (structure.units(uri).defined.contains(to)) setProject(uri, to)
     else
-      fail("Invalid project name '" + to + "' in build " + uri +
-          " (type 'projects' to list available projects).")
+      fail(
+          "Invalid project name '" + to + "' in build " + uri +
+            " (type 'projects' to list available projects).")
 
   def changeBuild(newBuild: URI): State =
     if (structure.units contains newBuild)
       setProject(newBuild, getRoot(newBuild))
     else
-      fail("Invalid build unit '" + newBuild +
-          "' (type 'projects' to list available builds).")
+      fail(
+          "Invalid build unit '" + newBuild +
+            "' (type 'projects' to list available builds).")
 
   def fail(msg: String): State = {
     s.log.error(msg)
@@ -63,8 +65,9 @@ final class ProjectNavigation(s: State) {
   import complete.Parsers._
 
   val parser: Parser[Option[ResolvedReference]] = {
-    val reference = Act.resolvedReference(
-        structure.index.keyIndex, currentRef.build, success(()))
+    val reference = Act.resolvedReference(structure.index.keyIndex,
+                                          currentRef.build,
+                                          success(()))
     val root = token('/' ^^^ rootRef)
     success(None) | some(token(Space) ~> (root | reference))
   }

@@ -50,8 +50,8 @@ class RDD[T: ClassTag](
   override def toString = s"RDD($x)"
 }
 
-class FlatMappedRDD[U: ClassTag, T: ClassTag](
-    val prev: RDD[T], f: T => TraversableOnce[U])
+class FlatMappedRDD[U: ClassTag, T: ClassTag](val prev: RDD[T],
+                                              f: T => TraversableOnce[U])
     extends RDD[U](prev) {
 
   private var fun = f

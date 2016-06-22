@@ -65,13 +65,14 @@ private[ui] class GraphUIData(timelineDivId: String,
   def generateTimelineHtml(jsCollector: JsCollector): Seq[Node] = {
     jsCollector.addPreparedStatement(s"registerTimeline($minY, $maxY);")
     if (batchInterval.isDefined) {
-      jsCollector.addStatement("drawTimeline(" +
-          s"'#$timelineDivId', $dataJavaScriptName, $minX, $maxX, $minY, $maxY, '$unitY'," +
-          s" ${batchInterval.get}" + ");")
+      jsCollector.addStatement(
+          "drawTimeline(" +
+            s"'#$timelineDivId', $dataJavaScriptName, $minX, $maxX, $minY, $maxY, '$unitY'," +
+            s" ${batchInterval.get}" + ");")
     } else {
       jsCollector.addStatement(
           s"drawTimeline('#$timelineDivId', $dataJavaScriptName, $minX, $maxX, $minY, $maxY," +
-          s" '$unitY');")
+            s" '$unitY');")
     }
     <div id={timelineDivId}></div>
   }
@@ -81,9 +82,10 @@ private[ui] class GraphUIData(timelineDivId: String,
     jsCollector.addPreparedStatement(
         s"registerHistogram($histogramData, $minY, $maxY);")
     if (batchInterval.isDefined) {
-      jsCollector.addStatement("drawHistogram(" +
-          s"'#$histogramDivId', $histogramData, $minY, $maxY, '$unitY', ${batchInterval.get}" +
-          ");")
+      jsCollector.addStatement(
+          "drawHistogram(" +
+            s"'#$histogramDivId', $histogramData, $minY, $maxY, '$unitY', ${batchInterval.get}" +
+            ");")
     } else {
       jsCollector.addStatement(
           s"drawHistogram('#$histogramDivId', $histogramData, $minY, $maxY, '$unitY');")
@@ -155,8 +157,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       resources ++ basicInfo ++ listener.synchronized {
         generateStatTable() ++ generateBatchListTables()
       }
-    SparkUIUtils.headerSparkPage(
-        "Streaming Statistics", content, parent, Some(5000))
+    SparkUIUtils
+      .headerSparkPage("Streaming Statistics", content, parent, Some(5000))
   }
 
   /**
@@ -218,30 +220,28 @@ private[ui] class StreamingPage(parent: StreamingTab)
     val minBatchTime = if (batchTimes.isEmpty) startTime else batchTimes.min
     val maxBatchTime = if (batchTimes.isEmpty) startTime else batchTimes.max
 
-    val eventRateForAllStreams = new EventRateUIData(
-        batches.map { batchInfo =>
+    val eventRateForAllStreams = new EventRateUIData(batches.map { batchInfo =>
       (batchInfo.batchTime.milliseconds,
        batchInfo.numRecords * 1000.0 / listener.batchDuration)
     })
 
-    val schedulingDelay = new MillisecondsStatUIData(
-        batches.flatMap { batchInfo =>
-      batchInfo.schedulingDelay.map(batchInfo.batchTime.milliseconds -> _)
+    val schedulingDelay = new MillisecondsStatUIData(batches.flatMap {
+      batchInfo =>
+        batchInfo.schedulingDelay.map(batchInfo.batchTime.milliseconds -> _)
     })
-    val processingTime = new MillisecondsStatUIData(
-        batches.flatMap { batchInfo =>
-      batchInfo.processingDelay.map(batchInfo.batchTime.milliseconds -> _)
+    val processingTime = new MillisecondsStatUIData(batches.flatMap {
+      batchInfo =>
+        batchInfo.processingDelay.map(batchInfo.batchTime.milliseconds -> _)
     })
-    val totalDelay = new MillisecondsStatUIData(
-        batches.flatMap { batchInfo =>
+    val totalDelay = new MillisecondsStatUIData(batches.flatMap { batchInfo =>
       batchInfo.totalDelay.map(batchInfo.batchTime.milliseconds -> _)
     })
 
     // Use the max value of "schedulingDelay", "processingTime", and "totalDelay" to make the
     // Y axis ranges same.
     val _maxTime = (for (m1 <- schedulingDelay.max; m2 <- processingTime.max;
-                         m3 <- totalDelay.max) yield
-      m1 max m2 max m3).getOrElse(0L)
+                         m3 <- totalDelay.max)
+      yield m1 max m2 max m3).getOrElse(0L)
     // Should start at 0
     val minTime = 0L
     val (maxTime, normalizedUnit) = UIUtils.normalizeDuration(_maxTime)
@@ -509,14 +509,16 @@ private[ui] class StreamingPage(parent: StreamingTab)
 
     val activeBatchesContent = {
       <h4 id="active">Active Batches ({runningBatches.size + waitingBatches.size})</h4> ++ new ActiveBatchTable(
-          runningBatches, waitingBatches, listener.batchDuration).toNodeSeq
+          runningBatches,
+          waitingBatches,
+          listener.batchDuration).toNodeSeq
     }
 
     val completedBatchesContent = {
       <h4 id="completed">
         Completed Batches (last {completedBatches.size} out of {listener.numTotalCompletedBatches})
-      </h4> ++ new CompletedBatchTable(
-          completedBatches, listener.batchDuration).toNodeSeq
+      </h4> ++ new CompletedBatchTable(completedBatches,
+                                       listener.batchDuration).toNodeSeq
     }
 
     activeBatchesContent ++ completedBatchesContent

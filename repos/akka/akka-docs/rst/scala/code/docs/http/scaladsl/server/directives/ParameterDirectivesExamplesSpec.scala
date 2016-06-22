@@ -125,7 +125,8 @@ class ParameterDirectivesExamplesSpec
       responseAs[String] === "The color is 'blue' and the city is Chicago."
     }
 
-    Get("/?color=blue&city=Chicago&city=Boston") ~> Route.seal(route) ~> check {
+    Get("/?color=blue&city=Chicago&city=Boston") ~> Route
+      .seal(route) ~> check {
       responseAs[String] === "The color is 'blue' and the cities are Chicago, Boston."
     }
   }

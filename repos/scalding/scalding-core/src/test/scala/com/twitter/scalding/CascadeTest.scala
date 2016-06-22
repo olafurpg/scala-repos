@@ -103,8 +103,11 @@ class TwoPhaseCascadeTest
     val lines = fromFile(output1.getAbsolutePath).getLines.toList
 
     "verify output got changed by both flows" in {
-      lines shouldBe List(
-          "job2job1:a", "job2job1:b", "job2job1:c", "job2job1:d", "job2job1:e")
+      lines shouldBe List("job2job1:a",
+                          "job2job1:b",
+                          "job2job1:c",
+                          "job2job1:d",
+                          "job2job1:e")
     }
 
     input0.delete()

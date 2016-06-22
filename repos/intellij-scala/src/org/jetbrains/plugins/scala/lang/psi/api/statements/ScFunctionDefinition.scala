@@ -89,7 +89,8 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
                   .toSeq if ref.isReferenceTo(this)
         } yield {
           RecursiveReference(
-              ref, expressions.contains(possiblyTailRecursiveCallFor(ref)))
+              ref,
+              expressions.contains(possiblyTailRecursiveCallFor(ref)))
         }
       case None => Seq.empty
     }

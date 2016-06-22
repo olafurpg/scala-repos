@@ -38,13 +38,14 @@ class ScalaReferenceContributor extends PsiReferenceContributor {
 
 class InterpolatedStringReferenceProvider extends PsiReferenceProvider {
   override def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     element match {
       case s: ScInterpolatedStringLiteral => Array.empty
       case l: ScLiteral
           if (l.isString || l.isMultiLineString) && l.getText.contains("$") =>
-        val interpolated = ScalaPsiElementFactory.createExpressionFromText(
-            "s" + l.getText, l.getContext)
+        val interpolated = ScalaPsiElementFactory
+          .createExpressionFromText("s" + l.getText, l.getContext)
         interpolated.getChildren.filter {
           case r: ScInterpolatedStringPartReference => false
           case ref: ScReferenceExpression => true
@@ -144,8 +145,12 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
                              text: String,
                              offset: Int,
                              soft: Boolean): Array[PsiReference] = {
-    new FileReferenceSet(
-        text, element, offset, this, true, myEndingSlashNotAllowed) {
+    new FileReferenceSet(text,
+                         element,
+                         offset,
+                         this,
+                         true,
+                         myEndingSlashNotAllowed) {
       protected override def isSoft: Boolean = soft
 
       override def isAbsolutePathReference: Boolean = true
@@ -163,10 +168,11 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
         getRoots(module, includingClasses = true)
       }
 
-      override def createFileReference(
-          range: TextRange, index: Int, text: String): FileReference = {
-        FilePathReferenceProvider.this.createFileReference(
-            this, range, index, text)
+      override def createFileReference(range: TextRange,
+                                       index: Int,
+                                       text: String): FileReference = {
+        FilePathReferenceProvider.this
+          .createFileReference(this, range, index, text)
       }
 
       protected override def getReferenceCompletionFilter: Condition[
@@ -186,7 +192,7 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
 
   protected def isPsiElementAccepted(element: PsiElement): Boolean = {
     !(element.isInstanceOf[PsiJavaFile] &&
-        element.isInstanceOf[PsiCompiledElement])
+          element.isInstanceOf[PsiCompiledElement])
   }
 
   protected def createFileReference(referenceSet: FileReferenceSet,
@@ -197,23 +203,28 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
   }
 
   def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     element match {
       case interpolated: ScInterpolationPattern =>
         val refs = interpolated.getReferencesToStringParts
         val start: Int = interpolated.getTextRange.getStartOffset
         return refs.flatMap { r =>
           val offset = r.getElement.getTextRange.getStartOffset - start
-          getReferencesByElement(
-              r.getElement, r.getElement.getText, offset, soft = true)
+          getReferencesByElement(r.getElement,
+                                 r.getElement.getText,
+                                 offset,
+                                 soft = true)
         }
       case interpolatedString: ScInterpolatedStringLiteral =>
         val refs = interpolatedString.getReferencesToStringParts
         val start: Int = interpolatedString.getTextRange.getStartOffset
         return refs.flatMap { r =>
           val offset = r.getElement.getTextRange.getStartOffset - start
-          getReferencesByElement(
-              r.getElement, r.getElement.getText, offset, soft = true)
+          getReferencesByElement(r.getElement,
+                                 r.getElement.getText,
+                                 offset,
+                                 soft = true)
         }
       case literal: ScLiteral =>
         literal.getValue match {

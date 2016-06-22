@@ -78,8 +78,8 @@ object Resolvers {
 
   val git: Resolver = (info: ResolveInfo) => {
     val uri = info.uri.withoutMarkerScheme
-    val localCopy = uniqueSubdirectoryFor(
-        uri.copy(scheme = "git"), in = info.staging)
+    val localCopy =
+      uniqueSubdirectoryFor(uri.copy(scheme = "git"), in = info.staging)
     val from = uri.withoutFragment.toASCIIString
 
     if (uri.hasFragment) {
@@ -113,8 +113,8 @@ object Resolvers {
     def toResolver: Resolver =
       (info: ResolveInfo) => {
         val uri = info.uri.withoutMarkerScheme
-        val localCopy = uniqueSubdirectoryFor(
-            normalized(uri), in = info.staging)
+        val localCopy =
+          uniqueSubdirectoryFor(normalized(uri), in = info.staging)
         val from = uri.withoutFragment.toASCIIString
 
         if (uri.hasFragment) {

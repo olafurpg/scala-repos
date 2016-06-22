@@ -48,8 +48,8 @@ object Executor {
     (baseConfig, args)
   }
 
-  def apply(
-      inArgs: Array[String], generator: (Args => ScaldingExecutionConfig)) {
+  def apply(inArgs: Array[String],
+            generator: (Args => ScaldingExecutionConfig)) {
 
     val (hadoopConf, args) = buildHadoopConf(inArgs)
 
@@ -81,7 +81,8 @@ object Executor {
     def shards: Int = args.getOrElse("shards", "0").toInt
 
     val options =
-      Map("DEFAULT" -> Options()
+      Map(
+          "DEFAULT" -> Options()
             .set(Reducers(reducers))
             .set(FlatMapShards(shards))) ++ config.getNamedOptions
 

@@ -25,8 +25,8 @@ object ExitGuard {
   }
 
   private def updateName() {
-    for ((t, gs) <- guards) t.setName(
-        "Finagle ExitGuard count=%d".format(gs.size))
+    for ((t, gs) <- guards)
+      t.setName("Finagle ExitGuard count=%d".format(gs.size))
   }
 
   /**

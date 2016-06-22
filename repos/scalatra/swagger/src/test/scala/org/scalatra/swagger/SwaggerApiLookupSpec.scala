@@ -24,8 +24,9 @@ class SwaggerApiLookupSpec extends ScalatraSpec with JsonMatchers {
   val swagger = new Swagger("1.2", "1.0.0", apiInfo)
 
   addServlet(new ApiController1()(swagger), "/api/unnamed")
-  addServlet(
-      new ApiController2()(swagger), "/api/custom-name", "MyServletName")
+  addServlet(new ApiController2()(swagger),
+             "/api/custom-name",
+             "MyServletName")
   addServlet(new ApiDocs()(swagger), "/api-docs")
   implicit val formats: Formats = DefaultFormats
 
@@ -45,8 +46,8 @@ class SwaggerApiLookupSpec extends ScalatraSpec with JsonMatchers {
     val json = jackson.parseJson(body)
     json \ "resourcePath" must_== JString("/api/unnamed")
     json \ "apis" \\ "path" must_==
-      JObject("path" -> JString("/api/unnamed/"),
-              "path" -> JString("/api/unnamed/{id}"))
+    JObject("path" -> JString("/api/unnamed/"),
+            "path" -> JString("/api/unnamed/{id}"))
   }
 
   def listBarOperations = get("/api-docs/api/custom-name") {
@@ -54,8 +55,8 @@ class SwaggerApiLookupSpec extends ScalatraSpec with JsonMatchers {
     val json = jackson.parseJson(body)
     json \ "resourcePath" must_== JString("/api/custom-name")
     json \ "apis" \\ "path" must_==
-      JObject("path" -> JString("/api/custom-name/"),
-              "path" -> JString("/api/custom-name/{id}"))
+    JObject("path" -> JString("/api/custom-name/"),
+            "path" -> JString("/api/custom-name/{id}"))
   }
 }
 

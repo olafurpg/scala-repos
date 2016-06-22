@@ -74,7 +74,8 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
             e.printStackTrace
         } map (_.toOption)
       }
-      val query = $query(gameQuery(user) ++ Json.obj(
+      val query = $query(
+          gameQuery(user) ++ Json.obj(
               Game.BSONFields.createdAt -> $gte($date(from))))
       pimpQB(query)
         .sort(Query.sortChronological)
@@ -89,13 +90,13 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
           }
         } &> Enumeratee.grouped(Iteratee takeUpTo 50) |>>> Iteratee
         .foldM[Seq[Seq[Entry]], Int](fromNumber) {
-        case (number, xs) =>
-          val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
-            case (e, i) => e.copy(number = number + i)
-          }
-          val nextNumber = number + entries.size
-          storage bulkInsert entries inject nextNumber
-      }
+          case (number, xs) =>
+            val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
+              case (e, i) => e.copy(number = number + i)
+            }
+            val nextNumber = number + entries.size
+            storage bulkInsert entries inject nextNumber
+        }
     } void
   }
 }

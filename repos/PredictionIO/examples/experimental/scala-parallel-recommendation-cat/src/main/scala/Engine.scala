@@ -9,19 +9,16 @@ case class Query(
     categories: Option[Set[String]],
     whiteList: Option[Set[String]],
     blackList: Option[Set[String]]
-)
-    extends Serializable
+) extends Serializable
 
 case class PredictedResult(
     itemScores: Array[ItemScore]
-)
-    extends Serializable
+) extends Serializable
 
 case class ItemScore(
     item: String,
     score: Double
-)
-    extends Serializable
+) extends Serializable
 
 object RecommendationEngine extends IEngineFactory {
   def apply() = {

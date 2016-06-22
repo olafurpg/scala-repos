@@ -49,16 +49,25 @@ class LatencyHistogramTest extends FunSuite with Matchers {
 
   test("constructor checks inputs") {
     intercept[IllegalArgumentException] {
-      new LatencyHistogram(
-          -1L, 0.0, 1L, LatencyHistogram.DefaultSlices, Stopwatch.systemMillis)
+      new LatencyHistogram(-1L,
+                           0.0,
+                           1L,
+                           LatencyHistogram.DefaultSlices,
+                           Stopwatch.systemMillis)
     }
     intercept[IllegalArgumentException] {
-      new LatencyHistogram(
-          1L, -0.1, 1L, LatencyHistogram.DefaultSlices, Stopwatch.systemMillis)
+      new LatencyHistogram(1L,
+                           -0.1,
+                           1L,
+                           LatencyHistogram.DefaultSlices,
+                           Stopwatch.systemMillis)
     }
     intercept[IllegalArgumentException] {
-      new LatencyHistogram(
-          1L, 1.1, 1L, LatencyHistogram.DefaultSlices, Stopwatch.systemMillis)
+      new LatencyHistogram(1L,
+                           1.1,
+                           1L,
+                           LatencyHistogram.DefaultSlices,
+                           Stopwatch.systemMillis)
     }
   }
 

@@ -115,9 +115,9 @@ abstract class Pickler extends SubComponent {
       */
     private def isLocalToPickle(sym: Symbol): Boolean =
       (sym != NoSymbol) && !sym.isPackageClass &&
-      (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
-          sym.hasFlag(EXISTENTIAL) // existential param
-          || sym.isParameter || isLocalToPickle(sym.owner))
+        (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
+              sym.hasFlag(EXISTENTIAL) // existential param
+              || sym.isParameter || isLocalToPickle(sym.owner))
     private def isExternalSymbol(sym: Symbol): Boolean =
       (sym != NoSymbol) && !isLocalToPickle(sym)
 
@@ -196,16 +196,18 @@ abstract class Pickler extends SubComponent {
                 val parents =
                   (if (sym.isTrait) List(definitions.ObjectTpe) else Nil) ::: List(
                       sym.tpe)
-                globals + sym.newClassWithInfo(
-                    tpnme.LOCAL_CHILD, parents, EmptyScope, pos = sym.pos)
+                globals + sym.newClassWithInfo(tpnme.LOCAL_CHILD,
+                                               parents,
+                                               EmptyScope,
+                                               pos = sym.pos)
               }
 
             putChildren(sym, children.toList sortBy (_.sealedSortName))
           }
           for (annot <- (sym.annotations filter (ann =>
                                  ann.isStatic &&
-                                 !ann.isErroneous)).reverse) putAnnotation(
-              sym, annot)
+                                   !ann.isErroneous)).reverse)
+            putAnnotation(sym, annot)
         } else if (sym != NoSymbol) {
           putEntry(if (sym.isModuleClass) sym.name.toTermName else sym.name)
           if (!sym.owner.isRoot) putSymbol(sym.owner)

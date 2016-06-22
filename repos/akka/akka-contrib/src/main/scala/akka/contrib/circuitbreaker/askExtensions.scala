@@ -53,8 +53,8 @@ object Implicits {
   def askWithCircuitBreaker(circuitBreakerProxy: ActorRef, message: Any)(
       implicit executionContext: ExecutionContext,
       timeout: Timeout): Future[Any] =
-    circuitBreakerProxy.internalAskWithCircuitBreaker(
-        message, timeout, ActorRef.noSender)
+    circuitBreakerProxy
+      .internalAskWithCircuitBreaker(message, timeout, ActorRef.noSender)
 
   /**
     * Wraps the `ask` method in [[akka.pattern.AskSupport]] method to convert failures connected to the circuit
@@ -62,8 +62,9 @@ object Implicits {
     */
   @throws[akka.contrib.circuitbreaker.OpenCircuitException](
       "if the call failed because the circuit breaker proxy state was OPEN")
-  def askWithCircuitBreaker(
-      circuitBreakerProxy: ActorRef, message: Any, sender: ActorRef)(
+  def askWithCircuitBreaker(circuitBreakerProxy: ActorRef,
+                            message: Any,
+                            sender: ActorRef)(
       implicit executionContext: ExecutionContext,
       timeout: Timeout): Future[Any] =
     circuitBreakerProxy.internalAskWithCircuitBreaker(message, timeout, sender)
@@ -101,8 +102,9 @@ final class AskeableWithCircuitBreakerActor(val actorRef: ActorRef)
 
   @throws[OpenCircuitException]
   private[circuitbreaker] def internalAskWithCircuitBreaker(
-      message: Any, timeout: Timeout, sender: ActorRef)(
-      implicit executionContext: ExecutionContext) = {
+      message: Any,
+      timeout: Timeout,
+      sender: ActorRef)(implicit executionContext: ExecutionContext) = {
     import akka.pattern.ask
     import Implicits.futureExtensions
 
@@ -120,8 +122,9 @@ final class AskeableWithCircuitBreakerActorSelection(
     internalAskWithCircuitBreaker(message, timeout, sender)
 
   private[circuitbreaker] def internalAskWithCircuitBreaker(
-      message: Any, timeout: Timeout, sender: ActorRef)(
-      implicit executionContext: ExecutionContext) = {
+      message: Any,
+      timeout: Timeout,
+      sender: ActorRef)(implicit executionContext: ExecutionContext) = {
     import akka.pattern.ask
     import Implicits.futureExtensions
 

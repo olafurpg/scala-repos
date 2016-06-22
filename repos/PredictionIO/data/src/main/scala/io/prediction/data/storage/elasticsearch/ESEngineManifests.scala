@@ -25,8 +25,9 @@ import org.json4s._
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-class ESEngineManifests(
-    client: Client, config: StorageClientConfig, index: String)
+class ESEngineManifests(client: Client,
+                        config: StorageClientConfig,
+                        index: String)
     extends EngineManifests
     with Logging {
   implicit val formats = DefaultFormats + new EngineManifestSerializer
@@ -36,8 +37,9 @@ class ESEngineManifests(
   def insert(engineManifest: EngineManifest): Unit = {
     val json = write(engineManifest)
     val response = client
-      .prepareIndex(
-          index, estype, esid(engineManifest.id, engineManifest.version))
+      .prepareIndex(index,
+                    estype,
+                    esid(engineManifest.id, engineManifest.version))
       .setSource(json)
       .execute()
       .actionGet()

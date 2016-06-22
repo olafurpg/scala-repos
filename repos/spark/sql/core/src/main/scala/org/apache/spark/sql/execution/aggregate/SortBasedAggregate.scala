@@ -41,7 +41,8 @@ case class SortBasedAggregate(
   }
 
   override def producedAttributes: AttributeSet =
-    AttributeSet(aggregateAttributes) ++ AttributeSet(resultExpressions
+    AttributeSet(aggregateAttributes) ++ AttributeSet(
+        resultExpressions
           .diff(groupingExpressions)
           .map(_.toAttribute)) ++ AttributeSet(aggregateBufferAttributes)
 
@@ -89,8 +90,9 @@ case class SortBasedAggregate(
               initialInputBufferOffset,
               resultExpressions,
               (expressions, inputSchema) =>
-                newMutableProjection(
-                    expressions, inputSchema, subexpressionEliminationEnabled),
+                newMutableProjection(expressions,
+                                     inputSchema,
+                                     subexpressionEliminationEnabled),
               numOutputRows)
           if (!hasInput && groupingExpressions.isEmpty) {
             // There is no input and there is no grouping expressions.

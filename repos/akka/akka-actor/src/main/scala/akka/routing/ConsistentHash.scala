@@ -17,8 +17,8 @@ import java.util.Arrays
   * hash, i.e. make sure it is different for different nodes.
   *
   */
-class ConsistentHash[T: ClassTag] private (
-    nodes: immutable.SortedMap[Int, T], val virtualNodesFactor: Int) {
+class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T],
+                                           val virtualNodesFactor: Int) {
 
   import ConsistentHash._
 
@@ -41,9 +41,9 @@ class ConsistentHash[T: ClassTag] private (
   def :+(node: T): ConsistentHash[T] = {
     val nodeHash = hashFor(node.toString)
     new ConsistentHash(nodes ++
-                       ((1 to virtualNodesFactor) map { r ⇒
-                             (concatenateNodeHash(nodeHash, r) -> node)
-                           }),
+                         ((1 to virtualNodesFactor) map { r ⇒
+                               (concatenateNodeHash(nodeHash, r) -> node)
+                             }),
                        virtualNodesFactor)
   }
 
@@ -62,9 +62,9 @@ class ConsistentHash[T: ClassTag] private (
   def :-(node: T): ConsistentHash[T] = {
     val nodeHash = hashFor(node.toString)
     new ConsistentHash(nodes --
-                       ((1 to virtualNodesFactor) map { r ⇒
-                             concatenateNodeHash(nodeHash, r)
-                           }),
+                         ((1 to virtualNodesFactor) map { r ⇒
+                               concatenateNodeHash(nodeHash, r)
+                             }),
                        virtualNodesFactor)
   }
 
@@ -119,15 +119,15 @@ class ConsistentHash[T: ClassTag] private (
 }
 
 object ConsistentHash {
-  def apply[T: ClassTag](
-      nodes: Iterable[T], virtualNodesFactor: Int): ConsistentHash[T] = {
+  def apply[T: ClassTag](nodes: Iterable[T],
+                         virtualNodesFactor: Int): ConsistentHash[T] = {
     new ConsistentHash(
         immutable.SortedMap.empty[Int, T] ++
-        (for {
-              node ← nodes
-              nodeHash = hashFor(node.toString)
-              vnode ← 1 to virtualNodesFactor
-            } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
+          (for {
+                node ← nodes
+                nodeHash = hashFor(node.toString)
+                vnode ← 1 to virtualNodesFactor
+              } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
         virtualNodesFactor)
   }
 

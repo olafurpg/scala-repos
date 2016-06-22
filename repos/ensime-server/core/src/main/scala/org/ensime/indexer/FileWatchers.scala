@@ -38,8 +38,7 @@ class ClassfileWatcher(
     listeners: Seq[FileChangeListener]
 )(
     implicit vfs: EnsimeVFS
-)
-    extends Actor
+) extends Actor
     with SLF4JLogging {
 
   private val impls =
@@ -66,8 +65,7 @@ class SourceWatcher(
     listeners: Seq[FileChangeListener]
 )(
     implicit vfs: EnsimeVFS
-)
-    extends Watcher
+) extends Watcher
     with SLF4JLogging {
   private val impls =
     if (config.disableSourceMonitoring) Nil
@@ -92,8 +90,7 @@ private class ApachePollingFileWatcher(
     listeners: Seq[FileChangeListener]
 )(
     implicit vfs: EnsimeVFS
-)
-    extends Watcher
+) extends Watcher
     with SLF4JLogging {
   private val base = vfs.vfile(watched).getName.getURI
 

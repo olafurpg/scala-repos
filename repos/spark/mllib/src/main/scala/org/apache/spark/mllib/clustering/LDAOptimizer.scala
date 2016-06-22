@@ -51,8 +51,8 @@ sealed trait LDAOptimizer {
     * Initializer for the optimizer. LDA passes the common parameters to the optimizer and
     * the internal structure can be initialized properly.
     */
-  private[clustering] def initialize(
-      docs: RDD[(Long, Vector)], lda: LDA): LDAOptimizer
+  private[clustering] def initialize(docs: RDD[(Long, Vector)],
+                                     lda: LDA): LDAOptimizer
 
   private[clustering] def next(): LDAOptimizer
 
@@ -90,14 +90,14 @@ final class EMLDAOptimizer extends LDAOptimizer {
   private[clustering] var docConcentration: Double = 0
   private[clustering] var topicConcentration: Double = 0
   private[clustering] var checkpointInterval: Int = 10
-  private var graphCheckpointer: PeriodicGraphCheckpointer[
-      TopicCounts, TokenCount] = null
+  private var graphCheckpointer: PeriodicGraphCheckpointer[TopicCounts,
+                                                           TokenCount] = null
 
   /**
     * Compute bipartite term/doc graph.
     */
-  override private[clustering] def initialize(
-      docs: RDD[(Long, Vector)], lda: LDA): EMLDAOptimizer = {
+  override private[clustering] def initialize(docs: RDD[(Long, Vector)],
+                                              lda: LDA): EMLDAOptimizer = {
     // EMLDAOptimizer currently only supports symmetric document-topic priors
     val docConcentration = lda.getDocConcentration
 
@@ -109,11 +109,11 @@ final class EMLDAOptimizer extends LDAOptimizer {
     require(
         docConcentration > 1.0 || docConcentration == -1.0,
         s"LDA docConcentration must be" +
-        s" > 1.0 (or -1 for auto) for EM Optimizer, but was set to $docConcentration")
+          s" > 1.0 (or -1 for auto) for EM Optimizer, but was set to $docConcentration")
     require(
         topicConcentration > 1.0 || topicConcentration == -1.0,
         s"LDA topicConcentration " +
-        s"must be > 1.0 (or -1 for auto) for EM Optimizer, but was set to $topicConcentration")
+          s"must be > 1.0 (or -1 for auto) for EM Optimizer, but was set to $topicConcentration")
 
     this.docConcentration =
       if (docConcentration == -1) (50.0 / k) + 1.0
@@ -158,7 +158,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
     this.checkpointInterval = lda.getCheckpointInterval
     this.graphCheckpointer =
       new PeriodicGraphCheckpointer[TopicCounts, TokenCount](
-          checkpointInterval, graph.vertices.sparkContext)
+          checkpointInterval,
+          graph.vertices.sparkContext)
     this.graphCheckpointer.update(this.graph)
     this.globalTopicTotals = computeGlobalTopicTotals()
     this
@@ -172,8 +173,9 @@ final class EMLDAOptimizer extends LDAOptimizer {
     val alpha = docConcentration
 
     val N_k = globalTopicTotals
-    val sendMsg: EdgeContext[
-        TopicCounts, TokenCount, (Boolean, TopicCounts)] => Unit =
+    val sendMsg: EdgeContext[TopicCounts,
+                             TokenCount,
+                             (Boolean, TopicCounts)] => Unit =
       (edgeContext) => {
         // Compute N_{wj} gamma_{wjk}
         val N_wj = edgeContext.attr
@@ -194,14 +196,13 @@ final class EMLDAOptimizer extends LDAOptimizer {
     val mergeMsg: ((Boolean, TopicCounts),
                    (Boolean, TopicCounts)) => (Boolean, TopicCounts) =
       (m0, m1) => {
-        val sum =
-          if (m0._1) {
-            m0._2 += m1._2
-          } else if (m1._1) {
-            m1._2 += m0._2
-          } else {
-            m0._2 + m1._2
-          }
+        val sum = if (m0._1) {
+          m0._2 += m1._2
+        } else if (m1._1) {
+          m1._2 += m0._2
+        } else {
+          m0._2 + m1._2
+        }
         (true, sum)
       }
     // M-STEP: Aggregation computes new N_{kj}, N_{wk} counts.
@@ -415,29 +416,28 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
     this
   }
 
-  override private[clustering] def initialize(
-      docs: RDD[(Long, Vector)], lda: LDA): OnlineLDAOptimizer = {
+  override private[clustering] def initialize(docs: RDD[(Long, Vector)],
+                                              lda: LDA): OnlineLDAOptimizer = {
     this.k = lda.getK
     this.corpusSize = docs.count()
     this.vocabSize = docs.first()._2.size
-    this.alpha =
-      if (lda.getAsymmetricDocConcentration.size == 1) {
-        if (lda.getAsymmetricDocConcentration(0) == -1)
-          Vectors.dense(Array.fill(k)(1.0 / k))
-        else {
-          require(lda.getAsymmetricDocConcentration(0) >= 0,
-                  s"all entries in alpha must be >=0, got: $alpha")
-          Vectors.dense(Array.fill(k)(lda.getAsymmetricDocConcentration(0)))
-        }
-      } else {
-        require(lda.getAsymmetricDocConcentration.size == k,
-                s"alpha must have length k, got: $alpha")
-        lda.getAsymmetricDocConcentration.foreachActive {
-          case (_, x) =>
-            require(x >= 0, s"all entries in alpha must be >= 0, got: $alpha")
-        }
-        lda.getAsymmetricDocConcentration
+    this.alpha = if (lda.getAsymmetricDocConcentration.size == 1) {
+      if (lda.getAsymmetricDocConcentration(0) == -1)
+        Vectors.dense(Array.fill(k)(1.0 / k))
+      else {
+        require(lda.getAsymmetricDocConcentration(0) >= 0,
+                s"all entries in alpha must be >=0, got: $alpha")
+        Vectors.dense(Array.fill(k)(lda.getAsymmetricDocConcentration(0)))
       }
+    } else {
+      require(lda.getAsymmetricDocConcentration.size == k,
+              s"alpha must have length k, got: $alpha")
+      lda.getAsymmetricDocConcentration.foreachActive {
+        case (_, x) =>
+          require(x >= 0, s"all entries in alpha must be >= 0, got: $alpha")
+      }
+      lda.getAsymmetricDocConcentration
+    }
     this.eta =
       if (lda.getTopicConcentration == -1) 1.0 / k
       else lda.getTopicConcentration
@@ -487,8 +487,11 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
               case v: SparseVector => v.indices.toList
             }
             val (gammad, sstats) =
-              OnlineLDAOptimizer.variationalTopicInference(
-                  termCounts, expElogbetaBc.value, alpha, gammaShape, k)
+              OnlineLDAOptimizer.variationalTopicInference(termCounts,
+                                                           expElogbetaBc.value,
+                                                           alpha,
+                                                           gammaShape,
+                                                           k)
             stat(::, ids) := stat(::, ids).toDenseMatrix + sstats
             gammaPart = gammad :: gammaPart
         }
@@ -565,8 +568,10 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
 
   override private[clustering] def getLDAModel(
       iterationTimes: Array[Double]): LDAModel = {
-    new LocalLDAModel(
-        Matrices.fromBreeze(lambda).transpose, alpha, eta, gammaShape)
+    new LocalLDAModel(Matrices.fromBreeze(lambda).transpose,
+                      alpha,
+                      eta,
+                      gammaShape)
   }
 }
 
@@ -598,8 +603,7 @@ private[clustering] object OnlineLDAOptimizer {
     // Initialize the variational distribution q(theta|gamma) for the mini-batch
     val gammad: BDV[Double] =
       new Gamma(gammaShape, 1.0 / gammaShape).samplesVector(k) // K
-    val expElogthetad: BDV[Double] =
-      exp(LDAUtils.dirichletExpectation(gammad)) // K
+    val expElogthetad: BDV[Double] = exp(LDAUtils.dirichletExpectation(gammad)) // K
     val expElogbetad = expElogbeta(ids, ::).toDenseMatrix // ids * K
 
     val phiNorm: BDV[Double] = expElogbetad * expElogthetad :+ 1e-100 // ids
@@ -611,7 +615,7 @@ private[clustering] object OnlineLDAOptimizer {
       val lastgamma = gammad.copy
       //        K                  K * ids               ids
       gammad :=
-        (expElogthetad :* (expElogbetad.t * (ctsVector :/ phiNorm))) :+ alpha
+      (expElogthetad :* (expElogbetad.t * (ctsVector :/ phiNorm))) :+ alpha
       expElogthetad := exp(LDAUtils.dirichletExpectation(gammad))
       // TODO: Keep more values in log space, and only exponentiate when needed.
       phiNorm := expElogbetad * expElogthetad :+ 1e-100

@@ -123,7 +123,8 @@ sealed abstract class Free[S[_], A] extends Product with Serializable {
     * from `S` to a monad `M`.
     */
   final def runM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(
-      implicit S: Functor[S], M: Monad[M]): M[A] = {
+      implicit S: Functor[S],
+      M: Monad[M]): M[A] = {
     def runM2(t: Free[S, A]): M[A] = t.resume match {
       case Left(s) => Monad[M].flatMap(f(s))(runM2)
       case Right(r) => Monad[M].pure(r)

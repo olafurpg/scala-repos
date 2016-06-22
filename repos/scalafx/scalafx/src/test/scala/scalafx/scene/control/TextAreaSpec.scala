@@ -41,5 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class TextAreaSpec
     extends SimpleSFXDelegateSpec[jfxsc.TextArea, TextArea](
-        classOf[jfxsc.TextArea], classOf[TextArea])
+        classOf[jfxsc.TextArea],
+        classOf[TextArea])
     with RunOnApplicationThread

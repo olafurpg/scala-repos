@@ -21,8 +21,9 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
                                       new ScalaDocWithSubscriptSurrounder,
                                       new ScalaDocWithSuperscriptSurrounder)
 
-  def getElementsToSurround(
-      file: PsiFile, startOffset: Int, endOffset: Int): Array[PsiElement] = {
+  def getElementsToSurround(file: PsiFile,
+                            startOffset: Int,
+                            endOffset: Int): Array[PsiElement] = {
     if (endOffset == startOffset) return PsiElement.EMPTY_ARRAY
 
     val validBoundElements = Set(DOC_COMMENT_DATA, DOC_WHITESPACE)
@@ -30,11 +31,11 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
     def checkBoundElement(element: PsiElement): Boolean =
       validBoundElements.contains(element.getNode.getElementType)
 
-    def checkSyntaxBoundElement(
-        element: PsiElement, isStart: Boolean): Boolean =
+    def checkSyntaxBoundElement(element: PsiElement,
+                                isStart: Boolean): Boolean =
       element.getNode.getElementType.isInstanceOf[ScaladocSyntaxElementType] &&
-      (isStart && startOffset == element.getTextOffset || !isStart &&
-          endOffset == element.getTextRange.getEndOffset)
+        (isStart && startOffset == element.getTextOffset || !isStart &&
+              endOffset == element.getTextRange.getEndOffset)
 
     val startElement = file.findElementAt(startOffset)
     val endElement = file.findElementAt(endOffset - 1)
@@ -42,22 +43,20 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
     if (startElement == null || endElement == null)
       return PsiElement.EMPTY_ARRAY
 
-    val isFirstElementMarked =
-      if (checkBoundElement(startElement)) {
-        //cannot extract function because of return
-        false
-      } else {
-        if (checkSyntaxBoundElement(startElement, true)) true
-        else return PsiElement.EMPTY_ARRAY
-      }
+    val isFirstElementMarked = if (checkBoundElement(startElement)) {
+      //cannot extract function because of return
+      false
+    } else {
+      if (checkSyntaxBoundElement(startElement, true)) true
+      else return PsiElement.EMPTY_ARRAY
+    }
 
-    val isLastElementMarked =
-      if (checkBoundElement(endElement)) {
-        false
-      } else {
-        if (checkSyntaxBoundElement(endElement, false)) true
-        else return PsiElement.EMPTY_ARRAY
-      }
+    val isLastElementMarked = if (checkBoundElement(endElement)) {
+      false
+    } else {
+      if (checkSyntaxBoundElement(endElement, false)) true
+      else return PsiElement.EMPTY_ARRAY
+    }
 
     if (startElement.getParent != endElement.getParent) {
       (isFirstElementMarked, isLastElementMarked) match {
@@ -78,22 +77,20 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
       return Array(startElement)
     }
 
-    var (nextElement, elementsToSurround) =
-      if (isFirstElementMarked) {
-        if (startElement.getParent.getTextRange.getEndOffset <= endOffset)
-          (startElement.getParent.getNextSibling,
-           ArrayBuffer(startElement.getParent))
-        else return PsiElement.EMPTY_ARRAY
-      } else {
-        (startElement.getNextSibling, ArrayBuffer(startElement))
-      }
-    val lastBoundElement =
-      if (isLastElementMarked) {
-        if (endElement.getTextOffset >= startOffset) (endElement.getParent)
-        else return PsiElement.EMPTY_ARRAY
-      } else {
-        endElement
-      }
+    var (nextElement, elementsToSurround) = if (isFirstElementMarked) {
+      if (startElement.getParent.getTextRange.getEndOffset <= endOffset)
+        (startElement.getParent.getNextSibling,
+         ArrayBuffer(startElement.getParent))
+      else return PsiElement.EMPTY_ARRAY
+    } else {
+      (startElement.getNextSibling, ArrayBuffer(startElement))
+    }
+    val lastBoundElement = if (isLastElementMarked) {
+      if (endElement.getTextOffset >= startOffset) (endElement.getParent)
+      else return PsiElement.EMPTY_ARRAY
+    } else {
+      endElement
+    }
 
     var hasAsterisk = false
 
@@ -118,7 +115,7 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
 
       elementsToSurround += nextElement
     } while (nextElement != lastBoundElement &&
-    (nextElement = nextElement.getNextSibling, true)._2);
+      (nextElement = nextElement.getNextSibling, true)._2);
 
     elementsToSurround.toArray
   }

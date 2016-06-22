@@ -45,8 +45,8 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
     val state = udaf.terminatePartial()
 
     val soi = ObjectInspectorFactory
-      .getReflectionObjectInspector(
-          classOf[UDAFPercentile.State], ObjectInspectorOptions.JAVA)
+      .getReflectionObjectInspector(classOf[UDAFPercentile.State],
+                                    ObjectInspectorOptions.JAVA)
       .asInstanceOf[StructObjectInspector]
 
     val a = unwrap(state, soi).asInstanceOf[InternalRow]
@@ -84,8 +84,8 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
         0.asInstanceOf[Float]) :: Literal(0.asInstanceOf[Double]) :: Literal(
         "0") :: Literal(java.sql.Date.valueOf("2014-09-23")) :: Literal(
         Decimal(BigDecimal(123.123))) :: Literal(new java.sql.Timestamp(
-            123123)) :: Literal(Array[Byte](1, 2, 3)) :: Literal.create(
-        Seq[Int](1, 2, 3), ArrayType(IntegerType)) :: Literal.create(
+            123123)) :: Literal(Array[Byte](1, 2, 3)) :: Literal
+      .create(Seq[Int](1, 2, 3), ArrayType(IntegerType)) :: Literal.create(
         Map[Int, Int](1 -> 2, 2 -> 1),
         MapType(IntegerType, IntegerType)) :: Literal.create(
         Row(1, 2.0d, 3.0f),
@@ -103,7 +103,8 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
             toWritableInspector(tpe))
       case MapType(keyType, valueType, _) =>
         ObjectInspectorFactory.getStandardMapObjectInspector(
-            toWritableInspector(keyType), toWritableInspector(valueType))
+            toWritableInspector(keyType),
+            toWritableInspector(valueType))
       case StringType =>
         PrimitiveObjectInspectorFactory.writableStringObjectInspector
       case IntegerType =>
@@ -151,8 +152,9 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
     }
   }
 
-  def checkValues(
-      row1: Seq[Any], row2: InternalRow, row2Schema: StructType): Unit = {
+  def checkValues(row1: Seq[Any],
+                  row2: InternalRow,
+                  row2Schema: StructType): Unit = {
     row1.zip(row2.toSeq(row2Schema)).foreach {
       case (r1, r2) =>
         checkValue(r1, r2)
@@ -177,21 +179,17 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
     val ois = dataTypes.map(toInspector)
 
     checkDataType(ois.map(inspectorToDataType), dataTypes)
-    checkDataType(
-        dataTypes.map(toWritableInspector).map(inspectorToDataType), dataTypes)
+    checkDataType(dataTypes.map(toWritableInspector).map(inspectorToDataType),
+                  dataTypes)
   }
 
   test("wrap / unwrap null, constant null and writables") {
     val writableOIs = dataTypes.map(toWritableInspector)
     val nullRow = data.map(d => null)
 
-    checkValues(nullRow,
-                nullRow
-                  .zip(writableOIs)
-                  .zip(dataTypes)
-                  .map {
-                    case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
-                  })
+    checkValues(nullRow, nullRow.zip(writableOIs).zip(dataTypes).map {
+      case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
+    })
 
     // struct couldn't be constant, sweep it out
     val constantExprs = data.filter(!_.dataType.isInstanceOf[StructType])
@@ -204,57 +202,41 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
       constantExprs.map(e => toInspector(Literal.create(null, e.dataType)))
 
     checkValues(constantData,
-                constantData
-                  .zip(constantWritableOIs)
-                  .zip(constantTypes)
-                  .map {
-                    case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
-                  })
+                constantData.zip(constantWritableOIs).zip(constantTypes).map {
+                  case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
+                })
 
-    checkValues(constantNullData,
-                constantData
-                  .zip(constantNullWritableOIs)
-                  .zip(constantTypes)
-                  .map {
-                    case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
-                  })
+    checkValues(
+        constantNullData,
+        constantData.zip(constantNullWritableOIs).zip(constantTypes).map {
+          case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
+        })
 
-    checkValues(constantNullData,
-                constantNullData
-                  .zip(constantWritableOIs)
-                  .zip(constantTypes)
-                  .map {
-                    case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
-                  })
+    checkValues(
+        constantNullData,
+        constantNullData.zip(constantWritableOIs).zip(constantTypes).map {
+          case ((d, oi), dt) => unwrap(wrap(d, oi, dt), oi)
+        })
   }
 
   test("wrap / unwrap primitive writable object inspector") {
     val writableOIs = dataTypes.map(toWritableInspector)
 
-    checkValues(row,
-                row
-                  .zip(writableOIs)
-                  .zip(dataTypes)
-                  .map {
-                    case ((data, oi), dt) => unwrap(wrap(data, oi, dt), oi)
-                  })
+    checkValues(row, row.zip(writableOIs).zip(dataTypes).map {
+      case ((data, oi), dt) => unwrap(wrap(data, oi, dt), oi)
+    })
   }
 
   test("wrap / unwrap primitive java object inspector") {
     val ois = dataTypes.map(toInspector)
 
-    checkValues(row,
-                row
-                  .zip(ois)
-                  .zip(dataTypes)
-                  .map {
-                    case ((data, oi), dt) => unwrap(wrap(data, oi, dt), oi)
-                  })
+    checkValues(row, row.zip(ois).zip(dataTypes).map {
+      case ((data, oi), dt) => unwrap(wrap(data, oi, dt), oi)
+    })
   }
 
   test("wrap / unwrap Struct Type") {
-    val dt = StructType(
-        dataTypes.zipWithIndex.map {
+    val dt = StructType(dataTypes.zipWithIndex.map {
       case (t, idx) => StructField(s"c_$idx", t)
     })
     val inspector = toInspector(dt)

@@ -31,7 +31,7 @@ object ClassHelpersSpec extends Specification {
   "The findType function" should {
     "return a Full can with the found class when given the type, the name, and a list of packages to conform to" in {
       findType[java.util.List[Object]]("ArrayList", List("java.util")) must_==
-        Full(classOf[java.util.ArrayList[Object]])
+      Full(classOf[java.util.ArrayList[Object]])
     }
     "return an Empty can if the class cannot be coerced to the expected type" in {
       findType[String]("ClassHelpers", List("net.liftweb.util")) must_== Empty
@@ -40,23 +40,23 @@ object ClassHelpersSpec extends Specification {
   "the findClass function" should {
     "return a Full can with the found class when given the name and package" in {
       findClass("ClassHelpers", List("net.liftweb.util")) must_==
-        Full(classOf[ClassHelpers])
+      Full(classOf[ClassHelpers])
     }
     "return a Full can with the found class when given the name and package, with an underscored name instead of CamelCased" in {
       findClass("class_helpers", List("net.liftweb.util")) must_==
-        Full(classOf[ClassHelpers])
+      Full(classOf[ClassHelpers])
     }
     "return a Full can with the found class when given the name and a list of packages" in {
       findClass("ClassHelpers", List("net.liftweb.util", "java.util")) must_==
-        Full(classOf[ClassHelpers])
+      Full(classOf[ClassHelpers])
       findClass("ArrayList", List("net.liftweb.util", "java.util")) must_==
-        Full(classOf[java.util.ArrayList[_]])
+      Full(classOf[java.util.ArrayList[_]])
     }
     "return a Full can with the found class when given the name, a list of packages and a target type to conform to" in {
       findClass("ArrayList",
                 List("java.util"),
                 classOf[java.util.List[Object]]) must_==
-        Full(classOf[java.util.ArrayList[Object]])
+      Full(classOf[java.util.ArrayList[Object]])
     }
     "return an Empty can if no class is found given a name and package" in {
       findClass("ClassHelpers", List("net.liftweb.nothere")) must_== Empty
@@ -71,13 +71,13 @@ object ClassHelpersSpec extends Specification {
       findClass(List(("wrong name", List("net.liftweb.util", "other.package")),
                      ("ClassHelpers",
                       List("net.liftweb.util", "other.package")))) must_==
-        Full(classOf[ClassHelpers])
+      Full(classOf[ClassHelpers])
     }
     "use a list of modifiers functions to try to modify the original name in order to find the class" in {
       findClass("classHelpers",
                 List("net.liftweb.util"),
                 List((n: String) => n.capitalize)) must_==
-        Full(classOf[ClassHelpers])
+      Full(classOf[ClassHelpers])
     }
   }
 
@@ -181,7 +181,7 @@ object ClassHelpersSpec extends Specification {
   "The invokeMethod function" can {
     "call a method with its parameters" in {
       invokeMethod(classOf[String], "", "valueOf", Array("1")) must_==
-        Full("1")
+      Full("1")
     }
     "call a method with its parameters and parameter types" in {
       invokeMethod(classOf[String],
@@ -209,12 +209,13 @@ object ClassHelpersSpec extends Specification {
     }
     "return a Full Box with the function from Unit to a Box containing the result of the method to invoke" in {
       createInvoker("length", "").openOrThrowException("Test").apply() must_==
-        Full(0)
+      Full(0)
     }
     "The invoker function will throw the cause exception if the method can't be called" in {
       (() =>
-         createInvoker("get", "").openOrThrowException("Test").apply)() must throwA[
-          Exception]
+         createInvoker("get", "")
+           .openOrThrowException("Test")
+           .apply)() must throwA[Exception]
     }
   }
 }

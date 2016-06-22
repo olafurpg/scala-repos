@@ -51,12 +51,12 @@ private[stream] object ReactiveStreamsCompliance {
   final def rejectDuplicateSubscriber[T](subscriber: Subscriber[T]): Unit = {
     // since it is already subscribed it has received the subscription first
     // and we can emit onError immediately
-    tryOnError(
-        subscriber, canNotSubscribeTheSameSubscriberMultipleTimesException)
+    tryOnError(subscriber,
+               canNotSubscribeTheSameSubscriberMultipleTimesException)
   }
 
-  final def rejectAdditionalSubscriber[T](
-      subscriber: Subscriber[T], rejector: String): Unit = {
+  final def rejectAdditionalSubscriber[T](subscriber: Subscriber[T],
+                                          rejector: String): Unit = {
     tryOnSubscribe(subscriber, CancelledSubscription)
     tryOnError(
         subscriber,
@@ -107,8 +107,8 @@ private[stream] object ReactiveStreamsCompliance {
     }
   }
 
-  final def tryOnSubscribe[T](
-      subscriber: Subscriber[T], subscription: Subscription): Unit = {
+  final def tryOnSubscribe[T](subscriber: Subscriber[T],
+                              subscription: Subscription): Unit = {
     try subscriber.onSubscribe(subscription) catch {
       case NonFatal(t) ⇒
         throw new SignalThrewException(subscriber + ".onSubscribe", t)
@@ -126,7 +126,8 @@ private[stream] object ReactiveStreamsCompliance {
     try subscription.request(demand) catch {
       case NonFatal(t) ⇒
         throw new SignalThrewException(
-            "It is illegal to throw exceptions from request(), rule 3.16", t)
+            "It is illegal to throw exceptions from request(), rule 3.16",
+            t)
     }
   }
 
@@ -134,7 +135,8 @@ private[stream] object ReactiveStreamsCompliance {
     try subscription.cancel() catch {
       case NonFatal(t) ⇒
         throw new SignalThrewException(
-            "It is illegal to throw exceptions from cancel(), rule 3.15", t)
+            "It is illegal to throw exceptions from cancel(), rule 3.15",
+            t)
     }
   }
 }

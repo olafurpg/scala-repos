@@ -125,15 +125,17 @@ class SecurityServiceSpec
     authService.get("/apikeys/" + queryKey + "/grants/")
 
   def addAPIKeyGrant(authAPIKey: String, updateKey: String, grantId: GrantId) =
-    addAPIKeyGrantRaw(
-        authAPIKey, updateKey, JObject("grantId" -> JString(grantId)))
+    addAPIKeyGrantRaw(authAPIKey,
+                      updateKey,
+                      JObject("grantId" -> JString(grantId)))
 
-  def addAPIKeyGrantRaw(
-      authAPIKey: String, updateKey: String, grantId: JValue) =
+  def addAPIKeyGrantRaw(authAPIKey: String,
+                        updateKey: String,
+                        grantId: JValue) =
     authService
       .query("apiKey", authAPIKey)
-      .post("/apikeys/" + updateKey + "/grants/")(grantId)(
-          identity[JValue], tc)
+      .post("/apikeys/" + updateKey + "/grants/")(grantId)(identity[JValue],
+                                                           tc)
 
   def createAPIKeyGrant(authAPIKey: String, request: v1.NewGrantRequest) =
     createAPIKeyGrantRaw(authAPIKey, request.serialize)
@@ -143,8 +145,9 @@ class SecurityServiceSpec
       .query("apiKey", authAPIKey)
       .post("/grants/")(request)(identity[JValue], tc)
 
-  def removeAPIKeyGrant(
-      authAPIKey: String, updateKey: String, grantId: GrantId) =
+  def removeAPIKeyGrant(authAPIKey: String,
+                        updateKey: String,
+                        grantId: GrantId) =
     authService.delete("/apikeys/" + updateKey + "/grants/" + grantId)
 
   def getGrantDetails(authAPIKey: String, grantId: String) =
@@ -155,8 +158,9 @@ class SecurityServiceSpec
       .query("apiKey", authAPIKey)
       .get("/grants/" + grantId + "/children/")
 
-  def addGrantChild(
-      authAPIKey: String, grantId: String, request: v1.NewGrantRequest) =
+  def addGrantChild(authAPIKey: String,
+                    grantId: String,
+                    request: v1.NewGrantRequest) =
     addGrantChildRaw(authAPIKey, grantId, request.serialize)
 
   def addGrantChildRaw(authAPIKey: String, grantId: String, request: JValue) =
@@ -172,13 +176,22 @@ class SecurityServiceSpec
 
   def equalGrant(g1: Grant, g2: Grant) =
     (g1.grantId == g2.grantId) && (g1.permissions == g2.permissions) &&
-    (g1.expirationDate == g2.expirationDate)
+      (g1.expirationDate == g2.expirationDate)
 
   def mkNewGrantRequest(grant: Grant) = grant match {
-    case Grant(
-        _, name, description, _, parentIds, permissions, _, expirationDate) =>
-      v1.NewGrantRequest(
-          name, description, parentIds, permissions, expirationDate)
+    case Grant(_,
+               name,
+               description,
+               _,
+               parentIds,
+               permissions,
+               _,
+               expirationDate) =>
+      v1.NewGrantRequest(name,
+                         description,
+                         parentIds,
+                         permissions,
+                         expirationDate)
   }
 
   def standardGrant(accountId: AccountId) =
@@ -226,12 +239,12 @@ class SecurityServiceSpec
       to)
 
   val user5 = Await.result(
-      apiKeyManager.createAPIKey(
-          Some("user5-key"), None, user1.apiKey, Set.empty),
+      apiKeyManager
+        .createAPIKey(Some("user5-key"), None, user1.apiKey, Set.empty),
       to)
   val user6 = Await.result(
-      apiKeyManager.createAPIKey(
-          Some("user6-key"), None, user1.apiKey, Set.empty),
+      apiKeyManager
+        .createAPIKey(Some("user6-key"), None, user1.apiKey, Set.empty),
       to)
 
   val expiredGrant = Await.result(
@@ -243,8 +256,8 @@ class SecurityServiceSpec
                                 Some(new DateTime().minusYears(1000))),
       to)
   val expired = Await.result(
-      apiKeyManager.createAPIKey(
-          None, None, user1.apiKey, Set(expiredGrant.grantId)),
+      apiKeyManager
+        .createAPIKey(None, None, user1.apiKey, Set(expiredGrant.grantId)),
       to)
 
   val allAPIKeys = Await.result(apiKeyManager.listAPIKeys(), to)
@@ -358,8 +371,9 @@ class SecurityServiceSpec
     }
 
     "create non-root API key with defaults" in {
-      val request = v1.NewAPIKeyRequest(
-          Some("non-root-1"), None, Set(standardGrant("non-root-1")))
+      val request = v1.NewAPIKeyRequest(Some("non-root-1"),
+                                        None,
+                                        Set(standardGrant("non-root-1")))
       createAPIKey(rootAPIKey, request) must awaited(to) {
         beLike {
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
@@ -370,8 +384,9 @@ class SecurityServiceSpec
     }
 
     "create derived non-root API key" in {
-      val request = v1.NewAPIKeyRequest(
-          Some("non-root-2"), None, Set(mkNewGrantRequest(user1Grant)))
+      val request = v1.NewAPIKeyRequest(Some("non-root-2"),
+                                        None,
+                                        Set(mkNewGrantRequest(user1Grant)))
       val result = for {
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKey(
                                                                user1.apiKey,
@@ -404,8 +419,9 @@ class SecurityServiceSpec
     }
 
     "don't create if API key is expired" in {
-      val request = v1.NewAPIKeyRequest(
-          Some("expired-2"), None, Set(mkNewGrantRequest(expiredGrant)))
+      val request = v1.NewAPIKeyRequest(Some("expired-2"),
+                                        None,
+                                        Set(mkNewGrantRequest(expiredGrant)))
       createAPIKey(expired.apiKey, request) must awaited(to) {
         beLike {
           case HttpResponse(HttpStatus(BadRequest, _),
@@ -422,8 +438,9 @@ class SecurityServiceSpec
     }
 
     "don't create if API key cannot grant permissions" in {
-      val request = v1.NewAPIKeyRequest(
-          Some("unauthorized"), None, Set(mkNewGrantRequest(user1Grant)))
+      val request = v1.NewAPIKeyRequest(Some("unauthorized"),
+                                        None,
+                                        Set(mkNewGrantRequest(user1Grant)))
       createAPIKey(user2.apiKey, request) must awaited(to) {
         beLike {
           case HttpResponse(HttpStatus(BadRequest, _),
@@ -478,11 +495,11 @@ class SecurityServiceSpec
     "report an error on get and grant not found" in {
       getGrantDetails(user1.apiKey, "not-gonna-find-it") must awaited(to) {
         beLike {
-          case HttpResponse(
-              HttpStatus(NotFound, _),
-              _,
-              Some(JString("Unable to find grant not-gonna-find-it")),
-              _) =>
+          case HttpResponse(HttpStatus(NotFound, _),
+                            _,
+                            Some(
+                            JString("Unable to find grant not-gonna-find-it")),
+                            _) =>
             ok
         }
       }
@@ -575,7 +592,8 @@ class SecurityServiceSpec
                                                                    None,
                                                                    Set.empty[
                                                                        GrantId],
-                                                                   Set(ReadPermission(
+                                                                   Set(
+                                                                       ReadPermission(
                                                                            Path("/user1/secret"),
                                                                            WrittenByAccount(
                                                                                "user1"))),
@@ -619,7 +637,8 @@ class SecurityServiceSpec
                                                                    None,
                                                                    None,
                                                                    Set.empty,
-                                                                   Set(ReadPermission(
+                                                                   Set(
+                                                                       ReadPermission(
                                                                            Path("/user1/public"),
                                                                            WrittenByAccount(
                                                                                "user1"))),

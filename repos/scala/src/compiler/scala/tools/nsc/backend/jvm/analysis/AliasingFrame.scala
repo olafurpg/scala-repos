@@ -96,14 +96,13 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
     aliases(assignee) = set
   }
 
-  override def execute(
-      insn: AbstractInsnNode, interpreter: Interpreter[V]): Unit = {
+  override def execute(insn: AbstractInsnNode,
+                       interpreter: Interpreter[V]): Unit = {
     // Make the extension methods easier to use (otherwise we have to repeat `this`.stackTop)
     def stackTop: Int = this.stackTop
     def peekStack(n: Int): V = this.peekStack(n)
 
-    val prodCons =
-      InstructionStackEffect.forAsmAnalysis(insn, this) // needs to be called before super.execute, see its doc
+    val prodCons = InstructionStackEffect.forAsmAnalysis(insn, this) // needs to be called before super.execute, see its doc
     val consumed = InstructionStackEffect.cons(prodCons)
     val produced = InstructionStackEffect.prod(prodCons)
 
@@ -111,8 +110,8 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
 
     (insn.getOpcode: @switch) match {
       case ILOAD | LLOAD | FLOAD | DLOAD | ALOAD =>
-        newAlias(
-            assignee = stackTop, source = insn.asInstanceOf[VarInsnNode].`var`)
+        newAlias(assignee = stackTop,
+                 source = insn.asInstanceOf[VarInsnNode].`var`)
 
       case DUP =>
         val top = stackTop
@@ -250,7 +249,8 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
         //  - before: local1, local2, stack1, consumed1, consumed2
         //  - after:  local1, local2, stack1, produced1             // stackTop = 3
         val firstConsumed = stackTop - produced + 1 // firstConsumed = 3
-        for (i <- 0 until consumed) removeAlias(firstConsumed + i) // remove aliases for 3 and 4
+        for (i <- 0 until consumed)
+          removeAlias(firstConsumed + i) // remove aliases for 3 and 4
     }
   }
 
@@ -284,8 +284,8 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
     * }
     * [...]       // (x, a) -- merge of ((x, y, a)) and ((x, a), (y, b))
     */
-  override def merge(
-      other: Frame[_ <: V], interpreter: Interpreter[V]): Boolean = {
+  override def merge(other: Frame[_ <: V],
+                     interpreter: Interpreter[V]): Boolean = {
     // merge is the main performance hot spot of a data flow analysis.
 
     // in nullness analysis, super.merge (which actually merges the nullness values) takes 20% of
@@ -588,8 +588,9 @@ object AliasSet {
   /**
     * An iterator that yields the elements that are in one bit set and not in another (&~).
     */
-  private class AndNotIt(
-      setA: AliasSet, setB: AliasSet, thisAndOther: Array[Boolean])
+  private class AndNotIt(setA: AliasSet,
+                         setB: AliasSet,
+                         thisAndOther: Array[Boolean])
       extends IntIterator {
     // values in the first bit set
     private var a, b, c, d = -1
@@ -627,7 +628,7 @@ object AliasSet {
       x != -1 && {
         val otherHasA =
           x == notA || x == notB || x == notC || x == notD ||
-          (notXs != null && bsContains(notXs, x))
+            (notXs != null && bsContains(notXs, x))
         if (otherHasA) setThisAndOther(x)
         else abcdNext = x
         (num: @switch) match {
@@ -651,7 +652,7 @@ object AliasSet {
                    // boom. for nullness, this saves 35% of the overall analysis time.
                    i =
                      ((index + 1) << 6) -
-                     1 // -1 required because i is incremented in the loop body
+                       1 // -1 required because i is incremented in the loop body
                    true
                  } else {
                    val mask = 1l << i
@@ -660,8 +661,8 @@ object AliasSet {
                    !thisHasI || {
                      val otherHasI =
                        i == notA || i == notB || i == notC || i == notD ||
-                       (notXs != null && index < notXs.length &&
-                           (notXs(index) & mask) != 0l)
+                         (notXs != null && index < notXs.length &&
+                               (notXs(index) & mask) != 0l)
                      if (otherHasI) setThisAndOther(i)
                      otherHasI
                    }
@@ -678,7 +679,7 @@ object AliasSet {
     //
     def hasNext: Boolean =
       iValid || abcdNext != -1 || checkABCD(a, 1) || checkABCD(b, 2) ||
-      checkABCD(c, 3) || checkABCD(d, 4) || checkXs
+        checkABCD(c, 3) || checkABCD(d, 4) || checkXs
 
     def next(): Int = {
       if (hasNext) {
@@ -708,7 +709,8 @@ object AliasSet {
     * If `thisAndOther` is non-null, the iterator sets thisAndOther(i) to true for every value that
     * is both in a and b (&).
     */
-  def andNotIterator(
-      a: AliasSet, b: AliasSet, thisAndOther: Array[Boolean]): IntIterator =
+  def andNotIterator(a: AliasSet,
+                     b: AliasSet,
+                     thisAndOther: Array[Boolean]): IntIterator =
     new AndNotIt(a, b, thisAndOther)
 }

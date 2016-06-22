@@ -1,7 +1,7 @@
 abstract class Template[T <: AnyRef](private val t: T) {
 
 //  type Repr[A<:AnyRef]<:Template[T]
-  type Repr [T] <: Template[T]
+  type Repr[T] <: Template[T]
 
   def access1(timeout: Int): Repr[T] = this.asInstanceOf[Repr[T]]
   def access2: Repr[T] = this.asInstanceOf[Repr[T]]

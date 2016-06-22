@@ -14,8 +14,8 @@ import akka.testkit.AkkaSpec
 
 class FlowBufferSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 1, maxSize = 1)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 1, maxSize = 1)
 
   implicit val materializer = ActorMaterializer(settings)
 

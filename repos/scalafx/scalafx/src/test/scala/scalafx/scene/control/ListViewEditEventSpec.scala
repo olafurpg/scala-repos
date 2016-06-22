@@ -41,9 +41,10 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ListViewEditEventSpec[T <: Any]
-    extends SimpleSFXDelegateSpec[
-        jfxsc.ListView.EditEvent[T], ListView.EditEvent[T]](
-        classOf[jfxsc.ListView.EditEvent[T]], classOf[ListView.EditEvent[T]])
+    extends SimpleSFXDelegateSpec[jfxsc.ListView.EditEvent[T],
+                                  ListView.EditEvent[T]](
+        classOf[jfxsc.ListView.EditEvent[T]],
+        classOf[ListView.EditEvent[T]])
     with RunOnApplicationThread {
 
   /*
@@ -52,6 +53,8 @@ class ListViewEditEventSpec[T <: Any]
    * null to type T. 
    */
   override def getJavaClassInstance =
-    new jfxsc.ListView.EditEvent[T](
-        new jfxsc.ListView[T], null, null.asInstanceOf[T], 0)
+    new jfxsc.ListView.EditEvent[T](new jfxsc.ListView[T],
+                                    null,
+                                    null.asInstanceOf[T],
+                                    0)
 }

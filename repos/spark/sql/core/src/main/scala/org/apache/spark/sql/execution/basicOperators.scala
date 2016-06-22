@@ -51,9 +51,11 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
     references.filter(a => usedMoreThanOnce.contains(a.exprId))
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
-    val exprs = projectList.map(x =>
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
+    val exprs = projectList.map(
+        x =>
           ExpressionCanonicalizer.execute(
               BindReferences.bindReference(x, child.output)))
     ctx.currentVars = input
@@ -62,16 +64,17 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
     val nonDeterministicAttrs =
       projectList.filterNot(_.deterministic).map(_.toAttribute)
     s"""
-       |${evaluateRequiredVariables(
-           output, resultVars, AttributeSet(nonDeterministicAttrs))}
+       |${evaluateRequiredVariables(output,
+                                    resultVars,
+                                    AttributeSet(nonDeterministicAttrs))}
        |${consume(ctx, resultVars)}
      """.stripMargin
   }
 
   protected override def doExecute(): RDD[InternalRow] = {
     child.execute().mapPartitionsInternal { iter =>
-      val project = UnsafeProjection.create(
-          projectList, child.output, subexpressionEliminationEnabled)
+      val project = UnsafeProjection
+        .create(projectList, child.output, subexpressionEliminationEnabled)
       iter.map(project)
     }
   }
@@ -116,8 +119,9 @@ case class Filter(condition: Expression, child: SparkPlan)
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     val numOutput = metricTerm(ctx, "numOutputRows")
 
     // filter out the nulls
@@ -131,12 +135,11 @@ case class Filter(condition: Expression, child: SparkPlan)
       val bound = ExpressionCanonicalizer.execute(
           BindReferences.bindReference(e, output))
       val ev = bound.gen(ctx)
-      val nullCheck =
-        if (bound.nullable) {
-          s"${ev.isNull} || "
-        } else {
-          s""
-        }
+      val nullCheck = if (bound.nullable) {
+        s"${ev.isNull} || "
+      } else {
+        s""
+      }
       s"""
          |${ev.code}
          |if (${nullCheck}!${ev.value}) continue;
@@ -199,8 +202,8 @@ case class Sample(lowerBound: Double,
       // requiring us to copy the row, which is more expensive than the random number generator.
       new PartitionwiseSampledRDD[InternalRow, InternalRow](
           child.execute(),
-          new PoissonSampler[InternalRow](
-              upperBound - lowerBound, useGapSamplingIfPossible = false),
+          new PoissonSampler[InternalRow](upperBound - lowerBound,
+                                          useGapSamplingIfPossible = false),
           preservesPartitioning = true,
           seed)
     } else {
@@ -222,8 +225,8 @@ case class Range(start: Long,
                                                      "number of output rows"))
 
   // output attributes should not affect the results
-  override lazy val cleanArgs: Seq[Any] = Seq(
-      start, step, numSlices, numElements)
+  override lazy val cleanArgs: Seq[Any] =
+    Seq(start, step, numSlices, numElements)
 
   override def upstreams(): Seq[RDD[InternalRow]] = {
     sqlContext.sparkContext
@@ -246,12 +249,11 @@ case class Range(start: Long,
     val value = ctx.freshName("value")
     val ev = ExprCode("", "false", value)
     val BigInt = classOf[java.math.BigInteger].getName
-    val checkEnd =
-      if (step > 0) {
-        s"$number < $partitionEnd"
-      } else {
-        s"$number > $partitionEnd"
-      }
+    val checkEnd = if (step > 0) {
+      s"$number < $partitionEnd"
+    } else {
+      s"$number > $partitionEnd"
+    }
 
     ctx.addNewFunction("initRange", s"""
         | private void initRange(int idx) {
@@ -286,8 +288,9 @@ case class Range(start: Long,
 
     val input = ctx.freshName("input")
     // Right now, Range is only used when there is one upstream.
-    ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        input,
+                        s"$input = inputs[0];")
     s"""
       | // initialize Range
       | if (!$initTerm) {

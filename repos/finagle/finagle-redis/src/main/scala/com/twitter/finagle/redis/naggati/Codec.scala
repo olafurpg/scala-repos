@@ -98,8 +98,7 @@ class Codec[A: Manifest](
     encoder: Encoder[A],
     bytesReadCounter: Int => Unit,
     bytesWrittenCounter: Int => Unit
-)
-    extends FrameDecoder
+) extends FrameDecoder
     with ChannelDownstreamHandler {
   def this(firstStage: Stage, encoder: Encoder[A]) =
     this(firstStage, encoder, DontCareCounter, DontCareCounter)
@@ -119,34 +118,34 @@ class Codec[A: Manifest](
   }
 
   // turn an Encodable message into a Buffer.
-  override final def handleDownstream(
-      context: ChannelHandlerContext, event: ChannelEvent) {
+  override final def handleDownstream(context: ChannelHandlerContext,
+                                      event: ChannelEvent) {
     event match {
       case message: DownstreamMessageEvent => {
-          val obj = message.getMessage
-          if (manifest[A].runtimeClass.isAssignableFrom(obj.getClass)) {
-            encode(obj.asInstanceOf[A]) match {
-              case Some(buffer) =>
-                Channels.write(context,
-                               message.getFuture,
-                               buffer,
-                               message.getRemoteAddress)
-              case None =>
-                message.getFuture.setSuccess()
-            }
-          } else {
-            context.sendDownstream(event)
+        val obj = message.getMessage
+        if (manifest[A].runtimeClass.isAssignableFrom(obj.getClass)) {
+          encode(obj.asInstanceOf[A]) match {
+            case Some(buffer) =>
+              Channels.write(context,
+                             message.getFuture,
+                             buffer,
+                             message.getRemoteAddress)
+            case None =>
+              message.getFuture.setSuccess()
           }
-          obj match {
-            case signalling: Codec.Signalling => {
-                signalling.signals.foreach {
-                  case Codec.Disconnect => context.getChannel.close()
-                  case _ =>
-                }
-              }
-            case _ =>
-          }
+        } else {
+          context.sendDownstream(event)
         }
+        obj match {
+          case signalling: Codec.Signalling => {
+            signalling.signals.foreach {
+              case Codec.Disconnect => context.getChannel.close()
+              case _ =>
+            }
+          }
+          case _ =>
+        }
+      }
       case _ => context.sendDownstream(event)
     }
   }

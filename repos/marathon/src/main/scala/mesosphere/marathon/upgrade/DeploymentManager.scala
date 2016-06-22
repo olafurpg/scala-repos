@@ -58,14 +58,16 @@ class DeploymentManager(appRepository: AppRepository,
           log.info(
               s"Conflicting deployments for deployment ${plan.id} have been canceled")
           scheduler.schedulerActor ! ConflictingDeploymentsCanceled(
-              plan.id, if (conflictingDeployments.nonEmpty) {
-            conflictingDeployments.map(_.plan).to[Seq]
-          } else Seq(plan))
+              plan.id,
+              if (conflictingDeployments.nonEmpty) {
+                conflictingDeployments.map(_.plan).to[Seq]
+              } else Seq(plan))
       }
 
     case CancelAllDeployments =>
-      for ((_, DeploymentInfo(ref, _)) <- runningDeployments) ref ! Cancel(
-          new DeploymentCanceledException("The upgrade has been cancelled"))
+      for ((_, DeploymentInfo(ref, _)) <- runningDeployments)
+        ref ! Cancel(
+            new DeploymentCanceledException("The upgrade has been cancelled"))
       runningDeployments.clear()
       deploymentStatus.clear()
 
@@ -74,14 +76,17 @@ class DeploymentManager(appRepository: AppRepository,
 
       runningDeployments.get(id) match {
         case Some(info) =>
-          info.ref ! Cancel(new DeploymentCanceledException(
-                  "The upgrade has been cancelled"))
-        case None =>
-          origSender ! DeploymentFailed(
-              DeploymentPlan(
-                  id, Group.empty, Group.empty, Nil, Timestamp.now()),
+          info.ref ! Cancel(
               new DeploymentCanceledException(
                   "The upgrade has been cancelled"))
+        case None =>
+          origSender ! DeploymentFailed(DeploymentPlan(id,
+                                                       Group.empty,
+                                                       Group.empty,
+                                                       Nil,
+                                                       Timestamp.now()),
+                                        new DeploymentCanceledException(
+                                            "The upgrade has been cancelled"))
       }
 
     case msg @ DeploymentFinished(plan) =>
@@ -112,7 +117,8 @@ class DeploymentManager(appRepository: AppRepository,
       deploymentStatus += stepInfo.plan.id -> stepInfo
 
     case _: PerformDeployment =>
-      sender() ! Status.Failure(new ConcurrentTaskUpgradeException(
+      sender() ! Status.Failure(
+          new ConcurrentTaskUpgradeException(
               "Deployment is already in progress"))
 
     case RetrieveRunningDeployments =>
@@ -127,19 +133,21 @@ class DeploymentManager(appRepository: AppRepository,
 }
 
 object DeploymentManager {
-  final case class PerformDeployment(
-      driver: SchedulerDriver, plan: DeploymentPlan)
+  final case class PerformDeployment(driver: SchedulerDriver,
+                                     plan: DeploymentPlan)
   final case class CancelDeployment(id: String)
   case object CancelAllDeployments
   final case class CancelConflictingDeployments(plan: DeploymentPlan)
 
-  final case class DeploymentStepInfo(
-      plan: DeploymentPlan, step: DeploymentStep, nr: Int)
+  final case class DeploymentStepInfo(plan: DeploymentPlan,
+                                      step: DeploymentStep,
+                                      nr: Int)
   final case class DeploymentFinished(plan: DeploymentPlan)
   final case class DeploymentFailed(plan: DeploymentPlan, reason: Throwable)
   final case class AllDeploymentsCanceled(plans: Seq[DeploymentPlan])
   final case class ConflictingDeploymentsCanceled(
-      id: String, deployments: Seq[DeploymentPlan])
+      id: String,
+      deployments: Seq[DeploymentPlan])
 
   final case class DeploymentInfo(ref: ActorRef, plan: DeploymentPlan)
 }

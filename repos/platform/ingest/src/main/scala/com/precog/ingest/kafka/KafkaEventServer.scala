@@ -57,16 +57,18 @@ object KafkaEventServer
   implicit val M: Monad[Future] = new FutureMonad(defaultFutureDispatch)
 
   def configureEventService(config: Configuration): EventService.State = {
-    val accountFinder = new CachingAccountFinder(WebAccountFinder(
-            config.detach("accounts")).map(_.withM[Future]) valueOr { errs =>
+    val accountFinder = new CachingAccountFinder(
+        WebAccountFinder(config.detach("accounts"))
+          .map(_.withM[Future]) valueOr { errs =>
       sys.error("Unable to build new WebAccountFinder: " +
-          errs.list.mkString("\n", "\n", ""))
+            errs.list.mkString("\n", "\n", ""))
     })
 
-    val apiKeyFinder = new CachingAPIKeyFinder(WebAPIKeyFinder(
-            config.detach("security")).map(_.withM[Future]) valueOr { errs =>
+    val apiKeyFinder = new CachingAPIKeyFinder(
+        WebAPIKeyFinder(config.detach("security"))
+          .map(_.withM[Future]) valueOr { errs =>
       sys.error("Unable to build new WebAPIKeyFinder: " +
-          errs.list.mkString("\n", "\n", ""))
+            errs.list.mkString("\n", "\n", ""))
     })
 
     val permissionsFinder = new PermissionsFinder(
@@ -78,14 +80,16 @@ object KafkaEventServer
     val (eventStore, stoppable) =
       KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr {
         errs =>
-          sys.error("Unable to build new KafkaEventStore: " +
-              errs.list.mkString("\n", "\n", ""))
+          sys.error(
+              "Unable to build new KafkaEventStore: " +
+                errs.list.mkString("\n", "\n", ""))
       }
 
     val jobManager =
       WebJobManager(config.detach("jobs")) valueOr { errs =>
-        sys.error("Unable to build new WebJobManager: " +
-            errs.list.mkString("\n", "\n", ""))
+        sys.error(
+            "Unable to build new WebJobManager: " +
+              errs.list.mkString("\n", "\n", ""))
       }
 
     val serviceConfig =

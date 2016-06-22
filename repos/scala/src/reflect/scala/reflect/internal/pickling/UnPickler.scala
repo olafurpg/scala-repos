@@ -50,7 +50,7 @@ abstract class UnPickler {
         ex.printStackTrace()
         throw new RuntimeException(
             "error reading Scala signature of " + filename + ": " +
-            ex.getMessage())
+              ex.getMessage())
     }
   }
 
@@ -117,9 +117,9 @@ abstract class UnPickler {
       if (major != MajorVersion || minor > MinorVersion)
         throw new IOException(
             "Scala signature " + classRoot.decodedName +
-            " has wrong version\n expected: " + MajorVersion + "." +
-            MinorVersion + "\n found: " + major + "." + minor + " in " +
-            filename)
+              " has wrong version\n expected: " + MajorVersion + "." +
+              MinorVersion + "\n found: " + major + "." + minor + " in " +
+              filename)
     }
 
     /** The `decls` scope associated with given symbol */
@@ -335,14 +335,13 @@ abstract class UnPickler {
 
         markFlagsCompleted(sym)(mask = AllFlags)
         sym.privateWithin = privateWithin
-        sym.info =
-          (if (atEnd) {
-             assert(!sym.isSuperAccessor, sym)
-             newLazyTypeRef(inforef)
-           } else {
-             assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
-             newLazyTypeRefAndAlias(inforef, readNat())
-           })
+        sym.info = (if (atEnd) {
+                      assert(!sym.isSuperAccessor, sym)
+                      newLazyTypeRef(inforef)
+                    } else {
+                      assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
+                      newLazyTypeRefAndAlias(inforef, readNat())
+                    })
         if (shouldEnterInOwnerScope) symScope(sym.owner) enter sym
 
         sym
@@ -352,17 +351,17 @@ abstract class UnPickler {
         case TYPEsym | ALIASsym =>
           owner.newNonClassSymbol(name.toTypeName, NoPosition, pflags)
         case CLASSsym =>
-          val sym =
-            (if (isClassRoot) {
-               if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
-               else classRoot setFlag pflags
-             } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
+          val sym = (if (isClassRoot) {
+                       if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
+                       else classRoot setFlag pflags
+                     } else
+                       owner
+                         .newClassSymbol(name.toTypeName, NoPosition, pflags))
           if (!atEnd) sym.typeOfThis = newLazyTypeRef(readNat())
 
           sym
         case MODULEsym =>
-          val clazz =
-            at(inforef, () => readType()).typeSymbol // after NMT_TRANSITION, we can leave off the () => ... ()
+          val clazz = at(inforef, () => readType()).typeSymbol // after NMT_TRANSITION, we can leave off the () => ... ()
           if (isModuleRoot) moduleRoot setFlag pflags
           else owner.newLinkedModule(clazz, pflags)
         case VALsym =>
@@ -404,8 +403,9 @@ abstract class UnPickler {
         val sym = readSymbolRef() match {
           case stub: StubSymbol if !stub.isClass =>
             // SI-8502 This allows us to create a stub for a unpickled reference to `missingPackage.Foo`.
-            stub.owner.newStubSymbol(
-                stub.name.toTypeName, stub.missingMessage, isPackage = true)
+            stub.owner.newStubSymbol(stub.name.toTypeName,
+                                     stub.missingMessage,
+                                     isPackage = true)
           case sym => sym
         }
         ThisType(sym)
@@ -429,8 +429,8 @@ abstract class UnPickler {
         case METHODtpe => MethodTypeRef(readTypeRef(), readSymbols())
         case POLYtpe => PolyOrNullaryType(readTypeRef(), readSymbols())
         case EXISTENTIALtpe =>
-          ExistentialType(
-              underlying = readTypeRef(), quantified = readSymbols())
+          ExistentialType(underlying = readTypeRef(),
+                          quantified = readSymbols())
         case ANNOTATEDtpe =>
           AnnotatedType(underlying = readTypeRef(), annotations = readAnnots())
       }
@@ -726,7 +726,7 @@ abstract class UnPickler {
     protected def errorBadSignature(msg: String) =
       throw new RuntimeException(
           "malformed Scala signature of " + classRoot.name + " at " +
-          readIndex + "; " + msg)
+            readIndex + "; " + msg)
 
     def inferMethodAlternative(fun: Tree, argtpes: List[Type], restpe: Type) {} // can't do it; need a compiler for that.
 
@@ -751,8 +751,7 @@ abstract class UnPickler {
       private val p = phase
       protected def completeInternal(sym: Symbol): Unit =
         try {
-          val tp =
-            at(i, () => readType(sym.isTerm)) // after NMT_TRANSITION, revert `() => readType(sym.isTerm)` to `readType`
+          val tp = at(i, () => readType(sym.isTerm)) // after NMT_TRANSITION, revert `() => readType(sym.isTerm)` to `readType`
 
           // This is a temporary fix allowing to read classes generated by an older, buggy pickler.
           // See the generation of the LOCAL_CHILD class in Pickler.scala. In an earlier version, the
@@ -796,8 +795,9 @@ abstract class UnPickler {
 
           var alias = at(j, readSymbol)
           if (alias.isOverloaded)
-            alias = slowButSafeEnteringPhase(picklerPhase)((alias suchThat
-                    (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
+            alias = slowButSafeEnteringPhase(picklerPhase)(
+                (alias suchThat
+                      (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
 
           sym.asInstanceOf[TermSymbol].setAlias(alias)
         } catch {

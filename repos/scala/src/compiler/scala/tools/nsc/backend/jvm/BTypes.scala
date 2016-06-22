@@ -184,8 +184,8 @@ abstract class BTypes {
     })
   }
 
-  private def setClassInfoFromClassNode(
-      classNode: ClassNode, classBType: ClassBType): ClassBType = {
+  private def setClassInfoFromClassNode(classNode: ClassNode,
+                                        classBType: ClassBType): ClassBType = {
     val superClass = classNode.superName match {
       case null =>
         assert(classNode.name == ObjectRef.internalName,
@@ -233,15 +233,14 @@ abstract class BTypes {
     val nestedInfo =
       classNode.innerClasses.asScala.find(_.name == classNode.name) map {
         case innerEntry =>
-          val enclosingClass =
-            if (innerEntry.outerName != null) {
-              // if classNode is a member class, the outerName is non-null
-              classBTypeFromParsedClassfile(innerEntry.outerName)
-            } else {
-              // for anonymous or local classes, the outerName is null, but the enclosing class is
-              // stored in the EnclosingMethod attribute (which ASM encodes in classNode.outerClass).
-              classBTypeFromParsedClassfile(classNode.outerClass)
-            }
+          val enclosingClass = if (innerEntry.outerName != null) {
+            // if classNode is a member class, the outerName is non-null
+            classBTypeFromParsedClassfile(innerEntry.outerName)
+          } else {
+            // for anonymous or local classes, the outerName is null, but the enclosing class is
+            // stored in the EnclosingMethod attribute (which ASM encodes in classNode.outerClass).
+            classBTypeFromParsedClassfile(classNode.outerClass)
+          }
           val staticFlag = (innerEntry.access & Opcodes.ACC_STATIC) != 0
           NestedInfo(enclosingClass,
                      Option(innerEntry.outerName),
@@ -281,7 +280,7 @@ abstract class BTypes {
         val isScala =
           classNode.attrs != null && classNode.attrs.asScala.exists(a =>
                 a.`type` == BTypes.ScalaAttributeName ||
-                a.`type` == BTypes.ScalaSigAttributeName)
+                  a.`type` == BTypes.ScalaSigAttributeName)
         if (isScala) Some(NoInlineInfoAttribute(classNode.name))
         else None
       }
@@ -367,10 +366,10 @@ abstract class BTypes {
 
     final def isIntSizedType =
       this == BOOL || this == CHAR || this == BYTE || this == SHORT ||
-      this == INT
+        this == INT
     final def isIntegralType =
       this == INT || this == BYTE || this == LONG || this == CHAR ||
-      this == SHORT
+        this == SHORT
     final def isRealType = this == FLOAT || this == DOUBLE
     final def isNumericType = isIntegralType || isRealType
     final def isWideType = size == 2
@@ -404,7 +403,9 @@ abstract class BTypes {
               else
                 other match {
                   case otherClassType: ClassBType =>
-                    classType.isSubtypeOf(otherClassType).orThrow // e.g., java/lang/Double conforms to java/lang/Number
+                    classType
+                      .isSubtypeOf(otherClassType)
+                      .orThrow // e.g., java/lang/Double conforms to java/lang/Number
                   case _ => false
                 }
             } else if (isNullType) {
@@ -427,7 +428,7 @@ abstract class BTypes {
             other == UNIT
           case BOOL | BYTE | SHORT | CHAR =>
             this == other || other == INT ||
-            other == LONG // TODO Actually, BOOL does NOT conform to LONG. Even with adapt().
+              other == LONG // TODO Actually, BOOL does NOT conform to LONG. Even with adapt().
           case _ =>
             assert(isPrimitive && other.isPrimitive,
                    s"Expected primitive types $this - $other")
@@ -908,8 +909,8 @@ abstract class BTypes {
     }
 
     def info_=(i: Either[NoClassBTypeInfo, ClassInfo]): Unit = {
-      assert(
-          _info == null, s"Cannot set ClassBType.info multiple times: $this")
+      assert(_info == null,
+             s"Cannot set ClassBType.info multiple times: $this")
       _info = i
       checkInfoConsistency()
     }
@@ -959,8 +960,7 @@ abstract class BTypes {
       info.map(i => (i.flags & asm.Opcodes.ACC_INTERFACE) != 0)
 
     def superClassesTransitive: Either[NoClassBTypeInfo, List[ClassBType]] =
-      info.flatMap(
-          i =>
+      info.flatMap(i =>
             i.superClass match {
           case None => Right(Nil)
           case Some(sc) => sc.superClassesTransitive.map(sc :: _)
@@ -993,8 +993,8 @@ abstract class BTypes {
       })
     }
 
-    def innerClassAttributeEntry: Either[
-        NoClassBTypeInfo, Option[InnerClassEntry]] =
+    def innerClassAttributeEntry: Either[NoClassBTypeInfo,
+                                         Option[InnerClassEntry]] =
       info.map(i =>
             i.nestedInfo map {
           case NestedInfo(_, outerName, innerName, isStaticNestedClass) =>
@@ -1088,8 +1088,8 @@ abstract class BTypes {
       }
     }
 
-    private def firstCommonSuffix(
-        as: List[ClassBType], bs: List[ClassBType]): ClassBType = {
+    private def firstCommonSuffix(as: List[ClassBType],
+                                  bs: List[ClassBType]): ClassBType = {
       var chainA = as
       var chainB = bs
       var fcs: ClassBType = null
@@ -1177,8 +1177,10 @@ abstract class BTypes {
     * @param innerName The simple name of the inner class, may be null.
     * @param flags     The flags for this class in the InnerClass entry.
     */
-  final case class InnerClassEntry(
-      name: String, outerName: String, innerName: String, flags: Int)
+  final case class InnerClassEntry(name: String,
+                                   outerName: String,
+                                   innerName: String,
+                                   flags: Int)
 
   final case class ArrayBType(componentType: BType) extends RefBType {
     def dimension: Int = componentType match {

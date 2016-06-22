@@ -34,4 +34,5 @@ class VariableKernelEmpiricalDistribution(
 
 object VariableKernelEmpiricalDistribution
     extends ContinuousDistributionUFuncProvider[
-        Double, VariableKernelEmpiricalDistribution]
+        Double,
+        VariableKernelEmpiricalDistribution]

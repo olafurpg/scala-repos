@@ -60,14 +60,15 @@ class ParamsExtensionSpec extends Specification {
       params.getAs[Bogus]("a") must beSome
 
       params.getAs[Bogus]("a").get aka "The bogus value" must_==
-        Bogus("buffybuffy")
+      Bogus("buffybuffy")
     }
 
     "explicitely receive a custom TypeConverter" in {
 
       val params: Params = FakeParams(Map("a" -> "buffybuffy"))
 
-      params.getAs[Bogus]("a")((s: String) => Some(Bogus(s.toUpperCase))) must beSome(
+      params
+        .getAs[Bogus]("a")((s: String) => Some(Bogus(s.toUpperCase))) must beSome(
           Bogus("BUFFYBUFFY"))
     }
   }

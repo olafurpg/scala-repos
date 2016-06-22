@@ -33,8 +33,9 @@ class ScalaCompilerConfiguration(project: Project)
     profile.getSettings
   }
 
-  def configureSettingsForModule(
-      module: Module, source: String, options: Seq[String]) {
+  def configureSettingsForModule(module: Module,
+                                 source: String,
+                                 options: Seq[String]) {
     customProfiles.foreach { profile =>
       profile.removeModuleName(module.getName)
       if (profile.getName.startsWith(source) &&
@@ -72,8 +73,8 @@ class ScalaCompilerConfiguration(project: Project)
     if (incrementalityType != IncrementalityType.IDEA) {
       val incrementalityTypeElement = new Element("option")
       incrementalityTypeElement.setAttribute("name", "incrementalityType")
-      incrementalityTypeElement.setAttribute(
-          "value", incrementalityType.toString)
+      incrementalityTypeElement
+        .setAttribute("value", incrementalityType.toString)
       configurationElement.addContent(incrementalityTypeElement)
     }
 
@@ -83,8 +84,8 @@ class ScalaCompilerConfiguration(project: Project)
                                 new SkipDefaultValuesSerializationFilters())
       profileElement.setName("profile")
       profileElement.setAttribute("name", profile.getName)
-      profileElement.setAttribute(
-          "modules", profile.getModuleNames.asScala.mkString(","))
+      profileElement.setAttribute("modules",
+                                  profile.getModuleNames.asScala.mkString(","))
 
       configurationElement.addContent(profileElement)
     }
@@ -101,16 +102,18 @@ class ScalaCompilerConfiguration(project: Project)
       .getOrElse(IncrementalityType.IDEA)
 
     defaultProfile.setSettings(
-        new ScalaCompilerSettings(XmlSerializer.deserialize(
-                configurationElement, classOf[ScalaCompilerSettingsState])))
+        new ScalaCompilerSettings(
+            XmlSerializer.deserialize(configurationElement,
+                                      classOf[ScalaCompilerSettingsState])))
 
     customProfiles = configurationElement.getChildren("profile").asScala.map {
       profileElement =>
         val profile = new ScalaCompilerSettingsProfile(
             profileElement.getAttributeValue("name"))
 
-        val settings = new ScalaCompilerSettings(XmlSerializer.deserialize(
-                profileElement, classOf[ScalaCompilerSettingsState]))
+        val settings = new ScalaCompilerSettings(
+            XmlSerializer.deserialize(profileElement,
+                                      classOf[ScalaCompilerSettingsState]))
         profile.setSettings(settings)
 
         val moduleNames = profileElement

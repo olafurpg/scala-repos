@@ -85,16 +85,18 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
   def + = rule ~++ *
 
   def ~>?[B >: A, X2 >: X](f: => Rule[S, S, B => B, X2]) =
-    for (a <- rule; fs <- f ?) yield
-      fs.foldLeft[B](a) { (b, f) =>
-        f(b)
-      }
+    for (a <- rule; fs <- f ?)
+      yield
+        fs.foldLeft[B](a) { (b, f) =>
+          f(b)
+        }
 
   def ~>*[B >: A, X2 >: X](f: => Rule[S, S, B => B, X2]) =
-    for (a <- rule; fs <- f *) yield
-      fs.foldLeft[B](a) { (b, f) =>
-        f(b)
-      }
+    for (a <- rule; fs <- f *)
+      yield
+        fs.foldLeft[B](a) { (b, f) =>
+          f(b)
+        }
 
   def ~*~[B >: A, X2 >: X](join: => Rule[S, S, (B, B) => B, X2]) = {
     this ~>* (for (f <- join; a <- rule) yield f(_: B, a))
@@ -118,9 +120,9 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
       else
         rule(in) match {
           case Success(out, a) => {
-              result(i) = a
-              rep(i + 1, out)
-            }
+            result(i) = a
+            rep(i + 1, out)
+          }
           case Failure => Failure
           case err: Error[_] => err
         }

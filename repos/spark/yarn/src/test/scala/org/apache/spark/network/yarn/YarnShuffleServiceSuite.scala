@@ -102,9 +102,11 @@ class YarnShuffleServiceSuite
 
     blockResolver.registerExecutor(app1Id.toString, "exec-1", shuffleInfo1)
     blockResolver.registerExecutor(app2Id.toString, "exec-2", shuffleInfo2)
-    ShuffleTestAccessor.getExecutorInfo(app1Id, "exec-1", blockResolver) should be(
+    ShuffleTestAccessor
+      .getExecutorInfo(app1Id, "exec-1", blockResolver) should be(
         Some(shuffleInfo1))
-    ShuffleTestAccessor.getExecutorInfo(app2Id, "exec-2", blockResolver) should be(
+    ShuffleTestAccessor
+      .getExecutorInfo(app2Id, "exec-2", blockResolver) should be(
         Some(shuffleInfo2))
 
     if (!execStateFile.exists()) {

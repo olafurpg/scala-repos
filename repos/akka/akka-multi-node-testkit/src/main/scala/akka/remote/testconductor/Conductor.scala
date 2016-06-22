@@ -71,7 +71,8 @@ trait Conductor {
     if (_controller ne null)
       throw new RuntimeException("TestConductorServer was already started")
     _controller = system.actorOf(
-        Props(classOf[Controller], participants, controllerPort), "controller")
+        Props(classOf[Controller], participants, controllerPort),
+        "controller")
     import Settings.BarrierTimeout
     import system.dispatcher
     controller ? GetSockAddr flatMap {
@@ -136,15 +137,16 @@ trait Conductor {
     * @param target is the symbolic name of the other node to which connectivity shall be impeded
     * @param direction can be either `Direction.Send`, `Direction.Receive` or `Direction.Both`
     */
-  def blackhole(
-      node: RoleName, target: RoleName, direction: Direction): Future[Done] =
+  def blackhole(node: RoleName,
+                target: RoleName,
+                direction: Direction): Future[Done] =
     throttle(node, target, direction, 0f)
 
   private def requireTestConductorTranport(): Unit =
     if (!transport.defaultAddress.protocol.contains(".trttl.gremlin."))
       throw new ConfigurationException(
           "To use this feature you must activate the failure injector adapters " +
-          "(trttl, gremlin) by specifying `testTransport(on = true)` in your MultiNodeConfig.")
+            "(trttl, gremlin) by specifying `testTransport(on = true)` in your MultiNodeConfig.")
 
   /**
     * Switch the Netty pipeline of the remote support into pass through mode for
@@ -158,8 +160,9 @@ trait Conductor {
     * @param target is the symbolic name of the other node to which connectivity shall be impeded
     * @param direction can be either `Direction.Send`, `Direction.Receive` or `Direction.Both`
     */
-  def passThrough(
-      node: RoleName, target: RoleName, direction: Direction): Future[Done] =
+  def passThrough(node: RoleName,
+                  target: RoleName,
+                  direction: Direction): Future[Done] =
     throttle(node, target, direction, -1f)
 
   /**
@@ -260,15 +263,16 @@ trait Conductor {
   *
   * INTERNAL API.
   */
-private[akka] class ConductorHandler(
-    _createTimeout: Timeout, controller: ActorRef, log: LoggingAdapter)
+private[akka] class ConductorHandler(_createTimeout: Timeout,
+                                     controller: ActorRef,
+                                     log: LoggingAdapter)
     extends SimpleChannelUpstreamHandler {
 
   implicit val createTimeout = _createTimeout
   val clients = new ConcurrentHashMap[Channel, ActorRef]()
 
-  override def channelConnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+  override def channelConnected(ctx: ChannelHandlerContext,
+                                event: ChannelStateEvent) = {
     val channel = event.getChannel
     log.debug("connection from {}", getAddrString(channel))
     val fsm: ActorRef = Await.result(controller ? Controller.CreateServerFSM(
@@ -277,8 +281,8 @@ private[akka] class ConductorHandler(
     clients.put(channel, fsm)
   }
 
-  override def channelDisconnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+  override def channelDisconnected(ctx: ChannelHandlerContext,
+                                   event: ChannelStateEvent) = {
     val channel = event.getChannel
     log.debug("disconnect from {}", getAddrString(channel))
     val fsm = clients.get(channel)
@@ -286,8 +290,8 @@ private[akka] class ConductorHandler(
     clients.remove(channel)
   }
 
-  override def messageReceived(
-      ctx: ChannelHandlerContext, event: MessageEvent) = {
+  override def messageReceived(ctx: ChannelHandlerContext,
+                               event: MessageEvent) = {
     val channel = event.getChannel
     log.debug("message from {}: {}", getAddrString(channel), event.getMessage)
     event.getMessage match {
@@ -380,8 +384,9 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
       controller ! op
       stay
     case Event(msg: NetworkOp, _) ⇒
-      log.warning(
-          "client {} sent unsupported message {}", getAddrString(channel), msg)
+      log.warning("client {} sent unsupported message {}",
+                  getAddrString(channel),
+                  msg)
       stop()
     case Event(ToClient(msg: UnconfirmedClientOp), _) ⇒
       channel.write(msg)
@@ -421,8 +426,8 @@ private[akka] object Controller {
   *
   * INTERNAL API.
   */
-private[akka] class Controller(
-    private var initialParticipants: Int, controllerPort: InetSocketAddress)
+private[akka] class Controller(private var initialParticipants: Int,
+                               controllerPort: InetSocketAddress)
     extends Actor {
   import Controller._
   import BarrierCoordinator._
@@ -449,8 +454,8 @@ private[akka] class Controller(
     case FailedBarrier(data) ⇒ failBarrier(data)
     case BarrierEmpty(data, msg) ⇒ SupervisorStrategy.Resume
     case WrongBarrier(name, client, data) ⇒ {
-        client ! ToClient(BarrierResult(name, false)); failBarrier(data)
-      }
+      client ! ToClient(BarrierResult(name, false)); failBarrier(data)
+    }
     case ClientLost(data, node) ⇒ failBarrier(data)
     case DuplicateNode(data, node) ⇒ failBarrier(data)
   }
@@ -480,8 +485,8 @@ private[akka] class Controller(
       barrier forward c
       if (nodes contains name) {
         if (initialParticipants > 0) {
-          for (NodeInfo(_, _, client) ← nodes.values) client ! ToClient(
-              BarrierResult("initial startup", false))
+          for (NodeInfo(_, _, client) ← nodes.values)
+            client ! ToClient(BarrierResult("initial startup", false))
           initialParticipants = 0
         }
         fsm ! ToClient(BarrierResult("initial startup", false))
@@ -577,7 +582,7 @@ private[akka] object BarrierCoordinator {
             .find(_.fsm == client)
             .map(_.name.toString)
             .getOrElse(client.toString) + " tried to enter '" + barrier +
-          "' while we were waiting for '" + data.barrier + "'")
+            "' while we were waiting for '" + data.barrier + "'")
       with NoStackTrace
       with Printer
   final case class BarrierEmpty(data: Data, msg: String)
@@ -651,8 +656,8 @@ private[akka] class BarrierCoordinator
       }
     case Event(RemoveClient(name), d @ Data(clients, _, _, _)) ⇒
       if (clients.isEmpty)
-        throw BarrierEmpty(
-            d, "cannot remove " + name + ": no client to remove")
+        throw BarrierEmpty(d,
+                           "cannot remove " + name + ": no client to remove")
       stay using d.copy(clients = clients filterNot (_.name == name))
   }
 
@@ -678,8 +683,9 @@ private[akka] class BarrierCoordinator
       clients find (_.name == name) match {
         case None ⇒ stay
         case Some(client) ⇒
-          handleBarrier(d.copy(clients = clients - client,
-                               arrived = arrived filterNot (_ == client.fsm)))
+          handleBarrier(
+              d.copy(clients = clients - client,
+                     arrived = arrived filterNot (_ == client.fsm)))
       }
     case Event(FailBarrier(name), d @ Data(_, barrier, _, _)) ⇒
       if (name != barrier) throw WrongBarrier(name, sender(), d)

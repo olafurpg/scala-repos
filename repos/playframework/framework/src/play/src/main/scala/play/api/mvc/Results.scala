@@ -122,7 +122,8 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     else {
       withHeaders(
           SET_COOKIE -> Cookies.mergeSetCookieHeader(
-              header.headers.getOrElse(SET_COOKIE, ""), cookies))
+              header.headers.getOrElse(SET_COOKIE, ""),
+              cookies))
     }
   }
 
@@ -140,7 +141,8 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
   def discardingCookies(cookies: DiscardingCookie*): Result = {
     withHeaders(
         SET_COOKIE -> Cookies.mergeSetCookieHeader(
-            header.headers.getOrElse(SET_COOKIE, ""), cookies.map(_.toCookie)))
+            header.headers.getOrElse(SET_COOKIE, ""),
+            cookies.map(_.toCookie)))
   }
 
   /**
@@ -278,7 +280,7 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
   private def shouldWarnIfNotRedirect(flash: Flash): Boolean = {
     play.api.Play.privateMaybeApplication.exists(app =>
           (app.mode == play.api.Mode.Dev) && (!flash.isEmpty) &&
-          (header.status < 300 || header.status > 399))
+            (header.status < 300 || header.status > 399))
   }
 
   /**
@@ -303,8 +305,8 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
   * @param charset The charset to be sent to the client.
   * @param encode The transformation function.
   */
-case class Codec(charset: String)(
-    val encode: String => ByteString, val decode: ByteString => String)
+case class Codec(charset: String)(val encode: String => ByteString,
+                                  val decode: ByteString => String)
 
 /**
   * Default Codec support.
@@ -387,8 +389,8 @@ trait Results {
     * @param status the HTTP response status, e.g ‘200 OK’
     */
   class Status(status: Int)
-      extends Result(
-          header = ResponseHeader(status), body = HttpEntity.NoEntity) {
+      extends Result(header = ResponseHeader(status),
+                     body = HttpEntity.NoEntity) {
 
     /**
       * Set the result's content.
@@ -468,10 +470,10 @@ trait Results {
       * @param classLoader The classloader to load it from, defaults to the classloader for this class.
       * @param inline Whether it should be served as an inline file, or as an attachment.
       */
-    def sendResource(resource: String,
-                     classLoader: ClassLoader =
-                       Results.getClass.getClassLoader,
-                     inline: Boolean = true): Result = {
+    def sendResource(
+        resource: String,
+        classLoader: ClassLoader = Results.getClass.getClassLoader,
+        inline: Boolean = true): Result = {
       val stream = classLoader.getResourceAsStream(resource)
       val fileName = resource.split('/').last
       streamFile(StreamConverters.fromInputStream(() => stream),
@@ -561,12 +563,12 @@ trait Results {
   val NonAuthoritativeInformation = new Status(NON_AUTHORITATIVE_INFORMATION)
 
   /** Generates a ‘204 NO_CONTENT’ result. */
-  val NoContent = Result(
-      header = ResponseHeader(NO_CONTENT), body = HttpEntity.NoEntity)
+  val NoContent =
+    Result(header = ResponseHeader(NO_CONTENT), body = HttpEntity.NoEntity)
 
   /** Generates a ‘205 RESET_CONTENT’ result. */
-  val ResetContent = Result(
-      header = ResponseHeader(RESET_CONTENT), body = HttpEntity.NoEntity)
+  val ResetContent =
+    Result(header = ResponseHeader(RESET_CONTENT), body = HttpEntity.NoEntity)
 
   /** Generates a ‘206 PARTIAL_CONTENT’ result. */
   val PartialContent = new Status(PARTIAL_CONTENT)
@@ -596,8 +598,8 @@ trait Results {
   def SeeOther(url: String): Result = Redirect(url, SEE_OTHER)
 
   /** Generates a ‘304 NOT_MODIFIED’ result. */
-  val NotModified = Result(
-      header = ResponseHeader(NOT_MODIFIED), body = HttpEntity.NoEntity)
+  val NotModified =
+    Result(header = ResponseHeader(NOT_MODIFIED), body = HttpEntity.NoEntity)
 
   /**
     * Generates a ‘307 TEMPORARY_REDIRECT’ simple result.

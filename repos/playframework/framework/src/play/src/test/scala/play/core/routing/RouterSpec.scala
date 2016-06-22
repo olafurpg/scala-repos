@@ -74,9 +74,10 @@ object RouterSpec extends Specification {
     }
 
     "multipart path is not decoded" in {
-      val pathPattern = PathPattern(Seq(StaticPart("/path/"),
-                                        StaticPart("to/"),
-                                        DynamicPart("foo", ".+", false)))
+      val pathPattern = PathPattern(
+          Seq(StaticPart("/path/"),
+              StaticPart("to/"),
+              DynamicPart("foo", ".+", false)))
       val pathString = "/path/to/this/is/some%20file/with/id"
       pathPattern(pathString).get("foo") must beEqualTo(
           Right("this/is/some%20file/with/id"))

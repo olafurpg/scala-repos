@@ -48,27 +48,19 @@ object StormPlanTopology extends Properties("StormDag") {
   }
 
   implicit def arbSource1: Arbitrary[Producer[Storm, Int]] =
-    Arbitrary(
-        Gen
-          .listOfN(5000, Arbitrary.arbitrary[Int])
-          .map { x: List[Int] =>
-        Storm.source(TraversableSpout(x))
-      })
+    Arbitrary(Gen.listOfN(5000, Arbitrary.arbitrary[Int]).map { x: List[Int] =>
+      Storm.source(TraversableSpout(x))
+    })
   implicit def arbSource2: Arbitrary[KeyedProducer[Storm, Int, Int]] =
-    Arbitrary(
-        Gen
-          .listOfN(5000, Arbitrary.arbitrary[(Int, Int)])
-          .map { x: List[(Int, Int)] =>
+    Arbitrary(Gen.listOfN(5000, Arbitrary.arbitrary[(Int, Int)]).map {
+      x: List[(Int, Int)] =>
         IdentityKeyedProducer(Storm.source(TraversableSpout(x)))
-      })
+    })
 
   implicit def arbService2: Arbitrary[Storm#Service[Int, Int]] =
-    Arbitrary(
-        Arbitrary
-          .arbitrary[Int => Option[Int]]
-          .map { fn =>
-        ReadableServiceFactory[Int, Int](() => ReadableStore.fromFn(fn))
-      })
+    Arbitrary(Arbitrary.arbitrary[Int => Option[Int]].map { fn =>
+      ReadableServiceFactory[Int, Int](() => ReadableStore.fromFn(fn))
+    })
 
   lazy val genDag: Gen[TailProducer[Storm, Any]] = for {
     tail <- oneOf(summed, written)

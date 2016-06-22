@@ -35,8 +35,9 @@ abstract class AbstractFormatConversionIntention(name: String,
     }
   }
 
-  override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  override def isAvailable(project: Project,
+                           editor: Editor,
+                           element: PsiElement): Boolean = {
     findTargetIn(element).isDefined
   }
 
@@ -50,8 +51,8 @@ abstract class AbstractFormatConversionIntention(name: String,
 
     target.replace(result) match {
       case lit: ScLiteral if lit.isMultiLineString =>
-        MultilineStringUtil.addMarginsAndFormatMLString(
-            lit, editor.getDocument)
+        MultilineStringUtil
+          .addMarginsAndFormatMLString(lit, editor.getDocument)
       case _ =>
     }
   }

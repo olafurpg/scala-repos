@@ -122,8 +122,8 @@ object TimeHelpersSpec
         timeSpanAmounts forall {
           case (amount, unit) =>
             amount > 1 && timeSpanToString.contains(unit + "s") ||
-            amount == 1 && timeSpanToString.contains(unit) || amount == 0 &&
-            !timeSpanToString.contains(unit)
+              amount == 1 && timeSpanToString.contains(unit) || amount == 0 &&
+              !timeSpanToString.contains(unit)
         }
       })
       conversionIsOk && timeSpanStringIsPluralized
@@ -152,9 +152,9 @@ object TimeHelpersSpec
 
     "make sure noTime does not change the day" in forAllTimeZones {
       dateFormatter.format(0.days.ago.noTime.toDate) must_==
-        dateFormatter.format(new DateTime().toDate)
+      dateFormatter.format(new DateTime().toDate)
       dateFormatter.format(3.days.ago.noTime.toDate) must_==
-        dateFormatter.format(new Date(millis - (3 * 24 * 60 * 60 * 1000)))
+      dateFormatter.format(new Date(millis - (3 * 24 * 60 * 60 * 1000)))
     }
 
     "provide a day function returning the day of month corresponding to a given date (relative to UTC)" in forAllTimeZones {
@@ -209,7 +209,8 @@ object TimeHelpersSpec
 
     "provide a parseInternetDate function to parse a string formatted using the internet format" in forAllTimeZones {
       parseInternetDate(internetDateFormatter.format(now)).getTime.toLong must beCloseTo(
-          now.getTime.toLong, 1000L)
+          now.getTime.toLong,
+          1000L)
     }
     "provide a parseInternetDate function returning new Date(0) if the input date cant be parsed" in forAllTimeZones {
       parseInternetDate("unparsable") must_== new Date(0)

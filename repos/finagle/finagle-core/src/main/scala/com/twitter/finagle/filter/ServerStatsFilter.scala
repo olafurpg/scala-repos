@@ -38,7 +38,8 @@ private[finagle] object ServerStatsFilter {
   *       to return the `Future`.
   */
 private[finagle] class ServerStatsFilter[Req, Rep](
-    statsReceiver: StatsReceiver, nowNanos: () => Long)
+    statsReceiver: StatsReceiver,
+    nowNanos: () => Long)
     extends SimpleFilter[Req, Rep] {
   def this(statsReceiver: StatsReceiver) =
     this(statsReceiver, Stopwatch.systemNanos)

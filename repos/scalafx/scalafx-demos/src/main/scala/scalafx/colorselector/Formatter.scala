@@ -29,8 +29,8 @@ package scalafx.colorselector
 import scalafx.scene.paint.Color
 
 object Formatter {
-  val formatters = List(
-      HexFormatter, RgbFormatter, PercentFormatter, HsbFormatter)
+  val formatters =
+    List(HexFormatter, RgbFormatter, PercentFormatter, HsbFormatter)
 }
 
 abstract sealed case class Formatter(description: String) {
@@ -85,8 +85,8 @@ object PercentFormatter extends Formatter("Percent") {
                        c.opacity)
 
   def formatWithoutAlpha(c: Color): String =
-    RGB_FORMAT.format(
-        doubleToInt(c.red), doubleToInt(c.green), doubleToInt(c.blue))
+    RGB_FORMAT
+      .format(doubleToInt(c.red), doubleToInt(c.green), doubleToInt(c.blue))
 }
 
 object HsbFormatter extends Formatter("HSB") {

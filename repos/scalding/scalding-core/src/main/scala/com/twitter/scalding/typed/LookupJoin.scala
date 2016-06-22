@@ -80,8 +80,8 @@ object LookupJoin extends Serializable {
   def apply[T: Ordering, K: Ordering, V, JoinedV](
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
-      reducers: Option[Int] =
-        None): TypedPipe[(T, (K, (V, Option[JoinedV])))] =
+      reducers: Option[Int] = None)
+    : TypedPipe[(T, (K, (V, Option[JoinedV])))] =
     withWindow(left, right, reducers)((_, _) => true)
 
   /**
@@ -91,8 +91,8 @@ object LookupJoin extends Serializable {
   def rightSumming[T: Ordering, K: Ordering, V, JoinedV: Semigroup](
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
-      reducers: Option[Int] =
-        None): TypedPipe[(T, (K, (V, Option[JoinedV])))] =
+      reducers: Option[Int] = None)
+    : TypedPipe[(T, (K, (V, Option[JoinedV])))] =
     withWindowRightSumming(left, right, reducers)((_, _) => true)
 
   /**
@@ -172,34 +172,34 @@ object LookupJoin extends Serializable {
             (Option.empty[(T, JoinedV)],
              Option.empty[(T, V, Option[JoinedV])])) {
           case ((None, result), (time, Left(v))) => {
-              // The was no value previously
-              (None, Some((time, v, None)))
-            }
+            // The was no value previously
+            (None, Some((time, v, None)))
+          }
 
           case ((prev @ Some((oldt, jv)), result), (time, Left(v))) => {
-              // Left(v) means that we have a new value from the left
-              // pipe that we need to join against the current
-              // "lastJoined" value sitting in scanLeft's state. This
-              // is equivalent to a lookup on the data in the right
-              // pipe at time "thisTime".
-              val filteredJoined = if (gate(time, oldt)) Some(jv) else None
-              (prev, Some((time, v, filteredJoined)))
-            }
+            // Left(v) means that we have a new value from the left
+            // pipe that we need to join against the current
+            // "lastJoined" value sitting in scanLeft's state. This
+            // is equivalent to a lookup on the data in the right
+            // pipe at time "thisTime".
+            val filteredJoined = if (gate(time, oldt)) Some(jv) else None
+            (prev, Some((time, v, filteredJoined)))
+          }
 
           case ((None, result), (time, Right(joined))) => {
-              // There was no value before, so we just update to joined
-              (Some((time, joined)), None)
-            }
+            // There was no value before, so we just update to joined
+            (Some((time, joined)), None)
+          }
 
           case ((Some((oldt, oldJ)), result), (time, Right(joined))) => {
-              // Right(joinedV) means that we've received a new value
-              // to use in the simulated realtime service
-              // described in the comments above
-              // did it fall out of cache?
-              val nextJoined =
-                if (gate(time, oldt)) Semigroup.plus(oldJ, joined) else joined
-              (Some((time, nextJoined)), None)
-            }
+            // Right(joinedV) means that we've received a new value
+            // to use in the simulated realtime service
+            // described in the comments above
+            // did it fall out of cache?
+            val nextJoined =
+              if (gate(time, oldt)) Semigroup.plus(oldJ, joined) else joined
+            (Some((time, nextJoined)), None)
+          }
         }
         .toTypedPipe
 

@@ -229,10 +229,12 @@ object ActorSelection {
                     val m = sel.copy(elements = iter.toVector,
                                      wildcardFanOut =
                                        sel.wildcardFanOut ||
-                                       matchingChildren.size > 1)
-                    matchingChildren.foreach(c ⇒
-                          deliverSelection(
-                              c.asInstanceOf[InternalActorRef], sender, m))
+                                         matchingChildren.size > 1)
+                    matchingChildren.foreach(
+                        c ⇒
+                          deliverSelection(c.asInstanceOf[InternalActorRef],
+                                           sender,
+                                           m))
                   }
                 }
             }

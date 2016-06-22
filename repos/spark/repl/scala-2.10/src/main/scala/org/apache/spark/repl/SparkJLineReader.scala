@@ -35,8 +35,9 @@ private[repl] class SparkJLineReader(_completion: => Completion)
   def init() = term.init()
 
   def scalaToJline(tc: ScalaCompleter): Completer = new Completer {
-    def complete(
-        _buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
+    def complete(_buf: String,
+                 cursor: Int,
+                 candidates: JList[CharSequence]): Int = {
       val buf = if (_buf == null) "" else _buf
       val Candidates(newCursor, newCandidates) = tc.complete(buf, cursor)
       newCandidates foreach (candidates add _)
@@ -64,7 +65,8 @@ private[repl] class SparkJLineReader(_completion: => Completion)
 
       if (completion ne NoCompletion) {
         val argCompletor: ArgumentCompleter = new ArgumentCompleter(
-            new JLineDelimiter, scalaToJline(completion.completer()))
+            new JLineDelimiter,
+            scalaToJline(completion.completer()))
         argCompletor setStrict false
 
         this addCompleter argCompletor

@@ -10,9 +10,10 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   import StreamT._
 
   def uncons(implicit M: Monad[M]): M[Option[(A, StreamT[M, A])]] =
-    M.bind(step)(_ (yieldd = (a, s) => M.point(Some((a, s))),
-                    skip = s => s.uncons,
-                    done = M.point(None)))
+    M.bind(step)(
+        _ (yieldd = (a, s) => M.point(Some((a, s))),
+           skip = s => s.uncons,
+           done = M.point(None)))
 
   def ::(a: => A)(implicit M: Applicative[M]): StreamT[M, A] =
     StreamT[M, A](M.point(Yield(a, this)))
@@ -28,12 +29,13 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] =
     M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
-  def trans[N[_]](
-      t: M ~> N)(implicit M: Functor[M], N: Functor[N]): StreamT[N, A] =
+  def trans[N[_]](t: M ~> N)(implicit M: Functor[M],
+                             N: Functor[N]): StreamT[N, A] =
     StreamT(
-        t(M.map(this.step)(_ (yieldd = (a, as) => Yield(a, as trans t),
-                              skip = as => Skip(as trans t),
-                              done = Done))))
+        t(
+            M.map(this.step)(_ (yieldd = (a, as) => Yield(a, as trans t),
+                                skip = as => Skip(as trans t),
+                                done = Done))))
 
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap {
@@ -91,9 +93,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   /** @since 7.0.1 */
   def mapM[B](f: A => M[B])(implicit m: Monad[M]): StreamT[M, B] = stepBind {
-    _ (yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) },
-       skip = s => m.point(Skip(s mapM f)),
-       done = m.point(Done))
+    _ (yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) }, skip = s =>
+          m.point(Skip(s mapM f)), done = m.point(Done))
   }
 
   /**Don't use iteratively! */
@@ -205,11 +206,11 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
     new StreamTMonadPlus[F] {
       implicit def F: Applicative[F] = F0
     }
-  implicit def StreamTEqual[F[_], A](
-      implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] =
+  implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]],
+                                     F: Monad[F]): Equal[StreamT[F, A]] =
     E.contramap((_: StreamT[F, A]).toStream)
-  implicit def StreamTShow[F[_], A](
-      implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] =
+  implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]],
+                                    F: Monad[F]): Show[StreamT[F, A]] =
     Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
   implicit val StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
   implicit def StreamTFoldable[F[_]: Foldable]: Foldable[StreamT[F, ?]] =
@@ -238,8 +239,7 @@ object StreamT extends StreamTInstances {
 
   def unfoldM[M[_], A, B](start: B)(f: B => M[Option[(A, B)]])(
       implicit M: Functor[M]): StreamT[M, A] =
-    StreamT[M, A](
-        M.map(f(start)) {
+    StreamT[M, A](M.map(f(start)) {
       case Some((a, b)) => Yield(a, unfoldM(b)(f))
       case None => Done
     })
@@ -260,8 +260,8 @@ object StreamT extends StreamTInstances {
     def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z): Z
   }
 
-  def runStreamT[S, A](
-      stream: StreamT[State[S, ?], A], s0: S): StreamT[Id, A] =
+  def runStreamT[S, A](stream: StreamT[State[S, ?], A],
+                       s0: S): StreamT[Id, A] =
     StreamT[Id, A]({
       val (s1, sa) = stream.step(s0)
       sa((a, as) => Yield(a, runStreamT(as, s1)),
@@ -282,8 +282,9 @@ object StreamT extends StreamTInstances {
   object Skip {
     def apply[S](s: => S): Step[Nothing, S] =
       new Step[Nothing, S] {
-        def apply[Z](
-            yieldd: (Nothing, => S) => Z, skip: => S => Z, done: => Z) =
+        def apply[Z](yieldd: (Nothing, => S) => Z,
+                     skip: => S => Z,
+                     done: => Z) =
           skip(s)
       }
     def unapply[A, S](s: Step[A, S]): Option[(() => S)] =

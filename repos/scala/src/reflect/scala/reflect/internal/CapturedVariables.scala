@@ -25,8 +25,9 @@ trait CapturedVariables { self: SymbolTable =>
 
   /** Convert type of a captured variable to *Ref type.
     */
-  def capturedVariableType(
-      vble: Symbol, tpe: Type = NoType, erasedTypes: Boolean = false): Type = {
+  def capturedVariableType(vble: Symbol,
+                           tpe: Type = NoType,
+                           erasedTypes: Boolean = false): Type = {
     val tpe1 = if (tpe == NoType) vble.tpe else tpe
     val symClass = tpe1.typeSymbol
     def refType(valueRef: Map[Symbol, Symbol], objectRefClass: Symbol) =

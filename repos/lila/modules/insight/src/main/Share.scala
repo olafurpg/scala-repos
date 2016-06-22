@@ -4,8 +4,8 @@ import lila.pref.Pref
 import lila.security.Granter
 import lila.user.User
 
-final class Share(
-    getPref: String => Fu[Pref], areFriends: (String, String) => Fu[Boolean]) {
+final class Share(getPref: String => Fu[Pref],
+                  areFriends: (String, String) => Fu[Boolean]) {
 
   def getPrefId(insighted: User) = getPref(insighted.id) map (_.insightShare)
 

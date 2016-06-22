@@ -20,6 +20,6 @@ class AvroTutorial0(args: Args) extends Job(args) {
 ] }"""
 
   JsonLine("tutorial/data/session.json", ('sessionId, 'optionalField)).read
-    .write(UnpackedAvroSource(
-          "tutorial/data/avrooutput0.avro", new Schema.Parser().parse(schema)))
+    .write(UnpackedAvroSource("tutorial/data/avrooutput0.avro",
+                              new Schema.Parser().parse(schema)))
 }

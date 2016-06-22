@@ -45,8 +45,9 @@ object JqWiringSupport {
         if (first) cmd
         else {
           val sel = "jQuery('#'+" + id.encJs + ")"
-          Run(sel + ".fadeOut('fast', function() {" + cmd.toJsCmd + " " + sel +
-              ".fadeIn('fast');})")
+          Run(
+              sel + ".fadeOut('fast', function() {" + cmd.toJsCmd + " " + sel +
+                ".fadeIn('fast');})")
         }
       }
   }
@@ -60,8 +61,9 @@ object JqWiringSupport {
         if (first) cmd
         else {
           val sel = "jQuery('#'+" + id.encJs + ")"
-          Run(sel + ".hide(); " + cmd.toJsCmd + " " + sel +
-              ".slideDown('fast')")
+          Run(
+              sel + ".hide(); " + cmd.toJsCmd + " " + sel +
+                ".slideDown('fast')")
         }
       }
   }
@@ -86,7 +88,8 @@ object JqWiringSupport {
     * DOM with the deltas between the old list and the new list.
     */
   def calculateDeltas[T](oldList: Seq[T], newList: Seq[T], id: String)(
-      calcId: T => String, calcNodeSeq: T => NodeSeq): JsCmd =
+      calcId: T => String,
+      calcNodeSeq: T => NodeSeq): JsCmd =
     calculateDeltas[T](Full(oldList), newList, id)(calcId, calcNodeSeq)
 
   /**
@@ -104,7 +107,8 @@ object JqWiringSupport {
     * the DOM represents the new List
     */
   def calculateDeltas[T](oldList: Box[Seq[T]], newList: Seq[T], id: String)(
-      calcId: T => String, calcNodeSeq: T => NodeSeq): JsCmd = {
+      calcId: T => String,
+      calcNodeSeq: T => NodeSeq): JsCmd = {
     Helpers.delta(oldList, newList) {
       case RemoveDelta(ci) =>
         new JsCmd {
@@ -540,7 +544,7 @@ object JqJsCmds {
       with HasTime {
     def toJsCmd =
       "try{jQuery(" + ("#" + uid).encJs + ").show(" + timeStr +
-      ");} catch (e) {}"
+        ");} catch (e) {}"
   }
 
   /**
@@ -572,18 +576,21 @@ object JqJsCmds {
       with HasTime {
     def toJsCmd =
       "try{jQuery(" + ("#" + uid).encJs + ").hide(" + timeStr +
-      ");} catch (e) {}"
+        ");} catch (e) {}"
   }
 
   /**
     * Show a message msg in the element with id where for duration milliseconds and fade out in fadeout milliseconds
     */
-  case class DisplayMessage(
-      where: String, msg: NodeSeq, duration: TimeSpan, fadeTime: TimeSpan)
+  case class DisplayMessage(where: String,
+                            msg: NodeSeq,
+                            duration: TimeSpan,
+                            fadeTime: TimeSpan)
       extends JsCmd {
     def toJsCmd =
       (Show(where) & JqSetHtml(where, msg) & After(
-              duration, Hide(where, fadeTime))).toJsCmd
+              duration,
+              Hide(where, fadeTime))).toJsCmd
   }
 
   /**
@@ -607,8 +614,8 @@ object JqJsCmds {
     def toJsCmd =
       (After(duration,
              JqJE.JqId(id) ~>
-             (new JsRaw("fadeOut(" + fadeTime.millis + ")")
-                 with JsMember))).toJsCmd
+               (new JsRaw("fadeOut(" + fadeTime.millis + ")")
+                   with JsMember))).toJsCmd
   }
 
   /**
@@ -633,8 +640,8 @@ object JqJsCmds {
     def toJsCmd =
       (After(duration,
              JqJE.JqId(id) ~>
-             (new JsRaw("fadeIn(" + fadeTime.millis + ")")
-                 with JsMember))).toJsCmd
+               (new JsRaw("fadeIn(" + fadeTime.millis + ")")
+                   with JsMember))).toJsCmd
   }
 
   /**

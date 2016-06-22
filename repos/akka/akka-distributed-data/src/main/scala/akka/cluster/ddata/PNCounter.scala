@@ -38,8 +38,8 @@ object PNCounter {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class PNCounter private[akka](private[akka] val increments: GCounter,
-                                    private[akka] val decrements: GCounter)
+final class PNCounter private[akka] (private[akka] val increments: GCounter,
+                                     private[akka] val decrements: GCounter)
     extends ReplicatedData
     with ReplicatedDataSerialization
     with RemovedNodePruning {
@@ -104,10 +104,10 @@ final class PNCounter private[akka](private[akka] val increments: GCounter,
 
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     increments.needPruningFrom(removedNode) ||
-    decrements.needPruningFrom(removedNode)
+      decrements.needPruningFrom(removedNode)
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): PNCounter =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): PNCounter =
     copy(increments = increments.prune(removedNode, collapseInto),
          decrements = decrements.prune(removedNode, collapseInto))
 

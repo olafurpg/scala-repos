@@ -213,13 +213,14 @@ class HeartbeatReceiverSuite
     // executor means we permanently adjust the target number downwards until we
     // explicitly request new executors. For more detail, see SPARK-8119.
     assert(fakeClusterManager.getTargetNumExecutors === 2)
-    assert(fakeClusterManager.getExecutorIdsToKill === Set(executorId1,
-                                                           executorId2))
+    assert(
+        fakeClusterManager.getExecutorIdsToKill === Set(executorId1,
+                                                        executorId2))
   }
 
   /** Manually send a heartbeat and return the response. */
-  private def triggerHeartbeat(
-      executorId: String, executorShouldReregister: Boolean): Unit = {
+  private def triggerHeartbeat(executorId: String,
+                               executorShouldReregister: Boolean): Unit = {
     val metrics = new TaskMetrics
     val blockManagerId = BlockManagerId(executorId, "localhost", 12345)
     val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
@@ -277,8 +278,10 @@ private class FakeSchedulerBackend(scheduler: TaskSchedulerImpl,
 
   protected override def doRequestTotalExecutors(
       requestedTotal: Int): Boolean = {
-    clusterManagerEndpoint.askWithRetry[Boolean](RequestExecutors(
-            requestedTotal, localityAwareTasks, hostToLocalTaskCount))
+    clusterManagerEndpoint.askWithRetry[Boolean](
+        RequestExecutors(requestedTotal,
+                         localityAwareTasks,
+                         hostToLocalTaskCount))
   }
 
   protected override def doKillExecutors(executorIds: Seq[String]): Boolean = {

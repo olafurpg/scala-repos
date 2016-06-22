@@ -87,8 +87,8 @@ class BaseCharsetTest(val charset: Charset) {
           assertEquals(expectedEx.getInputLength(), actualEx.getInputLength())
 
         case (Success(actualChars), Success(expectedChars)) =>
-          assertArrayEquals(
-              expectedChars.map(_.toInt), actualChars.map(_.toInt))
+          assertArrayEquals(expectedChars.map(_.toInt),
+                            actualChars.map(_.toInt))
 
         case _ =>
           // For the error message
@@ -217,8 +217,9 @@ object BaseCharsetTest {
       def appendStr(s: String): Unit = {
         val s1 = s.replace(" ", "")
         require(s1.length % 2 == 0)
-        for (i <- 0 until s1.length by 2) buf +=
-          java.lang.Integer.parseInt(s1.substring(i, i + 2), 16).toByte
+        for (i <- 0 until s1.length by 2)
+          buf +=
+            java.lang.Integer.parseInt(s1.substring(i, i + 2), 16).toByte
       }
 
       appendStr(strings.next())

@@ -49,8 +49,7 @@ object Line {
         }
     }
 
-    loop(
-        lines collect {
+    loop(lines collect {
       case Node(move, _) => List(move)
     })
   }
@@ -65,8 +64,7 @@ object Line {
   }
 
   def toJson(lines: Lines): JsObject =
-    JsObject(
-        lines map {
+    JsObject(lines map {
       case Win(move) => move -> JsString("win")
       case Retry(move) => move -> JsString("retry")
       case Node(move, more) => move -> toJson(more)

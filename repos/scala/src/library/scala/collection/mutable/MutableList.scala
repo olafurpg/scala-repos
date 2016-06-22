@@ -108,8 +108,7 @@ class MutableList[A]
       last0.next = new LinkedList[A]
       last0 = last0.next
       last0.elem = elem
-      last0.next =
-        new LinkedList[A] // for performance, use sentinel `object` instead?
+      last0.next = new LinkedList[A] // for performance, use sentinel `object` instead?
       len = len + 1
     }
   }

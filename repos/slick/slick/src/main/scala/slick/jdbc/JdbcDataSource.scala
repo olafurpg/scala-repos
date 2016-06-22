@@ -103,8 +103,8 @@ object DataSourceJdbcDataSource extends JdbcDataSourceFactory {
           ds
         } catch {
           case ex: Exception =>
-            throw new SlickException(
-                "Error configuring DataSource " + dsClass, ex)
+            throw new SlickException("Error configuring DataSource " + dsClass,
+                                     ex)
         }
       case None =>
         val ds = new DriverDataSource
@@ -120,14 +120,15 @@ object DataSourceJdbcDataSource extends JdbcDataSourceFactory {
                                        "driverClassName"))
         ds
     }
-    new DataSourceJdbcDataSource(
-        ds, c.getBooleanOr("keepAliveConnection"), new ConnectionPreparer(c))
+    new DataSourceJdbcDataSource(ds,
+                                 c.getBooleanOr("keepAliveConnection"),
+                                 new ConnectionPreparer(c))
   }
 }
 
 /** A JdbcDataSource which can load a JDBC `Driver` from a class name */
-@deprecated(
-    "Use DataSourceJdbcDataSource with DriverDataSource instead", "3.1")
+@deprecated("Use DataSourceJdbcDataSource with DriverDataSource instead",
+            "3.1")
 trait DriverBasedJdbcDataSource extends JdbcDataSource {
   private[this] var registeredDriver: Driver = null
 
@@ -151,8 +152,8 @@ trait DriverBasedJdbcDataSource extends JdbcDataSource {
 }
 
 /** A JdbcDataSource for lookup via a `Driver` or the `DriverManager` */
-@deprecated(
-    "Use DataSourceJdbcDataSource with DriverDataSource instead", "3.1")
+@deprecated("Use DataSourceJdbcDataSource with DriverDataSource instead",
+            "3.1")
 class DriverJdbcDataSource(url: String,
                            user: String,
                            password: String,
@@ -205,8 +206,8 @@ class DriverJdbcDataSource(url: String,
   }
 }
 
-@deprecated(
-    "Use DataSourceJdbcDataSource with DriverDataSource instead", "3.1")
+@deprecated("Use DataSourceJdbcDataSource with DriverDataSource instead",
+            "3.1")
 object DriverJdbcDataSource extends JdbcDataSourceFactory {
   def forConfig(c: Config,
                 driver: Driver,

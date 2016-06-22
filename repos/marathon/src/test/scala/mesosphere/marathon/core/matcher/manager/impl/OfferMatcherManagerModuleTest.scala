@@ -171,8 +171,11 @@ class OfferMatcherManagerModuleTest
     val actorSystem = AlwaysElectedLeadershipModule(shutdownHooks)
     val config = new OfferMatcherManagerConfig {}
     config.afterInit()
-    module = new OfferMatcherManagerModule(
-        clock, random, new Metrics(new MetricRegistry), config, actorSystem)
+    module = new OfferMatcherManagerModule(clock,
+                                           random,
+                                           new Metrics(new MetricRegistry),
+                                           config,
+                                           actorSystem)
   }
 
   /**
@@ -193,11 +196,11 @@ class OfferMatcherManagerModuleTest
       }
     }
 
-    protected def matchTasks(
-        deadline: Timestamp, offer: Offer): Seq[TaskInfo] = numberedTasks()
+    protected def matchTasks(deadline: Timestamp,
+                             offer: Offer): Seq[TaskInfo] = numberedTasks()
 
-    override def matchOffer(
-        deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+    override def matchOffer(deadline: Timestamp,
+                            offer: Offer): Future[MatchedTaskOps] = {
       val opsWithSources = matchTasks(deadline, offer).map { task =>
         val launch =
           f.launch(task, MarathonTestHelper.makeTaskFromTaskInfo(task, offer))

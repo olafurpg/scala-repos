@@ -4,8 +4,9 @@ import scala.collection.JavaConversions._
 class bar {}
 
 class foo {
-  val map = WeakHashMap[
-      AnyRef, collection.mutable.Map[bar, collection.mutable.Set[bar]]]()
+  val map =
+    WeakHashMap[AnyRef,
+                collection.mutable.Map[bar, collection.mutable.Set[bar]]]()
 
   def test = {
     val tmp: bar = null

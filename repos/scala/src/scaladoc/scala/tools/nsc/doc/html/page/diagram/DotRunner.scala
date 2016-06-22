@@ -77,8 +77,7 @@ class DotProcess(settings: doc.Settings) {
   @volatile var error: Boolean = false // signal an error
   val inputString = new SyncVar[String] // used for the dot process input
   val outputString = new SyncVar[String] // used for the dot process output
-  val errorBuffer: StringBuffer =
-    new StringBuffer() // buffer used for both dot process error console AND logging
+  val errorBuffer: StringBuffer = new StringBuffer() // buffer used for both dot process error console AND logging
 
   // set in only one place, in the main thread
   var process: Process = null
@@ -95,8 +94,8 @@ class DotProcess(settings: doc.Settings) {
       // process creation
       if (process == null) {
         val procIO = new ProcessIO(inputFn(_), outputFn(_), errorFn(_))
-        val processBuilder: ProcessBuilder = Seq(
-            settings.docDiagramsDotPath.value, "-Tsvg")
+        val processBuilder: ProcessBuilder =
+          Seq(settings.docDiagramsDotPath.value, "-Tsvg")
         process = processBuilder.run(procIO)
       }
 
@@ -113,8 +112,8 @@ class DotProcess(settings: doc.Settings) {
       case exc: Throwable =>
         errorBuffer.append(
             "  Main thread in " + templateName + ": " +
-            (if (exc.isInstanceOf[NoSuchElementException]) "Timeout"
-             else "Exception: " + exc))
+              (if (exc.isInstanceOf[NoSuchElementException]) "Timeout"
+               else "Exception: " + exc))
         error = true
         return null
     }
@@ -146,8 +145,9 @@ class DotProcess(settings: doc.Settings) {
         settings.printMsg("\nThe following is the log of the failure:")
         settings.printMsg(errorBuffer.toString)
         settings.printMsg("  Cleanup: Last template: " + templateName)
-        settings.printMsg("  Cleanup: Last dot input: \n    " +
-            templateInput.replaceAll("\n", "\n    ") + "\n")
+        settings.printMsg(
+            "  Cleanup: Last dot input: \n    " +
+              templateInput.replaceAll("\n", "\n    ") + "\n")
         settings.printMsg(
             "  Cleanup: Dot path: " + settings.docDiagramsDotPath.value)
         if (process != null)
@@ -163,7 +163,7 @@ class DotProcess(settings: doc.Settings) {
             "These are usually spurious errors, but if you notice a persistent error on")
         settings.printMsg(
             "a diagram, please use the " + settings.docDiagramsDebug.name +
-            " flag and report a bug with the output.")
+              " flag and report a bug with the output.")
       }
     }
   }
@@ -219,8 +219,9 @@ class DotProcess(settings: doc.Settings) {
       case exc: Throwable =>
         error = true
         stdOut.close()
-        errorBuffer.append("  Output thread in " + templateName +
-            ": Exception: " + exc + "\n")
+        errorBuffer.append(
+            "  Output thread in " + templateName +
+              ": Exception: " + exc + "\n")
     }
   }
 

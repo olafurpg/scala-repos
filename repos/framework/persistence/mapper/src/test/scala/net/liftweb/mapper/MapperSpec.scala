@@ -193,15 +193,19 @@ class MapperSpec extends Specification with BeforeExample {
           SampleModel.create.firstName("fruit").moose(Full(77L)).save
 
           SampleModel.findAll(By(SampleModel.moose, Empty)).length must_== 3L
-          SampleModel.findAll(NotBy(SampleModel.moose, Empty)).length must_== 2L
+          SampleModel
+            .findAll(NotBy(SampleModel.moose, Empty))
+            .length must_== 2L
           SampleModel.findAll(NotNullRef(SampleModel.moose)).length must_== 2L
           SampleModel.findAll(NullRef(SampleModel.moose)).length must_== 3L
         }
 
         "enforce NOT NULL" in {
           val nullString: String = null
-          SampleModel.create.firstName("Not Null").notNull(nullString).save must throwA[
-              java.sql.SQLException]
+          SampleModel.create
+            .firstName("Not Null")
+            .notNull(nullString)
+            .save must throwA[java.sql.SQLException]
         }
 
         "enforce FK constraint on DefaultConnection" in {
@@ -422,7 +426,9 @@ class MapperSpec extends Specification with BeforeExample {
           frog.firstName.get must_== "Frog"
 
           SampleModel.findAll().length must_== 4
-          SampleModel.find(By(SampleModel.firstName, "Elwood")).isEmpty must_== true
+          SampleModel
+            .find(By(SampleModel.firstName, "Elwood"))
+            .isEmpty must_== true
         }
 
         "accept a Seq[T] as argument to ByList query parameter" in {

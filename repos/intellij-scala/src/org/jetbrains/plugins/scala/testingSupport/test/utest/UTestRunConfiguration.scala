@@ -25,16 +25,16 @@ class UTestRunConfiguration(
   }
 
   @tailrec
-  private def getClassPath(
-      currentClass: ScTypeDefinition, acc: String = ""): String = {
-    val parentTypeDef = PsiTreeUtil.getParentOfType(
-        currentClass, classOf[ScTypeDefinition], true)
+  private def getClassPath(currentClass: ScTypeDefinition,
+                           acc: String = ""): String = {
+    val parentTypeDef = PsiTreeUtil
+      .getParentOfType(currentClass, classOf[ScTypeDefinition], true)
     if (parentTypeDef == null) {
       currentClass.qualifiedName + acc
     } else {
       getClassPath(parentTypeDef,
                    acc + (if (parentTypeDef.isObject) "$" else ".") +
-                   currentClass.getName)
+                     currentClass.getName)
     }
   }
 

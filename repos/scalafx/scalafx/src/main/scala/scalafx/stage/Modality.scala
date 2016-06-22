@@ -38,8 +38,8 @@ object Modality extends SFXEnumDelegateCompanion[jfxs.Modality, Modality] {
     * Defines a top-level window that is not modal and does not block any other window.
     */
   val None = new Modality(jfxs.Modality.NONE)
-  @deprecated(
-      "Use None; NONE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use None; NONE will be removed in a future release",
+              "8.0.60-R10")
   val NONE = None
 
   /**

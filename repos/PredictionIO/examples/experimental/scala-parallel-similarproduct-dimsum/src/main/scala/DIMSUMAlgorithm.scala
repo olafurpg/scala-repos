@@ -26,13 +26,13 @@ class DIMSUMModel(
     val similarities: RDD[(Int, SparseVector)],
     val itemStringIntMap: BiMap[String, Int],
     val items: Map[Int, Item]
-)
-    extends IPersistentModel[DIMSUMAlgorithmParams] {
+) extends IPersistentModel[DIMSUMAlgorithmParams] {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
-  def save(
-      id: String, params: DIMSUMAlgorithmParams, sc: SparkContext): Boolean = {
+  def save(id: String,
+           params: DIMSUMAlgorithmParams,
+           sc: SparkContext): Boolean = {
 
     similarities.saveAsObjectFile(s"/tmp/${id}/similarities")
     sc.parallelize(Seq(itemStringIntMap))
@@ -52,8 +52,9 @@ class DIMSUMModel(
 
 object DIMSUMModel
     extends IPersistentModelLoader[DIMSUMAlgorithmParams, DIMSUMModel] {
-  def apply(
-      id: String, params: DIMSUMAlgorithmParams, sc: Option[SparkContext]) = {
+  def apply(id: String,
+            params: DIMSUMAlgorithmParams,
+            sc: Option[SparkContext]) = {
     new DIMSUMModel(
         similarities = sc.get.objectFile(s"/tmp/${id}/similarities"),
         itemStringIntMap = sc.get
@@ -89,11 +90,11 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-            " to Int index.")
+              " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+              " to Int index.")
 
       (uindex, (iindex, 1.0))
     }.filter {
@@ -163,19 +164,19 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
             sims.indices.zip(sims.values).filter {
               case (i, v) =>
                 whiteList.map(_.contains(i)).getOrElse(true) &&
-                blackList.map(!_.contains(i)).getOrElse(true) &&
-                // discard items in query as well
-                (!queryList.contains(i)) && // filter categories
-                query.categories.map { cat =>
-                  model
-                    .items(i)
-                    .categories
-                    .map { itemCat =>
-                      // keep this item if has ovelap categories with the query
-                      !(itemCat.toSet.intersect(cat).isEmpty)
-                    }
-                    .getOrElse(false) // discard this item if it has no categories
-                }.getOrElse(true)
+                  blackList.map(!_.contains(i)).getOrElse(true) &&
+                  // discard items in query as well
+                  (!queryList.contains(i)) && // filter categories
+                  query.categories.map { cat =>
+                    model
+                      .items(i)
+                      .categories
+                      .map { itemCat =>
+                        // keep this item if has ovelap categories with the query
+                        !(itemCat.toSet.intersect(cat).isEmpty)
+                      }
+                      .getOrElse(false) // discard this item if it has no categories
+                  }.getOrElse(true)
             }
           }
         }

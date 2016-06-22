@@ -49,12 +49,12 @@ object AdSamples {
                        "1000-5000",
                        "5000-10000",
                        "10000+")
-  val revenue = List(
-      "<500K", "500K-5M", "5-50M", "50-250M", "250-500M", "500M+")
-  val category = List(
-      "electronics", "fashion", "travel", "media", "sundries", "magical")
-  val ageTuples = List(
-      (0, 17), (18, 24), (25, 36), (37, 48), (49, 60), (61, 75), (76, 130))
+  val revenue =
+    List("<500K", "500K-5M", "5-50M", "50-250M", "250-500M", "500M+")
+  val category =
+    List("electronics", "fashion", "travel", "media", "sundries", "magical")
+  val ageTuples =
+    List((0, 17), (18, 24), (25, 36), (37, 48), (49, 60), (61, 75), (76, 130))
   val ageRangeStrings = ageTuples map { case (l, h) => "%d-%d".format(l, h) }
   val ageRangeArrays =
     ageTuples map { case (l, h) => JArray(List(JNum(l), JNum(h))) }
@@ -159,8 +159,7 @@ object AdSamples {
                          "research")
 
   def gaussianIndex(size: Int): Gen[Int] = {
-    Gen(
-        p => {
+    Gen(p => {
       def sample: Double = {
         val testIndex = (p.rng.nextGaussian * (size / 5)) + (size / 2)
         if (testIndex < 0 || testIndex >= size) sample
@@ -172,8 +171,7 @@ object AdSamples {
   }
 
   def exponentialIndex(size: Int): Gen[Int] = {
-    Gen(
-        p => {
+    Gen(p => {
       import scala.math._
       Some(round(exp(-p.rng.nextDouble * 8) * size).toInt.min(size - 1).max(0))
     })
@@ -392,8 +390,8 @@ case class DistributedSampleSet[T](val queriableSampleSize: Int,
 object DistributedSampleSet {
   def sample[T](sampleSize: Int,
                 queriableSamples: Int,
-                sampler: Gen[T] =
-                  AdSamples.defaultSample): (Vector[T], Option[Vector[T]]) = {
+                sampler: Gen[T] = AdSamples.defaultSample)
+    : (Vector[T], Option[Vector[T]]) = {
     def pull[T](sampleSet: SampleSet[T],
                 sampleData: Vector[T],
                 counter: Int): (SampleSet[T], Vector[T]) = {
@@ -405,8 +403,8 @@ object DistributedSampleSet {
       }
     }
 
-    val (sampleSet, data) = pull(
-        DistributedSampleSet(queriableSamples, sampler), Vector(), 0)
+    val (sampleSet, data) =
+      pull(DistributedSampleSet(queriableSamples, sampler), Vector(), 0)
     (data, sampleSet.queriableSamples)
   }
 }

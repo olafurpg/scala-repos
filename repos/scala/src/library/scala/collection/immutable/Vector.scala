@@ -59,7 +59,7 @@ object Vector extends IndexedSeqFactory[Vector] {
   *  @define mayNotTerminateInf
   *  @define willNotTerminateInf
   */
-final class Vector[+A] private[immutable](
+final class Vector[+A] private[immutable] (
     private[collection] val startIndex: Int,
     private[collection] val endIndex: Int,
     focus: Int)
@@ -136,27 +136,30 @@ final class Vector[+A] private[immutable](
   @inline private[this] def isDefaultCBF[A, B, That](
       bf: CanBuildFrom[Vector[A], B, That]): Boolean =
     (bf eq IndexedSeq.ReusableCBF) ||
-    (bf eq collection.immutable.Seq.ReusableCBF) ||
-    (bf eq collection.Seq.ReusableCBF)
+      (bf eq collection.immutable.Seq.ReusableCBF) ||
+      (bf eq collection.Seq.ReusableCBF)
 
   // SeqLike api
 
   override def updated[B >: A, That](index: Int, elem: B)(
       implicit bf: CanBuildFrom[Vector[A], B, That]): That =
     if (isDefaultCBF[A, B, That](bf))
-      updateAt(index, elem).asInstanceOf[That] // ignore bf--it will just give a Vector, and slowly
+      updateAt(index, elem)
+        .asInstanceOf[That] // ignore bf--it will just give a Vector, and slowly
     else super.updated(index, elem)(bf)
 
   override def +:[B >: A, That](elem: B)(
       implicit bf: CanBuildFrom[Vector[A], B, That]): That =
     if (isDefaultCBF[A, B, That](bf))
-      appendFront(elem).asInstanceOf[That] // ignore bf--it will just give a Vector, and slowly
+      appendFront(elem)
+        .asInstanceOf[That] // ignore bf--it will just give a Vector, and slowly
     else super.+:(elem)(bf)
 
   override def :+[B >: A, That](elem: B)(
       implicit bf: CanBuildFrom[Vector[A], B, That]): That =
     if (isDefaultCBF(bf))
-      appendBack(elem).asInstanceOf[That] // ignore bf--it will just give a Vector, and slowly
+      appendBack(elem)
+        .asInstanceOf[That] // ignore bf--it will just give a Vector, and slowly
     else super.:+(elem)(bf)
 
   override def take(n: Int): Vector[A] = {
@@ -222,13 +225,13 @@ final class Vector[+A] private[immutable](
           // Often it's better to append small numbers of elements (or prepend if RHS is a vector)
           case n
               if n <= TinyAppendFaster ||
-              n < (this.size >> Log2ConcatFaster) =>
+                n < (this.size >> Log2ConcatFaster) =>
             var v: Vector[B] = this
             for (x <- again) v = v :+ x
             v.asInstanceOf[That]
           case n
               if this.size < (n >> Log2ConcatFaster) &&
-              again.isInstanceOf[Vector[_]] =>
+                again.isInstanceOf[Vector[_]] =>
             var v = again.asInstanceOf[Vector[B]]
             val ri = this.reverseIterator
             while (ri.hasNext) v = ri.next +: v
@@ -283,10 +286,10 @@ final class Vector[+A] private[immutable](
 
         val freeSpace =
           ((1 << 5 * (depth)) -
-              endIndex) // free space at the right given the current tree-structure depth
+                endIndex) // free space at the right given the current tree-structure depth
         val shift =
           freeSpace & ~((1 << 5 * (depth - 1)) -
-              1) // number of elements by which we'll shift right (only move at top level)
+                1) // number of elements by which we'll shift right (only move at top level)
         val shiftBlocks =
           freeSpace >>> 5 * (depth - 1) // number of top-level blocks
 
@@ -299,8 +302,9 @@ final class Vector[+A] private[immutable](
           if (depth > 1) {
             val newBlockIndex = blockIndex + shift
             val newFocus = focus + shift
-            val s = new Vector(
-                startIndex - 1 + shift, endIndex + shift, newBlockIndex)
+            val s = new Vector(startIndex - 1 + shift,
+                               endIndex + shift,
+                               newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(0, shiftBlocks) // shift right by n blocks
@@ -319,8 +323,9 @@ final class Vector[+A] private[immutable](
             //assert(newBlockIndex == 0)
             //assert(newFocus == 0)
 
-            val s = new Vector(
-                startIndex - 1 + shift, endIndex + shift, newBlockIndex)
+            val s = new Vector(startIndex - 1 + shift,
+                               endIndex + shift,
+                               newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(0, shiftBlocks) // shift right by n elements
@@ -339,8 +344,8 @@ final class Vector[+A] private[immutable](
           val newBlockIndex = blockIndex + move
           val newFocus = focus + move
 
-          val s = new Vector(
-              startIndex - 1 + move, endIndex + move, newBlockIndex)
+          val s =
+            new Vector(startIndex - 1 + move, endIndex + move, newBlockIndex)
           s.initFrom(this)
           s.dirty = dirty
           s.debug()
@@ -359,8 +364,9 @@ final class Vector[+A] private[immutable](
           val s = new Vector(startIndex - 1, endIndex, newBlockIndex)
           s.initFrom(this)
           s.dirty = dirty
-          s.gotoFreshPosWritable(
-              newFocus, newBlockIndex, newFocus ^ newBlockIndex)
+          s.gotoFreshPosWritable(newFocus,
+                                 newBlockIndex,
+                                 newFocus ^ newBlockIndex)
           s.display0(lo) = value.asInstanceOf[AnyRef]
           //assert(s.depth == depth)
           s
@@ -404,14 +410,16 @@ final class Vector[+A] private[immutable](
           if (depth > 1) {
             val newBlockIndex = blockIndex - shift
             val newFocus = focus - shift
-            val s = new Vector(
-                startIndex - shift, endIndex + 1 - shift, newBlockIndex)
+            val s = new Vector(startIndex - shift,
+                               endIndex + 1 - shift,
+                               newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(shiftBlocks, 0) // shift left by n blocks
             s.debug()
-            s.gotoFreshPosWritable(
-                newFocus, newBlockIndex, newFocus ^ newBlockIndex)
+            s.gotoFreshPosWritable(newFocus,
+                                   newBlockIndex,
+                                   newFocus ^ newBlockIndex)
             s.display0(lo) = value.asInstanceOf[AnyRef]
             s.debug()
             //assert(depth == s.depth)
@@ -423,13 +431,15 @@ final class Vector[+A] private[immutable](
             //assert(newBlockIndex == 0)
             //assert(newFocus == 0)
 
-            val s = new Vector(
-                startIndex - shift, endIndex + 1 - shift, newBlockIndex)
+            val s = new Vector(startIndex - shift,
+                               endIndex + 1 - shift,
+                               newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(shiftBlocks, 0) // shift right by n elements
-            s.gotoPosWritable(
-                newFocus, newBlockIndex, newFocus ^ newBlockIndex)
+            s.gotoPosWritable(newFocus,
+                              newBlockIndex,
+                              newFocus ^ newBlockIndex)
             s.display0(32 - shift) = value.asInstanceOf[AnyRef]
             s.debug()
             s
@@ -441,8 +451,9 @@ final class Vector[+A] private[immutable](
           val s = new Vector(startIndex, endIndex + 1, newBlockIndex)
           s.initFrom(this)
           s.dirty = dirty
-          s.gotoFreshPosWritable(
-              newFocus, newBlockIndex, newFocus ^ newBlockIndex)
+          s.gotoFreshPosWritable(newFocus,
+                                 newBlockIndex,
+                                 newFocus ^ newBlockIndex)
           s.display0(lo) = value.asInstanceOf[AnyRef]
           //assert(s.depth == depth+1) might or might not create new level!
           if (s.depth == depth + 1) {
@@ -650,8 +661,8 @@ final class Vector[+A] private[immutable](
     if (cutIndex == blockIndex + 32)
       println("OUCH!!!")
      */
-    val s = new Vector(
-        startIndex - shift, cutIndex - shift, blockIndex - shift)
+    val s =
+      new Vector(startIndex - shift, cutIndex - shift, blockIndex - shift)
     s.initFrom(this)
     s.dirty = dirty
     s.gotoPosWritable(focus, blockIndex, focus ^ blockIndex)
@@ -770,8 +781,8 @@ private[immutable] trait VectorPointer[T] {
   private[immutable] final def initFrom[U](that: VectorPointer[U]): Unit =
     initFrom(that, that.depth)
 
-  private[immutable] final def initFrom[U](
-      that: VectorPointer[U], depth: Int) = {
+  private[immutable] final def initFrom[U](that: VectorPointer[U],
+                                           depth: Int) = {
     this.depth = depth
     (depth - 1) match {
       case -1 =>
@@ -927,8 +938,8 @@ private[immutable] trait VectorPointer[T] {
   // USED BY BUILDER
 
   // xor: oldIndex ^ index
-  private[immutable] final def gotoNextBlockStartWritable(
-      index: Int, xor: Int): Unit = {
+  private[immutable] final def gotoNextBlockStartWritable(index: Int,
+                                                          xor: Int): Unit = {
     // goto block start pos
     if (xor < (1 << 10)) {
       // level = 1
@@ -999,8 +1010,8 @@ private[immutable] trait VectorPointer[T] {
     b
   }
 
-  private[immutable] final def nullSlotAndCopy(
-      array: Array[AnyRef], index: Int) = {
+  private[immutable] final def nullSlotAndCopy(array: Array[AnyRef],
+                                               index: Int) = {
     //println("copy and null")
     val x = array(index)
     array(index) = null
@@ -1056,56 +1067,58 @@ private[immutable] trait VectorPointer[T] {
 
   // requires structure is clean and at pos oldIndex = xor ^ newIndex,
   // ensures structure is dirty and at pos newIndex and writable at level 0
-  private[immutable] final def gotoPosWritable0(
-      newIndex: Int, xor: Int): Unit = (depth - 1) match {
-    case 5 =>
-      display5 = copyOf(display5)
-      display4 = nullSlotAndCopy(display5, (newIndex >> 25) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display3 = nullSlotAndCopy(display4, (newIndex >> 20) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display2 = nullSlotAndCopy(display3, (newIndex >> 15) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
-        .asInstanceOf[Array[AnyRef]]
-    case 4 =>
-      display4 = copyOf(display4)
-      display3 = nullSlotAndCopy(display4, (newIndex >> 20) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display2 = nullSlotAndCopy(display3, (newIndex >> 15) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
-        .asInstanceOf[Array[AnyRef]]
-    case 3 =>
-      display3 = copyOf(display3)
-      display2 = nullSlotAndCopy(display3, (newIndex >> 15) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
-        .asInstanceOf[Array[AnyRef]]
-    case 2 =>
-      display2 = copyOf(display2)
-      display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
-        .asInstanceOf[Array[AnyRef]]
-      display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
-        .asInstanceOf[Array[AnyRef]]
-    case 1 =>
-      display1 = copyOf(display1)
-      display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
-        .asInstanceOf[Array[AnyRef]]
-    case 0 =>
-      display0 = copyOf(display0)
-  }
+  private[immutable] final def gotoPosWritable0(newIndex: Int,
+                                                xor: Int): Unit =
+    (depth - 1) match {
+      case 5 =>
+        display5 = copyOf(display5)
+        display4 = nullSlotAndCopy(display5, (newIndex >> 25) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display3 = nullSlotAndCopy(display4, (newIndex >> 20) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display2 = nullSlotAndCopy(display3, (newIndex >> 15) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
+          .asInstanceOf[Array[AnyRef]]
+      case 4 =>
+        display4 = copyOf(display4)
+        display3 = nullSlotAndCopy(display4, (newIndex >> 20) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display2 = nullSlotAndCopy(display3, (newIndex >> 15) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
+          .asInstanceOf[Array[AnyRef]]
+      case 3 =>
+        display3 = copyOf(display3)
+        display2 = nullSlotAndCopy(display3, (newIndex >> 15) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
+          .asInstanceOf[Array[AnyRef]]
+      case 2 =>
+        display2 = copyOf(display2)
+        display1 = nullSlotAndCopy(display2, (newIndex >> 10) & 31)
+          .asInstanceOf[Array[AnyRef]]
+        display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
+          .asInstanceOf[Array[AnyRef]]
+      case 1 =>
+        display1 = copyOf(display1)
+        display0 = nullSlotAndCopy(display1, (newIndex >> 5) & 31)
+          .asInstanceOf[Array[AnyRef]]
+      case 0 =>
+        display0 = copyOf(display0)
+    }
 
   // requires structure is dirty and at pos oldIndex,
   // ensures structure is dirty and at pos newIndex and writable at level 0
-  private[immutable] final def gotoPosWritable1(
-      oldIndex: Int, newIndex: Int, xor: Int): Unit = {
+  private[immutable] final def gotoPosWritable1(oldIndex: Int,
+                                                newIndex: Int,
+                                                xor: Int): Unit = {
     if (xor < (1 << 5)) {
       // level = 0
       display0 = copyOf(display0)
@@ -1186,11 +1199,15 @@ private[immutable] trait VectorPointer[T] {
 
   // USED IN DROP
 
-  private[immutable] final def copyRange(
-      array: Array[AnyRef], oldLeft: Int, newLeft: Int) = {
+  private[immutable] final def copyRange(array: Array[AnyRef],
+                                         oldLeft: Int,
+                                         newLeft: Int) = {
     val elems = new Array[AnyRef](32)
-    Platform.arraycopy(
-        array, oldLeft, elems, newLeft, 32 - math.max(newLeft, oldLeft))
+    Platform.arraycopy(array,
+                       oldLeft,
+                       elems,
+                       newLeft,
+                       32 - math.max(newLeft, oldLeft))
     elems
   }
 
@@ -1199,8 +1216,9 @@ private[immutable] trait VectorPointer[T] {
 
   // requires structure is clean and at pos oldIndex,
   // ensures structure is dirty and at pos newIndex and writable at level 0
-  private[immutable] final def gotoFreshPosWritable0(
-      oldIndex: Int, newIndex: Int, xor: Int): Unit = {
+  private[immutable] final def gotoFreshPosWritable0(oldIndex: Int,
+                                                     newIndex: Int,
+                                                     xor: Int): Unit = {
     // goto block start pos
     if (xor < (1 << 5)) {
       // level = 0
@@ -1273,8 +1291,9 @@ private[immutable] trait VectorPointer[T] {
 
   // requires structure is dirty and at pos oldIndex,
   // ensures structure is dirty and at pos newIndex and writable at level 0
-  private[immutable] final def gotoFreshPosWritable1(
-      oldIndex: Int, newIndex: Int, xor: Int): Unit = {
+  private[immutable] final def gotoFreshPosWritable1(oldIndex: Int,
+                                                     newIndex: Int,
+                                                     xor: Int): Unit = {
     stabilize(oldIndex)
     gotoFreshPosWritable0(oldIndex, newIndex, xor)
   }

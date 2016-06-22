@@ -53,8 +53,8 @@ class ArrayOrderBenchmarks extends MyBenchmark {
     x.length - y.length
   }
 
-  def indirectAdd[@sp(Int) A: ClassTag: Ring](
-      x: Array[A], y: Array[A]): Array[A] =
+  def indirectAdd[@sp(Int) A: ClassTag: Ring](x: Array[A],
+                                              y: Array[A]): Array[A] =
     spire.std.ArraySupport.plus(x, y)
 
   def directAdd(x: Array[Int], y: Array[Int]): Array[Int] = {

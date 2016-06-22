@@ -36,15 +36,16 @@ class ScaladocAction
       configurationDialog.saveSettings()
       config = new ScaladocConfiguration(configurationDialog, project, scope)
       try {
-        val runConfig = new ScaladocRunConfiguration(
-            project, configurationDialog, config)
+        val runConfig =
+          new ScaladocRunConfiguration(project, configurationDialog, config)
 
         val runner: ProgramRunner[_ <: RunnerSettings] =
-          RunnerRegistry.getInstance.getRunner(
-              DefaultRunExecutor.EXECUTOR_ID, config)
+          RunnerRegistry.getInstance
+            .getRunner(DefaultRunExecutor.EXECUTOR_ID, config)
         val builder: ExecutionEnvironmentBuilder =
           new ExecutionEnvironmentBuilder(
-              project, DefaultRunExecutor.getRunExecutorInstance)
+              project,
+              DefaultRunExecutor.getRunExecutorInstance)
         builder.runProfile(config)
         builder.runnerAndSettings(
             runner,
@@ -68,14 +69,15 @@ class ScaladocAction
   }
 
   override def getAdditionalActionSettings(
-      project: Project, dialog: BaseAnalysisActionDialog): JComponent = {
+      project: Project,
+      dialog: BaseAnalysisActionDialog): JComponent = {
     configurationDialog = new ScaladocConsoleRunConfigurationForm(project)
-    configurationDialog.getOutputDirChooser.getDocument.addDocumentListener(
-        new DocumentAdapter() {
-      def textChanged(e: DocumentEvent) {
-        updateAvailability(dialog)
-      }
-    })
+    configurationDialog.getOutputDirChooser.getDocument
+      .addDocumentListener(new DocumentAdapter() {
+        def textChanged(e: DocumentEvent) {
+          updateAvailability(dialog)
+        }
+      })
     updateAvailability(dialog)
     configurationDialog.createCenterPanel()
   }
@@ -98,8 +100,9 @@ object ScaladocAction {
   class ScaladocRunConfiguration(project: Project,
                                  dialog: ScaladocConsoleRunConfigurationForm,
                                  config: ScaladocConfiguration)
-      extends RunConfigurationBase(
-          project, ScaladocRunConfigurationFactory, "Generate Scaladoc") {
+      extends RunConfigurationBase(project,
+                                   ScaladocRunConfigurationFactory,
+                                   "Generate Scaladoc") {
     override def checkConfiguration() {}
 
     override def getConfigurationEditor: SettingsEditor[
@@ -112,8 +115,8 @@ object ScaladocAction {
         override def applyEditorTo(s: ScaladocRunConfiguration) {}
       }
 
-    override def getState(
-        executor: Executor, env: ExecutionEnvironment): RunProfileState =
+    override def getState(executor: Executor,
+                          env: ExecutionEnvironment): RunProfileState =
       config.getState(executor, env)
   }
 }

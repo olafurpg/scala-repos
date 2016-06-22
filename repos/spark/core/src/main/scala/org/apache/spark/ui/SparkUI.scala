@@ -117,7 +117,8 @@ private[spark] class SparkUI private (
             maxCores = None,
             coresPerExecutor = None,
             memoryPerExecutorMB = None,
-            attempts = Seq(new ApplicationAttemptInfo(
+            attempts = Seq(
+                new ApplicationAttemptInfo(
                     attemptId = None,
                     startTime = new Date(startTime),
                     endTime = new Date(-1),

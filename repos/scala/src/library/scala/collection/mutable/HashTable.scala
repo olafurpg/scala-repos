@@ -82,8 +82,8 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     * Initializes the collection from the input stream. `readEntry` will be called for each
     * entry to be read from the input stream.
     */
-  private[collection] def init(
-      in: java.io.ObjectInputStream, readEntry: => Entry) {
+  private[collection] def init(in: java.io.ObjectInputStream,
+                               readEntry: => Entry) {
     in.defaultReadObject
 
     _loadFactor = in.readInt()
@@ -116,8 +116,8 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     * `foreachEntry` determines the order in which the key/value pairs are saved to the stream. To
     * deserialize, `init` should be used.
     */
-  private[collection] def serializeTo(
-      out: java.io.ObjectOutputStream, writeEntry: Entry => Unit) {
+  private[collection] def serializeTo(out: java.io.ObjectOutputStream,
+                                      writeEntry: Entry => Unit) {
     out.defaultWriteObject
     out.writeInt(_loadFactor)
     out.writeInt(tableSize)

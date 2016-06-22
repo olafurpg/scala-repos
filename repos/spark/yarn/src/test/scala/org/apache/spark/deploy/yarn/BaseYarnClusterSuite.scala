@@ -145,8 +145,8 @@ abstract class BaseYarnClusterSuite
       extraConf: Map[String, String] = Map(),
       extraEnv: Map[String, String] = Map()): SparkAppHandle.State = {
     val deployMode = if (clientMode) "client" else "cluster"
-    val propsFile = createConfFile(
-        extraClassPath = extraClassPath, extraConf = extraConf)
+    val propsFile =
+      createConfFile(extraClassPath = extraClassPath, extraConf = extraConf)
     val env =
       Map("YARN_CONF_DIR" -> hadoopConfDir.getAbsolutePath()) ++ extraEnv
 
@@ -193,8 +193,8 @@ abstract class BaseYarnClusterSuite
     * the tests enforce that something is written to a file after everything is ok to indicate
     * that the job succeeded.
     */
-  protected def checkResult(
-      finalState: SparkAppHandle.State, result: File): Unit = {
+  protected def checkResult(finalState: SparkAppHandle.State,
+                            result: File): Unit = {
     checkResult(finalState, result, "success")
   }
 
@@ -218,7 +218,7 @@ abstract class BaseYarnClusterSuite
 
     val testClasspath = new TestClasspathBuilder()
       .buildClassPath(logConfDir.getAbsolutePath() + File.pathSeparator +
-          extraClassPath.mkString(File.pathSeparator))
+            extraClassPath.mkString(File.pathSeparator))
       .asScala
       .mkString(File.pathSeparator)
 
@@ -226,10 +226,10 @@ abstract class BaseYarnClusterSuite
     props.put("spark.executor.extraClassPath", testClasspath)
 
     // SPARK-4267: make sure java options are propagated correctly.
-    props.setProperty(
-        "spark.driver.extraJavaOptions", "-Dfoo=\"one two three\"")
-    props.setProperty(
-        "spark.executor.extraJavaOptions", "-Dfoo=\"one two three\"")
+    props
+      .setProperty("spark.driver.extraJavaOptions", "-Dfoo=\"one two three\"")
+    props.setProperty("spark.executor.extraJavaOptions",
+                      "-Dfoo=\"one two three\"")
 
     yarnCluster.getConfig().asScala.foreach { e =>
       props.setProperty("spark.hadoop." + e.getKey(), e.getValue())
@@ -243,8 +243,8 @@ abstract class BaseYarnClusterSuite
     extraConf.foreach { case (k, v) => props.setProperty(k, v) }
 
     val propsFile = File.createTempFile("spark", ".properties", tempDir)
-    val writer = new OutputStreamWriter(
-        new FileOutputStream(propsFile), StandardCharsets.UTF_8)
+    val writer = new OutputStreamWriter(new FileOutputStream(propsFile),
+                                        StandardCharsets.UTF_8)
     props.store(writer, "Spark properties.")
     writer.close()
     propsFile.getAbsolutePath()

@@ -75,7 +75,7 @@ trait IngestSupport extends Logging {
     } onFailure {
       case ex: Exception =>
         logger.error("Request " + request.shows +
-                     " failed due to unavailability of security subsystem.",
+                       " failed due to unavailability of security subsystem.",
                      ex)
       // FIXME: Provisionally accept data for ingest if one of the permissions-checking services is unavailable
     } flatMap {
@@ -86,7 +86,8 @@ trait IngestSupport extends Logging {
         logger.warn(
             "Unable to resolve accounts for write from %s owners %s to path %s"
               .format(apiKey, request.parameters.get('ownerAccountId), path))
-        M.point(HttpResponse[JValue](
+        M.point(
+            HttpResponse[JValue](
                 Forbidden,
                 content = Some(JString(
                         "Either the ownerAccountId parameter you specified could not be resolved to a set of permitted accounts, or the API key specified was invalid."))))

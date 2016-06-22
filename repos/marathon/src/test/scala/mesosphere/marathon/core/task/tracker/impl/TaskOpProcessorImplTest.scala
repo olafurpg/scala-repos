@@ -33,8 +33,10 @@ class TaskOpProcessorImplTest
 
     When("the processor processes a noop")
     val result = f.processor.process(
-        TaskOpProcessor.Operation(
-            deadline, testActor, Task.Id("task1"), TaskOpProcessor.Action.Noop)
+        TaskOpProcessor.Operation(deadline,
+                                  testActor,
+                                  Task.Id("task1"),
+                                  TaskOpProcessor.Action.Noop)
     )
 
     Then("it replies with unit immediately")
@@ -94,8 +96,9 @@ class TaskOpProcessorImplTest
     verify(f.taskRepository).store(task)
 
     And("the taskTracker gets the update")
-    f.taskTrackerProbe.expectMsg(TaskTrackerActor.TaskUpdated(
-            taskState, TaskTrackerActor.Ack(testActor, ())))
+    f.taskTrackerProbe.expectMsg(
+        TaskTrackerActor.TaskUpdated(taskState,
+                                     TaskTrackerActor.Ack(testActor, ())))
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
@@ -144,8 +147,9 @@ class TaskOpProcessorImplTest
     result should be(Success(()))
 
     And("the taskTracker gets the update")
-    f.taskTrackerProbe.expectMsg(TaskTrackerActor.TaskUpdated(
-            taskState, TaskTrackerActor.Ack(testActor, ())))
+    f.taskTrackerProbe.expectMsg(
+        TaskTrackerActor.TaskUpdated(taskState,
+                                     TaskTrackerActor.Ack(testActor, ())))
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
@@ -275,8 +279,9 @@ class TaskOpProcessorImplTest
     verify(f.taskRepository).expunge(taskId)
 
     And("the taskTracker gets the update")
-    f.taskTrackerProbe.expectMsg(TaskTrackerActor.TaskRemoved(
-            Task.Id(taskId), TaskTrackerActor.Ack(testActor, ())))
+    f.taskTrackerProbe.expectMsg(
+        TaskTrackerActor.TaskRemoved(Task.Id(taskId),
+                                     TaskTrackerActor.Ack(testActor, ())))
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
@@ -295,8 +300,10 @@ class TaskOpProcessorImplTest
 
     When("the processor processes an update")
     val result = f.processor.process(
-        TaskOpProcessor.Operation(
-            deadline, testActor, taskId, TaskOpProcessor.Action.Expunge)
+        TaskOpProcessor.Operation(deadline,
+                                  testActor,
+                                  taskId,
+                                  TaskOpProcessor.Action.Expunge)
     )
 
     Then("it replies with unit immediately")
@@ -309,8 +316,9 @@ class TaskOpProcessorImplTest
     verify(f.taskRepository).task(taskId.idString)
 
     And("the taskTracker gets the update")
-    f.taskTrackerProbe.expectMsg(TaskTrackerActor.TaskRemoved(
-            taskId, TaskTrackerActor.Ack(testActor, ())))
+    f.taskTrackerProbe.expectMsg(
+        TaskTrackerActor.TaskRemoved(taskId,
+                                     TaskTrackerActor.Ack(testActor, ())))
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
@@ -422,8 +430,9 @@ class TaskOpProcessorImplTest
     verify(f.taskRepository).store(marathonTask)
 
     And("the taskTracker gets the update")
-    f.taskTrackerProbe.expectMsg(TaskTrackerActor.TaskUpdated(
-            unlaunched, TaskTrackerActor.Ack(testActor, ())))
+    f.taskTrackerProbe.expectMsg(
+        TaskTrackerActor.TaskUpdated(unlaunched,
+                                     TaskTrackerActor.Ack(testActor, ())))
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
@@ -435,8 +444,9 @@ class TaskOpProcessorImplTest
     lazy val taskRepository = mock[TaskRepository]
     lazy val statusUpdateResolver =
       mock[TaskOpProcessorImpl.StatusUpdateActionResolver]
-    lazy val processor = new TaskOpProcessorImpl(
-        taskTrackerProbe.ref, taskRepository, statusUpdateResolver)
+    lazy val processor = new TaskOpProcessorImpl(taskTrackerProbe.ref,
+                                                 taskRepository,
+                                                 statusUpdateResolver)
 
     def verifyNoMoreInteractions(): Unit = {
       taskTrackerProbe.expectNoMsg(0.seconds)

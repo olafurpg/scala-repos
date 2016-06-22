@@ -27,11 +27,11 @@ abstract class SelectionHandlerSettings(config: Config) {
     case "unlimited" ⇒ -1
     case _ ⇒
       getInt("max-channels") requiring
-      (_ > 0, "max-channels must be > 0 or 'unlimited'")
+        (_ > 0, "max-channels must be > 0 or 'unlimited'")
   }
   val SelectorAssociationRetries: Int =
     getInt("selector-association-retries") requiring
-    (_ >= 0, "selector-association-retries must be >= 0")
+      (_ >= 0, "selector-association-retries must be >= 0")
 
   val SelectorDispatcher: String = getString("selector-dispatcher")
   val WorkerDispatcher: String = getString("worker-dispatcher")
@@ -84,7 +84,8 @@ private[io] object SelectionHandler {
   case object ChannelWritable extends DeadLetterSuppression
 
   private[io] abstract class SelectorBasedManager(
-      selectorSettings: SelectionHandlerSettings, nrOfSelectors: Int)
+      selectorSettings: SelectionHandlerSettings,
+      nrOfSelectors: Int)
       extends Actor {
 
     override def supervisorStrategy = connectionSupervisorStrategy
@@ -122,8 +123,8 @@ private[io] object SelectionHandler {
         } else super.logFailure(context, child, cause, decision)
     }
 
-  private class ChannelRegistryImpl(
-      executionContext: ExecutionContext, log: LoggingAdapter)
+  private class ChannelRegistryImpl(executionContext: ExecutionContext,
+                                    log: LoggingAdapter)
       extends ChannelRegistry {
     private[this] val selector = SelectorProvider.provider.openSelector
     private[this] val wakeUp = new AtomicBoolean(false)
@@ -148,9 +149,9 @@ private[io] object SelectionHandler {
                   case OP_READ ⇒ connection ! ChannelReadable
                   case OP_WRITE ⇒ connection ! ChannelWritable
                   case OP_READ_AND_WRITE ⇒ {
-                      connection ! ChannelWritable;
-                      connection ! ChannelReadable
-                    }
+                    connection ! ChannelWritable;
+                    connection ! ChannelReadable
+                  }
                   case x if (x & OP_ACCEPT) > 0 ⇒
                     connection ! ChannelAcceptable
                   case x if (x & OP_CONNECT) > 0 ⇒
@@ -171,7 +172,8 @@ private[io] object SelectionHandler {
 
       override def run(): Unit =
         if (selector.isOpen)
-          try super.run() finally executionContext.execute(this) // re-schedule select behind all currently queued tasks
+          try super.run() finally executionContext
+            .execute(this) // re-schedule select behind all currently queued tasks
     }
 
     executionContext.execute(select) // start selection "loop"
@@ -308,14 +310,16 @@ private[io] class SelectionHandler(settings: SelectionHandlerSettings)
               }
             case e ⇒ e.getMessage
           }
-          context.system.eventStream.publish(Logging.Debug(
-                  child.path.toString, classOf[SelectionHandler], logMessage))
+          context.system.eventStream.publish(
+              Logging.Debug(child.path.toString,
+                            classOf[SelectionHandler],
+                            logMessage))
         } catch { case NonFatal(_) ⇒ }
     }
   }
 
-  def spawnChildWithCapacityProtection(
-      cmd: WorkerForCommand, retriesLeft: Int): Unit = {
+  def spawnChildWithCapacityProtection(cmd: WorkerForCommand,
+                                       retriesLeft: Int): Unit = {
     if (TraceLogging) log.debug("Executing [{}]", cmd)
     if (MaxChannelsPerSelector == -1 || childCount < MaxChannelsPerSelector) {
       val newName = sequenceNumber.toString

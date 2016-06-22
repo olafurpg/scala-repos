@@ -40,7 +40,8 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
           case Some(ref) =>
             ref.bind() match {
               case Some(r: ScalaResolveResult)
-                  if r.getActualElement.isInstanceOf[PsiClass] && r.getActualElement
+                  if r.getActualElement
+                    .isInstanceOf[PsiClass] && r.getActualElement
                     .asInstanceOf[PsiClass]
                     .qualifiedName == "scala.throws" =>
                 constr.args match {
@@ -51,7 +52,8 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
                         ScType.extractClass(tp, Some(getProject)) match {
                           case Some(clazz)
                               if clazz.qualifiedName == "java.lang.Class" =>
-                            ScType.extractClass(arg(0), Some(getProject)) match {
+                            ScType
+                              .extractClass(arg(0), Some(getProject)) match {
                               case Some(p) =>
                                 JavaPsiFacade
                                   .getInstance(getProject)

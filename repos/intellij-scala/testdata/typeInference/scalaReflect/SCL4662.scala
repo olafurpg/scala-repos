@@ -17,8 +17,7 @@ object SCL4662 {
       val memb = value.members
       val methods = memb.filter(_.isMethod).map(_.asMethod).toArray
       /*start*/
-      methods.flatMap(
-          e =>
+      methods.flatMap(e =>
             try {
           Some(lookAtMe.reflectMethod(e))
         } catch {

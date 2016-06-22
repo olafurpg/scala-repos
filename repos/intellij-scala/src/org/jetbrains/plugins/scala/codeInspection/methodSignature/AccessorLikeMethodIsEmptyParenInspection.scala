@@ -16,8 +16,8 @@ class AccessorLikeMethodIsEmptyParenInspection
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunction
         if f.hasQueryLikeName && f.isEmptyParen && !f.hasUnitResultType &&
-        f.superMethods.isEmpty && !isScalaJSFacade(f.getContainingClass) =>
-      holder.registerProblem(
-          f.nameId, getDisplayName, new RemoveParentheses(f))
+          f.superMethods.isEmpty && !isScalaJSFacade(f.getContainingClass) =>
+      holder
+        .registerProblem(f.nameId, getDisplayName, new RemoveParentheses(f))
   }
 }

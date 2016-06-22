@@ -149,7 +149,7 @@ trait SymbolTrackers {
                                                           children map (c =>
                                                                 c.indentString(
                                                                     indent +
-                                                                    "    ")) mkString
+                                                                      "    ")) mkString
                                                           ("\n", "\n", ""))
         }
       }

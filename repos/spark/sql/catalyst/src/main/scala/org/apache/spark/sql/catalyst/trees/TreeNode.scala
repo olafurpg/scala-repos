@@ -280,8 +280,8 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     * @param rule the function use to transform this nodes children
     */
   def transformUp(rule: PartialFunction[BaseType, BaseType]): BaseType = {
-    val afterRuleOnChildren = transformChildren(
-        rule, (t, r) => t.transformUp(r))
+    val afterRuleOnChildren =
+      transformChildren(rule, (t, r) => t.transformUp(r))
     if (this fastEquals afterRuleOnChildren) {
       CurrentOrigin.withOrigin(origin) {
         rule.applyOrElse(this, identity[BaseType])
@@ -538,17 +538,19 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     builder.append("\n")
 
     if (innerChildren.nonEmpty) {
-      innerChildren.init.foreach(_.generateTreeString(
-              depth + 2, lastChildren :+ false :+ false, builder))
-      innerChildren.last.generateTreeString(
-          depth + 2, lastChildren :+ false :+ true, builder)
+      innerChildren.init.foreach(
+          _.generateTreeString(depth + 2,
+                               lastChildren :+ false :+ false,
+                               builder))
+      innerChildren.last
+        .generateTreeString(depth + 2, lastChildren :+ false :+ true, builder)
     }
 
     if (treeChildren.nonEmpty) {
       treeChildren.init.foreach(
           _.generateTreeString(depth + 1, lastChildren :+ false, builder))
-      treeChildren.last.generateTreeString(
-          depth + 1, lastChildren :+ true, builder)
+      treeChildren.last
+        .generateTreeString(depth + 1, lastChildren :+ true, builder)
     }
 
     builder
@@ -579,7 +581,7 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     def collectJsonValue(tn: BaseType): Unit = {
       val jsonFields =
         ("class" -> JString(tn.getClass.getName)) ::
-        ("num-children" -> JInt(tn.children.length)) :: tn.jsonFields
+          ("num-children" -> JInt(tn.children.length)) :: tn.jsonFields
       jsonValues += JObject(jsonFields)
       tn.children.foreach(collectJsonValue)
     }
@@ -593,7 +595,7 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     val fieldValues = productIterator.toSeq ++ otherCopyArgs
     assert(fieldNames.length == fieldValues.length,
            s"${getClass.getSimpleName} fields: " + fieldNames.mkString(", ") +
-           s", values: " + fieldValues.map(_.toString).mkString(", "))
+             s", values: " + fieldValues.map(_.toString).mkString(", "))
 
     fieldNames
       .zip(fieldValues)
@@ -630,8 +632,8 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     case m: Metadata => m.jsonValue
     case s: StorageLevel =>
       ("useDisk" -> s.useDisk) ~ ("useMemory" -> s.useMemory) ~
-      ("useOffHeap" -> s.useOffHeap) ~ ("deserialized" -> s.deserialized) ~
-      ("replication" -> s.replication)
+        ("useOffHeap" -> s.useOffHeap) ~ ("deserialized" -> s.deserialized) ~
+        ("replication" -> s.replication)
     case n: TreeNode[_] => n.jsonValue
     case o: Option[_] => o.map(parseToJson)
     case t: Seq[_] => JArray(t.map(parseToJson).toList)
@@ -664,15 +666,15 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
 }
 
 object TreeNode {
-  def fromJSON[BaseType <: TreeNode[BaseType]](
-      json: String, sc: SparkContext): BaseType = {
+  def fromJSON[BaseType <: TreeNode[BaseType]](json: String,
+                                               sc: SparkContext): BaseType = {
     val jsonAST = parse(json)
     assert(jsonAST.isInstanceOf[JArray])
     reconstruct(jsonAST.asInstanceOf[JArray], sc).asInstanceOf[BaseType]
   }
 
-  private def reconstruct(
-      treeNodeJson: JArray, sc: SparkContext): TreeNode[_] = {
+  private def reconstruct(treeNodeJson: JArray,
+                          sc: SparkContext): TreeNode[_] = {
     assert(treeNodeJson.arr.forall(_.isInstanceOf[JObject]))
     val jsonNodes = Stack(treeNodeJson.arr.map(_.asInstanceOf[JObject]): _*)
 
@@ -728,93 +730,96 @@ object TreeNode {
 
   import universe._
 
-  private def parseFromJson(
-      value: JValue,
-      expectedType: Type,
-      children: Seq[TreeNode[_]],
-      sc: SparkContext): AnyRef = ScalaReflectionLock.synchronized {
-    if (value == JNull) return null
+  private def parseFromJson(value: JValue,
+                            expectedType: Type,
+                            children: Seq[TreeNode[_]],
+                            sc: SparkContext): AnyRef =
+    ScalaReflectionLock.synchronized {
+      if (value == JNull) return null
 
-    expectedType match {
-      case t if t <:< definitions.BooleanTpe =>
-        value.asInstanceOf[JBool].value: java.lang.Boolean
-      case t if t <:< definitions.ByteTpe =>
-        value.asInstanceOf[JInt].num.toByte: java.lang.Byte
-      case t if t <:< definitions.ShortTpe =>
-        value.asInstanceOf[JInt].num.toShort: java.lang.Short
-      case t if t <:< definitions.IntTpe =>
-        value.asInstanceOf[JInt].num.toInt: java.lang.Integer
-      case t if t <:< definitions.LongTpe =>
-        value.asInstanceOf[JInt].num.toLong: java.lang.Long
-      case t if t <:< definitions.FloatTpe =>
-        value.asInstanceOf[JDouble].num.toFloat: java.lang.Float
-      case t if t <:< definitions.DoubleTpe =>
-        value.asInstanceOf[JDouble].num: java.lang.Double
+      expectedType match {
+        case t if t <:< definitions.BooleanTpe =>
+          value.asInstanceOf[JBool].value: java.lang.Boolean
+        case t if t <:< definitions.ByteTpe =>
+          value.asInstanceOf[JInt].num.toByte: java.lang.Byte
+        case t if t <:< definitions.ShortTpe =>
+          value.asInstanceOf[JInt].num.toShort: java.lang.Short
+        case t if t <:< definitions.IntTpe =>
+          value.asInstanceOf[JInt].num.toInt: java.lang.Integer
+        case t if t <:< definitions.LongTpe =>
+          value.asInstanceOf[JInt].num.toLong: java.lang.Long
+        case t if t <:< definitions.FloatTpe =>
+          value.asInstanceOf[JDouble].num.toFloat: java.lang.Float
+        case t if t <:< definitions.DoubleTpe =>
+          value.asInstanceOf[JDouble].num: java.lang.Double
 
-      case t if t <:< localTypeOf[java.lang.Boolean] =>
-        value.asInstanceOf[JBool].value: java.lang.Boolean
-      case t if t <:< localTypeOf[BigInt] => value.asInstanceOf[JInt].num
-      case t if t <:< localTypeOf[java.lang.String] =>
-        value.asInstanceOf[JString].s
-      case t if t <:< localTypeOf[UUID] =>
-        UUID.fromString(value.asInstanceOf[JString].s)
-      case t if t <:< localTypeOf[DataType] => DataType.parseDataType(value)
-      case t if t <:< localTypeOf[Metadata] =>
-        Metadata.fromJObject(value.asInstanceOf[JObject])
-      case t if t <:< localTypeOf[StorageLevel] =>
-        val JBool(useDisk) = value \ "useDisk"
-        val JBool(useMemory) = value \ "useMemory"
-        val JBool(useOffHeap) = value \ "useOffHeap"
-        val JBool(deserialized) = value \ "deserialized"
-        val JInt(replication) = value \ "replication"
-        StorageLevel(
-            useDisk, useMemory, useOffHeap, deserialized, replication.toInt)
-      case t if t <:< localTypeOf[TreeNode[_]] =>
-        value match {
-          case JInt(i) => children(i.toInt)
-          case arr: JArray => reconstruct(arr, sc)
-          case _ =>
-            throw new RuntimeException(
-                s"$value is not a valid json value for tree node.")
-        }
-      case t if t <:< localTypeOf[Option[_]] =>
-        if (value == JNothing) {
-          None
-        } else {
-          val TypeRef(_, _, Seq(optType)) = t
-          Option(parseFromJson(value, optType, children, sc))
-        }
-      case t if t <:< localTypeOf[Seq[_]] =>
-        val TypeRef(_, _, Seq(elementType)) = t
-        val JArray(elements) = value
-        elements.map(parseFromJson(_, elementType, children, sc)).toSeq
-      case t if t <:< localTypeOf[Map[_, _]] =>
-        val TypeRef(_, _, Seq(keyType, valueType)) = t
-        val JObject(fields) = value
-        fields.map {
-          case (name, value) =>
-            name -> parseFromJson(value, valueType, children, sc)
-        }.toMap
-      case t if t <:< localTypeOf[RDD[_]] =>
-        new EmptyRDD[Any](sc)
-      case _ if isScalaObject(value) =>
-        val JString(clsName) = value \ "object"
-        val cls = Utils.classForName(clsName)
-        cls.getField("MODULE$").get(cls)
-      case t if t <:< localTypeOf[Product] =>
-        val fields = getConstructorParameters(t)
-        val clsName = getClassNameFromType(t)
-        parseToProduct(clsName, fields, value, children, sc)
-      // There maybe some cases that the parameter type signature is not Product but the value is,
-      // e.g. `SpecifiedWindowFrame` with type signature `WindowFrame`, handle it here.
-      case _ if isScalaProduct(value) =>
-        val JString(clsName) = value \ "product-class"
-        val fields = getConstructorParameters(Utils.classForName(clsName))
-        parseToProduct(clsName, fields, value, children, sc)
-      case _ =>
-        sys.error(s"Do not support type $expectedType with json $value.")
+        case t if t <:< localTypeOf[java.lang.Boolean] =>
+          value.asInstanceOf[JBool].value: java.lang.Boolean
+        case t if t <:< localTypeOf[BigInt] => value.asInstanceOf[JInt].num
+        case t if t <:< localTypeOf[java.lang.String] =>
+          value.asInstanceOf[JString].s
+        case t if t <:< localTypeOf[UUID] =>
+          UUID.fromString(value.asInstanceOf[JString].s)
+        case t if t <:< localTypeOf[DataType] => DataType.parseDataType(value)
+        case t if t <:< localTypeOf[Metadata] =>
+          Metadata.fromJObject(value.asInstanceOf[JObject])
+        case t if t <:< localTypeOf[StorageLevel] =>
+          val JBool(useDisk) = value \ "useDisk"
+          val JBool(useMemory) = value \ "useMemory"
+          val JBool(useOffHeap) = value \ "useOffHeap"
+          val JBool(deserialized) = value \ "deserialized"
+          val JInt(replication) = value \ "replication"
+          StorageLevel(useDisk,
+                       useMemory,
+                       useOffHeap,
+                       deserialized,
+                       replication.toInt)
+        case t if t <:< localTypeOf[TreeNode[_]] =>
+          value match {
+            case JInt(i) => children(i.toInt)
+            case arr: JArray => reconstruct(arr, sc)
+            case _ =>
+              throw new RuntimeException(
+                  s"$value is not a valid json value for tree node.")
+          }
+        case t if t <:< localTypeOf[Option[_]] =>
+          if (value == JNothing) {
+            None
+          } else {
+            val TypeRef(_, _, Seq(optType)) = t
+            Option(parseFromJson(value, optType, children, sc))
+          }
+        case t if t <:< localTypeOf[Seq[_]] =>
+          val TypeRef(_, _, Seq(elementType)) = t
+          val JArray(elements) = value
+          elements.map(parseFromJson(_, elementType, children, sc)).toSeq
+        case t if t <:< localTypeOf[Map[_, _]] =>
+          val TypeRef(_, _, Seq(keyType, valueType)) = t
+          val JObject(fields) = value
+          fields.map {
+            case (name, value) =>
+              name -> parseFromJson(value, valueType, children, sc)
+          }.toMap
+        case t if t <:< localTypeOf[RDD[_]] =>
+          new EmptyRDD[Any](sc)
+        case _ if isScalaObject(value) =>
+          val JString(clsName) = value \ "object"
+          val cls = Utils.classForName(clsName)
+          cls.getField("MODULE$").get(cls)
+        case t if t <:< localTypeOf[Product] =>
+          val fields = getConstructorParameters(t)
+          val clsName = getClassNameFromType(t)
+          parseToProduct(clsName, fields, value, children, sc)
+        // There maybe some cases that the parameter type signature is not Product but the value is,
+        // e.g. `SpecifiedWindowFrame` with type signature `WindowFrame`, handle it here.
+        case _ if isScalaProduct(value) =>
+          val JString(clsName) = value \ "product-class"
+          val fields = getConstructorParameters(Utils.classForName(clsName))
+          parseToProduct(clsName, fields, value, children, sc)
+        case _ =>
+          sys.error(s"Do not support type $expectedType with json $value.")
+      }
     }
-  }
 
   private def parseToProduct(clsName: String,
                              fields: Seq[(String, Type)],

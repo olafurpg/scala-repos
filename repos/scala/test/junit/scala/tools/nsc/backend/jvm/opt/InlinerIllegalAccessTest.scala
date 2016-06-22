@@ -62,12 +62,13 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     val methods = cClass.methods.asScala.filter(_.name(0) == 'f').toList
 
     def check(classNode: ClassNode, test: Option[AbstractInsnNode] => Unit) = {
-      for (m <- methods) test(
-          inliner
-            .findIllegalAccess(m.instructions,
-                               classBTypeFromParsedClassfile(cClass.name),
-                               classBTypeFromParsedClassfile(classNode.name))
-            .map(_._1))
+      for (m <- methods)
+        test(
+            inliner
+              .findIllegalAccess(m.instructions,
+                                 classBTypeFromParsedClassfile(cClass.name),
+                                 classBTypeFromParsedClassfile(classNode.name))
+              .map(_._1))
     }
 
     check(cClass, assertEmpty)
@@ -146,7 +147,7 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     def checkAccess(a: MethodNode, expected: Int): Unit = {
       assert(
           (a.access &
-              (ACC_STATIC | ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE)) == expected,
+                (ACC_STATIC | ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE)) == expected,
           s"${a.name}, ${a.access}")
     }
 
@@ -204,8 +205,8 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // protected static accessed in same class, or protected static accessed in subclass(rgD).
     // can be inlined to sub- and superclasses, and classes in the same package (gCl)
     for ((m, declCls) <- Set((rgC, cCl), (rgD, dCl));
-         c <- Set(cCl, dCl, eCl, fCl, gCl, hCl)) check(
-        m, declCls, c, assertEmpty)
+         c <- Set(cCl, dCl, eCl, fCl, gCl, hCl))
+      check(m, declCls, c, assertEmpty)
 
     // protected in non-subclass and different package
     for (m <- Set(rcC, rgC)) check(m, cCl, iCl, cOrDOwner)

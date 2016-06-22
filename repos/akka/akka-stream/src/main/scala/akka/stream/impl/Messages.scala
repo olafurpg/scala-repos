@@ -16,8 +16,8 @@ private[akka] case object SubscribePending
 /**
   * INTERNAL API
   */
-private[akka] final case class RequestMore(
-    subscription: ActorSubscription[_], demand: Long)
+private[akka] final case class RequestMore(subscription: ActorSubscription[_],
+                                           demand: Long)
     extends DeadLetterSuppression
     with NoSerializationVerificationNeeded
 

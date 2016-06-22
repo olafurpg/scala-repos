@@ -129,7 +129,8 @@ case class FakeRequest[A](
     */
   def withFormUrlEncodedBody(
       data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = {
-    copyFakeRequest(body = AnyContentAsFormUrlEncoded(
+    copyFakeRequest(
+        body = AnyContentAsFormUrlEncoded(
             play.utils.OrderPreserving.groupBy(data.toSeq)(_._1)))
   }
 
@@ -198,8 +199,8 @@ object FakeRequest {
   /**
     * Constructs a new request.
     */
-  def apply(
-      method: String, path: String): FakeRequest[AnyContentAsEmpty.type] = {
+  def apply(method: String,
+            path: String): FakeRequest[AnyContentAsEmpty.type] = {
     FakeRequest(method, path, FakeHeaders(), AnyContentAsEmpty)
   }
 

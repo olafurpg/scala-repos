@@ -69,8 +69,9 @@ object PersistentViewSpec {
       }
   }
 
-  private class PassiveTestPersistentView(
-      name: String, probe: ActorRef, var failAt: Option[String])
+  private class PassiveTestPersistentView(name: String,
+                                          probe: ActorRef,
+                                          var failAt: Option[String])
       extends PersistentView {
     override val persistenceId: String = name
     override val viewId: String = name + "-view"
@@ -143,8 +144,8 @@ object PersistentViewSpec {
     }
   }
 
-  private class PersistentOrNotTestPersistentView(
-      name: String, probe: ActorRef)
+  private class PersistentOrNotTestPersistentView(name: String,
+                                                  probe: ActorRef)
       extends PersistentView {
     override val persistenceId: String = name
     override val viewId: String = name + "-view"
@@ -350,8 +351,10 @@ abstract class PersistentViewSpec(config: Config)
 
       persistentActorProbe.expectMsg("c-3")
 
-      view = system.actorOf(Props(
-              classOf[PersistentOrNotTestPersistentView], name, viewProbe.ref))
+      view = system.actorOf(
+          Props(classOf[PersistentOrNotTestPersistentView],
+                name,
+                viewProbe.ref))
 
       view ! "d"
       view ! "e"
@@ -382,7 +385,8 @@ abstract class PersistentViewSpec(config: Config)
           Props(classOf[StashingPersistentView], name, viewProbe.ref))
       view ! "other"
       view ! "unstash"
-      viewProbe.expectMsg("a-2") // note that the lastSequenceNumber is 2, since we have replayed b-2
+      viewProbe
+        .expectMsg("a-2") // note that the lastSequenceNumber is 2, since we have replayed b-2
       viewProbe.expectMsg("b-2")
       viewProbe.expectMsg("other-2")
     }

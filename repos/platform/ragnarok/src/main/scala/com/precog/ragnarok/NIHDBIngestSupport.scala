@@ -121,7 +121,8 @@ trait NIHDBIngestSupport
         _ <- M point {
               vfs.unsecured
                 .writeAll(
-                    Seq((0,
+                    Seq(
+                        (0,
                          IngestMessage(apiKey,
                                        path,
                                        Authorities(accountId),
@@ -134,8 +135,10 @@ trait NIHDBIngestSupport
         _ = logger.debug(
             "Insert complete on //%s, waiting for cook".format(db))
         projection <- vfs
-                       .readProjection(
-                           apiKey, path, Version.Current, AccessMode.Read)
+                       .readProjection(apiKey,
+                                       path,
+                                       Version.Current,
+                                       AccessMode.Read)
                        .run
       } yield {
         (projection valueOr { err =>

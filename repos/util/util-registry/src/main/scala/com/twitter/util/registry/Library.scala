@@ -42,8 +42,9 @@ object Library {
   * Can change the value of params that were already set in the registry, but cannot
   * add new ones.
   */
-class Roster private[registry](
-    scope: Seq[String], keys: Set[String], log: Logger) {
+class Roster private[registry] (scope: Seq[String],
+                                keys: Set[String],
+                                log: Logger) {
   private[this] val registry = GlobalRegistry.get
 
   /**

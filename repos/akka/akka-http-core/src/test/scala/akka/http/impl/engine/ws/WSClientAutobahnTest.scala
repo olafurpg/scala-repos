@@ -188,7 +188,8 @@ object WSClientAutobahnTest extends App {
           super.onDownstreamFinish(ctx)
         }
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[T]): TerminationDirective = {
+            cause: Throwable,
+            ctx: Context[T]): TerminationDirective = {
           p.failure(cause)
           super.onUpstreamFailure(cause, ctx)
         }

@@ -41,10 +41,10 @@ class YieldFilter extends ElementFilter {
         if (leafText(i, context) == "yield") return false
         for (child <- parent.getParent.getNode.getChildren(null)
              if child.getElementType == ScalaTokenTypes.kYIELD) return false
-        return ScalaCompletionUtil.checkAnyWith(
-            parent.getParent, "yield true", context.getManager) ||
-        ScalaCompletionUtil.checkReplace(
-            parent.getParent, "yield", context.getManager)
+        return ScalaCompletionUtil
+          .checkAnyWith(parent.getParent, "yield true", context.getManager) ||
+          ScalaCompletionUtil
+            .checkReplace(parent.getParent, "yield", context.getManager)
       }
     }
     false

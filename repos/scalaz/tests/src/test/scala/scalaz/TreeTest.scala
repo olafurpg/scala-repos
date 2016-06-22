@@ -22,7 +22,7 @@ object TreeTest extends SpecLite {
     val a = F.indexed(xs)
     Equal[Tree[Byte]].equal(a.map(_._2), xs) must_=== true
     F.toList(a) must_===
-      F.toList(xs).zipWithIndex.map { case (a, b) => (b, a) }
+    F.toList(xs).zipWithIndex.map { case (a, b) => (b, a) }
   }
 
   "infinite Tree flatten" ! {
@@ -32,12 +32,12 @@ object TreeTest extends SpecLite {
 
   "A tree must can be rendered as an ASCII string" ! {
     Node(1, Stream(Node(2, Stream(Leaf(3))), Leaf(4))).drawTree must_==
-      Seq("1",
-          "|",
-          "+- 2",
-          "|  |",
-          "|  `- 3",
-          "|",
-          "`- 4").mkString("", "\n", "\n")
+    Seq("1",
+        "|",
+        "+- 2",
+        "|  |",
+        "|  `- 3",
+        "|",
+        "`- 4").mkString("", "\n", "\n")
   }
 }

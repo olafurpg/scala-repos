@@ -57,13 +57,13 @@ object Duration {
   def ONE = One
 
   def Unknown = new Duration(jfxu.Duration.UNKNOWN)
-  @deprecated(
-      "Use Unknown; UNKNOWN will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Unknown; UNKNOWN will be removed in a future release",
+              "8.0.60-R10")
   def UNKNOWN = Unknown
 
   def Zero = new Duration(jfxu.Duration.ZERO)
-  @deprecated(
-      "Use Zero; ZERO will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Zero; ZERO will be removed in a future release",
+              "8.0.60-R10")
   def ZERO = Zero
 }
 

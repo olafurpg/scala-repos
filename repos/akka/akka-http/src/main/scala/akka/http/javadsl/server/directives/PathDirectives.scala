@@ -158,7 +158,8 @@ abstract class PathDirectives extends MiscDirectives {
                                        innerRoute: Route,
                                        moreInnerRoutes: Route*): Route =
     RedirectToTrailingSlashIfMissing(redirectionStatusCode)(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   /**
     * If the request path ends with a slash, redirect to the same uri without trailing slash in the path.
@@ -170,7 +171,8 @@ abstract class PathDirectives extends MiscDirectives {
                                          innerRoute: Route,
                                          moreInnerRoutes: Route*): Route =
     RedirectToNoTrailingSlashIfPresent(redirectionStatusCode)(
-        innerRoute, moreInnerRoutes.toList)
+        innerRoute,
+        moreInnerRoutes.toList)
 
   private def RawPathPrefixForMatchers(
       matchers: immutable.Seq[PathMatcher[_]]): Directive =

@@ -70,8 +70,7 @@ class ThrottledHandler(
     handler: Handler,
     val duration: Duration,
     val maxToDisplay: Int
-)
-    extends ProxyHandler(handler) {
+) extends ProxyHandler(handler) {
 
   private class Throttle(startTime: Time, name: String, level: javalog.Level) {
     private[this] var expired = false

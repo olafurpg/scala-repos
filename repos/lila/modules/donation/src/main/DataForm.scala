@@ -5,8 +5,10 @@ import play.api.data.Forms._
 
 object DataForm {
 
-  private val txnTypes = Set(
-      "express_checkout", "web_accept", "recurring_payment", "subscr_payment")
+  private val txnTypes = Set("express_checkout",
+                             "web_accept",
+                             "recurring_payment",
+                             "subscr_payment")
 
   val ipn = Form(
       mapping(

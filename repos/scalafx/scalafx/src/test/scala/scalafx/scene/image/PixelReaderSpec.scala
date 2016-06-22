@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PixelReaderSpec
     extends SimpleSFXDelegateSpec[jfxsi.PixelReader, PixelReader](
-        classOf[jfxsi.PixelReader], classOf[PixelReader]) {
+        classOf[jfxsi.PixelReader],
+        classOf[PixelReader]) {
 
   override protected def getScalaClassInstance = new PixelReader {
     override val delegate = getJavaClassInstance

@@ -52,9 +52,9 @@ object LoggingReceive {
   * This decorator adds invocation logging to a Receive function.
   * @param source the log source, if not defined the actor of the context will be used
   */
-class LoggingReceive(
-    source: Option[AnyRef], r: Receive, label: Option[String])(
-    implicit context: ActorContext)
+class LoggingReceive(source: Option[AnyRef],
+                     r: Receive,
+                     label: Option[String])(implicit context: ActorContext)
     extends Receive {
   def this(source: Option[AnyRef], r: Receive)(
       implicit context: ActorContext) = this(source, r, None)
@@ -64,13 +64,14 @@ class LoggingReceive(
       val (str, clazz) = LogSource.fromAnyRef(
           source getOrElse context.asInstanceOf[ActorCell].actor)
       context.system.eventStream.publish(
-          Debug(str,
-                clazz,
-                "received " + (if (handled) "handled" else "unhandled") +
+          Debug(
+              str,
+              clazz,
+              "received " + (if (handled) "handled" else "unhandled") +
                 " message " + o + " from " + context.sender() + (label match {
-                  case Some(l) ⇒ " in state " + l
-                  case _ ⇒ ""
-                })))
+                case Some(l) ⇒ " in state " + l
+                case _ ⇒ ""
+              })))
     }
     handled
   }

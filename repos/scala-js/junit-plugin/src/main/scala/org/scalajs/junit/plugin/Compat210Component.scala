@@ -14,10 +14,10 @@ trait Compat210Component {
 
   import global._
 
-  def newValDef(
-      sym: Symbol, rhs: Tree)(mods: Modifiers = Modifiers(sym.flags),
-                              name: TermName = sym.name.toTermName,
-                              tpt: Tree = TypeTreeMemberType(sym)): ValDef = {
+  def newValDef(sym: Symbol, rhs: Tree)(
+      mods: Modifiers = Modifiers(sym.flags),
+      name: TermName = sym.name.toTermName,
+      tpt: Tree = TypeTreeMemberType(sym)): ValDef = {
     atPos(sym.pos)(ValDef(mods, name, tpt, rhs)) setSymbol sym
   }
 

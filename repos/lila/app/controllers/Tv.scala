@@ -24,8 +24,12 @@ object Tv extends LilaController {
           OptionFuResult(GameRepo.pov(gameId, color)) { pov =>
             Env.tv.tv.getChampions zip Env.game.crosstableApi(pov.game) map {
               case (champions, crosstable) =>
-                Ok(html.tv.sides(
-                        channel, champions, pov, crosstable, streams = Nil))
+                Ok(
+                    html.tv.sides(channel,
+                                  champions,
+                                  pov,
+                                  crosstable,
+                                  streams = Nil))
             }
           }
       }
@@ -50,8 +54,10 @@ object Tv extends LilaController {
             }
           },
           api = apiVersion =>
-            Env.api.roundApi.watcher(
-                pov, apiVersion, tv = onTv.some, withOpening = false) map {
+            Env.api.roundApi.watcher(pov,
+                                     apiVersion,
+                                     tv = onTv.some,
+                                     withOpening = false) map {
               Ok(_)
           }
       )
@@ -63,8 +69,8 @@ object Tv extends LilaController {
     (lila.tv.Tv.Channel.byKey get chanKey).fold(notFound)(lichessGames)
   }
 
-  private def lichessGames(
-      channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
+  private def lichessGames(channel: lila.tv.Tv.Channel)(
+      implicit ctx: Context) =
     Env.tv.tv.getChampions zip Env.tv.tv.getGames(channel, 9) map {
       case (champs, games) =>
         NoCache {
@@ -107,8 +113,8 @@ object Tv extends LilaController {
     FormFuResult(Env.tv.streamerList.form) { err =>
       fuccess(html.tv.streamConfig(err))
     } { text =>
-      Env.tv.streamerList.store.set(text) >> Env.mod.logApi.streamConfig(me.id) inject Redirect(
-          routes.Tv.streamConfig)
+      Env.tv.streamerList.store.set(text) >> Env.mod.logApi
+        .streamConfig(me.id) inject Redirect(routes.Tv.streamConfig)
     }
   }
 

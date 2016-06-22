@@ -127,19 +127,19 @@ private[ui] class AllStagesPage(parent: StagesTab) extends WebUIPage("") {
         }
       if (shouldShowActiveStages) {
         content ++=
-          <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
+        <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
       }
       if (shouldShowPendingStages) {
         content ++=
-          <h4 id="pending">Pending Stages ({pendingStages.size})</h4> ++ pendingStagesTable.toNodeSeq
+        <h4 id="pending">Pending Stages ({pendingStages.size})</h4> ++ pendingStagesTable.toNodeSeq
       }
       if (shouldShowCompletedStages) {
         content ++=
-          <h4 id="completed">Completed Stages ({completedStageNumStr})</h4> ++ completedStagesTable.toNodeSeq
+        <h4 id="completed">Completed Stages ({completedStageNumStr})</h4> ++ completedStagesTable.toNodeSeq
       }
       if (shouldShowFailedStages) {
         content ++=
-          <h4 id ="failed">Failed Stages ({numFailedStages})</h4> ++ failedStagesTable.toNodeSeq
+        <h4 id ="failed">Failed Stages ({numFailedStages})</h4> ++ failedStagesTable.toNodeSeq
       }
       UIUtils.headerSparkPage("Stages for All Jobs", content, parent)
     }

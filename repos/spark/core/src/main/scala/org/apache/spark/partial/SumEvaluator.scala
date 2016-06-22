@@ -41,8 +41,10 @@ private[spark] class SumEvaluator(totalOutputs: Int, confidence: Double)
     if (outputsMerged == totalOutputs) {
       new BoundedDouble(counter.sum, 1.0, counter.sum, counter.sum)
     } else if (outputsMerged == 0) {
-      new BoundedDouble(
-          0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
+      new BoundedDouble(0,
+                        0.0,
+                        Double.NegativeInfinity,
+                        Double.PositiveInfinity)
     } else {
       val p = outputsMerged.toDouble / totalOutputs
       val meanEstimate = counter.mean
@@ -52,7 +54,7 @@ private[spark] class SumEvaluator(totalOutputs: Int, confidence: Double)
       val sumEstimate = meanEstimate * countEstimate
       val sumVar =
         (meanEstimate * meanEstimate * countVar) +
-        (countEstimate * countEstimate * meanVar) + (meanVar * countVar)
+          (countEstimate * countEstimate * meanVar) + (meanVar * countVar)
       val sumStdev = math.sqrt(sumVar)
       val confFactor = {
         if (counter.count > 100) {

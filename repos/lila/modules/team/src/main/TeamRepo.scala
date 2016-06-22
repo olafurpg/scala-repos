@@ -18,7 +18,8 @@ object TeamRepo {
     $find.one($select(id) ++ Json.obj("createdBy" -> createdBy))
 
   def teamIdsByCreator(userId: String): Fu[List[String]] =
-    teamTube.coll.distinct("_id", BSONDocument("createdBy" -> userId).some) map lila.db.BSON.asStrings
+    teamTube.coll
+      .distinct("_id", BSONDocument("createdBy" -> userId).some) map lila.db.BSON.asStrings
 
   def name(id: String): Fu[Option[String]] =
     $primitive.one($select(id), "name")(_.asOpt[String])

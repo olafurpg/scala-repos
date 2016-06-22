@@ -106,7 +106,8 @@ object WebSocket {
   object MessageFlowTransformer {
 
     implicit val identityMessageFlowTransformer: MessageFlowTransformer[
-        Message, Message] = {
+        Message,
+        Message] = {
       new MessageFlowTransformer[Message, Message] {
         def transform(flow: Flow[Message, Message, _]) = flow
       }
@@ -116,7 +117,8 @@ object WebSocket {
       * Converts text messages to/from Strings.
       */
     implicit val stringMessageFlowTransformer: MessageFlowTransformer[
-        String, String] = {
+        String,
+        String] = {
       new MessageFlowTransformer[String, String] {
         def transform(flow: Flow[String, String, _]) = {
           AkkaStreams.bypassWith[Message, String, Message](
@@ -134,7 +136,8 @@ object WebSocket {
       * Converts binary messages to/from ByteStrings.
       */
     implicit val byteStringMessageFlowTransformer: MessageFlowTransformer[
-        ByteString, ByteString] = {
+        ByteString,
+        ByteString] = {
       new MessageFlowTransformer[ByteString, ByteString] {
         def transform(flow: Flow[ByteString, ByteString, _]) = {
           AkkaStreams.bypassWith[Message, ByteString, Message](
@@ -152,7 +155,8 @@ object WebSocket {
       * Converts binary messages to/from byte arrays.
       */
     implicit val byteArrayMessageFlowTransformer: MessageFlowTransformer[
-        Array[Byte], Array[Byte]] = {
+        Array[Byte],
+        Array[Byte]] = {
       byteStringMessageFlowTransformer.map(_.toArray, ByteString.apply)
     }
 
@@ -160,7 +164,8 @@ object WebSocket {
       * Converts messages to/from JsValue
       */
     implicit val jsonMessageFlowTransformer: MessageFlowTransformer[
-        JsValue, JsValue] = {
+        JsValue,
+        JsValue] = {
       def closeOnException[T](block: => T) =
         try {
           Left(block)
@@ -239,8 +244,7 @@ object WebSocket {
   @deprecated("Use accept with an Akka streams flow instead", "2.5.0")
   def adapter[A](f: RequestHeader => Enumeratee[A, A])(
       implicit transformer: MessageFlowTransformer[A, A]): WebSocket = {
-    using(
-        f.andThen { enumeratee =>
+    using(f.andThen { enumeratee =>
       val (iteratee, enumerator) = Concurrent.joined[A]
       (enumeratee &> iteratee, enumerator)
     })
@@ -364,18 +368,17 @@ object WebSocket {
   /**
     * Like Enumeratee.onEOF, however enumeratee.onEOF always gets fed an EOF (by the enumerator if nothing else).
     */
-  private def onEOF[E](
-      enumerator: Enumerator[E], action: () => Unit): Enumerator[E] =
+  private def onEOF[E](enumerator: Enumerator[E],
+                       action: () => Unit): Enumerator[E] =
     new Enumerator[E] {
       def apply[A](i: Iteratee[E, A]) = enumerator(wrap(i))
 
       def wrap[A](i: Iteratee[E, A]): Iteratee[E, A] = new Iteratee[E, A] {
-        def fold[B](
-            folder: (Step[E, A]) => Future[B])(implicit ec: ExecutionContext) =
+        def fold[B](folder: (Step[E, A]) => Future[B])(
+            implicit ec: ExecutionContext) =
           i.fold {
             case Step.Cont(k) =>
-              folder(
-                  Step.Cont {
+              folder(Step.Cont {
                 case eof @ Input.EOF =>
                   action()
                   wrap(k(eof))

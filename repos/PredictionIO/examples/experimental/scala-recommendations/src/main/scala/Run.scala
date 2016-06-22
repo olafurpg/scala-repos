@@ -29,14 +29,16 @@ import java.io.File
 case class DataSourceParams(val filepath: String) extends Params
 
 case class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        DataSourceParams, Null, RDD[Rating], (Int, Int), Double] {
+    extends PDataSource[DataSourceParams,
+                        Null,
+                        RDD[Rating],
+                        (Int, Int),
+                        Double] {
 
   override def read(sc: SparkContext)
     : Seq[(Null, RDD[Rating], RDD[((Int, Int), Double)])] = {
     val data = sc.textFile(dsp.filepath)
-    val ratings: RDD[Rating] = data.map(
-        _.split("::") match {
+    val ratings: RDD[Rating] = data.map(_.split("::") match {
       case Array(user, item, rate) =>
         Rating(user.toInt, item.toInt, rate.toDouble)
     })
@@ -146,8 +148,7 @@ object RecommendationEngine extends IEngineFactory {
 }
 
 class Tuple2IntSerializer
-    extends CustomSerializer[(Int, Int)](
-        format =>
+    extends CustomSerializer[(Int, Int)](format =>
           ({
         case JArray(List(JInt(x), JInt(y))) => (x.intValue, y.intValue)
       }, {

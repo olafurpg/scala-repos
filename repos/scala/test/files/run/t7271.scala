@@ -30,7 +30,8 @@ object Test extends DirectTest {
     val settings = new Settings()
     settings.Xprintpos.value = true
     val command = new CompilerCommand(
-        (CommandLineParser tokenize extraSettings) ++ args.toList, settings)
+        (CommandLineParser tokenize extraSettings) ++ args.toList,
+        settings)
     new Global(command.settings, new ConsoleReporter(settings)) with Positions
   }
 }

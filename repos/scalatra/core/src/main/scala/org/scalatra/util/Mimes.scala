@@ -69,8 +69,8 @@ trait Mimes {
         .toString
     }
   }
-  def inputStreamMime(
-      input: InputStream, fallback: String = DefaultMime): String = {
+  def inputStreamMime(input: InputStream,
+                      fallback: String = DefaultMime): String = {
     detectMime(fallback) {
       MimeUtil2
         .getMostSpecificMimeType(
@@ -124,8 +124,8 @@ trait Mimes {
 
   private def quiet(fn: => Unit): Unit = {
     allCatch.withApply(
-        internalLogger.warn(
-            "An error occurred while registering a mime type detector.", _)
+        internalLogger
+          .warn("An error occurred while registering a mime type detector.", _)
     )(fn)
   }
 

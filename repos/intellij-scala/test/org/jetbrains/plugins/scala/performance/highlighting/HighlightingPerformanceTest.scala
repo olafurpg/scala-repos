@@ -20,15 +20,18 @@ class HighlightingPerformanceTest extends ScalaFixtureTestCase {
           true,
           false)
     TestUtils.assertTiming(
-        "Failed highlighting performance test", TIMEOUT, new Runnable {
-      def run() {
-        try {
-          myFixture.testHighlighting(false, false, false, file.getVirtualFile)
-        } catch {
-          case e: RuntimeException =>
-        }
-      }
-    })
+        "Failed highlighting performance test",
+        TIMEOUT,
+        new Runnable {
+          def run() {
+            try {
+              myFixture
+                .testHighlighting(false, false, false, file.getVirtualFile)
+            } catch {
+              case e: RuntimeException =>
+            }
+          }
+        })
   }
 
   def testPerformance() {
@@ -77,7 +80,7 @@ object addressbook {
         th { background-color: #cccccc; }
         td { border-left: 1px solid #acacac; }
         td { border-bottom: 1px solid #acacac; }""" + "\"\"\"" +
-      """}
+        """}
       </style>
     </head>;
 

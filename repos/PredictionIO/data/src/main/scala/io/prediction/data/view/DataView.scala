@@ -102,8 +102,9 @@ object DataView {
         sqlContext.parquetFile(fileName)
       case e: java.lang.RuntimeException =>
         if (e.toString.contains("is not a Parquet file")) {
-          logger.error(s"$fileName does not contain a valid Parquet file. " +
-              "Please delete it and try again.")
+          logger.error(
+              s"$fileName does not contain a valid Parquet file. " +
+                "Please delete it and try again.")
         }
         throw e
     }

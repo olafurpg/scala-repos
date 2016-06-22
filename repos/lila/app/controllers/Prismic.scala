@@ -24,8 +24,8 @@ object Prismic {
 
   def prismicApi = fetchPrismicApi(true)
 
-  implicit def makeLinkResolver(
-      prismicApi: PrismicApi, ref: Option[String] = None) =
+  implicit def makeLinkResolver(prismicApi: PrismicApi,
+                                ref: Option[String] = None) =
     DocumentLinkResolver(prismicApi) {
       case (DocumentLink(id, _, _, slug, false), _) =>
         routes.Blog.show(id, slug, ref).url

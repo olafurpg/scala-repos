@@ -69,8 +69,10 @@ package mongotestrecords {
   case class Address(street: String, city: String)
   case class Child(name: String, age: Int, birthdate: Option[Date])
 
-  case class Person(
-      name: String, age: Int, address: Address, children: List[Child])
+  case class Person(name: String,
+                    age: Int,
+                    address: Address,
+                    children: List[Child])
       extends JsonObject[Person] {
     def meta = Person
   }
@@ -150,7 +152,7 @@ package mongotestrecords {
             dbo.get(k.toString) match {
               case bdbo: BasicDBObject
                   if (bdbo.containsField("name") &&
-                      bdbo.containsField("type")) =>
+                        bdbo.containsField("type")) =>
                 Map("name" -> bdbo.getString("name"),
                     "type" -> bdbo.getString("type"))
               case _ => null
@@ -253,8 +255,9 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
       for (t <- fromDb) {
         t.id.value must_== tr.id.value
         t.booleanfield.value must_== tr.booleanfield.value
-        TstRecord.formats.dateFormat.format(t.datetimefield.value.getTime) must_==
-          TstRecord.formats.dateFormat.format(tr.datetimefield.value.getTime)
+        TstRecord.formats.dateFormat
+          .format(t.datetimefield.value.getTime) must_==
+        TstRecord.formats.dateFormat.format(tr.datetimefield.value.getTime)
         t.doublefield.value must_== tr.doublefield.value
         t.intfield.value must_== tr.intfield.value
         t.localefield.value must_== tr.localefield.value
@@ -273,11 +276,11 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
         t.person.value.children.size must_== tr.person.value.children.size
         for (i <- List.range(0, t.person.value.children.size - 1)) {
           t.person.value.children(i).name must_==
-            tr.person.value.children(i).name
+          tr.person.value.children(i).name
           t.person.value.children(i).age must_==
-            tr.person.value.children(i).age
+          tr.person.value.children(i).age
           t.person.value.children(i).birthdate must_==
-            tr.person.value.children(i).birthdate
+          tr.person.value.children(i).birthdate
         }
       }
 
@@ -345,7 +348,7 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     val refFromFetch = md1.refdocId.obj
     refFromFetch.isDefined must_== true
     refFromFetch.openOrThrowException("we know this is Full").id.get must_==
-      ref1.id.get
+    ref1.id.get
 
     // query for a single doc with a JObject query
     val md1a = MainDoc.find(("name") -> "md1")
@@ -397,8 +400,7 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     // get the doc back from the db and compare
     val mdq5 = MainDoc.find("_id", md1.id.get)
     mdq5.isDefined must_== true
-    mdq5.map(
-        m => {
+    mdq5.map(m => {
       m.name.value must_== "md1a"
       m.cnt.value must_== 1
     })

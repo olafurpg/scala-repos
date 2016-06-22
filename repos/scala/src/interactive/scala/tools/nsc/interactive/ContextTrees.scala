@@ -70,8 +70,8 @@ trait ContextTrees { self: Global =>
   /** Returns the ContextTree containing `pos`, or the ContextTree positioned just before `pos`,
     *  or None if `pos` is located before all ContextTrees.
     */
-  def locateContextTree(
-      contexts: Contexts, pos: Position): Option[ContextTree] = {
+  def locateContextTree(contexts: Contexts,
+                        pos: Position): Option[ContextTree] = {
     if (contexts.isEmpty) None
     else {
       // binary search on contexts, loop invar: lo <= hi, recursion metric: `hi - lo`
@@ -113,8 +113,8 @@ trait ContextTrees { self: Global =>
   def addContext(contexts: Contexts, context: Context): Unit = {
     val cpos = context.tree.pos
     if (cpos.isTransparent)
-      for (t <- context.tree.children flatMap solidDescendants) addContext(
-          contexts, context, t.pos)
+      for (t <- context.tree.children flatMap solidDescendants)
+        addContext(contexts, context, t.pos)
     else addContext(contexts, context, cpos)
   }
 
@@ -147,8 +147,10 @@ trait ContextTrees { self: Global =>
               } else if (cpos includes oldpos) {
                 val start = contexts.indexWhere(cpos includes _.pos)
                 val last = contexts.lastIndexWhere(cpos includes _.pos)
-                contexts(start) = new ContextTree(
-                    cpos, context, contexts.slice(start, last + 1))
+                contexts(start) =
+                  new ContextTree(cpos,
+                                  context,
+                                  contexts.slice(start, last + 1))
                 contexts.remove(start + 1, last - start)
                 true
               } else false
@@ -166,8 +168,9 @@ trait ContextTrees { self: Global =>
                 if ((lopos precedes cpos) && (cpos precedes hipos))
                   contexts.insert(hi, new ContextTree(cpos, context))
                 else
-                  inform("internal error? skewed positions: " + lopos +
-                      " !< " + cpos + " !< " + hipos)
+                  inform(
+                      "internal error? skewed positions: " + lopos +
+                        " !< " + cpos + " !< " + hipos)
               }
             }
             loop(0, hi)
@@ -179,8 +182,8 @@ trait ContextTrees { self: Global =>
           ex.printStackTrace()
           println(
               "failure inserting " + cpos + " into " + contexts + "/" +
-              contexts(contexts.length - 1).pos + "/" +
-              (contexts(contexts.length - 1).pos includes cpos))
+                contexts(contexts.length - 1).pos + "/" +
+                (contexts(contexts.length - 1).pos includes cpos))
           throw ex
       }
     }

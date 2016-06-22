@@ -47,8 +47,8 @@ private[streaming] class StreamingListenerBus(
     }
   }
 
-  protected override def doPostEvent(
-      listener: StreamingListener, event: StreamingListenerEvent): Unit = {
+  protected override def doPostEvent(listener: StreamingListener,
+                                     event: StreamingListenerEvent): Unit = {
     event match {
       case receiverStarted: StreamingListenerReceiverStarted =>
         listener.onReceiverStarted(receiverStarted)

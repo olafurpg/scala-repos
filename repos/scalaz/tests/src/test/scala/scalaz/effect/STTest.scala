@@ -29,6 +29,6 @@ object STTest extends SpecLite {
         r <- arr.freeze
       } yield r
     runST(new ForallST[ImmutableArray[Boolean]] { def apply[S] = e1[S] }).toList must_===
-      (List(false, true, true))
+    (List(false, true, true))
   }
 }

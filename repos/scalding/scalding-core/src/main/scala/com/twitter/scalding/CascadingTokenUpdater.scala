@@ -48,8 +48,8 @@ object CascadingTokenUpdater {
   // Given the first free token spot
   // assign each of the class names given to al the subsequent
   // positions
-  private def assignTokens(
-      first: Int, names: Iterable[String]): Map[Int, String] =
+  private def assignTokens(first: Int,
+                           names: Iterable[String]): Map[Int, String] =
     names
       .foldLeft((first, Map[Int, String]())) { (idMap, clz) =>
         val (id, m) = idMap

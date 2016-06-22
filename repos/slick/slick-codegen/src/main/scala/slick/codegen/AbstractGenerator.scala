@@ -324,7 +324,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def rawName: String = model.name.toCamelCase.uncapitalize
       def doc: String =
         "Database column " + model.name + " " +
-        model.options.map(_.toString).mkString(", ")
+          model.options.map(_.toString).mkString(", ")
     }
 
     /** Primary key generator virtual class */
@@ -444,8 +444,8 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def rawName = disambiguateTerm("index" + id)
       def doc: String =
         (if (model.unique) "Uniqueness " else "") + "Index over " +
-        columns.map(_.name).mkString("(", ",", ")") +
-        s" (database name ${dbName})"
+          columns.map(_.name).mkString("(", ",", ")") +
+          s" (database name ${dbName})"
     }
 
     /** Common interface for any kind of definition within the generated code */
@@ -479,12 +479,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       override def docWithCode: Code = {
         val newdoc =
           doc +
-          (if (scalaKeywords.contains(rawName))
-             s"\nNOTE: The name was escaped because it collided with a Scala keyword."
-           else "") +
-          (if (slickTableTermMembersNoArgs.contains(rawName))
-             s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
-           else "")
+            (if (scalaKeywords.contains(rawName))
+               s"\nNOTE: The name was escaped because it collided with a Scala keyword."
+             else "") +
+            (if (slickTableTermMembersNoArgs.contains(rawName))
+               s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
+             else "")
         codegen.docWithCode(newdoc, code)
       }
 

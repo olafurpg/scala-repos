@@ -11,8 +11,9 @@ import java.io.{BufferedReader}
 import session.NoHistory
 
 /** Reads using standard JDK API */
-class SimpleReader(
-    in: BufferedReader, out: JPrintWriter, val interactive: Boolean)
+class SimpleReader(in: BufferedReader,
+                   out: JPrintWriter,
+                   val interactive: Boolean)
     extends InteractiveReader {
   val history = NoHistory
   val completion = NoCompletion

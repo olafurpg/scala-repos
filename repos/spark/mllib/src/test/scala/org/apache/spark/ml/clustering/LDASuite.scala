@@ -25,8 +25,10 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 object LDASuite {
-  def generateLDAData(
-      sql: SQLContext, rows: Int, k: Int, vocabSize: Int): DataFrame = {
+  def generateLDAData(sql: SQLContext,
+                      rows: Int,
+                      k: Int,
+                      vocabSize: Int): DataFrame = {
     val avgWC = 1 // average instances of each word in a doc
     val sc = sql.sparkContext
     val rng = new java.util.Random()
@@ -205,7 +207,8 @@ class LDASuite
     assert(topics.count() === k)
     assert(
         topics.select("topic").rdd.map(_.getInt(0)).collect().toSet === Range(
-            0, k).toSet)
+            0,
+            k).toSet)
     topics.select("termIndices").collect().foreach {
       case r: Row =>
         val termIndices = r.getAs[Seq[Int]](0)
@@ -246,22 +249,28 @@ class LDASuite
   test("read/write LocalLDAModel") {
     def checkModelData(model: LDAModel, model2: LDAModel): Unit = {
       assert(model.vocabSize === model2.vocabSize)
-      assert(Vectors.dense(model.topicsMatrix.toArray) ~==
+      assert(
+          Vectors.dense(model.topicsMatrix.toArray) ~==
             Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
-      assert(Vectors.dense(model.getDocConcentration) ~==
+      assert(
+          Vectors.dense(model.getDocConcentration) ~==
             Vectors.dense(model2.getDocConcentration) absTol 1e-6)
     }
     val lda = new LDA()
-    testEstimatorAndModelReadWrite(
-        lda, dataset, LDASuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(lda,
+                                   dataset,
+                                   LDASuite.allParamSettings,
+                                   checkModelData)
   }
 
   test("read/write DistributedLDAModel") {
     def checkModelData(model: LDAModel, model2: LDAModel): Unit = {
       assert(model.vocabSize === model2.vocabSize)
-      assert(Vectors.dense(model.topicsMatrix.toArray) ~==
+      assert(
+          Vectors.dense(model.topicsMatrix.toArray) ~==
             Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
-      assert(Vectors.dense(model.getDocConcentration) ~==
+      assert(
+          Vectors.dense(model.getDocConcentration) ~==
             Vectors.dense(model2.getDocConcentration) absTol 1e-6)
     }
     val lda = new LDA()

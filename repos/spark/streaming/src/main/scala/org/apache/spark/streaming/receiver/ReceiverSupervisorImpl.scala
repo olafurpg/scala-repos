@@ -47,8 +47,7 @@ private[streaming] class ReceiverSupervisorImpl(
     env: SparkEnv,
     hadoopConf: Configuration,
     checkpointDirOption: Option[String]
-)
-    extends ReceiverSupervisor(receiver, env.conf)
+) extends ReceiverSupervisor(receiver, env.conf)
     with Logging {
 
   private val host = SparkEnv.get.blockManager.blockManagerId.host
@@ -59,8 +58,8 @@ private[streaming] class ReceiverSupervisorImpl(
       if (checkpointDirOption.isEmpty) {
         throw new SparkException(
             "Cannot enable receiver write-ahead log without checkpoint directory set. " +
-            "Please use streamingContext.checkpoint() to set the checkpoint directory. " +
-            "See documentation for more details.")
+              "Please use streamingContext.checkpoint() to set the checkpoint directory. " +
+              "See documentation for more details.")
       }
       new WriteAheadLogBasedBlockHandler(env.blockManager,
                                          receiver.streamId,
@@ -69,8 +68,8 @@ private[streaming] class ReceiverSupervisorImpl(
                                          hadoopConf,
                                          checkpointDirOption.get)
     } else {
-      new BlockManagerBasedBlockHandler(
-          env.blockManager, receiver.storageLevel)
+      new BlockManagerBasedBlockHandler(env.blockManager,
+                                        receiver.storageLevel)
     }
   }
 
@@ -137,8 +136,9 @@ private[streaming] class ReceiverSupervisorImpl(
       metadataOption: Option[Any],
       blockIdOption: Option[StreamBlockId]
   ) {
-    pushAndReportBlock(
-        ArrayBufferBlock(arrayBuffer), metadataOption, blockIdOption)
+    pushAndReportBlock(ArrayBufferBlock(arrayBuffer),
+                       metadataOption,
+                       blockIdOption)
   }
 
   /** Store a iterator of received data as a data block into Spark's memory. */
@@ -172,8 +172,8 @@ private[streaming] class ReceiverSupervisorImpl(
     logDebug(
         s"Pushed block $blockId in ${(System.currentTimeMillis - time)} ms")
     val numRecords = blockStoreResult.numRecords
-    val blockInfo = ReceivedBlockInfo(
-        streamId, numRecords, metadataOption, blockStoreResult)
+    val blockInfo =
+      ReceivedBlockInfo(streamId, numRecords, metadataOption, blockStoreResult)
     trackerEndpoint.askWithRetry[Boolean](AddBlock(blockInfo))
     logDebug(s"Reported block $blockId")
   }
@@ -196,13 +196,16 @@ private[streaming] class ReceiverSupervisorImpl(
   }
 
   override protected def onReceiverStart(): Boolean = {
-    val msg = RegisterReceiver(
-        streamId, receiver.getClass.getSimpleName, host, executorId, endpoint)
+    val msg = RegisterReceiver(streamId,
+                               receiver.getClass.getSimpleName,
+                               host,
+                               executorId,
+                               endpoint)
     trackerEndpoint.askWithRetry[Boolean](msg)
   }
 
-  override protected def onReceiverStop(
-      message: String, error: Option[Throwable]) {
+  override protected def onReceiverStop(message: String,
+                                        error: Option[Throwable]) {
     logInfo("Deregistering receiver " + streamId)
     val errorString = error.map(Throwables.getStackTraceAsString).getOrElse("")
     trackerEndpoint.askWithRetry[Boolean](
@@ -218,8 +221,8 @@ private[streaming] class ReceiverSupervisorImpl(
     }
     stoppedGenerators.foreach(registeredBlockGenerators.remove(_))
 
-    val newBlockGenerator = new BlockGenerator(
-        blockGeneratorListener, streamId, env.conf)
+    val newBlockGenerator =
+      new BlockGenerator(blockGeneratorListener, streamId, env.conf)
     registeredBlockGenerators.add(newBlockGenerator)
     newBlockGenerator
   }

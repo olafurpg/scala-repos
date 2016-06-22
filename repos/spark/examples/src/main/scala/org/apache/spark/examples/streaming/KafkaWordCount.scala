@@ -75,7 +75,7 @@ object KafkaWordCountProducer {
     if (args.length < 4) {
       System.err.println(
           "Usage: KafkaWordCountProducer <metadataBrokerList> <topic> " +
-          "<messagesPerSec> <wordsPerMessage>")
+            "<messagesPerSec> <wordsPerMessage>")
       System.exit(1)
     }
 

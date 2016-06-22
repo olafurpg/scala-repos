@@ -125,11 +125,15 @@ trait RandomLibSpecs[M[+ _]]
 
     val observe = dag.Observe(numbers, uniform)(line)
 
-    val randObj = dag.Join(
-        WrapObject, Cross(None), Const(CString("rand"))(line), observe)(line)
+    val randObj = dag.Join(WrapObject,
+                           Cross(None),
+                           Const(CString("rand"))(line),
+                           observe)(line)
 
-    val numbersObj = dag.Join(
-        WrapObject, Cross(None), Const(CString("data"))(line), numbers)(line)
+    val numbersObj = dag.Join(WrapObject,
+                              Cross(None),
+                              Const(CString("data"))(line),
+                              numbers)(line)
 
     val input = dag.Join(JoinObject, IdentitySort, randObj, numbersObj)(line)
 

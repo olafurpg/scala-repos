@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull
 /**
   * @author Pavel Fatin
   */
-class SbtProjectSettingsControl(
-    context: Context, initialSettings: SbtProjectSettings)
+class SbtProjectSettingsControl(context: Context,
+                                initialSettings: SbtProjectSettings)
     extends AbstractExternalProjectSettingsControl[SbtProjectSettings](
         initialSettings) {
 

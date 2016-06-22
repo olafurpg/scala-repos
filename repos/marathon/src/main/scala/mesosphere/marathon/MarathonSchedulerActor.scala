@@ -58,8 +58,8 @@ class MarathonSchedulerActor private (
 
   override def preStart(): Unit = {
     schedulerActions = createSchedulerActions(self)
-    deploymentManager = context.actorOf(
-        deploymentManagerProps(schedulerActions), "DeploymentManager")
+    deploymentManager = context
+      .actorOf(deploymentManagerProps(schedulerActions), "DeploymentManager")
     historyActor = context.actorOf(historyActorProps, "HistoryActor")
 
     leaderInfo.subscribe(self)
@@ -163,8 +163,8 @@ class MarathonSchedulerActor private (
         val origSender = sender()
         withLockFor(appId) {
           val promise = Promise[Unit]()
-          context.actorOf(TaskKillActor.props(
-                  driver, appId, taskTracker, eventBus, taskIds, promise))
+          context.actorOf(TaskKillActor
+                .props(driver, appId, taskTracker, eventBus, taskIds, promise))
           val res = for {
             _ <- promise.future
             Some(app) <- appRepository.currentVersion(appId)
@@ -311,7 +311,8 @@ class MarathonSchedulerActor private (
                   p.id
               }
               origSender ! CommandFailed(
-                  cmd, AppLockedException(relatedDeploymentIds))
+                  cmd,
+                  AppLockedException(relatedDeploymentIds))
           }
     }
   }
@@ -492,7 +493,7 @@ class SchedulerActions(appRepository: AppRepository,
         for (unknownAppId <- tasksByApp.allAppIdsWithTasks -- appIds) {
           log.warn(
               s"App $unknownAppId exists in TaskTracker, but not App store. " +
-              "The app was likely terminated. Will now expunge."
+                "The app was likely terminated. Will now expunge."
           )
           for (orphanTask <- tasksByApp.marathonAppTasks(unknownAppId)) {
             log.info(s"Killing task ${orphanTask.getId}")

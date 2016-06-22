@@ -66,8 +66,11 @@ class SubScene(override val delegate: jfxs.SubScene)
            depthBuffer: Boolean,
            antiAliasing: SceneAntialiasing) =
     this(
-        new jfxs.SubScene(
-            new jfxs.Group(), width, height, depthBuffer, antiAliasing))
+        new jfxs.SubScene(new jfxs.Group(),
+                          width,
+                          height,
+                          depthBuffer,
+                          antiAliasing))
 
   /** Creates a SubScene for a specific root Node with a specific size. */
   def this(root: Parent, width: Double, height: Double) =
@@ -98,7 +101,7 @@ class SubScene(override val delegate: jfxs.SubScene)
     case _ =>
       throw new IllegalStateException(
           "Cannot access children of root: " + root +
-          "\nUse a class that extends Group or Pane, or override the getChildren method.")
+            "\nUse a class that extends Group or Pane, or override the getChildren method.")
   }
 
   /**

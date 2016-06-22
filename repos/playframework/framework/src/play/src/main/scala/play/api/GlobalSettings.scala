@@ -129,7 +129,7 @@ trait GlobalSettings {
       }
       val inContext =
         context.isEmpty || request.path == context ||
-        request.path.startsWith(context + "/")
+          request.path.startsWith(context + "/")
       next(request) match {
         case action: EssentialAction if inContext => doFilter(action)
         case handler => handler
@@ -189,8 +189,8 @@ trait GlobalSettings {
     * @return the result to send to the client
     */
   def onBadRequest(request: RequestHeader, error: String): Future[Result] =
-    defaultErrorHandler.onClientError(
-        request, play.api.http.Status.BAD_REQUEST, error)
+    defaultErrorHandler
+      .onClientError(request, play.api.http.Status.BAD_REQUEST, error)
 }
 
 /**
@@ -239,11 +239,11 @@ object GlobalSettings {
             if !configuration.getString("application.global").isDefined =>
           DefaultGlobal
         case e if configuration.getString("application.global").isDefined => {
-            throw configuration.reportError(
-                "application.global",
-                s"Cannot initialize the custom Global object ($globalClass) (perhaps it's a wrong reference?)",
-                Some(e))
-          }
+          throw configuration.reportError(
+              "application.global",
+              s"Cannot initialize the custom Global object ($globalClass) (perhaps it's a wrong reference?)",
+              Some(e))
+        }
       }
 
     try {

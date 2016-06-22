@@ -103,8 +103,8 @@ object ChoiceBoxTreeTableCell {
     * @return $RETFTTC
     * @see $URL0#ChoiceBoxTreeTableCell-javafx.util.StringConverter-javafx.collections.ObservableList- $ORIGINALDOC
     */
-  def forTreeTableColumn[S, T](
-      converter: StringConverter[T], items: ObservableBuffer[T])
+  def forTreeTableColumn[S, T](converter: StringConverter[T],
+                               items: ObservableBuffer[T])
     : (jfxsc.TreeTableColumn[S, T] => TreeTableCell[S, T]) =
     (view: jfxsc.TreeTableColumn[S, T]) =>
       jfxscc.ChoiceBoxTreeTableCell
@@ -118,8 +118,8 @@ object ChoiceBoxTreeTableCell {
       message =
         "Use forTreeTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
       since = "1.0")
-  def forTreeTableColumn[S, T](
-      converter: jfxu.StringConverter[T], items: jfxc.ObservableList[T]) =
+  def forTreeTableColumn[S, T](converter: jfxu.StringConverter[T],
+                               items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxTreeTableCell.forTreeTableColumn[S, T](converter, items)
 
   /**

@@ -36,8 +36,8 @@ import akka.stream.scaladsl.Sink
   *
   * @param config a client configuration object
   */
-case class AhcWSClient(
-    config: AsyncHttpClientConfig)(implicit materializer: Materializer)
+case class AhcWSClient(config: AsyncHttpClientConfig)(
+    implicit materializer: Materializer)
     extends WSClient {
 
   private val asyncHttpClient = new DefaultAsyncHttpClient(config)
@@ -45,7 +45,8 @@ case class AhcWSClient(
   def underlying[T]: T = asyncHttpClient.asInstanceOf[T]
 
   private[libs] def executeRequest[T](
-      request: Request, handler: AsyncHandler[T]): ListenableFuture[T] =
+      request: Request,
+      handler: AsyncHandler[T]): ListenableFuture[T] =
     asyncHttpClient.executeRequest(request, handler)
 
   def close(): Unit = asyncHttpClient.close()
@@ -107,27 +108,28 @@ case object AhcWSRequest {
 /**
   * A Ahc WS Request.
   */
-case class AhcWSRequest(client: AhcWSClient,
-                        url: String,
-                        method: String,
-                        body: WSBody,
-                        headers: Map[String, Seq[String]],
-                        queryString: Map[String, Seq[String]],
-                        calc: Option[WSSignatureCalculator],
-                        auth: Option[(String, String, WSAuthScheme)],
-                        followRedirects: Option[Boolean],
-                        requestTimeout: Option[Int],
-                        virtualHost: Option[String],
-                        proxyServer: Option[WSProxyServer],
-                        disableUrlEncoding: Option[Boolean],
-                        filters: Seq[WSRequestFilter] = Nil)(
-    implicit materializer: Materializer)
+case class AhcWSRequest(
+    client: AhcWSClient,
+    url: String,
+    method: String,
+    body: WSBody,
+    headers: Map[String, Seq[String]],
+    queryString: Map[String, Seq[String]],
+    calc: Option[WSSignatureCalculator],
+    auth: Option[(String, String, WSAuthScheme)],
+    followRedirects: Option[Boolean],
+    requestTimeout: Option[Int],
+    virtualHost: Option[String],
+    proxyServer: Option[WSProxyServer],
+    disableUrlEncoding: Option[Boolean],
+    filters: Seq[WSRequestFilter] = Nil)(implicit materializer: Materializer)
     extends WSRequest {
 
   def sign(calc: WSSignatureCalculator): WSRequest = copy(calc = Some(calc))
 
-  def withAuth(
-      username: String, password: String, scheme: WSAuthScheme): WSRequest =
+  def withAuth(username: String,
+               password: String,
+               scheme: WSAuthScheme): WSRequest =
     copy(auth = Some((username, password, scheme)))
 
   def withHeaders(hdrs: (String, String)*): WSRequest = {
@@ -138,8 +140,7 @@ case class AhcWSRequest(client: AhcWSClient,
   }
 
   def withQueryString(parameters: (String, String)*): WSRequest =
-    copy(
-        queryString = parameters.foldLeft(this.queryString) {
+    copy(queryString = parameters.foldLeft(this.queryString) {
       case (m, (k, v)) => m + (k -> (v +: m.getOrElse(k, Nil)))
     })
 
@@ -172,8 +173,7 @@ case class AhcWSRequest(client: AhcWSClient,
   def withMethod(method: String): WSRequest = copy(method = method)
 
   def execute(): Future[WSResponse] = {
-    val executor = filterWSRequestExecutor(
-        new WSRequestExecutor {
+    val executor = filterWSRequestExecutor(new WSRequestExecutor {
       override def execute(request: WSRequest): Future[WSResponse] =
         request.asInstanceOf[AhcWSRequest].execute(buildRequest())
     })
@@ -245,10 +245,10 @@ case class AhcWSRequest(client: AhcWSClient,
   /**
     * Add http auth headers. Defaults to HTTP Basic.
     */
-  private[libs] def auth(username: String,
-                         password: String,
-                         scheme: Realm.AuthScheme =
-                           Realm.AuthScheme.BASIC): Realm = {
+  private[libs] def auth(
+      username: String,
+      password: String,
+      scheme: Realm.AuthScheme = Realm.AuthScheme.BASIC): Realm = {
     new Realm.Builder(username, password)
       .setScheme(scheme)
       .setUsePreemptiveAuth(true)
@@ -389,8 +389,8 @@ case class AhcWSRequest(client: AhcWSClient,
     val proxyBuilder =
       new AHCProxyServer.Builder(wsProxyServer.host, wsProxyServer.port)
     if (wsProxyServer.principal.isDefined) {
-      val realmBuilder = new Realm.Builder(
-          wsProxyServer.principal.orNull, wsProxyServer.password.orNull)
+      val realmBuilder = new Realm.Builder(wsProxyServer.principal.orNull,
+                                           wsProxyServer.password.orNull)
       val scheme: Realm.AuthScheme = wsProxyServer.protocol
         .getOrElse("http")
         .toLowerCase(java.util.Locale.ENGLISH) match {
@@ -433,10 +433,10 @@ class WSClientProvider @Inject()(wsApi: WSAPI) extends Provider[WSClient] {
 }
 
 @Singleton
-class AhcWSAPI @Inject()(environment: Environment,
-                         clientConfig: AhcWSClientConfig,
-                         lifecycle: ApplicationLifecycle)(
-    implicit materializer: Materializer)
+class AhcWSAPI @Inject()(
+    environment: Environment,
+    clientConfig: AhcWSClientConfig,
+    lifecycle: ApplicationLifecycle)(implicit materializer: Materializer)
     extends WSAPI {
 
   private val logger = Logger(classOf[AhcWSAPI])
@@ -617,9 +617,11 @@ trait AhcWSComponents {
 
   lazy val wsClientConfig: WSClientConfig =
     new WSConfigParser(configuration, environment).parse()
-  lazy val ahcWsClientConfig: AhcWSClientConfig = new AhcWSClientConfigParser(
-      wsClientConfig, configuration, environment).parse()
-  lazy val wsApi: WSAPI = new AhcWSAPI(
-      environment, ahcWsClientConfig, applicationLifecycle)(materializer)
+  lazy val ahcWsClientConfig: AhcWSClientConfig =
+    new AhcWSClientConfigParser(wsClientConfig, configuration, environment)
+      .parse()
+  lazy val wsApi: WSAPI =
+    new AhcWSAPI(environment, ahcWsClientConfig, applicationLifecycle)(
+        materializer)
   lazy val wsClient: WSClient = wsApi.client
 }

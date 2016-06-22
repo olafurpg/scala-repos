@@ -60,8 +60,8 @@ abstract class ScTypeDefinitionImpl protected (
         val mem: Option[ScMember] = member match {
           case method: PsiMethod =>
             Some(
-                ScalaPsiElementFactory.createMethodFromText(
-                    newMemberText, getManager))
+                ScalaPsiElementFactory.createMethodFromText(newMemberText,
+                                                            getManager))
           case _ => None
         }
         mem match {
@@ -100,8 +100,9 @@ abstract class ScTypeDefinitionImpl protected (
     val parentClass: ScTemplateDefinition = containingClass
     if (typeParameters.isEmpty) {
       if (parentClass != null) {
-        Success(ScProjectionType(
-                    ScThisType(parentClass), this, superReference = false),
+        Success(ScProjectionType(ScThisType(parentClass),
+                                 this,
+                                 superReference = false),
                 Some(this))
       } else {
         Success(ScType.designator(this), Some(this))
@@ -109,8 +110,9 @@ abstract class ScTypeDefinitionImpl protected (
     } else {
       if (parentClass != null) {
         Success(ScParameterizedType(
-                    ScProjectionType(
-                        ScThisType(parentClass), this, superReference = false),
+                    ScProjectionType(ScThisType(parentClass),
+                                     this,
+                                     superReference = false),
                     typeParameters.map(
                         new ScTypeParameterType(_, ScSubstitutor.empty))),
                 Some(this))
@@ -124,9 +126,9 @@ abstract class ScTypeDefinitionImpl protected (
     }
   }
 
-  def getTypeWithProjections(ctx: TypingContext,
-                             thisProjections: Boolean =
-                               false): TypeResult[ScType] = {
+  def getTypeWithProjections(
+      ctx: TypingContext,
+      thisProjections: Boolean = false): TypeResult[ScType] = {
     def args: Seq[ScTypeParameterType] =
       typeParameters.map(new ScTypeParameterType(_, ScSubstitutor.empty))
     def innerType =
@@ -137,8 +139,8 @@ abstract class ScTypeDefinitionImpl protected (
       val tpe: ScType =
         if (!thisProjections)
           parentClazz
-            .getTypeWithProjections(
-                TypingContext.empty, thisProjections = false)
+            .getTypeWithProjections(TypingContext.empty,
+                                    thisProjections = false)
             .getOrElse(
                 return Failure("Cannot resolve parent class", Some(this)))
         else ScThisType(parentClazz)
@@ -151,10 +153,10 @@ abstract class ScTypeDefinitionImpl protected (
   }
 
   override def getModifierList: ScModifierList =
-    super [ScTypeDefinition].getModifierList
+    super[ScTypeDefinition].getModifierList
 
   override def hasModifierProperty(name: String): Boolean =
-    super [ScTypeDefinition].hasModifierProperty(name)
+    super[ScTypeDefinition].hasModifierProperty(name)
 
   override def getNavigationElement = getContainingFile match {
     case s: ScalaFileImpl if s.isCompiled => getSourceMirrorClass
@@ -189,7 +191,7 @@ abstract class ScTypeDefinitionImpl protected (
       parentSourceMirror match {
         case td: ScTypeDefinitionImpl =>
           for (i <- td.typeDefinitions if name == i.name &&
-               hasSameScalaKind(i)) return i
+                 hasSameScalaKind(i)) return i
         case _ => this
       }
     }
@@ -216,7 +218,7 @@ abstract class ScTypeDefinitionImpl protected (
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
   override def getContainingClass: PsiClass = {
-    super [ScTypeDefinition].getContainingClass match {
+    super[ScTypeDefinition].getContainingClass match {
       case o: ScObject => o.fakeCompanionClassOrCompanionClass
       case containingClass => containingClass
     }
@@ -266,8 +268,8 @@ abstract class ScTypeDefinitionImpl protected (
   def getQualifiedNameForDebugger: String = {
     containingClass match {
       case td: ScTypeDefinition =>
-        td.getQualifiedNameForDebugger + "$" + transformName(
-            encodeName = true, name)
+        td.getQualifiedNameForDebugger + "$" + transformName(encodeName = true,
+                                                             name)
       case _ =>
         if (this.isPackageObject)
           qualifiedName("", encodeName = true) + ".package"
@@ -291,8 +293,9 @@ abstract class ScTypeDefinitionImpl protected (
                               encodeName: Boolean = false): String = {
     // Returns prefix with convenient separator sep
     @tailrec
-    def _packageName(
-        e: PsiElement, sep: String, k: (String) => String): String =
+    def _packageName(e: PsiElement,
+                     sep: String,
+                     k: (String) => String): String =
       e.getContext match {
         case o: ScObject if o.isPackageObject && o.name == "`package`" =>
           _packageName(o, sep, k)
@@ -343,14 +346,15 @@ abstract class ScTypeDefinitionImpl protected (
     }
   }
 
-  override def findMethodBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = {
-    super [ScTypeDefinition].findMethodBySignature(patternMethod, checkBases)
+  override def findMethodBySignature(patternMethod: PsiMethod,
+                                     checkBases: Boolean): PsiMethod = {
+    super[ScTypeDefinition].findMethodBySignature(patternMethod, checkBases)
   }
 
   override def findMethodsBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = {
-    super [ScTypeDefinition].findMethodsBySignature(patternMethod, checkBases)
+      patternMethod: PsiMethod,
+      checkBases: Boolean): Array[PsiMethod] = {
+    super[ScTypeDefinition].findMethodsBySignature(patternMethod, checkBases)
   }
 
   import _root_.java.util.{Collection => JCollection, List => JList}
@@ -360,26 +364,26 @@ abstract class ScTypeDefinitionImpl protected (
   override def findMethodsAndTheirSubstitutorsByName(
       name: String,
       checkBases: Boolean): JList[IPair[PsiMethod, PsiSubstitutor]] = {
-    super [ScTypeDefinition].findMethodsAndTheirSubstitutorsByName(
-        name, checkBases)
+    super[ScTypeDefinition]
+      .findMethodsAndTheirSubstitutorsByName(name, checkBases)
   }
 
   override def getAllMethodsAndTheirSubstitutors: JList[
       IPair[PsiMethod, PsiSubstitutor]] = {
-    super [ScTypeDefinition].getAllMethodsAndTheirSubstitutors
+    super[ScTypeDefinition].getAllMethodsAndTheirSubstitutors
   }
 
   override def getVisibleSignatures: JCollection[HierarchicalMethodSignature] = {
-    super [ScTypeDefinition].getVisibleSignatures
+    super[ScTypeDefinition].getVisibleSignatures
   }
 
-  override def findMethodsByName(
-      name: String, checkBases: Boolean): Array[PsiMethod] = {
-    super [ScTypeDefinition].findMethodsByName(name, checkBases)
+  override def findMethodsByName(name: String,
+                                 checkBases: Boolean): Array[PsiMethod] = {
+    super[ScTypeDefinition].findMethodsByName(name, checkBases)
   }
 
   override def findFieldByName(name: String, checkBases: Boolean): PsiField = {
-    super [ScTypeDefinition].findFieldByName(name, checkBases)
+    super[ScTypeDefinition].findFieldByName(name, checkBases)
   }
 
   override def checkDelete() {}
@@ -412,14 +416,14 @@ abstract class ScTypeDefinitionImpl protected (
   }
 
   override def isInheritor(baseClass: PsiClass, deep: Boolean): Boolean =
-    super [ScTypeDefinition].isInheritor(baseClass, deep)
+    super[ScTypeDefinition].isInheritor(baseClass, deep)
 
   def signaturesByName(name: String): Seq[PhysicalSignature] = {
     (for ((s: PhysicalSignature, _) <- TypeDefinitionMembers
                                         .getSignatures(this)
                                         .forName(name)
-                                        ._1) yield
-      s) ++ syntheticMethodsNoOverride
+                                        ._1)
+      yield s) ++ syntheticMethodsNoOverride
       .filter(_.name == name)
       .map(new PhysicalSignature(_, ScSubstitutor.empty))
   }
@@ -427,7 +431,7 @@ abstract class ScTypeDefinitionImpl protected (
   override def getNameIdentifier: PsiIdentifier = {
     Predef.assert(nameId != null,
                   "Class hase null nameId. Class text: " +
-                  getText) //diagnostic for EA-20122
+                    getText) //diagnostic for EA-20122
     new JavaIdentifier(nameId)
   }
 
@@ -437,7 +441,9 @@ abstract class ScTypeDefinitionImpl protected (
     if (!this.isValid) return icon //to prevent Invalid access: EA: 13535
     val isLocked = (flags & Iconable.ICON_FLAG_READ_STATUS) != 0 && !isWritable
     val rowIcon = ElementBase.createLayeredIcon(
-        this, icon, ElementPresentationUtil.getFlags(this, isLocked))
+        this,
+        icon,
+        ElementPresentationUtil.getFlags(this, isLocked))
     if ((flags & Iconable.ICON_FLAG_VISIBILITY) != 0) {
       val accessLevel = {
         if (hasModifierProperty("private")) PsiUtil.ACCESS_LEVEL_PRIVATE
@@ -453,7 +459,7 @@ abstract class ScTypeDefinitionImpl protected (
   protected def getIconInner: Icon
 
   override def getDocComment: PsiDocComment =
-    super [ScTypeDefinition].getDocComment
+    super[ScTypeDefinition].getDocComment
 
   override def isDeprecated: Boolean = {
     val stub = getStub
@@ -500,13 +506,13 @@ abstract class ScTypeDefinitionImpl protected (
     PsiClassImplUtil.getAllInnerClasses(this)
   }
 
-  override def findInnerClassByName(
-      name: String, checkBases: Boolean): PsiClass = {
-    super [ScTypeDefinition].findInnerClassByName(name, checkBases)
+  override def findInnerClassByName(name: String,
+                                    checkBases: Boolean): PsiClass = {
+    super[ScTypeDefinition].findInnerClassByName(name, checkBases)
   }
 
   override def getAllFields: Array[PsiField] = {
-    super [ScTypeDefinition].getAllFields
+    super[ScTypeDefinition].getAllFields
   }
 
   override def getOriginalElement: PsiElement = {

@@ -31,7 +31,7 @@ package org.apache.spark
   *
   * NOTE: this class's constructor should be considered private and may be subject to change.
   */
-class SparkStatusTracker private[spark](sc: SparkContext) {
+class SparkStatusTracker private[spark] (sc: SparkContext) {
 
   private val jobProgressListener = sc.jobProgressListener
 

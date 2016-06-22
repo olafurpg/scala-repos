@@ -16,8 +16,8 @@ private[streams] abstract class RelaxedPublisher[T] extends Publisher[T] {
 
   // Streams method
   final override def subscribe(subr: Subscriber[_ >: T]): Unit = {
-    val handle: SubscriptionHandle[_] = createSubscription(
-        subr, RelaxedPublisher.onSubscriptionEndedNop)
+    val handle: SubscriptionHandle[_] =
+      createSubscription(subr, RelaxedPublisher.onSubscriptionEndedNop)
     handle.start()
   }
 }

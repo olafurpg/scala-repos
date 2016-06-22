@@ -124,8 +124,8 @@ object TaskTracker {
     * @param appId   The id of the app.
     * @param taskStateMap The tasks of this app by task ID. FIXME: change keys to Task.TaskID
     */
-  case class AppTasks(
-      appId: PathId, taskStateMap: Map[Task.Id, Task] = Map.empty) {
+  case class AppTasks(appId: PathId,
+                      taskStateMap: Map[Task.Id, Task] = Map.empty) {
 
     def isEmpty: Boolean = taskMap.isEmpty
     def contains(taskId: Task.Id): Boolean = taskMap.contains(taskId)
@@ -146,7 +146,7 @@ object TaskTracker {
     def apply(appId: PathId, tasks: Iterable[MarathonTask]): AppTasks =
       AppTasks.forTasks(appId, tasks.map(TaskSerializer.fromProto(_)))
     def forTasks(appId: PathId, tasks: Iterable[Task]): AppTasks =
-      AppTasks(
-          appId, tasks.map(taskState => taskState.taskId -> taskState).toMap)
+      AppTasks(appId,
+               tasks.map(taskState => taskState.taskId -> taskState).toMap)
   }
 }

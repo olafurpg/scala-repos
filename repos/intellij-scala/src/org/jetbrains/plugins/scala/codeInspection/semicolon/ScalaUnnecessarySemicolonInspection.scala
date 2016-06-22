@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 class ScalaUnnecessarySemicolonInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = false
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
 
     new ScalaElementVisitor {
       def startOffset(element: PsiElement) =
@@ -36,8 +36,8 @@ class ScalaUnnecessarySemicolonInspection extends LocalInspectionTool {
             val text = file.getText
             val textWithoutSemicolon =
               text.take(offset) + text.drop(offset + 1)
-            val newFile = ScalaPsiElementFactory.createScalaFile(
-                textWithoutSemicolon, element.getManager)
+            val newFile = ScalaPsiElementFactory
+              .createScalaFile(textWithoutSemicolon, element.getManager)
             var elem1 = file.findElementAt(offset - 1)
             var elem2 = newFile.findElementAt(offset - 1)
             while (elem1 != null && endOffset(elem1) <= offset &&

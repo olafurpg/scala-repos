@@ -15,7 +15,7 @@ class ScalaForEachPostfixTemplate
         new AncestorSelector(
             SelectorConditions.isDescendantCondition(
                 "scala.collection.GenTraversableOnce") ||
-            SelectorConditions.isDescendantCondition("scala.Array"),
+              SelectorConditions.isDescendantCondition("scala.Array"),
             Topmost)) {
 
   override def getTemplateString(element: PsiElement): String =

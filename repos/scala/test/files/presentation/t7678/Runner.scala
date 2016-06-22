@@ -23,7 +23,8 @@ object Test extends InteractiveTest {
           val runDefinitions = currentRun.runDefinitions
           import runDefinitions._
           assert(
-              TypeTagsClass.map(sym => getMemberClass(sym, tpnme.TypeTag)) == TypeTagClass)
+              TypeTagsClass
+                .map(sym => getMemberClass(sym, tpnme.TypeTag)) == TypeTagClass)
           assert(TypeTagsClass.map(sym =>
                     getMemberClass(sym, tpnme.WeakTypeTag)) == WeakTypeTagClass)
           assert(TypeTagsClass.map(sym =>

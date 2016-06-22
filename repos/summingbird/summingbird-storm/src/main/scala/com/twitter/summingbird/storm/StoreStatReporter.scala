@@ -28,8 +28,8 @@ import com.twitter.util.{Promise, Future}
   *
   * @author Ian O Connell
   */
-class MergeableStatReporter[K, V](
-    context: TopologyContext, val self: Mergeable[K, V])
+class MergeableStatReporter[K, V](context: TopologyContext,
+                                  val self: Mergeable[K, V])
     extends MergeableProxy[K, V]
     with MergeableReporter[Mergeable[K, V], K, V] {
   private def buildMetric(s: String) =
@@ -48,7 +48,8 @@ class MergeableStatReporter[K, V](
   }
 
   override def traceMultiMerge[K1 <: K](
-      kvs: Map[K1, V], request: Map[K1, Future[Option[V]]]) = {
+      kvs: Map[K1, V],
+      request: Map[K1, Future[Option[V]]]) = {
     multiMergeMetric.incr()
     multiMergeTuplesMetric.incrBy(request.size)
     request.map {
@@ -78,8 +79,8 @@ class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V])
   val getFailedMetric = buildMetric("getFailed")
   val multiGetTupleFailedMetric = buildMetric("multiGetTupleFailed")
 
-  override def traceMultiGet[K1 <: K](
-      ks: Set[K1], request: Map[K1, Future[Option[V]]]) = {
+  override def traceMultiGet[K1 <: K](ks: Set[K1],
+                                      request: Map[K1, Future[Option[V]]]) = {
     multiGetMetric.incr()
     multiGetTuplesMetric.incrBy(request.size)
 
@@ -106,8 +107,8 @@ class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V])
     }.unit
   }
 
-  override def traceMultiPut[K1 <: K](
-      kvs: Map[K1, Option[V]], request: Map[K1, Future[Unit]]) = {
+  override def traceMultiPut[K1 <: K](kvs: Map[K1, Option[V]],
+                                      request: Map[K1, Future[Unit]]) = {
     multiPutMetric.incr()
     multiPutTuplesMetric.incrBy(request.size)
 

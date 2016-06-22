@@ -52,13 +52,15 @@ object SideEffectsUtil {
               case _: ScObject => true
               case p: ScParameter
                   if !p.isCallByNameParameter &&
-                  !ScFunctionType.isFunctionType(
-                      p.getRealParameterType(TypingContext.empty).getOrAny) =>
+                    !ScFunctionType.isFunctionType(p
+                          .getRealParameterType(TypingContext.empty)
+                          .getOrAny) =>
                 true
               case _: ScSyntheticFunction => true
               case m: PsiMethod =>
                 methodHasNoSideEffects(
-                    m, ref.qualifier.flatMap(_.getType().toOption))
+                    m,
+                    ref.qualifier.flatMap(_.getType().toOption))
               case _ => false
             })
       }
@@ -88,10 +90,12 @@ object SideEffectsUtil {
         case ResolvesTo(td: ScTypedDefinition) =>
           val withApplyText =
             baseExpr.getText + ".apply" +
-            args.map(_.getText).mkString("(", ", ", ")")
+              args.map(_.getText).mkString("(", ", ", ")")
           val withApply =
             ScalaPsiElementFactory.createExpressionWithContextFromText(
-                withApplyText, expr.getContext, expr)
+                withApplyText,
+                expr.getContext,
+                expr)
           withApply match {
             case ScMethodCall(ResolvesTo(m: PsiMethod), _) =>
               methodHasNoSideEffects(m, typeOfQual)
@@ -146,20 +150,22 @@ object SideEffectsUtil {
           .bind()
           .exists(rr =>
                 rr.implicitConversionClass.isDefined ||
-                rr.implicitFunction.isDefined)
+                  rr.implicitFunction.isDefined)
       case _ => false
     }
   }
 
   private def methodHasNoSideEffects(
-      m: PsiMethod, typeOfQual: Option[ScType] = None): Boolean = {
+      m: PsiMethod,
+      typeOfQual: Option[ScType] = None): Boolean = {
     val methodClazzName = Option(m.containingClass).map(_.qualifiedName)
 
     methodClazzName match {
       case Some(fqn) =>
         val name = fqn + "." + m.name
-        if (ScalaCodeStyleSettings.nameFitToPatterns(
-                name, methodsFromObjectWithSideEffects)) return false
+        if (ScalaCodeStyleSettings
+              .nameFitToPatterns(name, methodsFromObjectWithSideEffects))
+          return false
       case _ =>
     }
 

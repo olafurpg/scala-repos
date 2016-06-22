@@ -54,8 +54,7 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
     if (testCommandAvailable("cat")) {
       val nums = sc
         .makeRDD(Array(1, 2, 3, 4), 2)
-        .mapPartitionsWithIndex(
-            (index, iterator) => {
+        .mapPartitionsWithIndex((index, iterator) => {
           new Iterator[Int] {
             def hasNext = true
             def next() = {
@@ -122,8 +121,8 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
   test("pipe with env variable") {
     if (testCommandAvailable("printenv")) {
       val nums = sc.makeRDD(Array(1, 2, 3, 4), 2)
-      val piped = nums.pipe(
-          Seq("printenv", "MY_TEST_ENV"), Map("MY_TEST_ENV" -> "LALALA"))
+      val piped = nums.pipe(Seq("printenv", "MY_TEST_ENV"),
+                            Map("MY_TEST_ENV" -> "LALALA"))
       val c = piped.collect()
       assert(c.size === 2)
       assert(c(0) === "LALALA")
@@ -195,7 +194,8 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
 
         override def compute(theSplit: Partition, context: TaskContext) = {
           new InterruptibleIterator[(LongWritable, Text)](
-              context, Iterator((new LongWritable(1), new Text("b"))))
+              context,
+              Iterator((new LongWritable(1), new Text("b"))))
         }
       }
       val hadoopPart1 = generateFakeHadoopPartition()

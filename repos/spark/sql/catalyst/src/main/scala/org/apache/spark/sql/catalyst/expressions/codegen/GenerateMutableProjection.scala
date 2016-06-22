@@ -35,8 +35,8 @@ object GenerateMutableProjection
   protected def canonicalize(in: Seq[Expression]): Seq[Expression] =
     in.map(ExpressionCanonicalizer.execute)
 
-  protected def bind(
-      in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
+  protected def bind(in: Seq[Expression],
+                     inputSchema: Seq[Attribute]): Seq[Expression] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
   def generate(expressions: Seq[Expression],

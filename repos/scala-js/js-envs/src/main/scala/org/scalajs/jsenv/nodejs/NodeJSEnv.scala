@@ -29,8 +29,7 @@ class NodeJSEnv private (
     addArgs: Seq[String],
     addEnv: Map[String, String],
     val sourceMap: Boolean
-)
-    extends ExternalJSEnv(addArgs, addEnv)
+) extends ExternalJSEnv(addArgs, addEnv)
     with ComJSEnv {
 
   def this(nodejsPath: String = "node",
@@ -65,38 +64,38 @@ class NodeJSEnv private (
   /** Retry-timeout to wait for the JS VM to connect */
   protected val acceptTimeout = 5000
 
-  override def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+  override def jsRunner(libs: Seq[ResolvedJSDependency],
+                        code: VirtualJSFile): JSRunner = {
     new NodeRunner(libs, code)
   }
 
-  override def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+  override def asyncRunner(libs: Seq[ResolvedJSDependency],
+                           code: VirtualJSFile): AsyncJSRunner = {
     new AsyncNodeRunner(libs, code)
   }
 
-  override def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+  override def comRunner(libs: Seq[ResolvedJSDependency],
+                         code: VirtualJSFile): ComJSRunner = {
     new ComNodeRunner(libs, code)
   }
 
-  protected class NodeRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class NodeRunner(libs: Seq[ResolvedJSDependency],
+                             code: VirtualJSFile)
       extends ExtRunner(libs, code)
       with AbstractNodeRunner
 
-  protected class AsyncNodeRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class AsyncNodeRunner(libs: Seq[ResolvedJSDependency],
+                                  code: VirtualJSFile)
       extends AsyncExtRunner(libs, code)
       with AbstractNodeRunner
 
-  protected class ComNodeRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class ComNodeRunner(libs: Seq[ResolvedJSDependency],
+                                code: VirtualJSFile)
       extends AsyncNodeRunner(libs, code)
       with ComJSRunner {
 
-    private[this] val serverSocket = new ServerSocket(
-        0, 0, InetAddress.getByName(null)) // Loopback address
+    private[this] val serverSocket =
+      new ServerSocket(0, 0, InetAddress.getByName(null)) // Loopback address
     private[this] var comSocket: Socket = _
     private[this] var jvm2js: DataOutputStream = _
     private[this] var js2jvm: DataInputStream = _
@@ -350,8 +349,8 @@ class NodeJSEnv private (
     /** write a single JS file to a writer using an include fct if appropriate
       *  uses `require` if the file exists on the filesystem
       */
-    override protected def writeJSFile(
-        file: VirtualJSFile, writer: Writer): Unit = {
+    override protected def writeJSFile(file: VirtualJSFile,
+                                       writer: Writer): Unit = {
       file match {
         case file: FileVirtualJSFile =>
           val fname = file.file.getAbsolutePath

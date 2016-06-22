@@ -43,8 +43,8 @@ trait MetaProtoTag[ModelType <: ProtoTag[ModelType]]
     }
   }
 
-  override def findDbByKey(
-      dbId: ConnectionIdentifier, key: Long): Box[ModelType] = synchronized {
+  override def findDbByKey(dbId: ConnectionIdentifier,
+                           key: Long): Box[ModelType] = synchronized {
     if (idCache.contains(key)) Full(idCache(key))
     else {
       val ret = super.findDbByKey(dbId, key)

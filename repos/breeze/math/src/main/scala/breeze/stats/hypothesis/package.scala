@@ -33,8 +33,8 @@ package object hypothesis {
     val tScore = (mu1 - mu2) / sqrt((var1 / n1) + (var2 / n2)) // T statistic
     val dof =
       pow((var1 / n1) + (var2 / n2), 2) /
-      (pow(var1, 2) / (pow(n1, 2) * (n1 - 1)) + pow(var2, 2) /
-          (pow(n2, 2) * (n2 - 1))) //Welch–Satterthwaite equation
+        (pow(var1, 2) / (pow(n1, 2) * (n1 - 1)) + pow(var2, 2) /
+              (pow(n2, 2) * (n2 - 1))) //Welch–Satterthwaite equation
     new StudentsT(dof)(RandBasis.mt0).unnormalizedPdf(tScore) //return p value
   }
 
@@ -61,13 +61,14 @@ package object hypothesis {
      */
     val meanP =
       (successControl + successVariant).toDouble /
-      (trialsControl + trialsVariant).toDouble
+        (trialsControl + trialsVariant).toDouble
     val chi2 =
       (chiSquaredTerm(meanP * trialsControl, successControl) +
-          chiSquaredTerm((1 - meanP) * trialsControl,
-                         trialsControl - successControl) + chiSquaredTerm(
-              meanP * trialsVariant, successVariant) + chiSquaredTerm(
-              (1 - meanP) * trialsVariant, trialsVariant - successVariant))
+            chiSquaredTerm((1 - meanP) * trialsControl,
+                           trialsControl - successControl) + chiSquaredTerm(
+              meanP * trialsVariant,
+              successVariant) + chiSquaredTerm((1 - meanP) * trialsVariant,
+                                               trialsVariant - successVariant))
     val pVal = 1.0 - Gamma(0.5, 2.0).cdf(chi2)
     Chi2Result(chi2, pVal)
   }
@@ -82,8 +83,8 @@ package object hypothesis {
     * a false positive at least this large in *any* variant, not in one particular variant.
     * I.e., multiple comparisons are corrected for.
     */
-  def chi2Test(
-      control: (Long, Long), trials: Seq[(Long, Long)]): Seq[Chi2Result] = {
+  def chi2Test(control: (Long, Long),
+               trials: Seq[(Long, Long)]): Seq[Chi2Result] = {
     val numTrials = trials.size
     trials
       .map(x => chi2Test(control._1, control._2, x._1, x._2))

@@ -41,4 +41,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class AnchorPaneSpec
     extends SimpleSFXDelegateSpec[jfxsl.AnchorPane, AnchorPane](
-        classOf[jfxsl.AnchorPane], classOf[AnchorPane])
+        classOf[jfxsl.AnchorPane],
+        classOf[AnchorPane])

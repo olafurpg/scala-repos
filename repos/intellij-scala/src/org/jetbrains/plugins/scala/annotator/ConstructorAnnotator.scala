@@ -14,8 +14,8 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 trait ConstructorAnnotator {
   // TODO duplication with application annotator.
-  def annotateConstructor(
-      constructor: ScConstructor, holder: AnnotationHolder) {
+  def annotateConstructor(constructor: ScConstructor,
+                          holder: AnnotationHolder) {
     //in case if constructor is function
     constructor.reference match {
       case None => return
@@ -26,11 +26,11 @@ trait ConstructorAnnotator {
 
     resolved match {
       case List() =>
-        holder.createErrorAnnotation(
-            constructor.typeElement, "Cannot resolve constructor")
+        holder.createErrorAnnotation(constructor.typeElement,
+                                     "Cannot resolve constructor")
       case List(r: ScalaResolveResult) =>
-        val missed = for (MissedValueParameter(p) <- r.problems) yield
-          p.name + ": " + p.paramType.presentableText
+        val missed = for (MissedValueParameter(p) <- r.problems)
+          yield p.name + ": " + p.paramType.presentableText
         val argsElement = constructor.args.getOrElse(constructor.typeElement)
         if (missed.nonEmpty)
           holder.createErrorAnnotation(
@@ -39,16 +39,18 @@ trait ConstructorAnnotator {
 
         r.problems.foreach {
           case ExcessArgument(argument) =>
-            holder.createErrorAnnotation(
-                argument, "Too many arguments for constructor")
+            holder.createErrorAnnotation(argument,
+                                         "Too many arguments for constructor")
           case TypeMismatch(expression, expectedType) =>
             if (expression != null)
               for (t <- expression.getType(TypingContext.empty)) {
                 //TODO show parameter name
                 val (expectedText, actualText) =
                   ScTypePresentation.different(expectedType, t)
-                val message = ScalaBundle.message(
-                    "type.mismatch.expected.actual", expectedText, actualText)
+                val message =
+                  ScalaBundle.message("type.mismatch.expected.actual",
+                                      expectedText,
+                                      actualText)
                 val annotation =
                   holder.createErrorAnnotation(expression, message)
                 annotation.registerFix(ReportHighlightingErrorQuickFix)
@@ -64,10 +66,11 @@ trait ConstructorAnnotator {
                 "Constructor has malformed definition")
           case ExpansionForNonRepeatedParameter(expression) =>
             holder.createErrorAnnotation(
-                expression, "Expansion for non-repeated parameter")
+                expression,
+                "Expansion for non-repeated parameter")
           case PositionalAfterNamedArgument(argument) =>
-            holder.createErrorAnnotation(
-                argument, "Positional after named argument")
+            holder.createErrorAnnotation(argument,
+                                         "Positional after named argument")
           case ParameterSpecifiedMultipleTimes(assignment) =>
             holder.createErrorAnnotation(assignment.getLExpression,
                                          "Parameter specified multiple times")
@@ -85,16 +88,17 @@ trait ConstructorAnnotator {
             }
           case _ =>
             holder.createErrorAnnotation(
-                argsElement, "Not applicable." /* TODO + signatureOf(f)*/ )
+                argsElement,
+                "Not applicable." /* TODO + signatureOf(f)*/ )
         }
       case results =>
-        holder.createErrorAnnotation(
-            constructor.typeElement, "Cannot resolve constructor")
+        holder.createErrorAnnotation(constructor.typeElement,
+                                     "Cannot resolve constructor")
     }
   }
 
-  def annotateAuxiliaryConstructor(
-      constr: ScConstrBlock, holder: AnnotationHolder) {
+  def annotateAuxiliaryConstructor(constr: ScConstrBlock,
+                                   holder: AnnotationHolder) {
     val selfInvocation = constr.selfInvocation
     selfInvocation match {
       case Some(self) =>
@@ -116,7 +120,8 @@ trait ConstructorAnnotator {
         constr.getContainingFile match {
           case file: ScalaFile if !file.isCompiled =>
             val annotation = holder.createErrorAnnotation(
-                constr, ScalaBundle.message("constructor.invocation.expected"))
+                constr,
+                ScalaBundle.message("constructor.invocation.expected"))
             annotation.setHighlightType(
                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
           case _ => //nothing to do in decompiled stuff

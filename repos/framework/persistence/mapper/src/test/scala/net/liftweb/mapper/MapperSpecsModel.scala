@@ -114,8 +114,8 @@ object SampleTag extends SampleTag with LongKeyedMetaMapper[SampleTag] {
 
   private def populate {
     val samp = SampleModel.findAll()
-    val tags = List(
-        "Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
+    val tags =
+      List("Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
     for (t <- tags;
          m <- samp) SampleTag.create.tag(t).model(m).save
   }
@@ -184,8 +184,8 @@ object SampleTagSnake
 
   private def populate {
     val samp = SampleModelSnake.findAll()
-    val tags = List(
-        "Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
+    val tags =
+      List("Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
     for (t <- tags;
          m <- samp) SampleTagSnake.create.tag(t).model(m).save
   }
@@ -348,8 +348,7 @@ object Thing extends Thing with KeyedMetaMapper[String, Thing] {
 
   import java.util.UUID
   override def beforeCreate =
-    List(
-        (thing: Thing) => {
+    List((thing: Thing) => {
       thing.thing_id(UUID.randomUUID().toString())
     })
 }

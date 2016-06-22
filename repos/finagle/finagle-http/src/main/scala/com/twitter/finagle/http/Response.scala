@@ -113,6 +113,7 @@ object Response {
   private[http] def apply(httpRequest: Request): Response =
     new Response {
       final val httpResponse = new DefaultHttpResponse(
-          httpRequest.getProtocolVersion, HttpResponseStatus.OK)
+          httpRequest.getProtocolVersion,
+          HttpResponseStatus.OK)
     }
 }

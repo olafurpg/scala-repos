@@ -47,13 +47,12 @@ class ThriftServerFramedCodecFactory(protocolFactory: TProtocolFactory)
 class ThriftServerFramedCodec(
     config: ServerCodecConfig,
     protocolFactory: TProtocolFactory = Protocols.binaryFactory()
-)
-    extends Codec[Array[Byte], Array[Byte]] {
+) extends Codec[Array[Byte], Array[Byte]] {
   def pipelineFactory: ChannelPipelineFactory =
     ThriftServerFramedPipelineFactory
 
-  private[this] val preparer = ThriftServerPreparer(
-      protocolFactory, config.serviceName)
+  private[this] val preparer =
+    ThriftServerPreparer(protocolFactory, config.serviceName)
 
   override def prepareConnFactory(
       factory: ServiceFactory[Array[Byte], Array[Byte]],
@@ -67,7 +66,8 @@ class ThriftServerFramedCodec(
 }
 
 private[finagle] case class ThriftServerPreparer(
-    protocolFactory: TProtocolFactory, serviceName: String) {
+    protocolFactory: TProtocolFactory,
+    serviceName: String) {
   private[this] val uncaughtExceptionsFilter = new UncaughtAppExceptionFilter(
       protocolFactory)
 
@@ -76,7 +76,9 @@ private[finagle] case class ThriftServerPreparer(
       params: Stack.Params
   ): ServiceFactory[Array[Byte], Array[Byte]] = factory.map { service =>
     val payloadSize = new PayloadSizeFilter[Array[Byte], Array[Byte]](
-        params[param.Stats].statsReceiver, _.length, _.length)
+        params[param.Stats].statsReceiver,
+        _.length,
+        _.length)
 
     val ttwitter = new TTwitterServerFilter(serviceName, protocolFactory)
 

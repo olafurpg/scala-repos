@@ -36,8 +36,8 @@ class AppTasksResourceTest
     groupManager.app(appId.toRootPath) returns Future.successful(
         Some(AppDefinition(appId.toRootPath)))
 
-    val response = appsTaskResource.deleteMany(
-        appId, host, scale = false, force = false, auth.request)
+    val response = appsTaskResource
+      .deleteMany(appId, host, scale = false, force = false, auth.request)
     response.getStatus shouldEqual 200
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
@@ -344,8 +344,12 @@ class AppTasksResourceTest
   }
 
   private[this] def useRealTaskKiller(): Unit = {
-    taskKiller = new TaskKiller(
-        taskTracker, groupManager, service, config, auth.auth, auth.auth)
+    taskKiller = new TaskKiller(taskTracker,
+                                groupManager,
+                                service,
+                                config,
+                                auth.auth,
+                                auth.auth)
     appsTaskResource = new AppTasksResource(
         service,
         taskTracker,

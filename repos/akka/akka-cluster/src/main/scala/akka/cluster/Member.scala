@@ -13,7 +13,7 @@ import MemberStatus._
   * and roles.
   */
 @SerialVersionUID(1L)
-class Member private[cluster](
+class Member private[cluster] (
     val uniqueAddress: UniqueAddress,
     private[cluster] val upNumber: Int, // INTERNAL API
     val status: MemberStatus,
@@ -74,8 +74,8 @@ object Member {
     * INTERNAL API
     * Create a new member with status Joining.
     */
-  private[cluster] def apply(
-      uniqueAddress: UniqueAddress, roles: Set[String]): Member =
+  private[cluster] def apply(uniqueAddress: UniqueAddress,
+                             roles: Set[String]): Member =
     new Member(uniqueAddress, Int.MaxValue, Joining, roles)
 
   /**

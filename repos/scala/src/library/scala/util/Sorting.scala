@@ -143,8 +143,10 @@ object Sorting {
 
   // Ordering[T] might be slow especially for boxed primitives, so use binary search variant of insertion sort
   // Caller must pass iN >= i0 or math will fail.  Also, i0 >= 0.
-  private def insertionSort[@specialized T](
-      a: Array[T], i0: Int, iN: Int, ord: Ordering[T]): Unit = {
+  private def insertionSort[@specialized T](a: Array[T],
+                                            i0: Int,
+                                            iN: Int,
+                                            ord: Ordering[T]): Unit = {
     val n = iN - i0
     if (n < 2) return
     if (ord.compare(a(i0), a(i0 + 1)) > 0) {
@@ -177,12 +179,12 @@ object Sorting {
   }
 
   // Caller is required to pass iN >= i0, else math will fail.  Also, i0 >= 0.
-  private def mergeSort[@specialized T: ClassTag](a: Array[T],
-                                                  i0: Int,
-                                                  iN: Int,
-                                                  ord: Ordering[T],
-                                                  scratch: Array[T] =
-                                                    null): Unit = {
+  private def mergeSort[@specialized T: ClassTag](
+      a: Array[T],
+      i0: Int,
+      iN: Int,
+      ord: Ordering[T],
+      scratch: Array[T] = null): Unit = {
     if (iN - i0 < mergeThreshold) insertionSort(a, i0, iN, ord)
     else {
       val iK =

@@ -65,8 +65,8 @@ object ScalaMoveUtil {
           }
       }
     }
-    def moveClassInner(
-        aClass: PsiClass, moveDestination: PsiDirectory): PsiClass = {
+    def moveClassInner(aClass: PsiClass,
+                       moveDestination: PsiDirectory): PsiClass = {
       var newClass: PsiClass = null
       (aClass, aClass.getContainingFile) match {
         case (td: ScTypeDefinition, file: ScalaFile) =>
@@ -177,8 +177,8 @@ object ScalaMoveUtil {
     }
   }
 
-  def saveMoveDestination(
-      @NotNull element: PsiElement, moveDestination: PsiDirectory) = {
+  def saveMoveDestination(@NotNull element: PsiElement,
+                          moveDestination: PsiDirectory) = {
     val classes = element match {
       case c: PsiClass => Seq(c)
       case f: ScalaFile => f.typeDefinitions

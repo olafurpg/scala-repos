@@ -92,8 +92,9 @@ private[spark] object RandomSampler {
   * @tparam T item type
   */
 @DeveloperApi
-class BernoulliCellSampler[T](
-    lb: Double, ub: Double, complement: Boolean = false)
+class BernoulliCellSampler[T](lb: Double,
+                              ub: Double,
+                              complement: Boolean = false)
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter. */
@@ -153,7 +154,7 @@ class BernoulliSampler[T: ClassTag](fraction: Double)
 
   /** epsilon slop to avoid failure from floating point jitter */
   require(fraction >= (0.0 - RandomSampler.roundingEpsilon) &&
-          fraction <= (1.0 + RandomSampler.roundingEpsilon),
+            fraction <= (1.0 + RandomSampler.roundingEpsilon),
           s"Sampling fraction ($fraction) must be on interval [0, 1]")
 
   private val rng: Random = RandomSampler.newDefaultRNG
@@ -186,8 +187,8 @@ class BernoulliSampler[T: ClassTag](fraction: Double)
   * @tparam T item type
   */
 @DeveloperApi
-class PoissonSampler[T: ClassTag](
-    fraction: Double, useGapSamplingIfPossible: Boolean)
+class PoissonSampler[T: ClassTag](fraction: Double,
+                                  useGapSamplingIfPossible: Boolean)
     extends RandomSampler[T, T] {
 
   def this(fraction: Double) = this(fraction, useGapSamplingIfPossible = true)
@@ -212,8 +213,10 @@ class PoissonSampler[T: ClassTag](
       Iterator.empty
     } else if (useGapSamplingIfPossible &&
                fraction <= RandomSampler.defaultMaxGapSamplingFraction) {
-      new GapSamplingReplacementIterator(
-          items, fraction, rngGap, RandomSampler.rngEpsilon)
+      new GapSamplingReplacementIterator(items,
+                                         fraction,
+                                         rngGap,
+                                         RandomSampler.rngEpsilon)
     } else {
       items.flatMap { item =>
         val count = rng.sample()

@@ -48,7 +48,7 @@ trait SelectTest extends FunSuite /* with Checkers */ {
           select(bs, i)
           assert(bs(i) === i,
                  "Select %d on %s failed." format
-                 (i, orig.mkString("[ ", ", ", " ]")))
+                   (i, orig.mkString("[ ", ", ", " ]")))
         }
       }
     }

@@ -5,7 +5,7 @@ trait Foo[A <: AnyRef] {
   def f(a: A): Repr
   def g(a: A): Option[Repr]
 
-  type M [X]
+  type M[X]
   def m(a: A): M[a.type]
 
   type Id[X] = X

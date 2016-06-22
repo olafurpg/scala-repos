@@ -199,7 +199,8 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
     "respond with the converted CircuitOpenFailure if a converter is provided" in new CircuitBreakerScenario {
       Given(
           "A circuit breaker proxy pointing to a target actor built with a function to convert CircuitOpenFailure response into a String response")
-      val circuitBreaker = system.actorOf(baseCircuitBreakerPropsBuilder
+      val circuitBreaker = system.actorOf(
+          baseCircuitBreakerPropsBuilder
             .copy(openCircuitFailureConverter = { failureMsg ⇒
           s"NOT SENT: ${failureMsg.failedMsg}"
         })
@@ -322,10 +323,10 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
 
     "notify an event status change listener when changing state" in new CircuitBreakerScenario {
       Given("A circuit breaker actor proxying a test probe")
-      override val circuitBreaker =
-        system.actorOf(baseCircuitBreakerPropsBuilder
-              .copy(circuitEventListener = Some(eventListener.ref))
-              .props(target = receiver.ref))
+      override val circuitBreaker = system.actorOf(
+          baseCircuitBreakerPropsBuilder
+            .copy(circuitEventListener = Some(eventListener.ref))
+            .props(target = receiver.ref))
 
       When("Entering OPEN state")
       receiverRespondsWithFailureToRequest("request1")
@@ -353,8 +354,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
     "stop if the target actor terminates itself" in new CircuitBreakerScenario {
       Given("An actor that will terminate when receiving a message")
       import akka.actor.ActorDSL._
-      val suicidalActor = actor(
-          new Act {
+      val suicidalActor = actor(new Act {
         become {
           case anyMessage ⇒
             sender() ! "dying now"

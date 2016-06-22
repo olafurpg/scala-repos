@@ -26,12 +26,12 @@ import org.apache.spark.util.{IntParam, Utils}
 /**
   * Continuously appends the data from an input stream into the given file.
   */
-private[spark] class FileAppender(
-    inputStream: InputStream, file: File, bufferSize: Int = 8192)
+private[spark] class FileAppender(inputStream: InputStream,
+                                  file: File,
+                                  bufferSize: Int = 8192)
     extends Logging {
   @volatile private var outputStream: FileOutputStream = null
-  @volatile private var markedForStop =
-    false // has the appender been asked to stopped
+  @volatile private var markedForStop = false // has the appender been asked to stopped
 
   // Thread that reads the input stream and writes to file
   private val writingThread = new Thread("File appending thread for " + file) {
@@ -116,8 +116,9 @@ private[spark] class FileAppender(
 private[spark] object FileAppender extends Logging {
 
   /** Create the right appender based on Spark configuration */
-  def apply(
-      inputStream: InputStream, file: File, conf: SparkConf): FileAppender = {
+  def apply(inputStream: InputStream,
+            file: File,
+            conf: SparkConf): FileAppender = {
 
     import RollingFileAppender._
 
@@ -146,16 +147,16 @@ private[spark] object FileAppender extends Logging {
         case _ =>
           logWarning(
               s"Illegal interval for rolling executor logs [$rollingInterval], " +
-              s"rolling logs not enabled")
+                s"rolling logs not enabled")
           None
       }
       validatedParams.map {
         case (interval, pattern) =>
-          new RollingFileAppender(
-              inputStream,
-              file,
-              new TimeBasedRollingPolicy(interval, pattern),
-              conf)
+          new RollingFileAppender(inputStream,
+                                  file,
+                                  new TimeBasedRollingPolicy(interval,
+                                                             pattern),
+                                  conf)
       }.getOrElse {
         new FileAppender(inputStream, file)
       }
@@ -166,8 +167,10 @@ private[spark] object FileAppender extends Logging {
         case IntParam(bytes) =>
           logInfo(
               s"Rolling executor logs enabled for $file with rolling every $bytes bytes")
-          new RollingFileAppender(
-              inputStream, file, new SizeBasedRollingPolicy(bytes), conf)
+          new RollingFileAppender(inputStream,
+                                  file,
+                                  new SizeBasedRollingPolicy(bytes),
+                                  conf)
         case _ =>
           logWarning(
               s"Illegal size [$rollingSizeBytes] for rolling executor logs, rolling logs not enabled")
@@ -185,7 +188,7 @@ private[spark] object FileAppender extends Logging {
       case _ =>
         logWarning(
             s"Illegal strategy [$rollingStrategy] for rolling executor logs, " +
-            s"rolling logs not enabled")
+              s"rolling logs not enabled")
         new FileAppender(inputStream, file)
     }
   }

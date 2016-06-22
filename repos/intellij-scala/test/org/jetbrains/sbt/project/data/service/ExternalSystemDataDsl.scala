@@ -111,8 +111,9 @@ object ExternalSystemDataDsl {
         case (module, moduleNode) =>
           module.getLibraryDependencies.foreach { dependency =>
             libraryToNode.get(dependency).foreach { libraryNode =>
-              moduleNode.add(new LibraryDependencyNode(
-                      moduleNode, libraryNode, LibraryLevel.PROJECT))
+              moduleNode.add(new LibraryDependencyNode(moduleNode,
+                                                       libraryNode,
+                                                       LibraryLevel.PROJECT))
             }
           }
       }

@@ -24,7 +24,8 @@ class ScTupleImpl(node: ASTNode)
     if (exprs.length == 0) Success(Unit, Some(this))
     else {
       val tupleType = ScTupleType(exprs.map(_.getType(ctx).getOrAny))(
-          getProject, getResolveScope)
+          getProject,
+          getResolveScope)
       Success(tupleType, Some(this))
     }
 

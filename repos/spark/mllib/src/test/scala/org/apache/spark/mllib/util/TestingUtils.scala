@@ -31,8 +31,9 @@ object TestingUtils {
     * Note that if x or y is extremely close to zero, i.e., smaller than Double.MinPositiveValue,
     * the relative tolerance is meaningless, so the exception will be raised to warn users.
     */
-  private def RelativeErrorComparison(
-      x: Double, y: Double, eps: Double): Boolean = {
+  private def RelativeErrorComparison(x: Double,
+                                      y: Double,
+                                      eps: Double): Boolean = {
     val absX = math.abs(x)
     val absY = math.abs(y)
     val diff = math.abs(x - y)
@@ -51,8 +52,9 @@ object TestingUtils {
   /**
     * Private helper function for comparing two values using absolute tolerance.
     */
-  private def AbsoluteErrorComparison(
-      x: Double, y: Double, eps: Double): Boolean = {
+  private def AbsoluteErrorComparison(x: Double,
+                                      y: Double,
+                                      eps: Double): Boolean = {
     math.abs(x - y) < eps
   }
 
@@ -83,7 +85,8 @@ object TestingUtils {
     def ~==(r: CompareDoubleRightSide): Boolean = {
       if (!r.fun(x, r.y, r.eps)) {
         throw new TestFailedException(
-            s"Expected $x and ${r.y} to be within ${r.eps}${r.method}.", 0)
+            s"Expected $x and ${r.y} to be within ${r.eps}${r.method}.",
+            0)
       }
       true
     }
@@ -221,7 +224,7 @@ object TestingUtils {
       if (r.fun(x, r.y, r.eps)) {
         throw new TestFailedException(
             s"Did not expect \n$x\n and \n${r.y}\n to be within " +
-            "${r.eps}${r.method} for all elements.",
+              "${r.eps}${r.method} for all elements.",
             0)
       }
       true

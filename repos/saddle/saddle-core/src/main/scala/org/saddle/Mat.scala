@@ -363,8 +363,8 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     */
   def mult[B](m: Mat[B])(implicit evA: NUM[A], evB: NUM[B]): Mat[Double] = {
     if (numCols != m.numRows) {
-      val errMsg = "Cannot multiply (%d %d) x (%d %d)".format(
-          numRows, numCols, m.numRows, m.numCols)
+      val errMsg = "Cannot multiply (%d %d) x (%d %d)"
+        .format(numRows, numCols, m.numRows, m.numCols)
       throw new IllegalArgumentException(errMsg)
     }
 
@@ -465,8 +465,9 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     * Pretty-printer for Mat, which simply outputs the result of stringify.
     * @param nrows Number of elements to display
     */
-  def print(
-      nrows: Int = 8, ncols: Int = 8, stream: OutputStream = System.out) {
+  def print(nrows: Int = 8,
+            ncols: Int = 8,
+            stream: OutputStream = System.out) {
     stream.write(stringify(nrows, ncols).getBytes)
   }
 
@@ -480,7 +481,7 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
   override def equals(o: Any): Boolean = o match {
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+        this.numCols == rv.numCols && {
         var i = 0
         var eq = true
         while (eq && i < length) {

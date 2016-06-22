@@ -17,8 +17,8 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * Nikolay.Tropin
   * 2014-06-10
   */
-class ScalaMethodFilter(
-    function: ScMethodLike, callingExpressionLines: Range[Integer])
+class ScalaMethodFilter(function: ScMethodLike,
+                        callingExpressionLines: Range[Integer])
     extends MethodFilter {
   private val unknownName: String = "!unknownName!"
   private val myTargetMethodSignature =
@@ -30,7 +30,7 @@ class ScalaMethodFilter(
     else
       DebuggerUtil.getClassJVMName(clazz,
                                    clazz.isInstanceOf[ScObject] ||
-                                   ValueClassType.isValueClass(clazz))
+                                     ValueClassType.isValueClass(clazz))
   }
   private val funName = function match {
     case c: ScMethodLike if c.isConstructor => "<init>"
@@ -38,8 +38,8 @@ class ScalaMethodFilter(
     case _ => unknownName
   }
 
-  override def locationMatches(
-      process: DebugProcessImpl, location: Location): Boolean = {
+  override def locationMatches(process: DebugProcessImpl,
+                               location: Location): Boolean = {
     val method = location.method()
     if (!method.name.contains(funName)) return false
 
@@ -54,8 +54,8 @@ class ScalaMethodFilter(
              method.signature() != myTargetMethodSignature.getName(process))
       false
     else {
-      DebuggerUtilsEx.isAssignableFrom(
-          locationTypeName, location.declaringType) &&
+      DebuggerUtilsEx.isAssignableFrom(locationTypeName,
+                                       location.declaringType) &&
       !ScalaPositionManager.shouldSkip(location, process)
     }
   }

@@ -13,8 +13,7 @@ class ZkNodeDataCacheTest extends FunSuite {
 
   class ZkTestCache(
       clusterPath: String
-  )
-      extends ZkNodeDataCache[String](clusterPath, "Test", NullStatsReceiver) {
+  ) extends ZkNodeDataCache[String](clusterPath, "Test", NullStatsReceiver) {
     var parseNodeCalledCount = 0
     var shouldThrow = false
     override def loadEntity(path: String) = {

@@ -24,8 +24,9 @@ class ScaleAppUpdateStepImpl @Inject()(
 
   override def name: String = "scaleApp"
 
-  override def processUpdate(
-      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(timestamp: Timestamp,
+                             task: Task,
+                             status: TaskStatus): Future[_] = {
     val taskId = task.taskId
 
     status.getState match {

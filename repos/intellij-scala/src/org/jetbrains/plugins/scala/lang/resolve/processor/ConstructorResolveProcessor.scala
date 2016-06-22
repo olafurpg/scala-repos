@@ -61,7 +61,8 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                        isAccessible = accessible))
           } else {
             addResults(
-                constructors.toSeq.map(constr =>
+                constructors.toSeq.map(
+                    constr =>
                       new ScalaResolveResult(constr,
                                              subst,
                                              getImports(state),
@@ -71,7 +72,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                              fromType = fromType,
                                              isAccessible =
                                                isAccessible(constr, ref) &&
-                                               accessible)))
+                                                 accessible)))
           }
         case ta: ScTypeAliasDeclaration =>
           addResult(
@@ -106,7 +107,8 @@ class ConstructorResolveProcessor(constr: PsiElement,
               if (constructors.isEmpty) addResult(r)
               else {
                 addResults(
-                    constructors.toSeq.map(constr =>
+                    constructors.toSeq.map(
+                        constr =>
                           new ScalaResolveResult(
                               constr,
                               subst.followed(s),

@@ -50,8 +50,10 @@ object Screen {
   /**
     * Returns a ObservableList of Screens that intersects the provided rectangle.
     */
-  def screensForRectangle(
-      x: Double, y: Double, width: Double, height: Double) =
+  def screensForRectangle(x: Double,
+                          y: Double,
+                          width: Double,
+                          height: Double) =
     jfxs.Screen.getScreensForRectangle(x, y, width, height)
 
   /**

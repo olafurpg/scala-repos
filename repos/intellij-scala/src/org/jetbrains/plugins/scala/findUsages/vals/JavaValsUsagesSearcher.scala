@@ -55,8 +55,11 @@ class JavaValsUsagesSearcher
         }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(
-            processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(processor,
+                                       scope,
+                                       name,
+                                       UsageSearchContext.IN_CODE,
+                                       true)
       case wrapper: PsiTypedDefinitionWrapper =>
         //only this is added for find usages factory
         val name: String = wrapper.getName
@@ -71,11 +74,11 @@ class JavaValsUsagesSearcher
                     refElement.resolve match {
                       case t: PsiTypedDefinitionWrapper
                           if t.typedDefinition == wrapper.typedDefinition &&
-                          t.getName == wrapper.getName =>
+                            t.getName == wrapper.getName =>
                         if (!consumer.process(refElement)) return false
                       case t: StaticPsiTypedDefinitionWrapper
                           if t.typedDefinition == wrapper.typedDefinition &&
-                          t.getName == wrapper.getName =>
+                            t.getName == wrapper.getName =>
                         if (!consumer.process(refElement)) return false
                       case _ =>
                     }
@@ -88,8 +91,11 @@ class JavaValsUsagesSearcher
         }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(
-            processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(processor,
+                                       scope,
+                                       name,
+                                       UsageSearchContext.IN_CODE,
+                                       true)
       case _ => true
     }
   }

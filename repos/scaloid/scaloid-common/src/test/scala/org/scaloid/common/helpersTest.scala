@@ -79,13 +79,14 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
       r.getIntentFilter.getAction(0) shouldBe Intent.ACTION_VIEW
     }
 
-    val intent = new Intent(
-        Intent.ACTION_VIEW, Uri.parse("http://scaloid.org/"))
+    val intent =
+      new Intent(Intent.ACTION_VIEW, Uri.parse("http://scaloid.org/"))
     val received =
       Robolectric.getShadowApplication.getReceiversForIntent(intent).asScala
     received.size shouldBe 1
     received(0).onReceive(
-        Robolectric.getShadowApplication.getApplicationContext, intent)
+        Robolectric.getShadowApplication.getApplicationContext,
+        intent)
     val nextIntent = Robolectric.getShadowApplication.peekNextStartedActivity
     nextIntent.getComponent.getClassName shouldBe classOf[SActivityImpl].getName
   }
@@ -95,7 +96,8 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
     PreferenceHelpers.defaultSharedPreferences.edit
       .putString("foo", "bar")
       .commit
-    PreferenceHelpers.defaultSharedPreferences.getString("foo", "") shouldBe "bar"
+    PreferenceHelpers.defaultSharedPreferences
+      .getString("foo", "") shouldBe "bar"
   }
 
   @Test

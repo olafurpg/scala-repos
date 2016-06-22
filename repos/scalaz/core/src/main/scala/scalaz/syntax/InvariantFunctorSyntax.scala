@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `InvariantFunctor` */
-final class InvariantFunctorOps[F[_], A] private[syntax](val self: F[A])(
+final class InvariantFunctorOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: InvariantFunctor[F])
     extends Ops[F[A]] {
   ////

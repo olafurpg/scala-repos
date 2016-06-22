@@ -30,12 +30,12 @@ import scalaz.std.option._
   * `n > 2 * tails`. If `n <= 2 * tails`, then the mean and variance will be
   * `NaN` and the count will be `0`.
   */
-case class Statistics private[ragnarok](tails: Int,
-                                        allMin: List[Double],
-                                        allMax: List[Double],
-                                        m: Double,
-                                        vn: Double,
-                                        n: Int) {
+case class Statistics private[ragnarok] (tails: Int,
+                                         allMin: List[Double],
+                                         allMax: List[Double],
+                                         m: Double,
+                                         vn: Double,
+                                         n: Int) {
 
   //FIXME: keep track of Double error
 
@@ -47,8 +47,12 @@ case class Statistics private[ragnarok](tails: Int,
     */
   def *(x: Double): Statistics =
     if (x >= 0.0) {
-      Statistics(
-          tails, allMin map (_ * x), allMax map (_ * x), m * x, vn * x * x, n)
+      Statistics(tails,
+                 allMin map (_ * x),
+                 allMax map (_ * x),
+                 m * x,
+                 vn * x * x,
+                 n)
     } else {
       Statistics(tails,
                  allMax map (_ * x),
@@ -63,20 +67,19 @@ case class Statistics private[ragnarok](tails: Int,
   def +(that: Statistics): Statistics = Statistics.semigroup.append(this, that)
 
   // Calculates the mean, variance, and count without outliers.
-  private lazy val meanVarCount: (Double, Double, Int) =
-    if (n > 2 * tails) {
-      (allMin.reverse.tail ++ allMax.tail).foldLeft((m, vn, n)) {
-        case ((m, vn, n), x) =>
-          val mprev = m + (m - x) / (n - 1)
-          val sprev = vn - (x - mprev) * (x - m)
-          (mprev, sprev, n - 1)
-      } match {
-        case (m, vn, 1) => (m, 0.0, 1)
-        case (m, vn, n) => (m, math.abs(vn / (n - 1)), n)
-      }
-    } else {
-      (Double.NaN, Double.NaN, 0)
+  private lazy val meanVarCount: (Double, Double, Int) = if (n > 2 * tails) {
+    (allMin.reverse.tail ++ allMax.tail).foldLeft((m, vn, n)) {
+      case ((m, vn, n), x) =>
+        val mprev = m + (m - x) / (n - 1)
+        val sprev = vn - (x - mprev) * (x - m)
+        (mprev, sprev, n - 1)
+    } match {
+      case (m, vn, 1) => (m, 0.0, 1)
+      case (m, vn, n) => (m, math.abs(vn / (n - 1)), n)
     }
+  } else {
+    (Double.NaN, Double.NaN, 0)
+  }
 
   def min: Double = allMin.last
 

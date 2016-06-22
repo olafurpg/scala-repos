@@ -41,16 +41,29 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
   test("function get_json_object - null") {
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expected =
-      Row("1", "value1", "value2", "3", null, "5.23") :: Row(
-          "2", "value12", "2", "value3", "4.01", null) :: Row(
-          "3", "value13", "2", "value33", "value44", "5.01") :: Row(
-          "4", null, null, null, null, null) :: Row(
-          "5", "", null, null, null, null) :: Row("6",
-                                                  null,
-                                                  null,
-                                                  null,
-                                                  null,
-                                                  null) :: Nil
+      Row("1", "value1", "value2", "3", null, "5.23") :: Row("2",
+                                                             "value12",
+                                                             "2",
+                                                             "value3",
+                                                             "4.01",
+                                                             null) :: Row(
+          "3",
+          "value13",
+          "2",
+          "value33",
+          "value44",
+          "5.01") :: Row("4", null, null, null, null, null) :: Row(
+          "5",
+          "",
+          null,
+          null,
+          null,
+          null) :: Row("6",
+                       null,
+                       null,
+                       null,
+                       null,
+                       null) :: Nil
 
     checkAnswer(df.select($"key",
                           functions.get_json_object($"jstring", "$.f1"),
@@ -64,16 +77,29 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
   test("json_tuple select") {
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expected =
-      Row("1", "value1", "value2", "3", null, "5.23") :: Row(
-          "2", "value12", "2", "value3", "4.01", null) :: Row(
-          "3", "value13", "2", "value33", "value44", "5.01") :: Row(
-          "4", null, null, null, null, null) :: Row(
-          "5", "", null, null, null, null) :: Row("6",
-                                                  null,
-                                                  null,
-                                                  null,
-                                                  null,
-                                                  null) :: Nil
+      Row("1", "value1", "value2", "3", null, "5.23") :: Row("2",
+                                                             "value12",
+                                                             "2",
+                                                             "value3",
+                                                             "4.01",
+                                                             null) :: Row(
+          "3",
+          "value13",
+          "2",
+          "value33",
+          "value44",
+          "5.01") :: Row("4", null, null, null, null, null) :: Row(
+          "5",
+          "",
+          null,
+          null,
+          null,
+          null) :: Row("6",
+                       null,
+                       null,
+                       null,
+                       null,
+                       null) :: Nil
 
     checkAnswer(
         df.select(

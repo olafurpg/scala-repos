@@ -12,7 +12,8 @@ abstract class AbstractTestRunConfigurationFactory(
     val typez: ConfigurationType)
     extends ConfigurationFactory(typez) {
   override def createConfiguration(
-      name: String, template: RunConfiguration): RunConfiguration = {
+      name: String,
+      template: RunConfiguration): RunConfiguration = {
 
     val configuration = (super
       .createConfiguration(name, template))

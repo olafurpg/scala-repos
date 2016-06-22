@@ -52,26 +52,28 @@ private[changeSignature] object ConflictsUtil {
         val className = member.containingClass.qualifiedName
         val message =
           s"Method is overriden in a composite $kind in $className. " +
-          "Converting it to function definition is not supported."
+            "Converting it to function definition is not supported."
 
         result.putValue(bp, message)
       }
     }
   }
 
-  def addClassParameterConflicts(
-      cp: ScClassParameter, change: ChangeInfo, result: ConflictsMap): Unit = {
+  def addClassParameterConflicts(cp: ScClassParameter,
+                                 change: ChangeInfo,
+                                 result: ConflictsMap): Unit = {
     if (change.getNewParameters.nonEmpty) {
       val className = cp.containingClass.qualifiedName
       val message =
         s"Method is overriden by class parameter of $className. " +
-        "Converting it to a function definition is not supported."
+          "Converting it to a function definition is not supported."
       result.putValue(cp, message)
     }
   }
 
-  def addUnapplyUsagesConflicts(
-      p: PatternUsageInfo, change: ChangeInfo, result: ConflictsMap): Unit = {
+  def addUnapplyUsagesConflicts(p: PatternUsageInfo,
+                                change: ChangeInfo,
+                                result: ConflictsMap): Unit = {
     change match {
       case jc: JavaChangeInfo
           if jc.isParameterSetOrOrderChanged || jc.isParameterTypesChanged =>

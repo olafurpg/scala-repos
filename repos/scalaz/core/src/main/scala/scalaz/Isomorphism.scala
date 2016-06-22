@@ -422,7 +422,7 @@ trait IsomorphismBitraverse[F[_, _], G[_, _]]
 
   implicit def G: Bitraverse[G]
 
-  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(
-      f: A => H[C], g: B => H[D]): H[F[C, D]] =
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](
+      fab: F[A, B])(f: A => H[C], g: B => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
 }

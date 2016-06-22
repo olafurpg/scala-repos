@@ -33,8 +33,8 @@ class Statements(indent: Int) {
   def collapse_dotted_name(name: Seq[Ast.identifier]): Ast.expr = {
     name.tail
       .foldLeft[Ast.expr](Ast.expr.Name(name.head, Ast.expr_context.Load))(
-        (x, y) => Ast.expr.Attribute(x, y, Ast.expr_context.Load)
-    )
+          (x, y) => Ast.expr.Attribute(x, y, Ast.expr_context.Load)
+      )
   }
 
   val decorator: P[Ast.expr] =
@@ -79,17 +79,20 @@ class Statements(indent: Int) {
     )
   }
 
-  val augassign: P[Ast.operator] = P(
-      "+=".!.map(_ => Ast.operator.Add) | "-=".!.map(_ => Ast.operator.Sub) | "*=".!.map(
-          _ =>
-            Ast.operator.Mult) | "/=".!.map(_ => Ast.operator.Div) | "%=".!.map(
-          _ =>
-            Ast.operator.Mod) | "&=".!.map(_ => Ast.operator.BitAnd) | "|=".!.map(
-          _ =>
-            Ast.operator.BitOr) | "^=".!.map(_ => Ast.operator.BitXor) | "<<=".!
-        .map(_ => Ast.operator.LShift) | ">>=".!.map(_ => Ast.operator.RShift) | "**=".!
-        .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
-  )
+  val augassign: P[Ast.operator] =
+    P(
+        "+=".!.map(_ => Ast.operator.Add) | "-=".!
+          .map(_ => Ast.operator.Sub) | "*=".!
+          .map(_ => Ast.operator.Mult) | "/=".!
+          .map(_ => Ast.operator.Div) | "%=".!
+          .map(_ => Ast.operator.Mod) | "&=".!
+          .map(_ => Ast.operator.BitAnd) | "|=".!
+          .map(_ => Ast.operator.BitOr) | "^=".!
+          .map(_ => Ast.operator.BitXor) | "<<=".!
+          .map(_ => Ast.operator.LShift) | ">>=".!.map(_ =>
+              Ast.operator.RShift) | "**=".!
+          .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
+    )
 
   val print_stmt: P[Ast.stmt.Print] = {
     val noDest =
@@ -119,18 +122,19 @@ class Statements(indent: Int) {
     val named = P(".".rep(1).!.? ~ dotted_name.!.map(Some(_)))
     val unNamed = P(".".rep(1).!.map(x => (Some(x), None)))
     val star = P("*".!.map(_ => Seq(Ast.alias(Ast.identifier("*"), None))))
-    P(kw("from") ~ (named | unNamed) ~ kw("import") ~
-        (star | "(" ~ import_as_names ~ ")" | import_as_names)).map {
+    P(
+        kw("from") ~ (named | unNamed) ~ kw("import") ~
+          (star | "(" ~ import_as_names ~ ")" | import_as_names)).map {
       case (dots, module, names) =>
-        Ast.stmt.ImportFrom(
-            module.map(Ast.identifier), names, dots.map(_.length))
+        Ast.stmt
+          .ImportFrom(module.map(Ast.identifier), names, dots.map(_.length))
     }
   }
   val import_as_name: P[Ast.alias] =
     P(NAME ~ (kw("as") ~ NAME).?).map(Ast.alias.tupled)
   val dotted_as_name: P[Ast.alias] = P(
       dotted_name.map(x => Ast.identifier(x.map(_.name).mkString("."))) ~
-      (kw("as") ~ NAME).?).map(Ast.alias.tupled)
+        (kw("as") ~ NAME).?).map(Ast.alias.tupled)
   val import_as_names = P(import_as_name.rep(1, ",") ~ (",").?)
   val dotted_as_names = P(dotted_as_name.rep(1, ","))
   val dotted_name = P(NAME.rep(1, "."))
@@ -159,20 +163,21 @@ class Statements(indent: Int) {
         val (last_test, last_body) = last
         init
           .foldRight(Ast.stmt.If(last_test, last_body, orelse.toSeq.flatten)) {
-          case ((test, body), rhs) => Ast.stmt.If(test, body, Seq(rhs))
-        }
+            case ((test, body), rhs) => Ast.stmt.If(test, body, Seq(rhs))
+          }
     }
   }
   val space_indents = P(spaces.repX ~~ " ".repX(indent))
-  val while_stmt = P(kw("while") ~/ test ~ ":" ~~ suite ~~
-      (space_indents ~~ kw("else") ~/ ":" ~~ suite).?.map(_.toSeq.flatten))
+  val while_stmt = P(
+      kw("while") ~/ test ~ ":" ~~ suite ~~
+        (space_indents ~~ kw("else") ~/ ":" ~~ suite).?.map(_.toSeq.flatten))
     .map(Ast.stmt.While.tupled)
   val for_stmt: P[Ast.stmt.For] = P(
       kw("for") ~/ exprlist ~ kw("in") ~ testlist ~ ":" ~~ suite ~~
-      (space_indents ~ kw("else") ~/ ":" ~~ suite).?).map {
+        (space_indents ~ kw("else") ~/ ":" ~~ suite).?).map {
     case (itervars, generator, body, orelse) =>
-      Ast.stmt.For(
-          tuplize(itervars), tuplize(generator), body, orelse.toSeq.flatten)
+      Ast.stmt
+        .For(tuplize(itervars), tuplize(generator), body, orelse.toSeq.flatten)
   }
   val try_stmt: P[Ast.stmt] = {
     val `try` = P(kw("try") ~/ ":" ~~ suite)
@@ -193,8 +198,9 @@ class Statements(indent: Int) {
         Ast.stmt.TryFinally(tryBlock, finallyBlock)
       case (tryBlock, excepts, elseBlock, Some(finallyBlock)) =>
         Ast.stmt.TryFinally(
-            Seq(Ast.stmt.TryExcept(
-                    tryBlock, excepts, elseBlock.toSeq.flatten)),
+            Seq(
+                Ast.stmt
+                  .TryExcept(tryBlock, excepts, elseBlock.toSeq.flatten)),
             finallyBlock
         )
     }
@@ -219,13 +225,15 @@ class Statements(indent: Int) {
       val commentLine =
         P("\n" ~~ Lexical.nonewlinewscomment.?.map(_ => 0)).map((_, Some("")))
       val endLine = P(
-          "\n" ~~ (" " | "\t").repX(indent + 1).!.map(_.length) ~~ Lexical.comment.!.?)
+          "\n" ~~ (" " | "\t")
+            .repX(indent + 1)
+            .!
+            .map(_.length) ~~ Lexical.comment.!.?)
       P(Lexical.nonewlinewscomment.? ~~ (endLine | commentLine).repX(1)).map {
         _.collectFirst { case (s, None) => s }
       }.filter(_.isDefined).map(_.get)
     }
-    val indented = P(
-        deeper.flatMap { nextIndent =>
+    val indented = P(deeper.flatMap { nextIndent =>
       new Statements(nextIndent).stmt
         .repX(1, spaces.repX(1) ~~ (" " * nextIndent | "\t" * nextIndent))
         .map(_.flatten)

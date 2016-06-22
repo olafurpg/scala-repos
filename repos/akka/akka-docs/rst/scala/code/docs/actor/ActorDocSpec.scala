@@ -482,7 +482,8 @@ class ActorDocSpec extends AkkaSpec("""
 
       class WatchActor extends Actor {
         val child = context.actorOf(Props.empty, "child")
-        context.watch(child) // <-- this is the only call needed for registration
+        context
+          .watch(child) // <-- this is the only call needed for registration
         var lastSender = system.deadLetters
 
         def receive = {
@@ -591,8 +592,10 @@ class ActorDocSpec extends AkkaSpec("""
     def receive = {
       case ref: ActorRef =>
         //#reply-with-sender
-        sender().tell("reply", context.parent) // replies will go back to parent
-        sender().!("reply")(context.parent) // alternative syntax (beware of the parens!)
+        sender()
+          .tell("reply", context.parent) // replies will go back to parent
+        sender()
+          .!("reply")(context.parent) // alternative syntax (beware of the parens!)
       //#reply-with-sender
       case x =>
         //#reply-without-sender
@@ -616,12 +619,13 @@ class ActorDocSpec extends AkkaSpec("""
 
   "using ActorDSL outside of akka.actor package" in {
     import akka.actor.ActorDSL._
-    actor(
-        new Act {
-      superviseWith(
-          OneForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
-      superviseWith(
-          AllForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
+    actor(new Act {
+      superviseWith(OneForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
+      superviseWith(AllForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
     })
   }
 }

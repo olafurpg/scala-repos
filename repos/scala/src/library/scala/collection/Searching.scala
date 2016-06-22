@@ -53,8 +53,8 @@ object Searching {
       *         sequence, or the `InsertionPoint` where the element would be inserted if
       *         the element is not in the sequence.
       */
-    final def search[B >: A](
-        elem: B)(implicit ord: Ordering[B]): SearchResult =
+    final def search[B >: A](elem: B)(
+        implicit ord: Ordering[B]): SearchResult =
       coll match {
         case _: IndexedSeqLike[A, Repr] =>
           binarySearch(elem, 0, coll.length)(ord)
@@ -103,8 +103,9 @@ object Searching {
     }
 
     private def linearSearch[B >: A](
-        c: SeqView[A, Repr], elem: B, offset: Int)(
-        implicit ord: Ordering[B]): SearchResult = {
+        c: SeqView[A, Repr],
+        elem: B,
+        offset: Int)(implicit ord: Ordering[B]): SearchResult = {
       var idx = offset
       val it = c.iterator
       while (it.hasNext) {

@@ -7,8 +7,8 @@ import scala.concurrent.Future
 import scala.util.{Success, Failure}
 import Types._
 
-final class Env(
-    config: Config, lifecycle: play.api.inject.ApplicationLifecycle) {
+final class Env(config: Config,
+                lifecycle: play.api.inject.ApplicationLifecycle) {
 
   lazy val db = {
     val parsedUri: MongoConnection.ParsedURI =

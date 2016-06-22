@@ -76,7 +76,8 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
         result.count should ===(lastWrite.flatten.length)
         checkFileContents(
-            f, lastWrite.mkString("") + TestLines.mkString("").drop(100))
+            f,
+            lastWrite.mkString("") + TestLines.mkString("").drop(100))
       }
     }
 
@@ -96,7 +97,8 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
         f.length() should ===(result1.count + result2.count)
         checkFileContents(
-            f, TestLines.mkString("") + lastWrite.mkString("") + "\n")
+            f,
+            TestLines.mkString("") + lastWrite.mkString("") + "\n")
       }
     }
 

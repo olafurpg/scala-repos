@@ -8,8 +8,8 @@ import cats.functor.Bifunctor
 trait Bitraverse[F[_, _]] extends Bifoldable[F] with Bifunctor[F] { self =>
 
   /** Traverse each side of the structure with the given functions */
-  def bitraverse[G[_]: Applicative, A, B, C, D](fab: F[A, B])(
-      f: A => G[C], g: B => G[D]): G[F[C, D]]
+  def bitraverse[G[_]: Applicative, A, B, C, D](
+      fab: F[A, B])(f: A => G[C], g: B => G[D]): G[F[C, D]]
 
   /** Sequence each side of the structure with the given functions */
   def bisequence[G[_]: Applicative, A, B](fab: F[G[A], G[B]]): G[F[A, B]] =

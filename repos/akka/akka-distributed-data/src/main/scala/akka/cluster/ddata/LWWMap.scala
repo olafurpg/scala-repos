@@ -38,7 +38,7 @@ object LWWMap {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class LWWMap[A] private[akka](
+final class LWWMap[A] private[akka] (
     private[akka] val underlying: ORMap[LWWRegister[A]])
     extends ReplicatedData
     with ReplicatedDataSerialization
@@ -104,7 +104,8 @@ final class LWWMap[A] private[akka](
     * concurrency control.
     */
   def put(key: String, value: A)(
-      implicit node: Cluster, clock: Clock[A] = defaultClock[A]): LWWMap[A] =
+      implicit node: Cluster,
+      clock: Clock[A] = defaultClock[A]): LWWMap[A] =
     put(node, key, value, clock)
 
   /**
@@ -148,8 +149,8 @@ final class LWWMap[A] private[akka](
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     underlying.needPruningFrom(removedNode)
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): LWWMap[A] =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): LWWMap[A] =
     new LWWMap(underlying.prune(removedNode, collapseInto))
 
   override def pruningCleanup(removedNode: UniqueAddress): LWWMap[A] =

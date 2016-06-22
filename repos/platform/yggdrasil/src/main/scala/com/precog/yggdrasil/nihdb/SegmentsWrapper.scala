@@ -27,8 +27,9 @@ import com.precog.util._
 import com.precog.yggdrasil.table._
 import com.precog.niflheim._
 
-case class SegmentsWrapper(
-    segments: Seq[Segment], projectionId: Int, blockId: Long)
+case class SegmentsWrapper(segments: Seq[Segment],
+                           projectionId: Int,
+                           blockId: Long)
     extends Slice {
   import TransSpecModule.paths
 

@@ -88,7 +88,7 @@ abstract class HiveComparisonTest
   /** The local directory with cached golden answer will be stored. */
   protected val answerCache = new File(
       "src" + File.separator + "test" + File.separator + "resources" +
-      File.separator + "golden")
+        File.separator + "golden")
   if (!answerCache.exists) {
     answerCache.mkdir()
   }
@@ -129,7 +129,8 @@ abstract class HiveComparisonTest
   protected val cacheDigest = java.security.MessageDigest.getInstance("MD5")
   protected def getMd5(str: String): String = {
     val digest = java.security.MessageDigest.getInstance("MD5")
-    digest.update(str
+    digest.update(
+        str
           .replaceAll(System.lineSeparator(), "\n")
           .getBytes(StandardCharsets.UTF_8))
     new java.math.BigInteger(1, digest.digest).toString(16)
@@ -358,7 +359,9 @@ abstract class HiveComparisonTest
                 try {
                   // Hooks often break the harness and don't really affect our test anyway, don't
                   // even try running them.
-                  if (installHooksCommand.findAllMatchIn(queryString).nonEmpty) {
+                  if (installHooksCommand
+                        .findAllMatchIn(queryString)
+                        .nonEmpty) {
                     sys.error("hive exec hooks not supported for tests.")
                   }
 
@@ -376,7 +379,7 @@ abstract class HiveComparisonTest
                   // from Seq("").
                   stringToFile(cachedAnswerFile,
                                answer.mkString("\n") +
-                               (if (answer.nonEmpty) "\n" else ""))
+                                 (if (answer.nonEmpty) "\n" else ""))
                   answer
                 } catch {
                   case e: Exception =>
@@ -594,7 +597,7 @@ abstract class HiveComparisonTest
               case e: Exception =>
                 logError(
                     s"FATAL ERROR: Canary query threw $e This implies that the " +
-                    "testing environment has likely been corrupted.")
+                      "testing environment has likely been corrupted.")
                 // The testing setup traps exits so wait here for a long time so the developer
                 // can see when things started to go wrong.
                 Thread.sleep(1000000)

@@ -27,8 +27,7 @@ object Boilerplate {
       GenApplyArityFunctions
   )
 
-  val header =
-    "// auto-generated boilerplate" // TODO: put something meaningful here?
+  val header = "// auto-generated boilerplate" // TODO: put something meaningful here?
 
   /** Returns a seq of the generated files.  As a side-effect, it actually generates them... */
   def gen(dir: File) = for (t <- templates) yield {
@@ -72,7 +71,7 @@ object Boilerplate {
         rawContents flatMap { _ filter (_ startsWith "-") map (_.tail) }
       val postBody =
         rawContents.head dropWhile (_ startsWith "|") dropWhile
-        (_ startsWith "-") map (_.tail)
+          (_ startsWith "-") map (_.tail)
       (headerLines ++ preBody ++ instances ++ postBody) mkString "\n"
     }
   }
@@ -106,12 +105,11 @@ object Boilerplate {
       val tpesString = synTypes mkString ", "
       val params =
         (synVals zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
-      val next =
-        if (arity + 1 <= maxArity) {
-          s"def |@|[Z](z: F[Z]) = new CartesianBuilder${arity + 1}(${`a..n`}, z)"
-        } else {
-          ""
-        }
+      val next = if (arity + 1 <= maxArity) {
+        s"def |@|[Z](z: F[Z]) = new CartesianBuilder${arity + 1}(${`a..n`}, z)"
+      } else {
+        ""
+      }
 
       val n = if (arity == 1) { "" } else { arity.toString }
 
@@ -133,12 +131,11 @@ object Boilerplate {
         else
           s"def imap[Z](f: (${`A..N`}) => Z)(g: Z => (${`A..N`}))(implicit invariant: Invariant[F], cartesian: Cartesian[F]): F[Z] = Cartesian.imap$n(${`a..n`})(f)(g)"
 
-      val tupled =
-        if (arity != 1) {
-          s"def tupled(implicit invariant: Invariant[F], cartesian: Cartesian[F]): F[(${`A..N`})] = Cartesian.tuple$n(${`a..n`})"
-        } else {
-          ""
-        }
+      val tupled = if (arity != 1) {
+        s"def tupled(implicit invariant: Invariant[F], cartesian: Cartesian[F]): F[(${`A..N`})] = Cartesian.tuple$n(${`a..n`})"
+      } else {
+        ""
+      }
 
       block"""
         |package cats

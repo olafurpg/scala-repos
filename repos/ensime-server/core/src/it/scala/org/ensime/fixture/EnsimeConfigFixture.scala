@@ -43,7 +43,7 @@ object EnsimeConfigFixture {
   if (!dotEnsime.exists) {
     System.err.println(
         "The .ensime file must exist to run the integration tests." +
-        " Type 'sbt gen-ensime' to create it"
+          " Type 'sbt gen-ensime' to create it"
     )
     System.err.flush()
     sys.exit(1)

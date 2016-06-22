@@ -122,7 +122,7 @@ case class DeletePermission(path: Path, writtenBy: WrittenBy)
 object Permission {
   sealed trait WriteAs
   case object WriteAsAny extends WriteAs
-  case class WriteAsAll private[Permission](accountIds: Set[AccountId])
+  case class WriteAsAll private[Permission] (accountIds: Set[AccountId])
       extends WriteAs
 
   object WriteAs {
@@ -184,8 +184,8 @@ object Permission {
   }
 
   val extractorV1Base: Extractor[Permission] = new Extractor[Permission] {
-    private def writtenByPermission(
-        obj: JValue, pathV: Validation[Error, Path])(
+    private def writtenByPermission(obj: JValue,
+                                    pathV: Validation[Error, Path])(
         f: (Path, WrittenBy) => Permission): Validation[Error, Permission] = {
       (obj \? "ownerAccountIds") map { ids =>
         Apply[({ type l[a] = Validation[Error, a] })#l].zip
@@ -228,8 +228,8 @@ object Permission {
   }
 
   val extractorV0: Extractor[Permission] = new Extractor[Permission] {
-    private def writtenByPermission(
-        obj: JValue, pathV: Validation[Error, Path])(
+    private def writtenByPermission(obj: JValue,
+                                    pathV: Validation[Error, Path])(
         f: (Path, WrittenBy) => Permission): Validation[Error, Permission] = {
       obj.validated[Option[String]]("ownerAccountId") flatMap { opt =>
         opt map { id =>

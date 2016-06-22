@@ -55,31 +55,31 @@ class FailureAccrualPolicyTest extends FunSuite with MockitoSugar {
       "Consecutive failures policy: markDeadOnFailure() iterates over markDeadFor") {
     val policy = FailureAccrualPolicy.consecutiveFailures(1, expBackoff)
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
   }
 
   test(
       "Consecutive failures policy: markDeadOnFailure() returns Some(300.seconds) when stream runs out") {
     val policy = FailureAccrualPolicy.consecutiveFailures(1, expBackoffList)
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
 
-    for (i <- 0 until 5) assert(
-        policy.markDeadOnFailure() == Some(300.seconds))
+    for (i <- 0 until 5)
+      assert(policy.markDeadOnFailure() == Some(300.seconds))
   }
 
   test("Consecutive failures policy: markDeadFor resets on revived()") {
     val policy = FailureAccrualPolicy.consecutiveFailures(1, expBackoff)
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
 
     policy.revived()
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
   }
 
   test(
@@ -111,30 +111,30 @@ class FailureAccrualPolicyTest extends FunSuite with MockitoSugar {
   test("Success rate policy: markDeadOnFailure() iterates over markDeadFor") {
     val policy = FailureAccrualPolicy.successRate(1, 1, expBackoff)
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
   }
 
   test(
       "Success rate policy: markDeadOnFailure() returns 300 when stream runs out") {
     val policy = FailureAccrualPolicy.successRate(1, 1, expBackoffList)
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
 
-    for (i <- 0 until 5) assert(
-        policy.markDeadOnFailure() == Some(300.seconds))
+    for (i <- 0 until 5)
+      assert(policy.markDeadOnFailure() == Some(300.seconds))
   }
 
   test("Sucess rate policy: markDeadFor resets on revived()") {
     val policy = FailureAccrualPolicy.successRate(1, 1, expBackoff)
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
 
     policy.revived()
 
-    for (i <- 0 until expBackoffList.length) assert(
-        policy.markDeadOnFailure() == Some(expBackoffList(i)))
+    for (i <- 0 until expBackoffList.length)
+      assert(policy.markDeadOnFailure() == Some(expBackoffList(i)))
   }
 }

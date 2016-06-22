@@ -141,8 +141,8 @@ abstract class OrcSuite
 
     df.write.format("orc").saveAsTable("orcNullValues")
 
-    checkAnswer(
-        sql("SELECT * FROM orcNullValues"), Row.fromSeq(Seq.fill(11)(null)))
+    checkAnswer(sql("SELECT * FROM orcNullValues"),
+                Row.fromSeq(Seq.fill(11)(null)))
 
     sql("DROP TABLE IF EXISTS orcNullValues")
   }
@@ -175,7 +175,8 @@ class OrcSourceSuite extends OrcSuite {
       """.stripMargin.trim
     ) {
       OrcFilters
-        .createFilter(Array(
+        .createFilter(
+            Array(
                 LessThan("a", 10),
                 StringContains("b", "prefix")
             ))
@@ -190,7 +191,8 @@ class OrcSourceSuite extends OrcSuite {
       """.stripMargin.trim
     ) {
       OrcFilters
-        .createFilter(Array(
+        .createFilter(
+            Array(
                 LessThan("a", 10),
                 Not(And(
                         GreaterThan("a", 1),

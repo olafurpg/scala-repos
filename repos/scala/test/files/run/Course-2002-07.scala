@@ -56,7 +56,8 @@ object M0 {
         "    0 + 1 = " + eval(new Sum(new Number(0), new Number(1))));
     Console.println(
         "    1 + 2 = " + eval(new Sum(new Number(1), new Number(2))));
-    Console.println("2 + 3 + 4 = " + eval(
+    Console.println(
+        "2 + 3 + 4 = " + eval(
             new Sum(new Sum(new Number(2), new Number(3)), new Number(4))));
     Console.println;
   }
@@ -83,8 +84,9 @@ object M1 {
         "    0 + 1 = " + new Sum(new Number(0), new Number(1)).eval);
     Console.println(
         "    1 + 2 = " + new Sum(new Number(1), new Number(2)).eval);
-    Console.println("2 + 3 + 4 = " + new Sum(
-            new Sum(new Number(2), new Number(3)), new Number(4)).eval);
+    Console.println(
+        "2 + 3 + 4 = " + new Sum(new Sum(new Number(2), new Number(3)),
+                                 new Number(4)).eval);
     Console.println;
   }
 }
@@ -147,7 +149,8 @@ object M4 {
   }
 
   def test_concat[a](xss: List[List[a]]) = {
-    Console.println(concat(xss).toString + " = concat(" + xss + ")"); // !!! .toString
+    Console
+      .println(concat(xss).toString + " = concat(" + xss + ")"); // !!! .toString
   }
 
   def test = {
@@ -186,8 +189,9 @@ object M5 {
     }
 
   def test_zipFun[a, b](xs: List[a], ys: List[b]) = {
-    Console.println(zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
-        ")"); // !!! .toString
+    Console.println(
+        zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
+          ")"); // !!! .toString
   }
 
   def test = {
@@ -220,8 +224,9 @@ object M6 {
     }
 
   def test_zipFun[a, b](xs: List[a], ys: List[b]) = {
-    Console.println(zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
-        ")"); // !!! .toString
+    Console.println(
+        zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
+          ")"); // !!! .toString
   }
 
   def test = {
@@ -253,7 +258,8 @@ object M7 {
   }
 
   def test_heads[a](xss: List[List[a]]) = {
-    Console.println(heads(xss).toString + " = heads(" + xss + ")"); // !!! .toString
+    Console
+      .println(heads(xss).toString + " = heads(" + xss + ")"); // !!! .toString
   }
 
   def test = {
@@ -297,7 +303,8 @@ object M8 {
   }
 
   def test_heads[a](xss: List[List[a]]) = {
-    Console.println(heads(xss).toString + " = heads(" + xss + ")"); // !!! .toString
+    Console
+      .println(heads(xss).toString + " = heads(" + xss + ")"); // !!! .toString
   }
 
   def test = {
@@ -468,9 +475,9 @@ object Utils {
     case (List(), _) => -1
     case (_, List()) => +1
     case (x :: xs, y :: ys) => {
-        val diff = x.compareTo(y);
-        if (diff != 0) diff else compare(xs, ys)
-      }
+      val diff = x.compareTo(y);
+      if (diff != 0) diff else compare(xs, ys)
+    }
   }
 }
 
@@ -515,11 +522,11 @@ object MB {
           case (_, Add(rl, rr)) => (this + rl) + rr
           case (Add(ll, lr), _) if (lr +<= that) => ll + (that + lr)
           case (_, _) => {
-              val l = this.term;
-              val r = that.term;
-              if (l equ r) Lit(this.count + that.count) * r
-              else Add(this, that)
-            }
+            val l = this.term;
+            val r = that.term;
+            if (l equ r) Lit(this.count + that.count) * r
+            else Add(this, that)
+          }
         } else that + this;
 
     private def *<(that: Expr): Boolean = (this *<? that) < 0;
@@ -652,7 +659,7 @@ object MB {
 
     val f4 =
       (x + _3) * (_2 + x) * x * (x + _1) + (x + _5) * (x * (x + _2) + x + _1) +
-      (x ^ 2) + x;
+        (x ^ 2) + x;
     val f3 = f4.derive(x);
     val f2 = f3.derive(x);
     val f1 = f2.derive(x);

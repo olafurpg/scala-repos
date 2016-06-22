@@ -27,8 +27,7 @@ trait PrepJSExports {
       pos: Position,
       isNamed: Boolean,
       ignoreInvalid: Boolean
-  )
-      extends jsInterop.ExportInfo
+  ) extends jsInterop.ExportInfo
 
   /** Generate the exporter for the given DefDef
     *
@@ -57,11 +56,13 @@ trait PrepJSExports {
     else if (scalaPrimitives.isPrimitive(baseSym))
       err("You may not export a primitive")
     else if (hasIllegalRepeatedParam(baseSym))
-      err(s"In an exported $memType, a *-parameter must come last " +
-          "(through all parameter lists)")
+      err(
+          s"In an exported $memType, a *-parameter must come last " +
+            "(through all parameter lists)")
     else if (hasIllegalDefaultParam(baseSym))
-      err(s"In an exported $memType, all parameters with defaults " +
-          "must be at the end")
+      err(
+          s"In an exported $memType, all parameters with defaults " +
+            "must be at the end")
     else if (baseSym.isConstructor) {
       // we can generate constructors entirely in the backend, since they
       // do not need inheritance and such. But we want to check their sanity
@@ -125,14 +126,14 @@ trait PrepJSExports {
       if (!hasLegalExportVisibility(sym)) {
         err(
             "You may only export public and protected " +
-            (if (isMod) "objects" else "classes"))
+              (if (isMod) "objects" else "classes"))
       } else if (sym.isLocalToBlock) {
         err("You may not export a local " + (if (isMod) "object" else "class"))
       } else if (!sym.owner.hasPackageFlag) {
         err(
             "You may not export a nested " +
-            (if (isMod) "object"
-             else s"class. $createFactoryInOuterClassHint"))
+              (if (isMod) "object"
+               else s"class. $createFactoryInOuterClassHint"))
       } else if (sym.isAbstractClass) {
         err("You may not export an abstract class")
       } else if (!isMod && !hasAnyNonPrivateCtor) {
@@ -145,8 +146,8 @@ trait PrepJSExports {
         } {
           reporter.error(exp.pos,
                          "You may not use @JSNamedExport on " +
-                         (if (isMod) "an object"
-                          else "a Scala.js-defined JS class"))
+                           (if (isMod) "an object"
+                            else "a Scala.js-defined JS class"))
         }
 
         jsInterop.registerForExport(sym, normal)
@@ -172,8 +173,8 @@ trait PrepJSExports {
     val grouped = exports.groupBy(exp => (exp.jsName, exp.isNamed))
 
     for (((jsName, isNamed), exps) <- grouped.toList)
-    // Make sure that we are strict if necessary
-    yield exps.find(!_.ignoreInvalid).getOrElse(exps.head)
+      // Make sure that we are strict if necessary
+      yield exps.find(!_.ignoreInvalid).getOrElse(exps.head)
   }
 
   private def directExportsOf(sym: Symbol): List[ExportInfo] = {
@@ -190,7 +191,7 @@ trait PrepJSExports {
     // Annotations that are directly on the member
     val directAnnots = for {
       annot <- trgSym.annotations if annot.symbol == JSExportAnnotation ||
-      annot.symbol == JSExportNamedAnnotation
+        annot.symbol == JSExportNamedAnnotation
     } yield annot
 
     // Is this a member export (i.e. not a class or module export)?
@@ -234,7 +235,8 @@ trait PrepJSExports {
         val pos = if (hasExplicitName) annot.args.head.pos else trgSym.pos
 
         reporter.error(
-            pos, "An exported name may not contain a double underscore (`__`)")
+            pos,
+            "An exported name may not contain a double underscore (`__`)")
       }
 
       // Make sure we do not override the default export of toString
@@ -248,14 +250,14 @@ trait PrepJSExports {
         reporter.error(
             annot.pos,
             "You may not export a zero-argument " +
-            "method named other than 'toString' under the name 'toString'")
+              "method named other than 'toString' under the name 'toString'")
       }
 
       def isIllegalApplyExport = {
         isMember && !hasExplicitName && sym.name == nme.apply &&
         !(isExportAll && directAnnots.exists(annot =>
                   annot.symbol == JSExportAnnotation && annot.args.nonEmpty &&
-                  annot.stringArg(0) == Some("apply")))
+                    annot.stringArg(0) == Some("apply")))
       }
 
       // Don't allow apply without explicit name
@@ -266,9 +268,9 @@ trait PrepJSExports {
         reporter.warning(
             pos,
             "Member cannot be exported to function " +
-            "application. It is available under the name apply instead. " +
-            "Add @JSExport(\"apply\") to silence this warning. " +
-            "This will be enforced in 1.0.")
+              "application. It is available under the name apply instead. " +
+              "Add @JSExport(\"apply\") to silence this warning. " +
+              "This will be enforced in 1.0.")
       }
 
       if (isNamedExport && jsInterop.isJSProperty(sym)) {
@@ -321,7 +323,7 @@ trait PrepJSExports {
 
       val optExport = for {
         (forcingSym, ignoreInvalid) <- forcingSymInfo if nameValid ||
-        !ignoreInvalid
+          !ignoreInvalid
       } yield {
         // Enfore no __ in name
         if (!nameValid) {
@@ -329,8 +331,8 @@ trait PrepJSExports {
           reporter.error(
               sym.pos,
               s"${trgSym.name} may not have a double underscore (`__`) in " +
-              "its fully qualified name, since it is forced to be exported by " +
-              s"a @${trgAnnot.name} on $forcingSym")
+                "its fully qualified name, since it is forced to be exported by " +
+                s"a @${trgAnnot.name} on $forcingSym")
         }
 
         ExportInfo(name, sym.pos, false, ignoreInvalid)
@@ -375,10 +377,10 @@ trait PrepJSExports {
     expSym.setFlag(Flags.SYNTHETIC)
     expSym.resetFlag(
         Flags.DEFERRED | // We always have a body
-        Flags.ACCESSOR | // We are never a "direct" accessor
-        Flags.CASEACCESSOR | // And a fortiori not a case accessor
-        Flags.LAZY | // We are not a lazy val (even if we export one)
-        Flags.OVERRIDE // Synthetic methods need not bother with this
+          Flags.ACCESSOR | // We are never a "direct" accessor
+          Flags.CASEACCESSOR | // And a fortiori not a case accessor
+          Flags.LAZY | // We are not a lazy val (even if we export one)
+          Flags.OVERRIDE // Synthetic methods need not bother with this
     )
 
     // Remove export annotations
@@ -464,8 +466,10 @@ trait PrepJSExports {
   }
 
   /** generate a DefDef tree (from [[proxySym]]) that calls [[trgSym]] */
-  private def genProxyDefDef(
-      clsSym: Symbol, trgSym: Symbol, proxySym: Symbol, pos: Position) =
+  private def genProxyDefDef(clsSym: Symbol,
+                             trgSym: Symbol,
+                             proxySym: Symbol,
+                             pos: Position) =
     atPos(pos) {
 
       // Helper to ascribe repeated argument lists when calling

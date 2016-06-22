@@ -27,8 +27,8 @@ object Routing {
   /**
     * Interceptor is a filter(x,y) where x.isDefinedAt is considered to be always true.
     */
-  def intercept[A, B](
-      interceptor: (A) => Unit, interceptee: PF[A, B]): PF[A, B] =
+  def intercept[A, B](interceptor: (A) => Unit,
+                      interceptee: PF[A, B]): PF[A, B] =
     filter({ case a if a.isInstanceOf[A] => interceptor(a) }, interceptee)
 
   /**
@@ -42,10 +42,9 @@ object Routing {
   /**
     * Creates a Dispatcher given a routing and a message-transforming function.
     */
-  def dispatcherActor(
-      routing: PF[Any, ActorRef], msgTransformer: (Any) => Any): ActorRef =
-    actorOf(
-        new Actor with Dispatcher {
+  def dispatcherActor(routing: PF[Any, ActorRef],
+                      msgTransformer: (Any) => Any): ActorRef =
+    actorOf(new Actor with Dispatcher {
       override def transform(msg: Any) = msgTransformer(msg)
       def routes = routing
     }).start()

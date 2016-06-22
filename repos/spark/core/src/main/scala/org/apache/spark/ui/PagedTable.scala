@@ -150,8 +150,9 @@ private[ui] trait PagedTable[T] {
     * > means jumping to the next page.
     * }}}
     */
-  private[ui] def pageNavigation(
-      page: Int, pageSize: Int, totalPages: Int): Seq[Node] = {
+  private[ui] def pageNavigation(page: Int,
+                                 pageSize: Int,
+                                 totalPages: Int): Seq[Node] = {
     if (totalPages == 1) {
       Nil
     } else {

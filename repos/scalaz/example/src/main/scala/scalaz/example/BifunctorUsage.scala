@@ -30,24 +30,30 @@ object BifunctorUsage extends App {
   //
 
   // For a tuple, the result of bimap is obvious:
-  assert(Bifunctor[Tuple2].bimap(("asdf", 1))(_.toUpperCase, _ + 1) ===
-      ("ASDF", 2))
+  assert(
+      Bifunctor[Tuple2].bimap(("asdf", 1))(_.toUpperCase, _ + 1) ===
+        ("ASDF", 2))
 
   // For sum types, which function is applied depends on what value is present:
   assert(
       Bifunctor[Either].bimap(Left("asdf"): Either[String, Int])(
-          _.toUpperCase, _ + 1) === (Left("ASDF")))
+          _.toUpperCase,
+          _ + 1) === (Left("ASDF")))
   assert(
       Bifunctor[Either].bimap(Right(1): Either[String, Int])(
-          _.toUpperCase, _ + 1) === (Right(2)))
+          _.toUpperCase,
+          _ + 1) === (Right(2)))
 
   assert(
-      Bifunctor[Validation].bimap("asdf".failure[Int])(_.toUpperCase, _ + 1) === "ASDF".failure)
+      Bifunctor[Validation]
+        .bimap("asdf".failure[Int])(_.toUpperCase, _ + 1) === "ASDF".failure)
   assert(
-      Bifunctor[Validation].bimap(1.success[String])(_.toUpperCase, _ + 1) === 2.success)
+      Bifunctor[Validation]
+        .bimap(1.success[String])(_.toUpperCase, _ + 1) === 2.success)
 
   assert(
-      Bifunctor[\/].bimap("asdf".left[Int])(_.toUpperCase, _ + 1) === "ASDF".left)
+      Bifunctor[\/]
+        .bimap("asdf".left[Int])(_.toUpperCase, _ + 1) === "ASDF".left)
   assert(
       Bifunctor[\/].bimap(1.right[String])(_.toUpperCase, _ + 1) === 2.right)
 
@@ -92,7 +98,8 @@ object BifunctorUsage extends App {
   // list.
   val bff = Functor[List] bicompose Bifunctor[\/]
   val bfres = bff.bimap(List("asdf".left, 2.right, "qwer".left, 4.right))(
-      _.toUpperCase, _ + 1)
+      _.toUpperCase,
+      _ + 1)
   assert(bfres === List("ASDF".left, 3.right, "QWER".left, 5.right))
 
   //

@@ -62,15 +62,18 @@ trait SecureFlagSpec
     }
 
     "show that requests are secure in the absence of X_FORWARDED_PROTO" in withServer(
-        secureFlagAction, Some(sslPort)) { _ =>
+        secureFlagAction,
+        Some(sslPort)) { _ =>
       test(createConn(sslPort), true)
     }
     "show that requests are secure if X_FORWARDED_PROTO is https" in withServer(
-        secureFlagAction, Some(sslPort)) { _ =>
+        secureFlagAction,
+        Some(sslPort)) { _ =>
       test(createConn(sslPort, Some("https")), true)
     }
     "not show that requests are not secure if X_FORWARDED_PROTO is http" in withServer(
-        secureFlagAction, Some(sslPort)) { _ =>
+        secureFlagAction,
+        Some(sslPort)) { _ =>
       test(createConn(sslPort, Some("http")), false)
     }
   }
@@ -100,8 +103,11 @@ trait SecureFlagSpec
     "not show that requests are secure if X_FORWARDED_PROTO is http" in withServer(
         secureFlagAction) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest(
-              "GET", "/", "HTTP/1.1", Map((X_FORWARDED_PROTO, "http")), "foo")
+          BasicRequest("GET",
+                       "/",
+                       "HTTP/1.1",
+                       Map((X_FORWARDED_PROTO, "http")),
+                       "foo")
       )
       responses.length must_== 1
       responses(0).body must_== Left("false")
@@ -131,11 +137,11 @@ trait SecureFlagSpec
   case class MockTrustManager() extends X509TrustManager {
     val nullArray = Array[X509Certificate]()
 
-    def checkClientTrusted(
-        x509Certificates: Array[X509Certificate], s: String) {}
+    def checkClientTrusted(x509Certificates: Array[X509Certificate],
+                           s: String) {}
 
-    def checkServerTrusted(
-        x509Certificates: Array[X509Certificate], s: String) {}
+    def checkServerTrusted(x509Certificates: Array[X509Certificate],
+                           s: String) {}
 
     def getAcceptedIssuers = nullArray
   }

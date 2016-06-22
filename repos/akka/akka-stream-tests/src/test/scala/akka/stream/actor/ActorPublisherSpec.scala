@@ -22,8 +22,8 @@ object ActorPublisherSpec {
       my-dispatcher2 = $${akka.test.stream-dispatcher}
     """
 
-  def testPublisherProps(
-      probe: ActorRef, useTestDispatcher: Boolean = true): Props = {
+  def testPublisherProps(probe: ActorRef,
+                         useTestDispatcher: Boolean = true): Props = {
     val p = Props(new TestPublisher(probe))
     if (useTestDispatcher) p.withDispatcher("akka.test.stream-dispatcher")
     else p
@@ -460,9 +460,9 @@ class ActorPublisherSpec
       implicit val materializer = ActorMaterializer()
       val s = TestSubscriber.manualProbe[String]()
       val ref = Source
-        .actorPublisher(testPublisherProps(
-                testActor,
-                useTestDispatcher = false).withDispatcher("my-dispatcher1"))
+        .actorPublisher(
+            testPublisherProps(testActor, useTestDispatcher = false)
+              .withDispatcher("my-dispatcher1"))
         .withAttributes(ActorAttributes.dispatcher("my-dispatcher2"))
         .to(Sink.fromSubscriber(s))
         .run()

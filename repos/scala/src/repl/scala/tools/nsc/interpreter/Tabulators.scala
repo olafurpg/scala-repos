@@ -12,7 +12,7 @@ trait Tabulator {
 
   protected def fits(items: Seq[String], width: Int): Boolean =
     ((items map
-            (_.length)).sum + (items.length - 1) * marginSize < width)
+              (_.length)).sum + (items.length - 1) * marginSize < width)
   def tabulate(items: Seq[String]): Seq[Seq[String]] =
     (if (fits(items, width)) Seq(Seq(items mkString " " * marginSize))
      else printMultiLineColumns(items))
@@ -37,9 +37,10 @@ trait Tabulator {
       else {
         val h = 1 max padded.size /% groupSize
         val cols = (padded grouped h).toList
-        for (i <- 0 until h) yield
-          for (j <- 0 until groupSize) yield
-            if (i < cols(j).size) cols(j)(i) else ""
+        for (i <- 0 until h)
+          yield
+            for (j <- 0 until groupSize)
+              yield if (i < cols(j).size) cols(j)(i) else ""
       }
     grouped
   }
@@ -76,9 +77,10 @@ trait VariColumnTabulator extends Tabulator {
       else if (xwise) resulting((items grouped ncols).toSeq)
       else {
         val cols = (items grouped nrows).toList
-        val rows = for (i <- 0 until nrows) yield
-          for (j <- 0 until ncols) yield
-            if (j < cols.size && i < cols(j).size) cols(j)(i) else ""
+        val rows = for (i <- 0 until nrows)
+          yield
+            for (j <- 0 until ncols)
+              yield if (j < cols.size && i < cols(j).size) cols(j)(i) else ""
         resulting(rows)
       }
     }

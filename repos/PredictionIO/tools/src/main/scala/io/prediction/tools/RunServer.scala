@@ -41,37 +41,34 @@ object RunServer extends Logging {
 
     val driverClassPathIndex =
       ca.common.sparkPassThrough.indexOf("--driver-class-path")
-    val driverClassPathPrefix =
-      if (driverClassPathIndex != -1) {
-        Seq(ca.common.sparkPassThrough(driverClassPathIndex + 1))
-      } else {
-        Seq()
-      }
+    val driverClassPathPrefix = if (driverClassPathIndex != -1) {
+      Seq(ca.common.sparkPassThrough(driverClassPathIndex + 1))
+    } else {
+      Seq()
+    }
     val extraClasspaths =
       driverClassPathPrefix ++ WorkflowUtils.thirdPartyClasspaths
 
     val deployModeIndex = ca.common.sparkPassThrough.indexOf("--deploy-mode")
-    val deployMode =
-      if (deployModeIndex != -1) {
-        ca.common.sparkPassThrough(deployModeIndex + 1)
-      } else {
-        "client"
-      }
+    val deployMode = if (deployModeIndex != -1) {
+      ca.common.sparkPassThrough(deployModeIndex + 1)
+    } else {
+      "client"
+    }
 
-    val mainJar =
-      if (ca.build.uberJar) {
-        if (deployMode == "cluster") {
-          em.files.filter(_.startsWith("hdfs")).head
-        } else {
-          em.files.filterNot(_.startsWith("hdfs")).head
-        }
+    val mainJar = if (ca.build.uberJar) {
+      if (deployMode == "cluster") {
+        em.files.filter(_.startsWith("hdfs")).head
       } else {
-        if (deployMode == "cluster") {
-          em.files.filter(_.contains("pio-assembly")).head
-        } else {
-          core.getCanonicalPath
-        }
+        em.files.filterNot(_.startsWith("hdfs")).head
       }
+    } else {
+      if (deployMode == "cluster") {
+        em.files.filter(_.contains("pio-assembly")).head
+      } else {
+        core.getCanonicalPath
+      }
+    }
 
     val jarFiles = (em.files ++ Option(
             new File(ca.common.pioHome.get, "plugins").listFiles())
@@ -84,49 +81,49 @@ object RunServer extends Logging {
           "io.prediction.workflow.CreateServer",
           "--name",
           s"PredictionIO Engine Instance: ${engineInstanceId}") ++
-      (if (!ca.build.uberJar) {
-         Seq("--jars", jarFiles)
-       } else Seq()) ++
-      (if (extraFiles.size > 0) {
-         Seq("--files", extraFiles.mkString(","))
-       } else {
-         Seq()
-       }) ++
-      (if (extraClasspaths.size > 0) {
-         Seq("--driver-class-path", extraClasspaths.mkString(":"))
-       } else {
-         Seq()
-       }) ++
-      (if (ca.common.sparkKryo) {
-         Seq("--conf",
-             "spark.serializer=org.apache.spark.serializer.KryoSerializer")
-       } else {
-         Seq()
-       }) ++ Seq(mainJar,
-                 "--engineInstanceId",
-                 engineInstanceId,
-                 "--ip",
-                 ca.deploy.ip,
-                 "--port",
-                 ca.deploy.port.toString,
-                 "--event-server-ip",
-                 ca.eventServer.ip,
-                 "--event-server-port",
-                 ca.eventServer.port.toString) ++
-      (if (ca.accessKey.accessKey != "") {
-         Seq("--accesskey", ca.accessKey.accessKey)
-       } else {
-         Seq()
-       }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
-      (if (ca.common.batch != "")
-         Seq("--batch", ca.common.batch)
-       else Seq()) ++
-      (if (ca.common.verbose) Seq("--verbose") else Seq()) ++ ca.deploy.logUrl
+        (if (!ca.build.uberJar) {
+           Seq("--jars", jarFiles)
+         } else Seq()) ++
+        (if (extraFiles.size > 0) {
+           Seq("--files", extraFiles.mkString(","))
+         } else {
+           Seq()
+         }) ++
+        (if (extraClasspaths.size > 0) {
+           Seq("--driver-class-path", extraClasspaths.mkString(":"))
+         } else {
+           Seq()
+         }) ++
+        (if (ca.common.sparkKryo) {
+           Seq("--conf",
+               "spark.serializer=org.apache.spark.serializer.KryoSerializer")
+         } else {
+           Seq()
+         }) ++ Seq(mainJar,
+                   "--engineInstanceId",
+                   engineInstanceId,
+                   "--ip",
+                   ca.deploy.ip,
+                   "--port",
+                   ca.deploy.port.toString,
+                   "--event-server-ip",
+                   ca.eventServer.ip,
+                   "--event-server-port",
+                   ca.eventServer.port.toString) ++
+        (if (ca.accessKey.accessKey != "") {
+           Seq("--accesskey", ca.accessKey.accessKey)
+         } else {
+           Seq()
+         }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
+        (if (ca.common.batch != "")
+           Seq("--batch", ca.common.batch)
+         else Seq()) ++
+        (if (ca.common.verbose) Seq("--verbose") else Seq()) ++ ca.deploy.logUrl
         .map(x => Seq("--log-url", x))
         .getOrElse(Seq()) ++ ca.deploy.logPrefix
         .map(x => Seq("--log-prefix", x))
-        .getOrElse(Seq()) ++ Seq(
-          "--json-extractor", ca.common.jsonExtractor.toString)
+        .getOrElse(Seq()) ++ Seq("--json-extractor",
+                                 ca.common.jsonExtractor.toString)
 
     info(s"Submission command: ${sparkSubmit.mkString(" ")}")
 
@@ -134,8 +131,7 @@ object RunServer extends Logging {
                        None,
                        "CLASSPATH" -> "",
                        "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
-    Runtime.getRuntime.addShutdownHook(
-        new Thread(new Runnable {
+    Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
       def run(): Unit = {
         proc.destroy()
       }
@@ -143,8 +139,9 @@ object RunServer extends Logging {
     proc.exitValue()
   }
 
-  def newRunServer(
-      ca: ConsoleArgs, em: EngineManifest, engineInstanceId: String): Int = {
+  def newRunServer(ca: ConsoleArgs,
+                   em: EngineManifest,
+                   engineInstanceId: String): Int = {
     val jarFiles =
       em.files.map(new URI(_)) ++ Option(
           new File(ca.common.pioHome.get, "plugins").listFiles())
@@ -163,20 +160,20 @@ object RunServer extends Logging {
           ca.eventServer.ip,
           "--event-server-port",
           ca.eventServer.port.toString) ++
-      (if (ca.accessKey.accessKey != "") {
-         Seq("--accesskey", ca.accessKey.accessKey)
-       } else {
-         Nil
-       }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Nil) ++
-      (if (ca.common.batch != "") Seq("--batch", ca.common.batch) else Nil) ++
-      (if (ca.common.verbose) Seq("--verbose") else Nil) ++ ca.deploy.logUrl
+        (if (ca.accessKey.accessKey != "") {
+           Seq("--accesskey", ca.accessKey.accessKey)
+         } else {
+           Nil
+         }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Nil) ++
+        (if (ca.common.batch != "") Seq("--batch", ca.common.batch) else Nil) ++
+        (if (ca.common.verbose) Seq("--verbose") else Nil) ++ ca.deploy.logUrl
         .map(x => Seq("--log-url", x))
         .getOrElse(Nil) ++ ca.deploy.logPrefix
         .map(x => Seq("--log-prefix", x))
-        .getOrElse(Nil) ++ Seq(
-          "--json-extractor", ca.common.jsonExtractor.toString)
+        .getOrElse(Nil) ++ Seq("--json-extractor",
+                               ca.common.jsonExtractor.toString)
 
-    Runner.runOnSpark(
-        "io.prediction.workflow.CreateServer", args, ca, jarFiles)
+    Runner
+      .runOnSpark("io.prediction.workflow.CreateServer", args, ca, jarFiles)
   }
 }

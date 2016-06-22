@@ -88,8 +88,7 @@ trait Event[+T] { self =>
       val mu = new Object()
       var q = Queue.empty[T]
       self.respond { t =>
-        s.notify(
-            mu.synchronized {
+        s.notify(mu.synchronized {
           q = q.enqueue(t)
           while (q.length > n) {
             val (_, q1) = q.dequeue
@@ -235,8 +234,7 @@ trait Event[+T] { self =>
     def register(s: Witness[T]): Closable = {
       val n = new AtomicInteger(0)
       val c = new AtomicReference(Closable.nop)
-      c.set(
-          self.respond { t =>
+      c.set(self.respond { t =>
         if (n.incrementAndGet() <= howmany) s.notify(t)
         else c.getAndSet(Closable.nop).close()
       })

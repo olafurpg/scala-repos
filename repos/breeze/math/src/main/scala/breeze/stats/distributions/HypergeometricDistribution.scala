@@ -23,11 +23,14 @@ import org.apache.commons.math3.distribution.{HypergeometricDistribution => Apac
   *
   * @author stucchio
   */
-class HypergeometricDistribution(
-    populationSize: Int, numberOfSuccesses: Int, sampleSize: Int)
+class HypergeometricDistribution(populationSize: Int,
+                                 numberOfSuccesses: Int,
+                                 sampleSize: Int)
     extends ApacheDiscreteDistribution {
   protected final val inner = new ApacheHypergeometricDistribution(
-      populationSize, numberOfSuccesses, sampleSize)
+      populationSize,
+      numberOfSuccesses,
+      sampleSize)
 }
 
 object HypergeometricDistribution

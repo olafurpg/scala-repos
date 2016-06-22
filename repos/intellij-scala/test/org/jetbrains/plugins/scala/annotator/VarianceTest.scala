@@ -48,7 +48,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testVariancePrivateThis() {
-    assertMatches(messages(
+    assertMatches(
+        messages(
             "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
@@ -140,7 +141,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testSCL8803() {
-    assertMatches(messages("""object Main extends App {
+    assertMatches(
+        messages("""object Main extends App {
         |
         |  class Sum[+T](dummy: T, val sel: Int) {
         |    def this(d: T, value: List[Int]) = this(d, value.sum)
@@ -163,7 +165,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testUV() = {
-    assertMatches(messages("""
+    assertMatches(
+        messages("""
         |import scala.annotation.unchecked.{ uncheckedVariance => uV }
         |
         |class Test[+T] {

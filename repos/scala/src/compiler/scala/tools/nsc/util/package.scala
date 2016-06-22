@@ -81,7 +81,8 @@ package object util {
     */
   def stackTraceHeadString(ex: Throwable): String = {
     val frame =
-      ex.getStackTrace.dropWhile(_.getClassName contains "Predef") take 1 mkString ""
+      ex.getStackTrace
+        .dropWhile(_.getClassName contains "Predef") take 1 mkString ""
     val msg = ex.getMessage match {
       case null | "" => ""; case s => s"""("$s")"""
     }
@@ -128,16 +129,16 @@ package object util {
   @deprecated("Moved to scala.reflect.internal.util.BatchSourceFile", "2.10.0")
   type BatchSourceFile = scala.reflect.internal.util.BatchSourceFile
 
-  @deprecated(
-      "Moved to scala.reflect.internal.util.AbstractFileClassLoader", "2.11.0")
+  @deprecated("Moved to scala.reflect.internal.util.AbstractFileClassLoader",
+              "2.11.0")
   type AbstractFileClassLoader =
     scala.reflect.internal.util.AbstractFileClassLoader
 
-  @deprecated(
-      "Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")
+  @deprecated("Moved to scala.reflect.internal.util.ScalaClassLoader",
+              "2.11.0")
   val ScalaClassLoader = scala.reflect.internal.util.ScalaClassLoader
 
-  @deprecated(
-      "Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")
+  @deprecated("Moved to scala.reflect.internal.util.ScalaClassLoader",
+              "2.11.0")
   type ScalaClassLoader = scala.reflect.internal.util.ScalaClassLoader
 }

@@ -22,8 +22,9 @@ object Runtime {
 }
 
 import HasCompat._
-abstract class PicklerRuntime(
-    classLoader: ClassLoader, preclazz: Class[_], share: refs.Share) {
+abstract class PicklerRuntime(classLoader: ClassLoader,
+                              preclazz: Class[_],
+                              share: refs.Share) {
   import scala.reflect.runtime.universe._
   import definitions._
   import scala.reflect.runtime.{universe => ru}
@@ -38,8 +39,8 @@ abstract class PicklerRuntime(
     val elType = if (clazz != null) clazz.getComponentType() else null
     if (elType != null) {
       // TODO: correctly convert elType
-      appliedType(
-          ArrayClass.toType, List(mirror.classSymbol(elType).asType.toType))
+      appliedType(ArrayClass.toType,
+                  List(mirror.classSymbol(elType).asType.toType))
     } else {
       // TODO: fix duplication w.r.t Tools.scala
       val tpeWithMaybeTparams = sym.asType.toType
@@ -211,8 +212,7 @@ class InterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
             val pendingFields =
               if (tagKey.contains("anonfun$")) List[FieldIR]()
               else
-                cir.fields.filter(
-                    fir =>
+                cir.fields.filter(fir =>
                       fir.hasGetter || {
                     // exists as Java field
                     scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
@@ -319,17 +319,15 @@ class ShareNothingInterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
             val c = Class.forName(tagKey)
             c.getField("MODULE$").get(c)
           } else {
-            val pendingFields =
-              if (tagKey.contains("anonfun$")) {
-                List[FieldIR]()
-              } else {
-                cir.fields.filter(
-                    fir =>
-                      fir.hasGetter || {
-                    // exists as Java field
-                    scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
-                })
-              }
+            val pendingFields = if (tagKey.contains("anonfun$")) {
+              List[FieldIR]()
+            } else {
+              cir.fields.filter(fir =>
+                    fir.hasGetter || {
+                  // exists as Java field
+                  scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
+              })
+            }
 
             def fieldVals =
               pendingFields.map(fir => {

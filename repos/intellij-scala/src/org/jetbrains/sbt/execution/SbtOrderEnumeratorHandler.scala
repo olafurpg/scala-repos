@@ -52,7 +52,7 @@ class SbtOrderEnumeratorHandlerFactory
   }
 
   override def isApplicable(module: Module): Boolean = {
-    ExternalSystemApiUtil.isExternalSystemAwareModule(
-        SbtProjectSystem.Id, module)
+    ExternalSystemApiUtil
+      .isExternalSystemAwareModule(SbtProjectSystem.Id, module)
   }
 }

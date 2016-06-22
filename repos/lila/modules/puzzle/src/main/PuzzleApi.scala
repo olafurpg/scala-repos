@@ -10,8 +10,9 @@ import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSON
 import lila.db.Types.Coll
 import lila.user.{User, UserRepo}
 
-private[puzzle] final class PuzzleApi(
-    puzzleColl: Coll, attemptColl: Coll, apiToken: String) {
+private[puzzle] final class PuzzleApi(puzzleColl: Coll,
+                                      attemptColl: Coll,
+                                      apiToken: String) {
 
   import Puzzle.puzzleBSONHandler
 
@@ -46,7 +47,8 @@ private[puzzle] final class PuzzleApi(
           lila.db.Util findNextId puzzleColl flatMap { id =>
             val p = puzzle(id)
             val fenStart = p.fen.split(' ').take(2).mkString(" ")
-            puzzleColl.count(BSONDocument(
+            puzzleColl.count(
+                BSONDocument(
                     "fen" -> BSONRegex(fenStart.replace("/", "\\/"), "")
                 ).some) flatMap {
               case 0 =>
@@ -55,7 +57,7 @@ private[puzzle] final class PuzzleApi(
                 }
               case _ =>
                 insertPuzzles(rest) map
-                (Failure(new Exception("Duplicate puzzle")) :: _)
+                  (Failure(new Exception("Duplicate puzzle")) :: _)
             }
           }
       }
@@ -83,7 +85,8 @@ private[puzzle] final class PuzzleApi(
 
     def find(puzzleId: PuzzleId, userId: String): Fu[Option[Attempt]] =
       attemptColl
-        .find(BSONDocument(
+        .find(
+            BSONDocument(
                 Attempt.BSONFields.id -> Attempt.makeId(puzzleId, userId)
             ))
         .one[Attempt]
@@ -112,7 +115,8 @@ private[puzzle] final class PuzzleApi(
     def add(a: Attempt) = attemptColl insert a void
 
     def hasPlayed(user: User, puzzle: Puzzle): Fu[Boolean] =
-      attemptColl.count(BSONDocument(
+      attemptColl.count(
+          BSONDocument(
               Attempt.BSONFields.id -> Attempt.makeId(puzzle.id, user.id)
           ).some) map (0 !=)
 

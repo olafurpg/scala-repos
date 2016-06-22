@@ -23,11 +23,12 @@ object PrivateBeanProperty extends AnnotatorPart[ScAnnotation] {
     val member = PsiTreeUtil.getParentOfType(element, classOf[ScMember])
     def registerProblem() = {
       val toPublicFix = new MakeNonPrivateQuickFix(member, toProtected = false)
-      val toProtectedFix = new MakeNonPrivateQuickFix(
-          member, toProtected = true)
+      val toProtectedFix =
+        new MakeNonPrivateQuickFix(member, toProtected = true)
       val privateMod = member.getModifierList.accessModifier.get
       val errorAnnotation = holder.createErrorAnnotation(
-          privateMod, "Bean property should not be private")
+          privateMod,
+          "Bean property should not be private")
       errorAnnotation.registerFix(toPublicFix)
       errorAnnotation.registerFix(toProtectedFix)
     }

@@ -209,25 +209,23 @@ object helpers
               s"""<a href="${context.path}/$$1/$$2/pull/$$3">$$1/$$2#$$3</a>""")
           .replaceAll("\\[repo:([^\\s]+?)/([^\\s]+?)\\]",
                       s"""<a href="${context.path}/$$1/$$2\">$$1/$$2</a>""")
-          .replaceAll(
-              "\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
-              (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/${encodeRefName(
-                m.group(3))}">${m.group(3)}</a>""")
-          .replaceAll(
-              "\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
-              (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/${encodeRefName(
-                m.group(3))}">${m.group(3)}</a>""")
-          .replaceAll("\\[user:([^\\s]+?)\\]",
-                      (m: Match) => user(m.group(1)).body)
-          .replaceAll(
-              "\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
-              (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/commit/${m
-              .group(3)}">${m.group(1)}/${m.group(2)}@${m
-              .group(3)
-              .substring(0, 7)}</a>"""))
+          .replaceAll("\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
+                      (m: Match) =>
+                        s"""<a href="${context.path}/${m.group(1)}/${m
+                      .group(2)}/tree/${encodeRefName(m.group(3))}">${m.group(
+                        3)}</a>""")
+          .replaceAll("\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
+                      (m: Match) =>
+                        s"""<a href="${context.path}/${m.group(1)}/${m
+                      .group(2)}/tree/${encodeRefName(m.group(3))}">${m.group(
+                        3)}</a>""")
+          .replaceAll("\\[user:([^\\s]+?)\\]", (m: Match) =>
+                user(m.group(1)).body)
+          .replaceAll("\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
+                      (m: Match) =>
+                        s"""<a href="${context.path}/${m.group(1)}/${m
+                      .group(2)}/commit/${m.group(3)}">${m.group(1)}/${m.group(
+                        2)}@${m.group(3).substring(0, 7)}</a>"""))
 
   /**
     * Remove html tags from the given Html instance.
@@ -267,9 +265,9 @@ object helpers
     * Generates the text link to the account page.
     * If user does not exist or disabled, this method returns user name as text without link.
     */
-  def user(
-      userName: String, mailAddress: String = "", styleClass: String = "")(
-      implicit context: Context): Html =
+  def user(userName: String,
+           mailAddress: String = "",
+           styleClass: String = "")(implicit context: Context): Html =
     userWithContent(userName, mailAddress, styleClass)(Html(userName))
 
   /**
@@ -292,9 +290,10 @@ object helpers
     userWithContent(commit.authorName, commit.authorEmailAddress)(
         avatar(commit, size))
 
-  private def userWithContent(
-      userName: String, mailAddress: String = "", styleClass: String = "")(
-      content: Html)(implicit context: Context): Html =
+  private def userWithContent(userName: String,
+                              mailAddress: String = "",
+                              styleClass: String = "")(content: Html)(
+      implicit context: Context): Html =
     (if (mailAddress.isEmpty) {
        getAccountByUserName(userName)
      } else {
@@ -393,12 +392,12 @@ object helpers
           val url = m.group(0)
           val href = url.replace("\"", "&quot;")
           (x ++
-           (Seq(
-                   if (pos < m.start)
-                     Some(HtmlFormat.escape(text.substring(pos, m.start)))
-                   else None,
-                   Some(Html(s"""<a href="${href}">${url}</a>"""))
-               ).flatten),
+             (Seq(
+                     if (pos < m.start)
+                       Some(HtmlFormat.escape(text.substring(pos, m.start)))
+                     else None,
+                     Some(Html(s"""<a href="${href}">${url}</a>"""))
+                 ).flatten),
            m.end)
       }
     // append rest fragment

@@ -42,8 +42,9 @@ trait MVarFunctions {
     } yield new MVarImpl[A](value, readLatch, writeLatch)
 }
 
-private[this] class MVarImpl[A](
-    value: Atomic[Option[A]], readLatch: PhasedLatch, writeLatch: PhasedLatch)
+private[this] class MVarImpl[A](value: Atomic[Option[A]],
+                                readLatch: PhasedLatch,
+                                writeLatch: PhasedLatch)
     extends MVar[A] {
   def take = read(
       for {
@@ -63,7 +64,8 @@ private[this] class MVarImpl[A](
               case Some(a) => IO(a)
               case None =>
                 for {
-                  _ <- readLatch.awaitPhase(p) // we don't have a value so we wait for someone to put one
+                  _ <- readLatch
+                        .awaitPhase(p) // we don't have a value so we wait for someone to put one
                   a <- read_ // someone has put a value so now we try to read it
                 } yield a
             }

@@ -212,17 +212,16 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
     new UnrolledBuffer[T]
 
   val waterline = 50
-  val waterlineDelim =
-    100 // TODO -- fix this name!  It's a denominator, not a delimiter.  (But it's part of the API so we can't just change it.)
+  val waterlineDelim = 100 // TODO -- fix this name!  It's a denominator, not a delimiter.  (But it's part of the API so we can't just change it.)
   private[collection] val unrolledlength = 32
 
   /** Unrolled buffer node.
     */
-  class Unrolled[T: ClassTag] private[collection](var size: Int,
-                                                  var array: Array[T],
-                                                  var next: Unrolled[T],
-                                                  val buff: UnrolledBuffer[T] =
-                                                    null) {
+  class Unrolled[T: ClassTag] private[collection] (
+      var size: Int,
+      var array: Array[T],
+      var next: Unrolled[T],
+      val buff: UnrolledBuffer[T] = null) {
     private[collection] def this() =
       this(0, new Array[T](unrolledlength), null, null)
     private[collection] def this(b: UnrolledBuffer[T]) =
@@ -350,8 +349,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
     private def nullout(from: Int, until: Int) {
       var idx = from
       while (idx < until) {
-        array(idx) =
-          null.asInstanceOf[T] // TODO find a way to assign a default here!!
+        array(idx) = null.asInstanceOf[T] // TODO find a way to assign a default here!!
         idx += 1
       }
     }
@@ -369,7 +367,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
       array
         .take(size)
         .mkString("Unrolled@%08x".format(System.identityHashCode(this)) +
-                  "[" + size + "/" + array.length + "](",
+                    "[" + size + "/" + array.length + "](",
                   ", ",
                   ")") + " -> " + (if (next ne null) next.toString else "")
   }

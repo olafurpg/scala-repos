@@ -27,8 +27,8 @@ import org.apache.spark.util.Utils
 class GraphSuite extends SparkFunSuite with LocalSparkContext {
 
   def starGraph(sc: SparkContext, n: Int): Graph[String, Int] = {
-    Graph.fromEdgeTuples(
-        sc.parallelize((1 to n).map(x => (0: VertexId, x: VertexId)), 3), "v")
+    Graph.fromEdgeTuples(sc.parallelize((1 to n).map(x =>
+                  (0: VertexId, x: VertexId)), 3), "v")
   }
 
   test("Graph.fromEdgeTuples") {
@@ -40,8 +40,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(graph.edges.collect().forall(e => e.attr == 1))
 
       // uniqueEdges option should uniquify edges and store duplicate count in edge attributes
-      val uniqueGraph = Graph.fromEdgeTuples(
-          sc.parallelize(doubleRing), 1, Some(RandomVertexCut))
+      val uniqueGraph = Graph.fromEdgeTuples(sc.parallelize(doubleRing),
+                                             1,
+                                             Some(RandomVertexCut))
       assert(uniqueGraph.edges.count() === ring.size)
       assert(uniqueGraph.edges.collect().forall(e => e.attr == 2))
     }
@@ -117,7 +118,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
           nonemptyParts(mkGraph(sameSrcEdges).partitionBy(EdgePartition1D)).count === 1)
       // partitionBy(CanonicalRandomVertexCut) puts edges that are identical modulo direction into
       // the same partition
-      assert(nonemptyParts(mkGraph(canonicalEdges).partitionBy(
+      assert(
+          nonemptyParts(mkGraph(canonicalEdges).partitionBy(
                   CanonicalRandomVertexCut)).count === 1)
       // partitionBy(EdgePartition2D) puts identical edges in the same partition
       assert(nonemptyParts(mkGraph(identicalEdges).partitionBy(
@@ -129,7 +131,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val p = 100
       val verts = 1 to n
       val graph = Graph.fromEdgeTuples(
-          sc.parallelize(verts.flatMap(x =>
+          sc.parallelize(verts.flatMap(
+                             x =>
                                verts
                                  .withFilter(y => y % x == 0)
                                  .map(y => (x: VertexId, y: VertexId))),
@@ -152,7 +155,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         val failure = verts.maxBy(id => partitionSets.count(_.contains(id)))
         fail(
             ("Replication bound test failed for %d/%d vertices. " +
-                "Example: vertex %d replicated to %d (> %f) partitions.")
+                  "Example: vertex %d replicated to %d (> %f) partitions.")
               .format(numFailures,
                       n,
                       failure,
@@ -172,11 +175,15 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       // Forming triplets view
       val g = Graph(sc.parallelize(List((0L, "a"), (1L, "b"), (2L, "c"))),
                     sc.parallelize(List(Edge(0L, 1L, 1), Edge(0L, 2L, 1)), 2))
-      assert(g.triplets.collect().map(_.toTuple).toSet === Set(
-              ((0L, "a"), (1L, "b"), 1), ((0L, "a"), (2L, "c"), 1)))
+      assert(
+          g.triplets.collect().map(_.toTuple).toSet === Set(
+              ((0L, "a"), (1L, "b"), 1),
+              ((0L, "a"), (2L, "c"), 1)))
       val gPart = g.partitionBy(EdgePartition2D)
-      assert(gPart.triplets.collect().map(_.toTuple).toSet === Set(
-              ((0L, "a"), (1L, "b"), 1), ((0L, "a"), (2L, "c"), 1)))
+      assert(
+          gPart.triplets.collect().map(_.toTuple).toSet === Set(
+              ((0L, "a"), (1L, "b"), 1),
+              ((0L, "a"), (2L, "c"), 1)))
     }
   }
 
@@ -186,12 +193,14 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val star = starGraph(sc, n)
       // mapVertices preserving type
       val mappedVAttrs = star.mapVertices((vid, attr) => attr + "2")
-      assert(mappedVAttrs.vertices.collect().toSet === (0 to n)
+      assert(
+          mappedVAttrs.vertices.collect().toSet === (0 to n)
             .map(x => (x: VertexId, "v2"))
             .toSet)
       // mapVertices changing type
       val mappedVAttrs2 = star.mapVertices((vid, attr) => attr.length)
-      assert(mappedVAttrs2.vertices.collect().toSet === (0 to n)
+      assert(
+          mappedVAttrs2.vertices.collect().toSet === (0 to n)
             .map(x => (x: VertexId, 1))
             .toSet)
     }
@@ -205,7 +214,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
               (2L, Some(2)),
               (3L, Some(3))
           ))
-      val edges = sc.parallelize(Array(
+      val edges = sc.parallelize(
+          Array(
               Edge(1L, 2L, 0),
               Edge(2L, 3L, 0),
               Edge(3L, 1L, 0)
@@ -223,7 +233,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val graph2 = graph1.mapTriplets(t => t.srcAttr.get)
       assert(
           graph2.edges.map(_.attr).collect().toSet === Set[java.lang.Double](
-              1.0, 2.0, 3.0))
+              1.0,
+              2.0,
+              3.0))
     }
   }
 
@@ -243,7 +255,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
     withSpark { sc =>
       val n = 5
       val star = starGraph(sc, n)
-      assert(star
+      assert(
+          star
             .mapTriplets(et => et.srcAttr + et.dstAttr)
             .edges
             .collect()
@@ -255,7 +268,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
     withSpark { sc =>
       val n = 5
       val star = starGraph(sc, n)
-      assert(star.reverse.outDegrees.collect().toSet === (1 to n)
+      assert(
+          star.reverse.outDegrees.collect().toSet === (1 to n)
             .map(x => (x: VertexId, 1))
             .toSet)
     }
@@ -267,8 +281,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         sc.parallelize(Array((1L, 1), (2L, 2)))
       val edges: RDD[Edge[Int]] = sc.parallelize(Array(Edge(1L, 2L, 0)))
       val graph = Graph(vertices, edges).reverse
-      val result = GraphXUtils.mapReduceTriplets[Int, Int, Int](
-          graph, et => Iterator((et.dstId, et.srcAttr)), _ + _)
+      val result = GraphXUtils.mapReduceTriplets[Int, Int, Int](graph, et =>
+            Iterator((et.dstId, et.srcAttr)), _ + _)
       assert(result.collect().toSet === Set((1L, 2)))
     }
   }
@@ -282,12 +296,14 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val subgraph = star.subgraph(vpred = (vid, attr) => vid % 2 == 0)
 
       // We should have 5 vertices.
-      assert(subgraph.vertices.collect().toSet === (0 to n by 2)
+      assert(
+          subgraph.vertices.collect().toSet === (0 to n by 2)
             .map(x => (x, "v"))
             .toSet)
 
       // And 4 edges.
-      assert(subgraph.edges.map(_.copy()).collect().toSet === (2 to n by 2)
+      assert(
+          subgraph.edges.map(_.copy()).collect().toSet === (2 to n by 2)
             .map(x => Edge(0, x, 1))
             .toSet)
     }
@@ -335,7 +351,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val star2 = doubleStar.groupEdges { (a, b) =>
         a
       }
-      assert(star2.edges
+      assert(
+          star2.edges
             .collect()
             .toArray
             .sorted(Edge.lexicographicOrdering[Int]) === star.edges
@@ -353,7 +370,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         if (ctx.dstAttr != null) {
           throw new Exception(
               "expected ctx.dstAttr to be null due to TripletFields, but it was " +
-              ctx.dstAttr)
+                ctx.dstAttr)
         }
         ctx.sendToDst(ctx.srcAttr)
       }, _ + _, TripletFields.Src)
@@ -389,7 +406,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         (vid, a, bOpt) =>
           a + bOpt.getOrElse("")
       }
-      assert(newReverseStar.vertices.map(_._2).collect().toSet === (0 to n)
+      assert(
+          newReverseStar.vertices.map(_._2).collect().toSet === (0 to n)
             .map(x => "v%d".format(x))
             .toSet)
     }
@@ -405,8 +423,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         .map(et => (et.srcId, et.dstId, et.srcAttr, et.dstAttr))
         .collect()
         .toSet
-      assert(triplets === Set((1: VertexId, 2: VertexId, "a", "b"),
-                              (2: VertexId, 1: VertexId, "b", "a")))
+      assert(
+          triplets === Set((1: VertexId, 2: VertexId, "a", "b"),
+                           (2: VertexId, 1: VertexId, "b", "a")))
     }
   }
 
@@ -440,8 +459,11 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val verts =
         sc.parallelize(List((1: VertexId, "a"), (2: VertexId, "b")), 1)
       val edges = sc.parallelize(List(Edge(1, 2, 0), Edge(2, 1, 0)), 2)
-      val graph = Graph(
-          verts, edges, "", StorageLevel.MEMORY_ONLY, StorageLevel.MEMORY_ONLY)
+      val graph = Graph(verts,
+                        edges,
+                        "",
+                        StorageLevel.MEMORY_ONLY,
+                        StorageLevel.MEMORY_ONLY)
       // Note: Before caching, graph.vertices is cached, but graph.edges is not (but graph.edges'
       //       parent RDD is cached).
       graph.cache()
@@ -459,11 +481,12 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       .set("spark.default.parallelism", defaultParallelism.toString)
     val sc = new SparkContext("local", "test", conf)
     try {
-      val edges = sc.parallelize(
-          (1 to n).map(x => (x: VertexId, 0: VertexId)), numEdgePartitions)
+      val edges = sc.parallelize((1 to n).map(x => (x: VertexId, 0: VertexId)),
+                                 numEdgePartitions)
       val graph = Graph.fromEdgeTuples(edges, 1)
-      val neighborAttrSums = GraphXUtils.mapReduceTriplets[Int, Int, Int](
-          graph, et => Iterator((et.dstId, et.srcAttr)), _ + _)
+      val neighborAttrSums =
+        GraphXUtils.mapReduceTriplets[Int, Int, Int](graph, et =>
+              Iterator((et.dstId, et.srcAttr)), _ + _)
       assert(neighborAttrSums.collect().toSet === Set((0: VertexId, n)))
     } finally {
       sc.stop()

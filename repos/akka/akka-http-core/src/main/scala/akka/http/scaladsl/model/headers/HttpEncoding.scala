@@ -50,7 +50,7 @@ object HttpEncodingRange {
     One(encoding, qValue)
 }
 
-final case class HttpEncoding private[http](value: String)
+final case class HttpEncoding private[http] (value: String)
     extends jm.headers.HttpEncoding
     with LazyValueBytesRenderable
     with WithQValue[HttpEncodingRange] {

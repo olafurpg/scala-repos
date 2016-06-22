@@ -94,7 +94,7 @@ class DynamicConfigManager(
             case _ =>
               throw new IllegalArgumentException(
                   "Config change notification must have 'entity_type' set to either 'client' or 'topic'." +
-                  " Received: " + json)
+                    " Received: " + json)
           }
 
           val entity = map.get("entity_name") match {
@@ -102,7 +102,7 @@ class DynamicConfigManager(
             case _ =>
               throw new IllegalArgumentException(
                   "Config change notification does not specify 'entity_name'. Received: " +
-                  json)
+                    json)
           }
           val entityConfig =
             AdminUtils.fetchEntityConfig(zkUtils, entityType, entity)
@@ -113,9 +113,9 @@ class DynamicConfigManager(
         case o =>
           throw new IllegalArgumentException(
               "Config change notification has an unexpected value. The format is:" +
-              "{\"version\" : 1," + " \"entity_type\":\"topic/client\"," +
-              " \"entity_name\" : \"topic_name/client_id\"}." + " Received: " +
-              json)
+                "{\"version\" : 1," + " \"entity_type\":\"topic/client\"," +
+                " \"entity_name\" : \"topic_name/client_id\"}." + " Received: " +
+                json)
       }
     }
   }

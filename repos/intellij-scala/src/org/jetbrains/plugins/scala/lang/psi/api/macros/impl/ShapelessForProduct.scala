@@ -31,12 +31,13 @@ import org.jetbrains.plugins.scala.lang.psi.types._
   */
 object ShapelessForProduct extends ScalaMacroTypeable {
 
-  override def checkMacro(
-      macros: ScFunction, context: MacroContext): Option[ScType] = {
+  override def checkMacro(macros: ScFunction,
+                          context: MacroContext): Option[ScType] = {
     if (!context.expectedType.isDefined) return None
     val manager = ScalaPsiManager.instance(context.place.getProject)
-    val clazz = manager.getCachedClass(
-        "shapeless.Generic", context.place.getResolveScope, ClassCategory.TYPE)
+    val clazz = manager.getCachedClass("shapeless.Generic",
+                                       context.place.getResolveScope,
+                                       ClassCategory.TYPE)
     clazz match {
       case c: ScTypeDefinition =>
         val tpt = c.typeParameters
@@ -67,8 +68,8 @@ object ShapelessForProduct extends ScalaMacroTypeable {
             if (hnil == null) return None
             val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
               case (part, resultType) =>
-                ScParameterizedType(
-                    ScDesignatorType(coloncolon), Seq(part, resultType))
+                ScParameterizedType(ScDesignatorType(coloncolon),
+                                    Seq(part, resultType))
             }
             ScalaPsiUtil.getCompanionModule(c) match {
               case Some(obj: ScObject) =>

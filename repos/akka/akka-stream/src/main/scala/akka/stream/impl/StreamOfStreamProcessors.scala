@@ -20,16 +20,16 @@ private[akka] object MultiStreamOutputProcessor {
   final case class SubstreamCancel(substream: SubstreamKey)
       extends DeadLetterSuppression
       with NoSerializationVerificationNeeded
-  final case class SubstreamSubscribe(
-      substream: SubstreamKey, subscriber: Subscriber[Any])
+  final case class SubstreamSubscribe(substream: SubstreamKey,
+                                      subscriber: Subscriber[Any])
       extends DeadLetterSuppression
       with NoSerializationVerificationNeeded
   final case class SubstreamSubscriptionTimeout(substream: SubstreamKey)
       extends DeadLetterSuppression
       with NoSerializationVerificationNeeded
 
-  class SubstreamSubscription(
-      val parent: ActorRef, val substreamKey: SubstreamKey)
+  class SubstreamSubscription(val parent: ActorRef,
+                              val substreamKey: SubstreamKey)
       extends Subscription {
     override def request(elements: Long): Unit =
       parent ! SubstreamRequestMore(substreamKey, elements)
@@ -106,8 +106,8 @@ private[akka] object MultiStreamOutputProcessor {
       }
     }
 
-    private def closeSubscriber(
-        s: Subscriber[Any], withState: CompletedState): Unit =
+    private def closeSubscriber(s: Subscriber[Any],
+                                withState: CompletedState): Unit =
       withState match {
         case Completed ⇒ tryOnComplete(s)
         case Cancelled ⇒ // nothing to do
@@ -161,8 +161,8 @@ private[akka] trait MultiStreamOutputProcessorLike
 
   protected def createSubstreamOutput(): SubstreamOutput = {
     val id = SubstreamKey(nextId())
-    val cancellable = scheduleSubscriptionTimeout(
-        self, SubstreamSubscriptionTimeout(id))
+    val cancellable =
+      scheduleSubscriptionTimeout(self, SubstreamSubscriptionTimeout(id))
     val output = new SubstreamOutput(id, self, this, cancellable)
     substreamOutputs(output.key) = output
     output
@@ -223,13 +223,14 @@ private[akka] trait MultiStreamOutputProcessorLike
       invalidateSubstreamOutput(key)
   }
 
-  override protected def handleSubscriptionTimeout(
-      target: Publisher[_], cause: Exception) = target match {
-    case s: SubstreamOutput ⇒
-      s.error(cause)
-      s.attachSubscriber(CancelingSubscriber)
-    case _ ⇒ // ignore
-  }
+  override protected def handleSubscriptionTimeout(target: Publisher[_],
+                                                   cause: Exception) =
+    target match {
+      case s: SubstreamOutput ⇒
+        s.error(cause)
+        s.attachSubscriber(CancelingSubscriber)
+      case _ ⇒ // ignore
+    }
 }
 
 /**

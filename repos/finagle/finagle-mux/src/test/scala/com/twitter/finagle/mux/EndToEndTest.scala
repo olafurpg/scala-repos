@@ -61,8 +61,10 @@ class EndToEndTest
     val serverTrans = new QueueTransport[Message, Message](q1, q0)
 
     val server = ServerDispatcher.newRequestResponse(serverTrans, svc)
-    val session = new ClientSession(
-        clientTrans, FailureDetector.NullConfig, "test", NullStatsReceiver)
+    val session = new ClientSession(clientTrans,
+                                    FailureDetector.NullConfig,
+                                    "test",
+                                    NullStatsReceiver)
     val client = ClientDispatcher.newRequestResponse(session)
 
     val f = client(Request(Path.empty, Buf.Empty))
@@ -115,8 +117,7 @@ class EndToEndTest
   }
 
   def assertAnnotationsInOrder(tracer: Seq[Record], annos: Seq[Annotation]) {
-    assert(
-        tracer.collect {
+    assert(tracer.collect {
       case Record(_, _, ann, _) if annos.contains(ann) => ann
     } == annos)
   }

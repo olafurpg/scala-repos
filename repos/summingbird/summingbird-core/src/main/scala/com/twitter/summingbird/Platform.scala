@@ -21,11 +21,11 @@ package com.twitter.summingbird
   */
 trait Platform[P <: Platform[P]] {
   // The type of the inputs for this platform
-  type Source [_]
-  type Store [_, _]
-  type Sink [_]
-  type Service [_, _]
-  type Plan [_]
+  type Source[_]
+  type Store[_, _]
+  type Sink[_]
+  type Service[_, _]
+  type Plan[_]
 
   // derived types, that are used for intermediate graphs
   type Buffer[k, v] = Service[k, v] with Sink[(k, v)]

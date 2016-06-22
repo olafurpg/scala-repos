@@ -48,14 +48,13 @@ private[spark] object RUtils {
     * and environment variable `SPARK_HOME` are set.
     */
   def sparkRPackagePath(isDriver: Boolean): Seq[String] = {
-    val (master, deployMode) =
-      if (isDriver) {
-        (sys.props("spark.master"), sys.props("spark.submit.deployMode"))
-      } else {
-        val sparkConf = SparkEnv.get.conf
-        (sparkConf.get("spark.master"),
-         sparkConf.get("spark.submit.deployMode", "client"))
-      }
+    val (master, deployMode) = if (isDriver) {
+      (sys.props("spark.master"), sys.props("spark.submit.deployMode"))
+    } else {
+      val sparkConf = SparkEnv.get.conf
+      (sparkConf.get("spark.master"),
+       sparkConf.get("spark.submit.deployMode", "client"))
+    }
 
     val isYarnCluster =
       master != null && master.contains("yarn") && deployMode == "cluster"

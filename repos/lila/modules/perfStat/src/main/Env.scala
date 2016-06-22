@@ -35,8 +35,7 @@ final class Env(config: Config,
       indexer.userPerf(user, perfType) >> storage.find(user.id, perfType)
     } map (_ | PerfStat.init(user.id, perfType))
 
-  system.actorOf(
-      Props(new Actor {
+  system.actorOf(Props(new Actor {
     context.system.lilaBus.subscribe(self, 'finishGame)
     def receive = {
       case lila.game.actorApi.FinishGame(game, _, _) => indexer addGame game

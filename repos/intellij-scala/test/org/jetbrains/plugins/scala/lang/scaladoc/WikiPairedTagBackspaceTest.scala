@@ -12,27 +12,31 @@ class WikiPairedTagBackspaceTest
 
   def testDeleteUnderlinedTag() {
     checkGeneratedTextAfterBackspace(
-        "/** __" + CARET_MARKER + "blah blah__ */", "/** _blah blah */")
+        "/** __" + CARET_MARKER + "blah blah__ */",
+        "/** _blah blah */")
   }
 
   def testDeleteMonospaceTag() {
-    checkGeneratedTextAfterBackspace(
-        "/** `" + CARET_MARKER + "blahblah` */", "/** blahblah */")
+    checkGeneratedTextAfterBackspace("/** `" + CARET_MARKER + "blahblah` */",
+                                     "/** blahblah */")
   }
 
   def testDeleteItalicTag() {
     checkGeneratedTextAfterBackspace(
-        "/** ''" + CARET_MARKER + "blah blah'' */", "/** 'blah blah */")
+        "/** ''" + CARET_MARKER + "blah blah'' */",
+        "/** 'blah blah */")
   }
 
   def testDeleteBoldTag() {
     checkGeneratedTextAfterBackspace(
-        "/** '''" + CARET_MARKER + "blah blah''' */", "/** ''blah blah'' */")
+        "/** '''" + CARET_MARKER + "blah blah''' */",
+        "/** ''blah blah'' */")
   }
 
   def testDeleteSubscriptTag() {
     checkGeneratedTextAfterBackspace(
-        "/** ,," + CARET_MARKER + "blah blah,, */", "/** ,blah blah */")
+        "/** ,," + CARET_MARKER + "blah blah,, */",
+        "/** ,blah blah */")
   }
 
   def testScl6717() {
@@ -80,7 +84,7 @@ class WikiPairedTagBackspaceTest
   }
 
   def testDeleteEmptyItalicTag() {
-    checkGeneratedTextAfterBackspace(
-        "/** ''" + CARET_MARKER + "'' */", "/** ' */")
+    checkGeneratedTextAfterBackspace("/** ''" + CARET_MARKER + "'' */",
+                                     "/** ' */")
   }
 }

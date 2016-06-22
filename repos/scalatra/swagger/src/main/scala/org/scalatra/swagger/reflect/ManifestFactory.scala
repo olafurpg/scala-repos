@@ -19,8 +19,7 @@ private[swagger] object ManifestFactory {
 
     case at: GenericArrayType =>
       val componentManifest = manifestOf(at.getGenericComponentType)
-      val arrayManifest =
-        componentManifest.arrayManifest // strips component type args off
+      val arrayManifest = componentManifest.arrayManifest // strips component type args off
       Manifest.classType(arrayManifest.runtimeClass, componentManifest)
 
     case wt: WildcardType =>

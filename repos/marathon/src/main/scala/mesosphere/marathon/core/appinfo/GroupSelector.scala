@@ -15,12 +15,12 @@ trait GroupSelector extends AppSelector {
 }
 
 object GroupSelector {
-  def apply(
-      matchesApp: AppDefinition => Boolean,
-      matchesGroup: Group => Boolean): GroupSelector = new GroupSelector {
-    override def matches(app: AppDefinition): Boolean = matchesApp(app)
-    override def matches(group: Group): Boolean = matchesGroup(group)
-  }
+  def apply(matchesApp: AppDefinition => Boolean,
+            matchesGroup: Group => Boolean): GroupSelector =
+    new GroupSelector {
+      override def matches(app: AppDefinition): Boolean = matchesApp(app)
+      override def matches(group: Group): Boolean = matchesGroup(group)
+    }
   def forall(selectors: Iterable[GroupSelector]): GroupSelector =
     new AllGroupSelectorsMustMatch(selectors)
 

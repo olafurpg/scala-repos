@@ -71,8 +71,7 @@ class ALS private (
     private var implicitPrefs: Boolean,
     private var alpha: Double,
     private var seed: Long = System.nanoTime()
-)
-    extends Serializable
+) extends Serializable
     with Logging {
 
   /**
@@ -227,18 +226,16 @@ class ALS private (
   def run(ratings: RDD[Rating]): MatrixFactorizationModel = {
     val sc = ratings.context
 
-    val numUserBlocks =
-      if (this.numUserBlocks == -1) {
-        math.max(sc.defaultParallelism, ratings.partitions.length / 2)
-      } else {
-        this.numUserBlocks
-      }
-    val numProductBlocks =
-      if (this.numProductBlocks == -1) {
-        math.max(sc.defaultParallelism, ratings.partitions.length / 2)
-      } else {
-        this.numProductBlocks
-      }
+    val numUserBlocks = if (this.numUserBlocks == -1) {
+      math.max(sc.defaultParallelism, ratings.partitions.length / 2)
+    } else {
+      this.numUserBlocks
+    }
+    val numProductBlocks = if (this.numProductBlocks == -1) {
+      math.max(sc.defaultParallelism, ratings.partitions.length / 2)
+    } else {
+      this.numProductBlocks
+    }
 
     val (floatUserFactors, floatProdFactors) = NewALS.train[Int](
         ratings =

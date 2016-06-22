@@ -42,21 +42,21 @@ object VCardParserSpec extends Specification with XmlMatchers {
       val list = VCardParser.parse(vcard)
       list must beLike {
         case Left(l) => {
-            import VCardParser._
-            l must_== List(
-                VCardEntry(VCardKey("BEGIN", List()), List("VCARD")),
-                VCardEntry(VCardKey("VERSION", List()), List("2.1")),
-                VCardEntry(VCardKey("N", List()), List("Gump", "Forrest")),
-                VCardEntry(VCardKey("FN", List()), List("Forrest Gump")),
-                VCardEntry(VCardKey("ORG", List()),
-                           List("Bubba Gump Shrimp Co.")),
-                VCardEntry(VCardKey("TITLE", List()), List("Shrimp Man")),
-                VCardEntry(VCardKey("TEL", List(("WORK", ""), ("VOICE", ""))),
-                           List("(111) 555-1212")),
-                VCardEntry(VCardKey("TEL", List(("HOME", ""), ("VOICE", ""))),
-                           List("(404) 555-1212")),
-                VCardEntry(VCardKey("END", List()), List("VCARD")))
-          }
+          import VCardParser._
+          l must_== List(
+              VCardEntry(VCardKey("BEGIN", List()), List("VCARD")),
+              VCardEntry(VCardKey("VERSION", List()), List("2.1")),
+              VCardEntry(VCardKey("N", List()), List("Gump", "Forrest")),
+              VCardEntry(VCardKey("FN", List()), List("Forrest Gump")),
+              VCardEntry(VCardKey("ORG", List()),
+                         List("Bubba Gump Shrimp Co.")),
+              VCardEntry(VCardKey("TITLE", List()), List("Shrimp Man")),
+              VCardEntry(VCardKey("TEL", List(("WORK", ""), ("VOICE", ""))),
+                         List("(111) 555-1212")),
+              VCardEntry(VCardKey("TEL", List(("HOME", ""), ("VOICE", ""))),
+                         List("(404) 555-1212")),
+              VCardEntry(VCardKey("END", List()), List("VCARD")))
+        }
       }
     }
   }

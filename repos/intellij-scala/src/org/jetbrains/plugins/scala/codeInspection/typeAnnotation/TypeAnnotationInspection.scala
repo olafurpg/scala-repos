@@ -50,7 +50,7 @@ class TypeAnnotationInspection extends AbstractInspection {
 
     case method: ScFunctionDefinition
         if method.hasAssign && !method.hasExplicitType &&
-        !method.isSecondaryConstructor =>
+          !method.isSecondaryConstructor =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
       inspect(method.nameId,
@@ -70,8 +70,8 @@ class TypeAnnotationInspection extends AbstractInspection {
     }
   }
 
-  private def requirementForProperty(
-      property: ScMember, settings: ScalaCodeStyleSettings): Int = {
+  private def requirementForProperty(property: ScMember,
+                                     settings: ScalaCodeStyleSettings): Int = {
     if (property.isLocal) {
       settings.LOCAL_PROPERTY_TYPE_ANNOTATION
     } else {
@@ -82,8 +82,8 @@ class TypeAnnotationInspection extends AbstractInspection {
     }
   }
 
-  private def requirementForMethod(
-      method: ScFunctionDefinition, settings: ScalaCodeStyleSettings): Int = {
+  private def requirementForMethod(method: ScFunctionDefinition,
+                                   settings: ScalaCodeStyleSettings): Int = {
     if (method.isLocal) {
       settings.LOCAL_METHOD_TYPE_ANNOTATION
     } else {

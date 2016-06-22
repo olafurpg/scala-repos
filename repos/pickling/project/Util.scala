@@ -24,8 +24,9 @@ object Util {
             ))
       } catch {
         case ex: Exception =>
-          println("Failed to load Maven settings from " + mavenSettingsFile +
-              ": " + ex)
+          println(
+              "Failed to load Maven settings from " + mavenSettingsFile +
+                ": " + ex)
           Nil
       }
     } else {

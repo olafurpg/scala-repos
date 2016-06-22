@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadTell` */
-final class MonadTellOps[F[_], S, A] private[syntax](self: F[A])(
+final class MonadTellOps[F[_], S, A] private[syntax] (self: F[A])(
     implicit val F: MonadTell[F, S]) {
   ////
 

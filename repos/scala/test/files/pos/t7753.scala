@@ -16,8 +16,7 @@ object Test {
 
     val converted = conv(foo)
 
-    val v1: Int =
-      indirect(converted)(23) // Okay (after refining the return type `instance` in the return type of `conv`)
+    val v1: Int = indirect(converted)(23) // Okay (after refining the return type `instance` in the return type of `conv`)
     /*
     indirect(converted){(v: converted.instance.Out)converted.instance.Out}(
       23{Int(23)}

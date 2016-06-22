@@ -88,8 +88,8 @@ object SyntheticMembersInjector {
     }
   }
 
-  def inject(
-      source: ScTypeDefinition, withOverride: Boolean): Seq[ScFunction] = {
+  def inject(source: ScTypeDefinition,
+             withOverride: Boolean): Seq[ScFunction] = {
     val buffer = new ArrayBuffer[ScFunction]()
     for {
       injector <- EP_NAME.getExtensions.toSet ++ injectedExtensions(
@@ -101,8 +101,8 @@ object SyntheticMembersInjector {
           ScalaPsiUtil.getCompanionModule(o).getOrElse(source)
         case _ => source
       }
-      val function = ScalaPsiElementFactory.createMethodWithContext(
-          template, context, source)
+      val function = ScalaPsiElementFactory
+        .createMethodWithContext(template, context, source)
       function.setSynthetic(context)
       function.syntheticContainingClass = Some(source)
       if (withOverride ^ !function.hasModifierProperty("override"))
@@ -128,8 +128,8 @@ object SyntheticMembersInjector {
           ScalaPsiUtil.getCompanionModule(o).getOrElse(source)
         case _ => source
       }).extendsBlock
-      val td = ScalaPsiElementFactory.createTypeDefinitionWithContext(
-          template, context, source)
+      val td = ScalaPsiElementFactory
+        .createTypeDefinitionWithContext(template, context, source)
       td.syntheticContainingClass = Some(source)
       def updateSynthetic(element: ScMember): Unit = {
         element match {
@@ -168,8 +168,8 @@ object SyntheticMembersInjector {
           ScalaPsiUtil.getCompanionModule(o).getOrElse(source)
         case _ => source
       }
-      buffer += ScalaPsiElementFactory.createTypeElementFromText(
-          supers, context, source)
+      buffer += ScalaPsiElementFactory
+        .createTypeElementFromText(supers, context, source)
     } catch {
       case p: ProcessCanceledException => throw p
       case e: Throwable =>

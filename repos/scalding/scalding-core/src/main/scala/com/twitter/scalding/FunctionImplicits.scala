@@ -29,48 +29,151 @@ object FunctionImplicits {
       f: Function8[T1, T2, T3, T4, T5, T6, T7, T8, R])
     : Function1[(T1, T2, T3, T4, T5, T6, T7, T8), R] = f.tupled
 
-  implicit def function9ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, R](
+  implicit def function9ToTupledFunction1[T1,
+                                          T2,
+                                          T3,
+                                          T4,
+                                          T5,
+                                          T6,
+                                          T7,
+                                          T8,
+                                          T9,
+                                          R](
       f: Function9[T1, T2, T3, T4, T5, T6, T7, T8, T9, R])
     : Function1[(T1, T2, T3, T4, T5, T6, T7, T8, T9), R] = f.tupled
 
-  implicit def function10ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R](
+  implicit def function10ToTupledFunction1[T1,
+                                           T2,
+                                           T3,
+                                           T4,
+                                           T5,
+                                           T6,
+                                           T7,
+                                           T8,
+                                           T9,
+                                           T10,
+                                           R](
       f: Function10[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R])
     : Function1[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), R] = f.tupled
 
-  implicit def function11ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R](
+  implicit def function11ToTupledFunction1[T1,
+                                           T2,
+                                           T3,
+                                           T4,
+                                           T5,
+                                           T6,
+                                           T7,
+                                           T8,
+                                           T9,
+                                           T10,
+                                           T11,
+                                           R](
       f: Function11[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R])
     : Function1[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11), R] = f.tupled
 
-  implicit def function12ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R](
+  implicit def function12ToTupledFunction1[T1,
+                                           T2,
+                                           T3,
+                                           T4,
+                                           T5,
+                                           T6,
+                                           T7,
+                                           T8,
+                                           T9,
+                                           T10,
+                                           T11,
+                                           T12,
+                                           R](
       f: Function12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R])
     : Function1[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12), R] =
     f.tupled
 
-  implicit def function13ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R](
+  implicit def function13ToTupledFunction1[T1,
+                                           T2,
+                                           T3,
+                                           T4,
+                                           T5,
+                                           T6,
+                                           T7,
+                                           T8,
+                                           T9,
+                                           T10,
+                                           T11,
+                                           T12,
+                                           T13,
+                                           R](
       f: Function13[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R])
     : Function1[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13), R] =
     f.tupled
 
-  implicit def function14ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, R](
-      f: Function14[
-          T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, R])
-    : Function1[
-        (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14), R] =
+  implicit def function14ToTupledFunction1[T1,
+                                           T2,
+                                           T3,
+                                           T4,
+                                           T5,
+                                           T6,
+                                           T7,
+                                           T8,
+                                           T9,
+                                           T10,
+                                           T11,
+                                           T12,
+                                           T13,
+                                           T14,
+                                           R](
+      f: Function14[T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    R])
+    : Function1[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14),
+                R] =
     f.tupled
 
-  implicit def function15ToTupledFunction1[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, R](
-      f: Function15[
-          T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, R])
-    : Function1[
-        (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15),
-        R] = f.tupled
+  implicit def function15ToTupledFunction1[T1,
+                                           T2,
+                                           T3,
+                                           T4,
+                                           T5,
+                                           T6,
+                                           T7,
+                                           T8,
+                                           T9,
+                                           T10,
+                                           T11,
+                                           T12,
+                                           T13,
+                                           T14,
+                                           T15,
+                                           R](
+      f: Function15[T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    R]): Function1[
+      (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15),
+      R] = f.tupled
 
   implicit def function16ToTupledFunction1[T1,
                                            T2,

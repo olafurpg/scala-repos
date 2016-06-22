@@ -28,8 +28,9 @@ private[lobby] object Biter {
     for {
       userOption ← lobbyUserOption.map(_.id) ?? UserRepo.byId
       ownerOption ← hook.userId ?? UserRepo.byId
-      creatorColor <- assignCreatorColor(
-                         ownerOption, userOption, hook.realColor)
+      creatorColor <- assignCreatorColor(ownerOption,
+                                         userOption,
+                                         hook.realColor)
       game = blame(
           !creatorColor,
           userOption,
@@ -55,7 +56,8 @@ private[lobby] object Biter {
                                  joinerUser: Option[User],
                                  color: Color): Fu[chess.Color] = color match {
     case Color.Random =>
-      UserRepo.firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map chess.Color.apply
+      UserRepo
+        .firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map chess.Color.apply
     case Color.White => fuccess(chess.White)
     case Color.Black => fuccess(chess.Black)
   }
@@ -68,44 +70,43 @@ private[lobby] object Biter {
     }
 
   private def makeGame(hook: Hook) =
-    Game.make(
-        game = ChessGame(
-            board = Board init hook.realVariant, clock = hook.clock.some),
-        whitePlayer = Player.white,
-        blackPlayer = Player.black,
-        mode = hook.realMode,
-        variant = hook.realVariant,
-        source = lila.game.Source.Lobby,
-        pgnImport = None)
+    Game.make(game = ChessGame(board = Board init hook.realVariant,
+                               clock = hook.clock.some),
+              whitePlayer = Player.white,
+              blackPlayer = Player.black,
+              mode = hook.realMode,
+              variant = hook.realVariant,
+              source = lila.game.Source.Lobby,
+              pgnImport = None)
 
   private def makeGame(seek: Seek) =
-    Game.make(
-        game = ChessGame(board = Board init seek.realVariant, clock = none),
-        whitePlayer = Player.white,
-        blackPlayer = Player.black,
-        mode = seek.realMode,
-        variant = seek.realVariant,
-        source = lila.game.Source.Lobby,
-        daysPerTurn = seek.daysPerTurn,
-        pgnImport = None)
+    Game.make(game =
+                ChessGame(board = Board init seek.realVariant, clock = none),
+              whitePlayer = Player.white,
+              blackPlayer = Player.black,
+              mode = seek.realMode,
+              variant = seek.realVariant,
+              source = lila.game.Source.Lobby,
+              daysPerTurn = seek.daysPerTurn,
+              pgnImport = None)
 
   def canJoin(hook: Hook, user: Option[LobbyUser]): Boolean =
     hook.realMode.casual.fold(
         user.isDefined || hook.allowAnon,
         user ?? { _.lame == hook.lame }
     ) && !(hook.userId ?? (user ?? (_.blocking)).contains) && !((user map
-            (_.id)) ?? (hook.user ?? (_.blocking)).contains) &&
-    hook.realRatingRange.fold(true) { range =>
-      user ?? { u =>
-        (hook.perfType map (_.key) flatMap u.ratingMap.get) ?? range.contains
+              (_.id)) ?? (hook.user ?? (_.blocking)).contains) &&
+      hook.realRatingRange.fold(true) { range =>
+        user ?? { u =>
+          (hook.perfType map (_.key) flatMap u.ratingMap.get) ?? range.contains
+        }
       }
-    }
 
   def canJoin(seek: Seek, user: LobbyUser): Boolean =
     (seek.realMode.casual || user.lame == seek.user.lame) &&
-    !(user.blocking contains seek.user.id) &&
-    !(seek.user.blocking contains user.id) && seek.realRatingRange.fold(true) {
-      range =>
+      !(user.blocking contains seek.user.id) &&
+      !(seek.user.blocking contains user.id) && seek.realRatingRange
+      .fold(true) { range =>
         (seek.perfType map (_.key) flatMap user.ratingMap.get) ?? range.contains
-    }
+      }
 }

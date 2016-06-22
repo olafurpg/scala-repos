@@ -143,8 +143,9 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
   @migration(
       "`+` creates a new map. Use `+=` to add an element to this map and return that map itself.",
       "2.8.0")
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): Map[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): Map[A, B1] =
     clone().asInstanceOf[Map[A, B1]] += elem1 += elem2 ++= elems
 
   /** Creates a new map containing the key/value mappings provided by the specified traversable object
@@ -236,7 +237,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     */
   def retain(p: (A, B) => Boolean): this.type = {
     for ((k, v) <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
-    if (!p(k, v)) this -= k
+      if (!p(k, v)) this -= k
 
     this
   }

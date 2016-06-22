@@ -44,7 +44,8 @@ private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
         Dns.resolve(send.target.getHostName)(context.system, self) match {
           case Some(r) ⇒
             try {
-              pendingSend = pendingSend.copy(target =
+              pendingSend = pendingSend.copy(
+                  target =
                     new InetSocketAddress(r.addr, pendingSend.target.getPort))
               doSend(registration)
             } catch {

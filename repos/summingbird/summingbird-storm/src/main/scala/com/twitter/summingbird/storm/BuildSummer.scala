@@ -53,8 +53,10 @@ object BuildSummer {
     }
   }
 
-  private[this] final def legacyBuilder(
-      storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) = {
+  private[this] final def legacyBuilder(storm: Storm,
+                                        dag: Dag[Storm],
+                                        node: StormNode,
+                                        jobID: JobId) = {
     val nodeName = dag.getNodeName(node)
     val cacheSize = storm.getOrElse(dag, node, DEFAULT_FM_CACHE)
     require(
@@ -75,7 +77,8 @@ object BuildSummer {
         def getSummer[K, V: Semigroup]
           : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
           new com.twitter.algebird.util.summer.NullSummer[K, V](
-              tupleInCounter, tupleOutCounter)
+              tupleInCounter,
+              tupleOutCounter)
         }
       }
     } else {
@@ -132,8 +135,7 @@ object BuildSummer {
                 futurePool,
                 Compact(false),
                 CompactionSize(0))
-            summer.withCleanup(
-                () => {
+            summer.withCleanup(() => {
               Future {
                 executor.shutdown
                 executor.awaitTermination(10, TimeUnit.SECONDS)

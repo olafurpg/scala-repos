@@ -79,8 +79,8 @@ object ServerSettingsImpl
         c getBoolean "verbose-error-messages",
         c getIntBytes "response-header-size-hint",
         c getInt "backlog",
-        SocketOptionSettings.fromSubConfig(
-            root, c.getConfig("socket-options")),
+        SocketOptionSettings.fromSubConfig(root,
+                                           c.getConfig("socket-options")),
         defaultHostHeader =
           HttpHeader.parse("Host", c getString "default-host-header") match {
             case HttpHeader.ParsingResult.Ok(x: Host, Nil) ⇒ x

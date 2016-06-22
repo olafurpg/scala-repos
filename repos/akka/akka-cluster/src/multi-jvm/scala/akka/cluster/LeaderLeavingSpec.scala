@@ -67,7 +67,7 @@ abstract class LeaderLeavingSpec
               case state: CurrentClusterState ⇒
                 if (state.members.exists(m ⇒
                           m.address == oldLeaderAddress &&
-                          m.status == Exiting)) exitingLatch.countDown()
+                            m.status == Exiting)) exitingLatch.countDown()
               case MemberExited(m) if m.address == oldLeaderAddress ⇒
                 exitingLatch.countDown()
               case _ ⇒ // ignore
@@ -85,12 +85,12 @@ abstract class LeaderLeavingSpec
 
           // verify that the LEADER is no longer part of the 'members' set
           awaitAssert(clusterView.members.map(_.address) should not contain
-              (oldLeaderAddress))
+                (oldLeaderAddress))
 
           // verify that the LEADER is not part of the 'unreachable' set
           awaitAssert(
               clusterView.unreachableMembers.map(_.address) should not contain
-              (oldLeaderAddress))
+                (oldLeaderAddress))
 
           // verify that we have a new LEADER
           awaitAssert(clusterView.leader should not be (oldLeaderAddress))

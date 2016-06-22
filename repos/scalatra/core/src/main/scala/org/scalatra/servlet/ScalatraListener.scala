@@ -23,7 +23,7 @@ class ScalatraListener extends ServletContextListener {
     } catch {
       case e: Throwable =>
         logger.error("Failed to initialize scalatra application at " +
-                     sce.getServletContext.getContextPath,
+                       sce.getServletContext.getContextPath,
                      e)
         throw e
     }

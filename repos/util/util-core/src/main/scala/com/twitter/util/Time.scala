@@ -244,7 +244,7 @@ trait TimeLike[This <: TimeLike[This]] extends Ordered[This] { self: This =>
   /** Equality within `maxDelta` */
   def moreOrLessEquals(other: This, maxDelta: Duration): Boolean =
     (other ne Undefined) &&
-    ((this == other) || (this diff other).abs <= maxDelta)
+      ((this == other) || (this diff other).abs <= maxDelta)
 }
 
 /**
@@ -539,7 +539,7 @@ class TimeFormat(pattern: String,
   * An absolute point in time, represented as the number of
   * nanoseconds since the Unix epoch.
   */
-sealed class Time private[util](protected val nanos: Long) extends {
+sealed class Time private[util] (protected val nanos: Long) extends {
   protected val ops = Time
 } with TimeLike[Time] with Serializable {
   import ops._

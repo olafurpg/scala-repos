@@ -33,8 +33,7 @@ import scalaz.syntax.monad._
 import scalaz.syntax.comonad._
 
 class InMemoryFileStorageSpec extends Specification {
-  include(
-      new FileStorageSpec[Need] {
+  include(new FileStorageSpec[Need] {
     val M: Monad[Need] with Comonad[Need] = Need.need
     val fs = new InMemoryFileStorage[Need]
   })

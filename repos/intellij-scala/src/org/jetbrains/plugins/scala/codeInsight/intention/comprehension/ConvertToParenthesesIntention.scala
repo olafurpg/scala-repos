@@ -23,7 +23,7 @@ class ConvertToParenthesesIntention extends PsiElementBaseIntentionAction {
       case e @ Parent(_: ScForStatement) =>
         List(ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tRBRACE)
           .contains(e.getNode.getElementType) &&
-        IntentionAvailabilityChecker.checkIntention(this, element)
+          IntentionAvailabilityChecker.checkIntention(this, element)
       case _ => false
     }
   }

@@ -151,7 +151,7 @@ object Retries {
 
       def description: String =
         "Retries requests, at the service application level, that have been rejected " +
-        "or meet the application-configured retry policy for transport level failures."
+          "or meet the application-configured retry policy for transport level failures."
 
       def make(
           statsP: param.Stats,
@@ -166,28 +166,29 @@ object Retries {
         val retryBudget = budgetP.retryBudget
         val retryPolicy = policyP.retryPolicy
 
-        val filters =
-          if (retryPolicy eq RetryPolicy.Never) {
-            newRequeueFilter(retryBudget,
-                             budgetP.requeueBackoffs,
-                             withdrawsOnly = false,
-                             scoped,
-                             timerP.timer,
-                             next)
-          } else {
-            val retryFilter = new RetryExceptionsFilter[Req, Rep](
-                retryPolicy, timerP.timer, statsRecv, retryBudget)
-            // note that we wrap the budget, since the retry filter wraps this
-            val requeueFilter = newRequeueFilter(
-                retryBudget,
-                budgetP.requeueBackoffs,
-                withdrawsOnly = true,
-                scoped,
-                timerP.timer,
-                next
-            )
-            retryFilter.andThen(requeueFilter)
-          }
+        val filters = if (retryPolicy eq RetryPolicy.Never) {
+          newRequeueFilter(retryBudget,
+                           budgetP.requeueBackoffs,
+                           withdrawsOnly = false,
+                           scoped,
+                           timerP.timer,
+                           next)
+        } else {
+          val retryFilter = new RetryExceptionsFilter[Req, Rep](retryPolicy,
+                                                                timerP.timer,
+                                                                statsRecv,
+                                                                retryBudget)
+          // note that we wrap the budget, since the retry filter wraps this
+          val requeueFilter = newRequeueFilter(
+              retryBudget,
+              budgetP.requeueBackoffs,
+              withdrawsOnly = true,
+              scoped,
+              timerP.timer,
+              next
+          )
+          retryFilter.andThen(requeueFilter)
+        }
 
         svcFactory(retryBudget, filters, scoped, requeues, next)
       }
@@ -239,8 +240,8 @@ object Retries {
         * requeue a subset of exceptions (currently only `RetryableWriteExceptions`) as
         * some exceptions to acquire a service are considered fatal.
         */
-      private[this] def applySelf(
-          conn: ClientConnection, n: Int): Future[Service[Req, Rep]] =
+      private[this] def applySelf(conn: ClientConnection,
+                                  n: Int): Future[Service[Req, Rep]] =
         self(conn).rescue {
           case e @ RetryPolicy.RetryableWriteException(_) if n > 0 =>
             if (status == Status.Open) {

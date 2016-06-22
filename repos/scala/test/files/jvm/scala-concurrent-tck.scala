@@ -10,8 +10,7 @@ trait TestBase {
   def once(body: Done => Unit) {
     import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
     val q = new LinkedBlockingQueue[Try[Boolean]]
-    body(
-        new Done {
+    body(new Done {
       def apply(proof: => Boolean): Unit = q offer Try(proof)
     })
     assert(q.poll(2000, TimeUnit.MILLISECONDS).get)
@@ -569,8 +568,9 @@ trait Blocking extends TestBase {
   }
 
   def testFQCNForAwaitAPI(): Unit = once { done =>
-    done(classOf[CanAwait].getName == "scala.concurrent.CanAwait" &&
-        Await.getClass.getName == "scala.concurrent.Await")
+    done(
+        classOf[CanAwait].getName == "scala.concurrent.CanAwait" &&
+          Await.getClass.getName == "scala.concurrent.Await")
   }
 
   testAwaitSuccess()

@@ -20,7 +20,7 @@ object Bakery {
       val names = dslName.split("\\.").toList.reverse
       assert(names.length >= 1,
              "DSL trait name must be in the valid format. DSL trait name is " +
-             dslName)
+               dslName)
 
       val tpeName = newTypeName(names.head)
       names.tail.reverse match {
@@ -46,10 +46,11 @@ object Bakery {
                           List(),
                           List(List()),
                           TypeTree(),
-                          Block(List(Apply(Select(Super(This(typeNames.EMPTY),
-                                                        typeNames.EMPTY),
-                                                  termNames.CONSTRUCTOR),
-                                           List())),
+                          Block(List(
+                                    Apply(Select(Super(This(typeNames.EMPTY),
+                                                       typeNames.EMPTY),
+                                                 termNames.CONSTRUCTOR),
+                                          List())),
                                 Literal(Constant(())))),
                    DefDef(Modifiers(),
                           newTermName("main"),
@@ -62,7 +63,8 @@ object Bakery {
       Apply(Select(New(Ident(newTypeName("eval"))), termNames.CONSTRUCTOR),
             List())
 
-    c.eval(c.Expr[Any](c.untypecheck(
+    c.eval(
+        c.Expr[Any](c.untypecheck(
                 Block(composeDSL(Literal(Constant(1))), constructor))))
 
     c.Expr[Any](Literal(Constant(1)))

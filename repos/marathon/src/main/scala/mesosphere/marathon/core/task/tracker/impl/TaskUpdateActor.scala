@@ -59,8 +59,9 @@ object TaskUpdateActor {
   * * This actor is spawned as a child of the [[TaskTrackerActor]].
   * * Errors in this actor lead to a restart of the TaskTrackerActor.
   */
-private[impl] class TaskUpdateActor(
-    clock: Clock, metrics: ActorMetrics, processor: TaskOpProcessor)
+private[impl] class TaskUpdateActor(clock: Clock,
+                                    metrics: ActorMetrics,
+                                    processor: TaskOpProcessor)
     extends Actor {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -115,7 +116,7 @@ private[impl] class TaskUpdateActor(
         val queuedCount = metrics.numberOfQueuedOps.getValue
         log.debug(
             s"Finished processing ${op.action} for app [${op.appId}] and ${op.taskId} " +
-            s"$activeCount active, $queuedCount queued.");
+              s"$activeCount active, $queuedCount queued.");
       }
 
       processNextOpIfExists(op.taskId)
@@ -131,7 +132,7 @@ private[impl] class TaskUpdateActor(
       val activeCount = metrics.numberOfActiveOps.increment()
       log.debug(
           s"Start processing ${op.action} for app [${op.appId}] and ${op.taskId}. " +
-          s"$activeCount active, $queuedCount queued.")
+            s"$activeCount active, $queuedCount queued.")
 
       import context.dispatcher
       val future = {

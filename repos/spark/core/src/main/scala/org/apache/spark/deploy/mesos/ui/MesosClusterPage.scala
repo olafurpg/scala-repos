@@ -31,13 +31,15 @@ private[mesos] class MesosClusterPage(parent: MesosClusterUI)
     extends WebUIPage("") {
   def render(request: HttpServletRequest): Seq[Node] = {
     val state = parent.scheduler.getSchedulerState()
-    val queuedHeaders = Seq(
-        "Driver ID", "Submit Date", "Main Class", "Driver Resources")
+    val queuedHeaders =
+      Seq("Driver ID", "Submit Date", "Main Class", "Driver Resources")
     val driverHeaders =
       queuedHeaders ++ Seq("Start Date", "Mesos Slave ID", "State")
     val retryHeaders =
       Seq("Driver ID", "Submit Date", "Description") ++ Seq(
-          "Last Failed Status", "Next Retry Time", "Attempt Count")
+          "Last Failed Status",
+          "Next Retry Time",
+          "Attempt Count")
     val queuedTable =
       UIUtils.listingTable(queuedHeaders, queuedRow, state.queuedDrivers)
     val launchedTable =

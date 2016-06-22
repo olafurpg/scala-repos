@@ -238,8 +238,8 @@ class LongTestOnJDK8 {
 
   @Test def parseUnsignedLong_failure_cases(): Unit = {
     def test(s: String, radix: Int = 10): Unit =
-      expectThrows(
-          classOf[NumberFormatException], JLong.parseUnsignedLong(s, radix))
+      expectThrows(classOf[NumberFormatException],
+                   JLong.parseUnsignedLong(s, radix))
 
     // Bad radix
     test("0", MinRadix - 1)
@@ -257,8 +257,8 @@ class LongTestOnJDK8 {
 
     // Value out of range
     test("18446744073709551616")
-    test(
-        "11111111111111111111111111111111111111111111111111111111111111111", 2)
+    test("11111111111111111111111111111111111111111111111111111111111111111",
+         2)
     test("2214220303114400424121122431", 5)
     test("3w5e11264sgsg", 36)
     test("18446744073709551616654831357465413214984684321486984")

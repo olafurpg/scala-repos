@@ -44,8 +44,8 @@ class Dispatcher(
 
   @volatile private var executorServiceDelegate: LazyExecutorServiceDelegate =
     new LazyExecutorServiceDelegate(
-        executorServiceFactoryProvider.createExecutorServiceFactory(
-            id, threadFactory))
+        executorServiceFactoryProvider
+          .createExecutorServiceFactory(id, threadFactory))
 
   protected final def executorService: ExecutorServiceDelegate =
     executorServiceDelegate
@@ -53,8 +53,8 @@ class Dispatcher(
   /**
     * INTERNAL API
     */
-  protected[akka] def dispatch(
-      receiver: ActorCell, invocation: Envelope): Unit = {
+  protected[akka] def dispatch(receiver: ActorCell,
+                               invocation: Envelope): Unit = {
     val mbox = receiver.mailbox
     mbox.enqueue(receiver.self, invocation)
     registerForExecution(mbox, true, false)
@@ -63,8 +63,8 @@ class Dispatcher(
   /**
     * INTERNAL API
     */
-  protected[akka] def systemDispatch(
-      receiver: ActorCell, invocation: SystemMessage): Unit = {
+  protected[akka] def systemDispatch(receiver: ActorCell,
+                                     invocation: SystemMessage): Unit = {
     val mbox = receiver.mailbox
     mbox.systemEnqueue(receiver.self, invocation)
     registerForExecution(mbox, false, true)
@@ -95,8 +95,8 @@ class Dispatcher(
   /**
     * INTERNAL API
     */
-  protected[akka] def createMailbox(
-      actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox = {
+  protected[akka] def createMailbox(actor: akka.actor.Cell,
+                                    mailboxType: MailboxType): Mailbox = {
     new Mailbox(mailboxType.create(Some(actor.self), Some(actor.system)))
     with DefaultSystemMessageQueue
   }
@@ -110,8 +110,7 @@ class Dispatcher(
     * INTERNAL API
     */
   protected[akka] def shutdown: Unit = {
-    val newDelegate =
-      executorServiceDelegate.copy() // Doesn't matter which one we copy
+    val newDelegate = executorServiceDelegate.copy() // Doesn't matter which one we copy
     val es = esUpdater.getAndSet(this, newDelegate)
     es.shutdown()
   }
@@ -125,7 +124,8 @@ class Dispatcher(
       mbox: Mailbox,
       hasMessageHint: Boolean,
       hasSystemMessageHint: Boolean): Boolean = {
-    if (mbox.canBeScheduledForExecution(hasMessageHint, hasSystemMessageHint)) {
+    if (mbox
+          .canBeScheduledForExecution(hasMessageHint, hasSystemMessageHint)) {
       //This needs to be here to ensure thread safety and no races
       if (mbox.setAsScheduled()) {
         try {

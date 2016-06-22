@@ -119,8 +119,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
             address.getHostname,
             address.getPort)
 
-  private def mapWithErrorMessage[T](
-      map: Map[T, Int], value: T, unknown: String): Int =
+  private def mapWithErrorMessage[T](map: Map[T, Int],
+                                     value: T,
+                                     unknown: String): Int =
     map.get(value) match {
       case Some(x) ⇒ x
       case _ ⇒
@@ -200,7 +201,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
     cm.MetricsGossipEnvelope
       .newBuilder()
       .setFrom(addressToProto(envelope.from))
-      .setGossip(cm.MetricsGossip
+      .setGossip(
+          cm.MetricsGossip
             .newBuilder()
             .addAllAllAddresses(
                 allAddresses.map(addressToProto(_).build()).asJava)

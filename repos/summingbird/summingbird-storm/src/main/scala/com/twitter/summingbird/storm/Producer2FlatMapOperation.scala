@@ -44,7 +44,8 @@ object Producer2FlatMapOperation {
                          wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]])
                 .asInstanceOf[FlatMapOperation[Any, Any]]
             case OptionMappedProducer(_, op) =>
-              acc.andThen(FlatMapOperation[Any, Any](op
+              acc.andThen(
+                  FlatMapOperation[Any, Any](op
                         .andThen(_.iterator)
                         .asInstanceOf[Any => TraversableOnce[Any]]))
             case FlatMappedProducer(_, op) =>
@@ -61,7 +62,8 @@ object Producer2FlatMapOperation {
             case Summer(_, _, _) =>
               sys.error("Should not schedule a Summer inside a flat mapper")
             case KeyFlatMappedProducer(_, op) =>
-              acc.andThen(FlatMapOperation
+              acc.andThen(
+                  FlatMapOperation
                     .keyFlatMap[Any, Any, Any](op)
                     .asInstanceOf[FlatMapOperation[Any, Any]])
           }

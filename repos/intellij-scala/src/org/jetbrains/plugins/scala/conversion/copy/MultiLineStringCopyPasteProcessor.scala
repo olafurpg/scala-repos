@@ -28,7 +28,7 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
     findOuterString(file.findElementAt(startOffsets(0))) match {
       case Some(element)
           if element.getTextRange.getStartOffset <= startOffsets(0) &&
-          element.getTextRange.getEndOffset >= endOffsets(0) =>
+            element.getTextRange.getEndOffset >= endOffsets(0) =>
         text stripMargin getMarginChar(element)
       case _ => null
     }
@@ -52,7 +52,8 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
 
     val marginChar = getMarginChar(element)
     val textRange = new TextRange(
-        document.getLineStartOffset(document.getLineNumber(offset)), offset)
+        document.getLineStartOffset(document.getLineNumber(offset)),
+        offset)
 
     (if (document.getText(textRange).trim.length == 0 &&
          (text.trim().length == 0 || text.trim.charAt(0) != marginChar))

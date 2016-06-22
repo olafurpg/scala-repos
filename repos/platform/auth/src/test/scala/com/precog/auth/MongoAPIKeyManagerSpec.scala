@@ -75,7 +75,8 @@ class MongoAPIKeyManagerSpec
     "return current root API key" in new TestAPIKeyManager {
       val result =
         Await.result(MongoAPIKeyManager.findRootAPIKey(
-                         testDB, MongoAPIKeyManagerSettings.defaults.apiKeys),
+                         testDB,
+                         MongoAPIKeyManagerSettings.defaults.apiKeys),
                      timeout)
 
       result.apiKey mustEqual rootAPIKey
@@ -110,10 +111,14 @@ class MongoAPIKeyManagerSpec
 
     "list children API keys" in new TestAPIKeyManager {
       val (result, expected) = Await.result(for {
-        k1 <- apiKeyManager.createAPIKey(
-                 Some("blah1"), None, child2.apiKey, Set.empty)
-        k2 <- apiKeyManager.createAPIKey(
-                 Some("blah2"), None, child2.apiKey, Set.empty)
+        k1 <- apiKeyManager.createAPIKey(Some("blah1"),
+                                         None,
+                                         child2.apiKey,
+                                         Set.empty)
+        k2 <- apiKeyManager.createAPIKey(Some("blah2"),
+                                         None,
+                                         child2.apiKey,
+                                         Set.empty)
         kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
       } yield (kids, List(k1, k2)), timeout)
 
@@ -204,15 +209,17 @@ class MongoAPIKeyManagerSpec
     val notFoundAPIKeyID = "NOT-GOING-TO-FIND"
 
     val rootAPIKey = Await.result(apiKeyManager.rootAPIKey, to)
-    val child1 = Await.result(apiKeyManager.createAPIKey(
-                                  Some("child1"), None, rootAPIKey, Set.empty),
-                              to)
-    val child2 = Await.result(apiKeyManager.createAPIKey(
-                                  Some("child2"), None, rootAPIKey, Set.empty),
-                              to)
+    val child1 = Await.result(
+        apiKeyManager
+          .createAPIKey(Some("child1"), None, rootAPIKey, Set.empty),
+        to)
+    val child2 = Await.result(
+        apiKeyManager
+          .createAPIKey(Some("child2"), None, rootAPIKey, Set.empty),
+        to)
     val grantChild1 = Await.result(
-        apiKeyManager.createAPIKey(
-            Some("grantChild1"), None, child1.apiKey, Set.empty),
+        apiKeyManager
+          .createAPIKey(Some("grantChild1"), None, child1.apiKey, Set.empty),
         to)
 
     // wait until the keys appear in the DB (some delay between insert request and actor insert)

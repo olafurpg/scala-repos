@@ -69,7 +69,7 @@ sealed abstract class Tree[A] {
             otherSubtrees <- suspend(drawSubTrees(ts))
           } yield
             new StringBuilder("|") +:
-            (shift(branch, trunk, subtree) ++ otherSubtrees)
+              (shift(branch, trunk, subtree) ++ otherSubtrees)
       }
 
     def shift(first: String,
@@ -276,5 +276,5 @@ private trait TreeEqual[A] extends Equal[Tree[A]] {
   def A: Equal[A]
   override final def equal(a1: Tree[A], a2: Tree[A]) =
     A.equal(a1.rootLabel, a2.rootLabel) &&
-    a1.subForest.corresponds(a2.subForest)(equal _)
+      a1.subForest.corresponds(a2.subForest)(equal _)
 }

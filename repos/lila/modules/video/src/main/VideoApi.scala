@@ -135,10 +135,12 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                 currentPage = page,
                 maxPerPage = maxPerPage)
 
-    def similar(
-        user: Option[User], video: Video, max: Int): Fu[Seq[VideoView]] =
+    def similar(user: Option[User],
+                video: Video,
+                max: Int): Fu[Seq[VideoView]] =
       videoColl
-        .find(BSONDocument(
+        .find(
+            BSONDocument(
                 "tags" -> BSONDocument("$in" -> video.tags),
                 "_id" -> BSONDocument("$ne" -> video.id)
             ))
@@ -166,7 +168,8 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     def find(videoId: Video.ID, userId: String): Fu[Option[View]] =
       viewColl
-        .find(BSONDocument(
+        .find(
+            BSONDocument(
                 View.BSONFields.id -> View.makeId(videoId, userId)
             ))
         .one[View]
@@ -175,7 +178,8 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       (viewColl insert a).void recover lila.db.recoverDuplicateKey(_ => ())
 
     def hasSeen(user: User, video: Video): Fu[Boolean] =
-      viewColl.count(BSONDocument(
+      viewColl.count(
+          BSONDocument(
               View.BSONFields.id -> View.makeId(video.id, user.id)
           ).some) map (0 !=)
 
@@ -201,41 +205,42 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Descending, GroupField, Match, Project, Unwind, Sort, SumValue}
 
-    private val pathsCache = AsyncCache[List[Tag], List[TagNb]](
-        f = filterTags => {
-      val allPaths =
-        if (filterTags.isEmpty)
-          allPopular map { tags =>
-            tags.filterNot(_.isNumeric)
-          } else
-          videoColl
-            .aggregate(Match(BSONDocument(
-                               "tags" -> BSONDocument("$all" -> filterTags))),
-                       List(Project(BSONDocument("tags" -> BSONBoolean(true))),
-                            Unwind("tags"),
-                            GroupField("tags")("nb" -> SumValue(1))))
-            .map(_.documents.flatMap(_.asOpt[TagNb]))
+    private val pathsCache =
+      AsyncCache[List[Tag], List[TagNb]](f = filterTags => {
+        val allPaths =
+          if (filterTags.isEmpty)
+            allPopular map { tags =>
+              tags.filterNot(_.isNumeric)
+            } else
+            videoColl
+              .aggregate(
+                  Match(BSONDocument(
+                          "tags" -> BSONDocument("$all" -> filterTags))),
+                  List(Project(BSONDocument("tags" -> BSONBoolean(true))),
+                       Unwind("tags"),
+                       GroupField("tags")("nb" -> SumValue(1))))
+              .map(_.documents.flatMap(_.asOpt[TagNb]))
 
-      allPopular zip allPaths map {
-        case (all, paths) =>
-          val tags =
-            all map { t =>
-              paths find (_._id == t._id) getOrElse TagNb(t._id, 0)
-            } filterNot (_.empty) take max
-          val missing =
-            filterTags filterNot { t =>
-              tags exists (_.tag == t)
+        allPopular zip allPaths map {
+          case (all, paths) =>
+            val tags =
+              all map { t =>
+                paths find (_._id == t._id) getOrElse TagNb(t._id, 0)
+              } filterNot (_.empty) take max
+            val missing =
+              filterTags filterNot { t =>
+                tags exists (_.tag == t)
+              }
+            val list =
+              tags.take(max - missing.size) ::: missing.flatMap { t =>
+                all find (_.tag == t)
+              }
+            list.sortBy { t =>
+              if (filterTags contains t.tag) Int.MinValue
+              else -t.nb
             }
-          val list =
-            tags.take(max - missing.size) ::: missing.flatMap { t =>
-              all find (_.tag == t)
-            }
-          list.sortBy { t =>
-            if (filterTags contains t.tag) Int.MinValue
-            else -t.nb
-          }
-      }
-    }, maxCapacity = 100)
+        }
+      }, maxCapacity = 100)
 
     private val popularCache = AsyncCache.single[List[TagNb]](
         f = videoColl

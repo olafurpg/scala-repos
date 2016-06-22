@@ -22,8 +22,7 @@ class ExpandTables extends Phase {
         path: Node,
         tpe: Type): Node = tpe match {
       case p: ProductType =>
-        ProductNode(
-            p.elements.zipWithIndex.map {
+        ProductNode(p.elements.zipWithIndex.map {
           case (t, i) =>
             createResult(expansions, Select(path, ElementSymbol(i + 1)), t)
         })
@@ -34,8 +33,9 @@ class ExpandTables extends Phase {
       case tpe: NominalType =>
         createResult(expansions, path, tpe.structuralView)
       case m: MappedScalaType =>
-        TypeMapping(
-            createResult(expansions, path, m.baseType), m.mapper, m.classTag)
+        TypeMapping(createResult(expansions, path, m.baseType),
+                    m.mapper,
+                    m.classTag)
       case OptionType(el) =>
         val gen = new AnonSymbol
         createdOption = true

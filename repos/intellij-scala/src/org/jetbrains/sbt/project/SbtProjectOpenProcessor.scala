@@ -25,8 +25,8 @@ class SbtProjectOpenProcessor(builder: SbtProjectImportBuilder)
   override def doQuickImport(file: VirtualFile, wizardContext: WizardContext) = {
     val path = SbtProjectImportProvider.projectRootOf(file).getPath
 
-    val dialog = new AddModuleWizard(
-        null, path, new SbtProjectImportProvider(getBuilder))
+    val dialog =
+      new AddModuleWizard(null, path, new SbtProjectImportProvider(getBuilder))
 
     getBuilder.prepare(wizardContext)
     getBuilder.getControl(null).setLinkedProjectPath(path)

@@ -79,17 +79,18 @@ object Message extends LilaController {
       forms
         .thread(me)
         .bindFromRequest
-        .fold(err => renderForm(me, none, _ => err) map { BadRequest(_) },
-              data =>
-                api.makeThread(data, me) map { thread =>
-                  Redirect(routes.Message.thread(thread.id))
-              })
+        .fold(err =>
+              renderForm(me, none, _ => err) map { BadRequest(_) }, data =>
+              api.makeThread(data, me) map { thread =>
+            Redirect(routes.Message.thread(thread.id))
+        })
     }
   }
 
   private def renderForm(
-      me: UserModel, title: Option[String], f: Form[_] => Form[_])(
-      implicit ctx: Context): Fu[Html] =
+      me: UserModel,
+      title: Option[String],
+      f: Form[_] => Form[_])(implicit ctx: Context): Fu[Html] =
     get("user") ?? UserRepo.named flatMap { user =>
       user.fold(fuccess(true))(u => security.canMessage(me.id, u.id)) map {
         canMessage =>

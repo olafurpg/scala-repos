@@ -108,7 +108,8 @@ class InstanceTestsHijackedBoxedClassesTest {
     assertEquals(1.2, (1.2: Any).asInstanceOf[Float])
   }
 
-  @Test def should_support_isInstanceOf_via_java_lang_Class_positive(): Unit = {
+  @Test
+  def should_support_isInstanceOf_via_java_lang_Class_positive(): Unit = {
     def test(x: Any, clazz: Class[_]): Unit =
       assertTrue(clazz.isInstance(x))
 
@@ -127,7 +128,8 @@ class InstanceTestsHijackedBoxedClassesTest {
     test(-0.0, classOf[java.lang.Double])
   }
 
-  @Test def should_support_isInstanceOf_via_java_lang_Class_negative(): Unit = {
+  @Test
+  def should_support_isInstanceOf_via_java_lang_Class_negative(): Unit = {
     def test(x: Any, clazz: Class[_]): Unit =
       assertFalse(clazz.isInstance(x))
 

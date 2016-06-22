@@ -46,9 +46,9 @@ final class Semantics private (
   override def equals(that: Any): Boolean = that match {
     case that: Semantics =>
       this.asInstanceOfs == that.asInstanceOfs &&
-      this.moduleInit == that.moduleInit &&
-      this.strictFloats == that.strictFloats &&
-      this.productionMode == that.productionMode
+        this.moduleInit == that.moduleInit &&
+        this.strictFloats == that.strictFloats &&
+        this.productionMode == that.productionMode
     case _ =>
       false
   }
@@ -85,8 +85,9 @@ final class Semantics private (
     def cl(name: String, cond: Boolean) = if (cond) List(name) else Nil
 
     cl("asInstanceOfs", asInstanceOfs == CheckedBehavior.Compliant) ++ cl(
-        "moduleInit", moduleInit == CheckedBehavior.Compliant) ++ cl(
-        "strictFloats", strictFloats)
+        "moduleInit",
+        moduleInit == CheckedBehavior.Compliant) ++ cl("strictFloats",
+                                                       strictFloats)
   }
 
   private def copy(asInstanceOfs: CheckedBehavior = this.asInstanceOfs,

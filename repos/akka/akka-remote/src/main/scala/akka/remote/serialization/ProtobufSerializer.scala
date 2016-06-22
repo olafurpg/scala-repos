@@ -30,8 +30,8 @@ object ProtobufSerializer {
     * from Akka's protobuf representation in the supplied
     * [[akka.actor.ActorSystem]].
     */
-  def deserializeActorRef(
-      system: ExtendedActorSystem, refProtocol: ActorRefData): ActorRef =
+  def deserializeActorRef(system: ExtendedActorSystem,
+                          refProtocol: ActorRefData): ActorRef =
     system.provider.resolveActorRef(refProtocol.getPath)
 }
 
@@ -61,8 +61,8 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
 
   override def includeManifest: Boolean = true
 
-  override def fromBinary(
-      bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+  override def fromBinary(bytes: Array[Byte],
+                          manifest: Option[Class[_]]): AnyRef = {
     manifest match {
       case Some(clazz) ⇒
         @tailrec
@@ -74,12 +74,14 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
               val unCachedParsingMethod =
                 if (method eq null)
                   clazz.getDeclaredMethod(
-                      "parseFrom", ProtobufSerializer.ARRAY_OF_BYTE_ARRAY: _*)
+                      "parseFrom",
+                      ProtobufSerializer.ARRAY_OF_BYTE_ARRAY: _*)
                 else method
               if (parsingMethodBindingRef.compareAndSet(
                       parsingMethodBinding,
-                      parsingMethodBinding.updated(
-                          clazz, unCachedParsingMethod))) unCachedParsingMethod
+                      parsingMethodBinding.updated(clazz,
+                                                   unCachedParsingMethod)))
+                unCachedParsingMethod
               else parsingMethod(unCachedParsingMethod)
           }
         }
@@ -104,8 +106,8 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
             else method
           if (toByteArrayMethodBindingRef.compareAndSet(
                   toByteArrayMethodBinding,
-                  toByteArrayMethodBinding.updated(
-                      clazz, unCachedtoByteArrayMethod)))
+                  toByteArrayMethodBinding.updated(clazz,
+                                                   unCachedtoByteArrayMethod)))
             unCachedtoByteArrayMethod
           else toByteArrayMethod(unCachedtoByteArrayMethod)
       }

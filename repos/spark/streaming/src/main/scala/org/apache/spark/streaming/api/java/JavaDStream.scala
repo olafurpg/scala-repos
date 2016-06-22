@@ -81,8 +81,8 @@ class JavaDStream[T](val dstream: DStream[T])(
     *                       the new DStream will generate RDDs); must be a multiple of this
     *                       DStream's batching interval
     */
-  def window(
-      windowDuration: Duration, slideDuration: Duration): JavaDStream[T] =
+  def window(windowDuration: Duration,
+             slideDuration: Duration): JavaDStream[T] =
     dstream.window(windowDuration, slideDuration)
 
   /**

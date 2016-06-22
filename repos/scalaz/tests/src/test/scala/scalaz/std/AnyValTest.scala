@@ -16,8 +16,8 @@ object AnyValTest extends SpecLite {
            order.laws[Char].withProp("benchmark", order.scalaOrdering[Char]))
   checkAll("Short",
            order.laws[Short].withProp("benchmark", order.scalaOrdering[Short]))
-  checkAll(
-      "Int", order.laws[Int].withProp("benchmark", order.scalaOrdering[Int]))
+  checkAll("Int",
+           order.laws[Int].withProp("benchmark", order.scalaOrdering[Int]))
   checkAll("Long",
            order.laws[Long].withProp("benchmark", order.scalaOrdering[Long]))
   checkAll("Float",

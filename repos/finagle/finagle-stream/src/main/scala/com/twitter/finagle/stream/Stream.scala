@@ -94,7 +94,8 @@ class Stream[Req: RequestType] extends CodecFactory[Req, StreamResponse] {
 
       // TODO: remove when ChannelTransport is the default for clients.
       override def newClientTransport(
-          ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+          ch: Channel,
+          statsReceiver: StatsReceiver): Transport[Any, Any] =
         new ChannelTransport(ch)
     }
   }

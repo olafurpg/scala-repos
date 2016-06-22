@@ -40,7 +40,8 @@ import scalafx.testutil.{AlignmentDelegateSpec, RunOnApplicationThread, SimpleSF
 @RunWith(classOf[JUnitRunner])
 class LabeledSpec
     extends SimpleSFXDelegateSpec[jfxsc.Labeled, Labeled](
-        classOf[jfxsc.Labeled], classOf[Labeled])
+        classOf[jfxsc.Labeled],
+        classOf[Labeled])
     with AlignmentDelegateSpec[jfxsc.Labeled, Labeled]
     with RunOnApplicationThread {
 

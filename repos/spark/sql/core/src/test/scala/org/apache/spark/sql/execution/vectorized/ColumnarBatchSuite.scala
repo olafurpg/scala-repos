@@ -459,7 +459,8 @@ class ColumnarBatchSuite extends SparkFunSuite {
         assert(data.capacity == array.length * 2)
         data.putInts(0, array.length, array, 0)
         column.putArray(0, 0, array.length)
-        assert(ColumnVectorUtils
+        assert(
+            ColumnVectorUtils
               .toPrimitiveJavaArray(column.getArray(0))
               .asInstanceOf[Array[Int]] === array)
       }
@@ -631,16 +632,18 @@ class ColumnarBatchSuite extends SparkFunSuite {
     }
   }
 
-  private def compareStruct(
-      fields: Seq[StructField], r1: InternalRow, r2: Row, seed: Long) {
+  private def compareStruct(fields: Seq[StructField],
+                            r1: InternalRow,
+                            r2: Row,
+                            seed: Long) {
     fields.zipWithIndex.foreach { v =>
       {
         assert(r1.isNullAt(v._2) == r2.isNullAt(v._2), "Seed = " + seed)
         if (!r1.isNullAt(v._2)) {
           v._1.dataType match {
             case BooleanType =>
-              assert(
-                  r1.getBoolean(v._2) == r2.getBoolean(v._2), "Seed = " + seed)
+              assert(r1.getBoolean(v._2) == r2.getBoolean(v._2),
+                     "Seed = " + seed)
             case ByteType =>
               assert(r1.getByte(v._2) == r2.getByte(v._2), "Seed = " + seed)
             case ShortType =>
@@ -660,10 +663,11 @@ class ColumnarBatchSuite extends SparkFunSuite {
               val d2 = r2.getDecimal(v._2)
               assert(d1.compare(d2) == 0, "Seed = " + seed)
             case StringType =>
-              assert(
-                  r1.getString(v._2) == r2.getString(v._2), "Seed = " + seed)
+              assert(r1.getString(v._2) == r2.getString(v._2),
+                     "Seed = " + seed)
             case CalendarIntervalType =>
-              assert(r1.getInterval(v._2) === r2
+              assert(
+                  r1.getInterval(v._2) === r2
                     .get(v._2)
                     .asInstanceOf[CalendarInterval])
             case ArrayType(childType, n) =>
@@ -672,29 +676,29 @@ class ColumnarBatchSuite extends SparkFunSuite {
               assert(a1.length == a2.length, "Seed = " + seed)
               childType match {
                 case DoubleType => {
-                    var i = 0
-                    while (i < a1.length) {
-                      assert(doubleEquals(a1(i).asInstanceOf[Double],
-                                          a2(i).asInstanceOf[Double]),
-                             "Seed = " + seed)
-                      i += 1
-                    }
+                  var i = 0
+                  while (i < a1.length) {
+                    assert(doubleEquals(a1(i).asInstanceOf[Double],
+                                        a2(i).asInstanceOf[Double]),
+                           "Seed = " + seed)
+                    i += 1
                   }
+                }
                 case FloatType => {
-                    var i = 0
-                    while (i < a1.length) {
-                      assert(doubleEquals(a1(i).asInstanceOf[Float],
-                                          a2(i).asInstanceOf[Float]),
-                             "Seed = " + seed)
-                      i += 1
-                    }
+                  var i = 0
+                  while (i < a1.length) {
+                    assert(doubleEquals(a1(i).asInstanceOf[Float],
+                                        a2(i).asInstanceOf[Float]),
+                           "Seed = " + seed)
+                    i += 1
                   }
+                }
 
                 case t: DecimalType =>
                   var i = 0
                   while (i < a1.length) {
-                    assert(
-                        (a1(i) == null) == (a2(i) == null), "Seed = " + seed)
+                    assert((a1(i) == null) == (a2(i) == null),
+                           "Seed = " + seed)
                     if (a1(i) != null) {
                       val d1 = a1(i).asInstanceOf[Decimal].toBigDecimal
                       val d2 = a2(i).asInstanceOf[java.math.BigDecimal]
@@ -767,12 +771,11 @@ class ColumnarBatchSuite extends SparkFunSuite {
     val random = new Random(seed)
     var i = 0
     while (i < NUM_ITERS) {
-      val schema =
-        if (flatSchema) {
-          RandomDataGenerator.randomSchema(random, numFields, types)
-        } else {
-          RandomDataGenerator.randomNestedSchema(random, numFields, types)
-        }
+      val schema = if (flatSchema) {
+        RandomDataGenerator.randomSchema(random, numFields, types)
+      } else {
+        RandomDataGenerator.randomNestedSchema(random, numFields, types)
+      }
       val rows = mutable.ArrayBuffer.empty[Row]
       var j = 0
       while (j < NUM_ROWS) {

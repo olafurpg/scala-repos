@@ -39,7 +39,8 @@ import org.apache.spark.util.{RpcUtils, SerializableBuffer, ThreadUtils, Utils}
   * (spark.deploy.*).
   */
 private[spark] class CoarseGrainedSchedulerBackend(
-    scheduler: TaskSchedulerImpl, val rpcEnv: RpcEnv)
+    scheduler: TaskSchedulerImpl,
+    val rpcEnv: RpcEnv)
     extends ExecutorAllocationClient
     with SchedulerBackend
     with Logging {
@@ -51,12 +52,12 @@ private[spark] class CoarseGrainedSchedulerBackend(
   private val maxRpcMessageSize = RpcUtils.maxMessageSizeBytes(conf)
   // Submit tasks only after (registered resources / total expected resources)
   // is equal to at least this value, that is double between 0 and 1.
-  var minRegisteredRatio = math.min(
-      1, conf.getDouble("spark.scheduler.minRegisteredResourcesRatio", 0))
+  var minRegisteredRatio = math
+    .min(1, conf.getDouble("spark.scheduler.minRegisteredResourcesRatio", 0))
   // Submit tasks after maxRegisteredWaitingTime milliseconds
   // if minRegisteredRatio has not yet been reached
-  val maxRegisteredWaitingTimeMs = conf.getTimeAsMs(
-      "spark.scheduler.maxRegisteredResourcesWaitingTime", "30s")
+  val maxRegisteredWaitingTimeMs = conf
+    .getTimeAsMs("spark.scheduler.maxRegisteredResourcesWaitingTime", "30s")
   val createTime = System.currentTimeMillis()
 
   private val executorDataMap = new HashMap[String, ExecutorData]
@@ -80,8 +81,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
   // Executors that have been lost, but for which we don't yet know the real exit reason.
   protected val executorsPendingLossReason = new HashSet[String]
 
-  class DriverEndpoint(
-      override val rpcEnv: RpcEnv, sparkProperties: Seq[(String, String)])
+  class DriverEndpoint(override val rpcEnv: RpcEnv,
+                       sparkProperties: Seq[(String, String)])
       extends ThreadSafeRpcEndpoint
       with Logging {
 
@@ -122,7 +123,7 @@ private[spark] class CoarseGrainedSchedulerBackend(
               // Ignoring the update since we don't know about the executor.
               logWarning(
                   s"Ignored task status update ($taskId state $state) " +
-                  s"from unknown executor with ID $executorId")
+                    s"from unknown executor with ID $executorId")
           }
         }
 
@@ -151,12 +152,11 @@ private[spark] class CoarseGrainedSchedulerBackend(
         } else {
           // If the executor's rpc env is not listening for incoming connections, `hostPort`
           // will be null, and the client connection should be used to contact the executor.
-          val executorAddress =
-            if (executorRef.address != null) {
-              executorRef.address
-            } else {
-              context.senderAddress
-            }
+          val executorAddress = if (executorRef.address != null) {
+            executorRef.address
+          } else {
+            context.senderAddress
+          }
           logInfo(
               s"Registered executor $executorRef ($executorAddress) with ID $executorId")
           addressToExecutorId(executorAddress) = executorId
@@ -180,8 +180,10 @@ private[spark] class CoarseGrainedSchedulerBackend(
           }
           // Note: some tests expect the reply to come after we put the executor in the map
           context.reply(RegisteredExecutor(executorAddress.host))
-          listenerBus.post(SparkListenerExecutorAdded(
-                  System.currentTimeMillis(), executorId, data))
+          listenerBus.post(
+              SparkListenerExecutorAdded(System.currentTimeMillis(),
+                                         executorId,
+                                         data))
           makeOffers()
         }
 
@@ -216,8 +218,9 @@ private[spark] class CoarseGrainedSchedulerBackend(
       val activeExecutors = executorDataMap.filterKeys(executorIsAlive)
       val workOffers = activeExecutors.map {
         case (id, executorData) =>
-          new WorkerOffer(
-              id, executorData.executorHost, executorData.freeCores)
+          new WorkerOffer(id,
+                          executorData.executorHost,
+                          executorData.freeCores)
       }.toSeq
       launchTasks(scheduler.resourceOffers(workOffers))
     }
@@ -225,11 +228,12 @@ private[spark] class CoarseGrainedSchedulerBackend(
     override def onDisconnected(remoteAddress: RpcAddress): Unit = {
       addressToExecutorId
         .get(remoteAddress)
-        .foreach(removeExecutor(
+        .foreach(
+            removeExecutor(
                 _,
                 SlaveLost("Remote RPC client disassociated. Likely due to " +
-                    "containers exceeding thresholds, or network issues. Check driver logs for WARN " +
-                    "messages.")))
+                      "containers exceeding thresholds, or network issues. Check driver logs for WARN " +
+                      "messages.")))
     }
 
     // Make fake resource offers on just one executor
@@ -238,8 +242,9 @@ private[spark] class CoarseGrainedSchedulerBackend(
       if (executorIsAlive(executorId)) {
         val executorData = executorDataMap(executorId)
         val workOffers = Seq(
-            new WorkerOffer(
-                executorId, executorData.executorHost, executorData.freeCores))
+            new WorkerOffer(executorId,
+                            executorData.executorHost,
+                            executorData.freeCores))
         launchTasks(scheduler.resourceOffers(workOffers))
       }
     }
@@ -259,8 +264,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
               try {
                 var msg =
                   "Serialized task %s:%d was %d bytes, which exceeds max allowed: " +
-                  "spark.rpc.message.maxSize (%d bytes). Consider increasing " +
-                  "spark.rpc.message.maxSize or using broadcast variables for large values."
+                    "spark.rpc.message.maxSize (%d bytes). Consider increasing " +
+                    "spark.rpc.message.maxSize or using broadcast variables for large values."
                 msg = msg.format(task.taskId,
                                  task.index,
                                  serializedTask.limit,
@@ -276,7 +281,7 @@ private[spark] class CoarseGrainedSchedulerBackend(
 
           logInfo(
               s"Launching task ${task.taskId} on executor id: ${task.executorId} hostname: " +
-              s"${executorData.executorHost}.")
+                s"${executorData.executorHost}.")
 
           executorData.executorEndpoint.send(
               LaunchTask(new SerializableBuffer(serializedTask)))
@@ -298,10 +303,12 @@ private[spark] class CoarseGrainedSchedulerBackend(
           }
           totalCoreCount.addAndGet(-executorInfo.totalCores)
           totalRegisteredExecutors.addAndGet(-1)
-          scheduler.executorLost(
-              executorId, if (killed) ExecutorKilled else reason)
-          listenerBus.post(SparkListenerExecutorRemoved(
-                  System.currentTimeMillis(), executorId, reason.toString))
+          scheduler
+            .executorLost(executorId, if (killed) ExecutorKilled else reason)
+          listenerBus.post(
+              SparkListenerExecutorRemoved(System.currentTimeMillis(),
+                                           executorId,
+                                           reason.toString))
         case None =>
           logInfo(s"Asked to remove non-existent executor $executorId")
       }
@@ -372,7 +379,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
     } catch {
       case e: Exception =>
         throw new SparkException(
-            "Error asking standalone scheduler to shut down executors", e)
+            "Error asking standalone scheduler to shut down executors",
+            e)
     }
   }
 
@@ -385,7 +393,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
     } catch {
       case e: Exception =>
         throw new SparkException(
-            "Error stopping standalone scheduler's driver endpoint", e)
+            "Error stopping standalone scheduler's driver endpoint",
+            e)
     }
   }
 
@@ -403,7 +412,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
       // because (1) disconnected event is not yet received; (2) executors die silently.
       executorDataMap.toMap.foreach {
         case (eid, _) =>
-          driverEndpoint.askWithRetry[Boolean](RemoveExecutor(
+          driverEndpoint.askWithRetry[Boolean](
+              RemoveExecutor(
                   eid,
                   SlaveLost(
                       "Stale executor after cluster manager re-registered.")))
@@ -415,8 +425,9 @@ private[spark] class CoarseGrainedSchedulerBackend(
     driverEndpoint.send(ReviveOffers)
   }
 
-  override def killTask(
-      taskId: Long, executorId: String, interruptThread: Boolean) {
+  override def killTask(taskId: Long,
+                        executorId: String,
+                        interruptThread: Boolean) {
     driverEndpoint.send(KillTask(taskId, executorId, interruptThread))
   }
 
@@ -431,7 +442,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
     } catch {
       case e: Exception =>
         throw new SparkException(
-            "Error notifying standalone scheduler's driver endpoint", e)
+            "Error notifying standalone scheduler's driver endpoint",
+            e)
     }
   }
 
@@ -441,14 +453,14 @@ private[spark] class CoarseGrainedSchedulerBackend(
     if (sufficientResourcesRegistered) {
       logInfo(
           "SchedulerBackend is ready for scheduling beginning after " +
-          s"reached minRegisteredResourcesRatio: $minRegisteredRatio")
+            s"reached minRegisteredResourcesRatio: $minRegisteredRatio")
       return true
     }
     if ((System.currentTimeMillis() -
             createTime) >= maxRegisteredWaitingTimeMs) {
       logInfo(
           "SchedulerBackend is ready for scheduling beginning after waiting " +
-          s"maxRegisteredResourcesWaitingTime: $maxRegisteredWaitingTimeMs(ms)")
+            s"maxRegisteredResourcesWaitingTime: $maxRegisteredWaitingTimeMs(ms)")
       return true
     }
     false
@@ -468,7 +480,7 @@ private[spark] class CoarseGrainedSchedulerBackend(
       if (numAdditionalExecutors < 0) {
         throw new IllegalArgumentException(
             "Attempted to request a negative number of additional executor(s) " +
-            s"$numAdditionalExecutors from the cluster manager. Please specify a positive number!")
+              s"$numAdditionalExecutors from the cluster manager. Please specify a positive number!")
       }
       logInfo(
           s"Requesting $numAdditionalExecutors additional executor(s) from the cluster manager")
@@ -478,7 +490,7 @@ private[spark] class CoarseGrainedSchedulerBackend(
       // Account for executors pending to be added or removed
       val newTotal =
         numExistingExecutors + numPendingExecutors -
-        executorsPendingToRemove.size
+          executorsPendingToRemove.size
       doRequestTotalExecutors(newTotal)
     }
 
@@ -504,14 +516,15 @@ private[spark] class CoarseGrainedSchedulerBackend(
     if (numExecutors < 0) {
       throw new IllegalArgumentException(
           "Attempted to request a negative number of executor(s) " +
-          s"$numExecutors from the cluster manager. Please specify a positive number!")
+            s"$numExecutors from the cluster manager. Please specify a positive number!")
     }
 
     this.localityAwareTasks = localityAwareTasks
     this.hostToLocalTaskCount = hostToLocalTaskCount
 
     numPendingExecutors = math.max(
-        numExecutors - numExistingExecutors + executorsPendingToRemove.size, 0)
+        numExecutors - numExistingExecutors + executorsPendingToRemove.size,
+        0)
     doRequestTotalExecutors(numExecutors)
   }
 
@@ -552,8 +565,9 @@ private[spark] class CoarseGrainedSchedulerBackend(
     * @return whether the kill request is acknowledged. If list to kill is empty, it will return
     *         false.
     */
-  final def killExecutors(
-      executorIds: Seq[String], replace: Boolean, force: Boolean): Boolean =
+  final def killExecutors(executorIds: Seq[String],
+                          replace: Boolean,
+                          force: Boolean): Boolean =
     synchronized {
       logInfo(s"Requesting to kill executor(s) ${executorIds.mkString(", ")}")
       val (knownExecutors, unknownExecutors) =
@@ -577,8 +591,9 @@ private[spark] class CoarseGrainedSchedulerBackend(
       // with the cluster manager to avoid allocating new ones. When computing the new target,
       // take into account executors that are pending to be added or removed.
       if (!replace) {
-        doRequestTotalExecutors(numExistingExecutors + numPendingExecutors -
-            executorsPendingToRemove.size)
+        doRequestTotalExecutors(
+            numExistingExecutors + numPendingExecutors -
+              executorsPendingToRemove.size)
       } else {
         numPendingExecutors += knownExecutors.size
       }

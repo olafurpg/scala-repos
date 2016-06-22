@@ -33,8 +33,7 @@ private case class LassoCalculator(data: DenseMatrix[Double],
     while (improvedResult && (iter < MAX_ITER)) {
       iter += 1
       improvedResult = false
-      cfor(0)(i => i < data.cols, i => i + 1)(
-          i => {
+      cfor(0)(i => i < data.cols, i => i + 1)(i => {
         val eoc = estimateOneColumn(i)
         val oldCoefficient = resultVec(i)
         resultVec(i) = shrink(eoc.coefficients(0))
@@ -81,8 +80,7 @@ private case class LassoCalculator(data: DenseMatrix[Double],
 
   private def computeRsquared = {
     var r2 = 0.0
-    cfor(0)(i => i < outputs.size, i => i + 1)(
-        i => {
+    cfor(0)(i => i < outputs.size, i => i + 1)(i => {
       var o = outputs(i)
       cfor(0)(j => j < data.cols, j => j + 1)(j => {
         o -= data(i, j) * resultVec(j)
@@ -102,8 +100,9 @@ private case class LassoCalculator(data: DenseMatrix[Double],
   }
 }
 
-case class LassoResult(
-    coefficients: DenseVector[Double], rSquared: Double, lambda: Double)
+case class LassoResult(coefficients: DenseVector[Double],
+                       rSquared: Double,
+                       lambda: Double)
     extends RegressionResult[DenseVector[Double], Double] {
   require(lambda >= 0)
   def apply(x: DenseVector[Double]): Double = coefficients.dot(x)
@@ -133,10 +132,16 @@ object lasso extends UFunc {
         LassoCalculator(data, outputs, lambda, workArray).result
     }
 
-  implicit val matrixVectorSpecifiedWork: Impl4[
-      DenseMatrix[Double], DenseVector[Double], Double, Int, LassoResult] =
-    new Impl4[
-        DenseMatrix[Double], DenseVector[Double], Double, Int, LassoResult] {
+  implicit val matrixVectorSpecifiedWork: Impl4[DenseMatrix[Double],
+                                                DenseVector[Double],
+                                                Double,
+                                                Int,
+                                                LassoResult] =
+    new Impl4[DenseMatrix[Double],
+              DenseVector[Double],
+              Double,
+              Int,
+              LassoResult] {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 lambda: Double,
@@ -144,8 +149,10 @@ object lasso extends UFunc {
         LassoCalculator(data, outputs, lambda, new Array[Double](workSize)).result
     }
 
-  implicit val matrixVector: Impl3[
-      DenseMatrix[Double], DenseVector[Double], Double, LassoResult] =
+  implicit val matrixVector: Impl3[DenseMatrix[Double],
+                                   DenseVector[Double],
+                                   Double,
+                                   LassoResult] =
     new Impl3[DenseMatrix[Double], DenseVector[Double], Double, LassoResult] {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],

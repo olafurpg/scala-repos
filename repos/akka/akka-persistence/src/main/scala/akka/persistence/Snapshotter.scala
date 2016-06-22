@@ -41,7 +41,8 @@ trait Snapshotter extends Actor {
     */
   def saveSnapshot(snapshot: Any): Unit = {
     snapshotStore ! SaveSnapshot(
-        SnapshotMetadata(snapshotterId, snapshotSequenceNr), snapshot)
+        SnapshotMetadata(snapshotterId, snapshotSequenceNr),
+        snapshot)
   }
 
   /**

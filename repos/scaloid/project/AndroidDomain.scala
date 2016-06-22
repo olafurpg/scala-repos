@@ -65,7 +65,7 @@ case class AndroidListener(
 ) {
   def isSafe: Boolean =
     (!setter.startsWith("set")) || callbackMethods.length == 1 ||
-    callbackMethods.forall(_.retType.name == "Unit")
+      callbackMethods.forall(_.retType.name == "Unit")
 }
 
 case class AndroidIntentMethod(

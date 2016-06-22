@@ -80,11 +80,13 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
 
     // other
     "feed the body once a check has been done and passes" in {
-      withServer(Seq(
+      withServer(
+          Seq(
               "play.http.filters" -> classOf[CsrfFilters].getName
           )) {
         case _ =>
-          Action(_.body.asFormUrlEncoded
+          Action(
+              _.body.asFormUrlEncoded
                 .flatMap(_.get("foo"))
                 .flatMap(_.headOption)
                 .map(Results.Ok(_))
@@ -92,8 +94,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       } {
         val token = crypto.generateSignedToken
         import play.api.Play.current
-        await(WS
-              .url("http://localhost:" + testServerPort)
+        await(
+            WS.url("http://localhost:" + testServerPort)
               .withSession(TokenName -> token)
               .post(Map("foo" -> "bar", TokenName -> token))).body must_== "bar"
       }
@@ -122,7 +124,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       .build()
 
     "feed a not fully buffered body once a check has been done and passes" in new WithServer(
-        notBufferedFakeApp, testServerPort) {
+        notBufferedFakeApp,
+        testServerPort) {
       val token = crypto.generateSignedToken
       val response = await(
           WS.url("http://localhost:" + port)
@@ -179,8 +182,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
     }
   }
 
-  def buildCsrfCheckRequest(
-      sendUnauthorizedResult: Boolean, configuration: (String, String)*) =
+  def buildCsrfCheckRequest(sendUnauthorizedResult: Boolean,
+                            configuration: (String, String)*) =
     new CsrfTester {
       def apply[T](makeRequest: (WSRequest) => Future[WSResponse])(
           handleResponse: (WSResponse) => T) = {
@@ -188,7 +191,8 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
           configuration ++ Seq(
               "play.http.filters" -> classOf[CsrfFilters].getName) ++ {
             if (sendUnauthorizedResult)
-              Seq("play.filters.csrf.errorHandler" -> classOf[
+              Seq(
+                  "play.filters.csrf.errorHandler" -> classOf[
                       CustomErrorHandler].getName)
             else Nil
           }

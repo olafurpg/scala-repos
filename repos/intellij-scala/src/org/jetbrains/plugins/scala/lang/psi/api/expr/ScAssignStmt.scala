@@ -94,13 +94,13 @@ trait ScAssignStmt extends ScExpression {
                 r.bind() match {
                   case Some(resolveResult)
                       if resolveResult.isDynamic &&
-                      resolveResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
+                        resolveResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
                     return true
                   case _ =>
                     m.applyOrUpdateElement match {
                       case Some(innerResult)
                           if innerResult.isDynamic &&
-                          innerResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
+                            innerResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
                         return true
                       case _ =>
                     }

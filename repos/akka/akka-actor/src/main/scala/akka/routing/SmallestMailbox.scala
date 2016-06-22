@@ -30,8 +30,8 @@ object SmallestMailboxRoutingLogic {
   */
 @SerialVersionUID(1L)
 class SmallestMailboxRoutingLogic extends RoutingLogic {
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else selectNext(routees)
 

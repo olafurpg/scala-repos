@@ -62,15 +62,15 @@ class BehaviorSpec extends TypedSpec {
   trait Common {
     def behavior(monitor: ActorRef[Event]): Behavior[Command]
 
-    case class Setup(
-        ctx: EffectfulActorContext[Command], inbox: Inbox.SyncInbox[Event])
+    case class Setup(ctx: EffectfulActorContext[Command],
+                     inbox: Inbox.SyncInbox[Event])
 
     protected def mkCtx(requirePreStart: Boolean = false,
                         factory: (ActorRef[Event]) ⇒ Behavior[Command] =
                           behavior) = {
       val inbox = Inbox.sync[Event]("evt")
-      val ctx = new EffectfulActorContext(
-          "ctx", Props(factory(inbox.ref)), system)
+      val ctx =
+        new EffectfulActorContext("ctx", Props(factory(inbox.ref)), system)
       val msgs = inbox.receiveAll()
       if (requirePreStart) msgs should ===(GotSignal(PreStart) :: Nil)
       Setup(ctx, inbox)
@@ -306,8 +306,8 @@ class BehaviorSpec extends TypedSpec {
     }
   }
 
-  private def mkFull(
-      monitor: ActorRef[Event], state: State = StateA): Behavior[Command] = {
+  private def mkFull(monitor: ActorRef[Event],
+                     state: State = StateA): Behavior[Command] = {
     import ScalaDSL.{Full, Msg, Sig, Same, Unhandled, Stopped}
     Full {
       case Sig(ctx, signal) ⇒
@@ -353,8 +353,8 @@ class BehaviorSpec extends TypedSpec {
       with Stoppable {
     override def behavior(monitor: ActorRef[Event]): Behavior[Command] =
       behv(monitor, StateA)
-    private def behv(
-        monitor: ActorRef[Event], state: State): Behavior[Command] = {
+    private def behv(monitor: ActorRef[Event],
+                     state: State): Behavior[Command] = {
       import ScalaDSL.{FullTotal, Msg, Sig, Same, Unhandled, Stopped}
       FullTotal {
         case Sig(ctx, signal) ⇒

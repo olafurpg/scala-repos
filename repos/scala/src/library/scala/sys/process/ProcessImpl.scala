@@ -35,12 +35,11 @@ private[process] trait ProcessImpl { self: Process.type =>
 
       val t = Spawn(run())
 
-      (t,
-       () =>
-         result.get match {
-           case Right(value) => value
-           case Left(exception) => throw exception
-       })
+      (t, () =>
+            result.get match {
+          case Right(value) => value
+          case Left(exception) => throw exception
+      })
     }
   }
 
@@ -48,30 +47,26 @@ private[process] trait ProcessImpl { self: Process.type =>
       a: ProcessBuilder,
       b: ProcessBuilder,
       io: ProcessIO
-  )
-      extends SequentialProcess(a, b, io, _ == 0)
+  ) extends SequentialProcess(a, b, io, _ == 0)
 
   private[process] class OrProcess(
       a: ProcessBuilder,
       b: ProcessBuilder,
       io: ProcessIO
-  )
-      extends SequentialProcess(a, b, io, _ != 0)
+  ) extends SequentialProcess(a, b, io, _ != 0)
 
   private[process] class ProcessSequence(
       a: ProcessBuilder,
       b: ProcessBuilder,
       io: ProcessIO
-  )
-      extends SequentialProcess(a, b, io, _ => true)
+  ) extends SequentialProcess(a, b, io, _ => true)
 
   private[process] class SequentialProcess(
       a: ProcessBuilder,
       b: ProcessBuilder,
       io: ProcessIO,
       evaluateSecondProcess: Int => Boolean
-  )
-      extends CompoundProcess {
+  ) extends CompoundProcess {
 
     protected[this] override def runAndExitValue() = {
       val first = a.run(io)
@@ -124,8 +119,8 @@ private[process] trait ProcessImpl { self: Process.type =>
       extends CompoundProcess {
     protected[this] override def runAndExitValue() =
       runAndExitValue(new PipeSource(a.toString), new PipeSink(b.toString))
-    protected[this] def runAndExitValue(
-        source: PipeSource, sink: PipeSink): Option[Int] = {
+    protected[this] def runAndExitValue(source: PipeSource,
+                                        sink: PipeSink): Option[Int] = {
       source connectOut sink
       source.start()
       sink.start()
@@ -164,13 +159,14 @@ private[process] trait ProcessImpl { self: Process.type =>
     }
   }
 
-  private[process] abstract class PipeThread(
-      isSink: Boolean, labelFn: () => String)
+  private[process] abstract class PipeThread(isSink: Boolean,
+                                             labelFn: () => String)
       extends Thread {
     def run(): Unit
 
     private[process] def runloop(src: InputStream, dst: OutputStream): Unit = {
-      try BasicIO.transferFully(src, dst) catch ioFailure(ioHandler) finally BasicIO close {
+      try BasicIO
+        .transferFully(src, dst) catch ioFailure(ioHandler) finally BasicIO close {
         if (isSink) dst else src
       }
     }
@@ -235,13 +231,15 @@ private[process] trait ProcessImpl { self: Process.type =>
     * the process.
     * The implementation of `exitValue` interrupts `inputThread` and then waits until all I/O threads die before
     * returning. */
-  private[process] class SimpleProcess(
-      p: JProcess, inputThread: Thread, outputThreads: List[Thread])
+  private[process] class SimpleProcess(p: JProcess,
+                                       inputThread: Thread,
+                                       outputThreads: List[Thread])
       extends Process {
     override def isAlive() = p.isAlive()
     override def exitValue() = {
       try p.waitFor() // wait for the process to terminate
-      finally inputThread.interrupt() // we interrupt the input thread to notify it that it can terminate
+      finally inputThread
+        .interrupt() // we interrupt the input thread to notify it that it can terminate
       outputThreads foreach (_.join()) // this ensures that all output is complete before returning (waitFor does not ensure this)
 
       p.exitValue()
@@ -253,8 +251,8 @@ private[process] trait ProcessImpl { self: Process.type =>
       } finally inputThread.interrupt()
     }
   }
-  private[process] final class ThreadProcess(
-      thread: Thread, success: SyncVar[Boolean])
+  private[process] final class ThreadProcess(thread: Thread,
+                                             success: SyncVar[Boolean])
       extends Process {
     override def isAlive() = thread.isAlive()
     override def exitValue() = {

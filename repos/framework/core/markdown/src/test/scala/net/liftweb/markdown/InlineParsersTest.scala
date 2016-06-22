@@ -48,8 +48,7 @@ class InlineParsersTest
   }
 
   def runExceptionParsingTests(p: Parser[String], l: List[String]) {
-    for (s <- l) evaluating { apply(p, s) } should produce[
-        IllegalArgumentException]
+    for (s <- l) evaluating { apply(p, s) } should produce[IllegalArgumentException]
   }
 
   val italicTests: List[(String, String)] = List(
@@ -237,8 +236,8 @@ class InlineParsersTest
   }
 
   val ld1 = new LinkDefinition("id", "http://www.example.com", Some("Title"))
-  val ld2 = new LinkDefinition(
-      "id 2", "http://other.example.com", Some("Title 2"))
+  val ld2 =
+    new LinkDefinition("id 2", "http://other.example.com", Some("Title 2"))
   val ld3 = new LinkDefinition("id 3", "http://none.example.com", None)
   val map = Map(ld1.id -> ld1, ld2.id -> ld2, ld3.id -> ld3)
   val ctx = new InlineContext(map)
@@ -303,8 +302,8 @@ class InlineParsersTest
     runSucceedingParsingTests(inline(Map()), allInlineTests)
     val concatTests = for ((a1, a2) <- allInlineTests;
                            (b1, b2) <- allInlineTests;
-                           (c1, c2) <- allInlineTests) yield
-      (a1 + " " + b1 + " " + c1, a2 + " " + b2 + " " + c2);
+                           (c1, c2) <- allInlineTests)
+      yield (a1 + " " + b1 + " " + c1, a2 + " " + b2 + " " + c2);
 
     runSucceedingParsingTests(inline(Map()), concatTests)
   }

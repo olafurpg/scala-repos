@@ -43,12 +43,12 @@ object TypeUtils {
     }
   }
 
-  def checkForSameTypeInputExpr(
-      types: Seq[DataType], caller: String): TypeCheckResult = {
+  def checkForSameTypeInputExpr(types: Seq[DataType],
+                                caller: String): TypeCheckResult = {
     if (types.distinct.size > 1) {
       TypeCheckResult.TypeCheckFailure(
           s"input to $caller should all be the same type, but it's " +
-          types.map(_.simpleString).mkString("[", ", ", "]"))
+            types.map(_.simpleString).mkString("[", ", ", "]"))
     } else {
       TypeCheckResult.TypeCheckSuccess
     }

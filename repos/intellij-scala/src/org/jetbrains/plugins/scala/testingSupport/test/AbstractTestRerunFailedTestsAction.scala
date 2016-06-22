@@ -36,14 +36,15 @@ class AbstractTestRerunFailedTestsAction(
       def getModules: Array[Module] = configuration.getModules
 
       def getTestName(failed: AbstractTestProxy): String = {
-        failed.getLocation(getProject, GlobalSearchScope.allScope(getProject)) match {
+        failed
+          .getLocation(getProject, GlobalSearchScope.allScope(getProject)) match {
           case PsiLocationWithName(_, _, testName) => testName
           case _ => failed.getName
         }
       }
 
-      def getState(
-          executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      def getState(executor: Executor,
+                   env: ExecutionEnvironment): RunProfileState = {
         val extensionConfiguration =
           properties.asInstanceOf[PropertiesExtension].getRunConfigurationBase
         val state = configuration.getState(executor, env)

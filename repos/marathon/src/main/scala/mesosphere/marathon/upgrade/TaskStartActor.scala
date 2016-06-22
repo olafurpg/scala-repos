@@ -35,7 +35,8 @@ class TaskStartActor(val driver: SchedulerDriver,
   override def postStop(): Unit = {
     eventBus.unsubscribe(self)
     if (!promise.isCompleted)
-      promise.tryFailure(new TaskUpgradeCanceledException(
+      promise.tryFailure(
+          new TaskUpgradeCanceledException(
               "The task upgrade has been cancelled"))
   }
 

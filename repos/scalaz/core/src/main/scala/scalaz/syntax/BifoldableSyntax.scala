@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bifoldable` */
-final class BifoldableOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
+final class BifoldableOps[F[_, _], A, B] private[syntax] (val self: F[A, B])(
     implicit val F: Bifoldable[F])
     extends Ops[F[A, B]] {
   ////

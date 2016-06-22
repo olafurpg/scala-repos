@@ -25,8 +25,9 @@ class ScalaAttributeValueSelectioner extends ExtendWordSelectionHandlerBase {
     val end = e.nextElements.toSeq.takeWhile(isPartOfAttributeValue).last
 
     if (start != end) {
-      result.add(new TextRange(start.getTextRange.getStartOffset,
-                               end.getTextRange.getEndOffset))
+      result.add(
+          new TextRange(start.getTextRange.getStartOffset,
+                        end.getTextRange.getEndOffset))
     }
 
     result

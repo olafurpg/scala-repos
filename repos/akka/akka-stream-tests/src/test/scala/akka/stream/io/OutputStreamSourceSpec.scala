@@ -37,8 +37,8 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
   val byteString = ByteString(bytesArray)
 
   def expectTimeout[T](f: Future[T], timeout: Duration) =
-    the[Exception] thrownBy Await.result(f, timeout) shouldBe a[
-        TimeoutException]
+    the[Exception] thrownBy Await
+      .result(f, timeout) shouldBe a[TimeoutException]
 
   def expectSuccess[T](f: Future[T], value: T) =
     Await.result(f, timeout) should be(value)
@@ -135,8 +135,8 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       probe.expectSubscription()
       outputStream.close()
       probe.expectComplete()
-      the[Exception] thrownBy outputStream.write(bytesArray) shouldBe a[
-          IOException]
+      the[Exception] thrownBy outputStream
+        .write(bytesArray) shouldBe a[IOException]
     }
 
     "use dedicated default-blocking-io-dispatcher by default" in assertAllStagesStopped {
@@ -174,8 +174,8 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
       s.cancel()
       sourceProbe.expectMsg(GraphStageMessages.DownstreamFinish)
-      the[Exception] thrownBy outputStream.write(bytesArray) shouldBe a[
-          IOException]
+      the[Exception] thrownBy outputStream
+        .write(bytesArray) shouldBe a[IOException]
     }
 
     "fail to materialize with zero sized input buffer" in {
@@ -212,7 +212,7 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
           .toSeq
           .filter(t ⇒
                 t.getThreadName.startsWith("OutputStreamSourceSpec") &&
-                t.getLockName != null && t.getLockName.startsWith(
+                  t.getLockName != null && t.getLockName.startsWith(
                     "java.util.concurrent.locks.AbstractQueuedSynchronizer"))
 
       awaitAssert(threadsBlocked should ===(Seq()), 3.seconds)

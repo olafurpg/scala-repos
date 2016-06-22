@@ -29,7 +29,7 @@ class ScConstrBlockImpl(node: ASTNode)
   }
 
   override def createMirror(text: String): PsiElement = {
-    ScalaPsiElementFactory.createConstructorBodyWithContextFromText(
-        text, getContext, this)
+    ScalaPsiElementFactory
+      .createConstructorBodyWithContextFromText(text, getContext, this)
   }
 }

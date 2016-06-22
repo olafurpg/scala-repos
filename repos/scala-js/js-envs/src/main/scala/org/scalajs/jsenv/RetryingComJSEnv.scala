@@ -37,18 +37,18 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
 
   def name: String = s"Retrying ${baseEnv.name}"
 
-  def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+  def jsRunner(libs: Seq[ResolvedJSDependency],
+               code: VirtualJSFile): JSRunner = {
     baseEnv.jsRunner(libs, code)
   }
 
-  def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+  def asyncRunner(libs: Seq[ResolvedJSDependency],
+                  code: VirtualJSFile): AsyncJSRunner = {
     baseEnv.asyncRunner(libs, code)
   }
 
-  def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+  def comRunner(libs: Seq[ResolvedJSDependency],
+                code: VirtualJSFile): ComJSRunner = {
     new RetryingComJSRunner(libs, code)
   }
 
@@ -57,8 +57,8 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
     def stop(): Unit = ()
   }
 
-  private class RetryingComJSRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  private class RetryingComJSRunner(libs: Seq[ResolvedJSDependency],
+                                    code: VirtualJSFile)
       extends DummyJSRunner
       with ComJSRunner {
 
@@ -132,8 +132,9 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
         if (hasReceived || retryCount > maxRetries || promise.isCompleted)
           throw cause
 
-        _logger.warn("Retrying to launch a " + baseEnv.getClass.getName +
-            " after " + cause.toString)
+        _logger.warn(
+            "Retrying to launch a " + baseEnv.getClass.getName +
+              " after " + cause.toString)
 
         val oldRunner = curRunner
 
@@ -141,8 +142,9 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
           baseEnv.comRunner(libs, code)
         } catch {
           case NonFatal(t) =>
-            _logger.error("Could not retry: creating an new runner failed: " +
-                t.toString)
+            _logger.error(
+                "Could not retry: creating an new runner failed: " +
+                  t.toString)
             throw cause
         }
 

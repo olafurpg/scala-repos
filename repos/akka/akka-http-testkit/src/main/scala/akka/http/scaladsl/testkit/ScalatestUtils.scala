@@ -22,11 +22,13 @@ trait ScalatestUtils extends MarshallingTestUtils {
     equal(t).matcher[Throwable] compose (x ⇒ Await.result(x.failed, 1.second))
 
   def unmarshalToValue[T: FromEntityUnmarshaller](value: T)(
-      implicit ec: ExecutionContext, mat: Materializer): Matcher[HttpEntity] =
+      implicit ec: ExecutionContext,
+      mat: Materializer): Matcher[HttpEntity] =
     equal(value).matcher[T] compose (unmarshalValue(_))
 
   def unmarshalTo[T: FromEntityUnmarshaller](value: Try[T])(
-      implicit ec: ExecutionContext, mat: Materializer): Matcher[HttpEntity] =
+      implicit ec: ExecutionContext,
+      mat: Materializer): Matcher[HttpEntity] =
     equal(value).matcher[Try[T]] compose (unmarshal(_))
 }
 

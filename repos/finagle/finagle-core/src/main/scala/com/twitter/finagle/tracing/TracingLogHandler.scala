@@ -9,8 +9,7 @@ import java.util.{logging => javalog}
 class TracingLogHandler(
     formatter: Formatter = BareFormatter,
     level: Option[Level] = None
-)
-    extends Handler(formatter, level) {
+) extends Handler(formatter, level) {
 
   def flush() {}
   def close() {}

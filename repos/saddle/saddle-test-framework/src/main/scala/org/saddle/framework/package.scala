@@ -22,9 +22,9 @@ package object framework {
     arbVectorOfN[S](100)
 
   /** Yield an arbitrary Series of 100 values. */
-  implicit def arbSeries[
-      X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen]
-    : Arbitrary[Series[X, S]] = arbSeriesOfN[X, S](100)
+  implicit def arbSeries[X: Gen: Ordering: ClassManifest,
+                         S: ClassManifest: Gen]: Arbitrary[Series[X, S]] =
+    arbSeriesOfN[X, S](100)
 
   /** Yield an arbitrary 10 x 100 Frame. */
   implicit def arbFrame[X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen]
@@ -57,12 +57,13 @@ package object framework {
 
   /** A generator for FrameS of an arbitrary size. */
   def genFrameOfN[X: Gen: Ordering: ScalarTag, S: Gen: ScalarTag](
-      dsize: Int, ssize: Int): Gen[Frame[X, Int, S]] =
+      dsize: Int,
+      ssize: Int): Gen[Frame[X, Int, S]] =
     Gen.listOfN(dsize, genSeriesOfN[X, S](ssize)).map(ss => Frame(ss: _*))
 
   /** Yield an arbitrary 100 x 100 Matrix. */
-  def arbMatrixOfN[S: ClassManifest: Gen](
-      cols: Int, rows: Int): Arbitrary[Mat[S]] =
+  def arbMatrixOfN[S: ClassManifest: Gen](cols: Int,
+                                          rows: Int): Arbitrary[Mat[S]] =
     Arbitrary(genMatrixOfN[S](cols, rows))
 
   /** Yield an arbitrary Vector of 100 values. */
@@ -75,6 +76,7 @@ package object framework {
 
   /** Yield an arbitrary 100 x 100 Series. */
   def arbFrameOfN[X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen](
-      cols: Int, rows: Int): Arbitrary[Frame[X, Int, S]] =
+      cols: Int,
+      rows: Int): Arbitrary[Frame[X, Int, S]] =
     Arbitrary(genFrameOfN[X, S](cols, rows))
 }

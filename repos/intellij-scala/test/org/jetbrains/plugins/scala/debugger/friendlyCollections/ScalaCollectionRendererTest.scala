@@ -35,8 +35,8 @@ class ScalaCollectionRendererTest
       val testVariable = localVar(frameTree, context, variableName)
       val renderer = testVariable.getRenderer(getDebugProcess)
       testVariable.setRenderer(renderer)
-      testVariable.updateRepresentation(
-          context, DescriptorLabelListener.DUMMY_LISTENER)
+      testVariable.updateRepresentation(context,
+                                        DescriptorLabelListener.DUMMY_LISTENER)
       val value = testVariable.calcValue(context)
       renderer.buildChildren(value, new ChildrenBuilder {
         def setChildren(children: util.List[DebuggerTreeNode]) {
@@ -84,7 +84,8 @@ class ScalaCollectionRendererTest
     try {
       val frameProxy = evaluationContext.getFrameProxy
       val local = frameTree.getNodeFactory.getLocalVariableDescriptor(
-          null, frameProxy visibleVariableByName name)
+          null,
+          frameProxy visibleVariableByName name)
       local setContext evaluationContext
       local
     } catch {
@@ -130,8 +131,9 @@ class ScalaCollectionRendererTest
        |}
       """.replace("\r", "").stripMargin.trim)
   def testShortList() {
-    testScalaCollectionRenderer(
-        "lst", 6, "scala.collection.immutable.$colon$colon")
+    testScalaCollectionRenderer("lst",
+                                6,
+                                "scala.collection.immutable.$colon$colon")
   }
 
   addFileWithBreakpoints("Stack.scala",
@@ -158,8 +160,9 @@ class ScalaCollectionRendererTest
        |}
     """.stripMargin.replace("\r", "").trim)
   def testMutableList() {
-    testScalaCollectionRenderer(
-        "mutableList", 5, "scala.collection.mutable.MutableList")
+    testScalaCollectionRenderer("mutableList",
+                                5,
+                                "scala.collection.mutable.MutableList")
   }
 
   addFileWithBreakpoints("Queue.scala",
@@ -185,7 +188,8 @@ class ScalaCollectionRendererTest
        |}
       """.stripMargin.replace("\r", "").trim)
   def testLongList() {
-    testScalaCollectionRenderer(
-        "longList", 50, "scala.collection.immutable.$colon$colon")
+    testScalaCollectionRenderer("longList",
+                                50,
+                                "scala.collection.immutable.$colon$colon")
   }
 }

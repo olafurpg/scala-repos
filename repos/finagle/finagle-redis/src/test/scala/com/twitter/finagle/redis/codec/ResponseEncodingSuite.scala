@@ -26,14 +26,16 @@ final class ResponseEncodingSuite extends RedisResponseTest {
   }
 
   test("Correctly encode bulk replies", CodecTest) {
-    assert(codec.send(BulkReply(StringToChannelBuffer("foo\r\nbar"))) == List(
+    assert(
+        codec.send(BulkReply(StringToChannelBuffer("foo\r\nbar"))) == List(
             "$8\r\nfoo\r\nbar\r\n"))
   }
 
   test("Correctly encode multi bulk replies", CodecTest) {
     val messages = List(BulkReply(StringToChannelBuffer("foo")),
                         BulkReply(StringToChannelBuffer("bar")))
-    assert(codec.send(MBulkReply(messages)) == List(
+    assert(
+        codec.send(MBulkReply(messages)) == List(
             "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"))
   }
 }

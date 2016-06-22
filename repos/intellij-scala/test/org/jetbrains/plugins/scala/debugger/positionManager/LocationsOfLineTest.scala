@@ -30,7 +30,8 @@ class LocationOfLineTest_212
         Set(Loc("Multilevel$This$1$$anon$1", "<init>", 6)),
         Set(Loc("Multilevel$This$1$$anon$1", "run", 8)),
         Set(Loc("Multilevel$This$1$$anon$1", "run", 8)),
-        Set(Loc("Multilevel$This$1$$anon$1",
+        Set(
+            Loc("Multilevel$This$1$$anon$1",
                 "Multilevel$This$1$$anon$1$$$anonfun$1",
                 9)),
         Set(Loc("Multilevel$", "main", 18))

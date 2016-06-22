@@ -68,19 +68,19 @@ private[orc] object OrcFilters extends Logging {
       // Combines all convertible filters using `And` to produce a single conjunction
       conjunction <- convertibleFilters.reduceOption(And)
       // Then tries to build a single ORC `SearchArgument` for the conjunction predicate
-      builder <- buildSearchArgument(
-                    conjunction, SearchArgumentFactory.newBuilder())
+      builder <- buildSearchArgument(conjunction,
+                                     SearchArgumentFactory.newBuilder())
     } yield builder.build()
   }
 
-  private def buildSearchArgument(
-      expression: Filter, builder: Builder): Option[Builder] = {
+  private def buildSearchArgument(expression: Filter,
+                                  builder: Builder): Option[Builder] = {
     def newBuilder = SearchArgumentFactory.newBuilder()
 
     def isSearchableLiteral(value: Any): Boolean = value match {
       // These are types recognized by the `SearchArgumentImpl.BuilderImpl.boxLiteral()` method.
-      case _: String | _: Long | _: Double | _: Byte | _: Short |
-          _: Integer | _: Float =>
+      case _: String | _: Long | _: Double | _: Byte | _: Short | _: Integer |
+          _: Float =>
         true
       case _: DateWritable | _: HiveDecimal | _: HiveChar | _: HiveVarchar =>
         true

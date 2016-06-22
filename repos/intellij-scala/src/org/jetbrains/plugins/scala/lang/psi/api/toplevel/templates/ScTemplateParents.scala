@@ -41,8 +41,8 @@ trait ScTemplateParents extends ScalaPsiElement {
 }
 
 object ScTemplateParents {
-  def extractSupers(
-      typeElements: Seq[ScTypeElement], project: Project): Seq[PsiClass] = {
+  def extractSupers(typeElements: Seq[ScTypeElement],
+                    project: Project): Seq[PsiClass] = {
     typeElements.map {
       case element: ScTypeElement =>
         def tail(): PsiClass = {

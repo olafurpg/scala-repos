@@ -21,8 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScPatternDefinitionImpl private (
-    stub: StubElement[ScValue], nodeType: IElementType, node: ASTNode)
+class ScPatternDefinitionImpl private (stub: StubElement[ScValue],
+                                       nodeType: IElementType,
+                                       node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScPatternDefinition {
   override def accept(visitor: PsiElementVisitor): Unit = {

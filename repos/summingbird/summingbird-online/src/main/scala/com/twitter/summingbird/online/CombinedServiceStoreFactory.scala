@@ -27,9 +27,8 @@ trait CombinedServiceStoreFactory[-K, V]
 
 object CombinedServiceStoreFactory {
 
-  def apply[K, V](
-      onlineStore: => MergeableStore[(K, BatchID), V], batchesToKeep: Int)(
-      implicit b: Batcher) = {
+  def apply[K, V](onlineStore: => MergeableStore[(K, BatchID), V],
+                  batchesToKeep: Int)(implicit b: Batcher) = {
 
     lazy val clientStore =
       ClientStore[K, V](onlineStore, batchesToKeep)(b, onlineStore.semigroup)
@@ -45,8 +44,10 @@ object CombinedServiceStoreFactory {
                   onlineStore: => MergeableStore[(K, BatchID), V],
                   batchesToKeep: Int)(implicit b: Batcher) = {
 
-    lazy val clientStore = ClientStore[K, V](
-        offlineStore, onlineStore, batchesToKeep)(b, onlineStore.semigroup)
+    lazy val clientStore =
+      ClientStore[K, V](offlineStore, onlineStore, batchesToKeep)(
+          b,
+          onlineStore.semigroup)
 
     new CombinedServiceStoreFactory[K, V] {
       def mergeableStore = () => onlineStore

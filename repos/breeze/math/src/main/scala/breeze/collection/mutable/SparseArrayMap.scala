@@ -9,8 +9,8 @@ import scala.reflect.ClassTag
   * 
   * @author dlwh
   */
-class SparseArrayMap[@specialized T: ClassTag: Zero](
-    val length: Int, default: => T)
+class SparseArrayMap[@specialized T: ClassTag: Zero](val length: Int,
+                                                     default: => T)
     extends scala.collection.mutable.Map[Int, T]
     with MapLike[Int, T, SparseArrayMap[T]]
     with Serializable {

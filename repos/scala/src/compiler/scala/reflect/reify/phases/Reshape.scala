@@ -66,15 +66,16 @@ trait Reshape { self: Reifier =>
           if (reifyDebug && discardedParents.length > 0)
             println(
                 "discarding parents in Template: " +
-                discardedParents.mkString(", "))
+                  discardedParents.mkString(", "))
           val parents1 = parents diff discardedParents
           val body1 = reshapeLazyVals(trimSyntheticCaseClassCompanions(body))
           Template(parents1, self, body1).copyAttrs(template)
         case block @ Block(stats, expr) =>
           val stats1 = reshapeLazyVals(trimSyntheticCaseClassCompanions(stats))
           Block(stats1, expr).copyAttrs(block)
-        case unapply @ UnApply(
-            Unapplied(Select(fun, nme.unapply | nme.unapplySeq)), args) =>
+        case unapply @ UnApply(Unapplied(
+                               Select(fun, nme.unapply | nme.unapplySeq)),
+                               args) =>
           if (reifyDebug) println("unapplying unapply: " + tree)
           Apply(fun, args).copyAttrs(unapply)
         case _ =>
@@ -173,7 +174,8 @@ trait Reshape { self: Reifier =>
         if (reifyDebug)
           println("TypeTree, essential: %s (%s)".format(tt.tpe, tt.tpe.kind))
         if (reifyDebug)
-          println("verdict: rolled back to original %s".format(
+          println(
+              "verdict: rolled back to original %s".format(
                   tt.original.toString.replaceAll("\\s+", " ")))
         transform(tt.original)
       } else {
@@ -244,24 +246,23 @@ trait Reshape { self: Reifier =>
       *  If we do not do that, subsequent reflective compilation will fail.
       */
     private def toPreTyperAnnotation(ann: AnnotationInfo): Tree = {
-      val args =
-        if (ann.assocs.isEmpty) {
-          ann.args
-        } else {
-          def toScalaAnnotation(jann: ClassfileAnnotArg): Tree =
-            (jann: @unchecked) match {
-              case LiteralAnnotArg(const) => Literal(const)
-              case ArrayAnnotArg(arr) =>
-                Apply(Ident(definitions.ArrayModule),
-                      arr.toList map toScalaAnnotation)
-              case NestedAnnotArg(ann) => toPreTyperAnnotation(ann)
-            }
-
-          ann.assocs map {
-            case (nme, arg) =>
-              AssignOrNamedArg(Ident(nme), toScalaAnnotation(arg))
+      val args = if (ann.assocs.isEmpty) {
+        ann.args
+      } else {
+        def toScalaAnnotation(jann: ClassfileAnnotArg): Tree =
+          (jann: @unchecked) match {
+            case LiteralAnnotArg(const) => Literal(const)
+            case ArrayAnnotArg(arr) =>
+              Apply(Ident(definitions.ArrayModule),
+                    arr.toList map toScalaAnnotation)
+            case NestedAnnotArg(ann) => toPreTyperAnnotation(ann)
           }
+
+        ann.assocs map {
+          case (nme, arg) =>
+            AssignOrNamedArg(Ident(nme), toScalaAnnotation(arg))
         }
+      }
 
       def extractOriginal: PartialFunction[Tree, Tree] = {
         case Apply(Select(New(tpt), _), _) => tpt
@@ -288,7 +289,7 @@ trait Reshape { self: Reifier =>
 
     private def trimAccessors(deff: Tree, stats: List[Tree]): List[Tree] = {
       val symdefs = (stats collect { case vodef: ValOrDefDef => vodef } map
-          (vodeff => vodeff.symbol -> vodeff)).toMap
+            (vodeff => vodeff.symbol -> vodeff)).toMap
       val accessors = scala.collection.mutable.Map[ValDef, List[DefDef]]()
       stats collect { case ddef: DefDef => ddef } foreach
       (defdef => {
@@ -328,27 +329,27 @@ trait Reshape { self: Reifier =>
       val stats1 =
         stats flatMap {
           case vdef @ ValDef(mods, name, tpt, rhs) if !mods.isLazy =>
-            val mods1 =
-              if (accessors.contains(vdef)) {
-                val ddef = accessors(vdef)(0) // any accessor will do
-                val Modifiers(flags, _, annotations) = mods
-                var flags1 = flags & ~LOCAL
-                if (!ddef.symbol.isPrivate) flags1 = flags1 & ~PRIVATE
-                val privateWithin1 = ddef.mods.privateWithin
-                val annotations1 =
-                  accessors(vdef).foldLeft(annotations)((curr, acc) =>
-                        curr ++
+            val mods1 = if (accessors.contains(vdef)) {
+              val ddef = accessors(vdef)(0) // any accessor will do
+              val Modifiers(flags, _, annotations) = mods
+              var flags1 = flags & ~LOCAL
+              if (!ddef.symbol.isPrivate) flags1 = flags1 & ~PRIVATE
+              val privateWithin1 = ddef.mods.privateWithin
+              val annotations1 =
+                accessors(vdef).foldLeft(annotations)((curr, acc) =>
+                      curr ++
                         (acc.symbol.annotations map toPreTyperAnnotation))
-                Modifiers(flags1, privateWithin1, annotations1) setPositions mods.positions
-              } else {
-                mods
-              }
+              Modifiers(flags1, privateWithin1, annotations1) setPositions mods.positions
+            } else {
+              mods
+            }
             val mods2 = toPreTyperModifiers(mods1, vdef.symbol)
             val name1 = name.dropLocal
             val vdef1 = ValDef(mods2, name1.toTermName, tpt, rhs)
             if (reifyDebug)
-              println("resetting visibility of field: %s => %s".format(vdef,
-                                                                       vdef1))
+              println(
+                  "resetting visibility of field: %s => %s".format(vdef,
+                                                                   vdef1))
             Some(vdef1) // no copyAttrs here, because new ValDef and old symbols are now out of sync
           case ddef: DefDef if !ddef.mods.isLazy =>
             // lazy val accessors are removed in reshapeLazyVals
@@ -400,35 +401,35 @@ trait Reshape { self: Reifier =>
           })
     }
 
-    private def trimSyntheticCaseClassMembers(
-        deff: Tree, stats: List[Tree]): List[Tree] =
+    private def trimSyntheticCaseClassMembers(deff: Tree,
+                                              stats: List[Tree]): List[Tree] =
       stats filterNot
-      (memberDef =>
-            memberDef.isDef && {
-              val isSynthetic = memberDef.symbol.isSynthetic
-              // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
-              // that's why I replace the check with an assumption that all synthetic members are, in fact, generated of case classes
-              // val isCaseMember = deff.symbol.isCaseClass || deff.symbol.companionClass.isCaseClass
-              val isCaseMember = true
-              if (isSynthetic && isCaseMember && reifyDebug)
-                println("discarding case class synthetic def: " + memberDef)
-              isSynthetic && isCaseMember
-          })
+        (memberDef =>
+              memberDef.isDef && {
+                val isSynthetic = memberDef.symbol.isSynthetic
+                // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
+                // that's why I replace the check with an assumption that all synthetic members are, in fact, generated of case classes
+                // val isCaseMember = deff.symbol.isCaseClass || deff.symbol.companionClass.isCaseClass
+                val isCaseMember = true
+                if (isSynthetic && isCaseMember && reifyDebug)
+                  println("discarding case class synthetic def: " + memberDef)
+                isSynthetic && isCaseMember
+            })
 
     private def trimSyntheticCaseClassCompanions(
         stats: List[Tree]): List[Tree] =
       stats diff
-      (stats collect { case moddef: ModuleDef => moddef } filter
-          (moddef => {
-                val isSynthetic = moddef.symbol.isSynthetic
-                // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
-                // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
-                // val isCaseCompanion = moddef.symbol.companionClass.isCaseClass
-                val isCaseCompanion = true
-                if (isSynthetic && isCaseCompanion && reifyDebug)
-                  println(
-                      "discarding synthetic case class companion: " + moddef)
-                isSynthetic && isCaseCompanion
-              }))
+        (stats collect { case moddef: ModuleDef => moddef } filter
+              (moddef => {
+                    val isSynthetic = moddef.symbol.isSynthetic
+                    // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
+                    // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
+                    // val isCaseCompanion = moddef.symbol.companionClass.isCaseClass
+                    val isCaseCompanion = true
+                    if (isSynthetic && isCaseCompanion && reifyDebug)
+                      println(
+                          "discarding synthetic case class companion: " + moddef)
+                    isSynthetic && isCaseCompanion
+                  }))
   }
 }

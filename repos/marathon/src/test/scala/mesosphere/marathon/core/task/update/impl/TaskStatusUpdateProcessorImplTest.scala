@@ -35,8 +35,7 @@ class TaskStatusUpdateProcessorImplTest
   test(
       "process update for unknown task that's not lost will result in a kill and ack") {
     fOpt = Some(new Fixture)
-    val origUpdate =
-      TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
+    val origUpdate = TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
     val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder
       .setTaskId(Task.Id.forApp(appId).mesosTaskId)
       .build()
@@ -65,8 +64,7 @@ class TaskStatusUpdateProcessorImplTest
   test(
       "process update for known task without launchedTask that's not lost will result in a kill and ack") {
     fOpt = Some(new Fixture)
-    val origUpdate =
-      TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
+    val origUpdate = TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
     val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder
       .setTaskId(Task.Id.forApp(appId).mesosTaskId)
       .build()
@@ -76,7 +74,8 @@ class TaskStatusUpdateProcessorImplTest
     Given("an unknown task")
     import scala.concurrent.ExecutionContext.Implicits.global
     f.taskTracker.task(taskId)(global) returns Future.successful(
-        Some(MarathonTestHelper.minimalReservedTask(
+        Some(
+            MarathonTestHelper.minimalReservedTask(
                 taskId.appId,
                 Task.Reservation(Iterable.empty,
                                  MarathonTestHelper.taskReservationStateNew)))
@@ -137,8 +136,9 @@ class TaskStatusUpdateProcessorImplTest
     Given("a known task")
     import scala.concurrent.ExecutionContext.Implicits.global
     f.taskTracker.task(taskId) returns Future.successful(Some(taskState))
-    f.taskUpdater.statusUpdate(appId, status).asInstanceOf[Future[Unit]] returns Future
-      .successful(())
+    f.taskUpdater
+      .statusUpdate(appId, status)
+      .asInstanceOf[Future[Unit]] returns Future.successful(())
     f.appRepository.app(appId, version) returns Future.successful(Some(app))
     And("and a cooperative launchQueue")
     f.launchQueue.notifyOfTaskUpdate(any) returns Future.successful(None)
@@ -182,8 +182,8 @@ class TaskStatusUpdateProcessorImplTest
   lazy val task = MarathonTestHelper
     .makeOneCPUTask(Task.Id.forApp(appId).mesosTaskId.getValue)
     .build()
-  lazy val taskState = MarathonTestHelper.stagedTask(
-      task.getTaskId.getValue, appVersion = version)
+  lazy val taskState = MarathonTestHelper
+    .stagedTask(task.getTaskId.getValue, appVersion = version)
   lazy val marathonTask = taskState.marathonTask
 
   after {
@@ -211,8 +211,8 @@ class TaskStatusUpdateProcessorImplTest
 
     lazy val notifyHealthCheckManager = new NotifyHealthCheckManagerStepImpl(
         healthCheckManager)
-    lazy val notifyRateLimiter = new NotifyRateLimiterStepImpl(
-        launchQueue, appRepository)
+    lazy val notifyRateLimiter =
+      new NotifyRateLimiterStepImpl(launchQueue, appRepository)
     lazy val updateTaskTrackerStep = new UpdateTaskTrackerStepImpl(taskUpdater)
     lazy val postToEventStream = new PostToEventStreamStepImpl(eventBus)
     lazy val notifyLaunchQueue = new NotifyLaunchQueueStepImpl(launchQueue)

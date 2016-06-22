@@ -51,13 +51,10 @@ final class Env(config: Config,
     import reactivemongo.bson._
     private val coll = db("flag")
     private val cache = lila.memo.MixedCache.single[Int](
-        f = coll
-          .find(BSONDocument("_id" -> "asset"))
-          .one[BSONDocument]
-          .map {
-            _.flatMap(_.getAs[BSONNumberLike]("version"))
-              .fold(Net.AssetVersion)(_.toInt max Net.AssetVersion)
-          },
+        f = coll.find(BSONDocument("_id" -> "asset")).one[BSONDocument].map {
+          _.flatMap(_.getAs[BSONNumberLike]("version"))
+            .fold(Net.AssetVersion)(_.toInt max Net.AssetVersion)
+        },
         timeToLive = 30.seconds,
         default = Net.AssetVersion,
         logger = lila.log("assetVersion"))
@@ -118,7 +115,8 @@ final class Env(config: Config,
   lazy val cli = new Cli(system.lilaBus, renderer)
 
   system.actorOf(
-      Props(new KamonPusher(
+      Props(
+          new KamonPusher(
               countUsers = () => userEnv.onlineUserIdMemo.count
           )))
 }

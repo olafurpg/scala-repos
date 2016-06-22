@@ -80,8 +80,10 @@ object Long {
       }
       val radixPowLengthLong = radixPowLength.toLong
       val overflowBarrier = Long.divideUnsigned(-1L, radixPowLengthLong)
-      r += new StringRadixInfo(
-          chunkLength, radixPowLengthLong, paddingZeros, overflowBarrier)
+      r += new StringRadixInfo(chunkLength,
+                               radixPowLengthLong,
+                               paddingZeros,
+                               overflowBarrier)
     }
 
     r
@@ -142,8 +144,8 @@ object Long {
   }
 
   // Must be called only with valid radix
-  private def toUnsignedStringInternalLarge(
-      i: scala.Long, radix: Int): String = {
+  private def toUnsignedStringInternalLarge(i: scala.Long,
+                                            radix: Int): String = {
     import js.JSNumberOps._
     import js.JSStringOps._
 
@@ -210,8 +212,9 @@ object Long {
   @inline def parseUnsignedLong(s: String): scala.Long =
     parseUnsignedLong(s, 10)
 
-  def parseUnsignedLongInternal(
-      s: String, radix: Int, start: Int): scala.Long = {
+  def parseUnsignedLongInternal(s: String,
+                                radix: Int,
+                                start: Int): scala.Long = {
     import js.JSStringOps._
 
     val length = s.length
@@ -316,12 +319,13 @@ object Long {
     divModUnsigned(dividend, divisor, isDivide = true)
 
   // Intrinsic
-  def remainderUnsigned(
-      dividend: scala.Long, divisor: scala.Long): scala.Long =
+  def remainderUnsigned(dividend: scala.Long,
+                        divisor: scala.Long): scala.Long =
     divModUnsigned(dividend, divisor, isDivide = false)
 
-  private def divModUnsigned(
-      a: scala.Long, b: scala.Long, isDivide: scala.Boolean): scala.Long = {
+  private def divModUnsigned(a: scala.Long,
+                             b: scala.Long,
+                             isDivide: scala.Boolean): scala.Long = {
     /* This is a much simplified (and slow) version of
      * RuntimeLong.unsignedDivModHelper.
      */

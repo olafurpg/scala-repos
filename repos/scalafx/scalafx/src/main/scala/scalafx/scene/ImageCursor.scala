@@ -42,8 +42,9 @@ object ImageCursor {
   /**
     * Creates a custom image cursor from one of the specified images.
     */
-  def chooseBestCursor(
-      images: Array[jfxsi.Image], hotspotX: Double, hotspotY: Double) =
+  def chooseBestCursor(images: Array[jfxsi.Image],
+                       hotspotX: Double,
+                       hotspotY: Double) =
     jfxs.ImageCursor.chooseBestCursor(images, hotspotX, hotspotX)
 
   /**

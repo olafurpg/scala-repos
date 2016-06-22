@@ -21,8 +21,9 @@ import io.prediction.data.storage.StorageClientConfig
 import scalikejdbc._
 
 /** JDBC implementation of [[EngineManifests]] */
-class JDBCEngineManifests(
-    client: String, config: StorageClientConfig, prefix: String)
+class JDBCEngineManifests(client: String,
+                          config: StorageClientConfig,
+                          prefix: String)
     extends EngineManifests
     with Logging {
 

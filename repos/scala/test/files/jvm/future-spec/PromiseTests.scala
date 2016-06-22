@@ -172,15 +172,17 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "transform result with map" in {
-      f((future, result) =>
-            Await.result((future map (_.toString.length)), defaultTimeout) mustBe
-            (result.toString.length))
+      f(
+          (future, result) =>
+            Await
+              .result((future map (_.toString.length)), defaultTimeout) mustBe
+              (result.toString.length))
     }
 
     "compose result with flatMap" in {
       f { (future, result) =>
-        val r = for (r <- future; p <- Promise.successful("foo").future) yield
-          r.toString + p
+        val r = for (r <- future; p <- Promise.successful("foo").future)
+          yield r.toString + p
         Await.result(r, defaultTimeout) mustBe (result.toString + "foo")
       }
     }
@@ -206,7 +208,8 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "not recover from exception" in {
-      f((future, result) =>
+      f(
+          (future, result) =>
             Await.result(future.recover({ case _ => "pigdog" }),
                          defaultTimeout) mustBe (result))
     }
@@ -310,9 +313,10 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "project a failure" in {
-      f((future, message) =>
+      f(
+          (future, message) =>
             Await.result(future.failed, defaultTimeout).getMessage mustBe
-            (message))
+              (message))
     }
 
     "perform action on exception" in {

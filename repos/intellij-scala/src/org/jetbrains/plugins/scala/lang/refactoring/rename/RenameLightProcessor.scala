@@ -38,8 +38,8 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
     }
   }
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor): PsiElement = {
     val orig = originalElement(element)
     if (orig != null) {
       val processor = RenamePsiElementProcessor.forElement(orig)
@@ -71,7 +71,7 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
                              newName: String,
                              usages: Array[UsageInfo],
                              listener: RefactoringElementListener) {
-    ScalaRenameUtil.doRenameGenericNamedElement(
-        element, newName, usages, listener)
+    ScalaRenameUtil
+      .doRenameGenericNamedElement(element, newName, usages, listener)
   }
 }

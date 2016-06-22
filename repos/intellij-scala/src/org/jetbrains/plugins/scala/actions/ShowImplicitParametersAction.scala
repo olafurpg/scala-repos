@@ -47,8 +47,8 @@ class ShowImplicitParametersAction
     ScalaActionUtil.enableAndShowIfInScalaFile(e)
   }
 
-  private def presentableText(
-      rr: ScalaResolveResult, context: ScExpression): String = {
+  private def presentableText(rr: ScalaResolveResult,
+                              context: ScExpression): String = {
     val named = rr.getElement
     ScalaPsiUtil.nameContext(named).getContext match {
       case _: ScTemplateBody | _: ScEarlyDefinitions =>
@@ -126,8 +126,8 @@ class ShowImplicitParametersAction
     if (editor.getSelectionModel.hasSelection) {
       val selectionStart = editor.getSelectionModel.getSelectionStart
       val selectionEnd = editor.getSelectionModel.getSelectionEnd
-      val opt = ScalaRefactoringUtil.getExpression(
-          project, editor, file, selectionStart, selectionEnd)
+      val opt = ScalaRefactoringUtil
+        .getExpression(project, editor, file, selectionStart, selectionEnd)
       opt match {
         case Some((expr, _)) =>
           forExpr(expr)
@@ -138,7 +138,7 @@ class ShowImplicitParametersAction
       val element: PsiElement = file.findElementAt(offset) match {
         case w: PsiWhiteSpace
             if w.getTextRange.getStartOffset == offset &&
-            w.getText.contains("\n") =>
+              w.getText.contains("\n") =>
           file.findElementAt(offset - 1)
         case p => p
       }
@@ -165,8 +165,8 @@ class ShowImplicitParametersAction
       }
       val expressions = getExpressions
       def chooseExpression(expr: PsiElement) {
-        editor.getSelectionModel.setSelection(
-            expr.getTextRange.getStartOffset, expr.getTextRange.getEndOffset)
+        editor.getSelectionModel.setSelection(expr.getTextRange.getStartOffset,
+                                              expr.getTextRange.getEndOffset)
         forExpr(expr)
       }
       if (expressions.length == 0) {
@@ -174,18 +174,15 @@ class ShowImplicitParametersAction
       } else if (expressions.length == 1) {
         chooseExpression(expressions(0))
       } else {
-        ScalaRefactoringUtil.showChooser(
-            editor,
-            expressions,
-            (elem: PsiElement) => chooseExpression(elem),
-            "Expressions",
-            (expr: PsiElement) => {
-              expr match {
-                case expr: ScExpression =>
-                  ScalaRefactoringUtil.getShortText(expr)
-                case _ => expr.getText.slice(0, 20)
-              }
-            })
+        ScalaRefactoringUtil
+          .showChooser(editor, expressions, (elem: PsiElement) =>
+                chooseExpression(elem), "Expressions", (expr: PsiElement) => {
+            expr match {
+              case expr: ScExpression =>
+                ScalaRefactoringUtil.getShortText(expr)
+              case _ => expr.getText.slice(0, 20)
+            }
+          })
       }
     }
   }
@@ -208,8 +205,9 @@ class ShowImplicitParametersAction
     null
   }
 
-  private def navigateSelectedElement(
-      popup: JBPopup, jTree: JTree, project: Project): Boolean = {
+  private def navigateSelectedElement(popup: JBPopup,
+                                      jTree: JTree,
+                                      project: Project): Boolean = {
     val selectedNode: AbstractTreeNode[_] = getSelectedNode(jTree)
 
     val succeeded: Ref[Boolean] = new Ref[Boolean]
@@ -235,8 +233,8 @@ class ShowImplicitParametersAction
     succeeded.get
   }
 
-  private def showPopup(
-      editor: Editor, results: Seq[ScalaResolveResult]): Unit = {
+  private def showPopup(editor: Editor,
+                        results: Seq[ScalaResolveResult]): Unit = {
     val project = editor.getProject
 
     val tree = new Tree()
@@ -307,10 +305,11 @@ class ImplicitParametersTreeStructure(project: Project,
     extends AbstractTreeStructure {
   private val manager = PsiManager.getInstance(project)
 
-  class ImplicitParametersNode(
-      value: ScalaResolveResult, implicitResult: Option[ImplicitResult] = None)
-      extends AbstractPsiBasedNode[ScalaResolveResult](
-          project, value, ViewSettings.DEFAULT) {
+  class ImplicitParametersNode(value: ScalaResolveResult,
+                               implicitResult: Option[ImplicitResult] = None)
+      extends AbstractPsiBasedNode[ScalaResolveResult](project,
+                                                       value,
+                                                       ViewSettings.DEFAULT) {
     override def extractPsiFromValue(): PsiNamedElement = value.getElement
 
     override def getChildrenImpl: util.Collection[AbstractTreeNode[_]] = {
@@ -435,7 +434,8 @@ class ImplicitParametersTreeStructure(project: Project,
   }
 
   override def createDescriptor(
-      obj: Any, parent: NodeDescriptor[_]): NodeDescriptor[_] = {
+      obj: Any,
+      parent: NodeDescriptor[_]): NodeDescriptor[_] = {
     obj.asInstanceOf[NodeDescriptor[_]]
   }
 

@@ -37,8 +37,8 @@ class ZkInstance {
     zookeeperServer.setMinSessionTimeout(100)
     connectionFactory = ServerCnxnFactory(InetAddress.getLoopbackAddress)
     connectionFactory.startup(zookeeperServer)
-    zookeeperClient = new ZooKeeperClient(
-        Amount.of(10, Time.MILLISECONDS), zookeeperAddress)
+    zookeeperClient =
+      new ZooKeeperClient(Amount.of(10, Time.MILLISECONDS), zookeeperAddress)
 
     // Disable noise from zookeeper logger
 //    java.util.logging.LogManager.getLogManager().reset();

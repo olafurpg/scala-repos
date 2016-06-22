@@ -92,8 +92,8 @@ object TestLinearWriteSpeed {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, bytesOpt, sizeOpt, filesOpt)
+    CommandLineUtils
+      .checkRequiredArgs(parser, options, bytesOpt, sizeOpt, filesOpt)
 
     var bytesToWrite = options.valueOf(bytesOpt).longValue
     val bufferSize = options.valueOf(sizeOpt).intValue
@@ -126,16 +126,17 @@ object TestLinearWriteSpeed {
             buffer)
       } else if (options.has(channelOpt)) {
         writables(i) = new ChannelWritable(
-            new File(dir, "kafka-test-" + i + ".dat"), buffer)
+            new File(dir, "kafka-test-" + i + ".dat"),
+            buffer)
       } else if (options.has(logOpt)) {
         val segmentSize =
           rand.nextInt(512) * 1024 * 1024 +
-          64 * 1024 * 1024 // vary size to avoid herd effect
+            64 * 1024 * 1024 // vary size to avoid herd effect
         val logProperties = new Properties()
-        logProperties.put(
-            LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
-        logProperties.put(
-            LogConfig.FlushMessagesProp, flushInterval: java.lang.Long)
+        logProperties
+          .put(LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
+        logProperties
+          .put(LogConfig.FlushMessagesProp, flushInterval: java.lang.Long)
         writables(i) = new LogWritable(new File(dir, "kafka-test-" + i),
                                        new LogConfig(logProperties),
                                        scheduler,
@@ -173,7 +174,7 @@ object TestLinearWriteSpeed {
         println(
             "%10.3f\t%10.3f\t%10.3f".format(mb / ellapsedSecs,
                                             totalLatency / count.toDouble /
-                                            (1000.0 * 1000.0),
+                                              (1000.0 * 1000.0),
                                             maxLatency / (1000.0 * 1000.0)))
         lastReport = start
         written = 0

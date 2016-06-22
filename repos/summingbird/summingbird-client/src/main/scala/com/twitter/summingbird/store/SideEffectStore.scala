@@ -26,8 +26,8 @@ import com.twitter.util.Future
   * @author Sam Ritchie
   * @author Oscar Boykin
   */
-class SideEffectStore[K, V](
-    store: MergeableStore[K, V])(sideEffectFn: K => Future[Unit])
+class SideEffectStore[K, V](store: MergeableStore[K, V])(
+    sideEffectFn: K => Future[Unit])
     extends MergeableStore[K, V] {
 
   override def semigroup = store.semigroup

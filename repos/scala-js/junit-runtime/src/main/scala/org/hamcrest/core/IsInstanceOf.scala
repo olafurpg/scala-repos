@@ -13,8 +13,8 @@ class IsInstanceOf private (expectedClass: Class[_], matchableClass: Class[_])
   def this(expectedClass: Class[_]) =
     this(expectedClass, IsInstanceOf.matchableClass(expectedClass))
 
-  override protected def matches(
-      item: AnyRef, mismatch: Description): Boolean = {
+  override protected def matches(item: AnyRef,
+                                 mismatch: Description): Boolean = {
     if (null == item) {
       mismatch.appendText("null")
       false

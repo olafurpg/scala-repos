@@ -190,15 +190,13 @@ trait StringHelpers {
     def addChar(pos: Int, lastRand: Int, sb: GoodSB): GoodSB = {
       if (pos >= size) sb
       else {
-        val randNum =
-          if ((pos % 6) == 0) {
-            _random.synchronized(_random.nextInt)
-          } else {
-            lastRand
-          }
+        val randNum = if ((pos % 6) == 0) {
+          _random.synchronized(_random.nextInt)
+        } else {
+          lastRand
+        }
 
-        sb.append(
-            (randNum & 0x1f) match {
+        sb.append((randNum & 0x1f) match {
           case n if n < 26 => ('A' + n).toChar
           case n => ('0' + (n - 26)).toChar
         })
@@ -225,8 +223,9 @@ trait StringHelpers {
     * @param second default value for the second part if one or less parts can be found
     * @return a pair containing the first and second parts
     */
-  def splitColonPair(
-      in: String, first: String, second: String): (String, String) = {
+  def splitColonPair(in: String,
+                     first: String,
+                     second: String): (String, String) = {
     (in match {
       case null => List("")
       case s if s.indexOf(".") != -1 => s.roboSplit("\\.")
@@ -292,30 +291,30 @@ trait StringHelpers {
     what match {
       case null => Nil
       case str => {
-          val ret = new scala.collection.mutable.ListBuffer[String]
+        val ret = new scala.collection.mutable.ListBuffer[String]
 
-          val len = str.length
-          var pos = 0
-          var lastPos = 0
+        val len = str.length
+        var pos = 0
+        var lastPos = 0
 
-          while (pos < len) {
-            if (str.charAt(pos) == sep) {
-              if (pos > lastPos) {
-                val ns = str.substring(lastPos, pos)
-                ret += ns
-              }
-
-              lastPos = pos + 1
+        while (pos < len) {
+          if (str.charAt(pos) == sep) {
+            if (pos > lastPos) {
+              val ns = str.substring(lastPos, pos)
+              ret += ns
             }
-            pos += 1
-          }
 
-          if (pos > lastPos) {
-            ret += str.substring(lastPos, pos)
+            lastPos = pos + 1
           }
-
-          ret.toList
+          pos += 1
         }
+
+        if (pos > lastPos) {
+          ret += str.substring(lastPos, pos)
+        }
+
+        ret.toList
+      }
     }
 
   /**

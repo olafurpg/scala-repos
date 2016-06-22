@@ -144,24 +144,26 @@ object ResourceUtil {
         case Some(usedResources: Seq[MesosProtos.Resource]) =>
           usedResources
             .foldLeft(Some(resource): Option[MesosProtos.Resource]) {
-            case (Some(resource), usedResource) =>
-              if (resource.getType != usedResource.getType) {
-                log.warn("Different resource types for resource {}: {} and {}",
-                         resource.getName,
-                         resource.getType,
-                         usedResource.getType)
-                None
-              } else
-                try ResourceUtil.consumeResource(resource, usedResource) catch {
-                  case NonFatal(e) =>
-                    log.warn("while consuming {} of type {}",
-                             resource.getName,
-                             resource.getType,
-                             e)
-                    None
-                }
-            case (None, _) => None
-          }
+              case (Some(resource), usedResource) =>
+                if (resource.getType != usedResource.getType) {
+                  log.warn(
+                      "Different resource types for resource {}: {} and {}",
+                      resource.getName,
+                      resource.getType,
+                      usedResource.getType)
+                  None
+                } else
+                  try ResourceUtil
+                    .consumeResource(resource, usedResource) catch {
+                    case NonFatal(e) =>
+                      log.warn("while consuming {} of type {}",
+                               resource.getName,
+                               resource.getType,
+                               e)
+                      None
+                  }
+              case (None, _) => None
+            }
         case None => // if the resource isn't used, we keep it
           Some(resource)
       }
@@ -219,8 +221,8 @@ object ResourceUtil {
     }
   }
 
-  def displayResources(
-      resources: Iterable[MesosProtos.Resource], maxRanges: Int): String = {
+  def displayResources(resources: Iterable[MesosProtos.Resource],
+                       maxRanges: Int): String = {
     resources.map(displayResource(_, maxRanges)).mkString("; ")
   }
 }

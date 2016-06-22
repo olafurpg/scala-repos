@@ -21,7 +21,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
                         )),
             GroupUpdate(
                 "apps".toPath,
-                Set(AppDefinition("app1".toPath,
+                Set(
+                    AppDefinition("app1".toPath,
                                   Some("foo"),
                                   dependencies = Set("d1".toPath,
                                                      "../test/foo".toPath,
@@ -52,13 +53,14 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
 
   test("A group update can be applied to existing entries") {
     Given("A group with updates of existing nodes")
-    val actual = Group(
-        PathId.empty,
-        groups = Set(
-            Group("/test".toPath,
-                  apps = Set(AppDefinition("/test/bla".toPath, Some("foo")))),
-            Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
-        ))
+    val actual =
+      Group(PathId.empty,
+            groups = Set(
+                Group("/test".toPath,
+                      apps =
+                        Set(AppDefinition("/test/bla".toPath, Some("foo")))),
+                Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
+            ))
     val update = GroupUpdate(
         PathId.empty,
         Set.empty[AppDefinition],
@@ -70,7 +72,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
             ),
             GroupUpdate(
                 "apps".toPath,
-                Set(AppDefinition("app1".toPath,
+                Set(
+                    AppDefinition("app1".toPath,
                                   Some("foo"),
                                   dependencies = Set("d1".toPath,
                                                      "../test/foo".toPath,
@@ -125,7 +128,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
             GroupUpdate(
                 "/test/group3".toPath,
                 Set.empty[AppDefinition],
-                Set(GroupUpdate(
+                Set(
+                    GroupUpdate(
                         "/test/group3/sub1".toPath,
                         Set(AppDefinition("/test/group3/sub1/app4".toPath,
                                           Some("foo")))))

@@ -177,16 +177,16 @@ class ReplicaManagerTest {
       }
 
       var fetchCallbackFired = false
-      def fetchCallback(responseStatus: Map[
-              TopicAndPartition, FetchResponsePartitionData]) = {
+      def fetchCallback(responseStatus: Map[TopicAndPartition,
+                                            FetchResponsePartitionData]) = {
         assertEquals("Should give NotLeaderForPartitionException",
                      Errors.NOT_LEADER_FOR_PARTITION.code,
                      responseStatus.values.head.error)
         fetchCallbackFired = true
       }
 
-      val aliveBrokers = Seq(
-          new Broker(0, "host0", 0), new Broker(1, "host1", 1))
+      val aliveBrokers =
+        Seq(new Broker(0, "host0", 0), new Broker(1, "host1", 1))
       val metadataCache = EasyMock.createMock(classOf[MetadataCache])
       EasyMock
         .expect(metadataCache.getAliveBrokers)
@@ -204,13 +204,20 @@ class ReplicaManagerTest {
           0,
           0,
           collection.immutable
-            .Map(new TopicPartition(topic, 0) -> new PartitionState(
-                    0, 0, 0, brokerList, 0, brokerSet))
+            .Map(
+                new TopicPartition(topic, 0) -> new PartitionState(0,
+                                                                   0,
+                                                                   0,
+                                                                   brokerList,
+                                                                   0,
+                                                                   brokerSet))
             .asJava,
           Set(new BrokerEndPoint(0, "host1", 0),
               new BrokerEndPoint(1, "host2", 1)).asJava)
-      rm.becomeLeaderOrFollower(
-          0, leaderAndIsrRequest1, metadataCache, (_, _) => {})
+      rm.becomeLeaderOrFollower(0,
+                                leaderAndIsrRequest1,
+                                metadataCache,
+                                (_, _) => {})
       rm.getLeaderReplicaIfLocal(topic, 0)
 
       // Append a message.
@@ -230,7 +237,8 @@ class ReplicaManagerTest {
           fetchMinBytes = 100000,
           fetchInfo = collection.immutable.Map(
               new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(
-                  0, 100000)),
+                  0,
+                  100000)),
           responseCallback = fetchCallback)
 
       // Make this replica the follower
@@ -238,13 +246,20 @@ class ReplicaManagerTest {
           0,
           0,
           collection.immutable
-            .Map(new TopicPartition(topic, 0) -> new PartitionState(
-                    0, 1, 1, brokerList, 0, brokerSet))
+            .Map(
+                new TopicPartition(topic, 0) -> new PartitionState(0,
+                                                                   1,
+                                                                   1,
+                                                                   brokerList,
+                                                                   0,
+                                                                   brokerSet))
             .asJava,
           Set(new BrokerEndPoint(0, "host1", 0),
               new BrokerEndPoint(1, "host2", 1)).asJava)
-      rm.becomeLeaderOrFollower(
-          1, leaderAndIsrRequest2, metadataCache, (_, _) => {})
+      rm.becomeLeaderOrFollower(1,
+                                leaderAndIsrRequest2,
+                                metadataCache,
+                                (_, _) => {})
 
       assertTrue(produceCallbackFired)
       assertTrue(fetchCallbackFired)

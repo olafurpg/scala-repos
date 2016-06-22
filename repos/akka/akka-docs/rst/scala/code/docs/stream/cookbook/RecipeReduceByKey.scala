@@ -32,7 +32,9 @@ class RecipeReduceByKey extends RecipeSpec {
         .mergeSubstreams
       //#word-count
 
-      Await.result(counts.limit(10).runWith(Sink.seq), 3.seconds).toSet should be(
+      Await
+        .result(counts.limit(10).runWith(Sink.seq), 3.seconds)
+        .toSet should be(
           Set(("hello", 2),
               ("world", 1),
               ("and", 1),
@@ -68,7 +70,9 @@ class RecipeReduceByKey extends RecipeSpec {
                 left + right))
       //#reduce-by-key-general
 
-      Await.result(wordCounts.limit(10).runWith(Sink.seq), 3.seconds).toSet should be(
+      Await
+        .result(wordCounts.limit(10).runWith(Sink.seq), 3.seconds)
+        .toSet should be(
           Set(("hello", 2),
               ("world", 1),
               ("and", 1),

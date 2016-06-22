@@ -142,8 +142,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                                txLogScheduler)(actorSystem)
       } yield {
         nihdbV.disjunction leftMap {
-          ResourceError.fromExtractorError("Failed to create NIHDB in %s as %s"
-                .format(versionDir.toString, authorities))
+          ResourceError.fromExtractorError(
+              "Failed to create NIHDB in %s as %s".format(versionDir.toString,
+                                                          authorities))
         } map {
           NIHDBResource(_)
         }
@@ -231,8 +232,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         blobResult <- IOT {
                        writeResult traverse { size =>
                          logger.debug("Write complete on " + file)
-                         val metadata = BlobMetadata(
-                             mimeType, size, clock.now(), authorities)
+                         val metadata = BlobMetadata(mimeType,
+                                                     size,
+                                                     clock.now(),
+                                                     authorities)
                          //val metadataStore = PersistentJValue(versionDir, blobMetadataFilename)
                          //metadataStore.json = metadata.serialize
                          IOUtils.writeToFile(
@@ -291,8 +294,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
     /** Suck the file into a String */
     def asString(implicit M: Monad[Future]): OptionT[Future, String] =
-      OptionT(
-          M point {
+      OptionT(M point {
         stringTypes
           .contains(mimeType)
           .option(IOUtils.readFileToString(dataFile))
@@ -474,7 +476,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
           actorV <- vlog traverse { versionLog =>
                      logger.debug("Creating new PathManagerActor for " + path)
                      context.actorOf(
-                         Props(new PathManagerActor(
+                         Props(
+                             new PathManagerActor(
                                  path,
                                  VFSPathUtils.versionsSubdir(pathDir),
                                  versionLog,
@@ -537,7 +540,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         logger.debug("Received %d messages for ingest".format(messages.size))
         val requestor = sender
         val groupedAndPermissioned =
-          messages.groupBy({ case (_, event) => event.path }).toStream traverse {
+          messages
+            .groupBy({ case (_, event) => event.path })
+            .toStream traverse {
             case (path, pathMessages) =>
               targetActor(path) map { pathActor =>
                 pathMessages.map(_._2.apiKey).distinct.toStream traverse {
@@ -564,8 +569,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                     }
                   logger.debug(
                       "Sending %d archives, %d storeFiles, and %d events to %s"
-                        .format(
-                          totalArchives, totalStoreFiles, totalEvents, path))
+                        .format(totalArchives,
+                                totalStoreFiles,
+                                totalEvents,
+                                path))
                   pathActor.tell(IngestBundle(pathMessages, allPerms),
                                  requestor)
                 }
@@ -619,8 +626,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
     private def canCreate(path: Path,
                           permissions: Set[WritePermission],
                           authorities: Authorities): Boolean = {
-      logger.trace("Checking write permission for " + path + " as " +
-          authorities + " among " + permissions)
+      logger.trace(
+          "Checking write permission for " + path + " as " +
+            authorities + " among " + permissions)
       PermissionsFinder.canWriteAs(permissions filter {
         _.path.isEqualOrParentOf(path)
       }, authorities)
@@ -645,10 +653,11 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         versionLog.find(version) map {
           case VersionEntry(v, _, _) =>
             val dir = versionDir(v)
-            val openf =
-              if (NIHDB.hasProjection(dir)) { resourceBuilder.openNIHDB _ } else {
-                resourceBuilder.openBlob _
-              }
+            val openf = if (NIHDB.hasProjection(dir)) {
+              resourceBuilder.openNIHDB _
+            } else {
+              resourceBuilder.openBlob _
+            }
 
             for {
               resource <- EitherT {
@@ -662,7 +671,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                          }
             } yield resource
         } getOrElse {
-          left(IO(Corrupt("No version %s found to exist for resource %s."
+          left(
+              IO(Corrupt("No version %s found to exist for resource %s."
                         .format(version, path.path))))
         }
       }
@@ -686,7 +696,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                           bytes :: StreamT.empty[IO, Array[Byte]])
 
                     case NIHDBData(data) =>
-                      resourceBuilder.createNIHDB(versionDir(version), writeAs) flatMap {
+                      resourceBuilder
+                        .createNIHDB(versionDir(version), writeAs) flatMap {
                         _ traverse { nihdbr =>
                           nihdbr tap { _.db.insert(data) }
                         }
@@ -709,8 +720,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       }
     }
 
-    private def maybeExpireCache(
-        apiKey: APIKey, resource: Resource): IO[PrecogUnit] = {
+    private def maybeExpireCache(apiKey: APIKey,
+                                 resource: Resource): IO[PrecogUnit] = {
       resource.fold(
           blobr =>
             IO {
@@ -730,11 +741,12 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       )
     }
 
-    private def maybeCompleteJob(
-        msg: EventMessage, terminal: Boolean, response: PathActionResponse) = {
+    private def maybeCompleteJob(msg: EventMessage,
+                                 terminal: Boolean,
+                                 response: PathActionResponse) = {
       //TODO: Add job progress updates
       (response == UpdateSuccess(msg.path) &&
-          terminal).option(msg.jobId).join traverse {
+            terminal).option(msg.jobId).join traverse {
         jobManager.finish(_, clock.now())
       } map { _ =>
         response
@@ -744,15 +756,17 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
     def processEventMessages(msgs: Stream[(Long, EventMessage)],
                              permissions: Map[APIKey, Set[WritePermission]],
                              requestor: ActorRef): IO[PrecogUnit] = {
-      logger.debug("About to persist %d messages; replying to %s".format(
-              msgs.size, requestor.toString))
+      logger.debug(
+          "About to persist %d messages; replying to %s"
+            .format(msgs.size, requestor.toString))
 
       def openNIHDB(
           version: UUID): EitherT[IO, ResourceError, ProjectionResource] = {
         openResource(version) flatMap {
           _.fold(
               blob =>
-                left(IO(NotFound(
+                left(
+                    IO(NotFound(
                             "Located resource on %s is a BLOB, not a projection" format path.path))),
               db => right(IO(db))
           )
@@ -851,7 +865,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                             versionLog.current.isEmpty,
                             versionLog.isCompleted(streamId)))
               persistNIHDB(versionLog.current.isEmpty &&
-                           !versionLog.isCompleted(streamId),
+                             !versionLog.isCompleted(streamId),
                            offset,
                            msg,
                            streamId,
@@ -860,7 +874,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
             case StreamRef.Replace(streamId, terminal) =>
               logger.trace(
                   "Received replace for %s stream %s: complete: %b".format(
-                      path.path, streamId, versionLog.isCompleted(streamId)))
+                      path.path,
+                      streamId,
+                      versionLog.isCompleted(streamId)))
               persistNIHDB(!versionLog.isCompleted(streamId),
                            offset,
                            msg,
@@ -893,7 +909,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                       .format(path))
               }
               persistFile(versionLog.current.isEmpty &&
-                          !versionLog.isCompleted(streamId),
+                            !versionLog.isCompleted(streamId),
                           offset,
                           msg,
                           streamId,
@@ -912,7 +928,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                           terminal)
 
             case StreamRef.Append =>
-              IO(requestor ! PathOpFailure(
+              IO(
+                  requestor ! PathOpFailure(
                       path,
                       IllegalWriteRequestError(
                           "Append is not yet supported for binary files.")))
@@ -936,7 +953,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
             "Resource entering state of quiescence after receive timeout.")
         val quiesce =
           versions.values.toStream collect { case NIHDBResource(db) => db } traverse
-          (_.quiesce)
+            (_.quiesce)
         quiesce.unsafePerformIO
 
       case IngestBundle(messages, permissions) =>
@@ -954,9 +971,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
               openResource(v.id)
                 .fold(PathOpFailure(path, _), ReadSuccess(path, _))
             } getOrElse {
-              IO(PathOpFailure(path,
-                               NotFound("No current version found for path %s"
-                                     .format(path.path))))
+              IO(
+                  PathOpFailure(path,
+                                NotFound("No current version found for path %s"
+                                      .format(path.path))))
             }
 
           case Version.Archived(id) =>

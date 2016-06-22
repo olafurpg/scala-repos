@@ -31,10 +31,10 @@ object DateRange extends java.io.Serializable {
     * This is called parse to avoid a collision with implicit conversions
     * from String to RichDate
     */
-  def parse(truncatediso8601: String)(
-      implicit tz: TimeZone, dp: DateParser): DateRange =
-    DateRange(
-        RichDate(truncatediso8601), RichDate.upperBound(truncatediso8601))
+  def parse(truncatediso8601: String)(implicit tz: TimeZone,
+                                      dp: DateParser): DateRange =
+    DateRange(RichDate(truncatediso8601),
+              RichDate.upperBound(truncatediso8601))
 
   /**
     * We take the upper bound of the second parameter, so we take the latest time that
@@ -42,7 +42,8 @@ object DateRange extends java.io.Serializable {
     * ("2011-01-02T04", "2011-01-02T05") includes two full hours (all of 4 and all of 5)
     */
   def parse(iso8601start: String, iso8601inclusiveUpper: String)(
-      implicit tz: TimeZone, dp: DateParser): DateRange = {
+      implicit tz: TimeZone,
+      dp: DateParser): DateRange = {
 
     val start = RichDate(iso8601start)
     val end = RichDate.upperBound(iso8601inclusiveUpper)
@@ -54,14 +55,16 @@ object DateRange extends java.io.Serializable {
   /**
     * Pass one or two args (from a scalding.Args .list) to parse into a DateRange
     */
-  def parse(fromArgs: Seq[String])(
-      implicit tz: TimeZone, dp: DateParser): DateRange = fromArgs match {
-    case Seq(s, e) => parse(s, e)
-    case Seq(o) => parse(o)
-    case x =>
-      sys.error("--date must have exactly one or two date[time]s. Got: " +
-          x.toString)
-  }
+  def parse(fromArgs: Seq[String])(implicit tz: TimeZone,
+                                   dp: DateParser): DateRange =
+    fromArgs match {
+      case Seq(s, e) => parse(s, e)
+      case Seq(o) => parse(o)
+      case x =>
+        sys.error(
+            "--date must have exactly one or two date[time]s. Got: " +
+              x.toString)
+    }
 
   /**
     * DateRanges are inclusive. Use this to create a DateRange that excludes

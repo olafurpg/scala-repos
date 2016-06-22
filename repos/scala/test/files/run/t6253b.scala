@@ -51,15 +51,16 @@ object Test extends App {
       require(
           hashCount == hashCount0,
           s"key.hashCode should not be called, but has been called ${hashCount -
-          hashCount0} times. Key type $keyType.")
+            hashCount0} times. Key type $keyType.")
       require(u == (a intersect scala.collection.mutable.HashSet(b.toSeq: _*)),
               s"Operation must still work for other sets!")
       require(
           u.size == i - j,
           s"Expected size ${i + j}. Real size ${u.size}. Key type $keyType.")
-      for (x <- j until i) require(
-          u.contains(mkKey(x)),
-          s"Key type $keyType. Set (0 until ${i + j}) should contain $x but does not.")
+      for (x <- j until i)
+        require(
+            u.contains(mkKey(x)),
+            s"Key type $keyType. Set (0 until ${i + j}) should contain $x but does not.")
       val a_as = a intersect as
       val as_a = as intersect a
       require(

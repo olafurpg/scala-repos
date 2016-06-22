@@ -91,7 +91,7 @@ private[python] class DoubleArrayToWritableConverter
   override def convert(obj: Any): DoubleArrayWritable = obj match {
     case arr
         if arr.getClass.isArray &&
-        arr.getClass.getComponentType == classOf[Double] =>
+          arr.getClass.getComponentType == classOf[Double] =>
       val daw = new DoubleArrayWritable
       daw.set(arr.asInstanceOf[Array[Double]].map(new DoubleWritable(_)))
       daw
@@ -140,8 +140,8 @@ object WriteInputFormatTestDataGenerator {
      * Create test data for IntWritable, DoubleWritable, Text, BytesWritable,
      * BooleanWritable and NullWritable
      */
-    val intKeys = Seq(
-        (1, "aa"), (2, "bb"), (2, "aa"), (3, "cc"), (2, "bb"), (1, "aa"))
+    val intKeys =
+      Seq((1, "aa"), (2, "bb"), (2, "aa"), (3, "cc"), (2, "bb"), (1, "aa"))
     sc.parallelize(intKeys).saveAsSequenceFile(intPath)
     sc.parallelize(intKeys.map { case (k, v) => (k.toDouble, v) })
       .saveAsSequenceFile(doublePath)
@@ -151,8 +151,8 @@ object WriteInputFormatTestDataGenerator {
         case (k, v) => (k, v.getBytes(StandardCharsets.UTF_8))
       })
       .saveAsSequenceFile(bytesPath)
-    val bools = Seq(
-        (1, true), (2, true), (2, false), (3, true), (2, false), (1, false))
+    val bools =
+      Seq((1, true), (2, true), (2, false), (3, true), (2, false), (1, false))
     sc.parallelize(bools).saveAsSequenceFile(boolPath)
     sc.parallelize(intKeys)
       .map {
@@ -174,8 +174,9 @@ object WriteInputFormatTestDataGenerator {
           va.set(v.map(new DoubleWritable(_)))
           (new IntWritable(k), va)
       }
-      .saveAsNewAPIHadoopFile[SequenceFileOutputFormat[
-              IntWritable, DoubleArrayWritable]](arrPath)
+      .saveAsNewAPIHadoopFile[SequenceFileOutputFormat[IntWritable,
+                                                       DoubleArrayWritable]](
+          arrPath)
 
     // Create test data for MapWritable, with keys DoubleWritable and values Text
     val mapData = Seq(

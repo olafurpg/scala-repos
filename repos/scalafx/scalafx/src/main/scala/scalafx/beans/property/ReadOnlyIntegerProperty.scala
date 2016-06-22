@@ -44,8 +44,7 @@ class ReadOnlyIntegerProperty(
     with ReadOnlyProperty[Int, Number]
     with SFXDelegate[jfxbp.ReadOnlyIntegerProperty] {
   def this(bean: Object, name: String, value: Int) =
-    this(
-        new jfxbp.ReadOnlyIntegerPropertyBase() {
+    this(new jfxbp.ReadOnlyIntegerPropertyBase() {
       def getBean = bean
       def getName = name
       def get = value

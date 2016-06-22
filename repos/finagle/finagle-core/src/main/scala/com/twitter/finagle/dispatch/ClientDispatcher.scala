@@ -14,7 +14,8 @@ import java.net.InetSocketAddress
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
 abstract class GenSerialClientDispatcher[Req, Rep, In, Out](
-    trans: Transport[In, Out], statsReceiver: StatsReceiver)
+    trans: Transport[In, Out],
+    statsReceiver: StatsReceiver)
     extends Service[Req, Rep] {
 
   def this(trans: Transport[In, Out]) =
@@ -109,8 +110,8 @@ object GenSerialClientDispatcher {
 /**
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
-class SerialClientDispatcher[Req, Rep](
-    trans: Transport[Req, Rep], statsReceiver: StatsReceiver)
+class SerialClientDispatcher[Req, Rep](trans: Transport[Req, Rep],
+                                       statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Req, Rep, Req, Rep](trans, statsReceiver) {
 
   import GenSerialClientDispatcher.wrapWriteException

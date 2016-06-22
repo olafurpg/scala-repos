@@ -68,8 +68,8 @@ class ScTypeParamElementType[Func <: ScTypeParam]
                             StringRef.fromString(typeParameterText))
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeParamStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTypeParamStub = {
     val name = dataStream.readName
     val upperText = dataStream.readName
     val lowerText = dataStream.readName

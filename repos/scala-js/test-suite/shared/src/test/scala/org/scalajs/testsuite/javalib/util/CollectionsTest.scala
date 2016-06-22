@@ -20,11 +20,11 @@ import scala.reflect.ClassTag
 
 class CollectionsTest extends CollectionsTestBase {
 
-  private def checkImmutablilityOfCollectionApi[E](
-      coll: ju.Collection[E], elem: E): Unit = {
+  private def checkImmutablilityOfCollectionApi[E](coll: ju.Collection[E],
+                                                   elem: E): Unit = {
     expectThrows(classOf[UnsupportedOperationException], coll.add(elem))
-    expectThrows(
-        classOf[UnsupportedOperationException], coll.addAll(List(elem)))
+    expectThrows(classOf[UnsupportedOperationException],
+                 coll.addAll(List(elem)))
     assertFalse(coll.addAll(List.empty[E]))
 
     if (coll.count(_ == elem) != coll.size)
@@ -54,16 +54,17 @@ class CollectionsTest extends CollectionsTestBase {
     checkImmutablilityOfCollectionApi(list, elem)
     expectThrows(classOf[UnsupportedOperationException], list.add(0, elem))
     assertFalse(list.addAll(0, List.empty[E]))
-    expectThrows(
-        classOf[UnsupportedOperationException], list.addAll(0, List(elem)))
+    expectThrows(classOf[UnsupportedOperationException],
+                 list.addAll(0, List(elem)))
     expectThrows(classOf[UnsupportedOperationException], list.remove(0))
   }
 
-  private def checkImmutablilityOfMapApi[K, V](
-      map: ju.Map[K, V], k: K, v: V): Unit = {
+  private def checkImmutablilityOfMapApi[K, V](map: ju.Map[K, V],
+                                               k: K,
+                                               v: V): Unit = {
     expectThrows(classOf[UnsupportedOperationException], map.put(k, v))
-    expectThrows(
-        classOf[UnsupportedOperationException], map.putAll(Map(k -> v)))
+    expectThrows(classOf[UnsupportedOperationException],
+                 map.putAll(Map(k -> v)))
     map.putAll(Map.empty[K, V]) // Should not throw
 
     if (map.containsKey(k)) expectThrows(classOf[Throwable], map.remove(k))

@@ -30,7 +30,7 @@ trait Validators { self: DefaultMacroCompiler =>
         if (isImplMethod) macroImplOwner else macroImplOwner.owner
       val effectivelyStatic =
         effectiveOwner.isStaticOwner ||
-        effectiveOwner.moduleClass.isStaticOwner
+          effectiveOwner.moduleClass.isStaticOwner
       val correctBundleness =
         if (isImplMethod) macroImplOwner.isModuleClass
         else macroImplOwner.isClass && !macroImplOwner.isModuleClass
@@ -48,8 +48,7 @@ trait Validators { self: DefaultMacroCompiler =>
       // we only check strict correspondence between value parameterss
       // type parameters of macro defs and macro impls don't have to coincide with each other
       if (aparamss.length != rparamss.length) MacroImplParamssMismatchError()
-      map2(aparamss, rparamss)(
-          (aparams, rparams) => {
+      map2(aparamss, rparamss)((aparams, rparams) => {
         if (aparams.length < rparams.length)
           MacroImplMissingParamsError(aparams, rparams)
         if (rparams.length < aparams.length)
@@ -81,8 +80,13 @@ trait Validators { self: DefaultMacroCompiler =>
                                  atparams map varianceInType(aret),
                                  upper = false,
                                  maxLubDepth)
-        val boundsOk = typer.silent(_.infer.checkBounds(
-                macroDdef, NoPrefix, NoSymbol, atparams, atargs, ""))
+        val boundsOk = typer.silent(
+            _.infer.checkBounds(macroDdef,
+                                NoPrefix,
+                                NoSymbol,
+                                atparams,
+                                atargs,
+                                ""))
         boundsOk match {
           case SilentResultValue(true) => // do nothing, success
           case SilentResultValue(false) | SilentTypeError(_) =>
@@ -106,14 +110,17 @@ trait Validators { self: DefaultMacroCompiler =>
 
     // Technically this can be just an alias to MethodType, but promoting it to a first-class entity
     // provides better encapsulation and convenient syntax for pattern matching.
-    private case class MacroImplSig(
-        tparams: List[Symbol], paramss: List[List[Symbol]], ret: Type) {
+    private case class MacroImplSig(tparams: List[Symbol],
+                                    paramss: List[List[Symbol]],
+                                    ret: Type) {
       private def tparams_s =
         if (tparams.isEmpty) ""
         else tparams.map(_.defString).mkString("[", ", ", "]")
       private def paramss_s =
         paramss map
-        (ps => ps.map(s => s"${s.name}: ${s.tpe_*}").mkString("(", ", ", ")")) mkString ""
+          (ps =>
+                ps.map(s => s"${s.name}: ${s.tpe_*}")
+                  .mkString("(", ", ", ")")) mkString ""
       override def toString =
         "MacroImplSig(" + tparams_s + paramss_s + ret + ")"
     }
@@ -141,8 +148,9 @@ trait Validators { self: DefaultMacroCompiler =>
       */
     private lazy val macroImplSig: MacroImplSig = {
       val tparams = macroImpl.typeParams
-      val paramss = transformTypeTagEvidenceParams(
-          macroImplRef, (param, tparam) => NoSymbol)
+      val paramss =
+        transformTypeTagEvidenceParams(macroImplRef, (param, tparam) =>
+              NoSymbol)
       val ret = macroImpl.info.finalResultType
       MacroImplSig(tparams, paramss, ret)
     }
@@ -185,8 +193,8 @@ trait Validators { self: DefaultMacroCompiler =>
                 NoPrefix,
                 makeParam(nme.macroContext, macroDdef.pos, ctxTpe, SYNTHETIC))
           else
-            singleType(
-                ThisType(macroImpl.owner), macroImpl.owner.tpe.member(nme.c))
+            singleType(ThisType(macroImpl.owner),
+                       macroImpl.owner.tpe.member(nme.c))
         val paramss =
           if (isImplMethod)
             List(ctxPrefix.termSymbol) :: mmap(macroDdef.vparamss)(param)
@@ -235,8 +243,8 @@ trait Validators { self: DefaultMacroCompiler =>
 
       import SigGenerator._
       macroLogVerbose(s"generating macroImplSigs for: $macroDdef")
-      val result = MacroImplSig(
-          macroDdef.tparams map (_.symbol), paramss, implReturnType)
+      val result =
+        MacroImplSig(macroDdef.tparams map (_.symbol), paramss, implReturnType)
       macroLogVerbose(s"result is: $result")
       result
     }

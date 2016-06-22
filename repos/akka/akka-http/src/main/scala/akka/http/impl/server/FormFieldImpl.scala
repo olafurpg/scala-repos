@@ -56,7 +56,10 @@ object FormFieldImpl {
     new FormFieldImpl[T, U](receptacle)(fu, tTag, conv)
 
   def apply[T, U](receptacle: NameUnmarshallerReceptacle[T])(
-      implicit tTag: ClassTag[U], conv: T ⇒ U): FormField[U] =
+      implicit tTag: ClassTag[U],
+      conv: T ⇒ U): FormField[U] =
     apply(new NameReceptacle[T](receptacle.name))(
-        StrictForm.Field.unmarshallerFromFSU(receptacle.um), tTag, conv)
+        StrictForm.Field.unmarshallerFromFSU(receptacle.um),
+        tTag,
+        conv)
 }

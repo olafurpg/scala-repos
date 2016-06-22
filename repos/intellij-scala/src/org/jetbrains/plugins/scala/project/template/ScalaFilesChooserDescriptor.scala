@@ -11,7 +11,8 @@ class ScalaFilesChooserDescriptor
     extends AbstractFilesChooserDescriptor("Scala", ScalaSdkDescriptor)
 
 abstract class AbstractFilesChooserDescriptor(
-    languageName: String, sdkDescriptor: SdkDescriptorCompanion)
+    languageName: String,
+    sdkDescriptor: SdkDescriptorCompanion)
     extends FileChooserDescriptor(true, true, true, true, false, true) {
   setTitle(s"$languageName SDK files")
   setDescription(

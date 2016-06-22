@@ -16,9 +16,9 @@ object SphinxDoc {
       // generate online version of docs
       sphinxInputs in Sphinx <<=
         sphinxInputs in Sphinx in LocalProject(AkkaBuild.docs.id) map {
-        inputs =>
-          inputs.copy(tags = inputs.tags :+ "online")
-      },
+          inputs =>
+            inputs.copy(tags = inputs.tags :+ "online")
+        },
       // don't regenerate the pdf, just reuse the akka-docs version
       generatedPdf in Sphinx <<=
         generatedPdf in Sphinx in LocalProject(AkkaBuild.docs.id) map identity,
@@ -31,9 +31,9 @@ object SphinxDoc {
         sourceDirectory in Sphinx <<= baseDirectory / "rst",
         watchSources <++=
           (sourceDirectory in Sphinx, excludeFilter in Global) map {
-          (source, excl) =>
-            source descendantsExcept ("*.rst", excl) get
-        },
+            (source, excl) =>
+              source descendantsExcept ("*.rst", excl) get
+          },
         sphinxPackages in Sphinx <+=
           baseDirectory { _ / "_sphinx" / "pygments" },
         // copy akka-contrib/docs into our rst_preprocess/contrib (and apply substitutions)
@@ -74,20 +74,20 @@ object SphinxDoc {
               "version" -> v,
               "scalaVersion" -> s,
               "crossString" ->
-              (s match {
-                    case BinVer(_) => ""
-                    case _ => "cross CrossVersion.full"
-                  }),
+                (s match {
+                      case BinVer(_) => ""
+                      case _ => "cross CrossVersion.full"
+                    }),
               "jarName" ->
-              (s match {
-                    case BinVer(bv) => "akka-actor_" + bv + "-" + v + ".jar"
-                    case _ => "akka-actor_" + s + "-" + v + ".jar"
-                  }),
+                (s match {
+                      case BinVer(bv) => "akka-actor_" + bv + "-" + v + ".jar"
+                      case _ => "akka-actor_" + s + "-" + v + ".jar"
+                    }),
               "binVersion" ->
-              (s match {
-                    case BinVer(bv) => bv
-                    case _ => s
-                  }),
+                (s match {
+                      case BinVer(bv) => bv
+                      case _ => s
+                    }),
               "sigarVersion" -> Dependencies.Compile.sigar.revision,
               "sigarLoaderVersion" -> Dependencies.Compile.Provided.sigarLoader.revision,
               "github" -> GitHub.url(v)
@@ -109,8 +109,8 @@ object SphinxDoc {
         },
             sphinxInputs <<=
               (sphinxInputs, preprocess) map { (inputs, preprocessed) =>
-          inputs.copy(src = preprocessed)
-        }
+            inputs.copy(src = preprocessed)
+          }
         )) ++ Seq(
         cleanFiles <+= target in preprocess in Sphinx
     )

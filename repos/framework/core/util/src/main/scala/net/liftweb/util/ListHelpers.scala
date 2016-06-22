@@ -75,34 +75,33 @@ trait ListHelpers {
       (o, n) match {
         case (o, Nil) => o.foreach(t => ret += f(RemoveDelta(t)))
         case (Nil, n) => {
-            n.foreach { t =>
-              ret += f(
-                  insertAfter match {
-                case Full(x) => InsertAfterDelta(t, x)
-                case _ => AppendDelta(t)
-              })
-              insertAfter = Full(t)
-            }
+          n.foreach { t =>
+            ret += f(insertAfter match {
+              case Full(x) => InsertAfterDelta(t, x)
+              case _ => AppendDelta(t)
+            })
+            insertAfter = Full(t)
           }
+        }
 
         case (o :: or, n :: nr) if o == n => {
-            insertAfter = Full(n)
-            loop(or, nr)
-          }
+          insertAfter = Full(n)
+          loop(or, nr)
+        }
 
         case (or, n :: nr) if !or.contains(n) => {
-            insertAfter match {
-              case Full(x) => ret += f(InsertAfterDelta(n, x))
-              case _ => ret += f(InsertAtStartDelta(n))
-            }
-            insertAfter = Full(n)
-            loop(or, nr)
+          insertAfter match {
+            case Full(x) => ret += f(InsertAfterDelta(n, x))
+            case _ => ret += f(InsertAtStartDelta(n))
           }
+          insertAfter = Full(n)
+          loop(or, nr)
+        }
 
         case (o :: or, nr) => {
-            ret += f(RemoveDelta(o))
-            loop(or, nr)
-          }
+          ret += f(RemoveDelta(o))
+          loop(or, nr)
+        }
       }
     }
 
@@ -223,8 +222,7 @@ trait ListHelpers {
       case Nil => Nil
       case x :: Nil => List(List(x))
       case xs =>
-        rotateList(xs).flatMap(
-            x =>
+        rotateList(xs).flatMap(x =>
               (x: @unchecked) match {
             case x :: xs => permuteList(xs).map(x :: _)
             case _ => Nil
@@ -244,8 +242,7 @@ trait ListHelpers {
       case x :: Nil => List(List(x))
       case xs =>
         val rot = rotateList(xs)
-        val ret = rot.flatMap(
-            z =>
+        val ret = rot.flatMap(z =>
               (z: @unchecked) match {
             case x :: xs => permuteList(xs).map(x :: _)
         })

@@ -225,8 +225,10 @@ object StateSpec {
     * @tparam MappedType   Class of the mapped data
     */
   def function[KeyType, ValueType, StateType, MappedType](
-      mappingFunction: JFunction3[
-          KeyType, Optional[ValueType], State[StateType], MappedType])
+      mappingFunction: JFunction3[KeyType,
+                                  Optional[ValueType],
+                                  State[StateType],
+                                  MappedType])
     : StateSpec[KeyType, ValueType, StateType, MappedType] = {
     val wrappedFunc = (k: KeyType, v: Option[ValueType],
                        s: State[StateType]) => {

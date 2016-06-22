@@ -89,16 +89,16 @@ class MarathonSchedulerService @Inject()(
   val latch = new CountDownLatch(1)
 
   // Time to wait before trying to reconcile app tasks after driver starts
-  val reconciliationInitialDelay = Duration(
-      config.reconciliationInitialDelay(), MILLISECONDS)
+  val reconciliationInitialDelay =
+    Duration(config.reconciliationInitialDelay(), MILLISECONDS)
 
   // Interval between task reconciliation operations
-  val reconciliationInterval = Duration(
-      config.reconciliationInterval(), MILLISECONDS)
+  val reconciliationInterval =
+    Duration(config.reconciliationInterval(), MILLISECONDS)
 
   // Time to wait before trying to scale apps after driver starts
-  val scaleAppsInitialDelay = Duration(
-      config.scaleAppsInitialDelay(), MILLISECONDS)
+  val scaleAppsInitialDelay =
+    Duration(config.scaleAppsInitialDelay(), MILLISECONDS)
 
   // Interval between attempts to scale apps
   val scaleAppsInterval = Duration(config.scaleAppsInterval(), MILLISECONDS)
@@ -121,8 +121,8 @@ class MarathonSchedulerService @Inject()(
 
   def deploy(plan: DeploymentPlan, force: Boolean = false): Future[Unit] = {
     log.info(s"Deploy plan with force=$force:\n$plan ")
-    val future: Future[Any] = PromiseActor.askWithoutTimeout(
-        system, schedulerActor, Deploy(plan, force))
+    val future: Future[Any] = PromiseActor
+      .askWithoutTimeout(system, schedulerActor, Deploy(plan, force))
     future.map {
       case DeploymentStarted(_) => ()
       case CommandFailed(_, t) => throw t
@@ -258,8 +258,8 @@ class MarathonSchedulerService @Inject()(
 
     log.info(
         s"Call onDefeated leadership callbacks on ${leadershipCallbacks.mkString(", ")}")
-    Await.result(
-        Future.sequence(leadershipCallbacks.map(_.onDefeated)), zkTimeout)
+    Await.result(Future.sequence(leadershipCallbacks.map(_.onDefeated)),
+                 zkTimeout)
     log.info(s"Finished onDefeated leadership callbacks")
 
     // Our leadership has been defeated and thus we call the defeatLeadership() method.
@@ -418,8 +418,8 @@ class MarathonSchedulerService @Inject()(
     )
   }
 
-  private def abdicateAfterFailure(
-      abdicationCommand: () => Unit, runAbdicationCommand: Boolean): Unit =
+  private def abdicateAfterFailure(abdicationCommand: () => Unit,
+                                   runAbdicationCommand: Boolean): Unit =
     synchronized {
 
       increaseOfferLeadershipBackOff()
@@ -435,14 +435,14 @@ class MarathonSchedulerService @Inject()(
     }
 
   private def startLeaderDurationMetric() = {
-    metrics.gauge(
-        "service.mesosphere.marathon.leaderDuration", new Gauge[Long] {
-      val startedAt = System.currentTimeMillis()
+    metrics
+      .gauge("service.mesosphere.marathon.leaderDuration", new Gauge[Long] {
+        val startedAt = System.currentTimeMillis()
 
-      override def getValue: Long = {
-        System.currentTimeMillis() - startedAt
-      }
-    })
+        override def getValue: Long = {
+          System.currentTimeMillis() - startedAt
+        }
+      })
   }
   private def stopLeaderDurationMetric() = {
     metrics.registry.remove("service.mesosphere.marathon.leaderDuration")

@@ -83,8 +83,7 @@ trait Role {
   def getRoleByName(roleName: String): Box[Role] =
     (this.name == roleName) match {
       case false =>
-        childs.find(
-            role =>
+        childs.find(role =>
               role.getRoleByName(roleName) match {
             case Empty => false
             case theRole @ _ => return theRole

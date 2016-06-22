@@ -11,7 +11,8 @@ import com.intellij.openapi.project.Project
   * Date: 05.02.2009
   */
 class ScalaScriptRunConfigurationEditor(
-    project: Project, configuration: ScalaScriptRunConfiguration)
+    project: Project,
+    configuration: ScalaScriptRunConfiguration)
     extends SettingsEditor[ScalaScriptRunConfiguration] {
   val form = new ScalaScriptRunConfigurationForm(project, configuration)
 

@@ -190,8 +190,10 @@ object BitSetUtil {
 
   def bitSetToList(bs: BitSet): List[Int] = {
     @tailrec
-    def loopBits(
-        long: Long, bit: Int, base: Int, sofar: List[Int]): List[Int] = {
+    def loopBits(long: Long,
+                 bit: Int,
+                 base: Int,
+                 sofar: List[Int]): List[Int] = {
       if (bit < 0) sofar
       else if (((long >> bit) & 1) == 1)
         loopBits(long, bit - 1, base, (base + bit) :: sofar)
@@ -199,8 +201,10 @@ object BitSetUtil {
     }
 
     @tailrec
-    def loopLongs(
-        i: Int, longs: Array[Long], base: Int, sofar: List[Int]): List[Int] = {
+    def loopLongs(i: Int,
+                  longs: Array[Long],
+                  base: Int,
+                  sofar: List[Int]): List[Int] = {
       if (i < 0) sofar
       else
         loopLongs(i - 1, longs, base - 64, loopBits(longs(i), 63, base, sofar))

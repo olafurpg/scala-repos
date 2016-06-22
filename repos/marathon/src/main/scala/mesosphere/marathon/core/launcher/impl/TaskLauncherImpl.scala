@@ -35,8 +35,9 @@ private[launcher] class TaskLauncherImpl(
       if (log.isDebugEnabled()) {
         log.debug(s"Operations on $offerID:\n${operations.mkString("\n")}")
       }
-      driver.acceptOffers(
-          Collections.singleton(offerID), operations.asJava, noFilter)
+      driver.acceptOffers(Collections.singleton(offerID),
+                          operations.asJava,
+                          noFilter)
     }
     if (accepted) {
       usedOffersMeter.mark()
@@ -49,11 +50,12 @@ private[launcher] class TaskLauncherImpl(
     accepted
   }
 
-  override def declineOffer(
-      offerID: OfferID, refuseMilliseconds: Option[Long]): Unit = {
+  override def declineOffer(offerID: OfferID,
+                            refuseMilliseconds: Option[Long]): Unit = {
     val declined = withDriver(s"declineOffer(${offerID.getValue})") {
       val filters = refuseMilliseconds
-        .map(seconds =>
+        .map(
+            seconds =>
               Protos.Filters
                 .newBuilder()
                 .setRefuseSeconds(seconds / 1000.0)

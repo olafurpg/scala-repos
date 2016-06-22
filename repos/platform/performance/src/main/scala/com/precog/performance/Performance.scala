@@ -27,26 +27,26 @@ class Performance(
     benchmarkDefaults: BenchmarkParameters = Performance.benchmarkDefaults,
     profileDefaults: BenchmarkParameters = Performance.profileDefaults) {
 
-  def profile[T](
-      test: => T, profileParams: BenchmarkParameters = profileDefaults) = {
+  def profile[T](test: => T,
+                 profileParams: BenchmarkParameters = profileDefaults) = {
     benchmarkOnly(test, profileParams)
   }
 
   def benchmark[T](test: => T,
                    warmupParams: BenchmarkParameters = warmupDefaults,
-                   benchmarkParams: BenchmarkParameters =
-                     benchmarkDefaults): BenchmarkResults[T] = {
+                   benchmarkParams: BenchmarkParameters = benchmarkDefaults)
+    : BenchmarkResults[T] = {
     benchmarkOnly(test, warmupParams)
     benchmarkOnly(test, benchmarkParams)
   }
 
   def benchmarkOnly[T](test: => T,
-                       parameters: BenchmarkParameters =
-                         benchmarkDefaults): BenchmarkResults[T] = {
+                       parameters: BenchmarkParameters = benchmarkDefaults)
+    : BenchmarkResults[T] = {
 
     @tailrec
-    def benchmark[A](
-        test: => A, result: BenchmarkResults[A]): BenchmarkResults[A] = {
+    def benchmark[A](test: => A,
+                     result: BenchmarkResults[A]): BenchmarkResults[A] = {
       if (result.testRuns < parameters.testRuns) {
         val (t, r) = time(result.repCount, test)
         parameters.restBetweenTests foreach { Thread.sleep }
@@ -74,15 +74,14 @@ class Performance(
 
     def noop = ()
 
-    val overhead =
-      if (parameters.calcOverhead) {
-        val baseline = benchmark(
-            noop,
-            BenchmarkResults(0, 10, 0, Vector.empty[Long], Vector.empty[Unit]))
-        baseline.meanRepTime()
-      } else {
-        0.0
-      }
+    val overhead = if (parameters.calcOverhead) {
+      val baseline = benchmark(
+          noop,
+          BenchmarkResults(0, 10, 0, Vector.empty[Long], Vector.empty[Unit]))
+      baseline.meanRepTime()
+    } else {
+      0.0
+    }
 
     benchmark(test,
               BenchmarkResults(0,
@@ -112,8 +111,8 @@ object Performance {
 
   val warmupDefaults = BenchmarkParameters(10, 1000)
   val benchmarkDefaults = BenchmarkParameters(200, 1000)
-  val profileDefaults = BenchmarkParameters(
-      Int.MaxValue, 1000, Some(500), false, false)
+  val profileDefaults =
+    BenchmarkParameters(Int.MaxValue, 1000, Some(500), false, false)
 
   def apply(warmupDefaults: BenchmarkParameters = this.warmupDefaults,
             benchmarkDefaults: BenchmarkParameters = this.benchmarkDefaults) =
@@ -126,8 +125,11 @@ case class BenchmarkResults[T](testRuns: Int,
                                timings: Vector[Long],
                                results: Vector[T] = Vector.empty[T]) {
   def add(timing: Long, result: T): BenchmarkResults[T] =
-    BenchmarkResults(
-        testRuns + 1, repCount, baseline, timings :+ timing, results :+ result)
+    BenchmarkResults(testRuns + 1,
+                     repCount,
+                     baseline,
+                     timings :+ timing,
+                     results :+ result)
 
   private val reportTemplate =
     """

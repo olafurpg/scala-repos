@@ -40,8 +40,9 @@ private[akka] object ReplicatorMessageSerializer {
     * `evict` must be called from the outside, i.e. the
     * cache will not cleanup itself.
     */
-  final class SmallCache[A <: AnyRef, B <: AnyRef](
-      size: Int, timeToLive: FiniteDuration, getOrAddFactory: A ⇒ B) {
+  final class SmallCache[A <: AnyRef, B <: AnyRef](size: Int,
+                                                   timeToLive: FiniteDuration,
+                                                   getOrAddFactory: A ⇒ B) {
     require((size & (size - 1)) == 0, "size must be a power of 2")
     require(size <= 32, "size must be <= 32")
 
@@ -148,10 +149,12 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     .getDuration("akka.cluster.distributed-data.serializer-cache-time-to-live",
                  TimeUnit.MILLISECONDS)
     .millis
-  private val readCache = new SmallCache[Read, Array[Byte]](
-      4, cacheTimeToLive, m ⇒ readToProto(m).toByteArray)
-  private val writeCache = new SmallCache[Write, Array[Byte]](
-      4, cacheTimeToLive, m ⇒ writeToProto(m).toByteArray)
+  private val readCache =
+    new SmallCache[Read, Array[Byte]](4, cacheTimeToLive, m ⇒
+          readToProto(m).toByteArray)
+  private val writeCache =
+    new SmallCache[Write, Array[Byte]](4, cacheTimeToLive, m ⇒
+          writeToProto(m).toByteArray)
   system.scheduler.schedule(cacheTimeToLive, cacheTimeToLive / 2) {
     readCache.evict()
     writeCache.evict()
@@ -244,7 +247,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     b.setChunk(status.chunk).setTotChunks(status.totChunks)
     val entries = status.digests.foreach {
       case (key, digest) ⇒
-        b.addEntries(dm.Status.Entry
+        b.addEntries(
+            dm.Status.Entry
               .newBuilder()
               .setKey(key)
               .setDigest(ByteString.copyFrom(digest.toArray)))
@@ -265,7 +269,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     val b = dm.Gossip.newBuilder().setSendBack(gossip.sendBack)
     val entries = gossip.updatedData.foreach {
       case (key, data) ⇒
-        b.addEntries(dm.Gossip.Entry
+        b.addEntries(
+            dm.Gossip.Entry
               .newBuilder()
               .setKey(key)
               .setEnvelope(dataEnvelopeToProto(data)))
@@ -450,8 +455,9 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
           else
             PruningState.PruningInitialized(pruningEntry.getSeenList.asScala
                   .map(addressFromProto)(breakOut))
-        val state = PruningState(
-            uniqueAddressFromProto(pruningEntry.getOwnerAddress), phase)
+        val state =
+          PruningState(uniqueAddressFromProto(pruningEntry.getOwnerAddress),
+                       phase)
         val removed = uniqueAddressFromProto(pruningEntry.getRemovedAddress)
         removed -> state
       }(breakOut)

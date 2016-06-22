@@ -51,8 +51,8 @@ class SbtExternalSystemManager
         ExternalSystemConstants.EXTERNAL_SYSTEM_ID_KEY,
         SbtProjectSystem.Id.getId)
 
-    parameters.getVMParametersList.addProperty(
-        PathManager.PROPERTY_LOG_PATH, PathManager.getLogPath)
+    parameters.getVMParametersList
+      .addProperty(PathManager.PROPERTY_LOG_PATH, PathManager.getLogPath)
   }
 
   def getSystemId = SbtProjectSystem.Id
@@ -115,8 +115,8 @@ object SbtExternalSystemManager {
     jdkInImportSettings.orElse(jdkInProject)
   }
 
-  private def getVmExecutable(
-      projectJdkName: Option[String], settings: SbtSystemSettings): File =
+  private def getVmExecutable(projectJdkName: Option[String],
+                              settings: SbtSystemSettings): File =
     if (!ApplicationManager.getApplication.isUnitTestMode)
       getRealVmExecutable(projectJdkName, settings)
     else getUnitTestVmExecutable
@@ -129,8 +129,8 @@ object SbtExternalSystemManager {
     new File(sdkType.getVMExecutablePath(sdk))
   }
 
-  private def getRealVmExecutable(
-      projectJdkName: Option[String], settings: SbtSystemSettings): File = {
+  private def getRealVmExecutable(projectJdkName: Option[String],
+                                  settings: SbtSystemSettings): File = {
     val customVmFile = new File(settings.getCustomVMPath) / "bin" / "java"
     val customVmExecutable = settings.customVMEnabled.option(customVmFile)
 

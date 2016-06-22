@@ -213,8 +213,8 @@ object Behavior {
     */
   @SerialVersionUID(1L)
   private[akka] object emptyBehavior extends Behavior[Any] {
-    override def management(
-        ctx: ActorContext[Any], msg: Signal): Behavior[Any] =
+    override def management(ctx: ActorContext[Any],
+                            msg: Signal): Behavior[Any] =
       ScalaDSL.Unhandled
     override def message(ctx: ActorContext[Any], msg: Any): Behavior[Any] =
       ScalaDSL.Unhandled
@@ -226,8 +226,8 @@ object Behavior {
     */
   @SerialVersionUID(1L)
   private[akka] object ignoreBehavior extends Behavior[Any] {
-    override def management(
-        ctx: ActorContext[Any], msg: Signal): Behavior[Any] = ScalaDSL.Same
+    override def management(ctx: ActorContext[Any],
+                            msg: Signal): Behavior[Any] = ScalaDSL.Same
     override def message(ctx: ActorContext[Any], msg: Any): Behavior[Any] =
       ScalaDSL.Same
     override def toString = "Ignore"
@@ -238,11 +238,11 @@ object Behavior {
     */
   @SerialVersionUID(1L)
   private[akka] object unhandledBehavior extends Behavior[Nothing] {
-    override def management(
-        ctx: ActorContext[Nothing], msg: Signal): Behavior[Nothing] =
+    override def management(ctx: ActorContext[Nothing],
+                            msg: Signal): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
-    override def message(
-        ctx: ActorContext[Nothing], msg: Nothing): Behavior[Nothing] =
+    override def message(ctx: ActorContext[Nothing],
+                         msg: Nothing): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def toString = "Unhandled"
   }
@@ -252,11 +252,11 @@ object Behavior {
     */
   @SerialVersionUID(1L)
   private[akka] object sameBehavior extends Behavior[Nothing] {
-    override def management(
-        ctx: ActorContext[Nothing], msg: Signal): Behavior[Nothing] =
+    override def management(ctx: ActorContext[Nothing],
+                            msg: Signal): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
-    override def message(
-        ctx: ActorContext[Nothing], msg: Nothing): Behavior[Nothing] =
+    override def message(ctx: ActorContext[Nothing],
+                         msg: Nothing): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def toString = "Same"
   }
@@ -266,14 +266,14 @@ object Behavior {
     */
   @SerialVersionUID(1L)
   private[akka] object stoppedBehavior extends Behavior[Nothing] {
-    override def management(
-        ctx: ActorContext[Nothing], msg: Signal): Behavior[Nothing] = {
+    override def management(ctx: ActorContext[Nothing],
+                            msg: Signal): Behavior[Nothing] = {
       assert(msg == PostStop,
              s"stoppedBehavior received $msg (only PostStop is expected)")
       this
     }
-    override def message(
-        ctx: ActorContext[Nothing], msg: Nothing): Behavior[Nothing] =
+    override def message(ctx: ActorContext[Nothing],
+                         msg: Nothing): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def toString = "Stopped"
   }

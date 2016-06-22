@@ -113,10 +113,10 @@ class TupleTests {
   val m2iExist: M2[Int, _] = new M2[Int, Unit] {}
   val m2sExist: M2[String, _] = new M2[String, Unit] {}
   val m2dExist: M2[Double, _] = new M2[Double, Unit] {}
-  val m2eim2esm2eim2eem2edList = List(
-      m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
-  val m2eim2esm2eim2eem2edArray = Array(
-      m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
+  val m2eim2esm2eim2eem2edList =
+    List(m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
+  val m2eim2esm2eim2eem2edArray =
+    Array(m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
   val m2eim2esm2eim2eem2ed = (m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
 
   object mkString extends (Any -> String)(_.toString)
@@ -339,8 +339,8 @@ class TupleTests {
   @Test
   def testToSizedArray {
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
-      assertArrayEquals(
-          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+      assertArrayEquals(arr1.asInstanceOf[Array[Object]],
+                        arr2.asInstanceOf[Array[Object]])
 
     def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
@@ -426,8 +426,8 @@ class TupleTests {
     val u4 = getUnifier((a, a, a))
     typed[Unifier.Aux[(Apple, Apple, Apple), (Apple, Apple, Apple)]](u4)
     val u5 = getUnifier((a, a, a, a))
-    typed[Unifier.Aux[
-            (Apple, Apple, Apple, Apple), (Apple, Apple, Apple, Apple)]](u5)
+    typed[Unifier.Aux[(Apple, Apple, Apple, Apple),
+                      (Apple, Apple, Apple, Apple)]](u5)
     //val u6 = getUnifier((a, p))
     //typed[Unifier.Aux[(Apple, Pear), (Fruit, Fruit)]](u6)
     val u7 = getUnifier((a, f))
@@ -619,8 +619,8 @@ class TupleTests {
   @Test
   def testToTraversableArray {
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
-      assertArrayEquals(
-          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+      assertArrayEquals(arr1.asInstanceOf[Array[Object]],
+                        arr2.asInstanceOf[Array[Object]])
 
     val empty = ().to[Array]
     typed[Array[Nothing]](empty)
@@ -668,8 +668,8 @@ class TupleTests {
     // equalInferredTypes(mimsmimemdArray, mWithEx)
     // typed[Array[M[_]]](mWithEx)
     // The line above compiles when mimsmimemd is an HList, not when it it a tuple, as in testToSizedArray
-    assertArrayEquals2(
-        mimsmimemdArray.map(x => x: Any), mWithEx.map(x => x: Any))
+    assertArrayEquals2(mimsmimemdArray.map(x => x: Any), mWithEx.map(x =>
+              x: Any))
 
     val m2 = m2im2sm2im2im2d.to[Array]
     equalInferredTypes(m2im2sm2im2im2dArray, m2)
@@ -680,8 +680,8 @@ class TupleTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     // typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
     // Same remark as above
-    assertArrayEquals2(
-        m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x =>
+              x: Any))
   }
 
   @Test
@@ -693,8 +693,8 @@ class TupleTests {
     ToArray[APAP, Fruit]
 
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
-      assertArrayEquals(
-          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+      assertArrayEquals(arr1.asInstanceOf[Array[Object]],
+                        arr2.asInstanceOf[Array[Object]])
 
     val empty = ().toArray
     typed[Array[Nothing]](empty)
@@ -752,8 +752,8 @@ class TupleTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     // typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
     // The line above compiles when mimsmimemd is an HList, not when it is a tuple...
-    assertArrayEquals2(
-        m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x =>
+              x: Any))
   }
 
   @Test

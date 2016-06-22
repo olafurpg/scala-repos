@@ -18,8 +18,8 @@ object Test extends App {
         assert(left == 0 && left.asInstanceOf[Double].compareTo(0) == -1,
                s"$left was not -0.0")
       case Undefined =>
-        assert(
-            left.asInstanceOf[AnyRef] eq Undefined, s"$left was not Undefined")
+        assert(left.asInstanceOf[AnyRef] eq Undefined,
+               s"$left was not Undefined")
       case _ => assert(left == right, s"$left was not equal to $right")
     }
   }
@@ -93,9 +93,9 @@ object Test extends App {
   inputs filterNot (_.isFinite) foreach (_ * 0d mustBe undef)
   inputs filterNot (_.isFinite) foreach (_ * -0d mustBe undef)
   inputs filterNot (_.isFinite) foreach
-  (x => x * Double.PositiveInfinity mustBe x)
+    (x => x * Double.PositiveInfinity mustBe x)
   inputs filterNot (_.isFinite) foreach
-  (x => x * Double.NegativeInfinity mustBe -x)
+    (x => x * Double.NegativeInfinity mustBe -x)
 
   inf.toUnit(SECONDS) mustBe Double.PositiveInfinity
   minf.toUnit(MINUTES) mustBe Double.NegativeInfinity
@@ -123,9 +123,9 @@ object Test extends App {
   undef * nan mustBe undef
   inputs foreach (x => x / zero mustBe x.toUnit(SECONDS) / 0d)
   inputs foreach
-  (x => x / 0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / 0d))
+    (x => x / 0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / 0d))
   inputs foreach
-  (x => x / -0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / -0d))
+    (x => x / -0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / -0d))
 
   inputs filterNot (_ eq undef) foreach (_ compareTo undef mustBe -1)
   inputs filterNot (_ eq undef) foreach (undef compareTo _ mustBe 1)

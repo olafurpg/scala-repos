@@ -98,7 +98,8 @@ final case class CompoundResultConverter[M <: ResultConverterDomain,
                                                       Float,
                                                       Double,
                                                       Boolean) T](
-    width: Int, childConverters: ResultConverter[M, T]*)
+    width: Int,
+    childConverters: ResultConverter[M, T]*)
     extends ResultConverter[M, T] {
   private[this] val cha = childConverters.to[Array]
   private[this] val len = cha.length
@@ -139,7 +140,8 @@ final class UnitResultConverter[M <: ResultConverterDomain]
 }
 
 final class GetOrElseResultConverter[M <: ResultConverterDomain, T](
-    child: ResultConverter[M, Option[T]], default: () => T)
+    child: ResultConverter[M, Option[T]],
+    default: () => T)
     extends ResultConverter[M, T] {
   def read(pr: Reader) = child.read(pr).getOrElse(default())
   def update(value: T, pr: Updater) = child.update(Some(value), pr)
@@ -165,7 +167,9 @@ final class IsDefinedResultConverter[M <: ResultConverterDomain](
 }
 
 final case class TypeMappingResultConverter[M <: ResultConverterDomain, T, C](
-    child: ResultConverter[M, C], toBase: T => C, toMapped: C => T)
+    child: ResultConverter[M, C],
+    toBase: T => C,
+    toMapped: C => T)
     extends ResultConverter[M, T] {
   def read(pr: Reader) = toMapped(child.read(pr))
   def update(value: T, pr: Updater) = child.update(toBase(value), pr)
@@ -176,7 +180,8 @@ final case class TypeMappingResultConverter[M <: ResultConverterDomain, T, C](
 }
 
 final case class OptionRebuildingResultConverter[M <: ResultConverterDomain, T](
-    discriminator: ResultConverter[M, Boolean], data: ResultConverter[M, T])
+    discriminator: ResultConverter[M, Boolean],
+    data: ResultConverter[M, T])
     extends ResultConverter[M, Option[T]] {
   def read(pr: Reader): Option[T] =
     if (discriminator.read(pr)) Some(data.read(pr)) else None

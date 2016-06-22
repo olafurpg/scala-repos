@@ -100,7 +100,8 @@ class ReliableProxySpec
 
         idTarget()
         proxy = system.actorOf(
-            ReliableProxy.props(target.path, 100.millis, 5.seconds), "proxy1")
+            ReliableProxy.props(target.path, 100.millis, 5.seconds),
+            "proxy1")
         watch(proxy)
         proxy ! FSM.SubscribeTransitionCallBack(testActor)
         expectState(Connecting)

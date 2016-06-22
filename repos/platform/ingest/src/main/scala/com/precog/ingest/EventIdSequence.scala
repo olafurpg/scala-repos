@@ -53,20 +53,22 @@ class SystemEventIdSequence private (
   }
 
   private def refill(offset: Long): InternalState = {
-    coordination.renewEventRelayState(
-        agent, offset, state.block.producerId, blockSize) match {
+    coordination.renewEventRelayState(agent,
+                                      offset,
+                                      state.block.producerId,
+                                      blockSize) match {
       case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
       case Failure(e) => sys.error("Error trying to renew relay agent: " + e)
     }
   }
 
   def saveState(offset: Long) = {
-    state =
-      coordination.saveEventRelayState(agent, currentRelayState(offset)) match {
-        case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
-        case Failure(e) =>
-          sys.error("Error trying to save relay agent state: " + e)
-      }
+    state = coordination
+      .saveEventRelayState(agent, currentRelayState(offset)) match {
+      case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
+      case Failure(e) =>
+        sys.error("Error trying to save relay agent state: " + e)
+    }
 
     PrecogUnit
   }
@@ -104,7 +106,9 @@ object SystemEventIdSequence {
       InternalState(eventRelayState)
     }
 
-    new SystemEventIdSequence(
-        agent, coordination, loadInitialState(), blockSize)
+    new SystemEventIdSequence(agent,
+                              coordination,
+                              loadInitialState(),
+                              blockSize)
   }
 }

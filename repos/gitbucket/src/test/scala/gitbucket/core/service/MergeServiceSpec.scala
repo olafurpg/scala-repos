@@ -35,10 +35,12 @@ class MergeServiceSpec extends FunSpec {
     it("checkConflict false if not conflicted, and create cache") {
       val repo1Dir = initRepository("user1", "repo1")
       assert(
-          service.checkConflictCache("user1", "repo1", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo1", branch, issueId) == None)
       val conflicted = service.checkConflict("user1", "repo1", branch, issueId)
       assert(
-          service.checkConflictCache("user1", "repo1", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo1", branch, issueId) == Some(
               false))
       assert(conflicted == false)
     }
@@ -48,11 +50,13 @@ class MergeServiceSpec extends FunSpec {
         createConfrict(git)
       }
       assert(
-          service.checkConflictCache("user1", "repo2", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo2", branch, issueId) == None)
       val conflicted = service.checkConflict("user1", "repo2", branch, issueId)
       assert(conflicted == true)
       assert(
-          service.checkConflictCache("user1", "repo2", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo2", branch, issueId) == Some(
               true))
     }
   }
@@ -61,37 +65,43 @@ class MergeServiceSpec extends FunSpec {
       val repo3Dir = initRepository("user1", "repo3")
       assert(service.checkConflict("user1", "repo3", branch, issueId) == false)
       assert(
-          service.checkConflictCache("user1", "repo3", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo3", branch, issueId) == Some(
               false))
       using(Git.open(repo3Dir)) { git =>
         createFile(git, s"refs/heads/${branch}", "test.txt", "hoge2")
       }
       assert(
-          service.checkConflictCache("user1", "repo3", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo3", branch, issueId) == None)
     }
     it("merged cache invalid if request branch moved") {
       val repo4Dir = initRepository("user1", "repo4")
       assert(service.checkConflict("user1", "repo4", branch, issueId) == false)
       assert(
-          service.checkConflictCache("user1", "repo4", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo4", branch, issueId) == Some(
               false))
       using(Git.open(repo4Dir)) { git =>
         createFile(git, s"refs/pull/${issueId}/head", "test.txt", "hoge4")
       }
       assert(
-          service.checkConflictCache("user1", "repo4", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo4", branch, issueId) == None)
     }
     it("should merged cache invalid if origin branch moved") {
       val repo5Dir = initRepository("user1", "repo5")
       assert(service.checkConflict("user1", "repo5", branch, issueId) == false)
       assert(
-          service.checkConflictCache("user1", "repo5", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo5", branch, issueId) == Some(
               false))
       using(Git.open(repo5Dir)) { git =>
         createFile(git, s"refs/heads/${branch}", "test.txt", "hoge2")
       }
       assert(
-          service.checkConflictCache("user1", "repo5", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo5", branch, issueId) == None)
     }
     it("conflicted cache invalid if request branch moved") {
       val repo6Dir = initRepository("user1", "repo6")
@@ -100,13 +110,15 @@ class MergeServiceSpec extends FunSpec {
       }
       assert(service.checkConflict("user1", "repo6", branch, issueId) == true)
       assert(
-          service.checkConflictCache("user1", "repo6", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo6", branch, issueId) == Some(
               true))
       using(Git.open(repo6Dir)) { git =>
         createFile(git, s"refs/pull/${issueId}/head", "test.txt", "hoge4")
       }
       assert(
-          service.checkConflictCache("user1", "repo6", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo6", branch, issueId) == None)
     }
     it("conflicted cache invalid if origin branch moved") {
       val repo7Dir = initRepository("user1", "repo7")
@@ -115,13 +127,15 @@ class MergeServiceSpec extends FunSpec {
       }
       assert(service.checkConflict("user1", "repo7", branch, issueId) == true)
       assert(
-          service.checkConflictCache("user1", "repo7", branch, issueId) == Some(
+          service
+            .checkConflictCache("user1", "repo7", branch, issueId) == Some(
               true))
       using(Git.open(repo7Dir)) { git =>
         createFile(git, s"refs/heads/${branch}", "test.txt", "hoge4")
       }
       assert(
-          service.checkConflictCache("user1", "repo7", branch, issueId) == None)
+          service
+            .checkConflictCache("user1", "repo7", branch, issueId) == None)
     }
   }
   describe("mergePullRequest") {

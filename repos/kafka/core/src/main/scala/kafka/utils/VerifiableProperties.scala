@@ -77,8 +77,9 @@ class VerifiableProperties(val props: Properties) extends Logging {
     v
   }
 
-  def getShortInRange(
-      name: String, default: Short, range: (Short, Short)): Short = {
+  def getShortInRange(name: String,
+                      default: Short,
+                      range: (Short, Short)): Short = {
     val v =
       if (containsKey(name)) getProperty(name).toShort
       else default
@@ -151,7 +152,7 @@ class VerifiableProperties(val props: Properties) extends Logging {
       val v = getProperty(name)
       require(v == "true" || v == "false",
               "Unacceptable value for property '" + name +
-              "', boolean values must be either 'true' or 'false")
+                "', boolean values must be either 'true' or 'false")
       v.toBoolean
     }
   }
@@ -185,15 +186,15 @@ class VerifiableProperties(val props: Properties) extends Logging {
         case (key, value) =>
           if (!valid(value))
             throw new IllegalArgumentException(
-                "Invalid entry '%s' = '%s' for property '%s'".format(
-                    key, value, name))
+                "Invalid entry '%s' = '%s' for property '%s'"
+                  .format(key, value, name))
       }
       m
     } catch {
       case e: Exception =>
         throw new IllegalArgumentException(
-            "Error parsing configuration property '%s': %s".format(
-                name, e.getMessage))
+            "Error parsing configuration property '%s': %s"
+              .format(name, e.getMessage))
     }
   }
 
@@ -225,8 +226,8 @@ class VerifiableProperties(val props: Properties) extends Logging {
         warn("Property %s is not valid".format(key))
       else
         info(
-            "Property %s is overridden to %s".format(
-                key, props.getProperty(key)))
+            "Property %s is overridden to %s".format(key,
+                                                     props.getProperty(key)))
     }
   }
 

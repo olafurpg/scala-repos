@@ -8,7 +8,8 @@ import scala.reflect.api.{Universe => ApiUniverse}
 trait StdCreators { self: SymbolTable =>
 
   case class FixedMirrorTreeCreator(
-      mirror: scala.reflect.api.Mirror[StdCreators.this.type], tree: Tree)
+      mirror: scala.reflect.api.Mirror[StdCreators.this.type],
+      tree: Tree)
       extends TreeCreator {
     def apply[U <: ApiUniverse with Singleton](
         m: scala.reflect.api.Mirror[U]): U#Tree =
@@ -19,7 +20,8 @@ trait StdCreators { self: SymbolTable =>
   }
 
   case class FixedMirrorTypeCreator(
-      mirror: scala.reflect.api.Mirror[StdCreators.this.type], tpe: Type)
+      mirror: scala.reflect.api.Mirror[StdCreators.this.type],
+      tpe: Type)
       extends TypeCreator {
     def apply[U <: ApiUniverse with Singleton](
         m: scala.reflect.api.Mirror[U]): U#Type =

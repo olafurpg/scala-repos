@@ -24,10 +24,10 @@ final class TransactionClientIntegrationSuite extends RedisClientTest {
 
   test("Correctly hash set and multi get transaction", RedisTest, ClientTest) {
     withRedisClient { client =>
-      val txResult =
-        Await.result(client.transaction(Seq(HSet(foo, bar, baz),
-                                            HSet(foo, boo, moo),
-                                            HMGet(foo, Seq(bar, boo)))))
+      val txResult = Await.result(
+          client.transaction(Seq(HSet(foo, bar, baz),
+                                 HSet(foo, boo, moo),
+                                 HMGet(foo, Seq(bar, boo)))))
       assert(
           ReplyFormat.toString(txResult.toList) == Seq("1", "1", "baz", "moo"))
     }

@@ -47,8 +47,9 @@ final class SinatraRouteMatcher(pattern: String)
   def reverse(params: Map[String, String], splats: List[String]): String =
     generator(Builder("", params, splats)).get
 
-  case class Builder(
-      path: String, params: Map[String, String], splats: List[String]) {
+  case class Builder(path: String,
+                     params: Map[String, String],
+                     splats: List[String]) {
 
     def addLiteral(text: String): Builder = copy(path = path + text)
 

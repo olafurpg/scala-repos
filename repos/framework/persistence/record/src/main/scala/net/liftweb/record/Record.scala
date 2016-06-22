@@ -152,15 +152,14 @@ trait Record[MyType <: Record[MyType]] extends FieldContainer { self: MyType =>
   }
 
   override def toString = {
-    val fieldList = this.fields.map(
-        f =>
+    val fieldList = this.fields.map(f =>
           "%s=%s" format
-          (f.name, f.valueBox match {
-            case Full(c: java.util.Calendar) => c.getTime().toString()
-            case Full(null) => "null"
-            case Full(v) => v.toString
-            case x => x.toString
-          }))
+            (f.name, f.valueBox match {
+              case Full(c: java.util.Calendar) => c.getTime().toString()
+              case Full(null) => "null"
+              case Full(v) => v.toString
+              case x => x.toString
+            }))
 
     "%s={%s}" format (this.getClass.toString, fieldList.mkString(", "))
   }

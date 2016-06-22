@@ -11,5 +11,6 @@ abstract class Actor {
   def unstable: Actor = sys.error("foo")
 
   def dubiousSend(msg: MailBox#Message): Nothing =
-    unstable.send(msg) // in.Message becomes unstable.Message, but that's ok since Message is a concrete type member
+    unstable
+      .send(msg) // in.Message becomes unstable.Message, but that's ok since Message is a concrete type member
 }

@@ -152,8 +152,8 @@ object DataType {
                        ("valueType", v: JValue)) =>
       MapType(parseDataType(k), parseDataType(v), n)
 
-    case JSortedObject(
-        ("fields", JArray(fields)), ("type", JString("struct"))) =>
+    case JSortedObject(("fields", JArray(fields)),
+                       ("type", JString("struct"))) =>
       StructType(fields.map(parseStructField))
 
     // Scala/Java UDT
@@ -190,8 +190,9 @@ object DataType {
       StructField(name, parseDataType(dataType), nullable)
   }
 
-  protected[types] def buildFormattedString(
-      dataType: DataType, prefix: String, builder: StringBuilder): Unit = {
+  protected[types] def buildFormattedString(dataType: DataType,
+                                            prefix: String,
+                                            builder: StringBuilder): Unit = {
     dataType match {
       case array: ArrayType =>
         array.buildFormattedString(prefix, builder)
@@ -206,21 +207,22 @@ object DataType {
   /**
     * Compares two types, ignoring nullability of ArrayType, MapType, StructType.
     */
-  private[types] def equalsIgnoreNullability(
-      left: DataType, right: DataType): Boolean = {
+  private[types] def equalsIgnoreNullability(left: DataType,
+                                             right: DataType): Boolean = {
     (left, right) match {
       case (ArrayType(leftElementType, _), ArrayType(rightElementType, _)) =>
         equalsIgnoreNullability(leftElementType, rightElementType)
       case (MapType(leftKeyType, leftValueType, _),
             MapType(rightKeyType, rightValueType, _)) =>
         equalsIgnoreNullability(leftKeyType, rightKeyType) &&
-        equalsIgnoreNullability(leftValueType, rightValueType)
+          equalsIgnoreNullability(leftValueType, rightValueType)
       case (StructType(leftFields), StructType(rightFields)) =>
         leftFields.length == rightFields.length &&
-        leftFields.zip(rightFields).forall {
-          case (l, r) =>
-            l.name == r.name && equalsIgnoreNullability(l.dataType, r.dataType)
-        }
+          leftFields.zip(rightFields).forall {
+            case (l, r) =>
+              l.name == r.name && equalsIgnoreNullability(l.dataType,
+                                                          r.dataType)
+          }
       case (l, r) => l == r
     }
   }
@@ -239,25 +241,26 @@ object DataType {
     *   if and only if for all every pair of fields, `to.nullable` is true, or both
     *   of `fromField.nullable` and `toField.nullable` are false.
     */
-  private[sql] def equalsIgnoreCompatibleNullability(
-      from: DataType, to: DataType): Boolean = {
+  private[sql] def equalsIgnoreCompatibleNullability(from: DataType,
+                                                     to: DataType): Boolean = {
     (from, to) match {
       case (ArrayType(fromElement, fn), ArrayType(toElement, tn)) =>
         (tn || !fn) &&
-        equalsIgnoreCompatibleNullability(fromElement, toElement)
+          equalsIgnoreCompatibleNullability(fromElement, toElement)
 
       case (MapType(fromKey, fromValue, fn), MapType(toKey, toValue, tn)) =>
         (tn || !fn) && equalsIgnoreCompatibleNullability(fromKey, toKey) &&
-        equalsIgnoreCompatibleNullability(fromValue, toValue)
+          equalsIgnoreCompatibleNullability(fromValue, toValue)
 
       case (StructType(fromFields), StructType(toFields)) =>
         fromFields.length == toFields.length &&
-        fromFields.zip(toFields).forall {
-          case (fromField, toField) =>
-            fromField.name == toField.name && (toField.nullable ||
-                !fromField.nullable) && equalsIgnoreCompatibleNullability(
-                fromField.dataType, toField.dataType)
-        }
+          fromFields.zip(toFields).forall {
+            case (fromField, toField) =>
+              fromField.name == toField.name && (toField.nullable ||
+                    !fromField.nullable) && equalsIgnoreCompatibleNullability(
+                  fromField.dataType,
+                  toField.dataType)
+          }
 
       case (fromDataType, toDataType) => fromDataType == toDataType
     }

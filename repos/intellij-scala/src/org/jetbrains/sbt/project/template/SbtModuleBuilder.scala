@@ -31,7 +31,8 @@ import org.jetbrains.sbt.project.settings.SbtProjectSettings
   */
 class SbtModuleBuilder
     extends AbstractExternalModuleBuilder[SbtProjectSettings](
-        SbtProjectSystem.Id, new SbtProjectSettings) {
+        SbtProjectSystem.Id,
+        new SbtProjectSettings) {
   private var sbtVersion = Versions.DefaultSbtVersion
 
   private var scalaVersion = Versions.DefaultScalaVersion
@@ -54,7 +55,7 @@ class SbtModuleBuilder
     val file = getModuleFilePath.toFile
     val path =
       file.getParent + "/" + Sbt.ModulesDirectory + "/" +
-      file.getName.toLowerCase
+        file.getName.toLowerCase
     setModuleFilePath(path)
   }
 
@@ -83,41 +84,42 @@ class SbtModuleBuilder
         SbtBundle("sbt.settings.resolveSbtClassifiers"))
     val useAutoImportCheckBox = new JCheckBox(
         ExternalSystemBundle.message("settings.label.use.auto.import"))
-    val createContentDirsCheckBox = new JCheckBox(ExternalSystemBundle.message(
+    val createContentDirsCheckBox = new JCheckBox(
+        ExternalSystemBundle.message(
             "settings.label.create.empty.content.root.directories"))
 
-    val step = new SdkSettingsStep(
-        settingsStep, this, new Condition[SdkTypeId] {
-      def value(t: SdkTypeId): Boolean = t != null && t.isInstanceOf[JavaSdk]
-    }) {
-      override def updateDataModel() {
-        sbtVersion = sbtVersionComboBox.getSelectedItem
-        scalaVersion = scalaVersionComboBox.getSelectedItem
+    val step =
+      new SdkSettingsStep(settingsStep, this, new Condition[SdkTypeId] {
+        def value(t: SdkTypeId): Boolean = t != null && t.isInstanceOf[JavaSdk]
+      }) {
+        override def updateDataModel() {
+          sbtVersion = sbtVersionComboBox.getSelectedItem
+          scalaVersion = scalaVersionComboBox.getSelectedItem
 
-        settingsStep.getContext setProjectJdk myJdkComboBox.getSelectedJdk
+          settingsStep.getContext setProjectJdk myJdkComboBox.getSelectedJdk
 
-        getExternalProjectSettings.setResolveClassifiers(
-            resolveClassifiersCheckBox.isSelected)
-        getExternalProjectSettings.setResolveJavadocs(
-            resolveJavadocsCheckBox.isSelected)
-        getExternalProjectSettings.setResolveSbtClassifiers(
-            resolveSbtClassifiersCheckBox.isSelected)
-        getExternalProjectSettings.setUseAutoImport(
-            useAutoImportCheckBox.isSelected)
-        getExternalProjectSettings.setCreateEmptyContentRootDirectories(
-            createContentDirsCheckBox.isSelected)
+          getExternalProjectSettings.setResolveClassifiers(
+              resolveClassifiersCheckBox.isSelected)
+          getExternalProjectSettings.setResolveJavadocs(
+              resolveJavadocsCheckBox.isSelected)
+          getExternalProjectSettings.setResolveSbtClassifiers(
+              resolveSbtClassifiersCheckBox.isSelected)
+          getExternalProjectSettings.setUseAutoImport(
+              useAutoImportCheckBox.isSelected)
+          getExternalProjectSettings.setCreateEmptyContentRootDirectories(
+              createContentDirsCheckBox.isSelected)
+        }
       }
-    }
 
     createContentDirsCheckBox.setSelected(true)
     resolveClassifiersCheckBox.setSelected(true)
     resolveJavadocsCheckBox.setSelected(false)
     resolveSbtClassifiersCheckBox.setSelected(true)
 
-    settingsStep.addSettingsField(
-        SbtBundle("sbt.settings.sbtVersion"), sbtVersionComboBox)
-    settingsStep.addSettingsField(
-        SbtBundle("sbt.settings.scalaVersion"), scalaVersionComboBox)
+    settingsStep.addSettingsField(SbtBundle("sbt.settings.sbtVersion"),
+                                  sbtVersionComboBox)
+    settingsStep.addSettingsField(SbtBundle("sbt.settings.scalaVersion"),
+                                  scalaVersionComboBox)
     settingsStep.addSettingsField("", useAutoImportCheckBox)
     settingsStep.addSettingsField("", createContentDirsCheckBox)
 
@@ -130,8 +132,10 @@ class SbtModuleBuilder
     step
   }
 
-  private def createProjectTemplateIn(
-      root: File, name: String, scalaVersion: String, sbtVersion: String) {
+  private def createProjectTemplateIn(root: File,
+                                      name: String,
+                                      scalaVersion: String,
+                                      sbtVersion: String) {
     val buildFile = root / Sbt.BuildFile
     val projectDir = root / Sbt.ProjectDirectory
     val pluginsFile = projectDir / Sbt.PluginsFile
@@ -143,8 +147,8 @@ class SbtModuleBuilder
     writeToFile(buildFile,
                 SbtModuleBuilder.formatProjectDefinition(name, scalaVersion))
     writeToFile(pluginsFile, SbtModuleBuilder.PluginsDefinition)
-    writeToFile(
-        propertiesFile, SbtModuleBuilder.formatSbtProperties(sbtVersion))
+    writeToFile(propertiesFile,
+                SbtModuleBuilder.formatSbtProperties(sbtVersion))
   }
 
   override def getNodeIcon = Sbt.Icon

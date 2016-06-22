@@ -64,8 +64,10 @@ final class ModlogApi {
            ))
   }
 
-  def toggleCloseTopic(
-      mod: String, categ: String, topic: String, closed: Boolean) = add {
+  def toggleCloseTopic(mod: String,
+                       categ: String,
+                       topic: String,
+                       closed: Boolean) = add {
     Modlog(mod,
            none,
            closed ? Modlog.closeTopic | Modlog.openTopic,
@@ -74,8 +76,10 @@ final class ModlogApi {
            ))
   }
 
-  def toggleHideTopic(
-      mod: String, categ: String, topic: String, hidden: Boolean) = add {
+  def toggleHideTopic(mod: String,
+                      categ: String,
+                      topic: String,
+                      hidden: Boolean) = add {
     Modlog(mod,
            none,
            hidden ? Modlog.hideTopic | Modlog.showTopic,
@@ -92,13 +96,17 @@ final class ModlogApi {
   }
 
   def deleteQaAnswer(mod: String, user: String, text: String) = add {
-    Modlog(
-        mod, user.some, Modlog.deleteQaAnswer, details = Some(text take 140))
+    Modlog(mod,
+           user.some,
+           Modlog.deleteQaAnswer,
+           details = Some(text take 140))
   }
 
   def deleteQaComment(mod: String, user: String, text: String) = add {
-    Modlog(
-        mod, user.some, Modlog.deleteQaComment, details = Some(text take 140))
+    Modlog(mod,
+           user.some,
+           Modlog.deleteQaComment,
+           details = Some(text take 140))
   }
 
   def deleteTeam(mod: String, name: String, desc: String) = add {

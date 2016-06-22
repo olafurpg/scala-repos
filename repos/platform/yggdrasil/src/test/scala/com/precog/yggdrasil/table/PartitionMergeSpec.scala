@@ -75,9 +75,10 @@ trait PartitionMergeSpec[M[+ _]]
             }
           }
 
-          val derefed = table.transform(DerefObjectStatic(
-                  DerefObjectStatic(Leaf(Source), CPathField("value")),
-                  CPathField("a")))
+          val derefed = table.transform(
+              DerefObjectStatic(DerefObjectStatic(Leaf(Source),
+                                                  CPathField("value")),
+                                CPathField("a")))
 
           derefed.reduce(reducer).map(s => Table.constString(Set(s)))
       }

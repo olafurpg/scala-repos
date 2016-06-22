@@ -58,8 +58,8 @@ class DefaultInterpreterTest extends FunSuite {
   }
 
   test("full example") {
-    val dtab =
-      Dtab.read("""
+    val dtab = Dtab.read(
+        """
       /foo => /bar;
       /foo => 3 * /baz & 2 * /booz & /$/com.twitter.finagle.naming.testnamer;
       /rewritten/by/test/namer => /$/inet/0/7070;

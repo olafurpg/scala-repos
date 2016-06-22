@@ -29,7 +29,8 @@ object CompletionService {
       future.get()
   }
   def manage[A, T](service: CompletionService[A, T])(
-      setup: A => Unit, cleanup: A => Unit): CompletionService[A, T] =
+      setup: A => Unit,
+      cleanup: A => Unit): CompletionService[A, T] =
     wrap(service) { (node, work) => () =>
       setup(node)
       try { work() } finally { cleanup(node) }

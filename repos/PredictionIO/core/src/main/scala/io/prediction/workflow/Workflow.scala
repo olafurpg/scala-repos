@@ -76,12 +76,12 @@ object Workflow {
   }
    */
 
-  def runEvaluation(
-      evaluation: Evaluation,
-      engineParamsGenerator: EngineParamsGenerator,
-      env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      evaluationInstance: EvaluationInstance = EvaluationInstance(),
-      params: WorkflowParams = WorkflowParams()) {
+  def runEvaluation(evaluation: Evaluation,
+                    engineParamsGenerator: EngineParamsGenerator,
+                    env: Map[String, String] = WorkflowUtils.pioEnvVars,
+                    evaluationInstance: EvaluationInstance =
+                      EvaluationInstance(),
+                    params: WorkflowParams = WorkflowParams()) {
     runEvaluationTypeless(
         evaluation = evaluation,
         engine = evaluation.engine,
@@ -93,8 +93,15 @@ object Workflow {
     )
   }
 
-  def runEvaluationTypeless[
-      EI, Q, P, A, EEI, EQ, EP, EA, ER <: BaseEvaluatorResult](
+  def runEvaluationTypeless[EI,
+                            Q,
+                            P,
+                            A,
+                            EEI,
+                            EQ,
+                            EP,
+                            EA,
+                            ER <: BaseEvaluatorResult](
       evaluation: Evaluation,
       engine: BaseEngine[EI, Q, P, A],
       engineParamsList: Seq[EngineParams],

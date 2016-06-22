@@ -14,8 +14,10 @@ object GraphOpsIntegrationSpec {
 
   object Shuffle {
 
-    case class ShufflePorts[In, Out](
-        in1: Inlet[In], in2: Inlet[In], out1: Outlet[Out], out2: Outlet[Out])
+    case class ShufflePorts[In, Out](in1: Inlet[In],
+                                     in2: Inlet[In],
+                                     out1: Outlet[Out],
+                                     out2: Outlet[Out])
         extends Shape {
       override def inlets: immutable.Seq[Inlet[_]] = List(in1, in2)
       override def outlets: immutable.Seq[Outlet[_]] = List(out1, out2)
@@ -52,8 +54,8 @@ class GraphOpsIntegrationSpec extends AkkaSpec {
   import akka.stream.scaladsl.GraphOpsIntegrationSpec._
   import GraphDSL.Implicits._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 

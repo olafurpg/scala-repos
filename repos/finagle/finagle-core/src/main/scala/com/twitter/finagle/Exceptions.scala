@@ -109,8 +109,7 @@ trait TimeoutException extends SourcedException { self: Exception =>
 class RequestTimeoutException(
     protected val timeout: Duration,
     protected val explanation: String
-)
-    extends RequestException
+) extends RequestException
     with TimeoutException
 
 /**
@@ -158,8 +157,7 @@ class NoBrokersAvailableException(
     val name: String,
     val baseDtab: Dtab,
     val localDtab: Dtab
-)
-    extends RequestException {
+) extends RequestException {
   def this(name: String = "unknown") = this(name, Dtab.empty, Dtab.empty)
 
   override def exceptionMessage =
@@ -297,8 +295,8 @@ class ChannelException(underlying: Throwable, val remoteAddress: SocketAddress)
   * class will be extended to provide additional information relevant to a
   * particular category of connection failure.
   */
-class ConnectionFailedException(
-    underlying: Throwable, remoteAddress: SocketAddress)
+class ConnectionFailedException(underlying: Throwable,
+                                remoteAddress: SocketAddress)
     extends ChannelException(underlying, remoteAddress)
     with NoStacktrace {
   def this() = this(null, null)
@@ -308,8 +306,8 @@ class ConnectionFailedException(
   * Indicates that a given channel was closed, for instance if the connection
   * was reset by a peer or a proxy.
   */
-class ChannelClosedException(
-    underlying: Throwable, remoteAddress: SocketAddress)
+class ChannelClosedException(underlying: Throwable,
+                             remoteAddress: SocketAddress)
     extends ChannelException(underlying, remoteAddress)
     with NoStacktrace {
   def this(remoteAddress: SocketAddress) = this(null, remoteAddress)
@@ -339,8 +337,8 @@ class InconsistentStateException(remoteAddress: SocketAddress)
   * A catch-all exception class for uncategorized
   * [[com.twitter.finagle.ChannelException ChannelExceptions]].
   */
-case class UnknownChannelException(
-    underlying: Throwable, override val remoteAddress: SocketAddress)
+case class UnknownChannelException(underlying: Throwable,
+                                   override val remoteAddress: SocketAddress)
     extends ChannelException(underlying, remoteAddress) {
   def this() = this(null, null)
 }
@@ -381,8 +379,8 @@ case class ChannelWriteException(underlying: Throwable)
   * Indicates that an error occurred while an SSL handshake was being performed
   * with a server at a given `remoteAddress`.
   */
-case class SslHandshakeException(
-    underlying: Throwable, override val remoteAddress: SocketAddress)
+case class SslHandshakeException(underlying: Throwable,
+                                 override val remoteAddress: SocketAddress)
     extends ChannelException(underlying, remoteAddress) {
   def this() = this(null, null)
 }
@@ -456,7 +454,7 @@ class ServiceTimeoutException(override protected val timeout: Duration)
     with TimeoutException {
   override protected def explanation =
     "creating a service/connection or reserving a service/connection from the service/connection pool " +
-    serviceName
+      serviceName
 }
 
 /**

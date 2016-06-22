@@ -108,8 +108,8 @@ object MaxAbsScaler extends DefaultParamsReadable[MaxAbsScaler] {
   *
   */
 @Experimental
-class MaxAbsScalerModel private[ml](
-    override val uid: String, val maxAbs: Vector)
+class MaxAbsScalerModel private[ml] (override val uid: String,
+                                     val maxAbs: Vector)
     extends Model[MaxAbsScalerModel]
     with MaxAbsScalerParams
     with MLWritable {

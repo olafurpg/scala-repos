@@ -56,11 +56,11 @@ private[math] class ByteIsNumeric
   override def fromInt(n: Int): Byte = n.toByte
   override def fromDouble(n: Double): Byte = n.toByte
   override def toDouble(n: Byte): Double = n.toDouble
-  override def toRational(n: Byte): Rational = super [ByteIsReal].toRational(n)
+  override def toRational(n: Byte): Rational = super[ByteIsReal].toRational(n)
   override def toAlgebraic(n: Byte): Algebraic =
-    super [ByteIsReal].toAlgebraic(n)
-  override def toReal(n: Byte): Real = super [ByteIsReal].toReal(n)
-  override def toBigInt(n: Byte): BigInt = super [ByteIsReal].toBigInt(n)
+    super[ByteIsReal].toAlgebraic(n)
+  override def toReal(n: Byte): Real = super[ByteIsReal].toReal(n)
+  override def toBigInt(n: Byte): BigInt = super[ByteIsReal].toBigInt(n)
   def div(a: Byte, b: Byte): Byte = (a / b).toByte
 }
 
@@ -77,11 +77,11 @@ private[math] class ShortIsNumeric
   override def fromDouble(n: Double): Short = n.toShort
   override def toDouble(n: Short): Double = n.toDouble
   override def toRational(n: Short): Rational =
-    super [ShortIsReal].toRational(n)
+    super[ShortIsReal].toRational(n)
   override def toAlgebraic(n: Short): Algebraic =
-    super [ShortIsReal].toAlgebraic(n)
-  override def toReal(n: Short): Real = super [ShortIsReal].toReal(n)
-  override def toBigInt(n: Short): BigInt = super [ShortIsReal].toBigInt(n)
+    super[ShortIsReal].toAlgebraic(n)
+  override def toReal(n: Short): Real = super[ShortIsReal].toReal(n)
+  override def toBigInt(n: Short): BigInt = super[ShortIsReal].toBigInt(n)
   def div(a: Short, b: Short): Short = (a / b).toShort
 }
 
@@ -97,11 +97,11 @@ private[math] class IntIsNumeric
   override def fromInt(n: Int): Int = n
   override def fromDouble(n: Double): Int = n.toInt
   override def toDouble(n: Int): Double = n.toDouble
-  override def toRational(n: Int): Rational = super [IntIsReal].toRational(n)
+  override def toRational(n: Int): Rational = super[IntIsReal].toRational(n)
   override def toAlgebraic(n: Int): Algebraic =
-    super [IntIsReal].toAlgebraic(n)
-  override def toReal(n: Int): Real = super [IntIsReal].toReal(n)
-  override def toBigInt(n: Int): BigInt = super [IntIsReal].toBigInt(n)
+    super[IntIsReal].toAlgebraic(n)
+  override def toReal(n: Int): Real = super[IntIsReal].toReal(n)
+  override def toBigInt(n: Int): BigInt = super[IntIsReal].toBigInt(n)
   def div(a: Int, b: Int): Int = a / b
 }
 
@@ -117,11 +117,11 @@ private[math] class LongIsNumeric
   override def fromInt(n: Int): Long = n
   override def fromDouble(n: Double): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
-  override def toRational(n: Long): Rational = super [LongIsReal].toRational(n)
+  override def toRational(n: Long): Rational = super[LongIsReal].toRational(n)
   override def toAlgebraic(n: Long): Algebraic =
-    super [LongIsReal].toAlgebraic(n)
-  override def toReal(n: Long): Real = super [LongIsReal].toReal(n)
-  override def toBigInt(n: Long): BigInt = super [LongIsReal].toBigInt(n)
+    super[LongIsReal].toAlgebraic(n)
+  override def toReal(n: Long): Real = super[LongIsReal].toReal(n)
+  override def toBigInt(n: Long): BigInt = super[LongIsReal].toBigInt(n)
   def div(a: Long, b: Long): Long = a / b
 }
 
@@ -138,10 +138,10 @@ private[math] class BigIntIsNumeric
   override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   override def toDouble(n: BigInt): Double = n.toDouble
   override def toRational(n: BigInt): Rational =
-    super [BigIntIsReal].toRational(n)
+    super[BigIntIsReal].toRational(n)
   override def toAlgebraic(n: BigInt): Algebraic =
-    super [BigIntIsReal].toAlgebraic(n)
-  override def toReal(n: BigInt): Real = super [BigIntIsReal].toReal(n)
+    super[BigIntIsReal].toAlgebraic(n)
+  override def toReal(n: BigInt): Real = super[BigIntIsReal].toReal(n)
   override def toBigInt(n: BigInt): BigInt = n
   def div(a: BigInt, b: BigInt): BigInt = a / b
 }
@@ -159,10 +159,10 @@ private[math] class FloatIsNumeric
   override def fromDouble(n: Double): Float = n.toFloat
   override def toDouble(n: Float): Double = n.toDouble
   override def toRational(n: Float): Rational =
-    super [FloatIsReal].toRational(n)
+    super[FloatIsReal].toRational(n)
   override def toAlgebraic(n: Float): Algebraic =
-    super [FloatIsReal].toAlgebraic(n)
-  override def toReal(n: Float): Real = super [FloatIsReal].toReal(n)
+    super[FloatIsReal].toAlgebraic(n)
+  override def toReal(n: Float): Real = super[FloatIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)
@@ -178,10 +178,10 @@ private[math] class DoubleIsNumeric
   override def fromDouble(n: Double): Double = n
   override def toDouble(n: Double): Double = n.toDouble
   override def toRational(n: Double): Rational =
-    super [DoubleIsReal].toRational(n)
+    super[DoubleIsReal].toRational(n)
   override def toAlgebraic(n: Double): Algebraic =
-    super [DoubleIsReal].toAlgebraic(n)
-  override def toReal(n: Double): Real = super [DoubleIsReal].toReal(n)
+    super[DoubleIsReal].toAlgebraic(n)
+  override def toReal(n: Double): Real = super[DoubleIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)
@@ -197,10 +197,10 @@ private[math] class BigDecimalIsNumeric
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   override def toDouble(n: BigDecimal): Double = n.toDouble
   override def toRational(n: BigDecimal): Rational =
-    super [BigDecimalIsReal].toRational(n)
+    super[BigDecimalIsReal].toRational(n)
   override def toAlgebraic(n: BigDecimal): Algebraic =
-    super [BigDecimalIsReal].toAlgebraic(n)
-  override def toReal(n: BigDecimal): Real = super [BigDecimalIsReal].toReal(n)
+    super[BigDecimalIsReal].toAlgebraic(n)
+  override def toReal(n: BigDecimal): Real = super[BigDecimalIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)
@@ -216,8 +216,8 @@ private[math] class RationalIsNumeric
   override def toDouble(n: Rational): Double = n.toDouble
   override def toRational(n: Rational): Rational = n
   override def toAlgebraic(n: Rational): Algebraic =
-    super [RationalIsReal].toAlgebraic(n)
-  override def toReal(n: Rational): Real = super [RationalIsReal].toReal(n)
+    super[RationalIsReal].toAlgebraic(n)
+  override def toReal(n: Rational): Real = super[RationalIsReal].toReal(n)
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
 }
@@ -234,7 +234,7 @@ private[math] class AlgebraicIsNumeric
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
   override def toDouble(n: Algebraic): Double = n.toDouble
   override def toAlgebraic(n: Algebraic): Algebraic = n
-  override def toReal(n: Algebraic): Real = super [AlgebraicIsReal].toReal(n)
+  override def toReal(n: Algebraic): Real = super[AlgebraicIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)

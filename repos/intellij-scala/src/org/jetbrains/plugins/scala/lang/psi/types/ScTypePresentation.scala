@@ -44,8 +44,8 @@ trait ScTypePresentation {
           ""
         case e: PsiClass =>
           "<a href=\"psi_element://" + e.qualifiedName + "\"><code>" +
-          StringEscapeUtils.escapeHtml(e.name) + "</code></a>" +
-          (if (withPoint) "." else "")
+            StringEscapeUtils.escapeHtml(e.name) + "</code></a>" +
+            (if (withPoint) "." else "")
         case pack: PsiPackage if withPoint => ""
         case _ => StringEscapeUtils.escapeHtml(e.name) + "."
       }
@@ -90,15 +90,17 @@ trait ScTypePresentation {
                     sep: String,
                     end: String,
                     checkWildcard: Boolean = false): String = {
-      ts.map(innerTypeText(
-                _, needDotType = true, checkWildcard = checkWildcard))
+      ts.map(
+            innerTypeText(_,
+                          needDotType = true,
+                          checkWildcard = checkWildcard))
         .mkString(start, sep, end)
     }
 
     def typeTail(need: Boolean) = if (need) ".type" else ""
 
-    def existentialArgWithBounds(
-        wildcard: ScExistentialArgument, argText: String): String = {
+    def existentialArgWithBounds(wildcard: ScExistentialArgument,
+                                 argText: String): String = {
       val lowerBoundText =
         if (wildcard.lowerBound != types.Nothing)
           " >: " + innerTypeText(wildcard.lowerBound)
@@ -130,13 +132,13 @@ trait ScTypePresentation {
       }
       param.contextBound foreach { (tp: ScType) =>
         buffer ++=
-          s" : ${typeText0(ScTypeUtil.stripTypeArgs(subst.subst(tp)))}"
+        s" : ${typeText0(ScTypeUtil.stripTypeArgs(subst.subst(tp)))}"
       }
       buffer.toString()
     }
 
-    def projectionTypeText(
-        projType: ScProjectionType, needDotType: Boolean): String = {
+    def projectionTypeText(projType: ScProjectionType,
+                           needDotType: Boolean): String = {
       val ScProjectionType(p, _, _) = projType
       val e = projType.actualElement
       val refName = e.name
@@ -190,8 +192,7 @@ trait ScTypePresentation {
       val componentsText =
         if (comps.isEmpty) Nil
         else
-          Seq(
-              comps.map {
+          Seq(comps.map {
             case tp @ ScFunctionType(_, _) => "(" + innerTypeText(tp) + ")"
             case tp => innerTypeText(tp)
           }.mkString(" with "))
@@ -206,7 +207,8 @@ trait ScTypePresentation {
               rt,
               fun)
           val paramClauses = funCopy.paramClauses.clauses
-            .map(_.parameters
+            .map(
+                _.parameters
                   .map(param =>
                         ScalaDocumentationProvider.parseParameter(param,
                                                                   typeText0))
@@ -227,12 +229,14 @@ trait ScTypePresentation {
             s.namedElement match {
               case bp: ScBindingPattern =>
                 val b = ScBindingPattern.getCompoundCopy(rt, bp)
-                Seq((if (b.isVar) "var " else "val ") + b.name + " : " +
-                    typeText0(rt))
+                Seq(
+                    (if (b.isVar) "var " else "val ") + b.name + " : " +
+                      typeText0(rt))
               case fi: ScFieldId =>
                 val f = ScFieldId.getCompoundCopy(rt, fi)
-                Seq((if (f.isVar) "var " else "val ") + f.name + " : " +
-                    typeText0(rt))
+                Seq(
+                    (if (f.isVar) "var " else "val ") + f.name + " : " +
+                      typeText0(rt))
               case _ => Seq.empty
             }
           }
@@ -289,8 +293,8 @@ trait ScTypePresentation {
             case _ =>
               existentialTypeText(existType, checkWildcard = false, stable)
           }
-        case ex @ ScExistentialType(
-            ScParameterizedType(des, typeArgs), wilds) =>
+        case ex @ ScExistentialType(ScParameterizedType(des, typeArgs),
+                                    wilds) =>
           val wildcardsMap = ex.wildcardsMap()
           val replacingArgs =
             new ArrayBuffer[(ScType, ScExistentialArgument)]()
@@ -319,8 +323,8 @@ trait ScTypePresentation {
         case ScExistentialType(q, wilds) =>
           val wildsWithBounds =
             wilds.map(w => existentialArgWithBounds(w, "type " + w.name))
-          wildsWithBounds.mkString(
-              s"(${innerTypeText(q)}) forSome {", "; ", "}")
+          wildsWithBounds
+            .mkString(s"(${innerTypeText(q)}) forSome {", "; ", "}")
       }
     }
 
@@ -353,8 +357,11 @@ trait ScTypePresentation {
         case proj: ScProjectionType if proj != null =>
           projectionTypeText(proj, needDotType)
         case ScParameterizedType(des, typeArgs) =>
-          innerTypeText(des) + typeSeqText(
-              typeArgs, "[", ", ", "]", checkWildcard = true)
+          innerTypeText(des) + typeSeqText(typeArgs,
+                                           "[",
+                                           ", ",
+                                           "]",
+                                           checkWildcard = true)
         case j @ JavaArrayType(arg) =>
           s"Array[${innerTypeText(arg)}]"
         case ScSkolemizedType(name, _, _, _) => name
@@ -379,9 +386,10 @@ trait ScTypePresentation {
             })
             .mkString("[", ", ", "] ") + internalType.toString
         case mt @ ScMethodType(retType, params, isImplicit) =>
-          innerTypeText(ScFunctionType(retType, params.map(_.paramType))(
-                            mt.project, mt.scope),
-                        needDotType)
+          innerTypeText(
+              ScFunctionType(retType, params.map(_.paramType))(mt.project,
+                                                               mt.scope),
+              needDotType)
         case _ => "" //todo
       }
     }

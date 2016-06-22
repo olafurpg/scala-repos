@@ -39,9 +39,10 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
 
   test("uncorrelated scalar subquery in CTE") {
     assertResult(Array(Row(1))) {
-      sql("with t2 as (select 1 as b, 2 as c) " +
-          "select a from (select 1 as a union all select 2 as a) t " +
-          "where a = (select max(b) from t2) ").collect()
+      sql(
+          "with t2 as (select 1 as b, 2 as c) " +
+            "select a from (select 1 as a union all select 2 as a) t " +
+            "where a = (select max(b) from t2) ").collect()
     }
   }
 
@@ -56,7 +57,8 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
       sql("select (select a from (select 1 as a union all select 2 as a) t) as b")
         .collect()
     }
-    assert(error2.getMessage.contains(
+    assert(
+        error2.getMessage.contains(
             "more than one row returned by a subquery used as an expression"))
   }
 
@@ -79,7 +81,7 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
 
     assertResult(Array(Row("two"))) {
       sql("select (select min(value) from subqueryData" +
-          " where key = (select max(key) from subqueryData) - 1)").collect()
+            " where key = (select max(key) from subqueryData) - 1)").collect()
     }
   }
 }

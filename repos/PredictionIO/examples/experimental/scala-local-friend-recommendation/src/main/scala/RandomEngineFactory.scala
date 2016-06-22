@@ -8,8 +8,8 @@ object RandomEngineFactory extends IEngineFactory {
         classOf[FriendRecommendationDataSource],
         classOf[LIdentityPreparator[FriendRecommendationTrainingData]],
         Map("RandomAlgorithm" -> classOf[RandomAlgorithm]),
-        classOf[LFirstServing[
-                FriendRecommendationQuery, FriendRecommendationPrediction]]
+        classOf[LFirstServing[FriendRecommendationQuery,
+                              FriendRecommendationPrediction]]
     )
   }
 }

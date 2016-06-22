@@ -102,7 +102,8 @@ object JDBCUtils {
     * @param channelId Optional channel ID
     * @return Full event table name
     */
-  def eventTableName(
-      namespace: String, appId: Int, channelId: Option[Int]): String =
+  def eventTableName(namespace: String,
+                     appId: Int,
+                     channelId: Option[Int]): String =
     s"${namespace}_${appId}${channelId.map("_" + _).getOrElse("")}"
 }

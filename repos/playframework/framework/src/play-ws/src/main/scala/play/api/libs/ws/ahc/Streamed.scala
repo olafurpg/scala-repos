@@ -17,8 +17,8 @@ import scala.concurrent.{Future, Promise}
 
 private[play] object Streamed {
 
-  def execute(
-      client: AsyncHttpClient, request: Request): Future[StreamedResponse] = {
+  def execute(client: AsyncHttpClient,
+              request: Request): Future[StreamedResponse] = {
     val promise =
       Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]()
     client.executeRequest(request, new DefaultStreamedAsyncHandler(promise))
@@ -86,7 +86,8 @@ private[play] object Streamed {
       else {
         val headers = h.getHeaders
         responseHeaders = DefaultWSResponseHeaders(
-            statusCode, AhcWSRequest.ahcHeadersToMap(headers))
+            statusCode,
+            AhcWSRequest.ahcHeadersToMap(headers))
         State.CONTINUE
       }
     }

@@ -55,14 +55,13 @@ object GraphicsContext {
 class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     extends SFXDelegate[jfxsc.GraphicsContext] {
 
-  private def executeWithPoints(
-      action: (Array[Double], Array[Double], Int) => Unit,
-      points: Seq[(Double, Double)]) {
+  private def executeWithPoints(action: (Array[Double], Array[Double],
+                                         Int) => Unit,
+                                points: Seq[(Double, Double)]) {
     val xPoints = new ArrayBuffer[Double](points.size)
     val yPoints = new ArrayBuffer[Double](points.size)
 
-    points.foreach(
-        p => {
+    points.foreach(p => {
       xPoints += p._1
       yPoints += p._2
     })
@@ -240,8 +239,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Fills a polygon with the given points using the currently set fill paint.
     */
-  def fillPolygon(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+  def fillPolygon(xPoints: Array[Double],
+                  yPoints: Array[Double],
+                  nPoints: Int) {
     delegate.fillPolygon(xPoints, yPoints, nPoints)
   }
 
@@ -463,8 +463,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Strokes a polygon with the given points using the currently set stroke paint.
     */
-  def strokePolygon(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+  def strokePolygon(xPoints: Array[Double],
+                    yPoints: Array[Double],
+                    nPoints: Int) {
     delegate.strokePolygon(xPoints, yPoints, nPoints)
   }
 
@@ -478,8 +479,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Draws a polyline with the given points using the currently set stroke paint attribute.
     */
-  def strokePolyline(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+  def strokePolyline(xPoints: Array[Double],
+                     yPoints: Array[Double],
+                     nPoints: Int) {
     delegate.strokePolyline(xPoints, yPoints, nPoints)
   }
 

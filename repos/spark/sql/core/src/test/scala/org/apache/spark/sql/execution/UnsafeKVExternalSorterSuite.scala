@@ -35,10 +35,12 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
   private val valueTypes = Seq(IntegerType, FloatType, DoubleType, StringType)
 
   testKVSorter(new StructType, new StructType, spill = true)
-  testKVSorter(
-      new StructType().add("c1", IntegerType), new StructType, spill = true)
-  testKVSorter(
-      new StructType, new StructType().add("c1", IntegerType), spill = true)
+  testKVSorter(new StructType().add("c1", IntegerType),
+               new StructType,
+               spill = true)
+  testKVSorter(new StructType,
+               new StructType().add("c1", IntegerType),
+               spill = true)
 
   private val rand = new Random(42)
   for (i <- 0 until 6) {
@@ -62,8 +64,9 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     *
     * If spill is set to true, the sorter will spill probabilistically roughly every 100 records.
     */
-  private def testKVSorter(
-      keySchema: StructType, valueSchema: StructType, spill: Boolean): Unit = {
+  private def testKVSorter(keySchema: StructType,
+                           valueSchema: StructType,
+                           spill: Boolean): Unit = {
     // Create the data converters
     val kExternalConverter =
       CatalystTypeConverters.createToCatalystConverter(keySchema)
@@ -78,10 +81,12 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
       RandomDataGenerator.forType(valueSchema, nullable = false).get
 
     val inputData = Seq.fill(1024) {
-      val k = kConverter(kExternalConverter
+      val k = kConverter(
+          kExternalConverter
             .apply(keyDataGen.apply())
             .asInstanceOf[InternalRow])
-      val v = vConverter(vExternalConverter
+      val v = vConverter(
+          vExternalConverter
             .apply(valueDataGen.apply())
             .asInstanceOf[InternalRow])
       (k.asInstanceOf[InternalRow].copy(), v.asInstanceOf[InternalRow].copy())
@@ -133,8 +138,10 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
                             taskMemoryManager = taskMemMgr,
                             metricsSystem = null))
 
-    val sorter = new UnsafeKVExternalSorter(
-        keySchema, valueSchema, SparkEnv.get.blockManager, pageSize)
+    val sorter = new UnsafeKVExternalSorter(keySchema,
+                                            valueSchema,
+                                            SparkEnv.get.blockManager,
+                                            pageSize)
 
     // Insert the keys and values into the sorter
     inputData.foreach {

@@ -23,7 +23,8 @@ object ClusterDeathWatchMultiJvmSpec extends MultiNodeConfig {
   val fourth = role("fourth")
   val fifth = role("fifth")
 
-  commonConfig(debugConfig(on = false).withFallback(
+  commonConfig(
+      debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 
   deployOn(fourth, """/hello.remote = "@first@" """)
@@ -100,10 +101,10 @@ abstract class ClusterDeathWatchSpec
         cluster.down(third)
         // removed
         awaitAssert(clusterView.members.map(_.address) should not contain
-            (address(third)))
+              (address(third)))
         awaitAssert(
             clusterView.unreachableMembers.map(_.address) should not contain
-            (address(third)))
+              (address(third)))
         expectMsg(path3)
         enterBarrier("third-terminated")
       }
@@ -116,16 +117,15 @@ abstract class ClusterDeathWatchSpec
         enterBarrier("watch-established")
         runOn(third) {
           markNodeAsUnavailable(second)
-          awaitAssert(
-              clusterView.unreachableMembers.map(_.address) should contain(
-                  address(second)))
+          awaitAssert(clusterView.unreachableMembers
+                .map(_.address) should contain(address(second)))
           cluster.down(second)
           // removed
           awaitAssert(clusterView.members.map(_.address) should not contain
-              (address(second)))
+                (address(second)))
           awaitAssert(
               clusterView.unreachableMembers.map(_.address) should not contain
-              (address(second)))
+                (address(second)))
         }
         enterBarrier("second-terminated")
         enterBarrier("third-terminated")
@@ -168,7 +168,8 @@ abstract class ClusterDeathWatchSpec
       enterBarrier("subjected-started")
 
       runOn(first) {
-        system.actorSelection(RootActorPath(fifth) / "user" / "subject5") ! Identify(
+        system
+          .actorSelection(RootActorPath(fifth) / "user" / "subject5") ! Identify(
             "subject5")
         val subject5 = expectMsgType[ActorIdentity].ref.get
         watch(subject5)
@@ -208,9 +209,9 @@ abstract class ClusterDeathWatchSpec
         // removed
         awaitAssert(
             clusterView.unreachableMembers.map(_.address) should not contain
-            (address(fifth)))
+              (address(fifth)))
         awaitAssert(clusterView.members.map(_.address) should not contain
-            (address(fifth)))
+              (address(fifth)))
       }
 
       enterBarrier("fifth-terminated")
@@ -246,9 +247,9 @@ abstract class ClusterDeathWatchSpec
         // removed
         awaitAssert(
             clusterView.unreachableMembers.map(_.address) should not contain
-            (address(first)))
+              (address(first)))
         awaitAssert(clusterView.members.map(_.address) should not contain
-            (address(first)))
+              (address(first)))
 
         expectTerminated(hello)
 
@@ -257,7 +258,8 @@ abstract class ClusterDeathWatchSpec
         val timeout = remainingOrDefault
         try Await.ready(system.whenTerminated, timeout) catch {
           case _: TimeoutException ⇒
-            fail("Failed to stop [%s] within [%s] \n%s".format(
+            fail(
+                "Failed to stop [%s] within [%s] \n%s".format(
                     system.name,
                     timeout,
                     system.asInstanceOf[ActorSystemImpl].printTree))

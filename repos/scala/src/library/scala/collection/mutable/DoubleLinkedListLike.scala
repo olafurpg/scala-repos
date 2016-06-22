@@ -119,7 +119,7 @@ trait DoubleLinkedListLike[
   private def outofbounds(n: Int) =
     throw new IndexOutOfBoundsException(n.toString)
 
-  override def drop(n: Int): This = super [SeqLike].drop(n)
+  override def drop(n: Int): This = super[SeqLike].drop(n)
   override def tail = drop(1)
   override def apply(n: Int): A = atLocation(n)(_.elem)(outofbounds(n))
   override def update(n: Int, x: A): Unit =

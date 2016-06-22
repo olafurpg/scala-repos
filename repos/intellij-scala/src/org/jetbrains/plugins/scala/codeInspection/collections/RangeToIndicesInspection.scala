@@ -25,8 +25,8 @@ object RangeToIndices extends SimplificationType {
       case _ => None
     }
 
-  def toIndicesSimplification(
-      expr: ScExpression, qual: ScExpression): Some[Simplification] = {
+  def toIndicesSimplification(expr: ScExpression,
+                              qual: ScExpression): Some[Simplification] = {
     Some(
         replace(expr)
           .withText(invocationText(qual, "indices"))

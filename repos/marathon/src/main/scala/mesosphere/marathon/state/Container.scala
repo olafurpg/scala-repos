@@ -8,10 +8,10 @@ import scala.collection.immutable.Seq
 
 // TODO: trait Container and specializations?
 // Current implementation with type defaulting to DOCKER and docker to NONE makes no sense
-case class Container(
-    `type`: Mesos.ContainerInfo.Type = Mesos.ContainerInfo.Type.DOCKER,
-    volumes: Seq[Volume] = Nil,
-    docker: Option[Container.Docker] = None)
+case class Container(`type`: Mesos.ContainerInfo.Type =
+                       Mesos.ContainerInfo.Type.DOCKER,
+                     volumes: Seq[Volume] = Nil,
+                     docker: Option[Container.Docker] = None)
 
 object Container {
 
@@ -20,13 +20,13 @@ object Container {
   /**
     * Docker-specific container parameters.
     */
-  case class Docker(
-      image: String = "",
-      network: Option[Mesos.ContainerInfo.DockerInfo.Network] = None,
-      portMappings: Option[Seq[Docker.PortMapping]] = None,
-      privileged: Boolean = false,
-      parameters: Seq[Parameter] = Nil,
-      forcePullImage: Boolean = false)
+  case class Docker(image: String = "",
+                    network: Option[Mesos.ContainerInfo.DockerInfo.Network] =
+                      None,
+                    portMappings: Option[Seq[Docker.PortMapping]] = None,
+                    privileged: Boolean = false,
+                    parameters: Seq[Parameter] = Nil,
+                    forcePullImage: Boolean = false)
 
   object Docker {
 

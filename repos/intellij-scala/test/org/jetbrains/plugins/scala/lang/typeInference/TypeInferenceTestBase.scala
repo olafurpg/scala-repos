@@ -69,7 +69,10 @@ abstract class TypeInferenceTestBase
                                       classOf[ScExpression]) != null) 0
       else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+        scalaFile,
+        startOffset + addOne,
+        endOffset,
+        classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty) match {
       case Success(Unit, _) => expr.getTypeIgnoreBaseType(TypingContext.empty)
@@ -110,8 +113,8 @@ abstract class TypeInferenceTestBase
               ScType.presentableText(actualExpectedType)
             assertEquals(expectedExpectedTypeText, actualExpectedTypeText)
           case SimplifiedPattern(expectedText) =>
-            assertEquals(
-                expectedText, ScTypePresentation.withoutAliases(ttypez))
+            assertEquals(expectedText,
+                         ScTypePresentation.withoutAliases(ttypez))
           case _ => assertEquals(output, res)
         }
       case Failure(msg, elem) =>

@@ -99,8 +99,8 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
 
     // test for uncompressed regular messages
     {
-      val messageSet = new ByteBufferMessageSet(
-          NoCompressionCodec, messageList: _*)
+      val messageSet =
+        new ByteBufferMessageSet(NoCompressionCodec, messageList: _*)
       TestUtils.checkEquals[Message](
           messageList.iterator,
           TestUtils.getMessageIterator(messageSet.iterator))
@@ -117,8 +117,8 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
 
     // test for compressed regular messages
     {
-      val messageSet = new ByteBufferMessageSet(
-          DefaultCompressionCodec, messageList: _*)
+      val messageSet =
+        new ByteBufferMessageSet(DefaultCompressionCodec, messageList: _*)
       TestUtils.checkEquals[Message](
           messageList.iterator,
           TestUtils.getMessageIterator(messageSet.iterator))
@@ -132,10 +132,10 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     // test for mixed empty and non-empty messagesets uncompressed
     {
       val emptyMessageList: List[Message] = Nil
-      val emptyMessageSet = new ByteBufferMessageSet(
-          NoCompressionCodec, emptyMessageList: _*)
-      val regularMessgeSet = new ByteBufferMessageSet(
-          NoCompressionCodec, messageList: _*)
+      val emptyMessageSet =
+        new ByteBufferMessageSet(NoCompressionCodec, emptyMessageList: _*)
+      val regularMessgeSet =
+        new ByteBufferMessageSet(NoCompressionCodec, messageList: _*)
       val buffer = ByteBuffer.allocate(
           emptyMessageSet.buffer.limit + regularMessgeSet.buffer.limit)
       buffer.put(emptyMessageSet.buffer)
@@ -158,10 +158,10 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     // test for mixed empty and non-empty messagesets compressed
     {
       val emptyMessageList: List[Message] = Nil
-      val emptyMessageSet = new ByteBufferMessageSet(
-          DefaultCompressionCodec, emptyMessageList: _*)
-      val regularMessgeSet = new ByteBufferMessageSet(
-          DefaultCompressionCodec, messageList: _*)
+      val emptyMessageSet =
+        new ByteBufferMessageSet(DefaultCompressionCodec, emptyMessageList: _*)
+      val regularMessgeSet =
+        new ByteBufferMessageSet(DefaultCompressionCodec, messageList: _*)
       val buffer = ByteBuffer.allocate(
           emptyMessageSet.buffer.limit + regularMessgeSet.buffer.limit)
       buffer.put(emptyMessageSet.buffer)
@@ -182,11 +182,11 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
   @Test
   def testMessageWithProvidedOffsetSeq() {
     val offsets = Seq(0L, 2L)
-    val messages = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec,
-        offsetSeq = offsets,
-        new Message("hello".getBytes),
-        new Message("goodbye".getBytes))
+    val messages = new ByteBufferMessageSet(compressionCodec =
+                                              NoCompressionCodec,
+                                            offsetSeq = offsets,
+                                            new Message("hello".getBytes),
+                                            new Message("goodbye".getBytes))
     val iter = messages.iterator
     assertEquals("first offset should be 0", 0L, iter.next().offset)
     assertEquals("second offset should be 2", 2L, iter.next().offset)
@@ -200,7 +200,8 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                                timestamp = 0L,
                                codec = NoCompressionCodec)
     val compressedMessagesWithRecompresion = getMessages(
-        magicValue = Message.MagicValue_V0, codec = DefaultCompressionCodec)
+        magicValue = Message.MagicValue_V0,
+        codec = DefaultCompressionCodec)
     val compressedMessagesWithoutRecompression = getMessages(
         magicValue = Message.MagicValue_V1,
         timestamp = -1L,
@@ -303,14 +304,14 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     for (messageAndOffset <- validatedMessages) {
       messageAndOffset.message.ensureValid()
       assertEquals(messageAndOffset.message.timestamp, now)
-      assertEquals(
-          messageAndOffset.message.timestampType, TimestampType.CREATE_TIME)
+      assertEquals(messageAndOffset.message.timestampType,
+                   TimestampType.CREATE_TIME)
     }
     for (messageAndOffset <- validatedCompressedMessages) {
       messageAndOffset.message.ensureValid()
       assertEquals(messageAndOffset.message.timestamp, now)
-      assertEquals(
-          messageAndOffset.message.timestampType, TimestampType.CREATE_TIME)
+      assertEquals(messageAndOffset.message.timestampType,
+                   TimestampType.CREATE_TIME)
     }
   }
 
@@ -355,10 +356,10 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
 
   @Test
   def testAbsoluteOffsetAssignment() {
-    val messages = getMessages(
-        magicValue = Message.MagicValue_V0, codec = NoCompressionCodec)
-    val compressedMessages = getMessages(
-        magicValue = Message.MagicValue_V0, codec = DefaultCompressionCodec)
+    val messages = getMessages(magicValue = Message.MagicValue_V0,
+                               codec = NoCompressionCodec)
+    val compressedMessages = getMessages(magicValue = Message.MagicValue_V0,
+                                         codec = DefaultCompressionCodec)
     // check uncompressed offsets
     checkOffsets(messages, 0)
     val offset = 1234567
@@ -427,10 +428,10 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
   @Test
   def testOffsetAssignmentAfterMessageFormatConversion() {
     // Check up conversion
-    val messagesV0 = getMessages(
-        magicValue = Message.MagicValue_V0, codec = NoCompressionCodec)
-    val compressedMessagesV0 = getMessages(
-        magicValue = Message.MagicValue_V0, codec = DefaultCompressionCodec)
+    val messagesV0 = getMessages(magicValue = Message.MagicValue_V0,
+                                 codec = NoCompressionCodec)
+    val compressedMessagesV0 = getMessages(magicValue = Message.MagicValue_V0,
+                                           codec = DefaultCompressionCodec)
     // check uncompressed offsets
     checkOffsets(messagesV0, 0)
     val offset = 1234567
@@ -462,10 +463,10 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
 
     // Check down conversion
     val now = System.currentTimeMillis()
-    val messagesV1 = getMessages(
-        Message.MagicValue_V1, now, NoCompressionCodec)
-    val compressedMessagesV1 = getMessages(
-        Message.MagicValue_V1, now, DefaultCompressionCodec)
+    val messagesV1 =
+      getMessages(Message.MagicValue_V1, now, NoCompressionCodec)
+    val compressedMessagesV1 =
+      getMessages(Message.MagicValue_V1, now, DefaultCompressionCodec)
 
     // check uncompressed offsets
     checkOffsets(messagesV1, 0)
@@ -501,8 +502,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     assertTrue("Message set should not be empty", messages.size > 0)
     var offset = baseOffset
     for (entry <- messages) {
-      assertEquals(
-          "Unexpected offset in message set iterator", offset, entry.offset)
+      assertEquals("Unexpected offset in message set iterator",
+                   offset,
+                   entry.offset)
       offset += 1
     }
   }
@@ -521,15 +523,16 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
       timestamp: Long = Message.NoTimestamp,
       codec: CompressionCodec = NoCompressionCodec): ByteBufferMessageSet = {
     if (magicValue == Message.MagicValue_V0) {
-      new ByteBufferMessageSet(
-          codec,
-          new Message(
-              "hello".getBytes, Message.NoTimestamp, Message.MagicValue_V0),
-          new Message(
-              "there".getBytes, Message.NoTimestamp, Message.MagicValue_V0),
-          new Message("beautiful".getBytes,
-                      Message.NoTimestamp,
-                      Message.MagicValue_V0))
+      new ByteBufferMessageSet(codec,
+                               new Message("hello".getBytes,
+                                           Message.NoTimestamp,
+                                           Message.MagicValue_V0),
+                               new Message("there".getBytes,
+                                           Message.NoTimestamp,
+                                           Message.MagicValue_V0),
+                               new Message("beautiful".getBytes,
+                                           Message.NoTimestamp,
+                                           Message.MagicValue_V0))
     } else {
       new ByteBufferMessageSet(codec,
                                new Message("hello".getBytes,

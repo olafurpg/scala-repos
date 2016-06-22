@@ -93,8 +93,15 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
-      arbitraryNodes += new AndroidFacetNode(
-          "", null, null, null, null, null, null, false, Seq.empty)
+      arbitraryNodes += new AndroidFacetNode("",
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             false,
+                                             Seq.empty)
     }.build.toDataNode
     importProjectData(testProject)
   }

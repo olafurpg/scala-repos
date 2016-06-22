@@ -27,8 +27,8 @@ object CaseObjectOrderedBuf {
   def dispatch(c: Context)(): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
     case tpe
         if tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass &&
-        tpe.typeSymbol.asClass.isModuleClass &&
-        !tpe.typeConstructor.takesTypeArgs =>
+          tpe.typeSymbol.asClass.isModuleClass &&
+          !tpe.typeConstructor.takesTypeArgs =>
       CaseObjectOrderedBuf(c)(tpe)
   }
 
@@ -39,8 +39,8 @@ object CaseObjectOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = q"0"
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) = q"0"
 
       override def hash(element: ctx.TermName): ctx.Tree =
         q"${outerType.toString.hashCode}"
@@ -51,8 +51,8 @@ object CaseObjectOrderedBuf {
       override def get(inputStream: ctx.TermName): ctx.Tree =
         q"${outerType.typeSymbol.companionSymbol}"
 
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = q"0"
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree = q"0"
 
       override val lazyOuterVariables: Map[String, ctx.Tree] = Map.empty
       override def length(element: Tree) = ConstantLengthCalculation(c)(0)

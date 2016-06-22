@@ -29,17 +29,19 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
       "object" >> {
         val result = eval("""{ name: "John", age: 29, gender: "male" }""")
         result must haveSize(1)
-        result must contain(SObject(Map("name" -> SString("John"),
-                                        "age" -> SDecimal(29),
-                                        "gender" -> SString("male"))))
+        result must contain(
+            SObject(Map("name" -> SString("John"),
+                        "age" -> SDecimal(29),
+                        "gender" -> SString("male"))))
       }
 
       "object with null" >> {
         val result = eval("""{ name: "John", age: 29, gender: null }""")
         result must haveSize(1)
-        result must contain(SObject(Map("name" -> SString("John"),
-                                        "age" -> SDecimal(29),
-                                        "gender" -> SNull)))
+        result must contain(
+            SObject(Map("name" -> SString("John"),
+                        "age" -> SDecimal(29),
+                        "gender" -> SNull)))
       }
 
       "object with undefined" >> {

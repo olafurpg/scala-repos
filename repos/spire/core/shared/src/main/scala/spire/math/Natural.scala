@@ -344,7 +344,7 @@ sealed abstract class Natural
         case End(rd) => lhs * rd
         case Digit(rd, rtail) =>
           Digit(UInt(0), Digit(UInt(0), ltail * rtail)) +
-          Digit(UInt(0), ltail * rd) + Digit(UInt(0), rtail * ld) + Natural(
+            Digit(UInt(0), ltail * rd) + Digit(UInt(0), rtail * ld) + Natural(
               ld.toLong * rd.toLong)
       }
   }
@@ -707,8 +707,12 @@ object Natural extends NaturalInstances {
 trait NaturalInstances {
   implicit final val NaturalAlgebra = new NaturalAlgebra
   import NumberTag._
-  implicit final val NaturalTag = new CustomTag[Natural](
-      Integral, Some(Natural.zero), Some(Natural.zero), None, false, false)
+  implicit final val NaturalTag = new CustomTag[Natural](Integral,
+                                                         Some(Natural.zero),
+                                                         Some(Natural.zero),
+                                                         None,
+                                                         false,
+                                                         false)
 }
 
 private[math] trait NaturalIsRig extends Rig[Natural] {

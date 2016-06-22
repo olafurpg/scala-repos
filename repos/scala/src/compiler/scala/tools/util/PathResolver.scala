@@ -175,11 +175,11 @@ object PathResolver {
       |}""".asLines
   }
 
-  @deprecated(
-      "This method is no longer used be scalap and will be deleted", "2.11.5")
-  def fromPathString(path: String,
-                     context: JavaContext =
-                       DefaultJavaContext): JavaClassPath = {
+  @deprecated("This method is no longer used be scalap and will be deleted",
+              "2.11.5")
+  def fromPathString(
+      path: String,
+      context: JavaContext = DefaultJavaContext): JavaClassPath = {
     val s = new Settings()
     s.classpath.value = path
     new PathResolver(s, context).result
@@ -216,10 +216,11 @@ trait PathResolverResult {
   def resultAsURLs: Seq[URL] = result.asURLs
 }
 
-abstract class PathResolverBase[
-    BaseClassPathType <: ClassFileLookup[AbstractFile],
-    ResultClassPathType <: BaseClassPathType](
-    settings: Settings, classPathFactory: ClassPathFactory[BaseClassPathType])
+abstract class PathResolverBase[BaseClassPathType <: ClassFileLookup[
+                                    AbstractFile],
+                                ResultClassPathType <: BaseClassPathType](
+    settings: Settings,
+    classPathFactory: ClassPathFactory[BaseClassPathType])
     extends PathResolverResult {
 
   import PathResolver.{AsLines, Defaults, ppcp}
@@ -330,8 +331,8 @@ abstract class PathResolverBase[
 }
 
 class PathResolver(settings: Settings, context: JavaContext)
-    extends PathResolverBase[ClassPath[AbstractFile], JavaClassPath](
-        settings, context) {
+    extends PathResolverBase[ClassPath[AbstractFile], JavaClassPath](settings,
+                                                                     context) {
 
   def this(settings: Settings) = this(settings, DefaultJavaContext)
 
@@ -340,9 +341,11 @@ class PathResolver(settings: Settings, context: JavaContext)
 }
 
 class FlatClassPathResolver(
-    settings: Settings, flatClassPathFactory: ClassPathFactory[FlatClassPath])
+    settings: Settings,
+    flatClassPathFactory: ClassPathFactory[FlatClassPath])
     extends PathResolverBase[FlatClassPath, AggregateFlatClassPath](
-        settings, flatClassPathFactory) {
+        settings,
+        flatClassPathFactory) {
 
   def this(settings: Settings) =
     this(settings, new FlatClassPathFactory(settings))

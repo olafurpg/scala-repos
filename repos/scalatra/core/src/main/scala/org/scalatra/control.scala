@@ -28,8 +28,10 @@ trait Control {
   }
 
   def halt(result: ActionResult): Nothing = {
-    halt(
-        result.status.code, result.body, result.headers, result.status.message)
+    halt(result.status.code,
+         result.body,
+         result.headers,
+         result.status.message)
   }
 
   /**

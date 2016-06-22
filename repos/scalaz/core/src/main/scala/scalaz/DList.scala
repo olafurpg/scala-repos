@@ -14,7 +14,7 @@ import std.function._
   * making it very useful for append-heavy uses, such as logging and
   * pretty printing.
   */
-final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
+final class DList[A] private[scalaz] (f: IList[A] => Trampoline[IList[A]]) {
   import DList._
   def apply(xs: => IList[A]): Trampoline[IList[A]] = f(xs)
 
@@ -87,8 +87,7 @@ object DList extends DListInstances {
     xs.foldRight(DList[A]())(_ ++ _)
 
   def replicate[A](n: Int, a: A): DList[A] =
-    DL(
-        xs => {
+    DL(xs => {
       def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
       go(n)
     })

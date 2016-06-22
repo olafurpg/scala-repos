@@ -28,19 +28,18 @@ class TemplateFilter extends ElementFilter {
         case _: ScReferenceExpression =>
           parent.getParent match {
             case y: ScStableReferenceElementPattern => {
-                y.getParent match {
-                  case x: ScCaseClause => {
-                      x.getParent.getParent match {
-                        case _: ScMatchStmt
-                            if (x.getParent.getFirstChild == x) =>
-                          return false
-                        case _: ScMatchStmt => return true
-                        case _ => return true
-                      }
-                    }
-                  case _ =>
+              y.getParent match {
+                case x: ScCaseClause => {
+                  x.getParent.getParent match {
+                    case _: ScMatchStmt if (x.getParent.getFirstChild == x) =>
+                      return false
+                    case _: ScMatchStmt => return true
+                    case _ => return true
+                  }
                 }
+                case _ =>
               }
+            }
             case _ =>
           }
         case _ =>

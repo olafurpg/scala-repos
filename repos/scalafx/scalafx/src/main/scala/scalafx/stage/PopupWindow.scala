@@ -44,8 +44,8 @@ object PopupWindow {
     * Wraps [[http://download.java.net/jdk8/jfxdocs/javafx/stage/PopupWindow.AnchorLocation.html AnchorLocation]]
     */
   object AnchorLocation
-      extends SFXEnumDelegateCompanion[
-          jfxs.PopupWindow.AnchorLocation, AnchorLocation] {
+      extends SFXEnumDelegateCompanion[jfxs.PopupWindow.AnchorLocation,
+                                       AnchorLocation] {
 
     /** Represents bottom left content corner. */
     val ContentBottomLeft = new AnchorLocation(

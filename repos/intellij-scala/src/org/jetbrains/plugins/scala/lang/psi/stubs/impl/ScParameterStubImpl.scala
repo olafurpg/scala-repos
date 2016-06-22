@@ -19,8 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScParameterStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScParameter](parent, elemType)
     with ScParameterStub {
   private var name: String = _
@@ -37,8 +37,8 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
   private var _deprecatedName: Option[String] = None
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: String,
            typeText: String,
            stable: Boolean,
@@ -66,8 +66,8 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
   }
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: StringRef,
            typeText: StringRef,
            stable: Boolean,
@@ -108,8 +108,8 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
     val res: Option[ScTypeElement] =
       if (getTypeText != "")
         Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getTypeText, getPsi, null))
+            ScalaPsiElementFactory
+              .createTypeElementFromText(getTypeText, getPsi, null))
       else None
     myTypeElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -141,8 +141,8 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
       case Some("") => None
       case Some(text) =>
         Some(
-            ScalaPsiElementFactory.createExpressionWithContextFromText(
-                text, getPsi, null))
+            ScalaPsiElementFactory
+              .createExpressionWithContextFromText(text, getPsi, null))
     }
     myDefaultExpression = new SofterReference[Option[ScExpression]](res)
     res

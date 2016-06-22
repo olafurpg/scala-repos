@@ -162,7 +162,7 @@ private object IDF {
   * Represents an IDF model that can transform term frequency vectors.
   */
 @Since("1.1.0")
-class IDFModel private[spark](@Since("1.1.0") val idf: Vector)
+class IDFModel private[spark] (@Since("1.1.0") val idf: Vector)
     extends Serializable {
 
   /**

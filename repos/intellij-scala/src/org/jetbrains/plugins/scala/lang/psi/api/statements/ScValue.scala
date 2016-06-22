@@ -41,15 +41,16 @@ trait ScValue
 
   def declaredType: Option[ScType] =
     typeElement flatMap
-    (_.getType(TypingContext.empty) match {
-          case Success(t, _) => Some(t)
-          case _ => None
-        })
+      (_.getType(TypingContext.empty) match {
+            case Success(t, _) => Some(t)
+            case _ => None
+          })
 
   def getType(ctx: TypingContext): TypeResult[ScType]
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean): Boolean = m match {
+      m: ScMember,
+      isStrict: Boolean): Boolean = m match {
     case other: ScValue =>
       for (elem <- self.declaredElements) {
         if (other.declaredElements.exists(_.name == elem.name)) return true
@@ -74,7 +75,7 @@ trait ScValue
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
-    hasAnnotation("java.lang.Deprecated") != None
+      hasAnnotation("java.lang.Deprecated") != None
 
   override def modifiableReturnType: Option[ScType] =
     getType(TypingContext.empty).toOption

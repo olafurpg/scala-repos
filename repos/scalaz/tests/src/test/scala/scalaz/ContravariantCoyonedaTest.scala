@@ -45,8 +45,8 @@ object ContravariantCoyonedaGens {
     ((x - 1: BigInt) isProbablePrime 5, x)
   }
 
-  val intOrders: Gen[CtCoOrder[Int]] = Gen.oneOf[CtCoOrder[Int]](
-      aToString[Int], evensFirst, negated, probablePrime)
+  val intOrders: Gen[CtCoOrder[Int]] = Gen
+    .oneOf[CtCoOrder[Int]](aToString[Int], evensFirst, negated, probablePrime)
 }
 
 object ContravariantCoyonedaTest extends SpecLite {

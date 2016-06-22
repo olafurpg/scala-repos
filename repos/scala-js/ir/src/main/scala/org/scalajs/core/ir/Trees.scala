@@ -142,9 +142,10 @@ object Trees {
     def ref(implicit pos: Position): VarRef = VarRef(name)(vtpe)
   }
 
-  case class ParamDef(
-      name: Ident, ptpe: Type, mutable: Boolean, rest: Boolean)(
-      implicit val pos: Position)
+  case class ParamDef(name: Ident,
+                      ptpe: Type,
+                      mutable: Boolean,
+                      rest: Boolean)(implicit val pos: Position)
       extends Tree {
     val tpe = NoType
 
@@ -193,8 +194,8 @@ object Trees {
   case class Assign(lhs: Tree, rhs: Tree)(implicit val pos: Position)
       extends Tree {
     require(lhs match {
-      case _: VarRef | _: Select | _: ArraySelect |
-          _: JSDotSelect | _: JSBracketSelect | _: JSSuperBracketSelect =>
+      case _: VarRef | _: Select | _: ArraySelect | _: JSDotSelect |
+          _: JSBracketSelect | _: JSSuperBracketSelect =>
         true
       case _ => false
     }, s"Invalid lhs for Assign: $lhs")
@@ -208,8 +209,8 @@ object Trees {
     val tpe = NothingType
   }
 
-  case class If(cond: Tree, thenp: Tree, elsep: Tree)(
-      val tpe: Type)(implicit val pos: Position)
+  case class If(cond: Tree, thenp: Tree, elsep: Tree)(val tpe: Type)(
+      implicit val pos: Position)
       extends Tree
 
   case class While(cond: Tree, body: Tree, label: Option[Ident] = None)(
@@ -248,9 +249,9 @@ object Trees {
     *  implement alternatives.
     *  (This is not a pattern matching construct like in Scala.)
     */
-  case class Match(
-      selector: Tree, cases: List[(List[Literal], Tree)], default: Tree)(
-      val tpe: Type)(implicit val pos: Position)
+  case class Match(selector: Tree,
+                   cases: List[(List[Literal], Tree)],
+                   default: Tree)(val tpe: Type)(implicit val pos: Position)
       extends Tree
 
   case class Debugger()(implicit val pos: Position) extends Tree {
@@ -287,8 +288,10 @@ object Trees {
 
   /** Apply an instance method with static dispatch (e.g., super calls). */
   case class ApplyStatically(
-      receiver: Tree, cls: ClassType, method: Ident, args: List[Tree])(
-      val tpe: Type)(implicit val pos: Position)
+      receiver: Tree,
+      cls: ClassType,
+      method: Ident,
+      args: List[Tree])(val tpe: Type)(implicit val pos: Position)
       extends Tree
 
   /** Apply a static method. */
@@ -471,8 +474,8 @@ object Trees {
     val tpe = ClassType(Definitions.ClassClass)
   }
 
-  case class CallHelper(helper: String, args: List[Tree])(
-      val tpe: Type)(implicit val pos: Position)
+  case class CallHelper(helper: String, args: List[Tree])(val tpe: Type)(
+      implicit val pos: Position)
       extends Tree
 
   object CallHelper {
@@ -513,9 +516,9 @@ object Trees {
     val tpe = AnyType
   }
 
-  case class JSBracketMethodApply(
-      receiver: Tree, method: Tree, args: List[Tree])(
-      implicit val pos: Position)
+  case class JSBracketMethodApply(receiver: Tree,
+                                  method: Tree,
+                                  args: List[Tree])(implicit val pos: Position)
       extends Tree {
     val tpe = AnyType
   }
@@ -595,9 +598,10 @@ object Trees {
     *  super[method](...args)
     *  }}}
     */
-  case class JSSuperBracketCall(
-      cls: ClassType, receiver: Tree, method: Tree, args: List[Tree])(
-      implicit val pos: Position)
+  case class JSSuperBracketCall(cls: ClassType,
+                                receiver: Tree,
+                                method: Tree,
+                                args: List[Tree])(implicit val pos: Position)
       extends Tree {
     val tpe = AnyType
   }
@@ -639,8 +643,8 @@ object Trees {
     *  }
     *  }}}
     */
-  case class JSSuperConstructorCall(
-      args: List[Tree])(implicit val pos: Position)
+  case class JSSuperConstructorCall(args: List[Tree])(
+      implicit val pos: Position)
       extends Tree {
     val tpe = NoType
   }
@@ -776,8 +780,8 @@ object Trees {
     val tpe = AnyType
   }
 
-  case class JSObjectConstr(
-      fields: List[(PropertyName, Tree)])(implicit val pos: Position)
+  case class JSObjectConstr(fields: List[(PropertyName, Tree)])(
+      implicit val pos: Position)
       extends Tree {
     val tpe = AnyType
   }
@@ -883,8 +887,8 @@ object Trees {
                        args: List[ParamDef],
                        resultType: Type,
                        body: Tree)(
-      val optimizerHints: OptimizerHints, val hash: Option[TreeHash])(
-      implicit val pos: Position)
+      val optimizerHints: OptimizerHints,
+      val hash: Option[TreeHash])(implicit val pos: Position)
       extends Tree {
     val tpe = NoType
   }
@@ -897,9 +901,9 @@ object Trees {
     val tpe = NoType
   }
 
-  case class ConstructorExportDef(
-      name: String, args: List[ParamDef], body: Tree)(
-      implicit val pos: Position)
+  case class ConstructorExportDef(name: String,
+                                  args: List[ParamDef],
+                                  body: Tree)(implicit val pos: Position)
       extends Tree {
     val tpe = NoType
   }

@@ -14,8 +14,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScalaInjectedStringLiteralManipulator
     extends AbstractElementManipulator[ScLiteral] {
-  override def handleContentChange(
-      expr: ScLiteral, range: TextRange, newContent: String): ScLiteral = {
+  override def handleContentChange(expr: ScLiteral,
+                                   range: TextRange,
+                                   newContent: String): ScLiteral = {
     val oldText = expr.getText
     val contentString = expr.getFirstChild.getNode.getElementType match {
       case ScalaTokenTypes.tMULTILINE_STRING => newContent
@@ -23,7 +24,7 @@ class ScalaInjectedStringLiteralManipulator
     }
     val newText =
       oldText.substring(0, range.getStartOffset) + contentString +
-      oldText.substring(range.getEndOffset)
+        oldText.substring(range.getEndOffset)
 
     expr match {
       case inter: ScInterpolatedStringLiteral =>
@@ -32,7 +33,8 @@ class ScalaInjectedStringLiteralManipulator
         inter.reference.map {
           case ref =>
             ScalaPsiElementFactory.createExpressionFromText(
-                s"${ref.getText}$quotes$newContent$quotes", expr.getManager)
+                s"${ref.getText}$quotes$newContent$quotes",
+                expr.getManager)
         } match {
           case Some(l: ScLiteral) =>
             expr.replace(l)
@@ -42,8 +44,8 @@ class ScalaInjectedStringLiteralManipulator
                 "cannot handle content change")
         }
       case str if str.isString =>
-        val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-            newText, str.getManager)
+        val newExpr = ScalaPsiElementFactory
+          .createExpressionFromText(newText, str.getManager)
 
         val firstChild = str.getFirstChild
         val newElement = newExpr.getFirstChild

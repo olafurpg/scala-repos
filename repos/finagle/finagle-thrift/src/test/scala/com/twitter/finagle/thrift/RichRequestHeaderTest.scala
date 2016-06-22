@@ -75,8 +75,11 @@ class RichRequestHeaderTest extends FunSuite {
       .setFlags(4)
 
     val richHeader = new RichRequestHeader(header)
-    val expected = TraceId(
-        Some(SpanId(0)), Some(SpanId(1)), SpanId(2), Some(true), Flags(4))
+    val expected = TraceId(Some(SpanId(0)),
+                           Some(SpanId(1)),
+                           SpanId(2),
+                           Some(true),
+                           Flags(4))
     assert(expected == richHeader.traceId)
   }
 }

@@ -78,8 +78,12 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
            sparkHome: String,
            jarFile: String) =
     this(
-        new StreamingContext(
-            master, appName, batchDuration, sparkHome, Seq(jarFile), Map()))
+        new StreamingContext(master,
+                             appName,
+                             batchDuration,
+                             sparkHome,
+                             Seq(jarFile),
+                             Map()))
 
   /**
     * Create a StreamingContext.
@@ -96,8 +100,12 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
            sparkHome: String,
            jars: Array[String]) =
     this(
-        new StreamingContext(
-            master, appName, batchDuration, sparkHome, jars, Map()))
+        new StreamingContext(master,
+                             appName,
+                             batchDuration,
+                             sparkHome,
+                             jars,
+                             Map()))
 
   /**
     * Create a StreamingContext.
@@ -180,8 +188,8 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     * @param hostname      Hostname to connect to for receiving data
     * @param port          Port to connect to for receiving data
     */
-  def socketTextStream(
-      hostname: String, port: Int): JavaReceiverInputDStream[String] = {
+  def socketTextStream(hostname: String,
+                       port: Int): JavaReceiverInputDStream[String] = {
     ssc.socketTextStream(hostname, port)
   }
 
@@ -230,8 +238,8 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     * @param directory HDFS directory to monitor for new files
     * @param recordLength The length at which to split the records
     */
-  def binaryRecordsStream(
-      directory: String, recordLength: Int): JavaDStream[Array[Byte]] = {
+  def binaryRecordsStream(directory: String,
+                          recordLength: Int): JavaDStream[Array[Byte]] = {
     ssc.binaryRecordsStream(directory, recordLength)
   }
 
@@ -264,8 +272,8 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
     * @param port          Port to connect to for receiving data
     * @tparam T            Type of the objects in the received blocks
     */
-  def rawSocketStream[T](
-      hostname: String, port: Int): JavaReceiverInputDStream[T] = {
+  def rawSocketStream[T](hostname: String,
+                         port: Int): JavaReceiverInputDStream[T] = {
     implicit val cmt: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
     JavaReceiverInputDStream.fromReceiverInputDStream(
@@ -438,8 +446,8 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
   /**
     * Create a unified DStream from multiple DStreams of the same type and same slide duration.
     */
-  def union[T](
-      first: JavaDStream[T], rest: JList[JavaDStream[T]]): JavaDStream[T] = {
+  def union[T](first: JavaDStream[T],
+               rest: JList[JavaDStream[T]]): JavaDStream[T] = {
     val dstreams: Seq[DStream[T]] = (Seq(first) ++ rest.asScala).map(_.dstream)
     implicit val cm: ClassTag[T] = first.classTag
     ssc.union(dstreams)(cm)

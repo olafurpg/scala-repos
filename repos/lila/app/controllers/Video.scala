@@ -32,7 +32,8 @@ object Video extends LilaController {
               Ok(html.video.search(videos, control))
           }
         case None =>
-          env.api.video.byTags(ctx.me, control.filter.tags, getInt("page") | 1) zip env.api.video.count.apply map {
+          env.api.video
+            .byTags(ctx.me, control.filter.tags, getInt("page") | 1) zip env.api.video.count.apply map {
             case (videos, count) =>
               Ok(html.video.index(videos, count, control))
           }

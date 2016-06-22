@@ -70,7 +70,7 @@ class HttpEventActorTest
     Given("A HttpEventActor with 2 subscribers")
     val aut = TestActorRef(new NoHttpEventActor(Set("host1", "host2")))
     aut.underlyingActor.limiter +=
-      "host1" -> EventNotificationLimit(23, Some(100.seconds.fromNow))
+    "host1" -> EventNotificationLimit(23, Some(100.seconds.fromNow))
 
     When("An event is send to the actor")
     Then("Only one subscriber is limited")
@@ -90,7 +90,7 @@ class HttpEventActorTest
         "A HttpEventActor with 2 subscribers, where one has a overdue backoff")
     val aut = TestActorRef(new NoHttpEventActor(Set("host1", "host2")))
     aut.underlyingActor.limiter +=
-      "host1" -> EventNotificationLimit(23, Some((-100).seconds.fromNow))
+    "host1" -> EventNotificationLimit(23, Some((-100).seconds.fromNow))
     aut.underlyingActor.limiter
       .map(_._2.backoffUntil)
       .forall(_.map(_.isOverdue()).getOrElse(true))

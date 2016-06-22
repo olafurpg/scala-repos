@@ -54,7 +54,8 @@ class IsotonicRegressionSuite
   }
 
   private def runIsotonicRegression(
-      labels: Seq[Double], isotonic: Boolean): IsotonicRegressionModel = {
+      labels: Seq[Double],
+      isotonic: Boolean): IsotonicRegressionModel = {
     runIsotonicRegression(labels, Array.fill(labels.size)(1d), isotonic)
   }
 
@@ -72,8 +73,16 @@ class IsotonicRegressionSuite
      */
     val model = runIsotonicRegression(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18), true)
 
-    assert(Array.tabulate(9)(x => model.predict(x)) === Array(
-            1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
+    assert(
+        Array.tabulate(9)(x => model.predict(x)) === Array(1,
+                                                           2,
+                                                           2,
+                                                           2,
+                                                           6,
+                                                           16.5,
+                                                           16.5,
+                                                           17,
+                                                           18))
 
     assert(model.boundaries === Array(0, 1, 3, 4, 5, 6, 7, 8))
     assert(model.predictions === Array(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
@@ -180,8 +189,9 @@ class IsotonicRegressionSuite
   }
 
   test("weighted isotonic regression with zero weights") {
-    val model = runIsotonicRegression(
-        Seq[Double](1, 2, 3, 2, 1), Seq[Double](0, 0, 0, 1, 0), true)
+    val model = runIsotonicRegression(Seq[Double](1, 2, 3, 2, 1),
+                                      Seq[Double](0, 0, 0, 1, 0),
+                                      true)
 
     assert(model.boundaries === Array(0.0, 1.0, 4.0))
     assert(model.predictions === Array(1, 2, 2))
@@ -258,8 +268,9 @@ class IsotonicRegressionSuite
   }
 
   test("model construction") {
-    val model = new IsotonicRegressionModel(
-        Array(0.0, 1.0), Array(1.0, 2.0), isotonic = true)
+    val model = new IsotonicRegressionModel(Array(0.0, 1.0),
+                                            Array(1.0, 2.0),
+                                            isotonic = true)
     assert(model.predict(-0.5) === 1.0)
     assert(model.predict(0.0) === 1.0)
     assert(model.predict(0.5) ~== 1.5 absTol 1e-14)
@@ -273,20 +284,23 @@ class IsotonicRegressionSuite
 
     intercept[IllegalArgumentException] {
       // unordered boundaries
-      new IsotonicRegressionModel(
-          Array(1.0, 0.0), Array(1.0, 2.0), isotonic = true)
+      new IsotonicRegressionModel(Array(1.0, 0.0),
+                                  Array(1.0, 2.0),
+                                  isotonic = true)
     }
 
     intercept[IllegalArgumentException] {
       // unordered predictions (isotonic)
-      new IsotonicRegressionModel(
-          Array(0.0, 1.0), Array(2.0, 1.0), isotonic = true)
+      new IsotonicRegressionModel(Array(0.0, 1.0),
+                                  Array(2.0, 1.0),
+                                  isotonic = true)
     }
 
     intercept[IllegalArgumentException] {
       // unordered predictions (antitonic)
-      new IsotonicRegressionModel(
-          Array(0.0, 1.0), Array(1.0, 2.0), isotonic = false)
+      new IsotonicRegressionModel(Array(0.0, 1.0),
+                                  Array(1.0, 2.0),
+                                  isotonic = false)
     }
   }
 }

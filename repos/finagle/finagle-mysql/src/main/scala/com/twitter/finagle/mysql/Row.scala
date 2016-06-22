@@ -50,8 +50,9 @@ trait Row {
   * text-based protocol.
   * [[http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-ProtocolText::ResultsetRow]]
   */
-class StringEncodedRow(
-    rawRow: Buffer, val fields: IndexedSeq[Field], indexMap: Map[String, Int])
+class StringEncodedRow(rawRow: Buffer,
+                       val fields: IndexedSeq[Field],
+                       indexMap: Map[String, Int])
     extends Row {
   val buffer = BufferReader(rawRow)
 
@@ -99,8 +100,9 @@ class StringEncodedRow(
   * mysql binary protocol.
   * [[http://dev.mysql.com/doc/internals/en/binary-protocol-resultset-row.html]]
   */
-class BinaryEncodedRow(
-    rawRow: Buffer, val fields: IndexedSeq[Field], indexMap: Map[String, Int])
+class BinaryEncodedRow(rawRow: Buffer,
+                       val fields: IndexedSeq[Field],
+                       indexMap: Map[String, Int])
     extends Row {
   val buffer = BufferReader(rawRow, offset = 1)
 
@@ -143,7 +145,7 @@ class BinaryEncodedRow(
           case Type.VarChar | Type.String | Type.VarString | Type.TinyBlob |
               Type.Blob | Type.MediumBlob
               if !Charset.isBinary(field.charset) &&
-              Charset.isCompatible(field.charset) =>
+                Charset.isCompatible(field.charset) =>
             StringValue(buffer.readLengthCodedString(Charset(field.charset)))
 
           case Type.LongBlob =>

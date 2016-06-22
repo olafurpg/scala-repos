@@ -29,8 +29,9 @@ trait BytecodeWriters {
   /**
     * @param clsName cls.getName
     */
-  def getFile(
-      base: AbstractFile, clsName: String, suffix: String): AbstractFile = {
+  def getFile(base: AbstractFile,
+              clsName: String,
+              suffix: String): AbstractFile = {
     def ensureDirectory(dir: AbstractFile): AbstractFile =
       if (dir.isDirectory) dir
       else
@@ -39,8 +40,9 @@ trait BytecodeWriters {
             dir)
     var dir = base
     val pathParts = clsName.split("[./]").toList
-    for (part <- pathParts.init) dir =
-      ensureDirectory(dir) subdirectoryNamed part
+    for (part <- pathParts.init)
+      dir =
+        ensureDirectory(dir) subdirectoryNamed part
     ensureDirectory(dir) fileNamed pathParts.last + suffix
   }
   def getFile(sym: Symbol, clsName: String, suffix: String): AbstractFile =
@@ -157,8 +159,9 @@ trait BytecodeWriters {
       super.writeClass(label, jclassName, jclassBytes, outfile)
 
       val pathName = jclassName
-      val dumpFile =
-        pathName.split("[./]").foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
+      val dumpFile = pathName
+        .split("[./]")
+        .foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
       dumpFile.parent.createDirectory()
       val outstream = new DataOutputStream(new FileOutputStream(dumpFile.path))
 

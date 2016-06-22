@@ -33,7 +33,8 @@ trait ReplConfig {
   private[nsc] def replinfo(msg: => String) = if (isReplInfo) echo(msg)
 
   private[nsc] def logAndDiscard[T](
-      label: String, alt: => T): PartialFunction[Throwable, T] = {
+      label: String,
+      alt: => T): PartialFunction[Throwable, T] = {
     case t: ControlThrowable => throw t
     case t: Throwable =>
       repldbg(label + ": " + unwrap(t))

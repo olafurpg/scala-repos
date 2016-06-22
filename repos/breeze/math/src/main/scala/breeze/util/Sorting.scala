@@ -16,29 +16,40 @@ object Sorting {
   //**                          |/                                          **
   //\*                                                                      */
 
-  def indexSort(
-      x: Array[Int], off: Int, len: Int, order: Array[Int]): Array[Int] = {
+  def indexSort(x: Array[Int],
+                off: Int,
+                len: Int,
+                order: Array[Int]): Array[Int] = {
     indexSort_Int(x, off, len, order)
   }
 
-  def indexSort(
-      x: Array[Int], off: Int, len: Int, order: Array[Long]): Array[Int] = {
+  def indexSort(x: Array[Int],
+                off: Int,
+                len: Int,
+                order: Array[Long]): Array[Int] = {
     indexSort_Long(x, off, len, order)
   }
 
-  def indexSort(
-      x: Array[Int], off: Int, len: Int, order: Array[Float]): Array[Int] = {
+  def indexSort(x: Array[Int],
+                off: Int,
+                len: Int,
+                order: Array[Float]): Array[Int] = {
     indexSort_Float(x, off, len, order)
   }
 
-  def indexSort(
-      x: Array[Int], off: Int, len: Int, order: Array[Double]): Array[Int] = {
+  def indexSort(x: Array[Int],
+                off: Int,
+                len: Int,
+                order: Array[Double]): Array[Int] = {
     indexSort_Double(x, off, len, order)
   }
 
   @expand
   def indexSort[@expand.args(Int, Long, Float, Double) T](
-      x: Array[Int], off: Int, len: Int, order: Array[T]): Array[Int] = {
+      x: Array[Int],
+      off: Int,
+      len: Int,
+      order: Array[T]): Array[Int] = {
     def swap(a: Int, b: Int) {
       val t = x(a)
       x(a) = x(b)

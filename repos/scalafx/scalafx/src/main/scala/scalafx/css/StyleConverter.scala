@@ -58,20 +58,20 @@ object StyleConverter {
   def colorConverter: StyleConverter[String, javafx.scene.paint.Color] =
     new StyleConverter(jfxcss.StyleConverter.getColorConverter)
 
-  def effectConverter: StyleConverter[
-      Array[jfxcss.ParsedValue[_, _]], javafx.scene.effect.Effect] =
+  def effectConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]],
+                                      javafx.scene.effect.Effect] =
     new StyleConverter(jfxcss.StyleConverter.getEffectConverter)
 
   def enumConverter[E <: Enum[E]](
       enumClass: Class[E]): StyleConverter[String, _ <: Enum[_]] =
     new StyleConverter(jfxcss.StyleConverter.getEnumConverter(enumClass))
 
-  def fontConverter: StyleConverter[
-      Array[jfxcss.ParsedValue[_, _]], javafx.scene.text.Font] =
+  def fontConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]],
+                                    javafx.scene.text.Font] =
     new StyleConverter(jfxcss.StyleConverter.getFontConverter)
 
-  def insetsConverter: StyleConverter[
-      Array[jfxcss.ParsedValue[_, _]], javafx.geometry.Insets] =
+  def insetsConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]],
+                                      javafx.geometry.Insets] =
     new StyleConverter(jfxcss.StyleConverter.getInsetsConverter)
 
   def paintConverter: StyleConverter[

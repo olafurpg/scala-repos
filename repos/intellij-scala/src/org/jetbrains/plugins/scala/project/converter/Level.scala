@@ -8,8 +8,8 @@ import collection.JavaConverters._
 /**
   * @author Pavel Fatin
   */
-private sealed abstract class Level(
-    val title: String, private val facetTitle: String) {
+private sealed abstract class Level(val title: String,
+                                    private val facetTitle: String) {
   def librariesIn(context: ConversionContext): Seq[LibraryData]
 }
 

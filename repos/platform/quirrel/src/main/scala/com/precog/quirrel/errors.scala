@@ -136,7 +136,7 @@ case class IncorrectArity(expected: Int, got: Int) extends ErrorType {
 case class UnspecifiedRequiredParams(missing: Seq[String]) extends ErrorType {
   override def toString =
     "unconstrained parameters on function invoked without specification: " +
-    (missing mkString ", ")
+      (missing mkString ", ")
 }
 
 case object FunctionArgsInapplicable extends ErrorType {

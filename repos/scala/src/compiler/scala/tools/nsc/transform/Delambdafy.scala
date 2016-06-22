@@ -125,8 +125,8 @@ abstract class Delambdafy
     // this entry point is aimed at the statements in the compilation unit.
     // after working on the entire compilation until we'll have a set of
     // new class definitions to add to the top level
-    override def transformStats(
-        stats: List[Tree], exprOwner: Symbol): List[Tree] = {
+    override def transformStats(stats: List[Tree],
+                                exprOwner: Symbol): List[Tree] = {
       // Need to remove from the lambdaClassDefs map: there may be multiple PackageDef for the same
       // package when defining a package object. We only add the lambda class to one. See SI-9097.
       super.transformStats(stats, exprOwner) ++ lambdaClassDefs
@@ -154,8 +154,8 @@ abstract class Delambdafy
 
       val isStatic = target.hasFlag(STATIC)
 
-      def createBoxingBridgeMethod(
-          functionParamTypes: List[Type], functionResultType: Type): Tree = {
+      def createBoxingBridgeMethod(functionParamTypes: List[Type],
+                                   functionResultType: Type): Tree = {
         // Note: we bail out of this method and return EmptyTree if we find there is no adaptation required.
         // If we need to improve performance, we could check the types first before creating the
         // method and parameter symbols.
@@ -176,10 +176,13 @@ abstract class Delambdafy
         val (targetCaptureParams, targetFunctionParams) =
           targetParams.splitAt(numCaptures)
         val bridgeParams: List[Symbol] =
-          targetCaptureParams.map(param =>
+          targetCaptureParams.map(
+              param =>
                 methSym.newSyntheticValueParam(
-                    param.tpe, param.name.toTermName)) ::: map2(
-              targetFunctionParams, functionParamTypes)((param, tp) =>
+                    param.tpe,
+                    param.name.toTermName)) ::: map2(targetFunctionParams,
+                                                     functionParamTypes)(
+              (param, tp) =>
                 methSym.newSyntheticValueParam(boxedType(tp),
                                                param.name.toTermName))
 
@@ -223,8 +226,9 @@ abstract class Delambdafy
             if (enteringErasure(
                     functionResultType.typeSymbol.isDerivedValueClass))
               adaptToType(
-                  box(body.setType(ErasedValueType(
-                              functionResultType.typeSymbol, body.tpe)),
+                  box(body.setType(
+                          ErasedValueType(functionResultType.typeSymbol,
+                                          body.tpe)),
                       "boxing lambda target"),
                   bridgeResultType)
             else adaptToType(body, bridgeResultType)
@@ -239,8 +243,9 @@ abstract class Delambdafy
       /**
         * Creates the apply method for the anonymous subclass of FunctionN
         */
-      def createApplyMethod(
-          newClass: Symbol, fun: Function, thisProxy: Symbol): DefDef = {
+      def createApplyMethod(newClass: Symbol,
+                            fun: Function,
+                            thisProxy: Symbol): DefDef = {
         val methSym = newClass.newMethod(nme.apply, fun.pos, FINAL | SYNTHETIC)
         val params = fun.vparams map (_.duplicate)
 
@@ -265,8 +270,8 @@ abstract class Delambdafy
             gen.mkAttributedThis(oldClass) // sort of a lie, EmptyTree.<static method> would be more honest, but the backend chokes on that.
 
         val body = localTyper typed Apply(Select(qual, target), oldParams)
-        body.substituteSymbols(
-            fun.vparams map (_.symbol), params map (_.symbol))
+        body
+          .substituteSymbols(fun.vparams map (_.symbol), params map (_.symbol))
         body changeOwner (fun.symbol -> methSym)
 
         val methDef = DefDef(methSym, List(params), body)
@@ -287,8 +292,8 @@ abstract class Delambdafy
           newClass.newConstructor(originalFunction.pos, SYNTHETIC)
 
         val (paramSymbols, params, assigns) = (members map { member =>
-              val paramSymbol = newClass.newVariable(
-                  member.symbol.name.toTermName, newClass.pos, 0)
+              val paramSymbol = newClass
+                .newVariable(member.symbol.name.toTermName, newClass.pos, 0)
               paramSymbol.setInfo(member.symbol.info)
               val paramVal = ValDef(paramSymbol)
               val paramIdent = Ident(paramSymbol)
@@ -331,8 +336,8 @@ abstract class Delambdafy
         //      - reinstate the assertion in `Erasure.resolveAnonymousBridgeClash`
         val suffix =
           nme.DELAMBDAFY_LAMBDA_CLASS_NAME + "$" +
-          (if (funOwner.isPrimaryConstructor) ""
-           else "$" + funOwner.name + "$")
+            (if (funOwner.isPrimaryConstructor) ""
+             else "$" + funOwner.name + "$")
         val oldClassPart = oldClass.name.decode
         // make sure the class name doesn't contain $anon, otherwise isAnonymousClass/Function may be true
         val name = unit.freshTypeName(
@@ -365,8 +370,9 @@ abstract class Delambdafy
         val thisProxy = {
           if (isStatic) NoSymbol
           else {
-            val sym = lambdaClass.newVariable(
-                nme.FAKE_LOCAL_THIS, originalFunction.pos, SYNTHETIC)
+            val sym = lambdaClass.newVariable(nme.FAKE_LOCAL_THIS,
+                                              originalFunction.pos,
+                                              SYNTHETIC)
             sym.setInfo(oldClass.tpe)
           }
         }
@@ -393,11 +399,11 @@ abstract class Delambdafy
         val constr = createConstructor(lambdaClass, members)
 
         // apply method with same arguments and return type as original lambda.
-        val applyMethodDef = createApplyMethod(
-            lambdaClass, decapturedFunction, thisProxy)
+        val applyMethodDef =
+          createApplyMethod(lambdaClass, decapturedFunction, thisProxy)
 
-        val bridgeMethod = createBridgeMethod(
-            lambdaClass, originalFunction, applyMethodDef)
+        val bridgeMethod =
+          createBridgeMethod(lambdaClass, originalFunction, applyMethodDef)
 
         def fulldef(sym: Symbol) =
           if (sym == NoSymbol) sym.toString
@@ -408,8 +414,8 @@ abstract class Delambdafy
               // TODO SI-6260 maybe just create the apply method with the signature (Object => Object) in all cases
               //      rather than the method+bridge pair.
               if (bm.symbol.tpe =:= applyMethodDef.symbol.tpe)
-                erasure.resolveAnonymousBridgeClash(
-                    applyMethodDef.symbol, bm.symbol))
+                erasure.resolveAnonymousBridgeClash(applyMethodDef.symbol,
+                                                    bm.symbol))
 
         val body = members ++ List(constr, applyMethodDef) ++ bridgeMethod
 
@@ -459,8 +465,8 @@ abstract class Delambdafy
       if (functionalInterface.exists) {
         // Create a symbol representing a fictional lambda factory method that accepts the captured
         // arguments and returns a Function.
-        val msym = currentOwner.newMethod(
-            nme.ANON_FUN_NAME, originalFunction.pos, ARTIFACT)
+        val msym = currentOwner
+          .newMethod(nme.ANON_FUN_NAME, originalFunction.pos, ARTIFACT)
         val argTypes: List[Type] = allCaptureArgs.map(_.tpe)
         val params = msym.newSyntheticValueParams(argTypes)
         msym.setInfo(MethodType(params, functionType))
@@ -506,8 +512,8 @@ abstract class Delambdafy
     def createBridgeMethod(newClass: Symbol,
                            originalFunction: Function,
                            applyMethod: DefDef): Option[DefDef] = {
-      val bridgeMethSym = newClass.newMethod(
-          nme.apply, applyMethod.pos, FINAL | SYNTHETIC | BRIDGE)
+      val bridgeMethSym = newClass
+        .newMethod(nme.apply, applyMethod.pos, FINAL | SYNTHETIC | BRIDGE)
       val originalParams = applyMethod.vparamss(0)
       val bridgeParams =
         originalParams map { originalParam =>
@@ -625,7 +631,7 @@ abstract class Delambdafy
         gen mkAttributedSelect (gen mkAttributedThis newClass, thisProxy)
       case Ident(name) if (captureProxies contains tree.symbol) =>
         gen mkAttributedSelect
-        (gen mkAttributedThis newClass, captureProxies(tree.symbol))
+          (gen mkAttributedThis newClass, captureProxies(tree.symbol))
       case _ => super.transform(tree)
     }
   }
@@ -675,13 +681,15 @@ abstract class Delambdafy
     }
   }
 
-  final case class LambdaMetaFactoryCapable(
-      target: Symbol, arity: Int, functionalInterface: Symbol)
+  final case class LambdaMetaFactoryCapable(target: Symbol,
+                                            arity: Int,
+                                            functionalInterface: Symbol)
 
   // The functional interface that can be used to adapt the lambda target method `target` to the
   // given function type. Returns `NoSymbol` if the compiler settings are unsuitable.
   private def java8CompatFunctionalInterface(
-      target: Symbol, functionType: Type): (Symbol, Boolean) = {
+      target: Symbol,
+      functionType: Type): (Symbol, Boolean) = {
     val sym = functionType.typeSymbol
     val pack = currentRun.runDefinitions.Scala_Java8_CompatPackage
     val name1 =
@@ -689,12 +697,11 @@ abstract class Delambdafy
     val paramTps :+ restpe = functionType.typeArgs
     val arity = paramTps.length
     val isSpecialized = name1.toTypeName != sym.name
-    val functionalInterface =
-      if (!isSpecialized) {
-        currentRun.runDefinitions.Scala_Java8_CompatPackage_JFunction(arity)
-      } else {
-        pack.info.decl(name1.toTypeName.prepend("J"))
-      }
+    val functionalInterface = if (!isSpecialized) {
+      currentRun.runDefinitions.Scala_Java8_CompatPackage_JFunction(arity)
+    } else {
+      pack.info.decl(name1.toTypeName.prepend("J"))
+    }
     (functionalInterface, isSpecialized)
   }
 }

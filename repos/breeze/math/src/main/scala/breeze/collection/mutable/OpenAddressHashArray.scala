@@ -28,20 +28,22 @@ import scala.util.hashing.MurmurHash3
   * @author dlwh
   */
 @SerialVersionUID(1L)
-final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] private[mutable](
+final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] private[mutable] (
     protected var _index: Array[Int],
     protected var _data: Array[V],
     protected var load: Int,
     val size: Int,
     val default: ConfigurableDefault[V] = ConfigurableDefault.default[V])(
-    implicit protected val manElem: ClassTag[V], val zero: Zero[V])
+    implicit protected val manElem: ClassTag[V],
+    val zero: Zero[V])
     extends Storage[V]
     with ArrayLike[V]
     with Serializable {
   require(size > 0, "Size must be positive, but got " + size)
 
   def this(size: Int, default: ConfigurableDefault[V], initialSize: Int)(
-      implicit manElem: ClassTag[V], zero: Zero[V]) = {
+      implicit manElem: ClassTag[V],
+      zero: Zero[V]) = {
     this(OpenAddressHashArray.emptyIndexArray(
              OpenAddressHashArray.calculateSize(initialSize)),
          default.makeArray(OpenAddressHashArray.calculateSize(initialSize)),
@@ -51,7 +53,8 @@ final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] priva
   }
 
   def this(size: Int, default: ConfigurableDefault[V])(
-      implicit manElem: ClassTag[V], zero: Zero[V]) = {
+      implicit manElem: ClassTag[V],
+      zero: Zero[V]) = {
     this(size, default, 16)
   }
 

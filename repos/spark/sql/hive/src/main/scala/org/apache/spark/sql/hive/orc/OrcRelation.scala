@@ -71,7 +71,7 @@ private[sql] class DefaultSource extends FileFormat with DataSourceRegister {
           val availableCodecs =
             shortOrcCompressionCodecNames.keys.map(_.toLowerCase)
           throw new IllegalArgumentException(s"Codec [$codecName] " +
-              s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
+                s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
         }
         codecName.toLowerCase
     }
@@ -203,8 +203,8 @@ private[orc] class OrcOutputWriter(path: String,
   override protected[sql] def writeInternal(row: InternalRow): Unit = {
     wrapOrcStruct(cachedOrcStruct, structOI, row)
 
-    recordWriter.write(
-        NullWritable.get(), serializer.serialize(cachedOrcStruct, structOI))
+    recordWriter.write(NullWritable.get(),
+                       serializer.serialize(cachedOrcStruct, structOI))
   }
 
   override def close(): Unit = {

@@ -300,8 +300,8 @@ private[precog] case class Vector4[+A](_1: A, _2: A, _3: A, _4: A)
 
   def ++[B >: A](that: VectorCase[B]): VectorCase[B] = that match {
     case Vector0 => this
-    case _: Vector1[_] | _: Vector2[_] | _: Vector3[_] |
-        _: Vector4[_] | _: VectorN[_] =>
+    case _: Vector1[_] | _: Vector2[_] | _: Vector3[_] | _: Vector4[_] |
+        _: VectorN[_] =>
       VectorN(Vector(_1, _2, _3, _4) ++ that.toVector)
   }
 

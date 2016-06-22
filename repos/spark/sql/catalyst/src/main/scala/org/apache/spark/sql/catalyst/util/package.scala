@@ -64,9 +64,9 @@ package object util {
     new String(outStream.toByteArray, encoding)
   }
 
-  def resourceToBytes(resource: String,
-                      classLoader: ClassLoader =
-                        Utils.getSparkClassLoader): Array[Byte] = {
+  def resourceToBytes(
+      resource: String,
+      classLoader: ClassLoader = Utils.getSparkClassLoader): Array[Byte] = {
     val inStream = classLoader.getResourceAsStream(resource)
     val outStream = new ByteArrayOutputStream
     try {
@@ -111,7 +111,7 @@ package object util {
     leftPadded.zip(rightPadded).map {
       case (l, r) =>
         (if (l == r) " " else "!") + l +
-        (" " * ((maxLeftSize - l.length) + 3)) + r
+          (" " * ((maxLeftSize - l.length) + 3)) + r
     }
   }
 
@@ -145,11 +145,11 @@ package object util {
       PrettyAttribute(v.toString, t)
     case e: GetStructField =>
       val name = e.name.getOrElse(e.childSchema(e.ordinal).name)
-      PrettyAttribute(
-          usePrettyExpression(e.child).sql + "." + name, e.dataType)
+      PrettyAttribute(usePrettyExpression(e.child).sql + "." + name,
+                      e.dataType)
     case e: GetArrayStructFields =>
-      PrettyAttribute(
-          usePrettyExpression(e.child) + "." + e.field.name, e.dataType)
+      PrettyAttribute(usePrettyExpression(e.child) + "." + e.field.name,
+                      e.dataType)
   }
 
   def quoteIdentifier(name: String): String = {

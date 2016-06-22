@@ -10,8 +10,7 @@ object ConsistencySpec {
   val minThreads = 1
   val maxThreads = 2000
   val factor = 1.5d
-  val threads =
-    ThreadPoolConfig.scaledPoolSize(minThreads, factor, maxThreads) // Make sure we have more threads than cores
+  val threads = ThreadPoolConfig.scaledPoolSize(minThreads, factor, maxThreads) // Make sure we have more threads than cores
 
   val config = s"""
       consistency-dispatcher {
@@ -36,8 +35,8 @@ object ConsistencySpec {
     def receive = {
       case step: Long ⇒
         if (lastStep != (step - 1))
-          sender() ! "Test failed: Last step %s, this step %s".format(
-              lastStep, step)
+          sender() ! "Test failed: Last step %s, this step %s".format(lastStep,
+                                                                      step)
 
         var shouldBeFortyTwo = left.value + right.value
         if (shouldBeFortyTwo != 42) sender() ! "Test failed: 42 failed"

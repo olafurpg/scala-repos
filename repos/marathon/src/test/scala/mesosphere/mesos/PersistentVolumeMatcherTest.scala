@@ -129,8 +129,8 @@ class PersistentVolumeMatcherTest
     def makeTask(appId: PathId) = MarathonTestHelper.mininimalTask(appId)
     def makeTask(appId: PathId, reservation: Task.Reservation) =
       MarathonTestHelper.minimalReservedTask(appId, reservation)
-    def offerWithVolumes(
-        taskId: Task.Id, localVolumeIds: Task.LocalVolumeId*) =
+    def offerWithVolumes(taskId: Task.Id,
+                         localVolumeIds: Task.LocalVolumeId*) =
       MarathonTestHelper.offerWithVolumesOnly(taskId, localVolumeIds: _*)
     def appWithPersistentVolume(): AppDefinition =
       MarathonTestHelper.appWithPersistentVolume()

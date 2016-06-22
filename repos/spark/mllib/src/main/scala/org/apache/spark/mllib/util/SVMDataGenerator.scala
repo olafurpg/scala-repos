@@ -42,7 +42,7 @@ object SVMDataGenerator {
       // scalastyle:off println
       println(
           "Usage: SVMGenerator " +
-          "<master> <output_dir> [num_examples] [num_features] [num_partitions]")
+            "<master> <output_dir> [num_examples] [num_features] [num_partitions]")
       // scalastyle:on println
       System.exit(1)
     }
@@ -68,7 +68,7 @@ object SVMDataGenerator {
         }
         val yD =
           blas.ddot(trueWeights.length, x, 1, trueWeights, 1) +
-          rnd.nextGaussian() * 0.1
+            rnd.nextGaussian() * 0.1
         val y = if (yD < 0) 0.0 else 1.0
         LabeledPoint(y, Vectors.dense(x))
       }

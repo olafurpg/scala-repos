@@ -34,5 +34,5 @@ class KnownOpsInTimespanTimer(expectedOps: Long) extends Metric with Counting {
 
   def opsPerSecond: Double =
     expectedOps.toDouble /
-    (elapsedTime.toDouble / NANOSECONDS.convert(1, SECONDS))
+      (elapsedTime.toDouble / NANOSECONDS.convert(1, SECONDS))
 }

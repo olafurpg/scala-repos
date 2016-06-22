@@ -43,7 +43,8 @@ trait ScVariable
   def getType(ctx: TypingContext): TypeResult[ScType]
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean): Boolean = m match {
+      m: ScMember,
+      isStrict: Boolean): Boolean = m match {
     case other: ScVariable =>
       for (elem <- self.declaredElements) {
         if (other.declaredElements.exists(_.name == elem.name)) return true
@@ -67,7 +68,7 @@ trait ScVariable
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
-    hasAnnotation("java.lang.Deprecated") != None
+      hasAnnotation("java.lang.Deprecated") != None
 
   override def modifiableReturnType: Option[ScType] =
     getType(TypingContext.empty).toOption

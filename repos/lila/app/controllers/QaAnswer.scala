@@ -18,7 +18,7 @@ object QaAnswer extends QaController {
           data =>
             api.answer.create(data, q, me) map { answer =>
               Redirect(routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
-                  answer.id)
+                    answer.id)
           }
       )
     }
@@ -61,7 +61,7 @@ object QaAnswer extends QaController {
                 case None => NotFound
                 case Some(a2) =>
                   Redirect(routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
-                      a2.id)
+                        a2.id)
             }
         )
       }

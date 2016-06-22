@@ -30,13 +30,15 @@ object Test {
             val yss = Vector[Seq[Int]](ys, ysa, ysv, ysl)
             val fwd_slow = slowSearch(xs, ys)
             val bkw_slow = bkwSlowSearch(xs, ys)
-            val fwd_fast = xss.flatMap(xs =>
-                  yss.map(ys =>
-                        SeqLike.indexOf(
-                            xs, 0, xs.length, ys, 0, ys.length, 0)))
-            val bkw_fast = xss.flatMap(
+            val fwd_fast = xss.flatMap(
                 xs =>
                   yss.map(ys =>
+                        SeqLike
+                          .indexOf(xs, 0, xs.length, ys, 0, ys.length, 0)))
+            val bkw_fast = xss.flatMap(
+                xs =>
+                  yss.map(
+                      ys =>
                         SeqLike.lastIndexOf(xs,
                                             0,
                                             xs.length,

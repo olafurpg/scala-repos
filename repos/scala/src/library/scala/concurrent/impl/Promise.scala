@@ -58,8 +58,8 @@ private[concurrent] trait Promise[T]
 
 /* Precondition: `executor` is prepared, i.e., `executor` has been returned from invocation of `prepare` on some other `ExecutionContext`.
  */
-private final class CallbackRunnable[T](
-    val executor: ExecutionContext, val onComplete: Try[T] => Any)
+private final class CallbackRunnable[T](val executor: ExecutionContext,
+                                        val onComplete: Try[T] => Any)
     extends Runnable
     with OnCompleteRunnable {
   // must be filled in before running it
@@ -417,7 +417,8 @@ private[concurrent] object Promise {
       override def onFailure[U](pf: PartialFunction[Throwable, U])(
           implicit executor: ExecutionContext): Unit = ()
       override def failed: Future[Throwable] =
-        KeptPromise(Failure(new NoSuchElementException(
+        KeptPromise(
+            Failure(new NoSuchElementException(
                     "Future.failed not completed with a throwable."))).future
       override def recover[U >: T](pf: PartialFunction[Throwable, U])(
           implicit executor: ExecutionContext): Future[U] = this

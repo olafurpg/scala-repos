@@ -31,9 +31,11 @@ class ExecutionTest {
     _testExecution(ec1 => _testExecution(ec2 => f(ec1, ec2)))
   }
 
-  def testExecution[A](f: F.Function3[
-          TestExecutionContext, TestExecutionContext, TestExecutionContext, A])
-    : A = {
+  def testExecution[A](
+      f: F.Function3[TestExecutionContext,
+                     TestExecutionContext,
+                     TestExecutionContext,
+                     A]): A = {
     _testExecution(
         ec1 => _testExecution(ec2 => _testExecution(ec3 => f(ec1, ec2, ec3))))
   }

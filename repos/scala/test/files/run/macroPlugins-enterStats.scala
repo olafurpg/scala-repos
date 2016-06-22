@@ -37,15 +37,15 @@ object Test extends DirectTest {
       }
 
     object macroPlugin1 extends MacroPlugin {
-      override def pluginsEnterStats(
-          typer: Typer, stats: List[Tree]): List[Tree] = {
+      override def pluginsEnterStats(typer: Typer,
+                                     stats: List[Tree]): List[Tree] = {
         stats.foreach(stat => logEnterStat("macroPlugin1", stat))
         stats.flatMap(stat => stat +: deriveStat("macroPlugin1", typer, stat))
       }
     }
     object macroPlugin2 extends MacroPlugin {
-      override def pluginsEnterStats(
-          typer: Typer, stats: List[Tree]): List[Tree] = {
+      override def pluginsEnterStats(typer: Typer,
+                                     stats: List[Tree]): List[Tree] = {
         stats.foreach(stat => logEnterStat("macroPlugin2", stat))
         stats.flatMap(stat => stat +: deriveStat("macroPlugin2", typer, stat))
       }

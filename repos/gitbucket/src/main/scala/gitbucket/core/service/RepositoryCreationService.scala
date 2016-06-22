@@ -44,12 +44,11 @@ trait RepositoryCreationService {
         val builder = DirCache.newInCore.builder()
         val inserter = git.getRepository.newObjectInserter()
         val headId = git.getRepository.resolve(Constants.HEAD + "^{commit}")
-        val content =
-          if (description.nonEmpty) {
-            name + "\n" + "===============\n" + "\n" + description.get
-          } else {
-            name + "\n" + "===============\n"
-          }
+        val content = if (description.nonEmpty) {
+          name + "\n" + "===============\n" + "\n" + description.get
+        } else {
+          name + "\n" + "===============\n"
+        }
 
         builder.add(
             JGitUtil.createDirCacheEntry(

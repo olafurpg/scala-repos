@@ -29,15 +29,17 @@ import scala.util.{Failure, Success, Try}
 /**
   * Pavel Fatin
   */
-abstract class CreateEntityQuickFix(
-    ref: ScReferenceExpression, entity: String, keyword: String)
+abstract class CreateEntityQuickFix(ref: ScReferenceExpression,
+                                    entity: String,
+                                    keyword: String)
     extends CreateFromUsageQuickFixBase(ref, entity) {
   // TODO add private modifiers for unqualified entities ?
   // TODO use Java CFU when needed
   // TODO find better place for fields, create methods after
 
-  override def isAvailable(
-      project: Project, editor: Editor, file: PsiFile): Boolean = {
+  override def isAvailable(project: Project,
+                           editor: Editor,
+                           file: PsiFile): Boolean = {
     if (!super.isAvailable(project, editor, file)) return false
 
     def checkBlock(expr: ScExpression) = blockFor(expr) match {
@@ -46,8 +48,8 @@ abstract class CreateEntityQuickFix(
     }
 
     ref match {
-      case Both(
-          Parent(_: ScAssignStmt), Parent(Parent(_: ScArgumentExprList))) =>
+      case Both(Parent(_: ScAssignStmt),
+                Parent(Parent(_: ScArgumentExprList))) =>
         false
       case exp @ Parent(infix: ScInfixExpr) if infix.operation == exp =>
         checkBlock(infix.getBaseExpr)
@@ -66,8 +68,11 @@ abstract class CreateEntityQuickFix(
       blockFor(expr) match {
         case Success(bl) => Some(bl)
         case Failure(e) =>
-          CommonRefactoringUtil.showErrorHint(
-              project, editor, e.getMessage, "Create entity quickfix", null)
+          CommonRefactoringUtil.showErrorHint(project,
+                                              editor,
+                                              e.getMessage,
+                                              "Create entity quickfix",
+                                              null)
           None
       }
     }
@@ -83,7 +88,7 @@ abstract class CreateEntityQuickFix(
     val params = (genericParams ++: parameters).mkString
     val text =
       placeholder.format(keyword, ref.nameId.getText, params) +
-      unimplementedBody
+        unimplementedBody
 
     val block = ref match {
       case it if it.isQualified => ref.qualifier.flatMap(tryToFindBlock)
@@ -126,8 +131,8 @@ abstract class CreateEntityQuickFix(
       if (!isScalaConsole) {
         val newEditor = positionCursor(entity.getLastChild)
         val range = entity.getTextRange
-        newEditor.getDocument.deleteString(
-            range.getStartOffset, range.getEndOffset)
+        newEditor.getDocument
+          .deleteString(range.getStartOffset, range.getEndOffset)
         TemplateManager.getInstance(project).startTemplate(newEditor, template)
       }
     }
@@ -138,8 +143,8 @@ object CreateEntityQuickFix {
   private def materializeSytheticObject(obj: ScObject): ScObject = {
     val clazz = obj.fakeCompanionClassOrCompanionClass
     val objText = s"object ${clazz.name} {}"
-    val fromText = ScalaPsiElementFactory.createTemplateDefinitionFromText(
-        objText, clazz.getParent, clazz)
+    val fromText = ScalaPsiElementFactory
+      .createTemplateDefinitionFromText(objText, clazz.getParent, clazz)
     clazz.getParent.addAfter(fromText, clazz).asInstanceOf[ScObject]
   }
 
@@ -153,7 +158,8 @@ object CreateEntityQuickFix {
       case InstanceOfClass(td: ScTemplateDefinition) =>
         Success(td.extendsBlock)
       case th: ScThisReference
-          if PsiTreeUtil.getParentOfType(th, classOf[ScExtendsBlock], true) != null =>
+          if PsiTreeUtil
+            .getParentOfType(th, classOf[ScExtendsBlock], true) != null =>
         th.refTemplate match {
           case Some(ScTemplateDefinition.ExtendsBlock(block)) => Success(block)
           case None =>
@@ -163,7 +169,8 @@ object CreateEntityQuickFix {
                     ScTemplateDefinition])
             if (parentBl != null) Success(parentBl)
             else
-              Failure(new IllegalStateException(
+              Failure(
+                  new IllegalStateException(
                       "Cannot find template definition for `this` reference"))
         }
       case sup: ScSuperReference =>
@@ -180,7 +187,8 @@ object CreateEntityQuickFix {
                 ParentExtendsBlock(block)) =>
         Success(block)
       case _ =>
-        Failure(new IllegalStateException(
+        Failure(
+            new IllegalStateException(
                 "Cannot find a place to create definition"))
     }
   }

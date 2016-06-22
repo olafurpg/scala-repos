@@ -64,8 +64,7 @@ object Roots {
           Term(c.bigDecimal.stripTrailingZeros, e)
       }
       val maxScale = terms.map(_.coeff.scale).max
-      Polynomial(
-          terms.map {
+      Polynomial(terms.map {
         case Term(c, e) =>
           val c0 = BigInt(c.movePointRight(maxScale).unscaledValue)
           Term(c0, e)
@@ -104,8 +103,7 @@ object Roots {
 private[poly] class BigDecimalSimpleRoots(
     val poly: Polynomial[BigDecimal],
     scale: Int
-)
-    extends Roots[BigDecimal] {
+) extends Roots[BigDecimal] {
   private val zpoly: Polynomial[BigInt] = Roots.removeDecimal(poly)
   private val isolated: Vector[Interval[Rational]] = Roots.isolateRoots(zpoly)
 
@@ -132,8 +130,7 @@ private[poly] class BigDecimalSimpleRoots(
 private[poly] class BigDecimalRelativeRoots(
     val poly: Polynomial[BigDecimal],
     mc: MathContext
-)
-    extends Roots[BigDecimal] {
+) extends Roots[BigDecimal] {
   private val zpoly: Polynomial[BigInt] = Roots.removeDecimal(poly)
   private val isolated: Vector[Interval[Rational]] = Roots.isolateRoots(zpoly)
 
@@ -159,8 +156,7 @@ private[poly] class BigDecimalRelativeRoots(
 // http://arxiv.org/pdf/1104.1362v3.pdf
 private[poly] class FixedRealRoots(
     val poly: Polynomial[Real]
-)
-    extends Roots[Real] {
+) extends Roots[Real] {
   private val zpoly: Polynomial[BigInt] =
     Roots.removeFractions(poly.map(_.toRational))
   private val isolated: Vector[Interval[Rational]] = Roots.isolateRoots(zpoly)
@@ -188,10 +184,10 @@ private[poly] class FixedRealRoots(
 
 private[poly] class NumberRoots(
     val poly: Polynomial[Number]
-)
-    extends Roots[Number] {
+) extends Roots[Number] {
   private val roots = new BigDecimalRelativeRoots(
-      poly.map(_.toBigDecimal), BigDecimal.defaultMathContext)
+      poly.map(_.toBigDecimal),
+      BigDecimal.defaultMathContext)
 
   def count: Int = roots.count
 

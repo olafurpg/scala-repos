@@ -103,10 +103,10 @@ class Eval(target: Option[File]) {
               new FilesystemResolver(new File(".")),
               new FilesystemResolver(new File("." + File.separator + "config"))
           ) ++
-          (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
-                path =>
-                  new FilesystemResolver(new File(path))
-              })
+            (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
+                  path =>
+                    new FilesystemResolver(new File(path))
+                })
       )
   )
 
@@ -117,8 +117,10 @@ class Eval(target: Option[File]) {
   protected lazy val compilerSettings: Settings = new EvalSettings(target)
 
   // Primary encapsulation around native Scala compiler
-  private[this] lazy val compiler = new StringCompiler(
-      codeWrapperLineOffset, target, compilerSettings, compilerMessageHandler)
+  private[this] lazy val compiler = new StringCompiler(codeWrapperLineOffset,
+                                                       target,
+                                                       compilerSettings,
+                                                       compilerMessageHandler)
 
   /**
     * run preprocessors on our string, returning a String that is the processed source
@@ -158,12 +160,11 @@ class Eval(target: Option[File]) {
       val processed = sourceForString(unprocessedSource)
       val sourceChecksum = uniqueId(processed, None)
       val checksumFile = new File(targetDir, "checksum")
-      val lastChecksum =
-        if (checksumFile.exists) {
-          Source.fromFile(checksumFile).getLines().take(1).toList.head
-        } else {
-          -1
-        }
+      val lastChecksum = if (checksumFile.exists) {
+        Source.fromFile(checksumFile).getLines().take(1).toList.head
+      } else {
+        -1
+      }
 
       if (lastChecksum != sourceChecksum) {
         compiler.reset()
@@ -206,8 +207,9 @@ class Eval(target: Option[File]) {
   /**
     * same as apply[T], but does not run preprocessors.
     */
-  def applyProcessed[T](
-      className: String, code: String, resetState: Boolean): T = {
+  def applyProcessed[T](className: String,
+                        code: String,
+                        resetState: Boolean): T = {
     val cls = compiler(wrapCodeInClass(className, code), className, resetState)
     cls
       .getConstructor()
@@ -282,8 +284,8 @@ class Eval(target: Option[File]) {
     }
   }
 
-  private[util] def uniqueId(
-      code: String, idOpt: Option[Int] = Some(jvmId)): String = {
+  private[util] def uniqueId(code: String,
+                             idOpt: Option[Int] = Some(jvmId)): String = {
     val digest = MessageDigest.getInstance("SHA-1").digest(code.getBytes())
     val sha = new BigInteger(1, digest).toString(16)
     idOpt match {
@@ -348,9 +350,9 @@ class Eval(target: Option[File]) {
    * This is probably fragile.
    */
   lazy val impliedClassPath: List[String] = {
-    def getClassPath(cl: ClassLoader,
-                     acc: List[List[String]] =
-                       List.empty): List[List[String]] = {
+    def getClassPath(
+        cl: ClassLoader,
+        acc: List[List[String]] = List.empty): List[List[String]] = {
       val cp = cl match {
         case urlClassLoader: URLClassLoader =>
           urlClassLoader.getURLs
@@ -453,14 +455,14 @@ class Eval(target: Option[File]) {
               resolver.resolvable(path)
             } match {
               case Some(r: Resolver) => {
-                  // recursively process includes
-                  if (maxDepth == 0) {
-                    throw new IllegalStateException(
-                        "Exceeded maximum recusion depth")
-                  } else {
-                    apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
-                  }
+                // recursively process includes
+                if (maxDepth == 0) {
+                  throw new IllegalStateException(
+                      "Exceeded maximum recusion depth")
+                } else {
+                  apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
                 }
+              }
               case _ =>
                 throw new IllegalStateException(
                     "No resolver could find '%s'".format(path))
@@ -546,27 +548,27 @@ class Eval(target: Option[File]) {
      * Class loader for finding classes compiled by this StringCompiler.
      * After each reset, this class loader will not be able to find old compiled classes.
      */
-    var classLoader = new AbstractFileClassLoader(
-        target, this.getClass.getClassLoader)
+    var classLoader =
+      new AbstractFileClassLoader(target, this.getClass.getClassLoader)
 
     def reset() {
       targetDir match {
         case None => {
-            target.asInstanceOf[VirtualDirectory].clear()
-          }
+          target.asInstanceOf[VirtualDirectory].clear()
+        }
         case Some(t) => {
-            target.foreach { abstractFile =>
-              if (abstractFile.file == null ||
-                  abstractFile.file.getName.endsWith(".class")) {
-                abstractFile.delete()
-              }
+          target.foreach { abstractFile =>
+            if (abstractFile.file == null ||
+                abstractFile.file.getName.endsWith(".class")) {
+              abstractFile.delete()
             }
           }
+        }
       }
       cache.clear()
       reporter.reset()
-      classLoader = new AbstractFileClassLoader(
-          target, this.getClass.getClassLoader)
+      classLoader =
+        new AbstractFileClassLoader(target, this.getClass.getClassLoader)
     }
 
     object Debug {
@@ -639,5 +641,5 @@ class Eval(target: Option[File]) {
   class CompilerException(val messages: List[List[String]])
       extends Exception(
           "Compiler exception " +
-          messages.map(_.mkString("\n")).mkString("\n"))
+            messages.map(_.mkString("\n")).mkString("\n"))
 }

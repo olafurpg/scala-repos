@@ -23,8 +23,8 @@ object RoundRobinRoutingLogic {
 final class RoundRobinRoutingLogic extends RoutingLogic {
   val next = new AtomicLong
 
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.nonEmpty) {
       val size = routees.size
       val index = (next.getAndIncrement % size).asInstanceOf[Int]

@@ -21,8 +21,8 @@ trait SimpleFunction extends Node {
 }
 
 object SimpleFunction {
-  def apply[T: TypedType](
-      fname: String, fn: Boolean = false): (Seq[Rep[_]] => Rep[T]) = {
+  def apply[T: TypedType](fname: String,
+                          fn: Boolean = false): (Seq[Rep[_]] => Rep[T]) = {
     def build(params: IndexedSeq[Node]): SimpleFeatureNode[T] =
       new SimpleFeatureNode[T] with SimpleFunction {
         val name = fname
@@ -37,15 +37,16 @@ object SimpleFunction {
   }
   def nullary[R: TypedType](fname: String, fn: Boolean = false): Rep[R] =
     apply(fname, fn).apply(Seq())
-  def unary[T1, R: TypedType](
-      fname: String, fn: Boolean = false): (Rep[T1] => Rep[R]) = {
+  def unary[T1, R: TypedType](fname: String,
+                              fn: Boolean = false): (Rep[T1] => Rep[R]) = {
     val f = apply(fname, fn);
     { t1: Rep[T1] =>
       f(Seq(t1))
     }
   }
   def binary[T1, T2, R: TypedType](
-      fname: String, fn: Boolean = false): ((Rep[T1], Rep[T2]) => Rep[R]) = {
+      fname: String,
+      fn: Boolean = false): ((Rep[T1], Rep[T2]) => Rep[R]) = {
     val f = apply(fname, fn);
     { (t1: Rep[T1], t2: Rep[T2]) =>
       f(Seq(t1, t2))

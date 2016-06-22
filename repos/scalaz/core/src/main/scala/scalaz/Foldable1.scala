@@ -153,8 +153,8 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
       f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
     a.map(foldMap1(fa)(f))(_ => ())
 
-  def sequence1_[M[_], A](fa: F[M[A]])(
-      implicit a: Apply[M], x: Semigroup[M[A]]): M[Unit] =
+  def sequence1_[M[_], A](fa: F[M[A]])(implicit a: Apply[M],
+                                       x: Semigroup[M[A]]): M[Unit] =
     traverse1_(fa)(x => x)
 
   /** always return `false` */

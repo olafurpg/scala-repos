@@ -63,8 +63,9 @@ object StormTestRun {
     InflightTuples.reset()
     try {
       val cluster = new LocalCluster()
-      cluster.submitTopology(
-          "test topology", plannedTopology.config, plannedTopology.topology)
+      cluster.submitTopology("test topology",
+                             plannedTopology.config,
+                             plannedTopology.topology)
       Thread.sleep(4500)
       cluster.killTopology("test topology")
       Thread.sleep(1500)

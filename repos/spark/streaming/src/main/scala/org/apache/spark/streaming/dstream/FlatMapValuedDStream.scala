@@ -22,12 +22,12 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class FlatMapValuedDStream[
-    K: ClassTag, V: ClassTag, U: ClassTag](
+private[streaming] class FlatMapValuedDStream[K: ClassTag,
+                                              V: ClassTag,
+                                              U: ClassTag](
     parent: DStream[(K, V)],
     flatMapValueFunc: V => TraversableOnce[U]
-)
-    extends DStream[(K, U)](parent.ssc) {
+) extends DStream[(K, U)](parent.ssc) {
 
   override def dependencies: List[DStream[_]] = List(parent)
 

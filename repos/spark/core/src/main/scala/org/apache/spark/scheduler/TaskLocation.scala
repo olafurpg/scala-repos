@@ -29,8 +29,8 @@ private[spark] sealed trait TaskLocation {
 /**
   * A location that includes both a host and an executor id on that host.
   */
-private[spark] case class ExecutorCacheTaskLocation(
-    override val host: String, executorId: String)
+private[spark] case class ExecutorCacheTaskLocation(override val host: String,
+                                                    executorId: String)
     extends TaskLocation {
   override def toString: String =
     s"${TaskLocation.executorLocationTag}${host}_$executorId"

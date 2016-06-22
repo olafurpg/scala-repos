@@ -33,8 +33,10 @@ import org.apache.spark.util.Utils
 case class OrcParData(intField: Int, stringField: String)
 
 // The data that also includes the partitioning key
-case class OrcParDataWithKey(
-    intField: Int, pi: Int, stringField: String, ps: String)
+case class OrcParDataWithKey(intField: Int,
+                             pi: Int,
+                             stringField: String,
+                             ps: String)
 
 // TODO This test suite duplicates ParquetPartitionDiscoverySuite a lot
 class OrcPartitionDiscoverySuite
@@ -51,13 +53,13 @@ class OrcPartitionDiscoverySuite
     try f(dir) finally Utils.deleteRecursively(dir)
   }
 
-  def makeOrcFile[T <: Product: ClassTag: TypeTag](
-      data: Seq[T], path: File): Unit = {
+  def makeOrcFile[T <: Product: ClassTag: TypeTag](data: Seq[T],
+                                                   path: File): Unit = {
     data.toDF().write.mode("overwrite").orc(path.getCanonicalPath)
   }
 
-  def makeOrcFile[T <: Product: ClassTag: TypeTag](
-      df: DataFrame, path: File): Unit = {
+  def makeOrcFile[T <: Product: ClassTag: TypeTag](df: DataFrame,
+                                                   path: File): Unit = {
     df.write.mode("overwrite").orc(path.getCanonicalPath)
   }
 
@@ -90,8 +92,10 @@ class OrcPartitionDiscoverySuite
         ps <- Seq("foo", "bar")
       } {
         makeOrcFile((1 to 10).map(i => OrcParData(i, i.toString)),
-                    makePartitionDir(
-                        base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+                    makePartitionDir(base,
+                                     defaultPartitionName,
+                                     "pi" -> pi,
+                                     "ps" -> ps))
       }
 
       read.orc(base.getCanonicalPath).registerTempTable("t")
@@ -130,8 +134,10 @@ class OrcPartitionDiscoverySuite
       } {
         makeOrcFile(
             (1 to 10).map(i => OrcParDataWithKey(i, pi, i.toString, ps)),
-            makePartitionDir(
-                base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+            makePartitionDir(base,
+                             defaultPartitionName,
+                             "pi" -> pi,
+                             "ps" -> ps))
       }
 
       read.orc(base.getCanonicalPath).registerTempTable("t")
@@ -170,8 +176,10 @@ class OrcPartitionDiscoverySuite
         ps <- Seq("foo", null.asInstanceOf[String])
       } {
         makeOrcFile((1 to 10).map(i => OrcParData(i, i.toString)),
-                    makePartitionDir(
-                        base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+                    makePartitionDir(base,
+                                     defaultPartitionName,
+                                     "pi" -> pi,
+                                     "ps" -> ps))
       }
 
       read
@@ -208,8 +216,10 @@ class OrcPartitionDiscoverySuite
       } {
         makeOrcFile(
             (1 to 10).map(i => OrcParDataWithKey(i, pi, i.toString, ps)),
-            makePartitionDir(
-                base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+            makePartitionDir(base,
+                             defaultPartitionName,
+                             "pi" -> pi,
+                             "ps" -> ps))
       }
 
       read

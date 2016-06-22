@@ -94,8 +94,9 @@ object Volume {
   * Both paths can either refer to a directory or a file.  Paths must be
   * absolute.
   */
-case class DockerVolume(
-    containerPath: String, hostPath: String, mode: Mesos.Volume.Mode)
+case class DockerVolume(containerPath: String,
+                        hostPath: String,
+                        mode: Mesos.Volume.Mode)
     extends Volume
 
 object DockerVolume {

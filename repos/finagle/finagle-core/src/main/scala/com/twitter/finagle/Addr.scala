@@ -42,8 +42,7 @@ object Addr {
   case class Bound(
       addrs: immutable.Set[Address],
       metadata: Metadata
-  )
-      extends Addr
+  ) extends Addr
 
   /**
     * The address is failed: binding failed with
@@ -97,8 +96,8 @@ object Addrs {
   /**
     * @see com.twitter.finagle.Addr.Bound
     */
-  def newBoundAddr(
-      addrs: JCollection[Address], metadata: JMap[String, Any]): Addr =
+  def newBoundAddr(addrs: JCollection[Address],
+                   metadata: JMap[String, Any]): Addr =
     Addr.Bound(addrs.asScala.toSet, metadata.asScala.toMap)
 
   /**

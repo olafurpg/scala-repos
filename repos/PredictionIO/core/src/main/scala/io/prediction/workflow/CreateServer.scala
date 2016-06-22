@@ -135,8 +135,8 @@ object CreateServer extends Logging {
       opt[String]("env") action { (x, c) =>
         c.copy(env = Some(x))
       } text
-      ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
-          "format) to pass to the Spark execution environment.")
+        ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
+              "format) to pass to the Spark execution environment.")
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
       } text ("Port to bind to (default: 8000).")
@@ -224,12 +224,11 @@ object CreateServer extends Logging {
       .get
       .asInstanceOf[Seq[Any]]
 
-    val batch =
-      if (engineInstance.batch.nonEmpty) {
-        s"${engineInstance.engineFactory} (${engineInstance.batch})"
-      } else {
-        engineInstance.engineFactory
-      }
+    val batch = if (engineInstance.batch.nonEmpty) {
+      s"${engineInstance.engineFactory} (${engineInstance.batch})"
+    } else {
+      engineInstance.engineFactory
+    }
 
     val sparkContext = WorkflowContext(batch = batch,
                                        executorEnv = engineInstance.env,
@@ -310,23 +309,25 @@ class MasterActor(sc: ServerConfig,
           log.error(
               s"Another process is using $serverUrl. Unable to undeploy.")
         case _ =>
-          log.error(s"Another process is using $serverUrl, or an existing " +
-              s"engine server is not responding properly (HTTP $code). " +
-              "Unable to undeploy.")
+          log.error(
+              s"Another process is using $serverUrl, or an existing " +
+                s"engine server is not responding properly (HTTP $code). " +
+                "Unable to undeploy.")
       }
     } catch {
       case e: java.net.ConnectException =>
         log.warning(s"Nothing at $serverUrl")
       case _: Throwable =>
-        log.error("Another process might be occupying " +
-            s"$ip:$port. Unable to undeploy.")
+        log.error(
+            "Another process might be occupying " +
+              s"$ip:$port. Unable to undeploy.")
     }
   }
 
   def receive: Actor.Receive = {
     case x: StartServer =>
-      val actor = createServerActor(
-          sc, engineInstance, engineFactoryName, manifest)
+      val actor =
+        createServerActor(sc, engineInstance, engineFactoryName, manifest)
       currentServerActor = Some(actor)
       undeploy(sc.ip, sc.port)
       self ! BindServer()
@@ -375,7 +376,7 @@ class MasterActor(sc: ServerConfig,
       } getOrElse {
         log.warning(
             s"No latest completed engine instance for ${manifest.id} " +
-            s"${manifest.version}. Abort reloading.")
+              s"${manifest.version}. Abort reloading.")
       }
     case x: Http.Bound =>
       val serverUrl = s"https://${sc.ip}:${sc.port}"
@@ -445,22 +446,20 @@ class ServerActor[Q, P](val args: ServerConfig,
   def actorRefFactory: ActorContext = context
 
   implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-  val pluginsActorRef = context.actorOf(
-      Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
+  val pluginsActorRef = context
+    .actorOf(Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
   val pluginContext = EngineServerPluginContext(log, args.engineVariant)
 
   def receive: Actor.Receive = runRoute(myRoute)
 
-  val feedbackEnabled =
-    if (args.feedback) {
-      if (args.accessKey.isEmpty) {
-        log.error(
-            "Feedback loop cannot be enabled because accessKey is empty.")
-        false
-      } else {
-        true
-      }
-    } else false
+  val feedbackEnabled = if (args.feedback) {
+    if (args.accessKey.isEmpty) {
+      log.error("Feedback loop cannot be enabled because accessKey is empty.")
+      false
+    } else {
+      true
+    }
+  } else false
 
   def remoteLog(logUrl: String, logPrefix: String, message: String): Unit = {
     implicit val formats = Utils.json4sDefaultFormats
@@ -559,75 +558,73 @@ class ServerActor[Q, P](val args: ServerConfig,
                 * - prediction
                 * - prId
                 */
-              val result =
-                if (feedbackEnabled) {
-                  implicit val formats =
-                    algorithms.headOption map { alg =>
-                      alg.querySerializer
-                    } getOrElse {
-                      Utils.json4sDefaultFormats
-                    }
-                  // val genPrId = Random.alphanumeric.take(64).mkString
-                  def genPrId: String = Random.alphanumeric.take(64).mkString
-                  val newPrId = prediction match {
-                    case id: WithPrId =>
-                      val org = id.prId
-                      if (org.isEmpty) genPrId else org
-                    case _ => genPrId
+              val result = if (feedbackEnabled) {
+                implicit val formats =
+                  algorithms.headOption map { alg =>
+                    alg.querySerializer
+                  } getOrElse {
+                    Utils.json4sDefaultFormats
                   }
+                // val genPrId = Random.alphanumeric.take(64).mkString
+                def genPrId: String = Random.alphanumeric.take(64).mkString
+                val newPrId = prediction match {
+                  case id: WithPrId =>
+                    val org = id.prId
+                    if (org.isEmpty) genPrId else org
+                  case _ => genPrId
+                }
 
-                  // also save Query's prId as prId of this pio_pr predict events
-                  val queryPrId = query match {
-                    case id: WithPrId =>
-                      Map("prId" -> id.prId)
-                    case _ =>
-                      Map()
-                  }
-                  val data =
-                    Map(
-                        // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
-                        "event" -> "predict",
-                        "eventTime" -> queryTime.toString(),
-                        "entityType" -> "pio_pr", // prediction result
-                        "entityId" -> newPrId,
-                        "properties" -> Map(
-                            "engineInstanceId" -> engineInstance.id,
-                            "query" -> query,
-                            "prediction" -> prediction)) ++ queryPrId
-                  // At this point args.accessKey should be Some(String).
-                  val accessKey = args.accessKey.getOrElse("")
-                  val f: Future[Int] = future {
-                    scalaj.http
-                      .Http(
-                          s"http://${args.eventServerIp}:${args.eventServerPort}/" +
+                // also save Query's prId as prId of this pio_pr predict events
+                val queryPrId = query match {
+                  case id: WithPrId =>
+                    Map("prId" -> id.prId)
+                  case _ =>
+                    Map()
+                }
+                val data =
+                  Map(
+                      // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
+                      "event" -> "predict",
+                      "eventTime" -> queryTime.toString(),
+                      "entityType" -> "pio_pr", // prediction result
+                      "entityId" -> newPrId,
+                      "properties" -> Map(
+                          "engineInstanceId" -> engineInstance.id,
+                          "query" -> query,
+                          "prediction" -> prediction)) ++ queryPrId
+                // At this point args.accessKey should be Some(String).
+                val accessKey = args.accessKey.getOrElse("")
+                val f: Future[Int] = future {
+                  scalaj.http
+                    .Http(
+                        s"http://${args.eventServerIp}:${args.eventServerPort}/" +
                           s"events.json?accessKey=$accessKey")
-                      .postData(write(data))
-                      .header("content-type", "application/json")
-                      .asString
-                      .code
+                    .postData(write(data))
+                    .header("content-type", "application/json")
+                    .asString
+                    .code
+                }
+                f onComplete {
+                  case Success(code) => {
+                    if (code != 201) {
+                      log.error(s"Feedback event failed. Status code: $code." +
+                            s"Data: ${write(data)}.")
+                    }
                   }
-                  f onComplete {
-                    case Success(code) => {
-                        if (code != 201) {
-                          log.error(
-                              s"Feedback event failed. Status code: $code." +
-                              s"Data: ${write(data)}.")
-                        }
-                      }
-                    case Failure(t) => {
-                        log.error(s"Feedback event failed: ${t.getMessage}")
-                      }
+                  case Failure(t) => {
+                    log.error(s"Feedback event failed: ${t.getMessage}")
                   }
-                  // overwrite prId in predictedResult
-                  // - if it is WithPrId,
-                  //   then overwrite with new prId
-                  // - if it is not WithPrId, no prId injection
-                  if (prediction.isInstanceOf[WithPrId]) {
-                    predictionJValue merge parse(s"""{"prId" : "$newPrId"}""")
-                  } else {
-                    predictionJValue
-                  }
-                } else predictionJValue
+                }
+                // overwrite prId in predictedResult
+                // - if it is WithPrId,
+                //   then overwrite with new prId
+                // - if it is not WithPrId, no prId injection
+                if (prediction.isInstanceOf[WithPrId]) {
+                  predictionJValue merge parse(s"""{"prId" : "$newPrId"}""")
+                } else {
+                  predictionJValue
+                }
+              } else predictionJValue
 
               val pluginResult =
                 pluginContext.outputBlockers.values.foldLeft(result) {
@@ -639,10 +636,10 @@ class ServerActor[Q, P](val args: ServerConfig,
               val servingEndTime = DateTime.now
               lastServingSec =
                 (servingEndTime.getMillis -
-                    servingStartTime.getMillis) / 1000.0
+                      servingStartTime.getMillis) / 1000.0
               avgServingSec =
                 ((avgServingSec * requestCount) + lastServingSec) /
-                (requestCount + 1)
+                  (requestCount + 1)
               requestCount += 1
 
               respondWithMediaType(`application/json`) {
@@ -656,13 +653,13 @@ class ServerActor[Q, P](val args: ServerConfig,
                   remoteLog(url,
                             args.logPrefix.getOrElse(""),
                             s"Query:\n$queryString\n\nStack Trace:\n" +
-                            s"${getStackTraceString(e)}\n\n")
+                              s"${getStackTraceString(e)}\n\n")
                 }
                 complete(StatusCodes.BadRequest, e.getMessage)
               case e: Throwable =>
                 val msg =
                   s"Query:\n$queryString\n\nStack Trace:\n" +
-                  s"${getStackTraceString(e)}\n\n"
+                    s"${getStackTraceString(e)}\n\n"
                 log.error(msg)
                 args.logUrl map { url =>
                   remoteLog(url,

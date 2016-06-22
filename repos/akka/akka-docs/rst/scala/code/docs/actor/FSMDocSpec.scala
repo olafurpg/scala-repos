@@ -84,8 +84,10 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
         goto(Active) using t.copy(queue = v :+ obj)
 
       case Event(e, s) =>
-        log.warning(
-            "received unhandled request {} in state {}/{}", e, stateName, s)
+        log.warning("received unhandled request {} in state {}/{}",
+                    e,
+                    stateName,
+                    s)
         stay
     }
     //#unhandled-elided
@@ -141,8 +143,7 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
       //#stop-syntax
 
       //#transform-syntax
-      when(SomeState)(
-          transform {
+      when(SomeState)(transform {
         case Event(bytes: ByteString, read) => stay using (read + bytes.length)
       } using {
         case s @ FSM.State(state, read, timeout, stopReason, replies)
@@ -191,8 +192,9 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
       onTermination {
         case StopEvent(FSM.Failure(_), state, data) =>
           val lastEvents = getLog.mkString("\n\t")
-          log.warning("Failure in state " + state + " with data " + data +
-              "\n" + "Events leading up to this point:\n\t" + lastEvents)
+          log.warning(
+              "Failure in state " + state + " with data " + data +
+                "\n" + "Events leading up to this point:\n\t" + lastEvents)
       }
       // ...
       //#body-elided

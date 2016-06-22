@@ -59,8 +59,8 @@ trait RepositorySearchService { self: IssuesService =>
       }
     }
 
-  private def searchRepositoryFiles(
-      git: Git, query: String): List[(String, String)] = {
+  private def searchRepositoryFiles(git: Git,
+                                    query: String): List[(String, String)] = {
     val revWalk = new RevWalk(git.getRepository)
     val objectId = git.getRepository.resolve("HEAD")
     val revCommit = revWalk.parseCommit(objectId)
@@ -119,8 +119,8 @@ object RepositorySearchService {
     }
   }
 
-  case class SearchResult(
-      files: List[(String, String)], issues: List[(Issue, Int, String)])
+  case class SearchResult(files: List[(String, String)],
+                          issues: List[(Issue, Int, String)])
 
   case class IssueSearchResult(issueId: Int,
                                isPullRequest: Boolean,

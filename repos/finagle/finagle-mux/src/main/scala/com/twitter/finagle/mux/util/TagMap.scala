@@ -77,16 +77,15 @@ private[mux] object TagMap {
     def unmap(tag: Int): Option[T] = synchronized {
       if (!inRange(tag)) return None
 
-      val res =
-        if (inFast(tag)) {
-          val el = getFast(tag)
-          setFast(tag, null.asInstanceOf[T])
-          Option(el)
-        } else if (fallback.containsKey(tag)) {
-          Some(fallback.remove(tag))
-        } else {
-          None
-        }
+      val res = if (inFast(tag)) {
+        val el = getFast(tag)
+        setFast(tag, null.asInstanceOf[T])
+        Option(el)
+      } else if (fallback.containsKey(tag)) {
+        Some(fallback.remove(tag))
+      } else {
+        None
+      }
 
       set.release(tag)
       res

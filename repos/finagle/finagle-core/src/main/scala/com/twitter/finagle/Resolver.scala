@@ -98,8 +98,7 @@ object InetResolver {
 private[finagle] class InetResolver(
     unscopedStatsReceiver: StatsReceiver,
     pollIntervalOpt: Option[Duration]
-)
-    extends Resolver {
+) extends Resolver {
   import InetSocketAddressUtil._
 
   type HostPortMetadata = (String, Int, Addr.Metadata)
@@ -205,8 +204,7 @@ private[finagle] class InetResolver(
     */
   def bind(hosts: String): Var[Addr] = Try(parseHostPorts(hosts)) match {
     case Return(hp) =>
-      bindHostPortsToAddr(
-          hp.map {
+      bindHostPortsToAddr(hp.map {
         case (host, port) =>
           (host, port, Addr.Metadata.empty)
       })
@@ -240,8 +238,7 @@ object FixedInetResolver {
 private[finagle] class FixedInetResolver(
     statsReceiver: StatsReceiver,
     resolveOverride: Option[String => Future[Seq[InetAddress]]]
-)
-    extends InetResolver(statsReceiver, None) {
+) extends InetResolver(statsReceiver, None) {
 
   override val scheme = FixedInetResolver.scheme
 
@@ -296,8 +293,8 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
 
     if (dups.nonEmpty) throw new MultipleResolversPerSchemeException(dups)
 
-    for (r <- resolvers) log.info(
-        "Resolver[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
+    for (r <- resolvers)
+      log.info("Resolver[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
 
     resolvers
   }
@@ -353,7 +350,8 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
   def resolve(addr: String): Try[Group[SocketAddress]] =
     Try { eval(addr) } flatMap {
       case Name.Path(_) =>
-        Throw(new IllegalArgumentException(
+        Throw(
+            new IllegalArgumentException(
                 "Resolver.resolve does not support logical names"))
       case bound @ Name.Bound(_) =>
         Return(NameGroup(bound))

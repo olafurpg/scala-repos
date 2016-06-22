@@ -24,8 +24,8 @@ import blueeyes.core.http.{MimeType, MimeTypes}
 
 import scalaz.StreamT
 
-case class FileData[M[+ _]](
-    mimeType: Option[MimeType], data: StreamT[M, Array[Byte]])
+case class FileData[M[+ _]](mimeType: Option[MimeType],
+                            data: StreamT[M, Array[Byte]])
 
 /**
   * An abstraction for storing/manipulating/retrieving files.

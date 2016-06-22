@@ -108,8 +108,8 @@ private trait ProductFoldable[F[_], G[_]]
 
   implicit def G: Foldable[G]
 
-  override def foldRight[A, B](fa: (F[A], G[A]), z: => B)(
-      f: (A, => B) => B): B =
+  override def foldRight[A, B](fa: (F[A], G[A]), z: => B)(f: (A,
+                                                              => B) => B): B =
     F.foldRight(fa._1, G.foldRight(fa._2, z)(f))(f)
 
   override def foldMap[A, B](fa: (F[A], G[A]))(f: A => B)(
@@ -125,10 +125,10 @@ private trait ProductFoldable1L[F[_], G[_]]
     with ProductFoldable[F, G] {
   implicit def F: Foldable1[F]
 
-  override def foldMapRight1[A, B](fa: (F[A], G[A]))(
-      z: A => B)(f: (A, => B) => B): B =
-    cata(G.foldMapRight1Opt(fa._2)(z)(f))(
-        F.foldRight(fa._1, _)(f), F.foldMapRight1(fa._1)(z)(f))
+  override def foldMapRight1[A, B](fa: (F[A], G[A]))(z: A => B)(
+      f: (A, => B) => B): B =
+    cata(G.foldMapRight1Opt(fa._2)(z)(f))(F.foldRight(fa._1, _)(f),
+                                          F.foldMapRight1(fa._1)(z)(f))
 
   override def foldMap1[A, B](fa: (F[A], G[A]))(f: A => B)(
       implicit S: Semigroup[B]): B = {
@@ -158,8 +158,8 @@ private trait ProductFoldable1R[F[_], G[_]]
 
   override def foldMapLeft1[A, B](fa: (F[A], G[A]))(z: A => B)(
       f: (B, A) => B): B =
-    cata(F.foldMapLeft1Opt(fa._1)(z)(f))(
-        G.foldLeft(fa._2, _)(f), G.foldMapLeft1(fa._2)(z)(f))
+    cata(F.foldMapLeft1Opt(fa._1)(z)(f))(G.foldLeft(fa._2, _)(f),
+                                         G.foldMapLeft1(fa._2)(z)(f))
 }
 
 private trait ProductFoldable1[F[_], G[_]]
@@ -211,7 +211,7 @@ private trait ProductTraverse1L[F[_], G[_]]
 
   override def traverseImpl[X[_]: Applicative, A, B](a: (F[A], G[A]))(
       f: A => X[B]): X[(F[B], G[B])] =
-    super [ProductTraverse].traverseImpl(a)(f)
+    super[ProductTraverse].traverseImpl(a)(f)
 }
 
 private trait ProductTraverse1R[F[_], G[_]]
@@ -230,7 +230,7 @@ private trait ProductTraverse1R[F[_], G[_]]
 
   override def traverseImpl[X[_]: Applicative, A, B](a: (F[A], G[A]))(
       f: A => X[B]): X[(F[B], G[B])] =
-    super [ProductTraverse].traverseImpl(a)(f)
+    super[ProductTraverse].traverseImpl(a)(f)
 }
 
 private trait ProductTraverse1[F[_], G[_]]
@@ -247,7 +247,7 @@ private trait ProductTraverse1[F[_], G[_]]
 
   override def traverseImpl[X[_]: Applicative, A, B](a: (F[A], G[A]))(
       f: A => X[B]): X[(F[B], G[B])] =
-    super [ProductTraverse].traverseImpl(a)(f)
+    super[ProductTraverse].traverseImpl(a)(f)
 }
 
 private trait ProductDistributive[F[_], G[_]]
@@ -281,8 +281,8 @@ private trait ProductZip[F[_], G[_]] extends Zip[λ[α => (F[α], G[α])]] {
 
   implicit def G: Zip[G]
 
-  def zip[A, B](
-      a: => (F[A], G[A]), b: => (F[B], G[B])): (F[(A, B)], G[(A, B)]) =
+  def zip[A, B](a: => (F[A], G[A]),
+                b: => (F[B], G[B])): (F[(A, B)], G[(A, B)]) =
     (F.zip(a._1, b._1), G.zip(a._2, b._2))
 }
 
@@ -304,8 +304,8 @@ private trait ProductBifunctor[F[_, _], G[_, _]]
 
   implicit def G: Bifunctor[G]
 
-  override def bimap[A, B, C, D](fab: (F[A, B], G[A, B]))(
-      f: A => C, g: B => D): (F[C, D], G[C, D]) =
+  override def bimap[A, B, C, D](
+      fab: (F[A, B], G[A, B]))(f: A => C, g: B => D): (F[C, D], G[C, D]) =
     (F.bimap(fab._1)(f, g), G.bimap(fab._2)(f, g))
 }
 
@@ -336,6 +336,7 @@ private trait ProductBitraverse[F[_, _], G[_, _]]
   implicit def G: Bitraverse[G]
 
   def bitraverseImpl[X[_]: Applicative, A, B, C, D](x: (F[A, B], G[A, B]))(
-      f: A => X[C], g: B => X[D]): X[(F[C, D], G[C, D])] =
+      f: A => X[C],
+      g: B => X[D]): X[(F[C, D], G[C, D])] =
     Applicative[X].tuple2(F.bitraverse(x._1)(f)(g), G.bitraverse(x._2)(f)(g))
 }

@@ -67,7 +67,7 @@ object Test_multiset {
       xs forall
       (e =>
             cardinality(intersection, e) ==
-            (cardinality(xs, e) min cardinality(ys, e)))
+              (cardinality(xs, e) min cardinality(ys, e)))
     }, "obey min cardinality")
     assert({
       val intersection = xs intersect ys

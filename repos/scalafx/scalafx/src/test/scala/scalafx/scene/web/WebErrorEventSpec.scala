@@ -40,7 +40,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class WebErrorEventSpec
     extends SimpleSFXDelegateSpec[jfxsw.WebErrorEvent, WebErrorEvent](
-        classOf[jfxsw.WebErrorEvent], classOf[WebErrorEvent]) {
+        classOf[jfxsw.WebErrorEvent],
+        classOf[WebErrorEvent]) {
 
   override protected def getJavaClassInstance =
     new jfxsw.WebErrorEvent(null, null, null, null)

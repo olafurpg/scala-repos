@@ -25,8 +25,8 @@ class OffsetCommitRequest(
     clientId: String,
     versionId: Short) {
   val underlying = {
-    val scalaMap: collection.immutable.Map[
-        TopicAndPartition, OffsetAndMetadata] = {
+    val scalaMap: collection.immutable.Map[TopicAndPartition,
+                                           OffsetAndMetadata] = {
       import collection.JavaConversions._
 
       requestInfo.toMap

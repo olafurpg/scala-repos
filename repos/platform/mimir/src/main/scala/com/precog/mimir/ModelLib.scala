@@ -60,8 +60,8 @@ trait ModelLibModule[M[+ _]] {
                   modelSet: ModelSet): Map[ColumnRef, Column] = {
           val keyCols =
             cols filter {
-              case (
-                  ColumnRef(CPath(paths.Key, CPathIndex(_), _ @_ *), _), _) =>
+              case (ColumnRef(CPath(paths.Key, CPathIndex(_), _ @_ *), _),
+                    _) =>
                 true
               case _ => false
             }
@@ -81,7 +81,8 @@ trait ModelLibModule[M[+ _]] {
 
           val idCols = modelCols ++ keyCols
           if (idCols.isEmpty) {
-            Map(ColumnRef(CPath(paths.Key), CEmptyArray) -> Column.const(
+            Map(
+                ColumnRef(CPath(paths.Key), CEmptyArray) -> Column.const(
                     CEmptyArray))
           } else {
             idCols
@@ -191,7 +192,7 @@ trait ModelLibModule[M[+ _]] {
               if (modelDoubles.length == includedDoubles.length) {
                 val res =
                   dotProduct(modelDoubles.toArray, includedDoubles.toArray) +
-                  model.constant
+                    model.constant
                 arr(i) = trans(res)
                 arr
               } else {
@@ -199,14 +200,17 @@ trait ModelLibModule[M[+ _]] {
               }
           }
 
-          ScannerPrelims(
-              includedModel, definedModel, cpaths, includedCols, resultArray)
+          ScannerPrelims(includedModel,
+                         definedModel,
+                         cpaths,
+                         includedCols,
+                         resultArray)
         }
       }
     }
 
-    def determineColumns(
-        schema: CSchema, cpaths: Set[CPath]): Map[CPath, DoubleColumn] = {
+    def determineColumns(schema: CSchema,
+                         cpaths: Set[CPath]): Map[CPath, DoubleColumn] = {
       cpaths.map { cpath =>
         val jtpe = Schema.mkType(Seq(ColumnRef(cpath, CDouble)))
 
@@ -231,8 +235,8 @@ trait ModelLibModule[M[+ _]] {
       }.toMap
     }
 
-    def alignWithModels(
-        schema: CSchema, modelWithPaths: Map[String, Set[CPath]])
+    def alignWithModels(schema: CSchema,
+                        modelWithPaths: Map[String, Set[CPath]])
       : Map[String, Map[CPath, DoubleColumn]] = {
       modelWithPaths map {
         case (modelName, cpaths) =>
@@ -256,8 +260,8 @@ trait ModelLibModule[M[+ _]] {
           val rowIdentities = Model.createRowIdentities(schema)
 
           val modelNames: Set[String] = schema.columnRefs.collect {
-            case ColumnRef(
-                CPath(paths.Value, CPathField(modelName), _ @_ *), _) =>
+            case ColumnRef(CPath(paths.Value, CPathField(modelName), _ @_ *),
+                           _) =>
               modelName
           }.toSet
 
@@ -349,9 +353,9 @@ trait ModelLibModule[M[+ _]] {
               }
 
             joined.collect {
-              case (field,
-                    cols @ List(
-                    constant, resStdErr, degs, varCovar, values)) =>
+              case (
+                  field,
+                  cols @ List(constant, resStdErr, degs, varCovar, values)) =>
                 val cnst =
                   constant.map {
                     case (_, col) =>
@@ -431,8 +435,8 @@ trait ModelLibModule[M[+ _]] {
           val rowIdentities = Model.createRowIdentities(schema)
 
           val modelNames: Set[String] = schema.columnRefs.collect {
-            case ColumnRef(
-                CPath(paths.Value, CPathField(modelName), _ @_ *), _) =>
+            case ColumnRef(CPath(paths.Value, CPathField(modelName), _ @_ *),
+                           _) =>
               modelName
           }.toSet
 

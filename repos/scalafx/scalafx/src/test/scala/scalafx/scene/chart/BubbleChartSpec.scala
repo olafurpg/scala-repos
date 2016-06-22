@@ -41,8 +41,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class BubbleChartSpec
-    extends SimpleSFXDelegateSpec[
-        jfxsc.BubbleChart[Number, Number], BubbleChart[Number, Number]](
+    extends SimpleSFXDelegateSpec[jfxsc.BubbleChart[Number, Number],
+                                  BubbleChart[Number, Number]](
         classOf[jfxsc.BubbleChart[Number, Number]],
         classOf[BubbleChart[Number, Number]])
     with RunOnApplicationThread {
@@ -51,6 +51,6 @@ class BubbleChartSpec
     new BubbleChart[Number, Number](getJavaClassInstance)
 
   override def getJavaClassInstance =
-    new jfxsc.BubbleChart[Number, Number](
-        new jfxsc.NumberAxis, new jfxsc.NumberAxis)
+    new jfxsc.BubbleChart[Number, Number](new jfxsc.NumberAxis,
+                                          new jfxsc.NumberAxis)
 }

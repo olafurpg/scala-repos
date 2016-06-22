@@ -251,7 +251,7 @@ object Test {
       }
       assertEquals(
           "res instance" + res.isInstanceOf[Seq[Con] forSome { type Con }] +
-          " res(0)=" + res(0),
+            " res(0)=" + res(0),
           true,
           res.isInstanceOf[Seq[Foo] forSome { type Foo }] && res(0) == Foo())
     }
@@ -612,8 +612,7 @@ object Test {
 
   object Bug1093 {
     def run() {
-      assert(
-          (Some(3): @unchecked) match {
+      assert((Some(3): @unchecked) match {
         case Some(1 | 2) => false
         case Some(3) => true
       })
@@ -669,19 +668,19 @@ object Test {
 
   object Ticket11 {
     def run() {
-      Array[Throwable](
-          new Exception("abc"), new MyException1, new MyException2).foreach {
-        e =>
-          try {
-            throw e
-          } catch {
-            case e: SpecialException => {
-                assume(e.isInstanceOf[SpecialException])
-              }
-            case e => {
-                assume(e.isInstanceOf[Throwable])
-              }
+      Array[Throwable](new Exception("abc"),
+                       new MyException1,
+                       new MyException2).foreach { e =>
+        try {
+          throw e
+        } catch {
+          case e: SpecialException => {
+            assume(e.isInstanceOf[SpecialException])
           }
+          case e => {
+            assume(e.isInstanceOf[Throwable])
+          }
+        }
       }
     }
   }

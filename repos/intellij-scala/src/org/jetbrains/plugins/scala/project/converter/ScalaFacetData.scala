@@ -17,9 +17,10 @@ private case class ScalaFacetData(languageLevel: String,
   def removeFrom(module: ModuleSettings) {
     val facetElement = ScalaFacetData
       .scalaFacetElementIn(module)
-      .getOrElse(throw new IllegalStateException(
+      .getOrElse(
+          throw new IllegalStateException(
               "Cannot remove Scala facet from module: " +
-              module.getModuleName))
+                module.getModuleName))
 
     facetElement.detach()
   }

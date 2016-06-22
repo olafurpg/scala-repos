@@ -35,8 +35,8 @@ object SealedTraitLike {
     */
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-  def compareBinary(c: Context)(
-      inputStreamA: c.TermName, inputStreamB: c.TermName)(
+  def compareBinary(c: Context)(inputStreamA: c.TermName,
+                                inputStreamB: c.TermName)(
       subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
@@ -267,8 +267,8 @@ object SealedTraitLike {
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-  def compare(c: Context)(
-      cmpType: c.Type, elementA: c.TermName, elementB: c.TermName)(
+  def compare(
+      c: Context)(cmpType: c.Type, elementA: c.TermName, elementB: c.TermName)(
       subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
     import c.universe._
 

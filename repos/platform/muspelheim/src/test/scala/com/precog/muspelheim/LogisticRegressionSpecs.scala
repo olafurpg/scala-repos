@@ -84,15 +84,15 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(elems)) => {
-            ids must haveSize(0)
-            elems.keys mustEqual Set("model1")
+          ids must haveSize(0)
+          elems.keys mustEqual Set("model1")
 
-            elems("model1") must beLike {
-              case SObject(obj) =>
-                obj.keySet mustEqual Set("fit")
-                obj("fit") must beLike { case SDecimal(_) => ok }
-            }
+          elems("model1") must beLike {
+            case SObject(obj) =>
+              obj.keySet mustEqual Set("fit")
+              obj("fit") must beLike { case SDecimal(_) => ok }
           }
+        }
       }
     }
 
@@ -107,25 +107,25 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(elems)) => {
-            if (idJoin) ids must haveSize(2)
-            else ids must haveSize(1)
+          if (idJoin) ids must haveSize(2)
+          else ids must haveSize(1)
 
-            elems.keys must contain("predictedGender")
+          elems.keys must contain("predictedGender")
 
-            elems("predictedGender") must beLike {
-              case SObject(obj) =>
-                obj.keys mustEqual Set("model1")
-                obj("model1") must beLike {
-                  case SObject(obj2) =>
-                    obj2.keySet mustEqual Set("fit")
-                    obj2("fit") must beLike {
-                      case SDecimal(d) =>
-                        (d must be_>=(BigDecimal(0))) and
+          elems("predictedGender") must beLike {
+            case SObject(obj) =>
+              obj.keys mustEqual Set("model1")
+              obj("model1") must beLike {
+                case SObject(obj2) =>
+                  obj2.keySet mustEqual Set("fit")
+                  obj2("fit") must beLike {
+                    case SDecimal(d) =>
+                      (d must be_>=(BigDecimal(0))) and
                         (d must be_<=(BigDecimal(1)))
-                    }
-                }
-            }
+                  }
+              }
           }
+        }
       }
     }
 
@@ -206,24 +206,24 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(elems)) => {
-            ids must haveSize(2)
+          ids must haveSize(2)
 
-            elems.keys mustEqual Set("model1", "predictedGender")
+          elems.keys mustEqual Set("model1", "predictedGender")
 
-            elems("predictedGender") must beLike {
-              case SObject(obj) =>
-                obj.keys mustEqual Set("model1")
-                obj("model1") must beLike {
-                  case SObject(obj2) =>
-                    obj2.keySet mustEqual Set("fit")
-                    obj2("fit") must beLike {
-                      case SDecimal(d) =>
-                        (d must be_>=(BigDecimal(0))) and
+          elems("predictedGender") must beLike {
+            case SObject(obj) =>
+              obj.keys mustEqual Set("model1")
+              obj("model1") must beLike {
+                case SObject(obj2) =>
+                  obj2.keySet mustEqual Set("fit")
+                  obj2("fit") must beLike {
+                    case SDecimal(d) =>
+                      (d must be_>=(BigDecimal(0))) and
                         (d must be_<=(BigDecimal(1)))
-                    }
-                }
-            }
+                  }
+              }
           }
+        }
       }
     }
 

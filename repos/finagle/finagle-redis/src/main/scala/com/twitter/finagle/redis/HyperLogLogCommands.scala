@@ -15,8 +15,8 @@ trait HyperLogLogs { self: BaseClient =>
     * @return True if a bit was set in the HyperLogLog data structure
     * @see http://redis.io/commands/pfadd
     */
-  def pfAdd(
-      key: ChannelBuffer, elements: List[ChannelBuffer]): Future[JBoolean] =
+  def pfAdd(key: ChannelBuffer,
+            elements: List[ChannelBuffer]): Future[JBoolean] =
     doRequest(PFAdd(key, elements)) {
       case IntegerReply(n) => Future.value(n == 1)
     }
@@ -38,8 +38,8 @@ trait HyperLogLogs { self: BaseClient =>
     * @param srcKeys
     * @see http://redis.io/commands/pfmerge
     */
-  def pfMerge(
-      destKey: ChannelBuffer, srcKeys: Seq[ChannelBuffer]): Future[Unit] =
+  def pfMerge(destKey: ChannelBuffer,
+              srcKeys: Seq[ChannelBuffer]): Future[Unit] =
     doRequest(PFMerge(destKey, srcKeys)) {
       case StatusReply(_) => Future.Unit
     }

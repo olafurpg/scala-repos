@@ -42,8 +42,7 @@ import org.apache.spark.internal.Logging
 private[memory] class ExecutionMemoryPool(
     lock: Object,
     poolName: String
-)
-    extends MemoryPool(lock)
+) extends MemoryPool(lock)
     with Logging {
 
   /**
@@ -89,62 +88,62 @@ private[memory] class ExecutionMemoryPool(
       numBytes: Long,
       taskAttemptId: Long,
       maybeGrowPool: Long => Unit = (additionalSpaceNeeded: Long) => Unit,
-      computeMaxPoolSize: () => Long = () =>
-        poolSize): Long = lock.synchronized {
-    assert(numBytes > 0, s"invalid number of bytes requested: $numBytes")
+      computeMaxPoolSize: () => Long = () => poolSize): Long =
+    lock.synchronized {
+      assert(numBytes > 0, s"invalid number of bytes requested: $numBytes")
 
-    // TODO: clean up this clunky method signature
+      // TODO: clean up this clunky method signature
 
-    // Add this task to the taskMemory map just so we can keep an accurate count of the number
-    // of active tasks, to let other tasks ramp down their memory in calls to `acquireMemory`
-    if (!memoryForTask.contains(taskAttemptId)) {
-      memoryForTask(taskAttemptId) = 0L
-      // This will later cause waiting tasks to wake up and check numTasks again
-      lock.notifyAll()
-    }
-
-    // Keep looping until we're either sure that we don't want to grant this request (because this
-    // task would have more than 1 / numActiveTasks of the memory) or we have enough free
-    // memory to give it (we always let each task get at least 1 / (2 * numActiveTasks)).
-    // TODO: simplify this to limit each task to its own slot
-    while (true) {
-      val numActiveTasks = memoryForTask.keys.size
-      val curMem = memoryForTask(taskAttemptId)
-
-      // In every iteration of this loop, we should first try to reclaim any borrowed execution
-      // space from storage. This is necessary because of the potential race condition where new
-      // storage blocks may steal the free execution memory that this task was waiting for.
-      maybeGrowPool(numBytes - memoryFree)
-
-      // Maximum size the pool would have after potentially growing the pool.
-      // This is used to compute the upper bound of how much memory each task can occupy. This
-      // must take into account potential free memory as well as the amount this pool currently
-      // occupies. Otherwise, we may run into SPARK-12155 where, in unified memory management,
-      // we did not take into account space that could have been freed by evicting cached blocks.
-      val maxPoolSize = computeMaxPoolSize()
-      val maxMemoryPerTask = maxPoolSize / numActiveTasks
-      val minMemoryPerTask = poolSize / (2 * numActiveTasks)
-
-      // How much we can grant this task; keep its share within 0 <= X <= 1 / numActiveTasks
-      val maxToGrant =
-        math.min(numBytes, math.max(0, maxMemoryPerTask - curMem))
-      // Only give it as much memory as is free, which might be none if it reached 1 / numTasks
-      val toGrant = math.min(maxToGrant, memoryFree)
-
-      // We want to let each task get at least 1 / (2 * numActiveTasks) before blocking;
-      // if we can't give it this much now, wait for other tasks to free up memory
-      // (this happens if older tasks allocated lots of memory before N grew)
-      if (toGrant < numBytes && curMem + toGrant < minMemoryPerTask) {
-        logInfo(
-            s"TID $taskAttemptId waiting for at least 1/2N of $poolName pool to be free")
-        lock.wait()
-      } else {
-        memoryForTask(taskAttemptId) += toGrant
-        return toGrant
+      // Add this task to the taskMemory map just so we can keep an accurate count of the number
+      // of active tasks, to let other tasks ramp down their memory in calls to `acquireMemory`
+      if (!memoryForTask.contains(taskAttemptId)) {
+        memoryForTask(taskAttemptId) = 0L
+        // This will later cause waiting tasks to wake up and check numTasks again
+        lock.notifyAll()
       }
+
+      // Keep looping until we're either sure that we don't want to grant this request (because this
+      // task would have more than 1 / numActiveTasks of the memory) or we have enough free
+      // memory to give it (we always let each task get at least 1 / (2 * numActiveTasks)).
+      // TODO: simplify this to limit each task to its own slot
+      while (true) {
+        val numActiveTasks = memoryForTask.keys.size
+        val curMem = memoryForTask(taskAttemptId)
+
+        // In every iteration of this loop, we should first try to reclaim any borrowed execution
+        // space from storage. This is necessary because of the potential race condition where new
+        // storage blocks may steal the free execution memory that this task was waiting for.
+        maybeGrowPool(numBytes - memoryFree)
+
+        // Maximum size the pool would have after potentially growing the pool.
+        // This is used to compute the upper bound of how much memory each task can occupy. This
+        // must take into account potential free memory as well as the amount this pool currently
+        // occupies. Otherwise, we may run into SPARK-12155 where, in unified memory management,
+        // we did not take into account space that could have been freed by evicting cached blocks.
+        val maxPoolSize = computeMaxPoolSize()
+        val maxMemoryPerTask = maxPoolSize / numActiveTasks
+        val minMemoryPerTask = poolSize / (2 * numActiveTasks)
+
+        // How much we can grant this task; keep its share within 0 <= X <= 1 / numActiveTasks
+        val maxToGrant =
+          math.min(numBytes, math.max(0, maxMemoryPerTask - curMem))
+        // Only give it as much memory as is free, which might be none if it reached 1 / numTasks
+        val toGrant = math.min(maxToGrant, memoryFree)
+
+        // We want to let each task get at least 1 / (2 * numActiveTasks) before blocking;
+        // if we can't give it this much now, wait for other tasks to free up memory
+        // (this happens if older tasks allocated lots of memory before N grew)
+        if (toGrant < numBytes && curMem + toGrant < minMemoryPerTask) {
+          logInfo(
+              s"TID $taskAttemptId waiting for at least 1/2N of $poolName pool to be free")
+          lock.wait()
+        } else {
+          memoryForTask(taskAttemptId) += toGrant
+          return toGrant
+        }
+      }
+      0L // Never reached
     }
-    0L // Never reached
-  }
 
   /**
     * Release `numBytes` of memory acquired by the given task.
@@ -152,15 +151,14 @@ private[memory] class ExecutionMemoryPool(
   def releaseMemory(numBytes: Long, taskAttemptId: Long): Unit =
     lock.synchronized {
       val curMem = memoryForTask.getOrElse(taskAttemptId, 0L)
-      var memoryToFree =
-        if (curMem < numBytes) {
-          logWarning(
-              s"Internal error: release called on $numBytes bytes but task only has $curMem bytes " +
+      var memoryToFree = if (curMem < numBytes) {
+        logWarning(
+            s"Internal error: release called on $numBytes bytes but task only has $curMem bytes " +
               s"of memory from the $poolName pool")
-          curMem
-        } else {
-          numBytes
-        }
+        curMem
+      } else {
+        numBytes
+      }
       if (memoryForTask.contains(taskAttemptId)) {
         memoryForTask(taskAttemptId) -= memoryToFree
         if (memoryForTask(taskAttemptId) <= 0) {

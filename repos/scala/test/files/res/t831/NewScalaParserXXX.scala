@@ -26,17 +26,17 @@ trait ScalaPrecedenceXXX extends NewScalaScannerXXX {
   type NewLine <: Statement with NewLineImpl;
   trait NewLineImpl extends super.NewLineImpl with StatementImpl {
     def self: NewLine;
-    override def isActive = super [NewLineImpl].isActive;
+    override def isActive = super[NewLineImpl].isActive;
   }
 }
 trait NewScalaParserXXX extends NewScalaScannerXXX with ScalaPrecedenceXXX {
   type NewLine <: Statement with NewLineImpl;
-  trait MyNewLine extends super [NewScalaScannerXXX].NewLineImpl;
+  trait MyNewLine extends super[NewScalaScannerXXX].NewLineImpl;
   trait NewLineImpl
       extends MyNewLine
-      with super [ScalaPrecedenceXXX].NewLineImpl
+      with super[ScalaPrecedenceXXX].NewLineImpl
       with StatementImpl {
     def self: NewLine;
-    override def isActive = super [MyNewLine].isActive;
+    override def isActive = super[MyNewLine].isActive;
   }
 }

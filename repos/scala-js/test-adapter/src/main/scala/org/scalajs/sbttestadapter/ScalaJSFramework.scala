@@ -21,8 +21,7 @@ final class ScalaJSFramework(
     private[testadapter] val libEnv: ComJSEnv,
     private[testadapter] val logger: Logger,
     private[testadapter] val jsConsole: JSConsole
-)
-    extends Framework {
+) extends Framework {
 
   private[this] val frameworkInfo = fetchFrameworkInfo()
 

@@ -248,11 +248,11 @@ object ImmutableArray extends ImmutableArrayInstances {
       other match {
         case other: StringArray => new StringArray(str + other.str)
         case _ => {
-            val newArr = new Array[B](length + other.length)
-            this.copyToArray(newArr, 0, length)
-            other.copyToArray(newArr, length, other.length)
-            fromArray(newArr)
-          }
+          val newArr = new Array[B](length + other.length)
+          this.copyToArray(newArr, 0, length)
+          other.copyToArray(newArr, length, other.length)
+          fromArray(newArr)
+        }
       }
   }
 
@@ -289,7 +289,8 @@ object ImmutableArray extends ImmutableArrayInstances {
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
 
     override protected[this] def newBuilder: Builder[
-        A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
+        A,
+        WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
 
   object WrappedImmutableArray {

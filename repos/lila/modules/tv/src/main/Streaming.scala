@@ -52,7 +52,7 @@ private final class Streaming(system: ActorSystem,
                   res.json.validate[Twitch.Result] match {
                     case JsSuccess(data, _) =>
                       data.streamsOnAir(streamers) filter
-                      (_.name.toLowerCase contains keyword) take max
+                        (_.name.toLowerCase contains keyword) take max
                     case JsError(err) =>
                       logger.warn(
                           s"twitch ${res.status} $err ${~res.body.lines.toList.headOption}")
@@ -69,7 +69,7 @@ private final class Streaming(system: ActorSystem,
                   res.json.validate[Hitbox.Result] match {
                     case JsSuccess(data, _) =>
                       data.streamsOnAir(streamers) filter
-                      (_.name.toLowerCase contains keyword) take max
+                        (_.name.toLowerCase contains keyword) take max
                     case JsError(err) =>
                       logger.warn(
                           s"hitbox ${res.status} $err ${~res.body.lines.toList.headOption}")
@@ -90,7 +90,7 @@ private final class Streaming(system: ActorSystem,
                   res.json.validate[Youtube.Result] match {
                     case JsSuccess(data, _) =>
                       data.streamsOnAir(streamers) filter
-                      (_.name.toLowerCase contains keyword) take max
+                        (_.name.toLowerCase contains keyword) take max
                     case JsError(err) =>
                       logger.warn(
                           s"youtube ${res.status} $err ${~res.body.lines.toList.headOption}")

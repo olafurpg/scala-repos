@@ -46,8 +46,8 @@ class CoproductTests extends CatsSuite {
   checkAll("Eq[Coproduct[Option, Option, Int]]",
            SerializableTests.serializable(Eq[Coproduct[Option, Option, Int]]))
 
-  implicit def showEq[A](
-      implicit arbA: Arbitrary[A], stringEq: Eq[String]): Eq[Show[A]] =
+  implicit def showEq[A](implicit arbA: Arbitrary[A],
+                         stringEq: Eq[String]): Eq[Show[A]] =
     new Eq[Show[A]] {
       def eqv(f: Show[A], g: Show[A]): Boolean = {
         val samples = List.fill(100)(arbA.arbitrary.sample).collect {

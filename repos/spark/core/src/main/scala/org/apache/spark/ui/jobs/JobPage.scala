@@ -75,11 +75,13 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
          |  'end': new Date(${completionTime}),
          |  'content': '<div class="job-timeline-content" data-toggle="tooltip"' +
          |   'data-placement="top" data-html="true"' +
-         |   'data-title="${Utility.escape(escapedName)} (Stage ${stageId}.${attemptId})<br>' +
+         |   'data-title="${Utility
+           .escape(escapedName)} (Stage ${stageId}.${attemptId})<br>' +
          |   'Status: ${status.toUpperCase}<br>' +
          |   'Submitted: ${UIUtils.formatDate(new Date(submissionTime))}' +
          |   '${if (status != "running") {
-           s"""<br>Completed: ${UIUtils.formatDate(new Date(completionTime))}"""
+           s"""<br>Completed: ${UIUtils
+             .formatDate(new Date(completionTime))}"""
          } else {
            ""
          }}">' +
@@ -102,7 +104,8 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
              |  'content': '<div class="executor-event-content"' +
              |    'data-toggle="tooltip" data-placement="bottom"' +
              |    'data-title="Executor ${executorId}<br>' +
-             |    'Added at ${UIUtils.formatDate(new Date(event.startTime))}"' +
+             |    'Added at ${UIUtils
+                              .formatDate(new Date(event.startTime))}"' +
              |    'data-html="true">Executor ${executorId} added</div>'
              |}
            """.stripMargin
@@ -178,8 +181,8 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
 
     listener.synchronized {
       val parameterId = request.getParameter("id")
-      require(
-          parameterId != null && parameterId.nonEmpty, "Missing id parameter")
+      require(parameterId != null && parameterId.nonEmpty,
+              "Missing id parameter")
 
       val jobId = parameterId.toInt
       val jobDataOption = listener.jobIdToData.get(jobId)
@@ -187,18 +190,22 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
         val content = <div id="no-info">
             <p>No information to display for job {jobId}</p>
           </div>
-        return UIUtils.headerSparkPage(
-            s"Details for Job $jobId", content, parent)
+        return UIUtils
+          .headerSparkPage(s"Details for Job $jobId", content, parent)
       }
       val jobData = jobDataOption.get
       val isComplete = jobData.status != JobExecutionStatus.RUNNING
       val stages = jobData.stageIds.map { stageId =>
         // This could be empty if the JobProgressListener hasn't received information about the
         // stage or if the stage information has been garbage collected
-        listener.stageIdToInfo.getOrElse(
-            stageId,
-            new StageInfo(
-                stageId, 0, "Unknown", 0, Seq.empty, Seq.empty, "Unknown"))
+        listener.stageIdToInfo.getOrElse(stageId,
+                                         new StageInfo(stageId,
+                                                       0,
+                                                       "Unknown",
+                                                       0,
+                                                       Seq.empty,
+                                                       Seq.empty,
+                                                       "Unknown"))
       }
 
       val activeStages = Buffer[StageInfo]()
@@ -320,30 +327,33 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
                                appStartTime)
 
       content ++= UIUtils.showDagVizForJob(
-          jobId, operationGraphListener.getOperationGraphForJob(jobId))
+          jobId,
+          operationGraphListener.getOperationGraphForJob(jobId))
 
       if (shouldShowActiveStages) {
         content ++=
-          <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
+        <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
       }
       if (shouldShowPendingStages) {
         content ++=
-          <h4 id="pending">Pending Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
+        <h4 id="pending">Pending Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
       }
       if (shouldShowCompletedStages) {
         content ++=
-          <h4 id="completed">Completed Stages ({completedStages.size})</h4> ++ completedStagesTable.toNodeSeq
+        <h4 id="completed">Completed Stages ({completedStages.size})</h4> ++ completedStagesTable.toNodeSeq
       }
       if (shouldShowSkippedStages) {
         content ++=
-          <h4 id="skipped">Skipped Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
+        <h4 id="skipped">Skipped Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
       }
       if (shouldShowFailedStages) {
         content ++=
-          <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
+        <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
       }
-      UIUtils.headerSparkPage(
-          s"Details for Job $jobId", content, parent, showVisualization = true)
+      UIUtils.headerSparkPage(s"Details for Job $jobId",
+                              content,
+                              parent,
+                              showVisualization = true)
     }
   }
 }

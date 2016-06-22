@@ -41,9 +41,8 @@ class WorksheetCompiler {
     import org.jetbrains.plugins.scala.worksheet.processor.WorksheetCompiler._
 
     val worksheetVirtual = worksheetFile.getVirtualFile
-    val (iteration, tempFile, outputDir) =
-      WorksheetBoundCompilationInfo.updateOrCreate(
-          worksheetVirtual.getCanonicalPath, worksheetFile.getName)
+    val (iteration, tempFile, outputDir) = WorksheetBoundCompilationInfo
+      .updateOrCreate(worksheetVirtual.getCanonicalPath, worksheetFile.getName)
 
     val project = worksheetFile.getProject
 
@@ -57,7 +56,8 @@ class WorksheetCompiler {
     val oldContent = contentManager findContent ERROR_CONTENT_NAME
     if (oldContent != null) contentManager.removeContent(oldContent, true)
 
-    WorksheetSourceProcessor.process(worksheetFile, ifEditor, iteration) match {
+    WorksheetSourceProcessor
+      .process(worksheetFile, ifEditor, iteration) match {
       case Left((code, name)) =>
         FileUtil.writeToFile(tempFile, code)
 
@@ -83,7 +83,10 @@ class WorksheetCompiler {
         }
 
         val consumer = new RemoteServerConnector.CompilerInterfaceImpl(
-            task, worksheetPrinter, None, auto)
+            task,
+            worksheetPrinter,
+            None,
+            auto)
 
         task.start(new Runnable {
           override def run() {
@@ -141,8 +144,9 @@ class WorksheetCompiler {
     }
   }
 
-  private def openMessageView(
-      project: Project, content: Content, treeView: CompilerErrorTreeView) {
+  private def openMessageView(project: Project,
+                              content: Content,
+                              treeView: CompilerErrorTreeView) {
     val commandProcessor = CommandProcessor.getInstance()
     commandProcessor.executeCommand(project, new Runnable {
       override def run() {
@@ -160,10 +164,10 @@ class WorksheetCompiler {
 }
 
 object WorksheetCompiler extends WorksheetPerFileConfig {
-  private val MAKE_BEFORE_RUN = new FileAttribute(
-      "ScalaWorksheetMakeBeforeRun", 1, true)
-  private val CP_MODULE_NAME = new FileAttribute(
-      "ScalaWorksheetModuleForCp", 1, false)
+  private val MAKE_BEFORE_RUN =
+    new FileAttribute("ScalaWorksheetMakeBeforeRun", 1, true)
+  private val CP_MODULE_NAME =
+    new FileAttribute("ScalaWorksheetModuleForCp", 1, false)
   private val ERROR_CONTENT_NAME = "Worksheet errors"
 
   val CONFIG_ERROR_HEADER = "Worksheet configuration error:"

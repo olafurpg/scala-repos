@@ -164,8 +164,8 @@ trait StreamTest extends QueryTest with Timeouts {
   }
 
   /** Assert that a condition on the active query is true */
-  class AssertOnQuery(
-      val condition: StreamExecution => Boolean, val message: String)
+  class AssertOnQuery(val condition: StreamExecution => Boolean,
+                      val message: String)
       extends StreamAction {
     override def toString: String = s"AssertOnQuery(<condition>, $message)"
   }
@@ -271,10 +271,12 @@ trait StreamTest extends QueryTest with Timeouts {
       def exceptionToString(e: Throwable, prefix: String = ""): String = {
         val base =
           s"$prefix${e.getMessage}" +
-          e.getStackTrace.take(10).mkString(s"\n$prefix", s"\n$prefix\t", "\n")
+            e.getStackTrace
+              .take(10)
+              .mkString(s"\n$prefix", s"\n$prefix\t", "\n")
         if (e.getCause != null) {
-          base + s"\n$prefix\tCaused by: " + exceptionToString(
-              e.getCause, s"$prefix\t")
+          base + s"\n$prefix\tCaused by: " + exceptionToString(e.getCause,
+                                                               s"$prefix\t")
         } else {
           base
         }
@@ -317,7 +319,7 @@ trait StreamTest extends QueryTest with Timeouts {
                      "query.isActive() is false even after stopping")
               verify(currentStream.exception.isEmpty,
                      s"query.exception() is not empty after clean stop: " +
-                     currentStream.exception.map(_.toString()).getOrElse(""))
+                       currentStream.exception.map(_.toString()).getOrElse(""))
             } catch {
               case _: InterruptedException =>
               case _: org.scalatest.exceptions.TestFailedDueToTimeoutException =>
@@ -355,7 +357,7 @@ trait StreamTest extends QueryTest with Timeouts {
               verify(
                   exception.cause.getClass === ef.causeClass,
                   "incorrect cause in exception returned by query.exception()\n" +
-                  s"\tExpected: ${ef.causeClass}\n\tReturned: ${exception.cause.getClass}")
+                    s"\tExpected: ${ef.causeClass}\n\tReturned: ${exception.cause.getClass}")
             } catch {
               case _: InterruptedException =>
               case _: org.scalatest.exceptions.TestFailedDueToTimeoutException =>

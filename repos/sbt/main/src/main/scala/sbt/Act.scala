@@ -36,8 +36,8 @@ object Act {
                                        current,
                                        defaultConfigs,
                                        structure.index.keyMap,
-                                       structure.data)) yield
-      Aggregation.aggregate(selected.key, selected.mask, structure.extra)
+                                       structure.data))
+      yield Aggregation.aggregate(selected.key, selected.mask, structure.extra)
 
   def scopedKeySelected(
       index: KeyIndex,
@@ -74,8 +74,10 @@ object Act {
       rawProject <- optProjectRef(index, current)
       proj = resolveProject(rawProject, current)
       confAmb <- config(index configs proj)
-      partialMask = ScopeMask(
-          rawProject.isExplicit, confAmb.isExplicit, false, false)
+      partialMask = ScopeMask(rawProject.isExplicit,
+                              confAmb.isExplicit,
+                              false,
+                              false)
     } yield taskKeyExtra(proj, confAmb, partialMask)
   }
   def makeScopedKey(proj: Option[ResolvedReference],
@@ -135,15 +137,17 @@ object Act {
     data.definingScope(key.scope, key.key) == Some(key.scope)
   }
 
-  def examples(
-      p: Parser[String], exs: Set[String], label: String): Parser[String] =
+  def examples(p: Parser[String],
+               exs: Set[String],
+               label: String): Parser[String] =
     p !!! ("Expected " + label) examples exs
-  def examplesStrict(
-      p: Parser[String], exs: Set[String], label: String): Parser[String] =
+  def examplesStrict(p: Parser[String],
+                     exs: Set[String],
+                     label: String): Parser[String] =
     filterStrings(examples(p, exs, label), exs, label)
 
-  def optionalAxis[T](
-      p: Parser[T], ifNone: ScopeAxis[T]): Parser[ScopeAxis[T]] =
+  def optionalAxis[T](p: Parser[T],
+                      ifNone: ScopeAxis[T]): Parser[ScopeAxis[T]] =
     p.? map { opt =>
       toAxis(opt, ifNone)
     }
@@ -152,7 +156,8 @@ object Act {
 
   def config(confs: Set[String]): Parser[ParsedAxis[String]] = {
     val sep = ':' !!! "Expected ':' (if selecting a configuration)"
-    token((GlobalString ^^^ ParsedGlobal | value(
+    token(
+        (GlobalString ^^^ ParsedGlobal | value(
                 examples(ID, confs, "configuration"))) <~ sep) ?? Omitted
   }
 
@@ -267,8 +272,8 @@ object Act {
   def knownIDParser[T](knownKeys: Map[String, T], label: String): Parser[T] =
     token(examplesStrict(ID, knownKeys.keys.toSet, label)) map knownKeys
 
-  def knownPluginParser[T](
-      knownPlugins: Map[String, T], label: String): Parser[T] = {
+  def knownPluginParser[T](knownPlugins: Map[String, T],
+                           label: String): Parser[T] = {
     val pluginLabelParser = rep1sep(ID, '.').map(_.mkString("."))
     token(examplesStrict(pluginLabelParser, knownPlugins.keys.toSet, label)) map knownPlugins
   }
@@ -369,32 +374,34 @@ object Act {
     aggregatedKeyParser(Project extract state)
   def aggregatedKeyParser(extracted: Extracted): KeysParser =
     aggregatedKeyParser(extracted.structure, extracted.currentRef)
-  def aggregatedKeyParser(
-      structure: BuildStructure, currentRef: ProjectRef): KeysParser =
-    scopedKeyAggregated(
-        currentRef, structure.extra.configurationsForAxis, structure)
+  def aggregatedKeyParser(structure: BuildStructure,
+                          currentRef: ProjectRef): KeysParser =
+    scopedKeyAggregated(currentRef,
+                        structure.extra.configurationsForAxis,
+                        structure)
 
   def keyValues[T](state: State)(keys: Seq[ScopedKey[T]]): Values[T] =
     keyValues(Project extract state)(keys)
   def keyValues[T](extracted: Extracted)(keys: Seq[ScopedKey[T]]): Values[T] =
     keyValues(extracted.structure)(keys)
-  def keyValues[T](
-      structure: BuildStructure)(keys: Seq[ScopedKey[T]]): Values[T] =
+  def keyValues[T](structure: BuildStructure)(
+      keys: Seq[ScopedKey[T]]): Values[T] =
     keys.flatMap { key =>
       getValue(structure.data, key.scope, key.key) map { value =>
         KeyValue(key, value)
       }
     }
-  private[this] def anyKeyValues(
-      structure: BuildStructure, keys: Seq[ScopedKey[_]]): Seq[KeyValue[_]] =
+  private[this] def anyKeyValues(structure: BuildStructure,
+                                 keys: Seq[ScopedKey[_]]): Seq[KeyValue[_]] =
     keys.flatMap { key =>
       getValue(structure.data, key.scope, key.key) map { value =>
         KeyValue(key, value)
       }
     }
 
-  private[this] def getValue[T](
-      data: Settings[Scope], scope: Scope, key: AttributeKey[T]): Option[T] =
+  private[this] def getValue[T](data: Settings[Scope],
+                                scope: Scope,
+                                key: AttributeKey[T]): Option[T] =
     if (java.lang.Boolean.getBoolean("sbt.cli.nodelegation"))
       data.getDirect(scope, key)
     else data.get(scope, key)

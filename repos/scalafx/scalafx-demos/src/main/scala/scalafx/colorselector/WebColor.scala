@@ -197,5 +197,5 @@ sealed case class WebColor(name: String, color: Color) {
     */
   def sameColor(c: Color) =
     ((c.red == color.red) && (c.green == color.green) &&
-        (c.blue == color.blue))
+          (c.blue == color.blue))
 }

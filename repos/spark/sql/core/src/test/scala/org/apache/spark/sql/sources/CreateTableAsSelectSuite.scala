@@ -128,8 +128,8 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT a * 4 FROM jt
       """.stripMargin)
-    checkAnswer(
-        sql("SELECT * FROM jsonTable"), sql("SELECT a * 4 FROM jt").collect())
+    checkAnswer(sql("SELECT * FROM jsonTable"),
+                sql("SELECT a * 4 FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
     // Explicitly delete the data.
@@ -144,8 +144,8 @@ class CreateTableAsSelectSuite
         |SELECT b FROM jt
       """.stripMargin)
 
-    checkAnswer(
-        sql("SELECT * FROM jsonTable"), sql("SELECT b FROM jt").collect())
+    checkAnswer(sql("SELECT * FROM jsonTable"),
+                sql("SELECT b FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
   }

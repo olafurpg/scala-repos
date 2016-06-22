@@ -43,8 +43,8 @@ object Generated {
             (Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr" flatMap {
                   case Uci.Move(orig, dest, prom) =>
                     g(orig, dest, prom) map (_._1)
-                })
-              .fold(errs => Failure(new Exception(errs.shows)), Success.apply)
+                }).fold(errs =>
+                  Failure(new Exception(errs.shows)), Success.apply)
         }
     }) map { game =>
       Forsyth >> Forsyth.SituationPlus(game.situation, moves.size / 2)

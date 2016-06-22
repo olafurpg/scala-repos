@@ -105,8 +105,8 @@ abstract class ParamMap
 }
 
 /** Map-backed ParamMap. */
-class MapParamMap(
-    underlying: Map[String, Seq[String]], val isValid: Boolean = true)
+class MapParamMap(underlying: Map[String, Seq[String]],
+                  val isValid: Boolean = true)
     extends ParamMap {
 
   def get(name: String): Option[String] =
@@ -210,8 +210,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
     keySet.iterator
 
   // Get value from JMap, which might be null
-  private def jget(
-      params: JMap[String, JList[String]], name: String): Option[String] = {
+  private def jget(params: JMap[String, JList[String]],
+                   name: String): Option[String] = {
     val values = params.get(name)
     if (values != null && !values.isEmpty()) {
       Some(values.get(0))
@@ -221,8 +221,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
   }
 
   // Get values from JMap, which might be null
-  private def jgetAll(
-      params: JMap[String, JList[String]], name: String): Iterable[String] = {
+  private def jgetAll(params: JMap[String, JList[String]],
+                      name: String): Iterable[String] = {
     val values = params.get(name)
     if (values != null) {
       values.asScala

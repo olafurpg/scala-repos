@@ -71,8 +71,8 @@ class ScSelfInvocationImpl(node: ASTNode)
     proc.candidates.toSeq.map(_.element)
   }
 
-  private def workWithBindInternal(
-      bindInternal: Option[PsiElement], i: Int): TypeResult[ScType] = {
+  private def workWithBindInternal(bindInternal: Option[PsiElement],
+                                   i: Int): TypeResult[ScType] = {
     val (res: ScType, clazz: ScTemplateDefinition) = bindInternal match {
       case Some(c: ScMethodLike) =>
         val methodType = ScType

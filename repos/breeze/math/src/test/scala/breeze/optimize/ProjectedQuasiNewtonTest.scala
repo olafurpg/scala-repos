@@ -48,8 +48,9 @@ class ProjectedQuasiNewtonTest
   }
 
   property("optimize a simple multivariate gaussian with projection") {
-    val optimizer = new ProjectedQuasiNewton(
-        tolerance = 1.0E-5, projection = _.map(scala.math.min(_, 2.0)))
+    val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-5,
+                                             projection =
+                                               _.map(scala.math.min(_, 2.0)))
 
     forAll { init: DenseVector[Double] =>
       init := clip(init, Double.NegativeInfinity, 2.0)

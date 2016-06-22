@@ -135,7 +135,8 @@ private[streams] class FutureSubscription[T, U >: T](
       state = Completed
       result match {
         case Success(null) =>
-          subr.onError(new NullPointerException(
+          subr.onError(
+              new NullPointerException(
                   "Future completed with a null value that cannot be sent by a Publisher"))
         case Success(value) =>
           subr.onNext(value)

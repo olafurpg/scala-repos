@@ -15,13 +15,14 @@ package object interpolation {
   }
 
   trait UnivariateInterpolator[T]
-      extends VariableUFunc[
-          UnivariateInterpolatorImpl.type, UnivariateInterpolator[T]] {
+      extends VariableUFunc[UnivariateInterpolatorImpl.type,
+                            UnivariateInterpolator[T]] {
     def apply(x: T): T
   }
 
   abstract class HandyUnivariateInterpolator[T: ClassTag: Field: Ordering](
-      x_coords: Vector[T], y_coords: Vector[T])
+      x_coords: Vector[T],
+      y_coords: Vector[T])
       extends UnivariateInterpolator[T] {
 
     if (x_coords.size != x_coords.toArray.toSet.size)

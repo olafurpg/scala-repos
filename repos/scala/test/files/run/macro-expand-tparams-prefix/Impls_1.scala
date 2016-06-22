@@ -23,7 +23,8 @@ object Impls2 {
 
 object Impls345 {
   def foo[T, U: c.WeakTypeTag, V](c: Context)(
-      implicit T: c.WeakTypeTag[T], V: c.WeakTypeTag[V]): c.Expr[Unit] = {
+      implicit T: c.WeakTypeTag[T],
+      V: c.WeakTypeTag[V]): c.Expr[Unit] = {
     import c.universe._
     c.Expr(q"""
       println(${T.toString})

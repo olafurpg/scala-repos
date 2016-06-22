@@ -83,8 +83,9 @@ trait MathLibModule[M[+ _]]
       val cf2pName = "builtin::math::op2dd::pow"
     }
 
-    abstract class Op1DD(
-        name: String, defined: Double => Boolean, f: Double => Double)
+    abstract class Op1DD(name: String,
+                         defined: Double => Boolean,
+                         f: Double => Double)
         extends Op1F1(MathNamespace, name) {
       val tpe = UnaryOperationType(JNumberT, JNumberT)
       def f1(ctx: MorphContext): F1 = CF1P("builtin::math::op1dd::" + name) {

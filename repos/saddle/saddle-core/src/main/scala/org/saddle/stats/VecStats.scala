@@ -239,8 +239,8 @@ trait VecStats[@spec(Int, Long, Double) A] {
     } else sd.missing
   }
 
-  protected def _demeaned(
-      r: Vec[A], subOp: (A, Double) => Double): Vec[Double] = {
+  protected def _demeaned(r: Vec[A],
+                          subOp: (A, Double) => Double): Vec[Double] = {
     val sa = r.scalarTag
     val sd = ScalarTagDouble
 
@@ -312,8 +312,9 @@ trait VecStats[@spec(Int, Long, Double) A] {
   }
 
   // NB: destructive to argument v
-  protected def _rank(
-      v: Array[Double], tie: RankTie, ascending: Boolean): Vec[Double] = {
+  protected def _rank(v: Array[Double],
+                      tie: RankTie,
+                      ascending: Boolean): Vec[Double] = {
     val sd = ScalarTagDouble
 
     val nan =
@@ -447,8 +448,8 @@ class DoubleStats(r: Vec[Double]) extends VecStats[Double] {
     _percentile(r, tile, method)
 
   def demeaned: Vec[Double] = _demeaned(r, _ - _)
-  def rank(
-      tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
+  def rank(tie: RankTie = RankTie.Avg,
+           ascending: Boolean = true): Vec[Double] =
     _rank(r.contents, tie, ascending)
 
   def argmin: Int = array.argmin(r.toArray)
@@ -494,8 +495,8 @@ class IntStats(r: Vec[Int]) extends VecStats[Int] {
     _percentile(r.toDoubleArray, tile, method)
 
   def demeaned: Vec[Double] = _demeaned(r, _ - _)
-  def rank(
-      tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
+  def rank(tie: RankTie = RankTie.Avg,
+           ascending: Boolean = true): Vec[Double] =
     _rank(r.toDoubleArray, tie, ascending)
 
   def argmin: Int = array.argmin(r.toArray)
@@ -540,8 +541,8 @@ class LongStats(r: Vec[Long]) extends VecStats[Long] {
     _percentile(r.toDoubleArray, tile, method)
 
   def demeaned: Vec[Double] = _demeaned(r, _ - _)
-  def rank(
-      tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
+  def rank(tie: RankTie = RankTie.Avg,
+           ascending: Boolean = true): Vec[Double] =
     _rank(r.toDoubleArray, tie, ascending)
 
   def argmin: Int = array.argmin(r.toArray)

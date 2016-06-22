@@ -7,8 +7,8 @@ final case class TracedT[W[_], A, B](run: W[A => B]) {
   def map[C](f: B => C)(implicit W: Functor[W]): TracedT[W, A, C] =
     TracedT(W.map(run)(_ andThen f))
 
-  def cobind[C](f: TracedT[W, A, B] => C)(
-      implicit W: Cobind[W], A: Semigroup[A]): TracedT[W, A, C] =
+  def cobind[C](f: TracedT[W, A, B] => C)(implicit W: Cobind[W],
+                                          A: Semigroup[A]): TracedT[W, A, C] =
     TracedT(
         W.extend(run) { wf => m =>
           f(TracedT(W.map(wf)(_.compose(A.append(_, m)))))

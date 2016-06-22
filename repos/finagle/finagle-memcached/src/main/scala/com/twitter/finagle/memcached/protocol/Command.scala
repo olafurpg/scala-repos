@@ -26,8 +26,8 @@ private object KeyValidation {
 
     if (tooLong(key))
       throw new IllegalArgumentException(
-          "Invalid keys: key cannot be longer than %d bytes (%d)".format(
-              MaxKeyLength, key.length))
+          "Invalid keys: key cannot be longer than %d bytes (%d)"
+            .format(MaxKeyLength, key.length))
 
     val index = invalidByteIndex(key)
     if (index != -1) {
@@ -71,8 +71,11 @@ trait KeyValidation {
 
 sealed abstract class Command(val name: String)
 
-abstract class StorageCommand(
-    key: Buf, flags: Int, expiry: Time, value: Buf, name: String)
+abstract class StorageCommand(key: Buf,
+                              flags: Int,
+                              expiry: Time,
+                              value: Buf,
+                              name: String)
     extends Command(name)
     with KeyValidation {
   def keys: Seq[Buf] = Seq(key)

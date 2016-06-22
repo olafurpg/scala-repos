@@ -21,7 +21,8 @@ import scala.language.higherKinds
   */
 abstract class ParSetFactory[
     CC[X] <: ParSet[X] with ParSetLike[X, CC[X], _] with GenericParTemplate[
-        X, CC]]
+        X,
+        CC]]
     extends GenSetFactory[CC]
     with GenericParCompanion[CC] {
   def newBuilder[A]: Combiner[A, CC[A]] = newCombiner[A]

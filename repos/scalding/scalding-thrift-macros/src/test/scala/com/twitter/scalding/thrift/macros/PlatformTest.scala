@@ -83,7 +83,8 @@ class PlatformTest
 
     "Expected items should match : Internal Serializer / TestStructdd" in {
       runCompareTest[TestStruct](
-          toScroogeInternalOrderedSerialization[TestStruct], implicitly)
+          toScroogeInternalOrderedSerialization[TestStruct],
+          implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestSets" in {
@@ -93,7 +94,8 @@ class PlatformTest
 
     "Expected items should match : Internal Serializer / TestLists" in {
       runCompareTest[TestLists](
-          toScroogeInternalOrderedSerialization[TestLists], implicitly)
+          toScroogeInternalOrderedSerialization[TestLists],
+          implicitly)
     }
 
     "Expected items should match : Internal Serializer /  TestMaps" in {
@@ -115,12 +117,14 @@ class PlatformTest
 
     "Expected items should match : Internal Serializer / TestTypes" in {
       runCompareTest[TestTypes](
-          toScroogeInternalOrderedSerialization[TestTypes], implicitly)
+          toScroogeInternalOrderedSerialization[TestTypes],
+          implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestTypes2" in {
       runCompareTest[TestTypes](
-          toScroogeInternalOrderedSerialization[TestTypes], implicitly)
+          toScroogeInternalOrderedSerialization[TestTypes],
+          implicitly)
     }
 
     "Expected items should match : Internal Serializer / (Long, TestTypes)" in {

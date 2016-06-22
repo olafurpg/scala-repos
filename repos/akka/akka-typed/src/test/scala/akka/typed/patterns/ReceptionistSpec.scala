@@ -36,8 +36,8 @@ class ReceptionistSpec extends TypedSpec {
     }
 
     def `must register two services`(): Unit = {
-      val ctx = new EffectfulActorContext(
-          "registertwo", Props(behavior), system)
+      val ctx =
+        new EffectfulActorContext("registertwo", Props(behavior), system)
       val a = Inbox.sync[ServiceA]("a")
       val r = Inbox.sync[Registered[_]]("r")
       ctx.run(Register(ServiceKeyA, a.ref)(r.ref))
@@ -54,8 +54,8 @@ class ReceptionistSpec extends TypedSpec {
     }
 
     def `must register two services with the same key`(): Unit = {
-      val ctx = new EffectfulActorContext(
-          "registertwosame", Props(behavior), system)
+      val ctx =
+        new EffectfulActorContext("registertwosame", Props(behavior), system)
       val a1 = Inbox.sync[ServiceA]("a1")
       val r = Inbox.sync[Registered[_]]("r")
       ctx.run(Register(ServiceKeyA, a1.ref)(r.ref))
@@ -73,8 +73,8 @@ class ReceptionistSpec extends TypedSpec {
     }
 
     def `must unregister services when they terminate`(): Unit = {
-      val ctx = new EffectfulActorContext(
-          "registertwosame", Props(behavior), system)
+      val ctx =
+        new EffectfulActorContext("registertwosame", Props(behavior), system)
       val r = Inbox.sync[Registered[_]]("r")
       val a = Inbox.sync[ServiceA]("a")
       ctx.run(Register(ServiceKeyA, a.ref)(r.ref))

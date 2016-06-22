@@ -47,7 +47,8 @@ private object Json {
       typ.getRawClass == classOf[Annotation]
   }
 
-  mapper.setDefaultTyping(TypeResolverBuilder
+  mapper.setDefaultTyping(
+      TypeResolverBuilder
         .init(JsonTypeInfo.Id.CLASS, null)
         .inclusion(JsonTypeInfo.As.WRAPPER_ARRAY))
 
@@ -179,8 +180,9 @@ object ZipkinTracer {
   * @param initialSampleRate Start off with this sample rate. Can be changed later.
   * @param sink where to send sampled trace events to.
   */
-class SamplingTracer(
-    underlyingTracer: Tracer, initialSampleRate: Float, sink: Sink)
+class SamplingTracer(underlyingTracer: Tracer,
+                     initialSampleRate: Float,
+                     sink: Sink)
     extends Tracer {
 
   /**

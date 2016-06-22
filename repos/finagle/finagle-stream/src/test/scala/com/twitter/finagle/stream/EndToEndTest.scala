@@ -36,8 +36,7 @@ class EndToEndTest extends FunSuite {
       info: StreamResponse.Info,
       messages: Offer[Buf],
       error: Offer[Throwable]
-  )
-      extends StreamResponse {
+  ) extends StreamResponse {
 
     val released = new Promise[Unit]
     def release() = released.updateIfEmpty(Return.Unit)
@@ -60,7 +59,8 @@ class EndToEndTest extends FunSuite {
 
   def workIt(what: String)(
       mkClient: (MyStreamResponse) => (StreamService, SocketAddress)) {
-    test("Streams %s: writes from the server arrive on the client's channel"
+    test(
+        "Streams %s: writes from the server arrive on the client's channel"
           .format(what)) {
       val c = new WorkItContext()
       import c._
@@ -87,7 +87,8 @@ class EndToEndTest extends FunSuite {
       client.close()
     }
 
-    test("Streams %s: writes from the server are queued before the client responds"
+    test(
+        "Streams %s: writes from the server are queued before the client responds"
           .format(what)) {
       val c = new WorkItContext()
       import c._
@@ -111,14 +112,14 @@ class EndToEndTest extends FunSuite {
       client.close()
     }
 
-    test("Streams %s: the client does not admit concurrent requests".format(
+    test(
+        "Streams %s: the client does not admit concurrent requests".format(
             what)) {
       val c = new WorkItContext()
       import c._
       val (client, _) = mkClient(serverRes)
       val clientRes = Await.result(client(streamRequest), 15.seconds)
-      assert(
-          client(streamRequest).poll match {
+      assert(client(streamRequest).poll match {
         case Some(Throw(_: TooManyConcurrentRequestsException)) => true
         case _ => false
       })
@@ -126,7 +127,8 @@ class EndToEndTest extends FunSuite {
     }
 
     if (!sys.props.contains("SKIP_FLAKY"))
-      test("Streams %s: the server does not admit concurrent requests".format(
+      test(
+          "Streams %s: the server does not admit concurrent requests".format(
               what)) {
         val c = new WorkItContext()
         import c._
@@ -168,16 +170,14 @@ class EndToEndTest extends FunSuite {
 
         messages !! Buf.Utf8("chunk1")
 
-        assert(
-            Await.result(recvd ?, 1.second) match {
+        assert(Await.result(recvd ?, 1.second) match {
           case e: ChannelStateEvent =>
             e.getState == ChannelState.OPEN &&
-            (java.lang.Boolean.TRUE equals e.getValue)
+              (java.lang.Boolean.TRUE equals e.getValue)
           case _ => false
         })
 
-        assert(
-            Await.result(recvd ?, 1.second) match {
+        assert(Await.result(recvd ?, 1.second) match {
           case m: MessageEvent =>
             m.getMessage match {
               case res: HttpResponse => res.isChunked
@@ -186,8 +186,7 @@ class EndToEndTest extends FunSuite {
           case _ => false
         })
 
-        assert(
-            Await.result(recvd ?, 1.second) match {
+        assert(Await.result(recvd ?, 1.second) match {
           case m: MessageEvent =>
             m.getMessage match {
               case res: HttpChunk => !res.isLast // get "chunk1"
@@ -202,8 +201,7 @@ class EndToEndTest extends FunSuite {
         // the streaming should continue
         messages !! Buf.Utf8("chunk2")
 
-        assert(
-            Await.result(recvd ?, 1.second) match {
+        assert(Await.result(recvd ?, 1.second) match {
           case m: MessageEvent =>
             m.getMessage match {
               case res: HttpChunk => !res.isLast // get "chunk2"
@@ -227,11 +225,10 @@ class EndToEndTest extends FunSuite {
         })
 
         // And finally it's closed.
-        assert(
-            Await.result(recvd ?, 1.second) match {
+        assert(Await.result(recvd ?, 1.second) match {
           case e: ChannelStateEvent =>
             e.getState == ChannelState.OPEN &&
-            (java.lang.Boolean.FALSE equals e.getValue)
+              (java.lang.Boolean.FALSE equals e.getValue)
           case _ => false
         })
 
@@ -239,7 +236,8 @@ class EndToEndTest extends FunSuite {
         channel.close()
       }
 
-    test("Streams %s: server ignores channel buffer messages after channel close"
+    test(
+        "Streams %s: server ignores channel buffer messages after channel close"
           .format(what)) {
       val c = new WorkItContext()
       import c._
@@ -330,10 +328,10 @@ class EndToEndTest extends FunSuite {
     val s = Service.mk { (req: StreamRequest) =>
       val errors = new Broker[Throwable]
       errors ! EOF
-      Future.value(
-          new StreamResponse {
-        val info = StreamResponse.Info(
-            req.version, StreamResponse.Status(200), req.headers)
+      Future.value(new StreamResponse {
+        val info = StreamResponse.Info(req.version,
+                                       StreamResponse.Status(200),
+                                       req.headers)
         def messages = new Broker[Buf].recv
         def error = errors.recv
         def release() = errors !! EOF

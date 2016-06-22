@@ -35,9 +35,10 @@ object SbtIncrementalOptions {
 
   def fromString(s: String): Option[SbtIncrementalOptions] = {
     Try {
-      val Array(
-      nameHashing, recompileOnMacroDef, transitiveStep, recompileAllFraction) =
-        s.split(';')
+      val Array(nameHashing,
+                recompileOnMacroDef,
+                transitiveStep,
+                recompileAllFraction) = s.split(';')
       SbtIncrementalOptions(nameHashing.toBoolean,
                             recompileOnMacroDef.toBoolean,
                             transitiveStep.toInt,

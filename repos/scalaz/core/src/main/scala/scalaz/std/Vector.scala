@@ -43,10 +43,9 @@ trait VectorInstances extends VectorInstances0 {
       }
     }
 
-    override def traverseS[S, A, B](
-        v: Vector[A])(f: A => State[S, B]): State[S, Vector[B]] =
-      State(
-          (s: S) =>
+    override def traverseS[S, A, B](v: Vector[A])(
+        f: A => State[S, B]): State[S, Vector[B]] =
+      State((s: S) =>
             v.foldLeft((s, empty[B]))((acc, a) => {
           val bs = f(a)(acc._1)
           (bs._1, acc._2 :+ bs._2)
@@ -157,8 +156,8 @@ trait VectorFunctions {
   /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
     * any `p`s after the first false.
     */
-  final def takeWhileM[A, M[_]: Monad](
-      as: Vector[A])(p: A => M[Boolean]): M[Vector[A]] =
+  final def takeWhileM[A, M[_]: Monad](as: Vector[A])(
+      p: A => M[Boolean]): M[Vector[A]] =
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
           Monad[M].bind(p(a))(b =>
                 if (b) Monad[M].map(as)((tt: Vector[A]) => a +: tt)
@@ -171,8 +170,8 @@ trait VectorFunctions {
       p: A => M[Boolean]): M[Vector[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_]](as: Vector[A])(
-      p: A => M[Boolean])(implicit F: Applicative[M]): M[Vector[A]] =
+  final def filterM[A, M[_]](as: Vector[A])(p: A => M[Boolean])(
+      implicit F: Applicative[M]): M[Vector[A]] =
     lazyFoldRight(as, F.point(empty[A]))((a, g) =>
           F.ap(g)(F.map(p(a))(b => t => if (b) a +: t else t)))
 
@@ -192,13 +191,12 @@ trait VectorFunctions {
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
-  final def partitionM[A, M[_]](
-      as: Vector[A])(
-      p: A => M[Boolean])(implicit F: Applicative[M])
-    : M[(Vector[A], Vector[A])] =
+  final def partitionM[A, M[_]](as: Vector[A])(p: A => M[Boolean])(
+      implicit F: Applicative[M]): M[(Vector[A], Vector[A])] =
     lazyFoldRight(as, F.point(empty[A], empty[A]))((a, g) =>
           F.ap(g)(F.map(p(a))(b => {
-          case (x, y) => if (b) (a +: x, y) else (x, a +: y) })))
+        case (x, y) => if (b) (a +: x, y) else (x, a +: y)
+      })))
 
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
@@ -212,8 +210,8 @@ trait VectorFunctions {
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
   /** Split at each point where `p(as(n), as(n+1))` yields false. */
-  final def groupWhenM[A, M[_]: Monad](
-      as: Vector[A])(p: (A, A) => M[Boolean]): M[Vector[Vector[A]]] =
+  final def groupWhenM[A, M[_]: Monad](as: Vector[A])(
+      p: (A, A) => M[Boolean]): M[Vector[Vector[A]]] =
     if (as.isEmpty) Monad[M].point(empty)
     else {
       val stateP = (i: A) =>
@@ -249,8 +247,8 @@ trait VectorFunctions {
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
-  final def mapAccumLeft[A, B, C](as: Vector[A])(
-      c: C, f: (C, A) => (C, B)): (C, Vector[B]) =
+  final def mapAccumLeft[A, B, C](
+      as: Vector[A])(c: C, f: (C, A) => (C, B)): (C, Vector[B]) =
     as.foldLeft((c, empty[B])) { (acc, a) =>
       acc match {
         case (c, v) =>
@@ -262,8 +260,8 @@ trait VectorFunctions {
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
-  final def mapAccumRight[A, B, C](as: Vector[A])(
-      c: C, f: (C, A) => (C, B)): (C, Vector[B]) =
+  final def mapAccumRight[A, B, C](
+      as: Vector[A])(c: C, f: (C, A) => (C, B)): (C, Vector[B]) =
     as.foldRight((c, empty[B])) { (a, acc) =>
       acc match {
         case (c, v) =>

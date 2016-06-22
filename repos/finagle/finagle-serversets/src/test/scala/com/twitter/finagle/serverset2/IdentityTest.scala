@@ -25,7 +25,8 @@ class IdentityTest extends FunSuite {
     val userIdent = new UserIdentity()
     val testIdent = new TestIdentity()
 
-    assert(Identities.get() == Seq(
+    assert(
+        Identities.get() == Seq(
             "/%s/%s".format(testIdent.scheme, testIdent.id.get),
             "/%s/%s".format(userIdent.scheme, userIdent.id.get)))
   }

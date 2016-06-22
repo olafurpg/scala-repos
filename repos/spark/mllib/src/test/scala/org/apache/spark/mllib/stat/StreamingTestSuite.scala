@@ -43,8 +43,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setPeacePeriod(0)
       .setTestMethod(testMethod)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
 
     // setup and run the model
     val ssc = setupStreams(input,
@@ -72,8 +77,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setPeacePeriod(0)
       .setTestMethod(testMethod)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
 
     // setup and run the model
     val ssc = setupStreams(input,
@@ -101,8 +111,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setPeacePeriod(0)
       .setTestMethod(testMethod)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
 
     // setup and run the model
     val ssc = setupStreams(input,
@@ -130,8 +145,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setPeacePeriod(0)
       .setTestMethod(testMethod)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
 
     // setup and run the model
     val ssc = setupStreams(input,
@@ -156,8 +176,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     val model = new StreamingTest().setWindowSize(testWindow).setPeacePeriod(0)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
 
     // setup and run the model
     val ssc = setupStreams(input,
@@ -169,13 +194,15 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     // number of batches seen so far does not exceed testWindow, expect counts to continue growing
     for (i <- 0 until testWindow) {
-      assert(outputCounts
+      assert(
+          outputCounts
             .slice(2 * i, 2 * i + 2)
             .forall(_ == (i + 1) * pointsPerBatch / 2))
     }
 
     // number of batches seen exceeds testWindow, expect counts to be constant
-    assert(outputCounts
+    assert(
+        outputCounts
           .drop(2 * (testWindow - 1))
           .forall(_ == testWindow * pointsPerBatch / 2))
   }
@@ -193,8 +220,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val model =
       new StreamingTest().setWindowSize(0).setPeacePeriod(peacePeriod)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
 
     // setup and run the model
     val ssc = setupStreams(input,
@@ -203,8 +235,9 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[(Boolean, Double)](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.length == (numBatches -
-            peacePeriod) * pointsPerBatch)
+    assert(
+        outputBatches.flatten.length == (numBatches -
+              peacePeriod) * pointsPerBatch)
   }
 
   test("null hypothesis when only data from one group is present") {
@@ -218,9 +251,14 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     val model = new StreamingTest().setWindowSize(0).setPeacePeriod(0)
 
-    val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42).map(
-        batch => batch.filter(_.isExperiment)) // only keep one test group
+    val input = generateTestData(numBatches,
+                                 pointsPerBatch,
+                                 meanA,
+                                 stdevA,
+                                 meanB,
+                                 stdevB,
+                                 42)
+      .map(batch => batch.filter(_.isExperiment)) // only keep one test group
 
     // setup and run the model
     val ssc = setupStreams(input,

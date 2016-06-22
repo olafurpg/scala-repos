@@ -45,7 +45,7 @@ object LatentDirichletAllocationExample {
     // Output topics. Each is a distribution over words (matching word count vectors)
     println(
         "Learned topics (as distributions over vocab of " +
-        ldaModel.vocabSize + " words):")
+          ldaModel.vocabSize + " words):")
     val topics = ldaModel.topicsMatrix
     for (topic <- Range(0, 3)) {
       print("Topic " + topic + ":")

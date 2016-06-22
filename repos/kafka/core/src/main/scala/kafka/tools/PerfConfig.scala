@@ -34,7 +34,7 @@ class PerfConfig(args: Array[String]) {
   val dateFormatOpt = parser
     .accepts("date-format",
              "The date format to use for formatting the time field. " +
-             "See java.text.SimpleDateFormat for options.")
+               "See java.text.SimpleDateFormat for options.")
     .withRequiredArg
     .describedAs("date format")
     .ofType(classOf[String])
@@ -42,9 +42,9 @@ class PerfConfig(args: Array[String]) {
   val showDetailedStatsOpt = parser.accepts(
       "show-detailed-stats",
       "If set, stats are reported for each reporting " +
-      "interval as configured by reporting-interval")
-  val hideHeaderOpt = parser.accepts(
-      "hide-header", "If set, skips printing the header for the stats ")
+        "interval as configured by reporting-interval")
+  val hideHeaderOpt = parser
+    .accepts("hide-header", "If set, skips printing the header for the stats ")
   val messageSizeOpt = parser
     .accepts("message-size", "The size of each message.")
     .withRequiredArg

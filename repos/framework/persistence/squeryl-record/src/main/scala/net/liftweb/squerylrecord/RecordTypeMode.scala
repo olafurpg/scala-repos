@@ -189,16 +189,16 @@ trait RecordTypeMode extends PrimitiveTypeMode {
         with DateExpression[Option[Timestamp]]
         with SquerylRecordNonNumericalExpression[Option[Timestamp]]
       case None => {
-          val date = f.get match {
-            case Some(calendar) =>
-              Some(new Timestamp(calendar.getTimeInMillis))
-            case None => None
-          }
-          new ConstantExpressionNode[Option[Timestamp]](date)(
-              createOutMapperTimestampTypeOption)
-          with DateExpression[Option[Timestamp]]
-          with SquerylRecordNonNumericalExpression[Option[Timestamp]]
+        val date = f.get match {
+          case Some(calendar) =>
+            Some(new Timestamp(calendar.getTimeInMillis))
+          case None => None
         }
+        new ConstantExpressionNode[Option[Timestamp]](date)(
+            createOutMapperTimestampTypeOption)
+        with DateExpression[Option[Timestamp]]
+        with SquerylRecordNonNumericalExpression[Option[Timestamp]]
+      }
     }
 
   /** Needed for inner selects. The cast is possible here because the type is not 
@@ -213,7 +213,8 @@ trait RecordTypeMode extends PrimitiveTypeMode {
         with DateExpression[Timestamp]
         with SquerylRecordNonNumericalExpression[Timestamp]
       case None =>
-        new ConstantExpressionNode[Timestamp](getValue(f)
+        new ConstantExpressionNode[Timestamp](
+            getValue(f)
               .map(field => new Timestamp(field.getTimeInMillis))
               .orNull)(createOutMapperTimestampType)
         with DateExpression[Timestamp]
@@ -301,8 +302,8 @@ trait RecordTypeMode extends PrimitiveTypeMode {
         with SquerylRecordNonNumericalExpression[Enumeration#Value]
     }
 
-  implicit def enumFieldQuery2RightHandSideOfIn[
-      EnumType <: Enumeration, T <: Record[T]](
+  implicit def enumFieldQuery2RightHandSideOfIn[EnumType <: Enumeration,
+                                                T <: Record[T]](
       q: org.squeryl.Query[EnumNameField[T, EnumType]]) =
     new RightHandSideOfIn[Enumeration#Value](q.ast)
 
@@ -316,8 +317,8 @@ trait RecordTypeMode extends PrimitiveTypeMode {
   /**
     * Helper method for converting mandatory numerical fields to Squeryl Expressions.
     */
-  private def convertNumericalMandatory[T](
-      f: MandatoryTypedField[T], outMapper: OutMapper[T]) =
+  private def convertNumericalMandatory[T](f: MandatoryTypedField[T],
+                                           outMapper: OutMapper[T]) =
     fieldReference match {
       case Some(e) =>
         new SelectElementReference[T](e)(outMapper) with NumericalExpression[T]
@@ -330,8 +331,8 @@ trait RecordTypeMode extends PrimitiveTypeMode {
   /**
     * Helper method for converting optional numerical fields to Squeryl Expressions.
     */
-  private def convertNumericalOptional[T](
-      f: OptionalTypedField[T], outMapper: OutMapper[Option[T]]) =
+  private def convertNumericalOptional[T](f: OptionalTypedField[T],
+                                          outMapper: OutMapper[Option[T]]) =
     fieldReference match {
       case Some(e: SelectElement) =>
         new SelectElementReference[Option[T]](e)(outMapper)
@@ -343,8 +344,8 @@ trait RecordTypeMode extends PrimitiveTypeMode {
         with SquerylRecordNumericalExpression[Option[T]]
     }
 
-  private def convertNumericalOption[T](
-      f: Option[TypedField[T]], outMapper: OutMapper[Option[T]]) =
+  private def convertNumericalOption[T](f: Option[TypedField[T]],
+                                        outMapper: OutMapper[Option[T]]) =
     fieldReference match {
       case Some(e) =>
         new SelectElementReference[Option[T]](e)(outMapper)

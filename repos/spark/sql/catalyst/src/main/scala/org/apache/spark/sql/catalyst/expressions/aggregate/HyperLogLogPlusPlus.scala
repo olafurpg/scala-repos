@@ -95,7 +95,7 @@ case class HyperLogLogPlusPlus(child: Expression,
 
   require(p >= 4,
           "HLL++ requires at least 4 bits for addressing. " +
-          "Use a lower error, at most 27%.")
+            "Use a lower error, at most 27%.")
 
   /**
     * Shift used to extract the index of the register from the hashed value.
@@ -309,18 +309,17 @@ case class HyperLogLogPlusPlus(child: Expression,
     }
 
     // Estimate the cardinality.
-    val estimate =
-      if (V > 0) {
-        // Use linear counting for small cardinality estimates.
-        val H = m * Math.log(m / V)
-        if (H <= THRESHOLDS(p - 4)) {
-          H
-        } else {
-          EBiasCorrected
-        }
+    val estimate = if (V > 0) {
+      // Use linear counting for small cardinality estimates.
+      val H = m * Math.log(m / V)
+      if (H <= THRESHOLDS(p - 4)) {
+        H
       } else {
         EBiasCorrected
       }
+    } else {
+      EBiasCorrected
+    }
 
     // Round to the nearest long value.
     Math.round(estimate)

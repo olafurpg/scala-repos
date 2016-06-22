@@ -54,7 +54,8 @@ object PersistenceQueryDocSpec {
       config.getDuration("refresh-interval", MILLISECONDS).millis
 
     override def eventsByTag(
-        tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
+        tag: String,
+        offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
       val props = MyEventsByTagPublisher.props(tag, offset, refreshInterval)
       Source
         .actorPublisher[EventEnvelope](props)
@@ -96,16 +97,15 @@ object PersistenceQueryDocSpec {
       with akka.persistence.query.javadsl.AllPersistenceIdsQuery
       with akka.persistence.query.javadsl.CurrentPersistenceIdsQuery {
 
-    override def eventsByTag(tag: String,
-                             offset: Long =
-                               0L): javadsl.Source[EventEnvelope, NotUsed] =
+    override def eventsByTag(
+        tag: String,
+        offset: Long = 0L): javadsl.Source[EventEnvelope, NotUsed] =
       scaladslReadJournal.eventsByTag(tag, offset).asJava
 
-    override def eventsByPersistenceId(
-        persistenceId: String,
-        fromSequenceNr: Long = 0L,
-        toSequenceNr: Long =
-          Long.MaxValue): javadsl.Source[EventEnvelope, NotUsed] =
+    override def eventsByPersistenceId(persistenceId: String,
+                                       fromSequenceNr: Long = 0L,
+                                       toSequenceNr: Long = Long.MaxValue)
+      : javadsl.Source[EventEnvelope, NotUsed] =
       scaladslReadJournal
         .eventsByPersistenceId(persistenceId, fromSequenceNr, toSequenceNr)
         .asJava
@@ -187,7 +187,8 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
   import PersistenceQueryDocSpec._
 
   def this() {
-    this("""
+    this(
+        """
         akka.persistence.query.my-read-journal {
           class = "docs.persistence.query.PersistenceQueryDocSpec$MyReadJournalProvider"
           refresh-interval = 3s
@@ -249,9 +250,10 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
       readJournal.byTagsWithMeta(Set("red", "blue"))
 
     query.mapMaterializedValue { meta =>
-      println(s"The query is: " +
-          s"ordered deterministically: ${meta.deterministicOrder}, " +
-          s"infinite: ${meta.infinite}")
+      println(
+          s"The query is: " +
+            s"ordered deterministically: ${meta.deterministicOrder}, " +
+            s"infinite: ${meta.infinite}")
     }.map { event =>
       println(s"Event payload: ${event.payload}")
     }.runWith(Sink.ignore)

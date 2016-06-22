@@ -77,12 +77,18 @@ class StagePageSuite extends SparkFunSuite with LocalSparkContext {
     val page = new StagePage(tab)
 
     // Simulate a stage in job progress listener
-    val stageInfo = new StageInfo(
-        0, 0, "dummy", 1, Seq.empty, Seq.empty, "details")
+    val stageInfo =
+      new StageInfo(0, 0, "dummy", 1, Seq.empty, Seq.empty, "details")
     // Simulate two tasks to test PEAK_EXECUTION_MEMORY correctness
     (1 to 2).foreach { taskId =>
-      val taskInfo = new TaskInfo(
-          taskId, taskId, 0, 0, "0", "localhost", TaskLocality.ANY, false)
+      val taskInfo = new TaskInfo(taskId,
+                                  taskId,
+                                  0,
+                                  0,
+                                  "0",
+                                  "localhost",
+                                  TaskLocality.ANY,
+                                  false)
       jobListener.onStageSubmitted(SparkListenerStageSubmitted(stageInfo))
       jobListener.onTaskStart(SparkListenerTaskStart(0, 0, taskInfo))
       taskInfo.markSuccessful()

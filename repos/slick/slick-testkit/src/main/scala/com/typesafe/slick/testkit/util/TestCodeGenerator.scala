@@ -84,8 +84,8 @@ trait TestCodeGenerator {
           }
           val db = tdb.createDB()
           try {
-            val m = Await.result(
-                db.run((init >> generator).withPinnedSession), Duration.Inf)
+            val m = Await.result(db.run((init >> generator).withPinnedSession),
+                                 Duration.Inf)
             m.writeToFile(profile = slickProfile,
                           folder = dir,
                           pkg = packageName,

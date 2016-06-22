@@ -26,8 +26,8 @@ import akka.actor.ActorLogging
   *                  to `Long.MaxValue` (i.e. no limit).
   */
 @SerialVersionUID(1L)
-final case class Update(
-    await: Boolean = false, replayMax: Long = Long.MaxValue)
+final case class Update(await: Boolean = false,
+                        replayMax: Long = Long.MaxValue)
 
 object Update {
 
@@ -210,8 +210,8 @@ trait PersistentView
   }
 
   /** INTERNAL API. */
-  override protected[akka] def aroundReceive(
-      receive: Receive, message: Any): Unit =
+  override protected[akka] def aroundReceive(receive: Receive,
+                                             message: Any): Unit =
     currentState.stateReceive(receive, message)
 
   /** INTERNAL API. */
@@ -240,7 +240,7 @@ trait PersistentView
     log.error(
         cause,
         "Persistence view failure when replaying events for persistenceId [{}]. " +
-        "Last known sequence number [{}]",
+          "Last known sequence number [{}]",
         persistenceId,
         lastSequenceNr)
   }
@@ -277,12 +277,15 @@ trait PersistentView
         sso.foreach {
           case SelectedSnapshot(metadata, snapshot) ⇒
             setLastSequenceNr(metadata.sequenceNr)
-            PersistentView. super.aroundReceive(
-                receive, SnapshotOffer(metadata, snapshot))
+            PersistentView. super
+              .aroundReceive(receive, SnapshotOffer(metadata, snapshot))
         }
         changeState(replayStarted(await = true))
-        journal ! ReplayMessages(
-            lastSequenceNr + 1L, toSnr, replayMax, persistenceId, self)
+        journal ! ReplayMessages(lastSequenceNr + 1L,
+                                 toSnr,
+                                 replayMax,
+                                 persistenceId,
+                                 self)
       case other ⇒ internalStash.stash()
     }
   }
@@ -395,8 +398,11 @@ trait PersistentView
 
     def changeStateToReplayStarted(await: Boolean, replayMax: Long): Unit = {
       changeState(replayStarted(await))
-      journal ! ReplayMessages(
-          lastSequenceNr + 1L, Long.MaxValue, replayMax, persistenceId, self)
+      journal ! ReplayMessages(lastSequenceNr + 1L,
+                               Long.MaxValue,
+                               replayMax,
+                               persistenceId,
+                               self)
     }
   }
 }

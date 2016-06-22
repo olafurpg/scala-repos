@@ -225,8 +225,7 @@ sealed class SiteMapSingleton {
     }
 
   def findAndTestLoc(name: String): Box[Loc[_]] =
-    findLoc(name).flatMap(
-        l =>
+    findLoc(name).flatMap(l =>
           l.testAccess match {
         case Left(true) => Full(l)
         case _ => Empty

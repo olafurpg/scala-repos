@@ -50,19 +50,21 @@ object FoldableUsage extends App {
   // Foldables can be composed:
   val FoldListOfOptions = Foldable[List] compose Foldable[Option]
 
-  val listOfOptions: List[Option[Int]] = List(
-      1.some, 2.some, none[Int], 3.some, 4.some)
+  val listOfOptions: List[Option[Int]] =
+    List(1.some, 2.some, none[Int], 3.some, 4.some)
   assert(FoldListOfOptions.fold(listOfOptions) === 10)
 
   // with this you get a collapse function which is perhaps like the
   // flatten method in the standard library, however it is more versatile
   assert(
-      FoldListOfOptions.collapse[List, Int](listOfOptions) === listOfOptions.flatten)
+      FoldListOfOptions
+        .collapse[List, Int](listOfOptions) === listOfOptions.flatten)
 
   // we can accumulate into any type for which we have an
   // ApplicativePlus instance, so here we can collapse our List of
   // Options into a Vector
-  assert(FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(
+  assert(
+      FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(
           listOfOptions.flatten: _*))
 
   // we can go deeeeep:

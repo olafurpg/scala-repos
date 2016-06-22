@@ -26,7 +26,8 @@ abstract class DynamicAccess {
     * }}}
     */
   def createInstanceFor[T: ClassTag](
-      clazz: Class[_], args: immutable.Seq[(Class[_], AnyRef)]): Try[T]
+      clazz: Class[_],
+      args: immutable.Seq[(Class[_], AnyRef)]): Try[T]
 
   /**
     * Obtain a `Class[_]` object loaded with the right class loader (i.e. the one
@@ -42,7 +43,8 @@ abstract class DynamicAccess {
     * see the relevant requesting code for details.
     */
   def createInstanceFor[T: ClassTag](
-      fqcn: String, args: immutable.Seq[(Class[_], AnyRef)]): Try[T]
+      fqcn: String,
+      args: immutable.Seq[(Class[_], AnyRef)]): Try[T]
 
   /**
     * Obtain the Scala “object” instance for the given fully-qualified class name, if there is one.

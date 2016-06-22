@@ -56,7 +56,7 @@ private[regression] trait IsotonicRegressionBase
       this,
       "isotonic",
       "whether the output sequence should be isotonic/increasing (true) or" +
-      "antitonic/decreasing (false)")
+        "antitonic/decreasing (false)")
 
   /** @group getParam */
   final def getIsotonic: Boolean = $(isotonic)
@@ -96,12 +96,11 @@ private[regression] trait IsotonicRegressionBase
       } else {
         col($(featuresCol))
       }
-    val w =
-      if (hasWeightCol) {
-        col($(weightCol))
-      } else {
-        lit(1.0)
-      }
+    val w = if (hasWeightCol) {
+      col($(weightCol))
+    } else {
+      lit(1.0)
+    }
     dataset.select(col($(labelCol)), f, w).rdd.map {
       case Row(label: Double, feature: Double, weight: Double) =>
         (label, feature, weight)
@@ -115,7 +114,8 @@ private[regression] trait IsotonicRegressionBase
     * @return output schema
     */
   protected[ml] def validateAndTransformSchema(
-      schema: StructType, fitting: Boolean): StructType = {
+      schema: StructType,
+      fitting: Boolean): StructType = {
     if (fitting) {
       SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
       if (hasWeightCol) {
@@ -218,7 +218,7 @@ object IsotonicRegression extends DefaultParamsReadable[IsotonicRegression] {
   */
 @Since("1.5.0")
 @Experimental
-class IsotonicRegressionModel private[ml](
+class IsotonicRegressionModel private[ml] (
     override val uid: String,
     private val oldModel: MLlibIsotonicRegressionModel)
     extends Model[IsotonicRegressionModel]
@@ -293,8 +293,7 @@ object IsotonicRegressionModel extends MLReadable[IsotonicRegressionModel] {
   /** [[MLWriter]] instance for [[IsotonicRegressionModel]] */
   private[IsotonicRegressionModel] class IsotonicRegressionModelWriter(
       instance: IsotonicRegressionModel
-  )
-      extends MLWriter
+  ) extends MLWriter
       with Logging {
 
     private case class Data(boundaries: Array[Double],

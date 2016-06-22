@@ -75,8 +75,8 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
     options = options.reverse
     references = references.reverse
 
-    Assert.assertFalse(
-        "At least one expectation must be specified", references.isEmpty)
+    Assert.assertFalse("At least one expectation must be specified",
+                       references.isEmpty)
     Assert.assertEquals("Options number", references.size, options.size)
 
     null
@@ -85,7 +85,7 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   def assertKnown(parameters: Parameters) {
     for ((key, value) <- parameters) {
       Assert.assertTrue("Unknown parameter: " + key +
-                        "\nAllowed: " + Parameters.mkString(", "),
+                          "\nAllowed: " + Parameters.mkString(", "),
                         Parameters.contains(key))
     }
   }
@@ -93,8 +93,7 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   def parseParameters(s: String): Parameters = {
     if (s.isEmpty) Map()
     else
-      Map(
-          s.split("""\s*,\s*""").map(_.trim).map { it: String =>
+      Map(s.split("""\s*,\s*""").map(_.trim).map { it: String =>
         val parts = it.split("""\s*:\s*""")
         (parts(0), parts(1))
       }: _*)
@@ -147,26 +146,27 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
     }
 
     if (options.contains(Resolved) && options(Resolved) == "false") {
-      Assert.assertNull(
-          message(referenceName + " must NOT be resolved!"), target)
+      Assert
+        .assertNull(message(referenceName + " must NOT be resolved!"), target)
     } else {
-      Assert.assertNotNull(
-          message(referenceName + " must BE resolved!"), target)
+      Assert
+        .assertNotNull(message(referenceName + " must BE resolved!"), target)
 
       if (options.contains(Accessible) && options(Accessible) == "false") {
-        Assert.assertFalse(
-            message(referenceName + " must NOT be accessible!"), accessible)
+        Assert.assertFalse(message(referenceName + " must NOT be accessible!"),
+                           accessible)
       } else {
-        Assert.assertTrue(
-            message(referenceName + " must BE accessible!"), accessible)
+        Assert.assertTrue(message(referenceName + " must BE accessible!"),
+                          accessible)
       }
 
       if (options.contains(Applicable) && options(Applicable) == "false") {
-        Assert.assertFalse(
-            message(referenceName + " must NOT be applicable!"), applicable)
+        Assert.assertFalse(message(referenceName + " must NOT be applicable!"),
+                           applicable)
       } else {
-        Assert.assertTrue(message(referenceName + " must BE applicable! " +
-                              result.get.problems.mkString("(", ",", ")")),
+        Assert.assertTrue(message(
+                              referenceName + " must BE applicable! " +
+                                result.get.problems.mkString("(", ",", ")")),
                           applicable)
       }
 
@@ -208,9 +208,9 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
         val targetClass = target.getClass
         val text =
           Type + " - expected: " + expectedClass.getSimpleName + ", actual: " +
-          targetClass.getSimpleName
-        Assert.assertTrue(
-            message(text), expectedClass.isAssignableFrom(targetClass))
+            targetClass.getSimpleName
+        Assert.assertTrue(message(text),
+                          expectedClass.isAssignableFrom(targetClass))
       }
     }
   }

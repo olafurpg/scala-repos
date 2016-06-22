@@ -36,8 +36,10 @@ object Test {
     assertVectorIterated(a, label, start, end)
   }
 
-  def assertVectorIndexed[V](
-      a: Vector[V], label: String, start: Int, end: Int) = {
+  def assertVectorIndexed[V](a: Vector[V],
+                             label: String,
+                             start: Int,
+                             end: Int) = {
     val res = a
     assert(res.length == (end - start),
            res.length + "!=" + (end - start) + " (" + res + ")")
@@ -47,8 +49,10 @@ object Test {
     res
   }
 
-  def assertVectorIterated[V](
-      a: Vector[V], label: String, start: Int, end: Int) = {
+  def assertVectorIterated[V](a: Vector[V],
+                              label: String,
+                              start: Int,
+                              end: Int) = {
     val res = a
     assert(res.length == (end - start),
            res.length + "!=" + (end - start) + " (" + res + ")")

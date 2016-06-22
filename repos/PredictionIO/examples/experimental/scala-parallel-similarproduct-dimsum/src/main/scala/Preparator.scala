@@ -19,5 +19,4 @@ class PreparedData(
     val users: RDD[(String, User)],
     val items: RDD[(String, Item)],
     val viewEvents: RDD[ViewEvent]
-)
-    extends Serializable
+) extends Serializable

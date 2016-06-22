@@ -38,7 +38,8 @@ import java.nio.ByteBuffer
 import scalaz._
 
 class QueryDeleteHandler[A](jobManager: JobManager[Future], clock: Clock)(
-    implicit executor: ExecutionContext, M: Monad[Future])
+    implicit executor: ExecutionContext,
+    M: Monad[Future])
     extends CustomHttpService[A, APIKey => Future[HttpResponse[A]]] {
   import JobState._
   import scalaz.syntax.monad._
@@ -47,14 +48,16 @@ class QueryDeleteHandler[A](jobManager: JobManager[Future], clock: Clock)(
     Success({ (apiKey: APIKey) =>
       request.parameters get 'jobId map {
         jobId =>
-          jobManager.cancel(jobId, "User request through HTTP.", clock.now()) map {
+          jobManager
+            .cancel(jobId, "User request through HTTP.", clock.now()) map {
             case Left(error) =>
               HttpResponse[A](HttpStatus(BadRequest, error))
             case Right(_) =>
               HttpResponse[A](Accepted)
           }
       } getOrElse {
-        Future(HttpResponse[A](
+        Future(
+            HttpResponse[A](
                 HttpStatus(BadRequest, "Missing required 'jobId parameter.")))
       }
     })

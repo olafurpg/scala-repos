@@ -27,8 +27,8 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
   private[this] var pluginHolders: List[PluginHolder[_]] =
     List.empty[PluginHolder[_]]
 
-  val classLoader: URLClassLoader = new URLClassLoader(
-      urls.toArray, this.getClass.getClassLoader)
+  val classLoader: URLClassLoader =
+    new URLClassLoader(urls.toArray, this.getClass.getClassLoader)
 
   /**
     * Load plugin for a specific type.
@@ -86,8 +86,8 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
 
 object PluginManagerImpl {
   case class PluginReference[T](plugin: T, definition: PluginDefinition)
-  case class PluginHolder[T](
-      classTag: ClassTag[T], plugins: Seq[PluginReference[T]])
+  case class PluginHolder[T](classTag: ClassTag[T],
+                             plugins: Seq[PluginReference[T]])
   implicit val definitionFormat = Json.format[PluginDefinition]
 
   def parse(fileName: String): PluginDefinitions = {

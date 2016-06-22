@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SelectionModelSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.SelectionModel[T], SelectionModel[T]](
-        classOf[jfxsc.SelectionModel[T]], classOf[SelectionModel[T]]) {
+        classOf[jfxsc.SelectionModel[T]],
+        classOf[SelectionModel[T]]) {
 
   override protected def getScalaClassInstance =
     new SelectionModel[T](getJavaClassInstance) {}

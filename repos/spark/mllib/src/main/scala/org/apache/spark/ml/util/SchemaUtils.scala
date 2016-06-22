@@ -56,7 +56,7 @@ private[spark] object SchemaUtils {
     require(
         dataTypes.exists(actualDataType.equals),
         s"Column $colName must be of type equal to one of the following types: " +
-        s"${dataTypes.mkString("[", ", ", "]")} but was actually of type $actualDataType.$message")
+          s"${dataTypes.mkString("[", ", ", "]")} but was actually of type $actualDataType.$message")
   }
 
   /**

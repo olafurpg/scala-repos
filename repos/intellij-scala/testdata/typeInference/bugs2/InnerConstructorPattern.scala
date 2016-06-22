@@ -5,9 +5,9 @@ object Test2 {
 
   x match {
     case s @ H(z) => {
-        /*start*/
-        z /*end*/
-      }
+      /*start*/
+      z /*end*/
+    }
   }
 }
 //Int

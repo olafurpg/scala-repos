@@ -68,9 +68,9 @@ trait LinearRegressionTestSupport[M[+ _]]
     val testSeqY = {
       testSeqX map {
         case xs => {
-            val yvalue = dotProduct(actualThetas, 1.0 +: xs)
-            yvalue + Random.nextGaussian
-          }
+          val yvalue = dotProduct(actualThetas, 1.0 +: xs)
+          yvalue + Random.nextGaussian
+        }
       }
     }
 
@@ -177,8 +177,8 @@ trait LinearRegressionSpecs[M[+ _]]
 
     //runs the linear regression function on `loops` sets of data generated from the same distribution
     while (i < loops) {
-      val cpaths = Seq(
-          CPath(CPathIndex(0), CPathIndex(0)), CPath(CPathIndex(1))) sorted
+      val cpaths =
+        Seq(CPath(CPathIndex(0), CPathIndex(0)), CPath(CPathIndex(1))) sorted
 
       val (result, samples) = produceResult(cpaths, num, actualThetas)
 
@@ -461,8 +461,8 @@ trait LinearRegressionSpecs[M[+ _]]
       i += 1
     }
 
-    def getBooleans(
-        actuals: List[Double], values: List[List[Double]]): Array[Boolean] = {
+    def getBooleans(actuals: List[Double],
+                    values: List[List[Double]]): Array[Boolean] = {
       val zipped = actuals zip combineResults(num, values)
       zipped map { case (t, ts) => isOk(t, ts) } toArray
     }

@@ -63,11 +63,13 @@ trait EncodingFlags {
       if (stop == stopByte) {
         success(msgType)
       } else {
-        failure(Error.invalid(
+        failure(
+            Error.invalid(
                 "Invalid message: bad stop byte. Found [" + stop + "]"))
       }
     } else {
-      failure(Error.invalid(
+      failure(
+          Error.invalid(
               "Invalid message: bad magic byte. Found [" + magic + "]"))
     }
   }
@@ -92,10 +94,9 @@ object EventEncoding extends EncodingFlags with Logging {
     logger.trace("Serialized event " + event + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
-    writeHeader(
-        bytes,
-        event.fold(
-            _ => jsonIngestFlag, _ => jsonArchiveFlag, _ => storeFileFlag))
+    writeHeader(bytes,
+                event.fold(_ => jsonIngestFlag, _ => jsonArchiveFlag, _ =>
+                      storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes

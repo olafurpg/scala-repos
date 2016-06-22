@@ -75,7 +75,8 @@ class ValidatedTests extends CatsSuite {
   }
 
   test("catchOnly catches matching exceptions") {
-    assert(Validated
+    assert(
+        Validated
           .catchOnly[NumberFormatException] { "foo".toInt }
           .isInstanceOf[Invalid[NumberFormatException]])
   }

@@ -15,7 +15,8 @@ class MarathonStartupIntegrationTest
     Given(
         s"a Marathon process already running on port ${config.marathonBasePort}")
 
-    When("starting another Marathon process using an HTTP port that is already bound")
+    When(
+        "starting another Marathon process using an HTTP port that is already bound")
     val cwd = new File(".")
     val failingProcess = ProcessKeeper.startMarathon(
         cwd,

@@ -110,8 +110,9 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
         })
         .build()
 
-    "run in a browser" in new WithBrowser(
-        webDriver = WebDriverFactory(HTMLUNIT), app = applicationWithBrowser) {
+    "run in a browser" in new WithBrowser(webDriver =
+                                            WebDriverFactory(HTMLUNIT),
+                                          app = applicationWithBrowser) {
       browser.goTo("/")
 
       // Check the page
@@ -134,8 +135,8 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
       val callbackURL = s"http://$myPublicAddress/callback"
 
       // await is from play.api.test.FutureAwaits
-      val response = await(WS
-            .url(testPaymentGatewayURL)
+      val response = await(
+          WS.url(testPaymentGatewayURL)
             .withQueryString("callbackURL" -> callbackURL)
             .get())
 

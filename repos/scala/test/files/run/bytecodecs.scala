@@ -7,7 +7,7 @@ object Test {
     decode7to8(ys, ys.length)
     assert(ys.take(xs.length).deep == xs.deep,
            "test8to7(" + xs.deep + ") failed, result = " +
-           ys.take(xs.length).deep)
+             ys.take(xs.length).deep)
   }
 
   def testAll(xs: Array[Byte]) {

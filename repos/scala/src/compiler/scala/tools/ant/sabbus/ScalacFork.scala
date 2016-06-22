@@ -41,7 +41,8 @@ import scala.reflect.internal.util.ScalaClassLoader
 class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
   private def originOfThis: String =
-    ScalaClassLoader.originOfClass(classOf[ScalacFork]) map (_.toString) getOrElse "<unknown>"
+    ScalaClassLoader
+      .originOfClass(classOf[ScalacFork]) map (_.toString) getOrElse "<unknown>"
 
   /** Sets the `srcdir` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `sourceDir`. */
@@ -163,6 +164,6 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
     if (failOnError && res != 0)
       throw new BuildException(
           "Compilation failed because of an internal compiler error;" +
-          " see the error output for details.")
+            " see the error output for details.")
   }
 }

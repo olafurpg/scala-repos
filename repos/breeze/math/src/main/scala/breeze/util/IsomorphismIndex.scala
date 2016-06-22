@@ -5,8 +5,8 @@ package breeze.util
   * @author dlwh
   */
 @SerialVersionUID(1)
-class IsomorphismIndex[T, U](
-    val innerIndex: Index[T])(implicit iso: Isomorphism[T, U])
+class IsomorphismIndex[T, U](val innerIndex: Index[T])(
+    implicit iso: Isomorphism[T, U])
     extends Index[U]
     with Serializable {
   def apply(u: U): Int = innerIndex(iso.backward(u))

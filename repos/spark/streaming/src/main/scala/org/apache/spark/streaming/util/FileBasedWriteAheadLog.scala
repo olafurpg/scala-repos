@@ -53,8 +53,7 @@ private[streaming] class FileBasedWriteAheadLog(
     rollingIntervalSecs: Int,
     maxFailures: Int,
     closeFileAfterWrite: Boolean
-)
-    extends WriteAheadLog
+) extends WriteAheadLog
     with Logging {
 
   import FileBasedWriteAheadLog._
@@ -86,8 +85,8 @@ private[streaming] class FileBasedWriteAheadLog(
     * ByteBuffer to HDFS. When this method returns, the data is guaranteed to have been flushed
     * to HDFS, and will be available for readers to read.
     */
-  def write(
-      byteBuffer: ByteBuffer, time: Long): FileBasedWriteAheadLogSegment =
+  def write(byteBuffer: ByteBuffer,
+            time: Long): FileBasedWriteAheadLogSegment =
     synchronized {
       var fileSegment: FileBasedWriteAheadLogSegment = null
       var failures = 0
@@ -121,8 +120,8 @@ private[streaming] class FileBasedWriteAheadLog(
     var reader: FileBasedWriteAheadLogRandomReader = null
     var byteBuffer: ByteBuffer = null
     try {
-      reader = new FileBasedWriteAheadLogRandomReader(
-          fileSegment.path, hadoopConf)
+      reader =
+        new FileBasedWriteAheadLogRandomReader(fileSegment.path, hadoopConf)
       byteBuffer = reader.read(fileSegment)
     } finally {
       reader.close()
@@ -145,8 +144,8 @@ private[streaming] class FileBasedWriteAheadLog(
     def readFile(file: String): Iterator[ByteBuffer] = {
       logDebug(s"Creating log reader with $file")
       val reader = new FileBasedWriteAheadLogReader(file, hadoopConf)
-      CompletionIterator[ByteBuffer, Iterator[ByteBuffer]](
-          reader, reader.close _)
+      CompletionIterator[ByteBuffer, Iterator[ByteBuffer]](reader,
+                                                           reader.close _)
     }
     if (!closeFileAfterWrite) {
       logFilesToRead.iterator.map(readFile).flatten.asJava
@@ -177,7 +176,7 @@ private[streaming] class FileBasedWriteAheadLog(
     }
     logInfo(
         s"Attempting to clear ${oldLogFiles.size} old log files in $logDirectory " +
-        s"older than $threshTime: ${oldLogFiles.map { _.path }.mkString("\n")}")
+          s"older than $threshTime: ${oldLogFiles.map { _.path }.mkString("\n")}")
 
     def deleteFile(walInfo: LogInfo): Unit = {
       try {
@@ -203,7 +202,7 @@ private[streaming] class FileBasedWriteAheadLog(
           case e: RejectedExecutionException =>
             logWarning(
                 "Execution context shutdown before deleting old WriteAheadLogs. " +
-                "This would not affect recovery correctness.",
+                  "This would not affect recovery correctness.",
                 e)
         }
       }
@@ -226,7 +225,7 @@ private[streaming] class FileBasedWriteAheadLog(
         resetWriter()
         currentLogPath.foreach {
           pastLogs +=
-            LogInfo(currentLogWriterStartTime, currentLogWriterStopTime, _)
+          LogInfo(currentLogWriterStartTime, currentLogWriterStopTime, _)
         }
         currentLogWriterStartTime = currentTime
         currentLogWriterStopTime = currentTime + (rollingIntervalSecs * 1000)

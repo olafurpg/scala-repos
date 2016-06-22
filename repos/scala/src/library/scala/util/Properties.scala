@@ -51,7 +51,7 @@ private[scala] trait PropertiesTrait {
   def propOrNone(name: String) = Option(propOrNull(name))
   def propOrFalse(name: String) =
     propOrNone(name) exists
-    (x => List("yes", "on", "true") contains x.toLowerCase)
+      (x => List("yes", "on", "true") contains x.toLowerCase)
   def setProp(name: String, value: String) = System.setProperty(name, value)
   def clearProp(name: String) = System.clearProperty(name)
 
@@ -103,8 +103,8 @@ private[scala] trait PropertiesTrait {
     */
   val versionString =
     "version " + scalaPropOrElse("version.number", "(unknown)")
-  val copyrightString = scalaPropOrElse(
-      "copyright.string", "Copyright 2002-2016, LAMP/EPFL")
+  val copyrightString =
+    scalaPropOrElse("copyright.string", "Copyright 2002-2016, LAMP/EPFL")
 
   /** This is the encoding to use reading in source files, overridden with -encoding.
     *  Note that it uses "prop" i.e. looks in the scala jar, not the system properties.

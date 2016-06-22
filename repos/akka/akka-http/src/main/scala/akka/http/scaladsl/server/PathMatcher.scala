@@ -83,8 +83,9 @@ abstract class PathMatcher[L](implicit val ev: Tuple[L])
     * <tr><td>`PathMatcher[L :Tuple]`</td><td>`PathMatcher[List[L]]`</td></tr>
     * </table>
     */
-  def repeat(
-      min: Int, max: Int, separator: PathMatcher0 = PathMatchers.Neutral)(
+  def repeat(min: Int,
+             max: Int,
+             separator: PathMatcher0 = PathMatchers.Neutral)(
       implicit lift: PathMatcher.Lift[L, List]): PathMatcher[lift.Out] =
     new PathMatcher[lift.Out]()(lift.OutIsTuple) {
       require(min >= 0, "`min` must be >= 0")
@@ -302,7 +303,7 @@ trait ImplicitPathMatcherConstruction {
       case _ ⇒
         throw new IllegalArgumentException(
             "Path regex '" + regex.pattern.pattern +
-            "' must not contain more than one capturing group")
+              "' must not contain more than one capturing group")
     }
 
   /**

@@ -107,8 +107,8 @@ abstract class AkkaSpec(_system: ActorSystem)
 
   override def expectedTestDuration: FiniteDuration = 60 seconds
 
-  def muteDeadLetters(
-      messageClasses: Class[_]*)(sys: ActorSystem = system): Unit =
+  def muteDeadLetters(messageClasses: Class[_]*)(
+      sys: ActorSystem = system): Unit =
     if (!sys.log.isDebugEnabled) {
       def mute(clazz: Class[_]): Unit =
         sys.eventStream.publish(

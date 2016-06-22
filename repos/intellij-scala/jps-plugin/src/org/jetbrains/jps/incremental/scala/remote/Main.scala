@@ -29,15 +29,17 @@ object Main {
     make(args, System.out, standalone = true)
   }
 
-  private def make(
-      arguments: Seq[String], out: PrintStream, standalone: Boolean) {
+  private def make(arguments: Seq[String],
+                   out: PrintStream,
+                   standalone: Boolean) {
     var hasErrors = false
 
     val client = {
       val eventHandler = (event: Event) => {
         val encode = Base64Converter.encode(event.toBytes)
-        out.write((if (standalone && !encode.endsWith("=")) encode + "="
-                   else encode).getBytes)
+        out.write(
+            (if (standalone && !encode.endsWith("=")) encode + "="
+             else encode).getBytes)
       }
       new EventGeneratingClient(eventHandler, out.checkError) {
         override def error(text: String,
@@ -72,8 +74,8 @@ object Main {
         Arguments.from(strings)
       }
 
-      Server.compile(
-          args.sbtData, args.compilerData, args.compilationData, client)
+      Server
+        .compile(args.sbtData, args.compilerData, args.compilationData, client)
 
       if (!hasErrors)
         worksheetFactory.getRunner(out, standalone).loadAndRun(args, client)

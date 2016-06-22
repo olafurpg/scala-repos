@@ -108,8 +108,8 @@ abstract class JdbcDialect extends Serializable {
     * @param connection The connection object
     * @param properties The connection properties.  This is passed through from the relation.
     */
-  def beforeFetch(
-      connection: Connection, properties: Map[String, String]): Unit = {}
+  def beforeFetch(connection: Connection,
+                  properties: Map[String, String]): Unit = {}
 }
 
 /**

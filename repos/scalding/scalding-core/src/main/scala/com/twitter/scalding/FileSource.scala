@@ -49,8 +49,11 @@ abstract class SchemedSource extends Source {
     throw ModeException("Cascading local mode not supported for: " + toString)
 
   /** The scheme to use if the source is on hdfs. */
-  def hdfsScheme: Scheme[
-      JobConf, RecordReader[_, _], OutputCollector[_, _], _, _] =
+  def hdfsScheme: Scheme[JobConf,
+                         RecordReader[_, _],
+                         OutputCollector[_, _],
+                         _,
+                         _] =
     throw ModeException("Cascading Hadoop mode not supported for: " + toString)
 
   // The mode to use for output taps determining how conflicts with existing output are handled.
@@ -167,7 +170,7 @@ object FileSource {
         //
         dir ->
         (dir, OrVal(SuccessFileFilter.accept(fileStatus.getPath) &&
-                fileStatus.isFile),
+                  fileStatus.isFile),
             OrVal(HiddenFileFilter.accept(fileStatus.getPath)))
     }
 
@@ -217,11 +220,11 @@ abstract class FileSource
     mode match {
       // TODO support strict in Local
       case Local(_) => {
-          readOrWrite match {
-            case Read => createLocalTap(sinkMode)
-            case Write => new FileTap(localScheme, localWritePath, sinkMode)
-          }
+        readOrWrite match {
+          case Read => createLocalTap(sinkMode)
+          case Write => new FileTap(localScheme, localWritePath, sinkMode)
         }
+      }
       case hdfsMode @ Hdfs(_, _) =>
         readOrWrite match {
           case Read => createHdfsReadTap(hdfsMode)
@@ -229,23 +232,23 @@ abstract class FileSource
             CastHfsTap(createHfsTap(hdfsScheme, hdfsWritePath, sinkMode))
         }
       case _ => {
-          val tryTtp = Try(TestTapFactory(this, hdfsScheme, sinkMode)).map {
-            // these java types are invariant, so we cast here
+        val tryTtp = Try(TestTapFactory(this, hdfsScheme, sinkMode)).map {
+          // these java types are invariant, so we cast here
+          _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
+        }.orElse {
+          Try(TestTapFactory(this, localScheme.getSourceFields, sinkMode)).map {
             _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
-          }.orElse {
-            Try(TestTapFactory(this, localScheme.getSourceFields, sinkMode)).map {
-              _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
-            }
-          }
-
-          tryTtp match {
-            case Success(s) => s
-            case Failure(e) =>
-              throw new java.lang.IllegalArgumentException(
-                  s"Failed to create tap for: $toString, with error: ${e.getMessage}",
-                  e)
           }
         }
+
+        tryTtp match {
+          case Success(s) => s
+          case Failure(e) =>
+            throw new java.lang.IllegalArgumentException(
+                s"Failed to create tap for: $toString, with error: ${e.getMessage}",
+                e)
+        }
+      }
     }
   }
 
@@ -263,35 +266,35 @@ abstract class FileSource
   override def validateTaps(mode: Mode): Unit = {
     mode match {
       case Hdfs(strict, conf) => {
-          if (strict && (!hdfsReadPathsAreGood(conf))) {
-            throw new InvalidSourceException(
-                "[" + this.toString +
+        if (strict && (!hdfsReadPathsAreGood(conf))) {
+          throw new InvalidSourceException(
+              "[" + this.toString +
                 "] Data is missing from one or more paths in: " +
                 hdfsPaths.toString)
-          } else if (!hdfsPaths.exists { pathIsGood(_, conf) }) {
-            //Check that there is at least one good path:
-            throw new InvalidSourceException(
-                "[" + this.toString + "] No good paths in: " +
+        } else if (!hdfsPaths.exists { pathIsGood(_, conf) }) {
+          //Check that there is at least one good path:
+          throw new InvalidSourceException(
+              "[" + this.toString + "] No good paths in: " +
                 hdfsPaths.toString)
-          }
         }
+      }
 
       case Local(strict) => {
-          val files = localPaths.map { p =>
-            new java.io.File(p)
-          }
-          if (strict && !files.forall(_.exists)) {
-            throw new InvalidSourceException(
-                "[" + this.toString +
+        val files = localPaths.map { p =>
+          new java.io.File(p)
+        }
+        if (strict && !files.forall(_.exists)) {
+          throw new InvalidSourceException(
+              "[" + this.toString +
                 s"] Data is missing from: ${localPaths.filterNot { p =>
               new java.io.File(p).exists
             }}")
-          } else if (!files.exists(_.exists)) {
-            throw new InvalidSourceException(
-                "[" + this.toString + "] No good paths in: " +
+        } else if (!files.exists(_.exists)) {
+          throw new InvalidSourceException(
+              "[" + this.toString + "] No good paths in: " +
                 hdfsPaths.toString)
-          }
         }
+      }
       case _ => ()
     }
   }
@@ -315,12 +318,12 @@ abstract class FileSource
       }
     taps.size match {
       case 0 => {
-          // This case is going to result in an error, but we don't want to throw until
-          // validateTaps. Return an InvalidSource here so the Job constructor does not fail.
-          // In the worst case if the flow plan is misconfigured,
-          //openForRead on mappers should fail when using this tap.
-          new InvalidSourceTap(hdfsPaths)
-        }
+        // This case is going to result in an error, but we don't want to throw until
+        // validateTaps. Return an InvalidSource here so the Job constructor does not fail.
+        // In the worst case if the flow plan is misconfigured,
+        //openForRead on mappers should fail when using this tap.
+        new InvalidSourceTap(hdfsPaths)
+      }
       case 1 => taps.head
       case _ => new ScaldingMultiSourceTap(taps)
     }
@@ -381,13 +384,19 @@ trait DelimitedScheme extends SchemedSource {
 
   //These should not be changed:
   override def localScheme =
-    new CLTextDelimited(
-        fields, skipHeader, writeHeader, separator, strict, quote, types, safe)
+    new CLTextDelimited(fields,
+                        skipHeader,
+                        writeHeader,
+                        separator,
+                        strict,
+                        quote,
+                        types,
+                        safe)
 
   override def hdfsScheme = {
     assert(types == null || fields.size == types.size,
            "Fields [" + fields + "] of different size than types array [" +
-           types.mkString(",") + "]")
+             types.mkString(",") + "]")
     HadoopSchemeInstance(
         new CHTextDelimited(fields,
                             null,

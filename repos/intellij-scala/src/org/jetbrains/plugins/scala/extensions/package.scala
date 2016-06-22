@@ -56,7 +56,7 @@ package object extensions {
     def hasQueryLikeName = {
       def startsWith(name: String, prefix: String) =
         name.length > prefix.length && name.startsWith(prefix) &&
-        name.charAt(prefix.length).isUpper
+          name.charAt(prefix.length).isUpper
 
       repr.getName match {
         case "getInstance" => false // TODO others?
@@ -233,8 +233,9 @@ package object extensions {
       case _ => clazz.hasModifierProperty(PsiModifier.FINAL)
     }
 
-    def processPsiMethodsForNode(
-        node: SignatureNodes.Node, isStatic: Boolean, isInterface: Boolean)(
+    def processPsiMethodsForNode(node: SignatureNodes.Node,
+                                 isStatic: Boolean,
+                                 isInterface: Boolean)(
         processMethod: PsiMethod => Unit,
         processName: String => Unit = _ => ()): Unit = {
 
@@ -270,10 +271,10 @@ package object extensions {
 
       node.info.namedElement match {
         case fun: ScFunction if !fun.isConstructor =>
-          val wrappers = fun.getFunctionWrappers(
-              isStatic,
-              isInterface = fun.isAbstractMember,
-              concreteClassFor(fun))
+          val wrappers = fun.getFunctionWrappers(isStatic,
+                                                 isInterface =
+                                                   fun.isAbstractMember,
+                                                 concreteClassFor(fun))
           wrappers.foreach(processMethod)
           wrappers.foreach(w => processName(w.name))
         case method: PsiMethod if !method.isConstructor =>
@@ -289,7 +290,7 @@ package object extensions {
           }
         case t: ScTypedDefinition
             if t.isVal || t.isVar || (t.isInstanceOf[ScClassParameter] &&
-                t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
+                  t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
           PsiTypedDefinitionWrapper.processWrappersFor(t,
                                                        concreteClassFor(t),
                                                        node.info.name,
@@ -423,7 +424,8 @@ package object extensions {
   }
 
   def inWriteCommandAction[T](
-      project: Project, commandName: String = "Undefined")(body: => T): T = {
+      project: Project,
+      commandName: String = "Undefined")(body: => T): T = {
     val computable = new Computable[T] {
       override def compute(): T = body
     }
@@ -465,8 +467,8 @@ package object extensions {
     }
 
     catching(classOf[Exception]).withTry {
-      progressManager.runProcessWithProgressSynchronously(
-          computable, title, false, null)
+      progressManager
+        .runProcessWithProgressSynchronously(computable, title, false, null)
     }
   }
 
@@ -489,8 +491,7 @@ package object extensions {
   }
 
   def invokeLater[T](body: => T) {
-    ApplicationManager.getApplication.invokeLater(
-        new Runnable {
+    ApplicationManager.getApplication.invokeLater(new Runnable {
       def run() {
         body
       }
@@ -499,8 +500,7 @@ package object extensions {
 
   def invokeAndWait[T](body: => Unit) {
     preservingControlFlow {
-      SwingUtilities.invokeAndWait(
-          new Runnable {
+      SwingUtilities.invokeAndWait(new Runnable {
         def run() {
           body
         }

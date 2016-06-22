@@ -135,14 +135,14 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         case DeclarationKind.PACKAGE => kinds contains ResolveTargets.PACKAGE
         case DeclarationKind.CLASS if classKind =>
           (kinds contains ResolveTargets.CLASS) ||
-          (kinds contains ResolveTargets.OBJECT) ||
-          (kinds contains ResolveTargets.METHOD) //case classes get 'apply' generated
+            (kinds contains ResolveTargets.OBJECT) ||
+            (kinds contains ResolveTargets.METHOD) //case classes get 'apply' generated
         case DeclarationKind.VARIABLE =>
           (kinds contains ResolveTargets.VAR) ||
-          (kinds contains ResolveTargets.VAL)
+            (kinds contains ResolveTargets.VAL)
         case DeclarationKind.FIELD =>
           (kinds contains ResolveTargets.VAR) ||
-          (kinds contains ResolveTargets.VAL)
+            (kinds contains ResolveTargets.VAL)
         case DeclarationKind.METHOD => kinds contains ResolveTargets.METHOD
         case _ => false
       }
@@ -233,15 +233,15 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         //not scala from scala
         var break = true
         for (method <- e.getMethods if break &&
-             method.hasModifierProperty("static")) {
+               method.hasModifierProperty("static")) {
           if (!execute(method, state)) break = false
         }
         for (cl <- e.getInnerClasses if break &&
-             cl.hasModifierProperty("static")) {
+               cl.hasModifierProperty("static")) {
           if (!execute(cl, state)) break = false
         }
         for (field <- e.getFields if break &&
-             field.hasModifierProperty("static")) {
+               field.hasModifierProperty("static")) {
           if (!execute(field, state)) break = false
         }
         if (!break) return false
@@ -364,8 +364,8 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         }
         true
       case comp @ ScCompoundType(components, signaturesMap, typesMap) =>
-        TypeDefinitionMembers.processDeclarations(
-            comp, this, state, null, place)
+        TypeDefinitionMembers
+          .processDeclarations(comp, this, state, null, place)
       case ex: ScExistentialType =>
         processType(ex.skolem,
                     place,
@@ -391,8 +391,7 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
       visitedAliases: HashSet[ScTypeAlias],
       visitedTypeParameter: HashSet[ScTypeParameterType]): Boolean = {
     val subst = state.get(ScSubstitutor.key)
-    val compound =
-      state.get(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY) //todo: looks like ugly workaround
+    val compound = state.get(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY) //todo: looks like ugly workaround
     val newSubst = compound match {
       case Some(_) => subst
       case _ => if (subst != null) subst followed s else s

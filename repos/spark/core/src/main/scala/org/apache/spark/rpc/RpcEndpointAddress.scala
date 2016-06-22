@@ -28,8 +28,8 @@ import org.apache.spark.SparkException
   * @param rpcAddress The socket address of the endpoint.
   * @param name Name of the endpoint.
   */
-private[spark] case class RpcEndpointAddress(
-    val rpcAddress: RpcAddress, val name: String) {
+private[spark] case class RpcEndpointAddress(val rpcAddress: RpcAddress,
+                                             val name: String) {
 
   require(name != null, "RpcEndpoint name must be provided.")
 
@@ -37,12 +37,11 @@ private[spark] case class RpcEndpointAddress(
     this(RpcAddress(host, port), name)
   }
 
-  override val toString =
-    if (rpcAddress != null) {
-      s"spark://$name@${rpcAddress.host}:${rpcAddress.port}"
-    } else {
-      s"spark-client://$name"
-    }
+  override val toString = if (rpcAddress != null) {
+    s"spark://$name@${rpcAddress.host}:${rpcAddress.port}"
+  } else {
+    s"spark-client://$name"
+  }
 }
 
 private[spark] object RpcEndpointAddress {

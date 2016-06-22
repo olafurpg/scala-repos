@@ -81,9 +81,10 @@ class Netty4ListenerTest
 
     object StringServerInit extends (ChannelPipeline => Unit) {
       def apply(pipeline: ChannelPipeline): Unit = {
-        pipeline.addLast("line",
-                         new DelimiterBasedFrameDecoder(
-                             100, Delimiters.lineDelimiter(): _*))
+        pipeline.addLast(
+            "line",
+            new DelimiterBasedFrameDecoder(100,
+                                           Delimiters.lineDelimiter(): _*))
         pipeline.addLast("stringDecoder", new StringDecoder(Charsets.Utf8))
         pipeline.addLast("stringEncoder", new StringEncoder(Charsets.Utf8))
       }
@@ -104,9 +105,9 @@ class Netty4ListenerTest
 
     val serveTransport =
       (t: Transport[String, String]) => new SerialServerDispatcher(t, service)
-    val server =
-      listener.listen(new InetSocketAddress(InetAddress.getLoopbackAddress,
-                                            0))(serveTransport(_))
+    val server = listener.listen(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0))(
+        serveTransport(_))
 
     val client = new Socket()
     eventually { client.connect(server.boundAddress) }

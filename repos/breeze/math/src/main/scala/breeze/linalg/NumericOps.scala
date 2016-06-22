@@ -169,9 +169,9 @@ trait ImmutableNumericOps[+This] extends Any {
     canSlice(op.apply(repr), a, b)
 
   /** A transposed view of this object, followed by a slice. Sadly frequently necessary. */
-  final def t[TT >: This, That, Slice1, Result](
-      a: Slice1)(implicit op: CanTranspose[TT, That],
-                 canSlice: CanSlice[That, Slice1, Result]): Result =
+  final def t[TT >: This, That, Slice1, Result](a: Slice1)(
+      implicit op: CanTranspose[TT, That],
+      canSlice: CanSlice[That, Slice1, Result]): Result =
     canSlice(op.apply(repr), a)
 }
 
@@ -349,8 +349,10 @@ object NumericOps {
     }
 
     // TODO these two really shouldn't be necessary, but there's interference(?) from any2StringAdd, or something.
-    implicit def binaryOpFromDVOp2Add[V](implicit op: OpAdd.Impl2[
-            DenseVector[V], DenseVector[V], DenseVector[V]])
+    implicit def binaryOpFromDVOp2Add[V](
+        implicit op: OpAdd.Impl2[DenseVector[V],
+                                 DenseVector[V],
+                                 DenseVector[V]])
       : OpAdd.Impl2[Array[V], Array[V], Array[V]] = {
       new OpAdd.Impl2[Array[V], Array[V], Array[V]] {
         def apply(a: Array[V], b: Array[V]): Array[V] = {
@@ -378,8 +380,11 @@ object NumericOps {
       }
     }
 
-    implicit def binaryOpFromDVOp2[V, Op <: OpType](implicit op: UFunc.UImpl2[
-            Op, DenseVector[V], DenseVector[V], DenseVector[V]])
+    implicit def binaryOpFromDVOp2[V, Op <: OpType](
+        implicit op: UFunc.UImpl2[Op,
+                                  DenseVector[V],
+                                  DenseVector[V],
+                                  DenseVector[V]])
       : UFunc.UImpl2[Op, Array[V], Array[V], Array[V]] = {
       new UFunc.UImpl2[Op, Array[V], Array[V], Array[V]] {
         def apply(a: Array[V], b: Array[V]): Array[V] = {

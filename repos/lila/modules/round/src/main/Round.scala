@@ -80,8 +80,9 @@ private[round] final class Round(gameId: String,
 
     case Resign(playerId) =>
       handle(playerId) { pov =>
-        pov.game.resignable ?? finisher.other(
-            pov.game, _.Resign, Some(!pov.color))
+        pov.game.resignable ?? finisher.other(pov.game,
+                                              _.Resign,
+                                              Some(!pov.color))
       }
 
     case GoBerserk(color) =>
@@ -92,7 +93,8 @@ private[round] final class Round(gameId: String,
               (_.untranslated(
                   s"${pov.color.name.capitalize} is going berserk!"
               )))
-          GameRepo.save(progress) >> GameRepo.goBerserk(pov) inject progress.events
+          GameRepo.save(progress) >> GameRepo
+            .goBerserk(pov) inject progress.events
         }
       }
 
@@ -183,11 +185,12 @@ private[round] final class Round(gameId: String,
         pov.game.clock.ifTrue(pov.game moretimeable !pov.color) ?? { clock =>
           val newClock = clock.giveTime(!pov.color, moretimeDuration.toSeconds)
           val progress = (pov.game withClock newClock) + Event.Clock(newClock)
-          messenger.system(pov.game,
-                           (_.untranslated(
-                               "%s + %d seconds".format(
-                                   !pov.color, moretimeDuration.toSeconds)
-                           )))
+          messenger.system(
+              pov.game,
+              (_.untranslated(
+                  "%s + %d seconds".format(!pov.color,
+                                           moretimeDuration.toSeconds)
+              )))
           GameRepo save progress inject progress.events
         }
       }
@@ -224,9 +227,10 @@ private[round] final class Round(gameId: String,
     case AbortForMaintenance =>
       handle { game =>
         messenger.system(
-            game, (_.untranslated("Game aborted for server maintenance")))
-        messenger.system(
-            game, (_.untranslated("Sorry for the inconvenience!")))
+            game,
+            (_.untranslated("Game aborted for server maintenance")))
+        messenger.system(game,
+                         (_.untranslated("Sorry for the inconvenience!")))
         game.playable ?? finisher.other(game, _.Aborted)
       }
   }
@@ -248,7 +252,8 @@ private[round] final class Round(gameId: String,
     handleGame(GameRepo game gameId)(op)
 
   protected def handle(playerId: String)(op: Pov => Fu[Events]): Funit =
-    handlePov((GameRepo pov PlayerRef(gameId, playerId))
+    handlePov(
+        (GameRepo pov PlayerRef(gameId, playerId))
           .mon(_.round.move.segment.fetch))(op)
 
   protected def handle(color: Color)(op: Pov => Fu[Events]): Funit =

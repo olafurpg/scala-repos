@@ -13,7 +13,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
   private val sourceJars: List[JarFile] =
     getClass.getClassLoader.getResources("android").toList.map { binUrl =>
-      val binFile = new File(binUrl.toString
+      val binFile = new File(
+          binUrl.toString
             .split("/|!")
             .tail
             .dropRight(2)
@@ -42,8 +43,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
   }
 
   private def fixClassParamedType(tpe: ScalaType) =
-    tpe.copy(
-        params = tpe.params.map { t =>
+    tpe.copy(params = tpe.params.map { t =>
       if (t.isVar && t.bounds.head.name == "Any") {
         t.copy(bounds = List(ScalaType("AnyRef")))
       } else t
@@ -101,7 +101,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
     def hasIntentAsParam(m: Method): Boolean = {
       val params = m.getParameterTypes
       if (params.length > 0)
-        "android.content.Intent".equals(m.getParameterTypes.apply(0).getName) &&
+        "android.content.Intent"
+          .equals(m.getParameterTypes.apply(0).getName) &&
         !superMethods(methodSignature(m))
       else false
     }
@@ -142,7 +143,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             !m.getName.equals("getZoomControls")) &&
         //https://github.com/pocorall/scaloid/issues/56
         (!cls.getName.endsWith("View") ||
-            !m.getName.equals("setBackground")) // manually specifies this method
+            !m.getName
+              .equals("setBackground")) // manually specifies this method
       }
 
       val allMethodNames = clsMethods.map(_.getName).toSet
@@ -175,8 +177,13 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                 else if (name.equals("enabled")) Some("")
                 else None
 
-              Some(AndroidProperty(
-                      name, tpe, getter, setters, switch, nameClashes))
+              Some(
+                  AndroidProperty(name,
+                                  tpe,
+                                  getter,
+                                  setters,
+                                  switch,
+                                  nameClashes))
             }
         }
         .flatten
@@ -267,7 +274,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     val constructorNames: Map[List[String], List[String]] = {
       val constRegex = ("public +" + clsName +
-          """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
+            """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
       val argRegex = """(.+?) +([a-z][^\[,. ]*)(?:,|$)""".r
 
       constRegex

@@ -21,12 +21,11 @@ object LogisticGenerator {
         val margin: Double = -1.0 * x.dot(brzData)
         val gradientMultiplier = (1.0 / (1.0 + math.exp(margin))) - labels(i)
         val gradient = brzData * gradientMultiplier
-        val loss =
-          if (labels(i) > 0) {
-            math.log1p(math.exp(margin)) // log1p is log(1+p) but more accurate for small p
-          } else {
-            math.log1p(math.exp(margin)) - margin
-          }
+        val loss = if (labels(i) > 0) {
+          math.log1p(math.exp(margin)) // log1p is log(1+p) but more accurate for small p
+        } else {
+          math.log1p(math.exp(margin)) - margin
+        }
         cumGradient += gradient
         cumLoss += loss
         i = i + 1

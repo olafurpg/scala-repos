@@ -39,7 +39,7 @@ class DefaultPoolTest extends FunSuite {
 
   test(
       "DefaultPool should be able to maintain high - low connections in the " +
-      "pool, and low connection in watermark") {
+        "pool, and low connection in watermark") {
 
     new DefaultPoolHelper {
       val c1 = Await.result(factory())
@@ -65,7 +65,7 @@ class DefaultPoolTest extends FunSuite {
 
   test(
       "DefaultPool should be able to reuse connections after they have been " +
-      "released.") {
+        "released.") {
     new DefaultPoolHelper {
       val c1 = Await.result(factory())
       val c2 = Await.result(factory())

@@ -46,7 +46,7 @@ trait Naming {
     val sn = sessionNames
     val members =
       List(sn.read, sn.eval, sn.print) map Regex.quote mkString
-      ("(?:", "|", ")")
+        ("(?:", "|", ")")
     debugging("lineRegex")(
         Regex.quote(sn.line) + """\d+[./]""" + members + """[$.]""")
   }
@@ -89,10 +89,8 @@ trait Naming {
       (name startsWith pre) && ((name drop pre.length) forall (_.isDigit))
   }
 
-  private lazy val userVar =
-    new NameCreator(sessionNames.res) // var name, like res0
-  private lazy val internalVar =
-    new NameCreator(sessionNames.ires) // internal var name, like $ires0
+  private lazy val userVar = new NameCreator(sessionNames.res) // var name, like res0
+  private lazy val internalVar = new NameCreator(sessionNames.ires) // internal var name, like $ires0
 
   def isUserVarName(name: String) = userVar didGenerate name
   def isInternalVarName(name: String) = internalVar didGenerate name

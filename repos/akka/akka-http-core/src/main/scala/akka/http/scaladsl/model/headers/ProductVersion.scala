@@ -10,8 +10,9 @@ import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.model.parser.HeaderParser
 import akka.http.impl.util._
 
-final case class ProductVersion(
-    product: String = "", version: String = "", comment: String = "")
+final case class ProductVersion(product: String = "",
+                                version: String = "",
+                                comment: String = "")
     extends jm.headers.ProductVersion
     with ValueRenderable {
   def render[R <: Rendering](r: R): r.type = {

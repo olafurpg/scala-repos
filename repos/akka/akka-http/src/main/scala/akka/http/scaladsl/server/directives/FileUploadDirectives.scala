@@ -66,8 +66,9 @@ trait FileUploadDirectives {
           formData.parts
             .filter(part ⇒ part.filename.isDefined && part.name == fieldName)
             .map(part ⇒
-                  (FileInfo(
-                       part.name, part.filename.get, part.entity.contentType),
+                  (FileInfo(part.name,
+                            part.filename.get,
+                            part.entity.contentType),
                    part.entity.dataBytes))
             .take(1)
 
@@ -91,5 +92,6 @@ object FileUploadDirectives extends FileUploadDirectives
   * @param fileName User specified name of the uploaded file
   * @param contentType Content type of the file
   */
-final case class FileInfo(
-    fieldName: String, fileName: String, contentType: ContentType)
+final case class FileInfo(fieldName: String,
+                          fileName: String,
+                          contentType: ContentType)

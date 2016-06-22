@@ -17,8 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
   * Date: 09.07.14.
   */
 class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
-  override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
+  override def postProcessEnter(file: PsiFile,
+                                editor: Editor,
+                                dataContext: DataContext): Result = {
     val project = file.getProject
     val scalaSettings = ScalaCodeStyleSettings.getInstance(project)
     if (!scalaSettings.ENFORCE_FUNCTIONAL_SYNTAX_FOR_UNIT)
@@ -43,8 +44,8 @@ class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
           case (funDef: ScFunctionDefinition, prev: ScalaPsiElement) =>
             if (funDef.findFirstChildByType(ScalaTokenTypes.tASSIGN) == null)
               extensions.inWriteAction {
-                document.insertString(
-                    prev.getTextRange.getEndOffset, ": Unit =")
+                document.insertString(prev.getTextRange.getEndOffset,
+                                      ": Unit =")
                 PsiDocumentManager
                   .getInstance(project)
                   .commitDocument(document)

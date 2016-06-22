@@ -11,8 +11,9 @@ import scala.concurrent.{Await, Future}
 /**
   * Utility class for keeping track of a framework ID
   */
-class FrameworkIdUtil(
-    mStore: EntityStore[FrameworkId], timeout: Duration, key: String = "id") {
+class FrameworkIdUtil(mStore: EntityStore[FrameworkId],
+                      timeout: Duration,
+                      key: String = "id") {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 

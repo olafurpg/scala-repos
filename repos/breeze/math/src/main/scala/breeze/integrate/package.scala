@@ -4,8 +4,10 @@ import breeze.linalg._
 
 package object integrate {
 
-  def trapezoid(
-      f: Double => Double, start: Double, end: Double, nodes: Int): Double = {
+  def trapezoid(f: Double => Double,
+                start: Double,
+                end: Double,
+                nodes: Int): Double = {
     if (nodes < 2)
       throw new Exception(
           "When using trapezoid, you have to use at least two nodes.")
@@ -15,8 +17,10 @@ package object integrate {
     h * (s - (f(start) + f(end)) / 2.0)
   }
 
-  def simpson(
-      f: Double => Double, start: Double, end: Double, nodes: Int): Double = {
+  def simpson(f: Double => Double,
+              start: Double,
+              end: Double,
+              nodes: Int): Double = {
     if (nodes < 2)
       throw new Exception(
           "When using simpson, you have to use at least two nodes.")

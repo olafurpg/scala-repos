@@ -27,8 +27,8 @@ object Test {
       }
     } catch {
       case c: CompositeThrowable =>
-        for (t <- c.throwables) println(
-            "\n%s\n%s".format(t, t.getStackTrace.mkString("\n")))
+        for (t <- c.throwables)
+          println("\n%s\n%s".format(t, t.getStackTrace.mkString("\n")))
     }
   }
 }

@@ -136,8 +136,9 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
     }
   }
 
-  private def getOrDownloadTemplate(
-      templateId: String, pathTo: File, onError: String => Unit) {
+  private def getOrDownloadTemplate(templateId: String,
+                                    pathTo: File,
+                                    onError: String => Unit) {
     var hasError = false
 
     val fileName = ActivatorRepoProcessor.templateFileName(templateId)
@@ -159,14 +160,15 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
       }
     }
 
-    ActivatorRepoProcessor.downloadTemplateFromRepo(
-        templateId, pathTo, myOnError)
+    ActivatorRepoProcessor
+      .downloadTemplateFromRepo(templateId, pathTo, myOnError)
     workOffline = hasError
     if (!workOffline) cacheFile(pathTo, cachedTemplate)
   }
 
-  def createTemplate(
-      templateId: String, extractTo: File, onError: String => Unit) {
+  def createTemplate(templateId: String,
+                     extractTo: File,
+                     onError: String => Unit) {
     val contentDir =
       FileUtilRt.createTempDirectory(s"$templateId-template-content", "", true)
     val contentFile = new File(contentDir, "content.zip")

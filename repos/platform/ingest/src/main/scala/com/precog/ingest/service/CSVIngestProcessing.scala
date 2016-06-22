@@ -62,15 +62,16 @@ class CSVIngestProcessing(apiKey: APIKey,
     Success(new IngestProcessor(delimiter, quote, escape))
   }
 
-  final class IngestProcessor(
-      delimiter: Option[String], quote: Option[String], escape: Option[String])
+  final class IngestProcessor(delimiter: Option[String],
+                              quote: Option[String],
+                              escape: Option[String])
       extends IngestProcessorLike
       with Logging {
     import scalaz.syntax.apply._
     import scalaz.Validation._
 
-    def writeChunkStream(
-        chan: WritableByteChannel, chunk: ByteChunk): Future[Long] = {
+    def writeChunkStream(chan: WritableByteChannel,
+                         chunk: ByteChunk): Future[Long] = {
       chunk match {
         case Left(bytes) =>
           writeChannel(chan, bytes :: StreamT.empty[Future, Array[Byte]], 0L)
@@ -81,8 +82,8 @@ class CSVIngestProcessing(apiKey: APIKey,
     def writeToFile(byteStream: ByteChunk): Future[(File, Long)] = {
       val file = File.createTempFile("async-ingest-", null, tmpdir)
       val outChannel = new FileOutputStream(file).getChannel()
-      for (written <- writeChunkStream(outChannel, byteStream)) yield
-        (file, written)
+      for (written <- writeChunkStream(outChannel, byteStream))
+        yield (file, written)
     }
 
     final private def writeChannel(chan: WritableByteChannel,
@@ -99,8 +100,8 @@ class CSVIngestProcessing(apiKey: APIKey,
     }
 
     def readerBuilder: ValidationNel[String, java.io.Reader => CSVReader] = {
-      def charOrError(
-          s: Option[String], default: Char): ValidationNel[String, Char] = {
+      def charOrError(s: Option[String],
+                      default: Char): ValidationNel[String, Char] = {
         s map {
           case s if s.length == 1 => success(s.charAt(0))
           case _ => failure("Expected a single character but found a string.")
@@ -201,9 +202,10 @@ class CSVIngestProcessing(apiKey: APIKey,
                                   streamRef.terminate
                                 else streamRef) flatMap { _ =>
                 if (done)
-                  M.point(BatchResult(total + batch.length,
-                                      ingested + batch.length,
-                                      errors))
+                  M.point(
+                      BatchResult(total + batch.length,
+                                  ingested + batch.length,
+                                  errors))
                 else
                   readBatches(paths,
                               reader,
@@ -231,10 +233,11 @@ class CSVIngestProcessing(apiKey: APIKey,
       readerBuilder map { f =>
         for {
           (file, size) <- writeToFile(data)
-          result <- ingestSync(f(new InputStreamReader(
-                                       new FileInputStream(file), "UTF-8")),
-                               durability.jobId,
-                               StreamRef.forWriteMode(storeMode, false))
+          result <- ingestSync(
+                       f(new InputStreamReader(new FileInputStream(file),
+                                               "UTF-8")),
+                       durability.jobId,
+                       StreamRef.forWriteMode(storeMode, false))
         } yield {
           file.delete()
           result

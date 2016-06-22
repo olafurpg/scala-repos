@@ -24,8 +24,8 @@ object ScalaJSVersions {
   val binaryEmitted: String = "0.6.8"
 
   /** Versions whose binary files we can support (used by deserializer) */
-  val binarySupported: Set[String] = Set(
-      "0.6.0", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.8", binaryEmitted)
+  val binarySupported: Set[String] =
+    Set("0.6.0", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.8", binaryEmitted)
 
   // Just to be extra safe
   assert(binarySupported contains binaryEmitted)

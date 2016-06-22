@@ -30,20 +30,20 @@ trait Function1ish[A, B] {
 }
 
 object Test {
-  def lambdaFactory[A, B](hostClass: Class[_],
-                          instantiatedParam: Class[A],
-                          instantiatedRet: Class[B],
-                          accessorName: String,
-                          capturedParams: Array[(Class[_], AnyRef)] =
-                            Array()) = {
+  def lambdaFactory[A, B](
+      hostClass: Class[_],
+      instantiatedParam: Class[A],
+      instantiatedRet: Class[B],
+      accessorName: String,
+      capturedParams: Array[(Class[_], AnyRef)] = Array()) = {
     val caller = MethodHandles.lookup
     val methodType =
       MethodType.methodType(classOf[AnyRef], Array[Class[_]](classOf[AnyRef]))
-    val instantiatedMethodType = MethodType.methodType(
-        instantiatedRet, Array[Class[_]](instantiatedParam))
+    val instantiatedMethodType = MethodType
+      .methodType(instantiatedRet, Array[Class[_]](instantiatedParam))
     val (capturedParamTypes, captured) = capturedParams.unzip
-    val targetMethodType = MethodType.methodType(
-        instantiatedRet, capturedParamTypes :+ instantiatedParam)
+    val targetMethodType = MethodType
+      .methodType(instantiatedRet, capturedParamTypes :+ instantiatedParam)
     val invokedType =
       MethodType.methodType(classOf[Function1ish[_, _]], capturedParamTypes)
     val target = caller.findStatic(hostClass, accessorName, targetMethodType)
@@ -59,9 +59,10 @@ object Test {
   }
   def main(args: Array[String]) {
     println(
-        lambdaFactory(
-            classOf[C], classOf[String], classOf[String], "accessor$1")
-          .apply("abc"))
+        lambdaFactory(classOf[C],
+                      classOf[String],
+                      classOf[String],
+                      "accessor$1").apply("abc"))
     println(
         lambdaFactory(classOf[C],
                       classOf[String],

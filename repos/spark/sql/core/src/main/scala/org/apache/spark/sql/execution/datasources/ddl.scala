@@ -113,8 +113,8 @@ case class CreateTempTableUsing(tableIdent: TableIdentifier,
     sqlContext.sessionState.catalog.registerTable(
         tableIdent,
         Dataset
-          .newDataFrame(
-              sqlContext, LogicalRelation(dataSource.resolveRelation()))
+          .newDataFrame(sqlContext,
+                        LogicalRelation(dataSource.resolveRelation()))
           .logicalPlan)
 
     Seq.empty[Row]

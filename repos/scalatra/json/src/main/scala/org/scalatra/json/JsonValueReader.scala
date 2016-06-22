@@ -24,12 +24,11 @@ class JsonValueReader(val data: JValue)(implicit formats: Formats)
     val (part, rest) =
       if (path.indexOf(separator.beginning) > -1) path.splitAt(partIndex)
       else (path, "")
-    val realRest =
-      if (rest.nonEmpty) {
-        if (separator.end.nonBlank) {
-          if (rest.size > 1) rest.substring(2) else rest.substring(1)
-        } else rest.substring(1)
-      } else rest
+    val realRest = if (rest.nonEmpty) {
+      if (separator.end.nonBlank) {
+        if (rest.size > 1) rest.substring(2) else rest.substring(1)
+      } else rest.substring(1)
+    } else rest
     if (realRest.isEmpty) {
       get(part, subj)
     } else {

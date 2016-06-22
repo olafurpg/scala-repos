@@ -279,10 +279,10 @@ trait LensTests {
     assertEquals(("Joe Grey", 37, "Brighton"), nac1)
 
     val person2 = nameAgeCityLens.set(person)("Joe Soap", 27, "London")
-    assertEquals(
-        Person(
-            "Joe Soap", 27, Address("Southover Street", "London", "BN2 9UA")),
-        person2)
+    assertEquals(Person("Joe Soap",
+                        27,
+                        Address("Southover Street", "London", "BN2 9UA")),
+                 person2)
   }
 }
 
@@ -772,14 +772,14 @@ class OpticTests {
     assertEquals(BTerm(2), a)
     assertEquals(BTerm(1), b)
 
-    lazy val g0 @ rll(x: BTerm[Int], y: BTerm[Int]) = new BNode(
-        BTerm(1), new BNode(BTerm(2), new BNode(x, y)))
+    lazy val g0 @ rll(x: BTerm[Int], y: BTerm[Int]) =
+      new BNode(BTerm(1), new BNode(BTerm(2), new BNode(x, y)))
     val rrlvrrrv(x1, y1) = g0
     assertEquals(2, x1)
     assertEquals(1, y1)
 
-    lazy val rlg(z: BTerm[Int], g1: BGraph[Int]) = new BNode(
-        BTerm(1), new BNode(BTerm(2), new BNode(z, g1)))
+    lazy val rlg(z: BTerm[Int], g1: BGraph[Int]) =
+      new BNode(BTerm(1), new BNode(BTerm(2), new BNode(z, g1)))
 
     val looped(x2, y2) = g1
     assertEquals(1, x2)

@@ -61,8 +61,8 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
   override def getTestProjectJdk: Sdk =
     JavaSdk.getInstance().createJdk("java sdk", TestUtils.getDefaultJdk, false)
 
-  private def runTest(
-      sbtVersion: String, expectedMessages: Seq[Message]): Unit = {
+  private def runTest(sbtVersion: String,
+                      expectedMessages: Seq[Message]): Unit = {
     setSbtVersion(sbtVersion)
     val actualMessages = annotate().asJava
     UsefulTestCase.assertSameElements(actualMessages, expectedMessages: _*)
@@ -98,18 +98,20 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
     projectSettings.setModules(
         java.util.Collections.singleton(getModule.getModuleFilePath))
     SbtSystemSettings.getInstance(getProject).linkProject(projectSettings)
-    getModule.setOption(
-        ExternalSystemConstants.ROOT_PROJECT_PATH_KEY, getProject.getBasePath)
+    getModule.setOption(ExternalSystemConstants.ROOT_PROJECT_PATH_KEY,
+                        getProject.getBasePath)
   }
 
   private def addTestFileToModuleSources(): Unit = {
-    ModuleRootModificationUtil.updateModel(
-        getModule, new Consumer[ModifiableRootModel] {
-      override def consume(model: ModifiableRootModel): Unit = {
-        val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
-        model.addContentEntry(testdataUrl).addSourceFolder(testdataUrl, false)
-      }
-    })
+    ModuleRootModificationUtil
+      .updateModel(getModule, new Consumer[ModifiableRootModel] {
+        override def consume(model: ModifiableRootModel): Unit = {
+          val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
+          model
+            .addContentEntry(testdataUrl)
+            .addSourceFolder(testdataUrl, false)
+        }
+      })
     preventLeakageOfVfsPointers()
   }
 }

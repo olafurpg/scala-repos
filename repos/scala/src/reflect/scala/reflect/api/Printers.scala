@@ -198,7 +198,8 @@ trait Printers { self: Universe =>
           if (printKinds) printer.withKinds else printer.withoutKinds)
     printMirrors.value.map(printMirrors =>
           if (printMirrors) printer.withMirrors else printer.withoutMirrors)
-    printPositions.value.map(printPositions =>
+    printPositions.value.map(
+        printPositions =>
           if (printPositions) printer.withPositions
           else printer.withoutPositions)
     printer.print(what)
@@ -268,8 +269,9 @@ trait Printers { self: Universe =>
     * Hook to define what `showCode(...)` means.
     * @group Printers
     */
-  protected def newCodePrinter(
-      out: PrintWriter, tree: Tree, printRootPkg: Boolean): TreePrinter
+  protected def newCodePrinter(out: PrintWriter,
+                               tree: Tree,
+                               printRootPkg: Boolean): TreePrinter
 
   /** Renders internal structure of a reflection artifact as the
     *  visualization of a Scala syntax tree.

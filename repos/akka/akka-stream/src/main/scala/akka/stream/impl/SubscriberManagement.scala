@@ -50,8 +50,7 @@ private[akka] trait SubscriptionWithCursor[T]
   var active = true
 
   /** Do not increment directly, use `moreRequested(Long)` instead (it provides overflow protection)! */
-  var totalDemand: Long =
-    0 // number of requested but not yet dispatched elements
+  var totalDemand: Long = 0 // number of requested but not yet dispatched elements
   var cursor: Int = 0 // buffer cursor, managed by buffer
 }
 
@@ -90,7 +89,9 @@ private[akka] trait SubscriberManagement[T]
   protected def createSubscription(subscriber: Subscriber[_ >: T]): S
 
   private[this] val buffer = new ResizableMultiReaderRingBuffer[T](
-      initialBufferSize, maxBufferSize, this)
+      initialBufferSize,
+      maxBufferSize,
+      this)
 
   protected def bufferDebug: String = buffer.toString
 
@@ -127,7 +128,8 @@ private[akka] trait SubscriberManagement[T]
             // returns Long.MinValue if the subscription is to be terminated
             @tailrec
             def dispatchFromBufferAndReturnRemainingRequested(
-                requested: Long, eos: EndOfStream): Long =
+                requested: Long,
+                eos: EndOfStream): Long =
               if (requested == 0) {
                 // if we are at end-of-stream and have nothing more to read we complete now rather than after the next `requestMore`
                 if ((eos ne NotReached) && buffer.count(subscription) == 0)
@@ -143,8 +145,8 @@ private[akka] trait SubscriberManagement[T]
                     false
                 }
                 if (goOn)
-                  dispatchFromBufferAndReturnRemainingRequested(
-                      requested - 1, eos)
+                  dispatchFromBufferAndReturnRemainingRequested(requested - 1,
+                                                                eos)
                 else Long.MinValue
               } else if (eos ne NotReached) Long.MinValue
               else requested
@@ -174,7 +176,7 @@ private[akka] trait SubscriberManagement[T]
     val desired = Math
       .min(Int.MaxValue,
            Math.min(maxRequested(subscriptions), buffer.maxAvailable) -
-           pendingFromUpstream)
+             pendingFromUpstream)
       .toInt
     if (desired > 0) {
       pendingFromUpstream += desired
@@ -218,9 +220,9 @@ private[akka] trait SubscriberManagement[T]
   protected def completeDownstream(): Unit = {
     if (endOfStream eq NotReached) {
       @tailrec
-      def completeDoneSubscriptions(remaining: Subscriptions,
-                                    result: Subscriptions =
-                                      Nil): Subscriptions =
+      def completeDoneSubscriptions(
+          remaining: Subscriptions,
+          result: Subscriptions = Nil): Subscriptions =
         remaining match {
           case head :: tail ⇒
             if (buffer.count(head) == 0) {

@@ -160,8 +160,8 @@ class FpFilterTest extends FunSuite with Checkers {
     Sign(signExact(s)) == Sign(signFpFilter(s))
   }))
 
-  test("Orientation test for degenerate case")(
-      check(forAll { (s: Degenerate[Simplex]) =>
-    Sign(signExact(s.value)) == Sign(signFpFilter(s.value))
+  test("Orientation test for degenerate case")(check(forAll {
+    (s: Degenerate[Simplex]) =>
+      Sign(signExact(s.value)) == Sign(signFpFilter(s.value))
   }))
 }

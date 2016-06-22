@@ -135,12 +135,12 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
     }
   }
 
-  private def runTest(
-      enableWAL: Boolean, body: ReceiverInputDStream[_] => Unit): Unit = {
+  private def runTest(enableWAL: Boolean,
+                      body: ReceiverInputDStream[_] => Unit): Unit = {
     val conf = new SparkConf()
     conf.setMaster("local[4]").setAppName("ReceiverInputDStreamSuite")
-    conf.set(
-        WriteAheadLogUtils.RECEIVER_WAL_ENABLE_CONF_KEY, enableWAL.toString)
+    conf
+      .set(WriteAheadLogUtils.RECEIVER_WAL_ENABLE_CONF_KEY, enableWAL.toString)
     require(WriteAheadLogUtils.enableReceiverLog(conf) === enableWAL)
     val ssc = new StreamingContext(conf, Seconds(1))
     val receiverStream = new ReceiverInputDStream[Int](ssc) {
@@ -158,20 +158,21 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
     * @return
     */
   private def createBlockInfo(
-      withWALInfo: Boolean, createBlock: Boolean = true): ReceivedBlockInfo = {
+      withWALInfo: Boolean,
+      createBlock: Boolean = true): ReceivedBlockInfo = {
     val blockId = new StreamBlockId(0, Random.nextLong())
     if (createBlock) {
       SparkEnv.get.blockManager
         .putSingle(blockId, 1, StorageLevel.MEMORY_ONLY, tellMaster = true)
       require(SparkEnv.get.blockManager.master.contains(blockId))
     }
-    val storeResult =
-      if (withWALInfo) {
-        new WriteAheadLogBasedStoreResult(
-            blockId, None, new WriteAheadLogRecordHandle {})
-      } else {
-        new BlockManagerBasedStoreResult(blockId, None)
-      }
+    val storeResult = if (withWALInfo) {
+      new WriteAheadLogBasedStoreResult(blockId,
+                                        None,
+                                        new WriteAheadLogRecordHandle {})
+    } else {
+      new BlockManagerBasedStoreResult(blockId, None)
+    }
     new ReceivedBlockInfo(0, None, None, storeResult)
   }
 }

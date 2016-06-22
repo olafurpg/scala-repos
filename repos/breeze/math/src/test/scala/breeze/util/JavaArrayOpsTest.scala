@@ -16,8 +16,9 @@ class JavaArrayOpsTest extends FunSuite {
 
   test("JavaOpts 1D conversions") {
     val dvI = DenseVector(0, 1, 2, 3, 4, 5)
-    val dvC = DenseVector[Complex](
-        -1d * breeze.math.i, 0d * breeze.math.i, 2d * breeze.math.i)
+    val dvC = DenseVector[Complex](-1d * breeze.math.i,
+                                   0d * breeze.math.i,
+                                   2d * breeze.math.i)
     assert(dvI == arrayIToDv(dvIToArray(dvI)))
     assert(arrayIToDv(dvIToArray(dvI)).length == 6)
     assert(dvC == arrayCToDv(dvCToArray(dvC)))

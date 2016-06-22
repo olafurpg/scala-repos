@@ -57,8 +57,9 @@ object LightUtil {
                   .filter(_.isDefined)
                   .map(_.get)
                   .flatMap { arg =>
-                    ScType.toPsi(
-                        arg, holder.getProject, holder.getResolveScope) match {
+                    ScType.toPsi(arg,
+                                 holder.getProject,
+                                 holder.getResolveScope) match {
                       case c: PsiClassType =>
                         c.resolve() match {
                           case clazz: PsiClass => Seq(clazz.getQualifiedName)

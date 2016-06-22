@@ -150,7 +150,8 @@ class MiscInteropTest {
     assertEquals("Scala.js7357", propString)
   }
 
-  @Test def should_provide_equivalent_of_JS_for_in_loop2_of_issue_13(): Unit = {
+  @Test
+  def should_provide_equivalent_of_JS_for_in_loop2_of_issue_13(): Unit = {
     val obj = js.eval("var arrayTest13 = [ 7, 3, 5, 7 ]; arrayTest13;")
     val array = obj.asInstanceOf[js.Dictionary[js.Any]]
     var propCount = 0
@@ -166,8 +167,8 @@ class MiscInteropTest {
   }
 
   @Test def should_compile_js_undefined(): Unit = {
-    assertThrows(
-        classOf[Exception], js.undefined.asInstanceOf[js.Dynamic].toFixed())
+    assertThrows(classOf[Exception],
+                 js.undefined.asInstanceOf[js.Dynamic].toFixed())
   }
 
   @Test def should_allow_to_define_direct_subtraits_of_js_Any(): Unit = {

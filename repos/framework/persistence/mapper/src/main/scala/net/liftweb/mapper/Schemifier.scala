@@ -132,8 +132,9 @@ object Schemifier extends Loggable {
         }
       }
 
-      def tableCheck(
-          t: BaseMetaMapper, desc: String, f: => Collector): Collector = {
+      def tableCheck(t: BaseMetaMapper,
+                     desc: String,
+                     f: => Collector): Collector = {
         actualTableNames.get(t._dbTableNameLC).map(x => f).getOrElse {
           logger.warn("Skipping %s on table '%s' since it doesn't exist"
                 .format(desc, t.dbTableName))
@@ -142,37 +143,43 @@ object Schemifier extends Loggable {
       }
 
       val toRun =
-        tables.foldLeft(EmptyCollector)((b, t) =>
-              b + ensureTable(
-                  performWrite, logFunc, t, connection, actualTableNames)) +
         tables.foldLeft(EmptyCollector)(
             (b, t) =>
-              b + tableCheck(t,
-                             "ensureColumns",
-                             ensureColumns(performWrite,
-                                           logFunc,
-                                           t,
-                                           connection,
-                                           actualTableNames))) +
-        (if (structureOnly) EmptyCollector
-         else
-           (tables.foldLeft(EmptyCollector)((b, t) =>
-                     b + tableCheck(t,
-                                    "ensureIndexes",
-                                    ensureIndexes(performWrite,
-                                                  logFunc,
-                                                  t,
-                                                  connection,
-                                                  actualTableNames))) +
-               tables.foldLeft(EmptyCollector)((b, t) =>
-                     b + tableCheck(t,
-                                    "ensureConstraints",
-                                    ensureConstraints(performWrite,
-                                                      logFunc,
-                                                      t,
-                                                      dbId,
-                                                      connection,
-                                                      actualTableNames)))))
+              b + ensureTable(performWrite,
+                              logFunc,
+                              t,
+                              connection,
+                              actualTableNames)) +
+          tables.foldLeft(EmptyCollector)(
+              (b, t) =>
+                b + tableCheck(t,
+                               "ensureColumns",
+                               ensureColumns(performWrite,
+                                             logFunc,
+                                             t,
+                                             connection,
+                                             actualTableNames))) +
+          (if (structureOnly) EmptyCollector
+           else
+             (tables.foldLeft(EmptyCollector)(
+                     (b, t) =>
+                       b + tableCheck(t,
+                                      "ensureIndexes",
+                                      ensureIndexes(performWrite,
+                                                    logFunc,
+                                                    t,
+                                                    connection,
+                                                    actualTableNames))) +
+                 tables.foldLeft(EmptyCollector)(
+                     (b, t) =>
+                       b + tableCheck(t,
+                                      "ensureConstraints",
+                                      ensureConstraints(performWrite,
+                                                        logFunc,
+                                                        t,
+                                                        dbId,
+                                                        connection,
+                                                        actualTableNames)))))
 
       if (performWrite) {
         logger.debug("Executing DDL statements")
@@ -188,8 +195,8 @@ object Schemifier extends Loggable {
     }
   }
 
-  def destroyTables_!!(
-      logFunc: (=> AnyRef) => Unit, stables: BaseMetaMapper*): Unit =
+  def destroyTables_!!(logFunc: (=> AnyRef) => Unit,
+                       stables: BaseMetaMapper*): Unit =
     destroyTables_!!(DefaultConnectionIdentifier, logFunc, stables: _*)
 
   def destroyTables_!!(dbId: ConnectionIdentifier,
@@ -206,16 +213,17 @@ object Schemifier extends Loggable {
       val sConn = conn // SuperConnection(conn)
       val tables = stables.toList.filter(t => hasTable_?(t, sConn, th))
 
-      tables.foreach { table =>
-        try {
-          val ct = "DROP TABLE " + table._dbTableNameLC
-          val st = conn.createStatement
-          st.execute(ct)
-          logFunc(ct)
-          st.close
-        } catch {
-          case e: Exception => // dispose... probably just an SQL Exception
-        }
+      tables.foreach {
+        table =>
+          try {
+            val ct = "DROP TABLE " + table._dbTableNameLC
+            val st = conn.createStatement
+            st.execute(ct)
+            logFunc(ct)
+            st.close
+          } catch {
+            case e: Exception => // dispose... probably just an SQL Exception
+          }
       }
 
       tables
@@ -263,10 +271,10 @@ object Schemifier extends Loggable {
     *
     * @return SQL command.
     */
-  private def maybeWrite(performWrite: Boolean,
-                         logFunc: (=> AnyRef) => Unit,
-                         connection: SuperConnection)(
-      makeSql: () => String): String = {
+  private def maybeWrite(
+      performWrite: Boolean,
+      logFunc: (=> AnyRef) => Unit,
+      connection: SuperConnection)(makeSql: () => String): String = {
     val ct = makeSql()
     logger.trace("maybeWrite DDL: " + ct)
     if (performWrite) {
@@ -301,11 +309,11 @@ object Schemifier extends Loggable {
           f.dbPrimaryKey_?
         }.foreach { pkField =>
           connection.driverType.primaryKeySetup(
-              table._dbTableNameLC, pkField._dbColumnNameLC) foreach {
-            command =>
-              cmds += maybeWrite(performWrite, logFunc, connection) { () =>
-                command
-              }
+              table._dbTableNameLC,
+              pkField._dbColumnNameLC) foreach { command =>
+            cmds += maybeWrite(performWrite, logFunc, connection) { () =>
+              command
+            }
           }
         }
       }
@@ -314,8 +322,8 @@ object Schemifier extends Loggable {
     } else Collector(Nil, cmds.toList)
   }
 
-  private def createColumns(
-      table: BaseMetaMapper, connection: SuperConnection): Seq[String] = {
+  private def createColumns(table: BaseMetaMapper,
+                            connection: SuperConnection): Seq[String] = {
     table.mappedFields.flatMap(_.fieldCreatorString(connection.driverType))
   }
 
@@ -356,8 +364,8 @@ object Schemifier extends Loggable {
         .dbColumnNames(field.name)
         .filter(f => !cols.map(_.toLowerCase).contains(f.toLowerCase)))
         .foreach { colName =>
-          logger.trace("Column does not exist: %s.%s ".format(
-                  table.dbTableName, colName))
+          logger.trace("Column does not exist: %s.%s "
+                .format(table.dbTableName, colName))
 
           cmds += maybeWrite(performWrite, logFunc, connection) { () =>
             "ALTER TABLE " + table._dbTableNameLC + " " +
@@ -445,8 +453,8 @@ object Schemifier extends Loggable {
 
       val standardCreationStatement =
         (table._dbTableNameLC + "_" +
-            columns.map(_.field._dbColumnNameLC).mkString("_")) + " ON " +
-        table._dbTableNameLC + " ( " + columns.map(_.indexDesc).comma + " )"
+              columns.map(_.field._dbColumnNameLC).mkString("_")) + " ON " +
+          table._dbTableNameLC + " ( " + columns.map(_.indexDesc).comma + " )"
 
       val createStatement = index match {
         case i: net.liftweb.mapper.Index[_] =>
@@ -454,8 +462,8 @@ object Schemifier extends Loggable {
         case i: UniqueIndex[_] =>
           "CREATE UNIQUE INDEX " + standardCreationStatement
         case GenericIndex(createFunc, _, _) =>
-          createFunc(
-              table._dbTableNameLC, columns.map(_.field._dbColumnNameLC))
+          createFunc(table._dbTableNameLC,
+                     columns.map(_.field._dbColumnNameLC))
         case _ => logger.error("Invalid index: " + index); ""
       }
 
@@ -494,15 +502,17 @@ object Schemifier extends Loggable {
           val md = connection.getMetaData
           // val rs = md.getCrossReference(null, null,otherTable , null, null, myTable)
           var foundIt = false
-          using(md.getImportedKeys(
-                  null, getDefaultSchemaName(connection), myTable))(rs =>
+          using(
+              md.getImportedKeys(null,
+                                 getDefaultSchemaName(connection),
+                                 myTable))(rs =>
                 //val rs = md.getCrossReference(null, null,myTable , null, null, otherTable)
                 while (!foundIt && rs.next) {
               val pkName = rs.getString(4)
               val fkName = rs.getString(8)
               foundIt =
                 (field._dbColumnNameLC.toLowerCase == fkName.toLowerCase &&
-                    field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
+                      field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
           })
 
           if (!foundIt) {

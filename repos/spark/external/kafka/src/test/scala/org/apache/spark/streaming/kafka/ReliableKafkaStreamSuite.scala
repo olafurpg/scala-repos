@@ -98,7 +98,10 @@ class ReliableKafkaStreamSuite
 
     val stream =
       KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
-          ssc, kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_ONLY)
+          ssc,
+          kafkaParams,
+          Map(topic -> 1),
+          StorageLevel.MEMORY_ONLY)
     val result = new mutable.HashMap[String, Long]()
     stream.map { case (k, v) => v }.foreachRDD { r =>
       val ret = r.collect()
@@ -138,7 +141,10 @@ class ReliableKafkaStreamSuite
     // Consuming all the data sent to the broker which will potential commit the offsets internally.
     val stream =
       KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
-          ssc, kafkaParams, topics, StorageLevel.MEMORY_ONLY)
+          ssc,
+          kafkaParams,
+          topics,
+          StorageLevel.MEMORY_ONLY)
     stream.foreachRDD(_ => Unit)
     ssc.start()
 
@@ -151,8 +157,9 @@ class ReliableKafkaStreamSuite
   }
 
   /** Getting partition offset from Zookeeper. */
-  private def getCommitOffset(
-      groupId: String, topic: String, partition: Int): Option[Long] = {
+  private def getCommitOffset(groupId: String,
+                              topic: String,
+                              partition: Int): Option[Long] = {
     val topicDirs = new ZKGroupTopicDirs(groupId, topic)
     val zkPath = s"${topicDirs.consumerOffsetDir}/$partition"
     ZkUtils

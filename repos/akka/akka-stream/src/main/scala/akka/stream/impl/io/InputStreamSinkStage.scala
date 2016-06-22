@@ -139,7 +139,8 @@ private[akka] class InputStreamAdapter(
         detachedChunk match {
           case None ⇒
             try {
-              sharedBuffer.poll(readTimeout.toMillis, TimeUnit.MILLISECONDS) match {
+              sharedBuffer
+                .poll(readTimeout.toMillis, TimeUnit.MILLISECONDS) match {
                 case Data(data) ⇒
                   detachedChunk = Some(data)
                   readBytes(a, begin, length)
@@ -174,8 +175,7 @@ private[akka] class InputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   override def close(): Unit = {
-    executeIfNotClosed(
-        () ⇒ {
+    executeIfNotClosed(() ⇒ {
       // at this point Subscriber may be already terminated
       if (isStageAlive) sendToStage(Close)
       isActive = false

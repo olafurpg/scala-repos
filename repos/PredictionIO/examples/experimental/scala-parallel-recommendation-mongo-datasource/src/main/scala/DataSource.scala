@@ -22,12 +22,13 @@ case class DataSourceParams( // CHANGED
                             port: Int,
                             db: String, // DB name
                             collection: String // collection name
-)
-    extends Params
+) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -62,8 +63,7 @@ case class Rating(
 
 class TrainingData(
     val ratings: RDD[Rating]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
   }

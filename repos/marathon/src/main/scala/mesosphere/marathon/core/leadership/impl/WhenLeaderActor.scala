@@ -42,8 +42,8 @@ private class WhenLeaderActor(childProps: => Props)
             new IllegalStateException(s"not currently active ($self)"))
     }
 
-  private[impl] def starting(
-      coordinatorRef: ActorRef, childRef: ActorRef): Receive =
+  private[impl] def starting(coordinatorRef: ActorRef,
+                             childRef: ActorRef): Receive =
     LoggingReceive.withLabel("starting") {
       case Prepared(`childRef`) =>
         coordinatorRef ! Prepared(self)

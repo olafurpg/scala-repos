@@ -41,7 +41,8 @@ object AssertUtil {
     *  Any other exception is propagated.
     */
   def assertThrows[T <: Throwable](
-      body: => Any, checkMessage: String => Boolean = s => true)(
+      body: => Any,
+      checkMessage: String => Boolean = s => true)(
       implicit manifest: Manifest[T]): Unit = {
     try {
       body
@@ -49,7 +50,7 @@ object AssertUtil {
     } catch {
       case e: Throwable
           if (manifest.runtimeClass isAssignableFrom e.getClass) &&
-          checkMessage(e.getMessage) =>
+            checkMessage(e.getMessage) =>
     }
   }
 
@@ -66,8 +67,8 @@ object AssertUtil {
 
   /** Convenient for testing iterators.
     */
-  def assertSameElements[A, B >: A](
-      expected: IterableLike[A, _], actual: Iterator[B]): Unit =
+  def assertSameElements[A, B >: A](expected: IterableLike[A, _],
+                                    actual: Iterator[B]): Unit =
     assertSameElements(expected, actual.toList, "")
 
   /** Value is not strongly reachable from roots after body is evaluated.

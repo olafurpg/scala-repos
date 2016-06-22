@@ -31,8 +31,10 @@ object arityize {
               impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
-          ClassDef(
-              mods, newTypeName(name.encoded + order), newTargs, newTemplate)
+          ClassDef(mods,
+                   newTypeName(name.encoded + order),
+                   newTargs,
+                   newTemplate)
         }
 
         val ret = c.Expr(Block(results.toList, Literal(Constant(()))))
@@ -134,7 +136,8 @@ object arityize {
             Seq(tree)
         }
       case Block(stats, ret) =>
-        Seq(Block(stats.flatMap(st => expandArity(c, order, bindings)(st)),
+        Seq(
+            Block(stats.flatMap(st => expandArity(c, order, bindings)(st)),
                   expandArity(c, order, bindings)(ret).last))
       case Ident(nme) if nme.encoded == "__order__" =>
         Seq(Literal(Constant(order)))
@@ -142,9 +145,10 @@ object arityize {
       case t @ Literal(x) => Seq(t)
       case Apply(who, args) =>
         for (w2 <- expandArity(c, order, bindings)(who);
-             args2 = args.flatMap(arg => expandArity(c, order, bindings)(arg))) yield {
-          Apply(w2, args2)
-        }
+             args2 = args.flatMap(arg => expandArity(c, order, bindings)(arg)))
+          yield {
+            Apply(w2, args2)
+          }
       case Select(lhs, name) =>
         for (w2 <- expandArity(c, order, bindings)(lhs)) yield {
           Select(w2, name)
@@ -196,7 +200,8 @@ object arityize {
       vdef: c.universe.TypeDef): List[c.universe.TypeDef] = {
     import c.mirror.universe._
     if (shouldExpand(c)(vdef.mods)) {
-      List.tabulate(order)(i =>
+      List.tabulate(order)(
+          i =>
             TypeDef(vdef.mods,
                     newTypeName(vdef.name.encoded + (i + 1)),
                     vdef.tparams,

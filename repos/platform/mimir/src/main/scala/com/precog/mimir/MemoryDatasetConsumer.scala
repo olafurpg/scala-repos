@@ -50,8 +50,8 @@ trait MemoryDatasetConsumer[M[+ _]] extends EvaluatorModule[M] {
 
   implicit def M: Monad[M] with Comonad[M]
 
-  def Evaluator[N[+ _]](N0: Monad[N])(
-      implicit mn: M ~> N, nm: N ~> M): EvaluatorLike[N]
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: M ~> N,
+                                      nm: N ~> M): EvaluatorLike[N]
 
   def extractIds(jv: JValue): Seq[IdType]
 
@@ -90,12 +90,12 @@ trait MemoryDatasetConsumer[M[+ _]] extends EvaluatorModule[M] {
     case JString(str) => SString(str)
 
     case JObject(fields) => {
-        val map: Map[String, SValue] = fields.map({
-          case JField(name, value) => (name, jvalueToSValue(value))
-        })(collection.breakOut)
+      val map: Map[String, SValue] = fields.map({
+        case JField(name, value) => (name, jvalueToSValue(value))
+      })(collection.breakOut)
 
-        SObject(map)
-      }
+      SObject(map)
+    }
 
     case JArray(values) =>
       SArray(Vector(values map jvalueToSValue: _*))

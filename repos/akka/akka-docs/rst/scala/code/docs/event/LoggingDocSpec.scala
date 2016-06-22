@@ -36,16 +36,16 @@ object LoggingDocSpec {
     def receive = {
 
       case _ => {
-          //#mdc
-          val mdc = Map("requestId" -> 1234, "visitorId" -> 5678)
-          log.mdc(mdc)
+        //#mdc
+        val mdc = Map("requestId" -> 1234, "visitorId" -> 5678)
+        log.mdc(mdc)
 
-          // Log something
-          log.info("Starting new request")
+        // Log something
+        log.info("Starting new request")
 
-          log.clearMDC()
-          //#mdc
-        }
+        log.clearMDC()
+        //#mdc
+      }
     }
   }
 
@@ -69,8 +69,8 @@ object LoggingDocSpec {
 
     def receive: Receive = {
       case r: Req => {
-          log.info(s"Starting new request: ${r.work}")
-        }
+        log.info(s"Starting new request: ${r.work}")
+      }
     }
   }
 

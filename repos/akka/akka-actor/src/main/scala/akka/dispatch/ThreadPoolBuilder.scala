@@ -57,7 +57,8 @@ trait ExecutorServiceFactory {
   */
 trait ExecutorServiceFactoryProvider {
   def createExecutorServiceFactory(
-      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory
+      id: String,
+      threadFactory: ThreadFactory): ExecutorServiceFactory
 }
 
 /**
@@ -92,7 +93,8 @@ final case class ThreadPoolConfig(
     }
   }
   final def createExecutorServiceFactory(
-      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory = {
+      id: String,
+      threadFactory: ThreadFactory): ExecutorServiceFactory = {
     val tf = threadFactory match {
       case m: MonitorableThreadFactory ⇒
         // add the dispatcher id to the thread names
@@ -130,7 +132,8 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
     this.copy(config = config.copy(queueFactory = synchronousQueue(fair)))
 
   def withNewThreadPoolWithArrayBlockingQueueWithCapacityAndFairness(
-      capacity: Int, fair: Boolean): ThreadPoolConfigBuilder =
+      capacity: Int,
+      fair: Boolean): ThreadPoolConfigBuilder =
     this.copy(config =
           config.copy(queueFactory = arrayBlockingQueue(capacity, fair)))
 
@@ -146,12 +149,14 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
     this.copy(config =
           config.copy(maxPoolSize = math.max(size, config.corePoolSize)))
 
-  def setCorePoolSizeFromFactor(
-      min: Int, multiplier: Double, max: Int): ThreadPoolConfigBuilder =
+  def setCorePoolSizeFromFactor(min: Int,
+                                multiplier: Double,
+                                max: Int): ThreadPoolConfigBuilder =
     setCorePoolSize(scaledPoolSize(min, multiplier, max))
 
-  def setMaxPoolSizeFromFactor(
-      min: Int, multiplier: Double, max: Int): ThreadPoolConfigBuilder =
+  def setMaxPoolSizeFromFactor(min: Int,
+                               multiplier: Double,
+                               max: Int): ThreadPoolConfigBuilder =
     setMaxPoolSize(scaledPoolSize(min, multiplier, max))
 
   def setKeepAliveTimeInMillis(time: Long): ThreadPoolConfigBuilder =
@@ -183,8 +188,7 @@ object MonitorableThreadFactory {
       with BlockContext {
     override def blockOn[T](thunk: ⇒ T)(implicit permission: CanAwait): T = {
       val result = new AtomicReference[Option[T]](None)
-      ForkJoinPool.managedBlock(
-          new ForkJoinPool.ManagedBlocker {
+      ForkJoinPool.managedBlock(new ForkJoinPool.ManagedBlocker {
         def block(): Boolean = {
           result.set(Some(thunk))
           true
@@ -255,15 +259,17 @@ trait ExecutorServiceDelegate extends ExecutorService {
   def invokeAll[T](callables: Collection[_ <: Callable[T]]) =
     executor.invokeAll(callables)
 
-  def invokeAll[T](
-      callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
+  def invokeAll[T](callables: Collection[_ <: Callable[T]],
+                   l: Long,
+                   timeUnit: TimeUnit) =
     executor.invokeAll(callables, l, timeUnit)
 
   def invokeAny[T](callables: Collection[_ <: Callable[T]]) =
     executor.invokeAny(callables)
 
-  def invokeAny[T](
-      callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
+  def invokeAny[T](callables: Collection[_ <: Callable[T]],
+                   l: Long,
+                   timeUnit: TimeUnit) =
     executor.invokeAny(callables, l, timeUnit)
 }
 
@@ -273,8 +279,8 @@ trait ExecutorServiceDelegate extends ExecutorService {
   * (CallerRunsPolicy silently discards the runnable in this case, which is arguably broken)
   */
 class SaneRejectedExecutionHandler extends RejectedExecutionHandler {
-  def rejectedExecution(
-      runnable: Runnable, threadPoolExecutor: ThreadPoolExecutor): Unit = {
+  def rejectedExecution(runnable: Runnable,
+                        threadPoolExecutor: ThreadPoolExecutor): Unit = {
     if (threadPoolExecutor.isShutdown)
       throw new RejectedExecutionException("Shutdown")
     else runnable.run()

@@ -19,10 +19,12 @@ class SlickTreeException(msg: String,
                          mark: (Dumpable => Boolean) = null,
                          removeUnmarked: Boolean = true)
     extends SlickException(
-        SlickTreeException.format(msg, detail, mark, removeUnmarked), parent)
+        SlickTreeException.format(msg, detail, mark, removeUnmarked),
+        parent)
 
 private[slick] object SlickTreeException {
-  val treePrinter = new TreePrinter(prefix =
+  val treePrinter = new TreePrinter(
+      prefix =
         DumpInfo.highlight(if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
 
   def format(msg: String,

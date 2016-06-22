@@ -58,7 +58,8 @@ class SbtAnnotator extends Annotator {
         if (expressionType.equiv(types.Nothing) ||
             expressionType.equiv(types.Null)) {
           holder.createErrorAnnotation(
-              expression, SbtBundle("sbt.annotation.expectedExpressionType"))
+              expression,
+              SbtBundle("sbt.annotation.expectedExpressionType"))
         } else {
           if (!isTypeAllowed(expression, expressionType))
             holder.createErrorAnnotation(
@@ -68,23 +69,25 @@ class SbtAnnotator extends Annotator {
         }
       }
 
-    private def findTypeByText(
-        exp: ScExpression, text: String): Option[ScType] =
+    private def findTypeByText(exp: ScExpression,
+                               text: String): Option[ScType] =
       Option(
           ScalaPsiElementFactory.createTypeFromText(text, exp.getContext, exp))
 
-    private def isTypeAllowed(
-        expression: ScExpression, expressionType: ScType): Boolean =
-      SbtAnnotator.AllowedTypes.exists(typeStr =>
+    private def isTypeAllowed(expression: ScExpression,
+                              expressionType: ScType): Boolean =
+      SbtAnnotator.AllowedTypes.exists(
+          typeStr =>
             findTypeByText(expression, typeStr) exists
-            (t => expressionType conforms t))
+              (t => expressionType conforms t))
 
     private def annotateMissingBlankLines(): Unit =
       sbtFileElements.sliding(3).foreach {
         case Seq(_: ScExpression, space: PsiWhiteSpace, e: ScExpression)
             if space.getText.count(_ == '\n') == 1 =>
           holder.createErrorAnnotation(
-              e, SbtBundle("sbt.annotation.blankLineRequired", sbtVersion))
+              e,
+              SbtBundle("sbt.annotation.blankLineRequired", sbtVersion))
         case _ =>
       }
 
@@ -94,6 +97,6 @@ class SbtAnnotator extends Annotator {
 }
 
 object SbtAnnotator {
-  val AllowedTypes = List(
-      "Seq[Def.SettingsDefinition]", "Def.SettingsDefinition")
+  val AllowedTypes =
+    List("Seq[Def.SettingsDefinition]", "Def.SettingsDefinition")
 }

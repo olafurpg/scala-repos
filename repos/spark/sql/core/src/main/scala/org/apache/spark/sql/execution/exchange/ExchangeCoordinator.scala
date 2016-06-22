@@ -141,7 +141,7 @@ private[sql] class ExchangeCoordinator(
 
     logInfo(
         s"advisoryTargetPostShuffleInputSize: $advisoryTargetPostShuffleInputSize, " +
-        s"targetPostShuffleInputSize $targetPostShuffleInputSize.")
+          s"targetPostShuffleInputSize $targetPostShuffleInputSize.")
 
     // Make sure we do get the same number of pre-shuffle partitions for those stages.
     val distinctNumPreShufflePartitions = mapOutputStatistics
@@ -156,7 +156,7 @@ private[sql] class ExchangeCoordinator(
     assert(
         distinctNumPreShufflePartitions.length == 1,
         "There should be only one distinct value of the number pre-shuffle partitions " +
-        "among registered Exchange operator.")
+          "among registered Exchange operator.")
     val numPreShufflePartitions = distinctNumPreShufflePartitions.head
 
     val partitionStartIndices = ArrayBuffer[Int]()
@@ -224,7 +224,7 @@ private[sql] class ExchangeCoordinator(
           // submitMapStage does not accept RDD with 0 partition.
           // So, we will not submit this dependency.
           submittedStageFutures +=
-            exchange.sqlContext.sparkContext.submitMapStage(shuffleDependency)
+          exchange.sqlContext.sparkContext.submitMapStage(shuffleDependency)
         }
         i += 1
       }
@@ -241,18 +241,17 @@ private[sql] class ExchangeCoordinator(
 
       // Now, we estimate partitionStartIndices. partitionStartIndices.length will be the
       // number of post-shuffle partitions.
-      val partitionStartIndices =
-        if (mapOutputStatistics.length == 0) {
-          None
-        } else {
-          Some(estimatePartitionStartIndices(mapOutputStatistics))
-        }
+      val partitionStartIndices = if (mapOutputStatistics.length == 0) {
+        None
+      } else {
+        Some(estimatePartitionStartIndices(mapOutputStatistics))
+      }
 
       var k = 0
       while (k < numExchanges) {
         val exchange = exchanges(k)
-        val rdd = exchange.preparePostShuffleRDD(
-            shuffleDependencies(k), partitionStartIndices)
+        val rdd = exchange.preparePostShuffleRDD(shuffleDependencies(k),
+                                                 partitionStartIndices)
         newPostShuffleRDDs.put(exchange, rdd)
 
         k += 1

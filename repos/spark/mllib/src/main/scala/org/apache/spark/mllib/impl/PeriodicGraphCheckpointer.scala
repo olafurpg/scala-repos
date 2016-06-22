@@ -74,8 +74,8 @@ import org.apache.spark.storage.StorageLevel
   *
   * TODO: Move this out of MLlib?
   */
-private[mllib] class PeriodicGraphCheckpointer[VD, ED](
-    checkpointInterval: Int, sc: SparkContext)
+private[mllib] class PeriodicGraphCheckpointer[VD, ED](checkpointInterval: Int,
+                                                       sc: SparkContext)
     extends PeriodicCheckpointer[Graph[VD, ED]](checkpointInterval, sc) {
 
   override protected def checkpoint(data: Graph[VD, ED]): Unit =

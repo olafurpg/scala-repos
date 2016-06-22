@@ -30,18 +30,20 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
   private def createCombiner[T](i: T) = ArrayBuffer[T](i)
   private def mergeValue[T](buffer: ArrayBuffer[T], i: T): ArrayBuffer[T] =
     buffer += i
-  private def mergeCombiners[T](
-      buf1: ArrayBuffer[T], buf2: ArrayBuffer[T]): ArrayBuffer[T] =
+  private def mergeCombiners[T](buf1: ArrayBuffer[T],
+                                buf2: ArrayBuffer[T]): ArrayBuffer[T] =
     buf1 ++= buf2
 
   private def createExternalMap[T] = {
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
-    new ExternalAppendOnlyMap[T, T, ArrayBuffer[T]](
-        createCombiner[T], mergeValue[T], mergeCombiners[T], context = context)
+    new ExternalAppendOnlyMap[T, T, ArrayBuffer[T]](createCombiner[T],
+                                                    mergeValue[T],
+                                                    mergeCombiners[T],
+                                                    context = context)
   }
 
-  private def createSparkConf(
-      loadDefaults: Boolean, codec: Option[String] = None): SparkConf = {
+  private def createSparkConf(loadDefaults: Boolean,
+                              codec: Option[String] = None): SparkConf = {
     val conf = new SparkConf(loadDefaults)
     // Make the Java serializer write a reset instruction (TC_RESET) after each object to test
     // for a bug we had with bytes written past the last object in a batch (SPARK-2792)
@@ -254,8 +256,7 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     */
   private def testSimpleSpilling(codec: Option[String] = None): Unit = {
     val size = 1000
-    val conf =
-      createSparkConf(loadDefaults = true, codec) // Load defaults for Spark home
+    val conf = createSparkConf(loadDefaults = true, codec) // Load defaults for Spark home
     conf.set("spark.shuffle.manager", "hash") // avoid using external sorter
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
              (size / 4).toString)
@@ -383,8 +384,8 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
              (size / 2).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
-    val map = new ExternalAppendOnlyMap[FixedHashObject, Int, Int](
-        _ => 1, _ + _, _ + _, context = context)
+    val map = new ExternalAppendOnlyMap[FixedHashObject, Int, Int](_ =>
+          1, _ + _, _ + _, context = context)
 
     // Insert 10 copies each of lots of objects whose hash codes are either 0 or 1. This causes
     // problems if the map fails to group together the objects with the same code (SPARK-2043).
@@ -458,28 +459,28 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
            spillThreshold.toString)
     sc = new SparkContext("local", "test", conf)
     // No spilling
-    AccumulatorSuite.verifyPeakExecutionMemorySet(
-        sc, "external map without spilling") {
-      assertNotSpilled(sc, "verify peak memory") {
-        sc.parallelize(1 to spillThreshold / 2, 2)
-          .map { i =>
-            (i, i)
-          }
-          .reduceByKey(_ + _)
-          .count()
+    AccumulatorSuite
+      .verifyPeakExecutionMemorySet(sc, "external map without spilling") {
+        assertNotSpilled(sc, "verify peak memory") {
+          sc.parallelize(1 to spillThreshold / 2, 2)
+            .map { i =>
+              (i, i)
+            }
+            .reduceByKey(_ + _)
+            .count()
+        }
       }
-    }
     // With spilling
-    AccumulatorSuite.verifyPeakExecutionMemorySet(
-        sc, "external map with spilling") {
-      assertSpilled(sc, "verify peak memory") {
-        sc.parallelize(1 to spillThreshold * 3, 2)
-          .map { i =>
-            (i, i)
-          }
-          .reduceByKey(_ + _)
-          .count()
+    AccumulatorSuite
+      .verifyPeakExecutionMemorySet(sc, "external map with spilling") {
+        assertSpilled(sc, "verify peak memory") {
+          sc.parallelize(1 to spillThreshold * 3, 2)
+            .map { i =>
+              (i, i)
+            }
+            .reduceByKey(_ + _)
+            .count()
+        }
       }
-    }
   }
 }

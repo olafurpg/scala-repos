@@ -26,8 +26,7 @@ class CombinatoricsJob(args: Args) extends Job(args) {
 
   // how many ways can you invest $10000 in KR,ABT,DLTR,MNST ?
   val cash = 1000.0
-  val error =
-    1.0 // max error $1, so its ok if we cannot invest the last dollar
+  val error = 1.0 // max error $1, so its ok if we cannot invest the last dollar
   val (kr, abt, dltr, mnst) = (27.0, 64.0, 41.0, 52.0) // share prices
   val stocks = IndexedSeq(kr, abt, dltr, mnst)
 

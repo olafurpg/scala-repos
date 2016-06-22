@@ -47,7 +47,7 @@ private[feature] trait StringIndexerBase
     require(
         inputDataType == StringType || inputDataType.isInstanceOf[NumericType],
         s"The input column $inputColName must be either string type or numeric type, " +
-        s"but got $inputDataType.")
+          s"but got $inputDataType.")
     val inputFields = schema.fields
     val outputColName = $(outputCol)
     require(inputFields.forall(_.name != outputColName),
@@ -155,7 +155,7 @@ class StringIndexerModel(override val uid: String, val labels: Array[String])
     if (!dataset.schema.fieldNames.contains($(inputCol))) {
       logInfo(
           s"Input column ${$(inputCol)} does not exist during transformation. " +
-          "Skip StringIndexerModel.")
+            "Skip StringIndexerModel.")
       return dataset
     }
     validateAndTransformSchema(dataset.schema)
@@ -175,11 +175,11 @@ class StringIndexerModel(override val uid: String, val labels: Array[String])
     // If we are skipping invalid records, filter them out.
     val filteredDataset = (getHandleInvalid) match {
       case "skip" => {
-          val filterer = udf { label: String =>
-            labelToIndex.contains(label)
-          }
-          dataset.where(filterer(dataset($(inputCol))))
+        val filterer = udf { label: String =>
+          labelToIndex.contains(label)
         }
+        dataset.where(filterer(dataset($(inputCol))))
+      }
       case _ => dataset
     }
     filteredDataset.select(col("*"),
@@ -259,7 +259,7 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
   * @see [[StringIndexer]] for converting strings into indices
   */
 @Experimental
-class IndexToString private[ml](override val uid: String)
+class IndexToString private[ml] (override val uid: String)
     extends Transformer
     with HasInputCol
     with HasOutputCol
@@ -287,7 +287,7 @@ class IndexToString private[ml](override val uid: String)
       this,
       "labels",
       "Optional array of labels specifying index-string mapping." +
-      " If not provided or if empty, then metadata from inputCol is used instead.")
+        " If not provided or if empty, then metadata from inputCol is used instead.")
   setDefault(labels, Array.empty[String])
 
   /** @group getParam */
@@ -298,7 +298,7 @@ class IndexToString private[ml](override val uid: String)
     val inputDataType = schema(inputColName).dataType
     require(inputDataType.isInstanceOf[NumericType],
             s"The input column $inputColName must be a numeric type, " +
-            s"but got $inputDataType.")
+              s"but got $inputDataType.")
     val inputFields = schema.fields
     val outputColName = $(outputCol)
     require(inputFields.forall(_.name != outputColName),
@@ -310,16 +310,15 @@ class IndexToString private[ml](override val uid: String)
   override def transform(dataset: DataFrame): DataFrame = {
     val inputColSchema = dataset.schema($(inputCol))
     // If the labels array is empty use column metadata
-    val values =
-      if ($(labels).isEmpty) {
-        Attribute
-          .fromStructField(inputColSchema)
-          .asInstanceOf[NominalAttribute]
-          .values
-          .get
-      } else {
-        $(labels)
-      }
+    val values = if ($(labels).isEmpty) {
+      Attribute
+        .fromStructField(inputColSchema)
+        .asInstanceOf[NominalAttribute]
+        .values
+        .get
+    } else {
+      $(labels)
+    }
     val indexer = udf { index: Double =>
       val idx = index.toInt
       if (0 <= idx && idx < values.length) {

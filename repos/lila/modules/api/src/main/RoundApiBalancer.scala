@@ -10,8 +10,9 @@ import lila.analyse.Analysis
 import lila.game.Pov
 import lila.pref.Pref
 
-private[api] final class RoundApiBalancer(
-    system: ActorSystem, api: RoundApi, nbActors: Int) {
+private[api] final class RoundApiBalancer(system: ActorSystem,
+                                          api: RoundApi,
+                                          nbActors: Int) {
 
   private val logger = lila.log("round").branch("balancer")
 
@@ -42,14 +43,14 @@ private[api] final class RoundApiBalancer(
             val logger = RoundApiBalancer.this.logger
             def process = {
               case Player(pov, apiVersion, ctx) => {
-                  api.player(pov, apiVersion)(ctx) addFailureEffect { e =>
-                    logger.error(pov.toString, e)
-                  }
-                }.chronometer
-                  .logIfSlow(500, logger) { _ =>
-                    s"inner player $pov"
-                  }
-                  .result
+                api.player(pov, apiVersion)(ctx) addFailureEffect { e =>
+                  logger.error(pov.toString, e)
+                }
+              }.chronometer
+                .logIfSlow(500, logger) { _ =>
+                  s"inner player $pov"
+                }
+                .result
               case Watcher(pov,
                            apiVersion,
                            tv,
@@ -86,14 +87,14 @@ private[api] final class RoundApiBalancer(
     }
     .result
 
-  def watcher(pov: Pov,
-              apiVersion: Int,
-              tv: Option[lila.round.OnTv],
-              analysis: Option[(Pgn, Analysis)] = None,
-              initialFenO: Option[Option[String]] = None,
-              withMoveTimes: Boolean = false,
-              withOpening: Boolean = false)(
-      implicit ctx: Context): Fu[JsObject] = {
+  def watcher(
+      pov: Pov,
+      apiVersion: Int,
+      tv: Option[lila.round.OnTv],
+      analysis: Option[(Pgn, Analysis)] = None,
+      initialFenO: Option[Option[String]] = None,
+      withMoveTimes: Boolean = false,
+      withOpening: Boolean = false)(implicit ctx: Context): Fu[JsObject] = {
     router ? Watcher(pov,
                      apiVersion,
                      tv,

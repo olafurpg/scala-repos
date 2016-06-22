@@ -27,8 +27,8 @@ import mutable.{Builder, StringBuilder}
   *  @define Coll `WrappedString`
   *  @define coll wrapped string
   */
-@deprecatedInheritance(
-    "Inherit from StringLike instead of WrappedString.", "2.11.0")
+@deprecatedInheritance("Inherit from StringLike instead of WrappedString.",
+                       "2.11.0")
 class WrappedString(val self: String)
     extends AbstractSeq[Char]
     with IndexedSeq[Char]

@@ -31,8 +31,8 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
   // This doesn't mean you can't have multiple key managers, but that you can't have multiple key managers of
   // the same class, i.e. you can't have two X509KeyManagers in the array.
 
-  def getClientAliases(
-      keyType: String, issuers: Array[Principal]): Array[String] = {
+  def getClientAliases(keyType: String,
+                       issuers: Array[Principal]): Array[String] = {
     logger.debug(
         s"getClientAliases: keyType = $keyType, issuers = ${issuers.toSeq}")
 
@@ -73,8 +73,8 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
     withKeyManagers { keyManager: X509KeyManager =>
       keyManager match {
         case extendedKeyManager: X509ExtendedKeyManager =>
-          val clientAlias = extendedKeyManager.chooseEngineClientAlias(
-              keyType, issuers, engine)
+          val clientAlias = extendedKeyManager
+            .chooseEngineClientAlias(keyType, issuers, engine)
           if (clientAlias != null) {
             logger.debug(
                 s"chooseEngineClientAlias: using clientAlias $clientAlias with keyManager $extendedKeyManager")
@@ -96,8 +96,8 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
     withKeyManagers { keyManager: X509KeyManager =>
       keyManager match {
         case extendedKeyManager: X509ExtendedKeyManager =>
-          val clientAlias = extendedKeyManager.chooseEngineServerAlias(
-              keyType, issuers, engine)
+          val clientAlias = extendedKeyManager
+            .chooseEngineServerAlias(keyType, issuers, engine)
           if (clientAlias != null) {
             logger.debug(
                 s"chooseEngineServerAlias: using clientAlias $clientAlias with keyManager $extendedKeyManager")
@@ -110,8 +110,8 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
     null
   }
 
-  def getServerAliases(
-      keyType: String, issuers: Array[Principal]): Array[String] = {
+  def getServerAliases(keyType: String,
+                       issuers: Array[Principal]): Array[String] = {
     logger.debug(
         s"getServerAliases: keyType = $keyType, issuers = ${issuers.toSeq}")
 
@@ -127,8 +127,9 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
     nullIfEmpty(serverAliases.toArray)
   }
 
-  def chooseServerAlias(
-      keyType: String, issuers: Array[Principal], socket: Socket): String = {
+  def chooseServerAlias(keyType: String,
+                        issuers: Array[Principal],
+                        socket: Socket): String = {
     logger.debug(
         s"chooseServerAlias: keyType = $keyType, issuers = ${issuers.toSeq}, socket = $socket")
     withKeyManagers { keyManager =>

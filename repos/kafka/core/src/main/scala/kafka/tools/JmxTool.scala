@@ -37,8 +37,8 @@ object JmxTool extends Logging {
       .accepts(
           "object-name",
           "A JMX object name to use as a query. This can contain wild cards, and this option " +
-          "can be given multiple times to specify more than one query. If no objects are specified " +
-          "all objects will be queried.")
+            "can be given multiple times to specify more than one query. If no objects are specified " +
+            "all objects will be queried.")
       .withRequiredArg
       .describedAs("name")
       .ofType(classOf[String])
@@ -46,7 +46,7 @@ object JmxTool extends Logging {
       .accepts(
           "attributes",
           "The whitelist of attributes to query. This is a comma-separated list. If no " +
-          "attributes are specified all objects will be queried.")
+            "attributes are specified all objects will be queried.")
       .withRequiredArg
       .describedAs("name")
       .ofType(classOf[String])
@@ -61,7 +61,7 @@ object JmxTool extends Logging {
     val dateFormatOpt = parser
       .accepts("date-format",
                "The date format to use for formatting the time field. " +
-               "See java.text.SimpleDateFormat for options.")
+                 "See java.text.SimpleDateFormat for options.")
       .withRequiredArg
       .describedAs("format")
       .ofType(classOf[String])
@@ -75,8 +75,8 @@ object JmxTool extends Logging {
       .defaultsTo("service:jmx:rmi:///jndi/rmi://:9999/jmxrmi")
 
     if (args.length == 0)
-      CommandLineUtils.printUsageAndDie(
-          parser, "Dump JMX values to standard output.")
+      CommandLineUtils
+        .printUsageAndDie(parser, "Dump JMX values to standard output.")
 
     val options = parser.parse(args: _*)
 
@@ -147,8 +147,8 @@ object JmxTool extends Logging {
     var attributes = new mutable.HashMap[String, Any]()
     for (name <- names) {
       val mbean = mbsc.getMBeanInfo(name)
-      for (attrObj <- mbsc.getAttributes(
-                         name, mbean.getAttributes.map(_.getName))) {
+      for (attrObj <- mbsc.getAttributes(name,
+                                         mbean.getAttributes.map(_.getName))) {
         val attr = attrObj.asInstanceOf[Attribute]
         attributesWhitelist match {
           case Some(allowedAttributes) =>

@@ -65,8 +65,9 @@ class InMemoryCatalog extends ExternalCatalog {
     catalog(db).tables.contains(table)
   }
 
-  private def existsPartition(
-      db: String, table: String, spec: TablePartitionSpec): Boolean = {
+  private def existsPartition(db: String,
+                              table: String,
+                              spec: TablePartitionSpec): Boolean = {
     requireTableExists(db, table)
     catalog(db).tables(table).partitions.contains(spec)
   }
@@ -85,8 +86,9 @@ class InMemoryCatalog extends ExternalCatalog {
     }
   }
 
-  private def requirePartitionExists(
-      db: String, table: String, spec: TablePartitionSpec): Unit = {
+  private def requirePartitionExists(db: String,
+                                     table: String,
+                                     spec: TablePartitionSpec): Unit = {
     if (!existsPartition(db, table, spec)) {
       throw new AnalysisException(
           s"Partition does not exist in database '$db' table '$table': '$spec'")
@@ -97,8 +99,8 @@ class InMemoryCatalog extends ExternalCatalog {
   // Databases
   // --------------------------------------------------------------------------
 
-  override def createDatabase(
-      dbDefinition: CatalogDatabase, ignoreIfExists: Boolean): Unit =
+  override def createDatabase(dbDefinition: CatalogDatabase,
+                              ignoreIfExists: Boolean): Unit =
     synchronized {
       if (catalog.contains(dbDefinition.name)) {
         if (!ignoreIfExists) {
@@ -110,8 +112,9 @@ class InMemoryCatalog extends ExternalCatalog {
       }
     }
 
-  override def dropDatabase(
-      db: String, ignoreIfNotExists: Boolean, cascade: Boolean): Unit =
+  override def dropDatabase(db: String,
+                            ignoreIfNotExists: Boolean,
+                            cascade: Boolean): Unit =
     synchronized {
       if (catalog.contains(db)) {
         if (!cascade) {
@@ -178,8 +181,9 @@ class InMemoryCatalog extends ExternalCatalog {
     }
   }
 
-  override def dropTable(
-      db: String, table: String, ignoreIfNotExists: Boolean): Unit =
+  override def dropTable(db: String,
+                         table: String,
+                         ignoreIfNotExists: Boolean): Unit =
     synchronized {
       requireDbExists(db)
       if (existsTable(db, table)) {
@@ -192,8 +196,9 @@ class InMemoryCatalog extends ExternalCatalog {
       }
     }
 
-  override def renameTable(
-      db: String, oldName: String, newName: String): Unit = synchronized {
+  override def renameTable(db: String,
+                           oldName: String,
+                           newName: String): Unit = synchronized {
     requireTableExists(db, oldName)
     val oldDesc = catalog(db).tables(oldName)
     oldDesc.table =
@@ -243,7 +248,7 @@ class InMemoryCatalog extends ExternalCatalog {
         val dupSpecsStr = dupSpecs.mkString("\n===\n")
         throw new AnalysisException(
             "The following partitions already exist in database " +
-            s"'$db' table '$table':\n$dupSpecsStr")
+              s"'$db' table '$table':\n$dupSpecsStr")
       }
     }
     parts.foreach { p =>
@@ -251,45 +256,46 @@ class InMemoryCatalog extends ExternalCatalog {
     }
   }
 
-  override def dropPartitions(
-      db: String,
-      table: String,
-      partSpecs: Seq[TablePartitionSpec],
-      ignoreIfNotExists: Boolean): Unit = synchronized {
-    requireTableExists(db, table)
-    val existingParts = catalog(db).tables(table).partitions
-    if (!ignoreIfNotExists) {
-      val missingSpecs = partSpecs.collect {
-        case s if !existingParts.contains(s) => s
+  override def dropPartitions(db: String,
+                              table: String,
+                              partSpecs: Seq[TablePartitionSpec],
+                              ignoreIfNotExists: Boolean): Unit =
+    synchronized {
+      requireTableExists(db, table)
+      val existingParts = catalog(db).tables(table).partitions
+      if (!ignoreIfNotExists) {
+        val missingSpecs = partSpecs.collect {
+          case s if !existingParts.contains(s) => s
+        }
+        if (missingSpecs.nonEmpty) {
+          val missingSpecsStr = missingSpecs.mkString("\n===\n")
+          throw new AnalysisException(
+              "The following partitions do not exist in database " +
+                s"'$db' table '$table':\n$missingSpecsStr")
+        }
       }
-      if (missingSpecs.nonEmpty) {
-        val missingSpecsStr = missingSpecs.mkString("\n===\n")
-        throw new AnalysisException(
-            "The following partitions do not exist in database " +
-            s"'$db' table '$table':\n$missingSpecsStr")
+      partSpecs.foreach(existingParts.remove)
+    }
+
+  override def renamePartitions(db: String,
+                                table: String,
+                                specs: Seq[TablePartitionSpec],
+                                newSpecs: Seq[TablePartitionSpec]): Unit =
+    synchronized {
+      require(specs.size == newSpecs.size,
+              "number of old and new partition specs differ")
+      specs.zip(newSpecs).foreach {
+        case (oldSpec, newSpec) =>
+          val newPart = getPartition(db, table, oldSpec).copy(spec = newSpec)
+          val existingParts = catalog(db).tables(table).partitions
+          existingParts.remove(oldSpec)
+          existingParts.put(newSpec, newPart)
       }
     }
-    partSpecs.foreach(existingParts.remove)
-  }
 
-  override def renamePartitions(
-      db: String,
-      table: String,
-      specs: Seq[TablePartitionSpec],
-      newSpecs: Seq[TablePartitionSpec]): Unit = synchronized {
-    require(specs.size == newSpecs.size,
-            "number of old and new partition specs differ")
-    specs.zip(newSpecs).foreach {
-      case (oldSpec, newSpec) =>
-        val newPart = getPartition(db, table, oldSpec).copy(spec = newSpec)
-        val existingParts = catalog(db).tables(table).partitions
-        existingParts.remove(oldSpec)
-        existingParts.put(newSpec, newPart)
-    }
-  }
-
-  override def alterPartitions(
-      db: String, table: String, parts: Seq[CatalogTablePartition]): Unit =
+  override def alterPartitions(db: String,
+                               table: String,
+                               parts: Seq[CatalogTablePartition]): Unit =
     synchronized {
       parts.foreach { p =>
         requirePartitionExists(db, table, p.spec)
@@ -297,19 +303,20 @@ class InMemoryCatalog extends ExternalCatalog {
       }
     }
 
-  override def getPartition(
-      db: String,
-      table: String,
-      spec: TablePartitionSpec): CatalogTablePartition = synchronized {
-    requirePartitionExists(db, table, spec)
-    catalog(db).tables(table).partitions(spec)
-  }
+  override def getPartition(db: String,
+                            table: String,
+                            spec: TablePartitionSpec): CatalogTablePartition =
+    synchronized {
+      requirePartitionExists(db, table, spec)
+      catalog(db).tables(table).partitions(spec)
+    }
 
-  override def listPartitions(
-      db: String, table: String): Seq[CatalogTablePartition] = synchronized {
-    requireTableExists(db, table)
-    catalog(db).tables(table).partitions.values.toSeq
-  }
+  override def listPartitions(db: String,
+                              table: String): Seq[CatalogTablePartition] =
+    synchronized {
+      requireTableExists(db, table)
+      catalog(db).tables(table).partitions.values.toSeq
+    }
 
   // --------------------------------------------------------------------------
   // Functions
@@ -332,8 +339,9 @@ class InMemoryCatalog extends ExternalCatalog {
       catalog(db).functions.remove(funcName)
     }
 
-  override def renameFunction(
-      db: String, oldName: String, newName: String): Unit = synchronized {
+  override def renameFunction(db: String,
+                              oldName: String,
+                              newName: String): Unit = synchronized {
     requireFunctionExists(db, oldName)
     val newFunc = getFunction(db, oldName).copy(
         name = FunctionIdentifier(newName, Some(db)))
@@ -341,11 +349,12 @@ class InMemoryCatalog extends ExternalCatalog {
     catalog(db).functions.put(newName, newFunc)
   }
 
-  override def alterFunction(
-      db: String, funcDefinition: CatalogFunction): Unit = synchronized {
-    requireFunctionExists(db, funcDefinition.name.funcName)
-    catalog(db).functions.put(funcDefinition.name.funcName, funcDefinition)
-  }
+  override def alterFunction(db: String,
+                             funcDefinition: CatalogFunction): Unit =
+    synchronized {
+      requireFunctionExists(db, funcDefinition.name.funcName)
+      catalog(db).functions.put(funcDefinition.name.funcName, funcDefinition)
+    }
 
   override def getFunction(db: String, funcName: String): CatalogFunction =
     synchronized {

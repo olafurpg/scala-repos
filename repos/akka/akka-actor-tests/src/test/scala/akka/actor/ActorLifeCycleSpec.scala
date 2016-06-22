@@ -17,8 +17,9 @@ import java.util.UUID.{randomUUID ⇒ newUuid}
 
 object ActorLifeCycleSpec {
 
-  class LifeCycleTestActor(
-      testActor: ActorRef, id: String, generationProvider: AtomicInteger)
+  class LifeCycleTestActor(testActor: ActorRef,
+                           id: String,
+                           generationProvider: AtomicInteger)
       extends Actor {
     def report(msg: Any) = testActor ! message(msg)
     def message(msg: Any): Tuple3[Any, String, Int] = (msg, id, currentGen)
@@ -42,13 +43,12 @@ class ActorLifeCycleSpec
     "invoke preRestart, preStart, postRestart when using OneForOneStrategy" in {
       filterException[ActorKilledException] {
         val id = newUuid.toString
-        val supervisor =
-          system.actorOf(Props(classOf[Supervisor],
-                               OneForOneStrategy(maxNrOfRetries = 3)(
-                                   List(classOf[Exception]))))
+        val supervisor = system.actorOf(
+            Props(classOf[Supervisor],
+                  OneForOneStrategy(maxNrOfRetries = 3)(
+                      List(classOf[Exception]))))
         val gen = new AtomicInteger(0)
-        val restarterProps = Props(
-            new LifeCycleTestActor(testActor, id, gen) {
+        val restarterProps = Props(new LifeCycleTestActor(testActor, id, gen) {
           override def preRestart(reason: Throwable, message: Option[Any]) {
             report("preRestart")
           }
@@ -84,10 +84,10 @@ class ActorLifeCycleSpec
     "default for preRestart and postRestart is to call postStop and preStart respectively" in {
       filterException[ActorKilledException] {
         val id = newUuid().toString
-        val supervisor =
-          system.actorOf(Props(classOf[Supervisor],
-                               OneForOneStrategy(maxNrOfRetries = 3)(
-                                   List(classOf[Exception]))))
+        val supervisor = system.actorOf(
+            Props(classOf[Supervisor],
+                  OneForOneStrategy(maxNrOfRetries = 3)(
+                      List(classOf[Exception]))))
         val gen = new AtomicInteger(0)
         val restarterProps =
           Props(classOf[LifeCycleTestActor], testActor, id, gen)
@@ -120,7 +120,8 @@ class ActorLifeCycleSpec
 
     "not invoke preRestart and postRestart when never restarted using OneForOneStrategy" in {
       val id = newUuid().toString
-      val supervisor = system.actorOf(Props(
+      val supervisor = system.actorOf(
+          Props(
               classOf[Supervisor],
               OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
       val gen = new AtomicInteger(0)
@@ -148,12 +149,11 @@ class ActorLifeCycleSpec
 
     "clear the behavior stack upon restart" in {
       final case class Become(recv: ActorContext ⇒ Receive)
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case Become(beh) ⇒ {
-              context.become(beh(context), discardOld = false); sender() ! "ok"
-            }
+            context.become(beh(context), discardOld = false); sender() ! "ok"
+          }
           case x ⇒ sender() ! 42
         }
       }))

@@ -21,13 +21,13 @@ object MForeignKey {
 
   def getImportedKeys(table: MQName) =
     createAction(
-        _.metaData.getImportedKeys(
-            table.catalog_?, table.schema_?, table.name))
+        _.metaData
+          .getImportedKeys(table.catalog_?, table.schema_?, table.name))
 
   def getExportedKeys(table: MQName) =
     createAction(
-        _.metaData.getExportedKeys(
-            table.catalog_?, table.schema_?, table.name))
+        _.metaData
+          .getExportedKeys(table.catalog_?, table.schema_?, table.name))
 
   def getCrossReference(parentTable: MQName, foreignTable: MQName) =
     createAction(

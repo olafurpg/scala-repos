@@ -61,7 +61,8 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
 
     // This one doesn't use the implicit LoggingContext but uses `println` for logging
     def printRequestMethodAndResponseStatus(req: HttpRequest)(res: Any): Unit =
-      println(requestMethodAndResponseStatusAsInfo(req)(res)
+      println(
+          requestMethodAndResponseStatusAsInfo(req)(res)
             .map(_.obj.toString)
             .getOrElse(""))
     val logRequestResultPrintln = DebuggingDirectives.logRequestResult(

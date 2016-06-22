@@ -58,8 +58,8 @@ abstract class PipelineStage extends Params with Logging {
     * be assumed valid until proven otherwise.
     */
   @DeveloperApi
-  protected def transformSchema(
-      schema: StructType, logging: Boolean): StructType = {
+  protected def transformSchema(schema: StructType,
+                                logging: Boolean): StructType = {
     if (logging) {
       logDebug(s"Input schema: ${schema.json}")
     }
@@ -99,8 +99,8 @@ class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
     * @group param
     */
   @Since("1.2.0")
-  val stages: Param[Array[PipelineStage]] = new Param(
-      this, "stages", "stages of the pipeline")
+  val stages: Param[Array[PipelineStage]] =
+    new Param(this, "stages", "stages of the pipeline")
 
   /** @group setParam */
   @Since("1.2.0")
@@ -226,8 +226,8 @@ object Pipeline extends MLReadable[Pipeline] {
         case other =>
           throw new UnsupportedOperationException(
               "Pipeline write will fail on this Pipeline" +
-              s" because it contains a stage which does not implement Writable. Non-Writable stage:" +
-              s" ${other.uid} of type ${other.getClass}")
+                s" because it contains a stage which does not implement Writable. Non-Writable stage:" +
+                s" ${other.uid} of type ${other.getClass}")
       }
     }
 
@@ -243,8 +243,8 @@ object Pipeline extends MLReadable[Pipeline] {
       val stageUids = stages.map(_.uid)
       val jsonParams = List(
           "stageUids" -> parse(compact(render(stageUids.toSeq))))
-      DefaultParamsWriter.saveMetadata(
-          instance, path, sc, paramMap = Some(jsonParams))
+      DefaultParamsWriter
+        .saveMetadata(instance, path, sc, paramMap = Some(jsonParams))
 
       // Save stages
       val stagesDir = new Path(path, "stages").toString
@@ -271,8 +271,8 @@ object Pipeline extends MLReadable[Pipeline] {
         (metadata.params \ "stageUids").extract[Seq[String]].toArray
       val stages: Array[PipelineStage] = stageUids.zipWithIndex.map {
         case (stageUid, idx) =>
-          val stagePath = SharedReadWrite.getStagePath(
-              stageUid, idx, stageUids.length, stagesDir)
+          val stagePath = SharedReadWrite
+            .getStagePath(stageUid, idx, stageUids.length, stagesDir)
           DefaultParamsReader.loadParamsInstance[PipelineStage](stagePath, sc)
       }
       (metadata.uid, stages)
@@ -297,8 +297,9 @@ object Pipeline extends MLReadable[Pipeline] {
   */
 @Since("1.2.0")
 @Experimental
-class PipelineModel private[ml](@Since("1.4.0") override val uid: String,
-                                @Since("1.4.0") val stages: Array[Transformer])
+class PipelineModel private[ml] (
+    @Since("1.4.0") override val uid: String,
+    @Since("1.4.0") val stages: Array[Transformer])
     extends Model[PipelineModel]
     with MLWritable
     with Logging {
@@ -368,7 +369,7 @@ object PipelineModel extends MLReadable[PipelineModel] {
           case other =>
             throw new RuntimeException(
                 s"PipelineModel.read loaded a stage but found it" +
-                s" was not a Transformer.  Bad stage ${other.uid} of type ${other.getClass}")
+                  s" was not a Transformer.  Bad stage ${other.uid} of type ${other.getClass}")
         }
       new PipelineModel(uid, transformers)
     }

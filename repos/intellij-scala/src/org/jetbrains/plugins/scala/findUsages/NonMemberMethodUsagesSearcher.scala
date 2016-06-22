@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull
   * These are not considered by [[com.intellij.psi.impl.search.MethodUsagesSearcher]]
   */
 class NonMemberMethodUsagesSearcher
-    extends QueryExecutorBase[
-        PsiReference, MethodReferencesSearch.SearchParameters] {
+    extends QueryExecutorBase[PsiReference,
+                              MethodReferencesSearch.SearchParameters] {
   def processQuery(@NotNull p: MethodReferencesSearch.SearchParameters,
                    @NotNull consumer: Processor[PsiReference]) {
     extensions.inReadAction {
@@ -27,8 +27,8 @@ class NonMemberMethodUsagesSearcher
           consumer.process(t)
         }
       }
-      ReferencesSearch.searchOptimized(
-          method, searchScope, false, collector, newConsumer)
+      ReferencesSearch
+        .searchOptimized(method, searchScope, false, collector, newConsumer)
     }
   }
 }

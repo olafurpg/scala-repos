@@ -37,8 +37,8 @@ import org.apache.spark.rdd.RDD
   * @param binnedFeatures  Binned feature values.
   *                        Same length as LabeledPoint.features, but values are bin indices.
   */
-private[spark] class TreePoint(
-    val label: Double, val binnedFeatures: Array[Int])
+private[spark] class TreePoint(val label: Double,
+                               val binnedFeatures: Array[Int])
     extends Serializable {}
 
 private[spark] object TreePoint {
@@ -124,9 +124,9 @@ private[spark] object TreePoint {
       if (featureValue < 0 || featureValue >= featureArity) {
         throw new IllegalArgumentException(
             s"DecisionTree given invalid data:" +
-            s" Feature $featureIndex is categorical with values in {0,...,${featureArity - 1}," +
-            s" but a data point gives it value $featureValue.\n" +
-            "  Bad data point: " + labeledPoint.toString)
+              s" Feature $featureIndex is categorical with values in {0,...,${featureArity - 1}," +
+              s" but a data point gives it value $featureValue.\n" +
+              "  Bad data point: " + labeledPoint.toString)
       }
       featureValue.toInt
     }

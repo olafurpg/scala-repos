@@ -37,8 +37,8 @@ final class DBModule extends Module {
       bindNamed(db).to(new NamedDatabaseProvider(db))
     }
 
-  private def defaultDatabaseBinding(
-      default: String, dbs: Set[String]): Seq[Binding[_]] = {
+  private def defaultDatabaseBinding(default: String,
+                                     dbs: Set[String]): Seq[Binding[_]] = {
     if (dbs.contains(default)) Seq(bind[Database].to(bindNamed(default)))
     else Nil
   }
@@ -53,8 +53,10 @@ trait DBComponents {
   def connectionPool: ConnectionPool
   def applicationLifecycle: ApplicationLifecycle
 
-  lazy val dbApi: DBApi = new DBApiProvider(
-      environment, configuration, connectionPool, applicationLifecycle).get
+  lazy val dbApi: DBApi = new DBApiProvider(environment,
+                                            configuration,
+                                            connectionPool,
+                                            applicationLifecycle).get
 }
 
 /**
@@ -75,12 +77,11 @@ class DBApiProvider @Inject()(environment: Environment,
                                          injector,
                                          environment,
                                          defaultConnectionPool)
-    val configs =
-      if (config.hasPath(dbKey)) {
-        PlayConfig(config)
-          .getPrototypedMap(dbKey, "play.db.prototype")
-          .mapValues(_.underlying)
-      } else Map.empty[String, Config]
+    val configs = if (config.hasPath(dbKey)) {
+      PlayConfig(config)
+        .getPrototypedMap(dbKey, "play.db.prototype")
+        .mapValues(_.underlying)
+    } else Map.empty[String, Config]
     val db = new DefaultDBApi(configs, pool, environment)
     lifecycle.addStopHook { () =>
       Future.successful(db.shutdown())

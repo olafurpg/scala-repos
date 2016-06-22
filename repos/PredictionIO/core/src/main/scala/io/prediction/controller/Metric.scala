@@ -105,8 +105,8 @@ abstract class AverageMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Double
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).mean
   }
 }
@@ -131,8 +131,8 @@ abstract class OptionAverageMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Option[Double]
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).mean
   }
 }
@@ -160,8 +160,8 @@ abstract class StdevMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Double
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).stdev
   }
 }
@@ -189,8 +189,8 @@ abstract class OptionStdevMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Option[Double]
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).stdev
   }
 }
@@ -236,8 +236,8 @@ abstract class SumMetric[EI, Q, P, A, R: ClassTag](implicit num: Numeric[R])
   * @group Evaluation
   */
 class ZeroMetric[EI, Q, P, A] extends Metric[EI, Q, P, A, Double]() {
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = 0.0
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = 0.0
 }
 
 /** Companion object of [[ZeroMetric]]

@@ -1,13 +1,13 @@
 trait A {
-  type m [+x]
+  type m[+x]
 }
 
 trait A2 {
-  type m [+x <: String]
+  type m[+x <: String]
 }
 
 trait A3 {
-  type m [x]
+  type m[x]
 }
 
 trait FooCov[+x]

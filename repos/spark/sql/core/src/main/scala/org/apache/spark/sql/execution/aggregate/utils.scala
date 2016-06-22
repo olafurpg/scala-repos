@@ -29,8 +29,8 @@ object Utils {
   def planAggregateWithoutPartial(
       groupingExpressions: Seq[NamedExpression],
       aggregateExpressions: Seq[AggregateExpression],
-      aggregateFunctionToAttribute: Map[
-          (AggregateFunction, Boolean), Attribute],
+      aggregateFunctionToAttribute: Map[(AggregateFunction, Boolean),
+                                        Attribute],
       resultExpressions: Seq[NamedExpression],
       child: SparkPlan): Seq[SparkPlan] = {
 
@@ -86,8 +86,8 @@ object Utils {
   def planAggregateWithoutDistinct(
       groupingExpressions: Seq[NamedExpression],
       aggregateExpressions: Seq[AggregateExpression],
-      aggregateFunctionToAttribute: Map[
-          (AggregateFunction, Boolean), Attribute],
+      aggregateFunctionToAttribute: Map[(AggregateFunction, Boolean),
+                                        Attribute],
       resultExpressions: Seq[NamedExpression],
       child: SparkPlan): Seq[SparkPlan] = {
     // Check if we can use TungstenAggregate.
@@ -137,8 +137,8 @@ object Utils {
       groupingExpressions: Seq[NamedExpression],
       functionsWithDistinct: Seq[AggregateExpression],
       functionsWithoutDistinct: Seq[AggregateExpression],
-      aggregateFunctionToAttribute: Map[
-          (AggregateFunction, Boolean), Attribute],
+      aggregateFunctionToAttribute: Map[(AggregateFunction, Boolean),
+                                        Attribute],
       resultExpressions: Seq[NamedExpression],
       child: SparkPlan): Seq[SparkPlan] = {
 
@@ -230,7 +230,8 @@ object Utils {
             // Use original AggregationFunction to lookup attributes, which is used to build
             // aggregateFunctionToAttribute
             val attr = aggregateFunctionToAttribute(
-                functionsWithDistinct(i).aggregateFunction, true)
+                functionsWithDistinct(i).aggregateFunction,
+                true)
             (expr, attr)
         }.unzip
 
@@ -271,7 +272,8 @@ object Utils {
             // Use original AggregationFunction to lookup attributes, which is used to build
             // aggregateFunctionToAttribute
             val attr = aggregateFunctionToAttribute(
-                functionsWithDistinct(i).aggregateFunction, true)
+                functionsWithDistinct(i).aggregateFunction,
+                true)
             (expr, attr)
         }.unzip
 

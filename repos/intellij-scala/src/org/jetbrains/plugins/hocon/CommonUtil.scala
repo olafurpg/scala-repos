@@ -36,7 +36,7 @@ object CommonUtil {
   implicit class CharSequenceOps(val cs: CharSequence) extends AnyVal {
     def startsWith(str: String) =
       cs.length >= str.length &&
-      str.contentEquals(cs.subSequence(0, str.length))
+        str.contentEquals(cs.subSequence(0, str.length))
 
     def charIterator =
       Iterator.range(0, cs.length).map(cs.charAt)
@@ -53,7 +53,7 @@ object CommonUtil {
 
     def hasSingleChild =
       node.getFirstChildNode != null &&
-      node.getFirstChildNode.getTreeNext == null
+        node.getFirstChildNode.getTreeNext == null
   }
 
   implicit class StringOps(val str: String) extends AnyVal {
@@ -79,20 +79,19 @@ object CommonUtil {
 
   def unquote(str: String) = {
     var result = str.stripPrefix("\"").stripSuffix("\"")
-    result = quotedCharPattern.replaceAllIn(result,
-                                            m =>
-                                              m.group(0).charAt(1) match {
-                                                case '\\' => "\\"
-                                                case '/' => "/"
-                                                case '"' => "\""
-                                                case 'b' => "\b"
-                                                case 'f' => "\f"
-                                                case 'n' => "\n"
-                                                case 'r' => "\r"
-                                                case 't' => "\t"
-                                            })
-    quotedUnicodePattern.replaceAllIn(
-        result, m => jl.Short.parseShort(m.group(1), 16).toChar.toString)
+    result = quotedCharPattern.replaceAllIn(result, m =>
+          m.group(0).charAt(1) match {
+        case '\\' => "\\"
+        case '/' => "/"
+        case '"' => "\""
+        case 'b' => "\b"
+        case 'f' => "\f"
+        case 'n' => "\n"
+        case 'r' => "\r"
+        case 't' => "\t"
+    })
+    quotedUnicodePattern.replaceAllIn(result, m =>
+          jl.Short.parseShort(m.group(1), 16).toChar.toString)
   }
 
   def uncaps(str: String) =

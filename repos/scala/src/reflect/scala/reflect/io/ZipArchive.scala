@@ -118,8 +118,8 @@ abstract class ZipArchive(override val file: JFile)
         dir
     }
 
-  protected def getDir(
-      dirs: mutable.Map[String, DirEntry], entry: ZipEntry): DirEntry = {
+  protected def getDir(dirs: mutable.Map[String, DirEntry],
+                       entry: ZipEntry): DirEntry = {
     if (entry.isDirectory) ensureDir(dirs, entry.getName, entry)
     else ensureDir(dirs, dirName(entry.getName), null)
   }
@@ -209,8 +209,8 @@ final class URLZipArchive(val url: URL) extends ZipArchive(null) {
           if (offset == arr.length) arr
           else
             throw new IOException(
-                "Input stream truncated: read %d of %d bytes".format(
-                    offset, len))
+                "Input stream truncated: read %d of %d bytes".format(offset,
+                                                                     len))
         }
         override def sizeOption = Some(zipEntry.getSize().toInt)
       }

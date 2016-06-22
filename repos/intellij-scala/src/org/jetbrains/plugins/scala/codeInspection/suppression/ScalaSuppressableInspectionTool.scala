@@ -13,8 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScCommentOwner
   * @author Nikolay.Tropin
   */
 object ScalaSuppressableInspectionTool {
-  def findElementToolSuppressedIn(
-      element: PsiElement, toolId: String): Option[PsiElement] = {
+  def findElementToolSuppressedIn(element: PsiElement,
+                                  toolId: String): Option[PsiElement] = {
     if (element == null) return None
 
     def commentWithSuppression(elem: PsiElement): Option[PsiComment] = {
@@ -22,8 +22,8 @@ object ScalaSuppressableInspectionTool {
         val text: String = comment.getText
         val matcher: Matcher =
           SuppressionUtil.SUPPRESS_IN_LINE_COMMENT_PATTERN.matcher(text)
-        if (matcher.matches && SuppressionUtil.isInspectionToolIdMentioned(
-                matcher.group(1), toolId)) {
+        if (matcher.matches && SuppressionUtil
+              .isInspectionToolIdMentioned(matcher.group(1), toolId)) {
           return Some(comment)
         }
       }

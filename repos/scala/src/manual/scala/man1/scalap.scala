@@ -17,7 +17,8 @@ object scalap extends Command {
   val name = Section(
       "NAME",
       MBold(command) & " " & NDash & " Scala class file decoder for the " & Link(
-          "Scala 2", "http://scala-lang.org/") & " language")
+          "Scala 2",
+          "http://scala-lang.org/") & " language")
 
   val synopsis = Section(
       "SYNOPSIS",
@@ -28,7 +29,8 @@ object scalap extends Command {
       DefinitionList(
           Definition(Mono(Argument("options")),
                      "Command line options. See " & Link(
-                         Bold("OPTIONS"), "#options") & " below."),
+                         Bold("OPTIONS"),
+                         "#options") & " below."),
           Definition(
               Mono(Argument("class name")),
               "Full-qualified name of a class to be decoded (such as " & Mono(
@@ -67,12 +69,14 @@ object scalap extends Command {
 
   override val authors = Section("AUTHOR", "Written by Ilya Sergey.")
 
-  val seeAlso = Section(
-      "SEE ALSO",
-      Link(Bold("fsc") & "(1)", "fsc.html") & ", " & Link(
-          Bold("scala") & "(1)", "scala.html") & ", " & Link(
-          Bold("scalac") & "(1)", "scalac.html") & ", " & Link(
-          Bold("scaladoc") & "(1)", "scaladoc.html"))
+  val seeAlso =
+    Section("SEE ALSO",
+            Link(Bold("fsc") & "(1)", "fsc.html") & ", " & Link(
+                Bold("scala") & "(1)",
+                "scala.html") & ", " & Link(Bold("scalac") & "(1)",
+                                            "scalac.html") & ", " & Link(
+                Bold("scaladoc") & "(1)",
+                "scaladoc.html"))
 
   def manpage = new Document {
     title = command

@@ -18,11 +18,10 @@ object Util {
             })
     )
 
-  lazy val javaOnlySettings =
-    Seq[Setting[_]](
-        /*crossPaths := false, */ compileOrder := CompileOrder.JavaThenScala,
-        unmanagedSourceDirectories in Compile <<=
-          Seq(javaSource in Compile).join)
+  lazy val javaOnlySettings = Seq[Setting[_]](
+      /*crossPaths := false, */ compileOrder := CompileOrder.JavaThenScala,
+      unmanagedSourceDirectories in Compile <<=
+        Seq(javaSource in Compile).join)
   lazy val baseScalacOptions = Seq(
       scalacOptions ++= Seq("-Xelide-below", "0"),
       scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
@@ -138,7 +137,7 @@ object Util {
 
   def excludePomArtifact(artifactId: String) =
     (artifactId == "compiler-interface") ||
-    (artifactId startsWith "precompiled")
+      (artifactId startsWith "precompiled")
 
   val testExclusive = tags in test += ((ExclusiveTest, 1))
 

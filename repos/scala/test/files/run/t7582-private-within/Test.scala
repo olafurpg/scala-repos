@@ -9,8 +9,8 @@ object Test extends DirectTest {
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
-    val global = newCompiler(
-        "-usejavacp", "-cp", classpath, "-d", testOutput.path)
+    val global =
+      newCompiler("-usejavacp", "-cp", classpath, "-d", testOutput.path)
     import global._
     withRun(global) { _ =>
       def check(sym: Symbol) = {

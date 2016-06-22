@@ -34,14 +34,17 @@ class PrunedScanSource extends RelationProvider {
   }
 }
 
-case class SimplePrunedScan(
-    from: Int, to: Int)(@transient val sqlContext: SQLContext)
+case class SimplePrunedScan(from: Int, to: Int)(
+    @transient val sqlContext: SQLContext)
     extends BaseRelation
     with PrunedScan {
 
   override def schema: StructType =
-    StructType(StructField("a", IntegerType, nullable = false) :: StructField(
-            "b", IntegerType, nullable = false) :: Nil)
+    StructType(
+        StructField("a", IntegerType, nullable = false) :: StructField(
+            "b",
+            IntegerType,
+            nullable = false) :: Nil)
 
   override def buildScan(requiredColumns: Array[String]): RDD[Row] = {
     val rowBuilders = requiredColumns.map {
@@ -55,8 +58,10 @@ case class SimplePrunedScan(
 
     sqlContext.sparkContext
       .parallelize(from to to)
-      .map(i =>
-            Row.fromSeq(rowBuilders
+      .map(
+          i =>
+            Row.fromSeq(
+                rowBuilders
                   .map(_ (i))
                   .reduceOption(_ ++ _)
                   .getOrElse(Seq.empty)))
@@ -78,8 +83,8 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
       """.stripMargin)
   }
 
-  sqlTest(
-      "SELECT * FROM oneToTenPruned", (1 to 10).map(i => Row(i, i * 2)).toSeq)
+  sqlTest("SELECT * FROM oneToTenPruned",
+          (1 to 10).map(i => Row(i, i * 2)).toSeq)
 
   sqlTest("SELECT a, b FROM oneToTenPruned",
           (1 to 10).map(i => Row(i, i * 2)).toSeq)
@@ -89,16 +94,16 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
 
   sqlTest("SELECT a FROM oneToTenPruned", (1 to 10).map(i => Row(i)).toSeq)
 
-  sqlTest(
-      "SELECT a, a FROM oneToTenPruned", (1 to 10).map(i => Row(i, i)).toSeq)
+  sqlTest("SELECT a, a FROM oneToTenPruned",
+          (1 to 10).map(i => Row(i, i)).toSeq)
 
   sqlTest("SELECT b FROM oneToTenPruned", (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest(
-      "SELECT a * 2 FROM oneToTenPruned", (1 to 10).map(i => Row(i * 2)).toSeq)
+  sqlTest("SELECT a * 2 FROM oneToTenPruned",
+          (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest(
-      "SELECT A AS b FROM oneToTenPruned", (1 to 10).map(i => Row(i)).toSeq)
+  sqlTest("SELECT A AS b FROM oneToTenPruned",
+          (1 to 10).map(i => Row(i)).toSeq)
 
   sqlTest(
       "SELECT x.b, y.a FROM oneToTenPruned x JOIN oneToTenPruned y ON x.a = y.b",
@@ -119,8 +124,8 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
     test(s"Columns output ${expectedColumns.mkString(",")}: $sqlString") {
 
       // These tests check a particular plan, disable whole stage codegen.
-      caseInsensitiveContext.conf.setConf(
-          SQLConf.WHOLESTAGE_CODEGEN_ENABLED, false)
+      caseInsensitiveContext.conf
+        .setConf(SQLConf.WHOLESTAGE_CODEGEN_ENABLED, false)
       try {
         val queryExecution = sql(sqlString).queryExecution
         val rawPlan = queryExecution.executedPlan.collect {
@@ -135,8 +140,8 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
         if (rawColumns != expectedColumns) {
           fail(
               s"Wrong column names. Got $rawColumns, Expected $expectedColumns\n" +
-              s"Filters pushed: ${FiltersPushed.list.mkString(",")}\n" +
-              queryExecution)
+                s"Filters pushed: ${FiltersPushed.list.mkString(",")}\n" +
+                queryExecution)
         }
 
         if (rawOutput.numFields != expectedColumns.size) {

@@ -226,8 +226,8 @@ private[finagle] object Simulation extends com.twitter.app.App {
         println("-" * 100)
         println("Requests at %s".format(stopWatch()))
 
-        val lines = for ((name, fn) <- stats.gauges.toSeq) yield
-          (name.mkString("/"), fn())
+        val lines = for ((name, fn) <- stats.gauges.toSeq)
+          yield (name.mkString("/"), fn())
         for ((name, value) <- lines.sortBy(_._1)) println(name + " " + value)
       }
     }

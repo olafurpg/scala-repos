@@ -90,7 +90,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
 
   /** Record a computed batch of code */
   def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit
+      implicit flowDef: FlowDef,
+      mode: Mode): Unit
 
   @transient private val logger =
     LoggerFactory.getLogger(classOf[BatchedStore[_, _]])
@@ -173,8 +174,7 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
     val batchIntr = batcher.batchesCoveredBy(readTimespan)
 
     val batches = BatchID.toIterable(batchIntr).toList
-    val finalBatch =
-      batches.last // batches won't be empty, ensured by atLeastOneBatch method
+    val finalBatch = batches.last // batches won't be empty, ensured by atLeastOneBatch method
     val filteredBatches = select(batches).sorted
 
     assert(filteredBatches.contains(finalBatch),
@@ -291,8 +291,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
 
       (batchOps.coverIt(timeSpan).toList match {
         case Nil =>
-          Left(List("Timespan is covered by Nil: %s batcher: %s".format(
-                      timeSpan, batcher)))
+          Left(
+              List("Timespan is covered by Nil: %s batcher: %s"
+                    .format(timeSpan, batcher)))
         case list => Right((in, list))
       })
     })
@@ -311,15 +312,15 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
   /**
     * Adjist the Lower bound of the interval
     */
-  private def setLower(
-      lb: InclusiveLower[Timestamp],
-      interv: Interval[Timestamp]): Interval[Timestamp] = interv match {
-    case u @ ExclusiveUpper(_) => lb && u
-    case u @ InclusiveUpper(_) => lb && u
-    case Intersection(_, u) => lb && u
-    case Empty() => Empty()
-    case _ => lb // Otherwise the upperbound is infinity.
-  }
+  private def setLower(lb: InclusiveLower[Timestamp],
+                       interv: Interval[Timestamp]): Interval[Timestamp] =
+    interv match {
+      case u @ ExclusiveUpper(_) => lb && u
+      case u @ InclusiveUpper(_) => lb && u
+      case Intersection(_, u) => lb && u
+      case Empty() => Empty()
+      case _ => lb // Otherwise the upperbound is infinity.
+    }
 
   /**
     * Reads the input data after the last batch written.
@@ -354,7 +355,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       // Get the total time we want to cover. If the lower bound of the requested timeSpan
       // is not the firstDeltaTimestamp, adjust it to that.
       deltaTimes: Interval[Timestamp] = setLower(
-          InclusiveLower(firstDeltaTimestamp), timeSpan)
+          InclusiveLower(firstDeltaTimestamp),
+          timeSpan)
 
       // Try to read the range covering the time we want; get the time we can completely
       // cover and the data from input in that range.
@@ -368,10 +370,11 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       _ <- fromEither[FactoryInput](
               if (readDeltaTimestamps.contains(firstDeltaTimestamp)) Right(())
               else
-                Left(List("Cannot load initial timestamp " +
-                        firstDeltaTimestamp.toString +
-                        " of deltas " + " at " + this.toString + " only " +
-                        readDeltaTimestamps.toString)))
+                Left(
+                    List("Cannot load initial timestamp " +
+                          firstDeltaTimestamp.toString +
+                          " of deltas " + " at " + this.toString + " only " +
+                          readDeltaTimestamps.toString)))
 
       // Record the timespan we actually read.
       _ <- putState((readDeltaTimestamps, mode))
@@ -404,8 +407,9 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
   private def atLeastOneBatch(readTimespan: Interval[Timestamp]) =
     fromEither[FactoryInput] {
       if (batcher.batchesCoveredBy(readTimespan) == Empty()) {
-        Left(List("readTimespan is not convering at least one batch: " +
-                readTimespan.toString))
+        Left(
+            List("readTimespan is not convering at least one batch: " +
+                  readTimespan.toString))
       } else {
         Right(())
       }

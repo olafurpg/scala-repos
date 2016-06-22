@@ -81,8 +81,7 @@ package object project {
         .librariesOnly()
         .exportedOnly()
 
-      enumerator.forEachLibrary(
-          new Processor[Library] {
+      enumerator.forEachLibrary(new Processor[Library] {
         override def process(library: Library) = {
           if (library.isScalaSdk) {
             result = Some(new ScalaSdk(library))
@@ -139,8 +138,8 @@ package object project {
     def scalaCompilerSettings: ScalaCompilerSettings =
       compilerConfiguration.getSettingsForModule(module)
 
-    def configureScalaCompilerSettingsFrom(
-        source: String, options: Seq[String]) {
+    def configureScalaCompilerSettingsFrom(source: String,
+                                           options: Seq[String]) {
       compilerConfiguration.configureSettingsForModule(module, source, options)
     }
 
@@ -248,7 +247,7 @@ package object project {
 
     def documentationUrlFor(version: Option[Version]): String =
       "http://www.scala-lang.org/api/" +
-      version.map(_.number).getOrElse("current") + "/"
+        version.map(_.number).getOrElse("current") + "/"
   }
 
   implicit class ProjectPsiElementExt(element: PsiElement) {

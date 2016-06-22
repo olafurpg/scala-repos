@@ -65,7 +65,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       withAnnotations(List(annot))
 
     @tailrec private def dropOtherAnnotations(
-        anns: List[AnnotationInfo], cls: Symbol): List[AnnotationInfo] =
+        anns: List[AnnotationInfo],
+        cls: Symbol): List[AnnotationInfo] =
       anns match {
         case ann :: rest =>
           if (ann matches cls) anns else dropOtherAnnotations(rest, cls)
@@ -222,8 +223,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       val atp: Type,
       val args: List[Tree],
       val assocs: List[(Name, ClassfileAnnotArg)]
-  )
-      extends AnnotationInfo {
+  ) extends AnnotationInfo {
     // Classfile annot: args empty. Scala annot: assocs empty.
     assert(args.isEmpty || assocs.isEmpty, atp)
 

@@ -105,8 +105,9 @@ class CompileServerLauncher extends ApplicationComponent {
         val bootclasspathArg =
           if (bootClassPathLibs.isEmpty) Nil
           else
-            Seq("-Xbootclasspath/a:" +
-                bootClassPathLibs.mkString(File.pathSeparator))
+            Seq(
+                "-Xbootclasspath/a:" +
+                  bootClassPathLibs.mkString(File.pathSeparator))
         val classpath = (jdk.tools +: presentFiles)
           .map(_.canonicalPath)
           .mkString(File.pathSeparator)
@@ -144,10 +145,11 @@ class CompileServerLauncher extends ApplicationComponent {
           .right
           .map { process =>
             val watcher = new ProcessWatcher(process, "scalaCompileServer")
-            serverInstance = Some(ServerInstance(watcher,
-                                                 freePort,
-                                                 builder.directory(),
-                                                 withTimestamps(bootCp)))
+            serverInstance = Some(
+                ServerInstance(watcher,
+                               freePort,
+                               builder.directory(),
+                               withTimestamps(bootCp)))
             watcher.startNotify()
             process
           }
@@ -273,7 +275,7 @@ object CompileServerLauncher {
           .USE_PROJECT_HOME_AS_WORKING_DIR
         val workingDirChanged =
           useProjectHome &&
-          projectHome(project) != serverInstance.map(_.workingDir)
+            projectHome(project) != serverInstance.map(_.workingDir)
         workingDirChanged ||
         instance.bootClasspath != withTimestamps(bootClasspath(project))
     }

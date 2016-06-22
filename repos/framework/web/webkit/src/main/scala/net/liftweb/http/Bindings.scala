@@ -120,7 +120,7 @@ object Bindings {
         case Empty if Props.mode == Props.RunModes.Development =>
           Text(
               "Unable to find template with path " +
-              templatePath.mkString("/", "/", ""))
+                templatePath.mkString("/", "/", ""))
         case _ => NodeSeq.Empty
       }
     }

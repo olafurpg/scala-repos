@@ -17,8 +17,8 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 object SerializerSpecConfigs {
-  val customSerializers =
-    ConfigFactory.parseString("""
+  val customSerializers = ConfigFactory.parseString(
+      """
       akka.actor {
         serializers {
           my-payload = "akka.persistence.serialization.MyPayloadSerializer"
@@ -100,11 +100,11 @@ class SnapshotSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
       // println(s"encoded snapshot: " + String.valueOf(encodeHex(serializer.toBinary(snapshot))))
       val oldSnapshot = // 32 bytes per line
         "a8000000aced00057372002d616b6b612e70657273697374656e63652e736572" +
-        "69616c697a6174696f6e2e536e617073686f7448656164657200000000000000" +
-        "0102000249000c73657269616c697a657249644c00086d616e69666573747400" +
-        "0e4c7363616c612f4f7074696f6e3b7870000000047372000b7363616c612e4e" +
-        "6f6e6524465024f653ca94ac0200007872000c7363616c612e4f7074696f6ee3" +
-        "6024a8328a45e90200007870616263"
+          "69616c697a6174696f6e2e536e617073686f7448656164657200000000000000" +
+          "0102000249000c73657269616c697a657249644c00086d616e69666573747400" +
+          "0e4c7363616c612f4f7074696f6e3b7870000000047372000b7363616c612e4e" +
+          "6f6e6524465024f653ca94ac0200007872000c7363616c612e4f7074696f6ee3" +
+          "6024a8328a45e90200007870616263"
 
       val bytes = decodeHex(oldSnapshot.toCharArray)
       val deserialized =
@@ -126,11 +126,11 @@ class SnapshotSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
       // println(s"encoded snapshot: " + String.valueOf(encodeHex(serializer.toBinary(snapshot))))
       val oldSnapshot = // 32 bytes per line
         "a8000000aced00057372002d616b6b612e70657273697374656e63652e736572" +
-        "69616c697a6174696f6e2e536e617073686f7448656164657200000000000000" +
-        "0102000249000c73657269616c697a657249644c00086d616e69666573747400" +
-        "0e4c7363616c612f4f7074696f6e3b7870000000047372000b7363616c612e4e" +
-        "6f6e6524465024f653ca94ac0200007872000c7363616c612e4f7074696f6efe" +
-        "6937fddb0e66740200007870616263"
+          "69616c697a6174696f6e2e536e617073686f7448656164657200000000000000" +
+          "0102000249000c73657269616c697a657249644c00086d616e69666573747400" +
+          "0e4c7363616c612f4f7074696f6e3b7870000000047372000b7363616c612e4e" +
+          "6f6e6524465024f653ca94ac0200007872000c7363616c612e4f7074696f6efe" +
+          "6937fddb0e66740200007870616263"
 
       val bytes = decodeHex(oldSnapshot.toCharArray)
       val deserialized =
@@ -149,12 +149,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
   "A message serializer" when {
     "not given a manifest" must {
       "handle custom Persistent message serialization" in {
-        val persistent = PersistentRepr(MyPayload("a"),
-                                        13,
-                                        "p1",
-                                        "",
-                                        writerUuid =
-                                          UUID.randomUUID().toString)
+        val persistent =
+          PersistentRepr(MyPayload("a"),
+                         13,
+                         "p1",
+                         "",
+                         writerUuid = UUID.randomUUID().toString)
         val serializer = serialization.findSerializerFor(persistent)
 
         val bytes = serializer.toBinary(persistent)
@@ -166,12 +166,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
 
     "given a PersistentRepr manifest" must {
       "handle custom Persistent message serialization" in {
-        val persistent = PersistentRepr(MyPayload("b"),
-                                        13,
-                                        "p1",
-                                        "",
-                                        writerUuid =
-                                          UUID.randomUUID().toString)
+        val persistent =
+          PersistentRepr(MyPayload("b"),
+                         13,
+                         "p1",
+                         "",
+                         writerUuid = UUID.randomUUID().toString)
         val serializer = serialization.findSerializerFor(persistent)
 
         val bytes = serializer.toBinary(persistent)
@@ -184,12 +184,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
 
     "given payload serializer with string manifest" must {
       "handle serialization" in {
-        val persistent = PersistentRepr(MyPayload2("a", 17),
-                                        13,
-                                        "p1",
-                                        "",
-                                        writerUuid =
-                                          UUID.randomUUID().toString)
+        val persistent =
+          PersistentRepr(MyPayload2("a", 17),
+                         13,
+                         "p1",
+                         "",
+                         writerUuid = UUID.randomUUID().toString)
         val serializer = serialization.findSerializerFor(persistent)
 
         val bytes = serializer.toBinary(persistent)
@@ -223,11 +223,11 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
         //
         val oldData =
           "0a3e08c7da04120d4f6c645061796c6f61642841291a2" +
-          "9616b6b612e70657273697374656e63652e7365726961" +
-          "6c697a6174696f6e2e4f6c645061796c6f6164100d1a0" +
-          "2703120015a45616b6b613a2f2f4d6573736167655365" +
-          "7269616c697a657250657273697374656e63655370656" +
-          "32f73797374656d2f746573744163746f722d31233133" + "3137373931343033"
+            "9616b6b612e70657273697374656e63652e7365726961" +
+            "6c697a6174696f6e2e4f6c645061796c6f6164100d1a0" +
+            "2703120015a45616b6b613a2f2f4d6573736167655365" +
+            "7269616c697a657250657273697374656e63655370656" +
+            "32f73797374656d2f746573744163746f722d31233133" + "3137373931343033"
 
         // now the system is updated, OldPayload is replaced by MyPayload, and the
         // OldPayloadSerializer is adjusted to migrate OldPayload
@@ -248,12 +248,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
         // println(s"encoded persistent: " + String.valueOf(encodeHex(serializer.toBinary(persistent))))
         val oldData =
           "0a3208c3da0412022e611a28616b6b612e70657273697374656e63652e73657269616c697a" +
-          "6174696f6e2e4d795061796c6f6164100d1a027031200130033a0263313a02633240014a0c" +
-          "0a02703212026332180e20005244616b6b613a2f2f4d65737361676553657269616c697a65" +
-          "7250657273697374656e6365537065632f73797374656d2f746573744163746f7232232d34" +
-          "34373233313933375a44616b6b613a2f2f4d65737361676553657269616c697a6572506572" +
-          "73697374656e6365537065632f73797374656d2f746573744163746f7232232d3434373233" +
-          "31393337"
+            "6174696f6e2e4d795061796c6f6164100d1a027031200130033a0263313a02633240014a0c" +
+            "0a02703212026332180e20005244616b6b613a2f2f4d65737361676553657269616c697a65" +
+            "7250657273697374656e6365537065632f73797374656d2f746573744163746f7232232d34" +
+            "34373233313933375a44616b6b613a2f2f4d65737361676553657269616c697a6572506572" +
+            "73697374656e6365537065632f73797374656d2f746573744163746f7232232d3434373233" +
+            "31393337"
 
         val bytes = decodeHex(oldData.toCharArray)
         val expected =
@@ -339,8 +339,8 @@ class MessageSerializerRemotingSpec
     with DefaultTimeout {
   import MessageSerializerRemotingSpec._
 
-  val remoteSystem = ActorSystem(
-      "remote", remote.withFallback(customSerializers))
+  val remoteSystem =
+    ActorSystem("remote", remote.withFallback(customSerializers))
   val localActor =
     system.actorOf(Props(classOf[LocalActor], port(remoteSystem)), "local")
 

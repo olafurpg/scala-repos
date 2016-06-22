@@ -18,8 +18,8 @@ final class Env(config: Config,
   }
   import settings._
 
-  lazy val api = new ShutupApi(
-      coll = coll, follows = follows, reporter = reporter)
+  lazy val api =
+    new ShutupApi(coll = coll, follows = follows, reporter = reporter)
 
   private lazy val coll = db(CollectionShutup)
 

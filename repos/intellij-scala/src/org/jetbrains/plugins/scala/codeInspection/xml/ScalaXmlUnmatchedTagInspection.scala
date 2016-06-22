@@ -18,16 +18,17 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 class ScalaXmlUnmatchedTagInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitXmlStartTag(s: ScXmlStartTag) {
         if (s.getTextRange.isEmpty) return
 
         val endTag = s.getClosingTag
         def register(fixes: LocalQuickFix*) {
-          holder.registerProblem(
-              s, ScalaBundle.message("xml.no.closing.tag"), fixes: _*)
+          holder.registerProblem(s,
+                                 ScalaBundle.message("xml.no.closing.tag"),
+                                 fixes: _*)
         }
 
         if (endTag == null) {
@@ -41,8 +42,9 @@ class ScalaXmlUnmatchedTagInspection extends LocalInspectionTool {
       override def visitXmlEndTag(s: ScXmlEndTag) {
         val startTag = s.getOpeningTag
         def register(fixes: LocalQuickFix*) {
-          holder.registerProblem(
-              s, ScalaBundle.message("xml.no.opening.tag"), fixes: _*)
+          holder.registerProblem(s,
+                                 ScalaBundle.message("xml.no.opening.tag"),
+                                 fixes: _*)
         }
 
         if (startTag == null) {
@@ -58,7 +60,8 @@ class ScalaXmlUnmatchedTagInspection extends LocalInspectionTool {
 
 class DeleteUnmatchedTagQuickFix(s: ScalaPsiElement)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("xml.delete.unmatched.tag"), s) {
+        ScalaBundle.message("xml.delete.unmatched.tag"),
+        s) {
   override def getFamilyName: String = InspectionsUtil.SCALA
 
   def doApplyFix(project: Project) {
@@ -71,21 +74,24 @@ class DeleteUnmatchedTagQuickFix(s: ScalaPsiElement)
 
 class RenameClosingTagQuickFix(s: ScXmlStartTag)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("xml.rename.closing.tag"), s) {
+        ScalaBundle.message("xml.rename.closing.tag"),
+        s) {
   override def getFamilyName: String = InspectionsUtil.SCALA
 
   def doApplyFix(project: Project) {
     val elem = getElement
     if (!elem.isValid) return
 
-    elem.getClosingTag.replace(ScalaPsiElementFactory.createXmlEndTag(
-            elem.getTagName, elem.getManager))
+    elem.getClosingTag.replace(
+        ScalaPsiElementFactory.createXmlEndTag(elem.getTagName,
+                                               elem.getManager))
   }
 }
 
 class RenameOpeningTagQuickFix(s: ScXmlEndTag)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("xml.rename.opening.tag"), s) {
+        ScalaBundle.message("xml.rename.opening.tag"),
+        s) {
   override def getFamilyName: String = InspectionsUtil.SCALA
 
   def doApplyFix(project: Project) {

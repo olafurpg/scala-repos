@@ -61,7 +61,7 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
       case m =>
         throw new IllegalArgumentException(
             "Unsupported matrix format. Expected " +
-            s"SparseMatrix or DenseMatrix. Instead got: ${m.getClass}")
+              s"SparseMatrix or DenseMatrix. Instead got: ${m.getClass}")
     }
     val denseExplainedVariance = explainedVariance match {
       case dv: DenseVector =>
@@ -86,7 +86,7 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
   * @param pc a principal components Matrix. Each column is one principal component.
   */
 @Since("1.4.0")
-class PCAModel private[spark](
+class PCAModel private[spark] (
     @Since("1.4.0") val k: Int,
     @Since("1.4.0") val pc: DenseMatrix,
     @Since("1.6.0") val explainedVariance: DenseVector)
@@ -114,7 +114,7 @@ class PCAModel private[spark](
       case _ =>
         throw new IllegalArgumentException(
             "Unsupported vector format. Expected " +
-            s"SparseVector or DenseVector. Instead got: ${vector.getClass}")
+              s"SparseVector or DenseVector. Instead got: ${vector.getClass}")
     }
   }
 }

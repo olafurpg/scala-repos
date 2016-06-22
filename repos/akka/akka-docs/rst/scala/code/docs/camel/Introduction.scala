@@ -94,13 +94,15 @@ object Introduction {
     val actorRef = system.actorOf(Props[MyEndpoint])
     // get a future reference to the activation of the endpoint of the Consumer Actor
     val activationFuture = camel.activationFutureFor(actorRef)(
-        timeout = 10 seconds, executor = system.dispatcher)
+        timeout = 10 seconds,
+        executor = system.dispatcher)
     //#CamelActivation
     //#CamelDeactivation
     system.stop(actorRef)
     // get a future reference to the deactivation of the endpoint of the Consumer Actor
     val deactivationFuture = camel.deactivationFutureFor(actorRef)(
-        timeout = 10 seconds, executor = system.dispatcher)
+        timeout = 10 seconds,
+        executor = system.dispatcher)
     //#CamelDeactivation
   }
 }

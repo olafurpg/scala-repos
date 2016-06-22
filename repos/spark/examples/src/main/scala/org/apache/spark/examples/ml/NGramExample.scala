@@ -32,7 +32,8 @@ object NGramExample {
 
     // $example on$
     val wordDataFrame = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (0, Array("Hi", "I", "heard", "about", "Spark")),
               (1,
                Array("I", "wish", "Java", "could", "use", "case", "classes")),

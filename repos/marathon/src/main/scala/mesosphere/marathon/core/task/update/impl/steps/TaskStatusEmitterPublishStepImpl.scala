@@ -19,8 +19,9 @@ class TaskStatusEmitterPublishStepImpl @Inject()(
     extends TaskStatusUpdateStep {
   override def name: String = "emitUpdate"
 
-  override def processUpdate(
-      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(timestamp: Timestamp,
+                             task: Task,
+                             status: TaskStatus): Future[_] = {
     taskStatusEmitter.publish(
         TaskStatusUpdate(timestamp, task.taskId, MarathonTaskStatus(status)))
     Future.successful(())

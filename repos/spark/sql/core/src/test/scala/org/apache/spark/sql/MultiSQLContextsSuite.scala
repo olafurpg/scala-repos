@@ -57,8 +57,8 @@ class MultiSQLContextsSuite extends SparkFunSuite with BeforeAndAfterAll {
   }
 
   def testCreatingNewSQLContext(allowsMultipleContexts: Boolean): Unit = {
-    val conf = sparkConf.clone.set(
-        SQLConf.ALLOW_MULTIPLE_CONTEXTS.key, allowsMultipleContexts.toString)
+    val conf = sparkConf.clone.set(SQLConf.ALLOW_MULTIPLE_CONTEXTS.key,
+                                   allowsMultipleContexts.toString)
     val sparkContext = new SparkContext(conf)
 
     try {

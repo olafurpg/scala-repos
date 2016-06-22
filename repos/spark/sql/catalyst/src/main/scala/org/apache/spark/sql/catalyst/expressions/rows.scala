@@ -137,24 +137,23 @@ trait BaseGenericInternalRow extends InternalRow {
     var i = 0
     val len = numFields
     while (i < len) {
-      val update: Int =
-        if (isNullAt(i)) {
-          0
-        } else {
-          genericGet(i) match {
-            case b: Boolean => if (b) 0 else 1
-            case b: Byte => b.toInt
-            case s: Short => s.toInt
-            case i: Int => i
-            case l: Long => (l ^ (l >>> 32)).toInt
-            case f: Float => java.lang.Float.floatToIntBits(f)
-            case d: Double =>
-              val b = java.lang.Double.doubleToLongBits(d)
-              (b ^ (b >>> 32)).toInt
-            case a: Array[Byte] => java.util.Arrays.hashCode(a)
-            case other => other.hashCode()
-          }
+      val update: Int = if (isNullAt(i)) {
+        0
+      } else {
+        genericGet(i) match {
+          case b: Boolean => if (b) 0 else 1
+          case b: Byte => b.toInt
+          case s: Short => s.toInt
+          case i: Int => i
+          case l: Long => (l ^ (l >>> 32)).toInt
+          case f: Float => java.lang.Float.floatToIntBits(f)
+          case d: Double =>
+            val b = java.lang.Double.doubleToLongBits(d)
+            (b ^ (b >>> 32)).toInt
+          case a: Array[Byte] => java.util.Arrays.hashCode(a)
+          case other => other.hashCode()
         }
+      }
       result = 37 * result + update
       i += 1
     }

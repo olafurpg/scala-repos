@@ -90,7 +90,8 @@ private[python] class TransformFunction(
   }
 
   private def callPythonTransformFunction(
-      time: Long, rdds: JList[_]): JavaRDD[Array[Byte]] = {
+      time: Long,
+      rdds: JList[_]): JavaRDD[Array[Byte]] = {
     val resultRDD = pfunc.call(time, rdds)
     val failure = pfunc.getLastFailure
     if (failure != null) {
@@ -181,8 +182,8 @@ private[python] object PythonDStream {
     * helper function for DStream.foreachRDD(),
     * cannot be `foreachRDD`, it will confusing py4j
     */
-  def callForeachRDD(
-      jdstream: JavaDStream[Array[Byte]], pfunc: PythonTransformFunction) {
+  def callForeachRDD(jdstream: JavaDStream[Array[Byte]],
+                     pfunc: PythonTransformFunction) {
     val func = new TransformFunction((pfunc))
     jdstream.dstream.foreachRDD((rdd, time) => func(Some(rdd), time))
   }
@@ -201,8 +202,8 @@ private[python] object PythonDStream {
 /**
   * Base class for PythonDStream with some common methods
   */
-private[python] abstract class PythonDStream(
-    parent: DStream[_], pfunc: PythonTransformFunction)
+private[python] abstract class PythonDStream(parent: DStream[_],
+                                             pfunc: PythonTransformFunction)
     extends DStream[Array[Byte]](parent.ssc) {
 
   val func = new TransformFunction(pfunc)
@@ -217,8 +218,8 @@ private[python] abstract class PythonDStream(
 /**
   * Transformed DStream in Python.
   */
-private[python] class PythonTransformedDStream(
-    parent: DStream[_], pfunc: PythonTransformFunction)
+private[python] class PythonTransformedDStream(parent: DStream[_],
+                                               pfunc: PythonTransformFunction)
     extends PythonDStream(parent, pfunc) {
 
   override def compute(validTime: Time): Option[RDD[Array[Byte]]] = {
@@ -331,14 +332,13 @@ private[python] class PythonReducedWindowedDStream(
         windowDuration >= slideDuration * 5) {
 
       // subtract the values from old RDDs
-      val oldRDDs = parent.slice(
-          previous.beginTime + parent.slideDuration, current.beginTime)
-      val subtracted =
-        if (oldRDDs.size > 0) {
-          invReduceFunc(previousRDD, Some(ssc.sc.union(oldRDDs)), validTime)
-        } else {
-          previousRDD
-        }
+      val oldRDDs = parent
+        .slice(previous.beginTime + parent.slideDuration, current.beginTime)
+      val subtracted = if (oldRDDs.size > 0) {
+        invReduceFunc(previousRDD, Some(ssc.sc.union(oldRDDs)), validTime)
+      } else {
+        previousRDD
+      }
 
       // add the RDDs of the reduced values in "new time steps"
       val newRDDs =

@@ -59,27 +59,27 @@ private[gameSearch] object DataForm {
   val dateField = optional(nonEmptyText.verifying(dateConstraint))
 }
 
-private[gameSearch] case class SearchData(
-    players: SearchPlayer = SearchPlayer(),
-    winnerColor: Option[Int] = None,
-    perf: Option[Int] = None,
-    source: Option[Int] = None,
-    mode: Option[Int] = None,
-    turnsMin: Option[Int] = None,
-    turnsMax: Option[Int] = None,
-    ratingMin: Option[Int] = None,
-    ratingMax: Option[Int] = None,
-    hasAi: Option[Int] = None,
-    aiLevelMin: Option[Int] = None,
-    aiLevelMax: Option[Int] = None,
-    durationMin: Option[Int] = None,
-    durationMax: Option[Int] = None,
-    clock: SearchClock = SearchClock(),
-    dateMin: Option[String] = None,
-    dateMax: Option[String] = None,
-    status: Option[Int] = None,
-    analysed: Option[Int] = None,
-    sort: Option[SearchSort] = None) {
+private[gameSearch] case class SearchData(players: SearchPlayer =
+                                            SearchPlayer(),
+                                          winnerColor: Option[Int] = None,
+                                          perf: Option[Int] = None,
+                                          source: Option[Int] = None,
+                                          mode: Option[Int] = None,
+                                          turnsMin: Option[Int] = None,
+                                          turnsMax: Option[Int] = None,
+                                          ratingMin: Option[Int] = None,
+                                          ratingMax: Option[Int] = None,
+                                          hasAi: Option[Int] = None,
+                                          aiLevelMin: Option[Int] = None,
+                                          aiLevelMax: Option[Int] = None,
+                                          durationMin: Option[Int] = None,
+                                          durationMax: Option[Int] = None,
+                                          clock: SearchClock = SearchClock(),
+                                          dateMin: Option[String] = None,
+                                          dateMax: Option[String] = None,
+                                          status: Option[Int] = None,
+                                          analysed: Option[Int] = None,
+                                          sort: Option[SearchSort] = None) {
 
   def sortOrDefault = sort | SearchSort()
 
@@ -140,7 +140,8 @@ private[gameSearch] case class SearchPlayer(a: Option[String] = None,
 }
 
 private[gameSearch] case class SearchSort(
-    field: String = Sorting.default.f, order: String = Sorting.default.order)
+    field: String = Sorting.default.f,
+    order: String = Sorting.default.order)
 
 private[gameSearch] case class SearchClock(initMin: Option[Int] = None,
                                            initMax: Option[Int] = None,

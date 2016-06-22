@@ -47,14 +47,14 @@ private[spark] class FIFOSchedulableBuilder(val rootPool: Pool)
     // nothing
   }
 
-  override def addTaskSetManager(
-      manager: Schedulable, properties: Properties) {
+  override def addTaskSetManager(manager: Schedulable,
+                                 properties: Properties) {
     rootPool.addSchedulable(manager)
   }
 }
 
-private[spark] class FairSchedulableBuilder(
-    val rootPool: Pool, conf: SparkConf)
+private[spark] class FairSchedulableBuilder(val rootPool: Pool,
+                                            conf: SparkConf)
     extends SchedulableBuilder
     with Logging {
 
@@ -147,8 +147,8 @@ private[spark] class FairSchedulableBuilder(
     }
   }
 
-  override def addTaskSetManager(
-      manager: Schedulable, properties: Properties) {
+  override def addTaskSetManager(manager: Schedulable,
+                                 properties: Properties) {
     var poolName = DEFAULT_POOL_NAME
     var parentPool = rootPool.getSchedulableByName(poolName)
     if (properties != null) {

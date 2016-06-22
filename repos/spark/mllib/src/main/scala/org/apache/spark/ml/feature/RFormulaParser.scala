@@ -80,7 +80,8 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
 
   // expands the Dot operators in interaction terms
   private def expandInteraction(
-      schema: StructType, terms: Seq[InteractableTerm]): Seq[Seq[String]] = {
+      schema: StructType,
+      terms: Seq[InteractableTerm]): Seq[Seq[String]] = {
     if (terms.isEmpty) {
       return Seq(Nil)
     }
@@ -127,8 +128,9 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
   *              of column names; non-interaction terms as length 1 Seqs.
   * @param hasIntercept whether the formula specifies fitting with an intercept.
   */
-private[ml] case class ResolvedRFormula(
-    label: String, terms: Seq[Seq[String]], hasIntercept: Boolean)
+private[ml] case class ResolvedRFormula(label: String,
+                                        terms: Seq[Seq[String]],
+                                        hasIntercept: Boolean)
 
 /**
   * R formula terms. See the R formula docs here for more information:
@@ -167,8 +169,8 @@ private[ml] object RFormulaParser extends RegexParsers {
 
   private val dot: Parser[InteractableTerm] = "\\.".r ^^ { case _ => Dot }
 
-  private val interaction: Parser[List[InteractableTerm]] = rep1sep(
-      columnRef | dot, ":")
+  private val interaction: Parser[List[InteractableTerm]] =
+    rep1sep(columnRef | dot, ":")
 
   private val term: Parser[Term] =
     intercept | interaction ^^ { case terms => ColumnInteraction(terms) } | dot | columnRef

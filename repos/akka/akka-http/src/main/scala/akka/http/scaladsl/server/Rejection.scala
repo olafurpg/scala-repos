@@ -93,7 +93,8 @@ case class UnsupportedRequestEncodingRejection(supported: HttpEncoding)
   * The actualEntityLength gives the client a hint to create satisfiable ByteRanges.
   */
 case class UnsatisfiableRangeRejection(
-    unsatisfiableRanges: immutable.Seq[ByteRange], actualEntityLength: Long)
+    unsatisfiableRanges: immutable.Seq[ByteRange],
+    actualEntityLength: Long)
     extends Rejection
 
 /**
@@ -110,8 +111,8 @@ case class TooManyRangesRejection(maxRanges: Int) extends Rejection
   * Note that semantic issues with the request content (e.g. because some parameter was out of range)
   * will usually trigger a `ValidationRejection` instead.
   */
-case class MalformedRequestContentRejection(
-    message: String, cause: Option[Throwable] = None)
+case class MalformedRequestContentRejection(message: String,
+                                            cause: Option[Throwable] = None)
     extends Rejection
 
 /**
@@ -148,7 +149,8 @@ object UnacceptedResponseEncodingRejection {
   * specified in the cause.
   */
 case class AuthenticationFailedRejection(
-    cause: AuthenticationFailedRejection.Cause, challenge: HttpChallenge)
+    cause: AuthenticationFailedRejection.Cause,
+    challenge: HttpChallenge)
     extends Rejection
 
 object AuthenticationFailedRejection {
@@ -200,8 +202,8 @@ case class UnsupportedWebSocketSubprotocolRejection(supportedProtocol: String)
   * thrown by domain model constructors (e.g. via `require`).
   * It signals that an expected value was semantically invalid.
   */
-case class ValidationRejection(
-    message: String, cause: Option[Throwable] = None)
+case class ValidationRejection(message: String,
+                               cause: Option[Throwable] = None)
     extends Rejection
 
 /**

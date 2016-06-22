@@ -196,8 +196,8 @@ trait MemberHandlers {
     override def resultExtractionCode(req: Request) = {
       val lhsType = string2code(req lookupTypeOf name)
       val res = string2code(req fullPath name)
-      """ + "%s: %s = " + %s + "\n" """.format(
-          string2code(lhs.toString), lhsType, res) + "\n"
+      """ + "%s: %s = " + %s + "\n" """
+        .format(string2code(lhs.toString), lhsType, res) + "\n"
     }
   }
 
@@ -249,7 +249,7 @@ trait MemberHandlers {
 
     private val selectorNames =
       selectorRenames filterNot (_ == nme.USCOREkw) flatMap
-      (_.bothNames) toSet
+        (_.bothNames) toSet
     lazy val individualSymbols: List[Symbol] = exitingTyper(
         importableTargetMembers filter (m => selectorNames(m.name)))
     lazy val wildcardSymbols: List[Symbol] = exitingTyper(

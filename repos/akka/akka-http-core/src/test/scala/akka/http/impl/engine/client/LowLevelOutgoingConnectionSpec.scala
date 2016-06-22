@@ -441,7 +441,8 @@ class LowLevelOutgoingConnectionSpec
             }
 
           def expectSizeErrorInEntityOfType[T <: HttpEntity: ClassTag](
-              limit: Int, actualSize: Option[Long] = None) =
+              limit: Int,
+              actualSize: Option[Long] = None) =
             inside(response) {
               case HttpResponse(_, _, entity: T, _) ⇒
                 def gatherBytes =
@@ -449,7 +450,8 @@ class LowLevelOutgoingConnectionSpec
                     .runFold(ByteString.empty)(_ ++ _)
                     .awaitResult(100.millis)
                 (the[Exception] thrownBy gatherBytes).getCause shouldEqual EntityStreamSizeException(
-                    limit, actualSize)
+                    limit,
+                    actualSize)
             }
         }
       }
@@ -643,9 +645,10 @@ class LowLevelOutgoingConnectionSpec
     "support requests with an `Expect: 100-continue` headers" which {
 
       "have a strict entity and receive a `100 Continue` response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST,
-                                         headers = List(Expect.`100-continue`),
-                                         entity = "ABCDEF"))
+        requestsSub.sendNext(
+            HttpRequest(POST,
+                        headers = List(Expect.`100-continue`),
+                        entity = "ABCDEF"))
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
@@ -718,9 +721,10 @@ class LowLevelOutgoingConnectionSpec
       }
 
       "receive a normal response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST,
-                                         headers = List(Expect.`100-continue`),
-                                         entity = "ABCDEF"))
+        requestsSub.sendNext(
+            HttpRequest(POST,
+                        headers = List(Expect.`100-continue`),
+                        entity = "ABCDEF"))
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
@@ -748,9 +752,10 @@ class LowLevelOutgoingConnectionSpec
       }
 
       "receive an error response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST,
-                                         headers = List(Expect.`100-continue`),
-                                         entity = "ABCDEF"))
+        requestsSub.sendNext(
+            HttpRequest(POST,
+                        headers = List(Expect.`100-continue`),
+                        entity = "ABCDEF"))
         requestsSub.sendComplete()
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
@@ -818,8 +823,10 @@ class LowLevelOutgoingConnectionSpec
       val netIn = TestPublisher.manualProbe[ByteString]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create(OutgoingConnectionBlueprint(
-                    Host("example.com"), settings, NoLogging)) {
+        .fromGraph(
+            GraphDSL.create(OutgoingConnectionBlueprint(Host("example.com"),
+                                                        settings,
+                                                        NoLogging)) {
           implicit b ⇒ client ⇒
             import GraphDSL.Implicits._
             Source.fromPublisher(netIn) ~> Flow[ByteString].map(

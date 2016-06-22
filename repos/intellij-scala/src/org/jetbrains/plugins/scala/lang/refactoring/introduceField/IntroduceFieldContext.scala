@@ -27,7 +27,8 @@ class IntroduceFieldContext[T <: PsiElement](
   val occurrences = element match {
     case expr: ScExpression =>
       ScalaRefactoringUtil.getOccurrenceRanges(
-          ScalaRefactoringUtil.unparExpr(expr), aClass.extendsBlock)
+          ScalaRefactoringUtil.unparExpr(expr),
+          aClass.extendsBlock)
     case _ => null
   }
 

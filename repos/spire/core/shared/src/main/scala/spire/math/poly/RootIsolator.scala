@@ -53,8 +53,11 @@ object RootIsolator {
     val x = Polynomial.x[BigInt]
     val one = Polynomial.one[BigInt]
 
-    case class TransformedPoly(
-        p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt)
+    case class TransformedPoly(p: Polynomial[BigInt],
+                               a: BigInt,
+                               b: BigInt,
+                               c: BigInt,
+                               d: BigInt)
 
     // Find all roots recursively that are between (0, 1) and (1, infinity).
     def split1(p: Polynomial[BigInt],
@@ -78,8 +81,8 @@ object RootIsolator {
 
     // Isolate all positive roots in polynomial p.
     def rec(polys: List[TransformedPoly],
-            acc: Vector[Interval[Rational]] =
-              Vector.empty): Vector[Interval[Rational]] = polys match {
+            acc: Vector[Interval[Rational]] = Vector.empty)
+      : Vector[Interval[Rational]] = polys match {
       case TransformedPoly(p, a, b, c, d) :: rest =>
         if (p(BigInt(0)) == BigInt(0)) {
           val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }

@@ -55,12 +55,11 @@ class UISeleniumSuite
   }
 
   override protected def serverStartCommand(port: Int) = {
-    val portConf =
-      if (mode == ServerMode.binary) {
-        ConfVars.HIVE_SERVER2_THRIFT_PORT
-      } else {
-        ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT
-      }
+    val portConf = if (mode == ServerMode.binary) {
+      ConfVars.HIVE_SERVER2_THRIFT_PORT
+    } else {
+      ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT
+    }
 
     s"""$startScript
         |  --master local
@@ -98,8 +97,9 @@ class UISeleniumSuite
 
         // check whether statements exists
         queries.foreach { line =>
-          findAll(cssSelector("""ul table tbody tr td""")).map(_.text).toList should contain(
-              line)
+          findAll(cssSelector("""ul table tbody tr td"""))
+            .map(_.text)
+            .toList should contain(line)
         }
       }
     }

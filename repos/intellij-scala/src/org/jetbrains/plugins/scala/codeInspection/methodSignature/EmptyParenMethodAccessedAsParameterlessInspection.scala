@@ -37,7 +37,7 @@ class EmptyParenMethodAccessedAsParameterlessInspection
   def actionFor(holder: ProblemsHolder) = {
     case e: ScReferenceExpression
         if e.isValid &&
-        IntentionAvailabilityChecker.checkInspection(this, e) =>
+          IntentionAvailabilityChecker.checkInspection(this, e) =>
       e.getParent match {
         case gc: ScGenericCall =>
           ScalaPsiUtil.findCall(gc) match {
@@ -61,8 +61,9 @@ class EmptyParenMethodAccessedAsParameterlessInspection
           // this avoids false positives. To be more accurate, we would need an 'etaExpanded'
           // flag in ScalaResolveResult.
           case _ =>
-            holder.registerProblem(
-                e.nameId, getDisplayName, new AddCallParentheses(e))
+            holder.registerProblem(e.nameId,
+                                   getDisplayName,
+                                   new AddCallParentheses(e))
         }
       case _ =>
     }

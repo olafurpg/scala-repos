@@ -61,8 +61,8 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   implicit val executionContext =
     ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executionContext, Duration(15, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
+                                          Duration(15, "seconds"))
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
   val jobManager: JobManager[Future] = new InMemoryJobManager[Future]
@@ -75,8 +75,8 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
                                AccountPlan.Free)
   val ticker = actorSystem.actorOf(Props(new Ticker(ticks)))
 
-  def execute(
-      numTicks: Int, ticksToTimeout: Option[Int] = None): Future[JobId] = {
+  def execute(numTicks: Int,
+              ticksToTimeout: Option[Int] = None): Future[JobId] = {
     val timeout =
       ticksToTimeout map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
@@ -85,10 +85,14 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
       executor <- asyncExecutorFor(apiKey) leftMap {
                    EvaluationError.invalidState
                  }
-      ctx = EvaluationContext(
-          apiKey, account, Path("/\\\\/\\///\\/"), Path.Root, clock.now())
-      result <- executor.execute(
-                   numTicks.toString, ctx, QueryOptions(timeout = timeout))
+      ctx = EvaluationContext(apiKey,
+                              account,
+                              Path("/\\\\/\\///\\/"),
+                              Path.Root,
+                              clock.now())
+      result <- executor.execute(numTicks.toString,
+                                 ctx,
+                                 QueryOptions(timeout = timeout))
     } yield result
 
     executionResult.valueOr(err => sys.error(err.toString))
@@ -220,28 +224,28 @@ trait TestManagedPlatform
         val numTicks = query.toInt
         EitherT
           .right[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
-          schedule(0) {
-            StreamT.unfoldM[JobQueryTF, Slice, Int](0) {
-              case i if i < numTicks =>
-                schedule(1) {
-                  Some((Slice.fromJValues(
-                            Stream(JObject("value" -> JString(".")))),
-                        i + 1))
-                }.liftM[JobQueryT]
+            schedule(0) {
+              StreamT.unfoldM[JobQueryTF, Slice, Int](0) {
+                case i if i < numTicks =>
+                  schedule(1) {
+                    Some(
+                        (Slice.fromJValues(
+                             Stream(JObject("value" -> JString(".")))),
+                         i + 1))
+                  }.liftM[JobQueryT]
 
-              case _ =>
-                shardQueryMonad.point { None }
-            }
-          }.liftM[JobQueryT]
-        }
+                case _ =>
+                  shardQueryMonad.point { None }
+              }
+            }.liftM[JobQueryT]
+          }
       }
     }
   }
 
   def asyncExecutorFor(apiKey: APIKey)
     : EitherT[Future, String, QueryExecutor[Future, JobId]] = {
-    EitherT.right(
-        Future(new AsyncQueryExecutor {
+    EitherT.right(Future(new AsyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
@@ -250,8 +254,7 @@ trait TestManagedPlatform
       Future,
       String,
       QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
-    EitherT.right(
-        Future(new SyncQueryExecutor {
+    EitherT.right(Future(new SyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }

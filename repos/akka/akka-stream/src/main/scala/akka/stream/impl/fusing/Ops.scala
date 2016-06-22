@@ -25,8 +25,8 @@ import akka.stream.impl.Stages.DefaultAttributes
 /**
   * INTERNAL API
   */
-private[akka] final case class Map[In, Out](
-    f: In ⇒ Out, decider: Supervision.Decider)
+private[akka] final case class Map[In, Out](f: In ⇒ Out,
+                                            decider: Supervision.Decider)
     extends PushStage[In, Out] {
   override def onPush(elem: In, ctx: Context[Out]): SyncDirective =
     ctx.push(f(elem))
@@ -37,8 +37,8 @@ private[akka] final case class Map[In, Out](
 /**
   * INTERNAL API
   */
-private[akka] final case class Filter[T](
-    p: T ⇒ Boolean, decider: Supervision.Decider)
+private[akka] final case class Filter[T](p: T ⇒ Boolean,
+                                         decider: Supervision.Decider)
     extends PushStage[T, T] {
   override def onPush(elem: T, ctx: Context[T]): SyncDirective =
     if (p(elem)) ctx.push(elem)
@@ -50,8 +50,8 @@ private[akka] final case class Filter[T](
 /**
   * INTERNAL API
   */
-private[akka] final case class TakeWhile[T](
-    p: T ⇒ Boolean, decider: Supervision.Decider)
+private[akka] final case class TakeWhile[T](p: T ⇒ Boolean,
+                                            decider: Supervision.Decider)
     extends PushStage[T, T] {
 
   override def onPush(elem: T, ctx: Context[T]): SyncDirective =
@@ -64,8 +64,8 @@ private[akka] final case class TakeWhile[T](
 /**
   * INTERNAL API
   */
-private[akka] final case class DropWhile[T](
-    p: T ⇒ Boolean, decider: Supervision.Decider)
+private[akka] final case class DropWhile[T](p: T ⇒ Boolean,
+                                            decider: Supervision.Decider)
     extends PushStage[T, T] {
   var taking = false
 
@@ -87,8 +87,8 @@ private[akka] object Collect {
   final val NotApplied: Any ⇒ Any = _ ⇒ Collect.NotApplied
 }
 
-private[akka] final case class Collect[In, Out](
-    pf: PartialFunction[In, Out], decider: Supervision.Decider)
+private[akka] final case class Collect[In, Out](pf: PartialFunction[In, Out],
+                                                decider: Supervision.Decider)
     extends PushStage[In, Out] {
 
   import Collect.NotApplied
@@ -120,8 +120,8 @@ private[akka] final case class Recover[T](pf: PartialFunction[Throwable, T])
       case None ⇒ ctx.pull()
     }
 
-  override def onUpstreamFailure(
-      t: Throwable, ctx: Context[T]): TerminationDirective = {
+  override def onUpstreamFailure(t: Throwable,
+                                 ctx: Context[T]): TerminationDirective = {
     pf.applyOrElse(t, NotApplied) match {
       case NotApplied ⇒ ctx.fail(t)
       case result: T @unchecked ⇒
@@ -179,8 +179,9 @@ private[akka] final case class Drop[T](count: Long)
 /**
   * INTERNAL API
   */
-private[akka] final case class Scan[In, Out](
-    zero: Out, f: (Out, In) ⇒ Out, decider: Supervision.Decider)
+private[akka] final case class Scan[In, Out](zero: Out,
+                                             f: (Out, In) ⇒ Out,
+                                             decider: Supervision.Decider)
     extends PushPullStage[In, Out] {
   private var aggregator = zero
   private var pushedZero = false
@@ -214,8 +215,9 @@ private[akka] final case class Scan[In, Out](
 /**
   * INTERNAL API
   */
-private[akka] final case class Fold[In, Out](
-    zero: Out, f: (Out, In) ⇒ Out, decider: Supervision.Decider)
+private[akka] final case class Fold[In, Out](zero: Out,
+                                             f: (Out, In) ⇒ Out,
+                                             decider: Supervision.Decider)
     extends PushPullStage[In, Out] {
   private[this] var aggregator: Out = zero
 
@@ -374,8 +376,8 @@ private[akka] final case class Sliding[T](n: Int, step: Int)
 /**
   * INTERNAL API
   */
-private[akka] final case class Buffer[T](
-    size: Int, overflowStrategy: OverflowStrategy)
+private[akka] final case class Buffer[T](size: Int,
+                                         overflowStrategy: OverflowStrategy)
     extends DetachedStage[T, T] {
 
   private var buffer: BufferImpl[T] = _
@@ -403,42 +405,43 @@ private[akka] final case class Buffer[T](
     if (buffer.isEmpty) ctx.finish()
     else ctx.absorbTermination()
 
-  val enqueueAction: (DetachedContext[T],
-                      T) ⇒ UpstreamDirective = overflowStrategy match {
-    case DropHead ⇒
-      (ctx, elem) ⇒
-        if (buffer.isFull) buffer.dropHead()
-        buffer.enqueue(elem)
-        ctx.pull()
-      case DropTail ⇒
-      (ctx, elem) ⇒
-        if (buffer.isFull) buffer.dropTail()
-        buffer.enqueue(elem)
-        ctx.pull()
-      case DropBuffer ⇒
-      (ctx, elem) ⇒
-        if (buffer.isFull) buffer.clear()
-        buffer.enqueue(elem)
-        ctx.pull()
-      case DropNew ⇒
-      (ctx, elem) ⇒
-        if (!buffer.isFull) buffer.enqueue(elem)
-        ctx.pull()
-      case Backpressure ⇒
-      (ctx, elem) ⇒
-        buffer.enqueue(elem)
-        if (buffer.isFull) ctx.holdUpstream()
-        else ctx.pull()
-      case Fail ⇒
-      (ctx, elem) ⇒
-        if (buffer.isFull)
-          ctx.fail(new BufferOverflowException(
-                  s"Buffer overflow (max capacity was: $size)!"))
-        else {
+  val enqueueAction: (DetachedContext[T], T) ⇒ UpstreamDirective =
+    overflowStrategy match {
+      case DropHead ⇒
+        (ctx, elem) ⇒
+          if (buffer.isFull) buffer.dropHead()
           buffer.enqueue(elem)
           ctx.pull()
-        }
-  }
+        case DropTail ⇒
+        (ctx, elem) ⇒
+          if (buffer.isFull) buffer.dropTail()
+          buffer.enqueue(elem)
+          ctx.pull()
+        case DropBuffer ⇒
+        (ctx, elem) ⇒
+          if (buffer.isFull) buffer.clear()
+          buffer.enqueue(elem)
+          ctx.pull()
+        case DropNew ⇒
+        (ctx, elem) ⇒
+          if (!buffer.isFull) buffer.enqueue(elem)
+          ctx.pull()
+        case Backpressure ⇒
+        (ctx, elem) ⇒
+          buffer.enqueue(elem)
+          if (buffer.isFull) ctx.holdUpstream()
+          else ctx.pull()
+        case Fail ⇒
+        (ctx, elem) ⇒
+          if (buffer.isFull)
+            ctx.fail(
+                new BufferOverflowException(
+                    s"Buffer overflow (max capacity was: $size)!"))
+          else {
+            buffer.enqueue(elem)
+            ctx.pull()
+          }
+    }
 }
 
 /**
@@ -453,8 +456,10 @@ private[akka] final case class Completed[T]() extends PushPullStage[T, T] {
 /**
   * INTERNAL API
   */
-private[akka] final case class Batch[In, Out](
-    max: Long, costFn: In ⇒ Long, seed: In ⇒ Out, aggregate: (Out, In) ⇒ Out)
+private[akka] final case class Batch[In, Out](max: Long,
+                                              costFn: In ⇒ Long,
+                                              seed: In ⇒ Out,
+                                              aggregate: (Out, In) ⇒ Out)
     extends GraphStage[FlowShape[In, Out]] {
 
   val in = Inlet[In]("Batch.in")
@@ -649,8 +654,8 @@ private[akka] object MapAsync {
 /**
   * INTERNAL API
   */
-private[akka] final case class MapAsync[In, Out](
-    parallelism: Int, f: In ⇒ Future[Out])
+private[akka] final case class MapAsync[In, Out](parallelism: Int,
+                                                 f: In ⇒ Future[Out])
     extends GraphStage[FlowShape[In, Out]] {
 
   import MapAsync._
@@ -738,8 +743,8 @@ private[akka] final case class MapAsync[In, Out](
 /**
   * INTERNAL API
   */
-private[akka] final case class MapAsyncUnordered[In, Out](
-    parallelism: Int, f: In ⇒ Future[Out])
+private[akka] final case class MapAsyncUnordered[In, Out](parallelism: Int,
+                                                          f: In ⇒ Future[Out])
     extends GraphStage[FlowShape[In, Out]] {
 
   private val in = Inlet[In]("in")
@@ -838,7 +843,7 @@ private[akka] final case class Log[T](name: String,
           case ex: Exception ⇒
             throw new RuntimeException(
                 "Log stage can only provide LoggingAdapter when used with ActorMaterializer! " +
-                "Provide a LoggingAdapter explicitly or use the actor based flow materializer.",
+                  "Provide a LoggingAdapter explicitly or use the actor based flow materializer.",
                 ex)
         }
 
@@ -853,8 +858,8 @@ private[akka] final case class Log[T](name: String,
     ctx.push(elem)
   }
 
-  override def onUpstreamFailure(
-      cause: Throwable, ctx: Context[T]): TerminationDirective = {
+  override def onUpstreamFailure(cause: Throwable,
+                                 ctx: Context[T]): TerminationDirective = {
     if (isEnabled(logLevels.onFailure))
       logLevels.onFailure match {
         case Logging.ErrorLevel ⇒
@@ -1006,8 +1011,8 @@ private[stream] final class GroupedWithin[T](n: Int, d: FiniteDuration)
     }
 }
 
-private[stream] final class Delay[T](
-    d: FiniteDuration, strategy: DelayOverflowStrategy)
+private[stream] final class Delay[T](d: FiniteDuration,
+                                     strategy: DelayOverflowStrategy)
     extends SimpleLinearGraphStage[T] {
   private[this] def timerName = "DelayedTimer"
   override def initialAttributes: Attributes = DefaultAttributes.delay
@@ -1020,8 +1025,7 @@ private[stream] final class Delay[T](
         case Some(InputBuffer(min, max)) ⇒ max
       }
 
-      var buffer: BufferImpl[(Long, T)] =
-        _ // buffer has pairs timestamp with upstream element
+      var buffer: BufferImpl[(Long, T)] = _ // buffer has pairs timestamp with upstream element
       var willStop = false
 
       override def preStart(): Unit = buffer = BufferImpl(size, materializer)
@@ -1050,7 +1054,8 @@ private[stream] final class Delay[T](
                 buffer.clear()
                 grabAndPull(true)
               case Fail ⇒
-                failStage(new BufferOverflowException(
+                failStage(
+                    new BufferOverflowException(
                         s"Buffer overflow for delay combinator (max capacity was: $size)!"))
               case Backpressure ⇒
                 throw new IllegalStateException(

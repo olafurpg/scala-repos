@@ -18,8 +18,9 @@ object SecondsToDoFirstMove {
   }
 }
 
-final class AutoPairing(
-    roundMap: ActorRef, system: ActorSystem, onStart: String => Unit) {
+final class AutoPairing(roundMap: ActorRef,
+                        system: ActorSystem,
+                        onStart: String => Unit) {
 
   def apply(tour: Tournament, pairing: Pairing): Fu[Game] =
     for {
@@ -65,23 +66,26 @@ final class AutoPairing(
       _.fold(fufail[User]("No user named " + username))(fuccess)
     }
 
-  private def scheduleIdleCheck(
-      povRef: PovRef, secondsToMove: Int, thenAgain: Boolean) {
+  private def scheduleIdleCheck(povRef: PovRef,
+                                secondsToMove: Int,
+                                thenAgain: Boolean) {
     system.scheduler.scheduleOnce(secondsToMove seconds)(
         idleCheck(povRef, secondsToMove, thenAgain))
   }
 
-  private def idleCheck(
-      povRef: PovRef, secondsToMove: Int, thenAgain: Boolean) {
+  private def idleCheck(povRef: PovRef,
+                        secondsToMove: Int,
+                        thenAgain: Boolean) {
     GameRepo pov povRef foreach {
       _.filter(_.game.playable) foreach { pov =>
         if (pov.game.playerHasMoved(pov.color)) {
           if (thenAgain && !pov.game.playerHasMoved(pov.opponent.color))
             scheduleIdleCheck(
-                !pov.ref, pov.game.lastMoveTimeInSeconds.fold(secondsToMove) {
-              lmt =>
-                lmt - nowSeconds + secondsToMove
-            }, false)
+                !pov.ref,
+                pov.game.lastMoveTimeInSeconds.fold(secondsToMove) { lmt =>
+                  lmt - nowSeconds + secondsToMove
+                },
+                false)
         } else roundMap ! Tell(pov.gameId, NoStartColor(pov.color))
       }
     }

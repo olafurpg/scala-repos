@@ -30,8 +30,8 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
   def filterConfig(implicit ctx: UserContext): Fu[FilterConfig] =
     savedConfig map (_.filter)
 
-  def aiFilled(
-      fen: Option[String])(implicit ctx: UserContext): Fu[Form[AiConfig]] =
+  def aiFilled(fen: Option[String])(
+      implicit ctx: UserContext): Fu[Form[AiConfig]] =
     aiConfig map { config =>
       ai(ctx) fill fen.fold(config) { f =>
         config.copy(fen = f.some, variant = chess.variant.FromPosition)
@@ -54,8 +54,8 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
   def aiConfig(implicit ctx: UserContext): Fu[AiConfig] =
     savedConfig map (_.ai)
 
-  def friendFilled(
-      fen: Option[String])(implicit ctx: UserContext): Fu[Form[FriendConfig]] =
+  def friendFilled(fen: Option[String])(
+      implicit ctx: UserContext): Fu[Form[FriendConfig]] =
     friendConfig map { config =>
       friend(ctx) fill fen.fold(config) { f =>
         config.copy(fen = f.some, variant = chess.variant.FromPosition)

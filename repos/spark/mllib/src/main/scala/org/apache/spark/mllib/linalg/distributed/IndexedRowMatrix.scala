@@ -154,27 +154,23 @@ class IndexedRowMatrix @Since("1.0.0")(
     * @return SingularValueDecomposition(U, s, V)
     */
   @Since("1.0.0")
-  def computeSVD(
-      k: Int,
-      computeU: Boolean = false,
-      rCond: Double =
-        1e-9): SingularValueDecomposition[IndexedRowMatrix, Matrix] = {
+  def computeSVD(k: Int, computeU: Boolean = false, rCond: Double = 1e-9)
+    : SingularValueDecomposition[IndexedRowMatrix, Matrix] = {
 
     val n = numCols().toInt
     require(k > 0 && k <= n,
             s"Requested k singular values but got k=$k and numCols=$n.")
     val indices = rows.map(_.index)
     val svd = toRowMatrix().computeSVD(k, computeU, rCond)
-    val U =
-      if (computeU) {
-        val indexedRows = indices.zip(svd.U.rows).map {
-          case (i, v) =>
-            IndexedRow(i, v)
-        }
-        new IndexedRowMatrix(indexedRows, nRows, svd.U.numCols().toInt)
-      } else {
-        null
+    val U = if (computeU) {
+      val indexedRows = indices.zip(svd.U.rows).map {
+        case (i, v) =>
+          IndexedRow(i, v)
       }
+      new IndexedRowMatrix(indexedRows, nRows, svd.U.numCols().toInt)
+    } else {
+      null
+    }
     SingularValueDecomposition(U, svd.s, svd.V)
   }
 

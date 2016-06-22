@@ -20,8 +20,8 @@ object RandomRoutingLogic {
   */
 @SerialVersionUID(1L)
 final class RandomRoutingLogic extends RoutingLogic {
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else routees(ThreadLocalRandom.current.nextInt(routees.size))
 }

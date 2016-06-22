@@ -41,8 +41,8 @@ private case class ScalaSdkData(name: String,
     }
   }
 
-  private def addDirectoryBasedLibrary(
-      library: Elem, context: ConversionContext): File = {
+  private def addDirectoryBasedLibrary(library: Elem,
+                                       context: ConversionContext): File = {
     val file = {
       val fileName = name.replaceAll("\\W", "_")
       suggestLibraryFile(fileName, context)
@@ -53,8 +53,8 @@ private case class ScalaSdkData(name: String,
     file
   }
 
-  private def addProjectBasedLibrary(
-      library: Elem, context: ConversionContext) {
+  private def addProjectBasedLibrary(library: Elem,
+                                     context: ConversionContext) {
     val libraryTableElement = {
       val rootElement = context.getProjectSettings.getRootElement
       XPath
@@ -151,10 +151,10 @@ private object ScalaSdkData {
     document.detachRootElement()
   }
 
-  private def suggestLibraryFile(
-      name: String, context: ConversionContext): File = {
-    val base = Option(context.getSettingsBaseDir)
-      .getOrElse(throw new CannotConvertException(
+  private def suggestLibraryFile(name: String,
+                                 context: ConversionContext): File = {
+    val base = Option(context.getSettingsBaseDir).getOrElse(
+        throw new CannotConvertException(
             "Only directory-based IDEA projects are supported"))
 
     val candidates = {

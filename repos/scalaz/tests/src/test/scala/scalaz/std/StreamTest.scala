@@ -22,7 +22,7 @@ object StreamTest extends SpecLite {
   "Order[Stream[Int]] is consistent with Order[List[Int]]" ! forAll {
     (a: Stream[Int], b: Stream[Int]) =>
       Order[Stream[Int]].order(a, b) must_===
-        Order[List[Int]].order(a.toList, b.toList)
+      Order[List[Int]].order(a.toList, b.toList)
   }
 
   "Order[Stream[Int]] is lazy" ! {
@@ -40,8 +40,11 @@ object StreamTest extends SpecLite {
   "intersperse then remove odd items is identity" ! forAll {
     (a: Stream[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
-      a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must_===
-        (a)
+      a.intersperse(b)
+        .zipWithIndex
+        .filter(p => isEven(p._2))
+        .map(_._1) must_===
+      (a)
   }
 
   "intercalate is same as intersperse(s).flatten" ! forAll {
@@ -67,13 +70,13 @@ object StreamTest extends SpecLite {
   "foldl is foldLeft" ! forAll { (rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldLeft(List[Int]())(_ ++ _) must_===
-          (F.foldLeft(rnge, List[Int]())(_ ++ _)))
+        (F.foldLeft(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldr is foldRight" ! forAll { (rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldRight(List[Int]())(_ ++ _) must_===
-          (F.foldRight(rnge, List[Int]())(_ ++ _)))
+        (F.foldRight(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldMap evaluates lazily" in {
@@ -83,7 +86,7 @@ object StreamTest extends SpecLite {
 
   "foldRight evaluates lazily" in {
     Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must_===
-      (true)
+    (true)
   }
 
   "zipL" in {

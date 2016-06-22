@@ -37,7 +37,7 @@ import org.apache.spark.annotation.DeveloperApi
   * @param metadata internal metadata associated with this accumulator, if any
   */
 @DeveloperApi
-case class AccumulableInfo private[spark](
+case class AccumulableInfo private[spark] (
     id: Long,
     name: Option[String],
     update: Option[Any], // represents a partial update within a task

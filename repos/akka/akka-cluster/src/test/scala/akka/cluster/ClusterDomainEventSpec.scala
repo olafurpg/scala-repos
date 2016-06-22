@@ -15,34 +15,34 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
   import ClusterEvent._
 
   val aRoles = Set("AA", "AB")
-  val aJoining = TestMember(
-      Address("akka.tcp", "sys", "a", 2552), Joining, aRoles)
+  val aJoining =
+    TestMember(Address("akka.tcp", "sys", "a", 2552), Joining, aRoles)
   val aUp = TestMember(Address("akka.tcp", "sys", "a", 2552), Up, aRoles)
-  val aRemoved = TestMember(
-      Address("akka.tcp", "sys", "a", 2552), Removed, aRoles)
+  val aRemoved =
+    TestMember(Address("akka.tcp", "sys", "a", 2552), Removed, aRoles)
   val bRoles = Set("AB", "BB")
   val bUp = TestMember(Address("akka.tcp", "sys", "b", 2552), Up, bRoles)
   val bDown = TestMember(Address("akka.tcp", "sys", "b", 2552), Down, bRoles)
-  val bRemoved = TestMember(
-      Address("akka.tcp", "sys", "b", 2552), Removed, bRoles)
+  val bRemoved =
+    TestMember(Address("akka.tcp", "sys", "b", 2552), Removed, bRoles)
   val cRoles = Set.empty[String]
   val cUp = TestMember(Address("akka.tcp", "sys", "c", 2552), Up, cRoles)
-  val cLeaving = TestMember(
-      Address("akka.tcp", "sys", "c", 2552), Leaving, cRoles)
+  val cLeaving =
+    TestMember(Address("akka.tcp", "sys", "c", 2552), Leaving, cRoles)
   val dRoles = Set("DD", "DE")
-  val dLeaving = TestMember(
-      Address("akka.tcp", "sys", "d", 2552), Leaving, dRoles)
-  val dExiting = TestMember(
-      Address("akka.tcp", "sys", "d", 2552), Exiting, dRoles)
-  val dRemoved = TestMember(
-      Address("akka.tcp", "sys", "d", 2552), Removed, dRoles)
+  val dLeaving =
+    TestMember(Address("akka.tcp", "sys", "d", 2552), Leaving, dRoles)
+  val dExiting =
+    TestMember(Address("akka.tcp", "sys", "d", 2552), Exiting, dRoles)
+  val dRemoved =
+    TestMember(Address("akka.tcp", "sys", "d", 2552), Removed, dRoles)
   val eRoles = Set("EE", "DE")
-  val eJoining = TestMember(
-      Address("akka.tcp", "sys", "e", 2552), Joining, eRoles)
+  val eJoining =
+    TestMember(Address("akka.tcp", "sys", "e", 2552), Joining, eRoles)
   val eUp = TestMember(Address("akka.tcp", "sys", "e", 2552), Up, eRoles)
   val eDown = TestMember(Address("akka.tcp", "sys", "e", 2552), Down, eRoles)
-  val selfDummyAddress = UniqueAddress(
-      Address("akka.tcp", "sys", "selfDummy", 2552), 17)
+  val selfDummyAddress =
+    UniqueAddress(Address("akka.tcp", "sys", "selfDummy", 2552), 17)
 
   private[cluster] def converge(gossip: Gossip): (Gossip, Set[UniqueAddress]) =
     ((gossip, Set.empty[UniqueAddress]) /: gossip.members) {

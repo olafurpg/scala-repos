@@ -19,8 +19,9 @@ trait BaseTag extends Tag
 
 /** The profile-independent superclass of all table row objects.
   * @tparam T Row type for this table. Make sure it matches the type of your `*` projection. */
-abstract class AbstractTable[T](
-    val tableTag: Tag, val schemaName: Option[String], val tableName: String)
+abstract class AbstractTable[T](val tableTag: Tag,
+                                val schemaName: Option[String],
+                                val tableName: String)
     extends Rep[T] {
 
   /** The client-side type of the table as defined by its * projection */
@@ -28,8 +29,9 @@ abstract class AbstractTable[T](
 
   def tableIdentitySymbol: TableIdentitySymbol
 
-  lazy val tableNode = TableNode(
-      schemaName, tableName, tableIdentitySymbol, tableIdentitySymbol)(this)
+  lazy val tableNode =
+    TableNode(schemaName, tableName, tableIdentitySymbol, tableIdentitySymbol)(
+        this)
 
   def encodeRef(path: Node) =
     tableTag.taggedAs(path).asInstanceOf[AbstractTable[T]]
@@ -70,7 +72,9 @@ abstract class AbstractTable[T](
     * @param onDelete A `ForeignKeyAction`, default being `NoAction`.
     */
   def foreignKey[P, PU, TT <: AbstractTable[_], U](
-      name: String, sourceColumns: P, targetTableQuery: TableQuery[TT])(
+      name: String,
+      sourceColumns: P,
+      targetTableQuery: TableQuery[TT])(
       targetColumns: TT => P,
       onUpdate: ForeignKeyAction = ForeignKeyAction.NoAction,
       onDelete: ForeignKeyAction = ForeignKeyAction.NoAction)(
@@ -108,13 +112,13 @@ abstract class AbstractTable[T](
     * with Slick). */
   def primaryKey[T](name: String, sourceColumns: T)(
       implicit shape: Shape[_ <: FlatShapeLevel, T, _, _]): PrimaryKey =
-    PrimaryKey(
-        name, ForeignKey.linearizeFieldRefs(shape.toNode(sourceColumns)))
+    PrimaryKey(name,
+               ForeignKey.linearizeFieldRefs(shape.toNode(sourceColumns)))
 
   def tableConstraints: Iterator[Constraint] =
     for {
       m <- getClass().getMethods.iterator if m.getParameterTypes.length == 0 &&
-      classOf[Constraint].isAssignableFrom(m.getReturnType)
+        classOf[Constraint].isAssignableFrom(m.getReturnType)
       q = m.invoke(this).asInstanceOf[Constraint]
     } yield q
 
@@ -129,12 +133,14 @@ abstract class AbstractTable[T](
   /** Define an index or a unique constraint. */
   def index[T](name: String, on: T, unique: Boolean = false)(
       implicit shape: Shape[_ <: FlatShapeLevel, T, _, _]) =
-    new Index(
-        name, this, ForeignKey.linearizeFieldRefs(shape.toNode(on)), unique)
+    new Index(name,
+              this,
+              ForeignKey.linearizeFieldRefs(shape.toNode(on)),
+              unique)
 
   def indexes: Iterable[Index] =
     (for {
       m <- getClass().getMethods.view if m.getReturnType == classOf[Index] &&
-      m.getParameterTypes.length == 0
+        m.getParameterTypes.length == 0
     } yield m.invoke(this).asInstanceOf[Index]).sortBy(_.name)
 }

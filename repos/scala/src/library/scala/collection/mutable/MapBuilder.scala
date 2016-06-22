@@ -23,7 +23,9 @@ package mutable
   */
 class MapBuilder[A, B,
     Coll <: scala.collection.GenMap[A, B] with scala.collection.GenMapLike[
-        A, B, Coll]](empty: Coll)
+        A,
+        B,
+        Coll]](empty: Coll)
     extends ReusableBuilder[(A, B), Coll] {
   protected var elems: Coll = empty
   def +=(x: (A, B)): this.type = {

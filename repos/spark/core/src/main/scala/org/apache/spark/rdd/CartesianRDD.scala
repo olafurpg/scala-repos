@@ -30,8 +30,7 @@ private[spark] class CartesianPartition(
     @transient private val rdd2: RDD[_],
     s1Index: Int,
     s2Index: Int
-)
-    extends Partition {
+) extends Partition {
   var s1 = rdd1.partitions(s1Index)
   var s2 = rdd2.partitions(s2Index)
   override val index: Int = idx
@@ -46,8 +45,9 @@ private[spark] class CartesianPartition(
     }
 }
 
-private[spark] class CartesianRDD[T: ClassTag, U: ClassTag](
-    sc: SparkContext, var rdd1: RDD[T], var rdd2: RDD[U])
+private[spark] class CartesianRDD[T: ClassTag, U: ClassTag](sc: SparkContext,
+                                                            var rdd1: RDD[T],
+                                                            var rdd2: RDD[U])
     extends RDD[(T, U)](sc, Nil)
     with Serializable {
 
@@ -70,8 +70,8 @@ private[spark] class CartesianRDD[T: ClassTag, U: ClassTag](
             currSplit.s2)).distinct
   }
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[(T, U)] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[(T, U)] = {
     val currSplit = split.asInstanceOf[CartesianPartition]
     for (x <- rdd1.iterator(currSplit.s1, context);
          y <- rdd2.iterator(currSplit.s2, context)) yield (x, y)

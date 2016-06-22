@@ -40,7 +40,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
     new Ordering[List[A]] {
       def compare(a: List[A], b: List[A]): Int =
         (a zip b) map ((ord0.compare _).tupled) find (_ != 0) getOrElse
-        (a.length - b.length)
+          (a.length - b.length)
     }
 
   def extractCValues(colGroups: List[List[Column]], row: Int): List[CValue] = {
@@ -193,7 +193,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
         // This is terrible, but there isn't an immediately easy way to test
         // without duplicating concat.
         toCValues(slice).map(stripUndefineds) must_==
-          fakeConcat(slices).map(stripUndefineds)
+        fakeConcat(slices).map(stripUndefineds)
       }
     }
   }

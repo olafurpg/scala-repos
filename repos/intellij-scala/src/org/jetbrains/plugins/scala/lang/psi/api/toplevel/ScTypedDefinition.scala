@@ -141,11 +141,11 @@ trait ScTypedDefinition extends ScNamedElement with TypingContextOwner {
   @Cached(synchronized = false,
           modificationCount = ModCount.getBlockModificationCount,
           this)
-  def getTypedDefinitionWrapper(isStatic: Boolean,
-                                isInterface: Boolean,
-                                role: DefinitionRole,
-                                cClass: Option[PsiClass] =
-                                  None): PsiTypedDefinitionWrapper = {
+  def getTypedDefinitionWrapper(
+      isStatic: Boolean,
+      isInterface: Boolean,
+      role: DefinitionRole,
+      cClass: Option[PsiClass] = None): PsiTypedDefinitionWrapper = {
     new PsiTypedDefinitionWrapper(this, isStatic, isInterface, role, cClass)
   }
 

@@ -72,8 +72,8 @@ object UdpConnected
     * has been successfully enqueued to the O/S kernel.
     */
   final case class Send(payload: ByteString, ack: Any) extends Command {
-    require(
-        ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
+    require(ack != null,
+            "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }
@@ -165,7 +165,8 @@ class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
   def getManager: ActorRef = manager
 
   val bufferPool: BufferPool = new DirectByteBufferPool(
-      settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
+      settings.DirectBufferSize,
+      settings.MaxDirectBufferPoolSize)
 }
 
 /**

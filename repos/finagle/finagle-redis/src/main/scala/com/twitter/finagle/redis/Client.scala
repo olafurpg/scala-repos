@@ -59,9 +59,8 @@ class BaseClient(service: Service[Command, Reply]) {
     * @param section Optional parameter can be used to select a specific section of information
     * @return ChannelBuffer with collection of \r\n terminated lines if server has info on section
     */
-  def info(
-      section: ChannelBuffer =
-        ChannelBuffers.EMPTY_BUFFER): Future[Option[ChannelBuffer]] =
+  def info(section: ChannelBuffer = ChannelBuffers.EMPTY_BUFFER)
+    : Future[Option[ChannelBuffer]] =
     doRequest(Info(section)) {
       case BulkReply(message) => Future.value(Some(message))
       case EmptyBulkReply() => Future.value(None)
@@ -111,11 +110,11 @@ class BaseClient(service: Service[Command, Reply]) {
   private[redis] def doRequest[T](cmd: Command)(
       handler: PartialFunction[Reply, Future[T]]) =
     service(cmd) flatMap
-    (handler orElse {
-          case ErrorReply(message) =>
-            Future.exception(new ServerError(message))
-          case _ => Future.exception(new IllegalStateException)
-        })
+      (handler orElse {
+            case ErrorReply(message) =>
+              Future.exception(new ServerError(message))
+            case _ => Future.exception(new IllegalStateException)
+          })
 
   /**
     * Helper function to convert a Redis multi-bulk reply into a map of pairs
@@ -189,8 +188,7 @@ object TransactionalClient {
   */
 private[redis] class ConnectedTransactionalClient(
     serviceFactory: ServiceFactory[Command, Reply]
-)
-    extends Client(serviceFactory.toService)
+) extends Client(serviceFactory.toService)
     with TransactionalClient {
 
   def transaction(cmds: Seq[Command]): Future[Seq[Reply]] = {
@@ -224,7 +222,8 @@ private[redis] class ConnectedTransactionalClient(
       case MBulkReply(messages) => Future.value(messages)
       case EmptyMBulkReply() => Future.Nil
       case NilMBulkReply() =>
-        Future.exception(new ServerError(
+        Future.exception(
+            new ServerError(
                 "One or more keys were modified before transaction"))
       case ErrorReply(message) => Future.exception(new ServerError(message))
       case _ => Future.exception(new IllegalStateException)

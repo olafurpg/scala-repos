@@ -115,14 +115,18 @@ class KMeansSuite
       assert(model.clusterCenters === model2.clusterCenters)
     }
     val kmeans = new KMeans()
-    testEstimatorAndModelReadWrite(
-        kmeans, dataset, KMeansSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(kmeans,
+                                   dataset,
+                                   KMeansSuite.allParamSettings,
+                                   checkModelData)
   }
 }
 
 object KMeansSuite {
-  def generateKMeansData(
-      sql: SQLContext, rows: Int, dim: Int, k: Int): DataFrame = {
+  def generateKMeansData(sql: SQLContext,
+                         rows: Int,
+                         dim: Int,
+                         k: Int): DataFrame = {
     val sc = sql.sparkContext
     val rdd = sc
       .parallelize(1 to rows)

@@ -37,8 +37,8 @@ object Protocols {
           case NonFatal(t) =>
             Logger
               .get()
-              .info(
-                  "%s unable to initialize sun.misc.Unsafe", getClass.getName)
+              .info("%s unable to initialize sun.misc.Unsafe",
+                    getClass.getName)
             null
         }
     }
@@ -82,8 +82,8 @@ object Protocols {
     }
   }
 
-  def factory(statsReceiver: StatsReceiver =
-        DefaultStatsReceiver): TProtocolFactory = {
+  def factory(statsReceiver: StatsReceiver = DefaultStatsReceiver)
+    : TProtocolFactory = {
     binaryFactory(statsReceiver = statsReceiver)
   }
 
@@ -176,15 +176,14 @@ object Protocols {
         }
       val charBuffer = CharBuffer.wrap(chars, offset, count)
 
-      val out =
-        if (count * MultiByteMultiplierEstimate <= OutBufferSize) {
-          val o = outByteBuffer.get()
-          o.clear()
-          o
-        } else {
-          largerThanTlOutBuffer.incr()
-          ByteBuffer.allocate((count * MultiByteMultiplierEstimate).toInt)
-        }
+      val out = if (count * MultiByteMultiplierEstimate <= OutBufferSize) {
+        val o = outByteBuffer.get()
+        o.clear()
+        o
+      } else {
+        largerThanTlOutBuffer.incr()
+        ByteBuffer.allocate((count * MultiByteMultiplierEstimate).toInt)
+      }
 
       val csEncoder = charsetEncoder.get()
       csEncoder.reset()

@@ -39,37 +39,37 @@ private[api] final class RoundApi(
         case ((((json, tourOption), simulOption), note), forecast) =>
           (blindMode _ compose withTournament(pov, tourOption) _ compose withSimul(
                   pov,
-                  simulOption) _ compose withSteps(pov,
-                                                   none,
-                                                   initialFen,
-                                                   withOpening =
-                                                     false) _ compose withNote(
-                  note) _ compose withBookmark(ctx.me ?? {
+                  simulOption) _ compose withSteps(
+                  pov,
+                  none,
+                  initialFen,
+                  withOpening = false) _ compose withNote(note) _ compose withBookmark(
+                  ctx.me ?? {
                 bookmarkApi.bookmarked(pov.game, _)
               }) _ compose withForecastCount(forecast.map(_.steps.size)) _)(
               json)
       }
     }
 
-  def watcher(pov: Pov,
-              apiVersion: Int,
-              tv: Option[lila.round.OnTv],
-              analysis: Option[(Pgn, Analysis)] = None,
-              initialFenO: Option[Option[String]] = None,
-              withMoveTimes: Boolean = false,
-              withOpening: Boolean =
-                false)(implicit ctx: Context): Fu[JsObject] =
+  def watcher(
+      pov: Pov,
+      apiVersion: Int,
+      tv: Option[lila.round.OnTv],
+      analysis: Option[(Pgn, Analysis)] = None,
+      initialFenO: Option[Option[String]] = None,
+      withMoveTimes: Boolean = false,
+      withOpening: Boolean = false)(implicit ctx: Context): Fu[JsObject] =
     initialFenO.fold(GameRepo initialFen pov.game)(fuccess) flatMap {
       initialFen =>
-        jsonView.watcherJson(pov,
-                             ctx.pref,
-                             apiVersion,
-                             ctx.me,
-                             tv,
-                             withBlurs = ctx.me ?? Granter(_.ViewBlurs),
-                             initialFen = initialFen,
-                             withMoveTimes =
-                               withMoveTimes) zip getTourAndRanks(pov.game) zip
+        jsonView.watcherJson(
+            pov,
+            ctx.pref,
+            apiVersion,
+            ctx.me,
+            tv,
+            withBlurs = ctx.me ?? Granter(_.ViewBlurs),
+            initialFen = initialFen,
+            withMoveTimes = withMoveTimes) zip getTourAndRanks(pov.game) zip
         (pov.game.simulId ?? getSimul) zip
         (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) map {
           case (((json, tourOption), simulOption), note) =>
@@ -80,8 +80,8 @@ private[api] final class RoundApi(
                     pov,
                     analysis,
                     initialFen,
-                    withOpening =
-                      withOpening) _ compose withAnalysis(analysis) _)(json)
+                    withOpening = withOpening) _ compose withAnalysis(analysis) _)(
+                json)
         }
     }
 
@@ -91,9 +91,12 @@ private[api] final class RoundApi(
                        orientation: chess.Color,
                        owner: Boolean) =
     owner.??(forecastApi loadForDisplay pov).flatMap { fco =>
-      jsonView.userAnalysisJson(pov, pref, orientation, owner = owner) map withSteps(
-          pov, none, initialFen, withOpening = true) _ map withForecast(
-          pov, owner, fco) _
+      jsonView
+        .userAnalysisJson(pov, pref, orientation, owner = owner) map withSteps(
+          pov,
+          none,
+          initialFen,
+          withOpening = true) _ map withForecast(pov, owner, fco) _
     }
 
   private def withSteps(pov: Pov,
@@ -140,21 +143,22 @@ private[api] final class RoundApi(
             ))
     }
 
-  private def withTournament(
-      pov: Pov, tourOption: Option[TourAndRanks])(json: JsObject) =
+  private def withTournament(pov: Pov, tourOption: Option[TourAndRanks])(
+      json: JsObject) =
     tourOption.fold(json) { data =>
       json + ("tournament" -> Json
             .obj(
                 "id" -> data.tour.id,
                 "name" -> data.tour.name,
                 "running" -> data.tour.isStarted,
-                "berserkable" -> data.tour.isStarted
-                  .option(data.tour.berserkable),
+                "berserkable" -> data.tour.isStarted.option(
+                    data.tour.berserkable),
                 "nbSecondsForFirstMove" -> data.tour.isStarted.option {
                   SecondsToDoFirstMove.secondsToMoveFor(data.tour)
                 },
-                "ranks" -> data.tour.isStarted.option(Json.obj(
-                        "white" -> data.whiteRank, "black" -> data.blackRank))
+                "ranks" -> data.tour.isStarted.option(
+                    Json.obj("white" -> data.whiteRank,
+                             "black" -> data.blackRank))
             )
             .noNull)
     }

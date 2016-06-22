@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Foldable1` */
-final class Foldable1Ops[F[_], A] private[syntax](val self: F[A])(
+final class Foldable1Ops[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Foldable1[F])
     extends Ops[F[A]] {
   ////

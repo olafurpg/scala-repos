@@ -12,10 +12,11 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 class ScalaDelegateMethodTest
     extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
-  def runTest(
-      fileText: String, expectedText: String, specifyType: Boolean = true) {
-    configureFromFileTextAdapter(
-        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+  def runTest(fileText: String,
+              expectedText: String,
+              specifyType: Boolean = true) {
+    configureFromFileTextAdapter("dummy.scala",
+                                 fileText.replace("\r", "").stripMargin.trim)
     val oldSpecifyType =
       ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =

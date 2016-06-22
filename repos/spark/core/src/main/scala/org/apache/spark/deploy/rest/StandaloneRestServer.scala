@@ -57,8 +57,8 @@ private[deploy] class StandaloneRestServer(host: String,
 
   protected override val submitRequestServlet =
     new StandaloneSubmitRequestServlet(masterEndpoint, masterUrl, masterConf)
-  protected override val killRequestServlet = new StandaloneKillRequestServlet(
-      masterEndpoint, masterConf)
+  protected override val killRequestServlet =
+    new StandaloneKillRequestServlet(masterEndpoint, masterConf)
   protected override val statusRequestServlet =
     new StandaloneStatusRequestServlet(masterEndpoint, masterConf)
 }
@@ -67,7 +67,8 @@ private[deploy] class StandaloneRestServer(host: String,
   * A servlet for handling kill requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneKillRequestServlet(
-    masterEndpoint: RpcEndpointRef, conf: SparkConf)
+    masterEndpoint: RpcEndpointRef,
+    conf: SparkConf)
     extends KillRequestServlet {
 
   protected def handleKill(submissionId: String): KillSubmissionResponse = {
@@ -87,7 +88,8 @@ private[rest] class StandaloneKillRequestServlet(
   * A servlet for handling status requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneStatusRequestServlet(
-    masterEndpoint: RpcEndpointRef, conf: SparkConf)
+    masterEndpoint: RpcEndpointRef,
+    conf: SparkConf)
     extends StatusRequestServlet {
 
   protected def handleStatus(submissionId: String): SubmissionStatusResponse = {
@@ -113,7 +115,9 @@ private[rest] class StandaloneStatusRequestServlet(
   * A servlet for handling submit requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneSubmitRequestServlet(
-    masterEndpoint: RpcEndpointRef, masterUrl: String, conf: SparkConf)
+    masterEndpoint: RpcEndpointRef,
+    masterUrl: String,
+    conf: SparkConf)
     extends SubmitRequestServlet {
 
   /**
@@ -200,8 +204,8 @@ private[rest] class StandaloneSubmitRequestServlet(
         submitResponse.message = response.message
         submitResponse.success = response.success
         submitResponse.submissionId = response.driverId.orNull
-        val unknownFields = findUnknownFields(
-            requestMessageJson, requestMessage)
+        val unknownFields =
+          findUnknownFields(requestMessageJson, requestMessage)
         if (unknownFields.nonEmpty) {
           // If there are fields that the server does not know about, warn the client
           submitResponse.unknownFields = unknownFields

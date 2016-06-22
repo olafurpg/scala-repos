@@ -6,8 +6,8 @@ package play.api
 /**
   * Generic exception for unexpected error cases.
   */
-case class UnexpectedException(
-    message: Option[String] = None, unexpected: Option[Throwable] = None)
+case class UnexpectedException(message: Option[String] = None,
+                               unexpected: Option[Throwable] = None)
     extends PlayException(
         "Unexpected exception",
         message.getOrElse {

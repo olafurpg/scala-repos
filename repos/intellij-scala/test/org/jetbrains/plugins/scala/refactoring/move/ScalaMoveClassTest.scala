@@ -131,8 +131,9 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     PlatformTestUtil.assertDirectoriesEqual(rootDir2, rootDir)
   }
 
-  private def performAction(
-      classNames: Array[String], newPackageName: String, mode: Kinds.Value) {
+  private def performAction(classNames: Array[String],
+                            newPackageName: String,
+                            mode: Kinds.Value) {
     val classes = new ArrayBuffer[PsiClass]()
     for (name <- classNames) {
       classes ++= ScalaPsiManager

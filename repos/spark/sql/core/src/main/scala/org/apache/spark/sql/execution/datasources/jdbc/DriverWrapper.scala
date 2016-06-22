@@ -31,8 +31,8 @@ class DriverWrapper(val wrapped: Driver) extends Driver {
 
   override def jdbcCompliant(): Boolean = wrapped.jdbcCompliant()
 
-  override def getPropertyInfo(
-      url: String, info: Properties): Array[DriverPropertyInfo] = {
+  override def getPropertyInfo(url: String,
+                               info: Properties): Array[DriverPropertyInfo] = {
     wrapped.getPropertyInfo(url, info)
   }
 

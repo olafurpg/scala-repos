@@ -39,8 +39,9 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.{SerializableConfiguration, ShutdownHookManager}
 
-private[spark] class SqlNewHadoopPartition(
-    rddId: Int, val index: Int, rawSplit: InputSplit with Writable)
+private[spark] class SqlNewHadoopPartition(rddId: Int,
+                                           val index: Int,
+                                           rawSplit: InputSplit with Writable)
     extends SparkPartition {
 
   val serializableHadoopSplit = new SerializableWritable(rawSplit)
@@ -116,13 +117,15 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
     val result = new Array[SparkPartition](rawSplits.size)
     for (i <- 0 until rawSplits.size) {
       result(i) = new SqlNewHadoopPartition(
-          id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
+          id,
+          i,
+          rawSplits(i).asInstanceOf[InputSplit with Writable])
     }
     result
   }
 
-  override def compute(
-      theSplit: SparkPartition, context: TaskContext): Iterator[V] = {
+  override def compute(theSplit: SparkPartition,
+                       context: TaskContext): Iterator[V] = {
     val iter = new Iterator[V] {
       val split = theSplit.asInstanceOf[SqlNewHadoopPartition]
       logInfo("Input split: " + split.serializableHadoopSplit)
@@ -164,8 +167,8 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
           configurable.setConf(conf)
         case _ =>
       }
-      val attemptId = new TaskAttemptID(
-          jobTrackerId, id, TaskType.MAP, split.index, 0)
+      val attemptId =
+        new TaskAttemptID(jobTrackerId, id, TaskType.MAP, split.index, 0)
       val hadoopAttemptContext = new TaskAttemptContextImpl(conf, attemptId)
       private[this] var reader: RecordReader[Void, V] = null
 
@@ -178,8 +181,8 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
           format.getClass.getName == "org.apache.parquet.hadoop.ParquetInputFormat") {
         val parquetReader: VectorizedParquetRecordReader =
           new VectorizedParquetRecordReader()
-        if (!parquetReader.tryInitialize(
-                split.serializableHadoopSplit.value, hadoopAttemptContext)) {
+        if (!parquetReader.tryInitialize(split.serializableHadoopSplit.value,
+                                         hadoopAttemptContext)) {
           parquetReader.close()
         } else {
           reader = parquetReader.asInstanceOf[RecordReader[Void, V]]
@@ -190,10 +193,10 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
       }
 
       if (reader == null) {
-        reader = format.createRecordReader(
-            split.serializableHadoopSplit.value, hadoopAttemptContext)
-        reader.initialize(
-            split.serializableHadoopSplit.value, hadoopAttemptContext)
+        reader = format.createRecordReader(split.serializableHadoopSplit.value,
+                                           hadoopAttemptContext)
+        reader.initialize(split.serializableHadoopSplit.value,
+                          hadoopAttemptContext)
       }
 
       // Register an on-task-completion callback to close the input stream.
@@ -264,7 +267,8 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
             } catch {
               case e: java.io.IOException =>
                 logWarning(
-                    "Unable to get input size to set InputMetrics for task", e)
+                    "Unable to get input size to set InputMetrics for task",
+                    e)
             }
           }
         }
@@ -296,8 +300,8 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
     if (storageLevel.deserialized) {
       logWarning(
           "Caching NewHadoopRDDs as deserialized objects usually leads to undesired" +
-          " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
-          " Use a map transformation to make copies of the records.")
+            " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
+            " Use a map transformation to make copies of the records.")
     }
     super.persist(storageLevel)
   }
@@ -306,10 +310,11 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
     * Analogous to [[org.apache.spark.rdd.MapPartitionsRDD]], but passes in an InputSplit to
     * the given function rather than the index of the partition.
     */
-  private[spark] class NewHadoopMapPartitionsWithSplitRDD[
-      U: ClassTag, T: ClassTag](prev: RDD[T],
-                                f: (InputSplit, Iterator[T]) => Iterator[U],
-                                preservesPartitioning: Boolean = false)
+  private[spark] class NewHadoopMapPartitionsWithSplitRDD[U: ClassTag,
+                                                          T: ClassTag](
+      prev: RDD[T],
+      f: (InputSplit, Iterator[T]) => Iterator[U],
+      preservesPartitioning: Boolean = false)
       extends RDD[U](prev) {
 
     override val partitioner =
@@ -318,8 +323,8 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
     override def getPartitions: Array[SparkPartition] =
       firstParent[T].partitions
 
-    override def compute(
-        split: SparkPartition, context: TaskContext): Iterator[U] = {
+    override def compute(split: SparkPartition,
+                         context: TaskContext): Iterator[U] = {
       val partition = split.asInstanceOf[SqlNewHadoopPartition]
       val inputSplit = partition.serializableHadoopSplit.value
       f(inputSplit, firstParent[T].iterator(split, context))

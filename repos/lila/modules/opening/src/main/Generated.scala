@@ -6,8 +6,8 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import scalaz.Validation.FlatMap._
 
-private[opening] case class Generated(
-    fen: String, moves: Map[String, Generated.Move]) {
+private[opening] case class Generated(fen: String,
+                                      moves: Map[String, Generated.Move]) {
 
   def toOpening: Try[Opening.ID => Opening] =
     (chess.format.Forsyth <<< fen) match {
@@ -55,8 +55,8 @@ private[opening] object Generated {
             (Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr" flatMap {
                   case Uci.Move(orig, dest, prom) =>
                     g(orig, dest, prom) map (_._1)
-                })
-              .fold(errs => Failure(new Exception(errs.shows)), Success.apply)
+                }).fold(errs =>
+                  Failure(new Exception(errs.shows)), Success.apply)
         }
     }) map (_.pgnMoves)
   }

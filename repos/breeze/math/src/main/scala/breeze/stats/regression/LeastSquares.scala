@@ -34,13 +34,13 @@ private object leastSquaresImplementation {
 
     val resultVec =
       new DenseVector[Double](Arrays.copyOf(outputs.data, data.cols))
-    LeastSquaresRegressionResult(
-        resultVec, math.pow(outputs.data(data.cols + 1), 2))
+    LeastSquaresRegressionResult(resultVec,
+                                 math.pow(outputs.data(data.cols + 1), 2))
   }
 }
 
-case class LeastSquaresRegressionResult(
-    coefficients: DenseVector[Double], rSquared: Double)
+case class LeastSquaresRegressionResult(coefficients: DenseVector[Double],
+                                        rSquared: Double)
     extends RegressionResult[DenseVector[Double], Double] {
   def apply(x: DenseVector[Double]): Double = coefficients.dot(x)
 }
@@ -57,8 +57,8 @@ object leastSquares extends UFunc {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 workArray: Array[Double]): LeastSquaresRegressionResult =
-        leastSquaresImplementation.doLeastSquares(
-            data.copy, outputs.copy, workArray)
+        leastSquaresImplementation
+          .doLeastSquares(data.copy, outputs.copy, workArray)
     }
 
   implicit val matrixVectorSpecifiedWork: Impl3[DenseMatrix[Double],
@@ -72,21 +72,23 @@ object leastSquares extends UFunc {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 workSize: Int): LeastSquaresRegressionResult =
-        leastSquaresImplementation.doLeastSquares(
-            data.copy, outputs.copy, new Array[Double](workSize))
+        leastSquaresImplementation
+          .doLeastSquares(data.copy, outputs.copy, new Array[Double](workSize))
     }
 
   implicit val matrixVector: Impl2[DenseMatrix[Double],
                                    DenseVector[Double],
-                                   LeastSquaresRegressionResult] = new Impl2[
-      DenseMatrix[Double], DenseVector[Double], LeastSquaresRegressionResult] {
-    def apply(data: DenseMatrix[Double],
-              outputs: DenseVector[Double]): LeastSquaresRegressionResult =
-      leastSquaresImplementation.doLeastSquares(
-          data.copy,
-          outputs.copy,
-          new Array[Double](math.max(1, data.rows * data.cols * 2)))
-  }
+                                   LeastSquaresRegressionResult] =
+    new Impl2[DenseMatrix[Double],
+              DenseVector[Double],
+              LeastSquaresRegressionResult] {
+      def apply(data: DenseMatrix[Double],
+                outputs: DenseVector[Double]): LeastSquaresRegressionResult =
+        leastSquaresImplementation.doLeastSquares(
+            data.copy,
+            outputs.copy,
+            new Array[Double](math.max(1, data.rows * data.cols * 2)))
+    }
 }
 
 object leastSquaresDestructive extends UFunc {
@@ -115,19 +117,21 @@ object leastSquaresDestructive extends UFunc {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 workSize: Int): LeastSquaresRegressionResult =
-        leastSquaresImplementation.doLeastSquares(
-            data, outputs, new Array[Double](workSize))
+        leastSquaresImplementation
+          .doLeastSquares(data, outputs, new Array[Double](workSize))
     }
 
   implicit val matrixVector: Impl2[DenseMatrix[Double],
                                    DenseVector[Double],
-                                   LeastSquaresRegressionResult] = new Impl2[
-      DenseMatrix[Double], DenseVector[Double], LeastSquaresRegressionResult] {
-    def apply(data: DenseMatrix[Double],
-              outputs: DenseVector[Double]): LeastSquaresRegressionResult =
-      leastSquaresImplementation.doLeastSquares(
-          data,
-          outputs,
-          new Array[Double](math.max(1, data.rows * data.cols * 2)))
-  }
+                                   LeastSquaresRegressionResult] =
+    new Impl2[DenseMatrix[Double],
+              DenseVector[Double],
+              LeastSquaresRegressionResult] {
+      def apply(data: DenseMatrix[Double],
+                outputs: DenseVector[Double]): LeastSquaresRegressionResult =
+        leastSquaresImplementation.doLeastSquares(
+            data,
+            outputs,
+            new Array[Double](math.max(1, data.rows * data.cols * 2)))
+    }
 }

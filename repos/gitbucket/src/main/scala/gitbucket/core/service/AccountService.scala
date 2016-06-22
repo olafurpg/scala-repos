@@ -14,9 +14,9 @@ trait AccountService {
 
   private val logger = LoggerFactory.getLogger(classOf[AccountService])
 
-  def authenticate(
-      settings: SystemSettings, userName: String, password: String)(
-      implicit s: Session): Option[Account] =
+  def authenticate(settings: SystemSettings,
+                   userName: String,
+                   password: String)(implicit s: Session): Option[Account] =
     if (settings.ldapAuthentication) {
       ldapAuthentication(settings, userName, password)
     } else {
@@ -39,63 +39,64 @@ trait AccountService {
     * Authenticate by LDAP.
     */
   private def ldapAuthentication(
-      settings: SystemSettings, userName: String, password: String)(
-      implicit s: Session): Option[Account] = {
+      settings: SystemSettings,
+      userName: String,
+      password: String)(implicit s: Session): Option[Account] = {
     LDAPUtil.authenticate(settings.ldap.get, userName, password) match {
       case Right(ldapUserInfo) => {
-          // Create or update account by LDAP information
-          getAccountByUserName(ldapUserInfo.userName, true) match {
-            case Some(x) if (!x.isRemoved) => {
-                if (settings.ldap.get.mailAttribute.getOrElse("").isEmpty) {
-                  updateAccount(x.copy(fullName = ldapUserInfo.fullName))
-                } else {
-                  updateAccount(
-                      x.copy(mailAddress = ldapUserInfo.mailAddress,
-                             fullName = ldapUserInfo.fullName))
-                }
+        // Create or update account by LDAP information
+        getAccountByUserName(ldapUserInfo.userName, true) match {
+          case Some(x) if (!x.isRemoved) => {
+            if (settings.ldap.get.mailAttribute.getOrElse("").isEmpty) {
+              updateAccount(x.copy(fullName = ldapUserInfo.fullName))
+            } else {
+              updateAccount(
+                  x.copy(mailAddress = ldapUserInfo.mailAddress,
+                         fullName = ldapUserInfo.fullName))
+            }
+            getAccountByUserName(ldapUserInfo.userName)
+          }
+          case Some(x) if (x.isRemoved) => {
+            logger.info(
+                "LDAP Authentication Failed: Account is already registered but disabled.")
+            defaultAuthentication(userName, password)
+          }
+          case None =>
+            getAccountByMailAddress(ldapUserInfo.mailAddress, true) match {
+              case Some(x) if (!x.isRemoved) => {
+                updateAccount(x.copy(fullName = ldapUserInfo.fullName))
                 getAccountByUserName(ldapUserInfo.userName)
               }
-            case Some(x) if (x.isRemoved) => {
+              case Some(x) if (x.isRemoved) => {
                 logger.info(
                     "LDAP Authentication Failed: Account is already registered but disabled.")
                 defaultAuthentication(userName, password)
               }
-            case None =>
-              getAccountByMailAddress(ldapUserInfo.mailAddress, true) match {
-                case Some(x) if (!x.isRemoved) => {
-                    updateAccount(x.copy(fullName = ldapUserInfo.fullName))
-                    getAccountByUserName(ldapUserInfo.userName)
-                  }
-                case Some(x) if (x.isRemoved) => {
-                    logger.info(
-                        "LDAP Authentication Failed: Account is already registered but disabled.")
-                    defaultAuthentication(userName, password)
-                  }
-                case None => {
-                    createAccount(ldapUserInfo.userName,
-                                  "",
-                                  ldapUserInfo.fullName,
-                                  ldapUserInfo.mailAddress,
-                                  false,
-                                  None)
-                    getAccountByUserName(ldapUserInfo.userName)
-                  }
+              case None => {
+                createAccount(ldapUserInfo.userName,
+                              "",
+                              ldapUserInfo.fullName,
+                              ldapUserInfo.mailAddress,
+                              false,
+                              None)
+                getAccountByUserName(ldapUserInfo.userName)
               }
-          }
+            }
         }
+      }
       case Left(errorMessage) => {
-          logger.info(s"LDAP Authentication Failed: ${errorMessage}")
-          defaultAuthentication(userName, password)
-        }
+        logger.info(s"LDAP Authentication Failed: ${errorMessage}")
+        defaultAuthentication(userName, password)
+      }
     }
   }
 
   def getAccountByUserName(userName: String, includeRemoved: Boolean = false)(
       implicit s: Session): Option[Account] =
     Accounts filter
-    (t =>
-          (t.userName === userName.bind) &&
-          (t.removed === false.bind, !includeRemoved)) firstOption
+      (t =>
+            (t.userName === userName.bind) &&
+              (t.removed === false.bind, !includeRemoved)) firstOption
 
   def getAccountsByUserNames(userNames: Set[String],
                              knowns: Set[Account],
@@ -109,7 +110,7 @@ trait AccountService {
       map ++ Accounts
         .filter(t =>
               (t.userName inSetBind needs) &&
-              (t.removed === false.bind, !includeRemoved))
+                (t.removed === false.bind, !includeRemoved))
         .list
         .map(a => a.userName -> a)
         .toMap
@@ -117,12 +118,12 @@ trait AccountService {
   }
 
   def getAccountByMailAddress(
-      mailAddress: String, includeRemoved: Boolean = false)(
-      implicit s: Session): Option[Account] =
+      mailAddress: String,
+      includeRemoved: Boolean = false)(implicit s: Session): Option[Account] =
     Accounts filter
-    (t =>
-          (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
-          (t.removed === false.bind, !includeRemoved)) firstOption
+      (t =>
+            (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
+              (t.removed === false.bind, !includeRemoved)) firstOption
 
   def getAllUsers(includeRemoved: Boolean = true)(
       implicit s: Session): List[Account] =
@@ -219,8 +220,8 @@ trait AccountService {
       implicit s: Session): List[GroupMember] =
     GroupMembers.filter(_.groupName === groupName.bind).sortBy(_.userName).list
 
-  def getGroupsByUserName(
-      userName: String)(implicit s: Session): List[String] =
+  def getGroupsByUserName(userName: String)(
+      implicit s: Session): List[String] =
     GroupMembers
       .filter(_.userName === userName.bind)
       .sortBy(_.groupName)

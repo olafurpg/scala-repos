@@ -73,8 +73,8 @@ class MatCols[A: ST](cols: IndexedSeq[Vec[A]])
     val filt = cols.zipWithIndex.filter {
       case (col, ix) =>
         col.scalarTag.runtimeClass.isPrimitive &&
-        (bSt.isAny || bSt.isAnyVal) || !bSt.isAnyVal &&
-        bSt.runtimeClass.isAssignableFrom(col.scalarTag.runtimeClass)
+          (bSt.isAny || bSt.isAnyVal) || !bSt.isAnyVal &&
+          bSt.runtimeClass.isAssignableFrom(col.scalarTag.runtimeClass)
     }
     val (vecs, locs) = filt.unzip
     (vecs.asInstanceOf[IndexedSeq[Vec[B]]], locs.toArray)
@@ -96,8 +96,9 @@ object MatCols {
     new MatCols[A](cols.toIndexedSeq)
 
   // Logic to get string widths of columns in a sequence of vectors
-  private[saddle] def colLens[A: ST](
-      cols: MatCols[A], numCols: Int, len: Int): Map[Int, Int] = {
+  private[saddle] def colLens[A: ST](cols: MatCols[A],
+                                     numCols: Int,
+                                     len: Int): Map[Int, Int] = {
     val half = len / 2
     val maxf = (a: Int, b: String) => a.max(b.length)
 

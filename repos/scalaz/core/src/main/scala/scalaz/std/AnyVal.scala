@@ -575,14 +575,14 @@ trait BooleanFunctions {
       a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  final def pointOrEmptyNT[M[_]](
-      cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
+  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M],
+                                                M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = pointOrEmpty[M, A](cond)(a)
     }
 
-  final def emptyOrPureNT[M[_]](
-      cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M],
+                                               M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = emptyOrPure[M, A](cond)(a)
     }

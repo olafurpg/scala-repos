@@ -28,8 +28,10 @@ trait SnapshotStore extends Actor with ActorLogging {
       cfg.getDuration("circuit-breaker.call-timeout", MILLISECONDS).millis
     val resetTimeout =
       cfg.getDuration("circuit-breaker.reset-timeout", MILLISECONDS).millis
-    CircuitBreaker(
-        context.system.scheduler, maxFailures, callTimeout, resetTimeout)
+    CircuitBreaker(context.system.scheduler,
+                   maxFailures,
+                   callTimeout,
+                   resetTimeout)
   }
 
   final def receive =
@@ -146,8 +148,8 @@ trait SnapshotStore extends Actor with ActorLogging {
     * @param persistenceId id of the persistent actor.
     * @param criteria selection criteria for deleting.
     */
-  def deleteAsync(
-      persistenceId: String, criteria: SnapshotSelectionCriteria): Future[Unit]
+  def deleteAsync(persistenceId: String,
+                  criteria: SnapshotSelectionCriteria): Future[Unit]
 
   /**
     * Plugin API

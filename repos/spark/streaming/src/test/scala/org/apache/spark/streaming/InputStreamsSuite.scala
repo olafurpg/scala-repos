@@ -150,8 +150,9 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
       // Create a file that exists before the StreamingContext is created:
       val existingFile = new File(testDir, "0")
       Files.write("0\n", existingFile, StandardCharsets.UTF_8)
-      assert(existingFile.setLastModified(10000) &&
-          existingFile.lastModified === 10000)
+      assert(
+          existingFile.setLastModified(10000) &&
+            existingFile.lastModified === 10000)
 
       // Set up the streaming context and input streams
       withStreamingContext(new StreamingContext(conf, batchDuration)) { ssc =>
@@ -368,9 +369,11 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
 
       assert(
           ssc.graph.getInputStreams().length == receiverInputStreams.length +
-          inputStreams.length)
+            inputStreams.length)
       assert(
-          ssc.graph.getReceiverInputStreams().length == receiverInputStreams.length)
+          ssc.graph
+            .getReceiverInputStreams()
+            .length == receiverInputStreams.length)
       assert(ssc.graph.getReceiverInputStreams() === receiverInputStreams)
       assert(
           ssc.graph.getInputStreams().map(_.id) === Array.tabulate(5)(i => i))
@@ -388,7 +391,7 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
       Files.write("0\n", existingFile, StandardCharsets.UTF_8)
       assert(
           existingFile.setLastModified(10000) &&
-          existingFile.lastModified === 10000)
+            existingFile.lastModified === 10000)
 
       // Set up the streaming context and input streams
       withStreamingContext(new StreamingContext(conf, batchDuration)) { ssc =>
@@ -397,8 +400,10 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
         clock.setTime(existingFile.lastModified + batchDuration.milliseconds)
         val batchCounter = new BatchCounter(ssc)
         val fileStream = ssc
-          .fileStream[LongWritable, Text, TextInputFormat](
-              testDir.toString, (x: Path) => true, newFilesOnly = newFilesOnly)
+          .fileStream[LongWritable, Text, TextInputFormat](testDir.toString,
+                                                           (x: Path) => true,
+                                                           newFilesOnly =
+                                                             newFilesOnly)
           .map(_._2.toString)
         val outputQueue = new ConcurrentLinkedQueue[Seq[String]]
         val outputStream = new TestOutputStream(fileStream, outputQueue)
@@ -426,12 +431,11 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
         }
 
         // Verify that all the files have been read
-        val expectedOutput =
-          if (newFilesOnly) {
-            input.map(_.toString).toSet
-          } else {
-            (Seq(0) ++ input).map(_.toString).toSet
-          }
+        val expectedOutput = if (newFilesOnly) {
+          input.map(_.toString).toSet
+        } else {
+          (Seq(0) ++ input).map(_.toString).toSet
+        }
         assert(outputQueue.asScala.flatten.toSet === expectedOutput)
       }
     } finally {
@@ -468,8 +472,8 @@ class TestServer(portToBind: Int = 0) extends Logging {
             try {
               clientSocket.setTcpNoDelay(true)
               val outputStream = new BufferedWriter(
-                  new OutputStreamWriter(
-                      clientSocket.getOutputStream, StandardCharsets.UTF_8))
+                  new OutputStreamWriter(clientSocket.getOutputStream,
+                                         StandardCharsets.UTF_8))
 
               while (clientSocket.isConnected) {
                 val msg = queue.poll(100, TimeUnit.MILLISECONDS)

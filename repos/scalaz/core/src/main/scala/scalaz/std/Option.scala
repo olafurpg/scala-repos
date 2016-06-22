@@ -151,8 +151,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) =
-      Tag(
-          (Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag unwrap f1, Tag unwrap f2) match {
         case (Some(v1), Some(v2)) => Some(Order[A].min(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2
@@ -173,8 +172,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) =
-      Tag(
-          (Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag unwrap f1, Tag unwrap f2) match {
         case (Some(v1), Some(v2)) => Some(Order[A].max(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2

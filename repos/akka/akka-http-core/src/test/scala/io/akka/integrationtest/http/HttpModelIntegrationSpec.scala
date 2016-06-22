@@ -36,8 +36,8 @@ class HttpModelIntegrationSpec
     with Matchers
     with BeforeAndAfterAll {
 
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -54,14 +54,16 @@ class HttpModelIntegrationSpec
       // to deal with. We're going to convert this request into the library's
       // own HTTP model.
 
-      val request = HttpRequest(
-          method = HttpMethods.POST,
-          uri = Uri("/greeting"),
-          headers = List(Host("localhost"), RawHeader("Origin", "null")),
-          entity =
-            HttpEntity.Default(contentType = ContentTypes.`application/json`,
-                               contentLength = 5,
-                               Source(List(ByteString("hello")))))
+      val request =
+        HttpRequest(method = HttpMethods.POST,
+                    uri = Uri("/greeting"),
+                    headers =
+                      List(Host("localhost"), RawHeader("Origin", "null")),
+                    entity =
+                      HttpEntity.Default(contentType =
+                                           ContentTypes.`application/json`,
+                                         contentLength = 5,
+                                         Source(List(ByteString("hello")))))
 
       // Our library uses a simple model of headers: a Seq[(String, String)].
       // The body is represented as an Array[Byte]. To get the headers in
@@ -150,8 +152,9 @@ class HttpModelIntegrationSpec
 
       // Finally we can create our HttpResponse.
 
-      HttpResponse(entity = HttpEntity.Default(
-              contentType.get, contentLength.get, publisherBody))
+      HttpResponse(
+          entity = HttpEntity
+            .Default(contentType.get, contentLength.get, publisherBody))
     }
 
     "be able to wrap HttpHeaders with custom typed headers" in {

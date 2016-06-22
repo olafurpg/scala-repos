@@ -56,8 +56,8 @@ object Test extends App {
               .reflectClass(im.symbol)
               .reflectConstructor(tpe.member(TermName("<init>")).asMethod)()))
     println(
-        "class: " + failsafe(im
-              .reflectClass(tpe.member(TypeName("C")).asClass)
+        "class: " + failsafe(
+            im.reflectClass(tpe.member(TypeName("C")).asClass)
               .reflectConstructor(typeOf[C]
                     .member(TypeName("C"))
                     .asClass

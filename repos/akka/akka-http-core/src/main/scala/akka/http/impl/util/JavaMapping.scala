@@ -154,10 +154,11 @@ private[http] object JavaMapping {
 
   implicit def graphFlowMapping[JIn, SIn, JOut, SOut, M](
       implicit inMapping: JavaMapping[JIn, SIn],
-      outMapping: JavaMapping[JOut, SOut]): JavaMapping[
-      Graph[FlowShape[JIn, JOut], M], Graph[FlowShape[SIn, SOut], M]] =
-    new JavaMapping[
-        Graph[FlowShape[JIn, JOut], M], Graph[FlowShape[SIn, SOut], M]] {
+      outMapping: JavaMapping[JOut, SOut])
+    : JavaMapping[Graph[FlowShape[JIn, JOut], M],
+                  Graph[FlowShape[SIn, SOut], M]] =
+    new JavaMapping[Graph[FlowShape[JIn, JOut], M],
+                    Graph[FlowShape[SIn, SOut], M]] {
       def toScala(javaObject: Graph[FlowShape[JIn, JOut], M]): S =
         scaladsl
           .Flow[SIn]
@@ -193,8 +194,8 @@ private[http] object JavaMapping {
       _2Mapping: JavaMapping[J2, S2]): JavaMapping[Pair[J1, J2], (S1, S2)] =
     new JavaMapping[Pair[J1, J2], (S1, S2)] {
       def toJava(scalaObject: (S1, S2)): J =
-        Pair(
-            _1Mapping.toJava(scalaObject._1), _2Mapping.toJava(scalaObject._2))
+        Pair(_1Mapping.toJava(scalaObject._1),
+             _2Mapping.toJava(scalaObject._2))
       def toScala(javaObject: Pair[J1, J2]): (S1, S2) =
         (_1Mapping.toScala(javaObject.first),
          _2Mapping.toScala(javaObject.second))
@@ -225,14 +226,14 @@ private[http] object JavaMapping {
   }
 
   implicit object ConnectionContext
-      extends Inherited[
-          ConnectionContext, akka.http.scaladsl.ConnectionContext]
+      extends Inherited[ConnectionContext,
+                        akka.http.scaladsl.ConnectionContext]
   implicit object HttpConnectionContext
-      extends Inherited[
-          HttpConnectionContext, akka.http.scaladsl.HttpConnectionContext]
+      extends Inherited[HttpConnectionContext,
+                        akka.http.scaladsl.HttpConnectionContext]
   implicit object HttpsConnectionContext
-      extends Inherited[
-          HttpsConnectionContext, akka.http.scaladsl.HttpsConnectionContext]
+      extends Inherited[HttpsConnectionContext,
+                        akka.http.scaladsl.HttpsConnectionContext]
 
   implicit object ClientConnectionSettings
       extends Inherited[js.ClientConnectionSettings,
@@ -241,8 +242,8 @@ private[http] object JavaMapping {
       extends Inherited[js.ConnectionPoolSettings,
                         akka.http.scaladsl.settings.ConnectionPoolSettings]
   implicit object ParserSettings
-      extends Inherited[
-          js.ParserSettings, akka.http.scaladsl.settings.ParserSettings]
+      extends Inherited[js.ParserSettings,
+                        akka.http.scaladsl.settings.ParserSettings]
   implicit object CookieParsingMode
       extends Inherited[
           js.ParserSettings.CookieParsingMode,
@@ -252,8 +253,8 @@ private[http] object JavaMapping {
           js.ParserSettings.ErrorLoggingVerbosity,
           akka.http.scaladsl.settings.ParserSettings.ErrorLoggingVerbosity]
   implicit object ServerSettings
-      extends Inherited[
-          js.ServerSettings, akka.http.scaladsl.settings.ServerSettings]
+      extends Inherited[js.ServerSettings,
+                        akka.http.scaladsl.settings.ServerSettings]
   implicit object ServerSettingsT
       extends Inherited[js.ServerSettings.Timeouts,
                         akka.http.scaladsl.settings.ServerSettings.Timeouts]
@@ -267,8 +268,8 @@ private[http] object JavaMapping {
   implicit object ContentTypeNonBinary
       extends Inherited[jm.ContentType.NonBinary, sm.ContentType.NonBinary]
   implicit object ContentTypeWithFixedCharset
-      extends Inherited[
-          jm.ContentType.WithFixedCharset, sm.ContentType.WithFixedCharset]
+      extends Inherited[jm.ContentType.WithFixedCharset,
+                        sm.ContentType.WithFixedCharset]
   implicit object ContentTypeWithCharset
       extends Inherited[jm.ContentType.WithCharset, sm.ContentType.WithCharset]
   implicit object ContentTypeRange
@@ -292,11 +293,11 @@ private[http] object JavaMapping {
   implicit object MediaTypeNonBinary
       extends Inherited[jm.MediaType.NonBinary, sm.MediaType.NonBinary]
   implicit object MediaTypeFixedCharset
-      extends Inherited[
-          jm.MediaType.WithFixedCharset, sm.MediaType.WithFixedCharset]
+      extends Inherited[jm.MediaType.WithFixedCharset,
+                        sm.MediaType.WithFixedCharset]
   implicit object MediaTypeOpenCharset
-      extends Inherited[
-          jm.MediaType.WithOpenCharset, sm.MediaType.WithOpenCharset]
+      extends Inherited[jm.MediaType.WithOpenCharset,
+                        sm.MediaType.WithOpenCharset]
   implicit object StatusCode extends Inherited[jm.StatusCode, sm.StatusCode]
 
   implicit object ContentRange
@@ -317,8 +318,8 @@ private[http] object JavaMapping {
   implicit object UserAgent
       extends Inherited[jm.headers.UserAgent, sm.headers.`User-Agent`]
   implicit object ContentDispositionType
-      extends Inherited[
-          jm.headers.ContentDispositionType, sm.headers.ContentDispositionType]
+      extends Inherited[jm.headers.ContentDispositionType,
+                        sm.headers.ContentDispositionType]
   implicit object EntityTag
       extends Inherited[jm.headers.EntityTag, sm.headers.EntityTag]
   implicit object EntityTagRange
@@ -334,8 +335,8 @@ private[http] object JavaMapping {
   implicit object HttpEncoding
       extends Inherited[jm.headers.HttpEncoding, sm.headers.HttpEncoding]
   implicit object HttpEncodingRange
-      extends Inherited[
-          jm.headers.HttpEncodingRange, sm.headers.HttpEncodingRange]
+      extends Inherited[jm.headers.HttpEncodingRange,
+                        sm.headers.HttpEncodingRange]
   implicit object HttpOrigin
       extends Inherited[jm.headers.HttpOrigin, sm.headers.HttpOrigin]
   implicit object HttpOriginRange
@@ -363,8 +364,8 @@ private[http] object JavaMapping {
     def toJava(scalaObject: S): Uri.J = JavaUri(scalaObject)
   }
   implicit object UriParsingMode
-      extends Inherited[
-          jm.Uri.ParsingMode, akka.http.scaladsl.model.Uri.ParsingMode]
+      extends Inherited[jm.Uri.ParsingMode,
+                        akka.http.scaladsl.model.Uri.ParsingMode]
 
   implicit object Query extends JavaMapping[jm.Query, sm.Uri.Query] {
     def toScala(javaObject: J): Query.S = cast[JavaQuery](javaObject).query
@@ -376,6 +377,6 @@ private[http] object JavaMapping {
       case exp: ClassCastException ⇒
         throw new IllegalArgumentException(
             s"Illegal custom subclass of $classTag. " +
-            s"Please use only the provided factories in akka.http.javadsl.model.Http")
+              s"Please use only the provided factories in akka.http.javadsl.model.Http")
     }
 }

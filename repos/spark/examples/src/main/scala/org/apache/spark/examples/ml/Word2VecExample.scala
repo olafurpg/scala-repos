@@ -33,7 +33,8 @@ object Word2VecExample {
     // $example on$
     // Input data: Each row is a bag of words from a sentence or document.
     val documentDF = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               "Hi I heard about Spark".split(" "),
               "I wish Java could use case classes".split(" "),
               "Logistic regression models are neat".split(" ")

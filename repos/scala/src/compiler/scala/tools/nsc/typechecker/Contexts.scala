@@ -132,8 +132,8 @@ trait Contexts { self: Analyzer =>
     c
   }
 
-  def rootContextPostTyper(
-      unit: CompilationUnit, tree: Tree = EmptyTree): Context =
+  def rootContextPostTyper(unit: CompilationUnit,
+                           tree: Tree = EmptyTree): Context =
     rootContext(unit, tree, throwing = true)
 
   def resetContexts() {
@@ -196,7 +196,7 @@ trait Contexts { self: Analyzer =>
     * @param scope The current scope
     * @param _outer The next outer context.
     */
-  class Context private[typechecker](
+  class Context private[typechecker] (
       val tree: Tree,
       val owner: Symbol,
       val scope: Scope,
@@ -337,8 +337,8 @@ trait Contexts { self: Analyzer =>
       *  the original list afterwards.
       *  @param reportAmbiguous Should ambiguous errors be reported during evaluation of `body`?
       */
-    def savingUndeterminedTypeParams[A](
-        reportAmbiguous: Boolean = ambiguousErrors)(body: => A): A = {
+    def savingUndeterminedTypeParams[A](reportAmbiguous: Boolean =
+                                          ambiguousErrors)(body: => A): A = {
       withMode() {
         setAmbiguousErrors(reportAmbiguous)
         val saved = extractUndetparams()
@@ -403,8 +403,8 @@ trait Contexts { self: Analyzer =>
     //
 
     @inline final def withMode[T](
-        enabled: ContextMode = NOmode, disabled: ContextMode = NOmode)(
-        op: => T): T = {
+        enabled: ContextMode = NOmode,
+        disabled: ContextMode = NOmode)(op: => T): T = {
       val saved = contextMode
       set(enabled, disabled)
       try op finally contextMode = saved
@@ -509,8 +509,7 @@ trait Contexts { self: Analyzer =>
       c.variance = variance
       c.diagUsedDefaults = diagUsedDefaults
       c.openImplicits = openImplicits
-      c.contextMode =
-        contextMode // note: ConstructorSuffix, a bit within `mode`, is conditionally overwritten below.
+      c.contextMode = contextMode // note: ConstructorSuffix, a bit within `mode`, is conditionally overwritten below.
 
       // Fields that may take on a different value in the child
       c.prefix = prefixInChild
@@ -528,8 +527,8 @@ trait Contexts { self: Analyzer =>
     }
 
     /** Use reporter (possibly buffered) for errors/warnings and enable implicit conversion **/
-    def initRootContext(
-        throwing: Boolean = false, checking: Boolean = false): Unit = {
+    def initRootContext(throwing: Boolean = false,
+                        checking: Boolean = false): Unit = {
       _reporter =
         if (checking) new CheckingReporter
         else if (throwing) new ThrowingReporter
@@ -638,7 +637,8 @@ trait Contexts { self: Analyzer =>
     def deprecationWarning(pos: Position, sym: Symbol, msg: String): Unit =
       currentRun.reporting.deprecationWarning(fixPosition(pos), sym, msg)
     def deprecationWarning(pos: Position, sym: Symbol): Unit =
-      currentRun.reporting.deprecationWarning(fixPosition(pos), sym) // TODO: allow this to escalate to an error, and implicit search will ignore deprecated implicits
+      currentRun.reporting
+        .deprecationWarning(fixPosition(pos), sym) // TODO: allow this to escalate to an error, and implicit search will ignore deprecated implicits
 
     def featureWarning(pos: Position,
                        featureName: String,
@@ -712,7 +712,7 @@ trait Contexts { self: Analyzer =>
     /** Is `sub` a subclass of `base` or a companion object of such a subclass? */
     private def isSubClassOrCompanion(sub: Symbol, base: Symbol) =
       sub.isNonBottomSubClass(base) || sub.isModuleClass &&
-      sub.linkedClassOfClass.isNonBottomSubClass(base)
+        sub.linkedClassOfClass.isNonBottomSubClass(base)
 
     /** Return the closest enclosing context that defines a subclass of `clazz`
       *  or a companion object thereof, or `NoContext` if no such context exists.
@@ -731,8 +731,9 @@ trait Contexts { self: Analyzer =>
     }
 
     /** Is `sym` accessible as a member of `pre` in current context? */
-    def isAccessible(
-        sym: Symbol, pre: Type, superAccess: Boolean = false): Boolean = {
+    def isAccessible(sym: Symbol,
+                     pre: Type,
+                     superAccess: Boolean = false): Boolean = {
       lastAccessCheckDetails = ""
       // Console.println("isAccessible(%s, %s, %s)".format(sym, pre, superAccess))
 
@@ -750,7 +751,7 @@ trait Contexts { self: Analyzer =>
           // stops at first package, since further owners can only be surrounding packages
           @tailrec def abEnclosesStopAtPkg(o: Symbol): Boolean =
             (o eq ab) || (!o.isPackageClass && (o ne NoSymbol) &&
-                abEnclosesStopAtPkg(o.owner))
+                  abEnclosesStopAtPkg(o.owner))
           abEnclosesStopAtPkg(owner)
         } else (owner hasTransOwner ab)
       }
@@ -766,24 +767,24 @@ trait Contexts { self: Analyzer =>
         if (c == NoContext)
           lastAccessCheckDetails =
             "\n Access to protected " + target + " not permitted because" +
-            "\n " + "enclosing " + this.enclClass.owner +
-            this.enclClass.owner.locationString + " is not a subclass of " +
-            "\n " + sym.owner + sym.owner.locationString +
-            " where target is defined"
+              "\n " + "enclosing " + this.enclClass.owner +
+              this.enclClass.owner.locationString + " is not a subclass of " +
+              "\n " + sym.owner + sym.owner.locationString +
+              " where target is defined"
         c != NoContext && {
           target.isType || {
             // allow accesses to types from arbitrary subclasses fixes #4737
             val res =
               isSubClassOrCompanion(pre.widen.typeSymbol, c.owner) ||
-              c.owner.isModuleClass &&
-              isSubClassOrCompanion(pre.widen.typeSymbol,
-                                    c.owner.linkedClassOfClass)
+                c.owner.isModuleClass &&
+                  isSubClassOrCompanion(pre.widen.typeSymbol,
+                                        c.owner.linkedClassOfClass)
             if (!res)
               lastAccessCheckDetails =
                 "\n Access to protected " + target + " not permitted because" +
-                "\n prefix type " + pre.widen + " does not conform to" +
-                "\n " + c.owner + c.owner.locationString +
-                " where the access take place"
+                  "\n prefix type " + pre.widen + " does not conform to" +
+                  "\n " + c.owner + c.owner.locationString +
+                  " where the access take place"
             res
           }
         }
@@ -849,9 +850,10 @@ trait Contexts { self: Analyzer =>
                 current)
       }
       try restore() finally {
-        for ((sym, savedInfo) <- savedTypeBounds) sym setInfo debuglogResult(
-            s"Discarding inferred $sym=${sym.info}, restoring saved info")(
-            savedInfo)
+        for ((sym, savedInfo) <- savedTypeBounds)
+          sym setInfo debuglogResult(
+              s"Discarding inferred $sym=${sym.info}, restoring saved info")(
+              savedInfo)
 
         savedTypeBounds = Nil
       }
@@ -874,8 +876,10 @@ trait Contexts { self: Analyzer =>
       *  it is accessible, and if it is imported there is not already a local symbol
       *  with the same names. Local symbols override imported ones. This fixes #2866.
       */
-    private def isQualifyingImplicit(
-        name: Name, sym: Symbol, pre: Type, imported: Boolean) =
+    private def isQualifyingImplicit(name: Name,
+                                     sym: Symbol,
+                                     pre: Type,
+                                     imported: Boolean) =
       sym.isImplicit && isAccessible(sym, pre) && !(imported && {
             val e = scope.lookupEntry(name)
             (e ne null) && (e.owner == scope) &&
@@ -886,7 +890,9 @@ trait Contexts { self: Analyzer =>
       *  if any such symbol is accessible from this context and is a qualifying implicit.
       */
     private def withQualifyingImplicitAlternatives(
-        imp: ImportInfo, name: Name, pre: Type)(f: Symbol => Unit) =
+        imp: ImportInfo,
+        name: Name,
+        pre: Type)(f: Symbol => Unit) =
       for {
         sym <- importedAccessibleSymbol(imp,
                                         name,
@@ -895,13 +901,13 @@ trait Contexts { self: Analyzer =>
         if isQualifyingImplicit(name, sym, pre, imported = true)
       } f(sym)
 
-    private def collectImplicits(syms: Scope,
-                                 pre: Type,
-                                 imported: Boolean =
-                                   false): List[ImplicitInfo] =
+    private def collectImplicits(
+        syms: Scope,
+        pre: Type,
+        imported: Boolean = false): List[ImplicitInfo] =
       for (sym <- syms.toList
-           if isQualifyingImplicit(sym.name, sym, pre, imported)) yield
-        new ImplicitInfo(sym.name, pre, sym)
+           if isQualifyingImplicit(sym.name, sym, pre, imported))
+        yield new ImplicitInfo(sym.name, pre, sym)
 
     private def collectImplicitImports(imp: ImportInfo): List[ImplicitInfo] = {
       val qual = imp.qual
@@ -976,8 +982,9 @@ trait Contexts { self: Analyzer =>
             // !!! In the body of `class C(implicit a: A) { }`, `implicitss` returns `List(List(a), List(a), List(<predef..)))`
             //     it handled correctly by implicit search, which considers the second `a` to be shadowed, but should be
             //     remedied nonetheless.
-            Some(collectImplicits(owner.thisType.implicitMembers,
-                                  owner.thisType))
+            Some(
+                collectImplicits(owner.thisType.implicitMembers,
+                                 owner.thisType))
           }
       } else if (scope != nextOuter.scope && !owner.isPackageClass) {
         debuglog("collect local implicits " + scope.toList) //DEBUG
@@ -1004,7 +1011,9 @@ trait Contexts { self: Analyzer =>
       *    import foo._, java.io._
       */
     private def resolveAmbiguousImport(
-        name: Name, imp1: ImportInfo, imp2: ImportInfo): Option[ImportInfo] = {
+        name: Name,
+        imp1: ImportInfo,
+        imp2: ImportInfo): Option[ImportInfo] = {
       val imp1Explicit = imp1 isExplicitImport name
       val imp2Explicit = imp2 isExplicitImport name
       val ambiguous =
@@ -1012,10 +1021,10 @@ trait Contexts { self: Analyzer =>
         else !imp1Explicit && imp2Explicit
       val imp1Symbol =
         (imp1 importedSymbol name).initialize filter
-        (s => isAccessible(s, imp1.qual.tpe, superAccess = false))
+          (s => isAccessible(s, imp1.qual.tpe, superAccess = false))
       val imp2Symbol =
         (imp2 importedSymbol name).initialize filter
-        (s => isAccessible(s, imp2.qual.tpe, superAccess = false))
+          (s => isAccessible(s, imp2.qual.tpe, superAccess = false))
 
       // The types of the qualifiers from which the ambiguous imports come.
       // If the ambiguous name is a value, these must be the same.
@@ -1066,11 +1075,11 @@ trait Contexts { self: Analyzer =>
                                          requireExplicit: Boolean,
                                          record: Boolean): Symbol =
       imp.importedSymbol(name, requireExplicit, record) filter
-      (s => isAccessible(s, imp.qual.tpe, superAccess = false))
+        (s => isAccessible(s, imp.qual.tpe, superAccess = false))
 
     private def requiresQualifier(s: Symbol): Boolean =
       (s.owner.isClass && !s.owner.isPackageClass &&
-          !s.isTypeParameterOrSkolem && !s.isExistentiallyBound)
+            !s.isTypeParameterOrSkolem && !s.isExistentiallyBound)
 
     /** Must `sym` defined in package object of package `pkg`, if
       *  it selected from a prefix with `pkg` as its type symbol?
@@ -1088,10 +1097,8 @@ trait Contexts { self: Analyzer =>
       *  the search continuing as long as no qualifying name is found.
       */
     def lookupSymbol(name: Name, qualifies: Symbol => Boolean): NameLookup = {
-      var lookupError: NameLookup =
-        null // set to non-null if a definite error is encountered
-      var inaccessible: NameLookup =
-        null // records inaccessible symbol for error reporting in case none is found
+      var lookupError: NameLookup = null // set to non-null if a definite error is encountered
+      var inaccessible: NameLookup = null // records inaccessible symbol for error reporting in case none is found
       var defSym: Symbol = NoSymbol // the directly found symbol
       var pre: Type = NoPrefix // the prefix type of defSym, if a class member
       var cx: Context = this // the context under consideration
@@ -1112,7 +1119,7 @@ trait Contexts { self: Analyzer =>
 
       def isPackageOwnedInDifferentUnit(s: Symbol) =
         (s.isDefinedInPackage && (!currentRun.compiles(s) || unit.exists &&
-                s.sourceFile != unit.source.file))
+                  s.sourceFile != unit.source.file))
       def lookupInPrefix(name: Name) = pre member name filter qualifies
       def accessibleInPrefix(s: Symbol) =
         isAccessible(s, pre, superAccess = false)
@@ -1122,8 +1129,8 @@ trait Contexts { self: Analyzer =>
         val found0 = lookupInPrefix(name)
         val found1 = found0 filter accessibleInPrefix
         if (found0.exists && !found1.exists && inaccessible == null)
-          inaccessible = LookupInaccessible(
-              found0, analyzer.lastAccessCheckDetails)
+          inaccessible =
+            LookupInaccessible(found0, analyzer.lastAccessCheckDetails)
 
         found1
       }
@@ -1192,7 +1199,7 @@ trait Contexts { self: Analyzer =>
       //  2) Explicit imports have next highest precedence.
       def depthOk(imp: ImportInfo) =
         (imp.depth > symbolDepth || (unit.isJava &&
-                imp.isExplicitImport(name) && imp.depth == symbolDepth))
+                  imp.isExplicitImport(name) && imp.depth == symbolDepth))
 
       while (!impSym.exists && imports.nonEmpty && depthOk(imports.head)) {
         impSym = lookupImport(imp1, requireExplicit = false)
@@ -1220,7 +1227,7 @@ trait Contexts { self: Analyzer =>
         //   - imp1 is a wildcard import, so all explicit imports from outer scopes must be checked
         def keepLooking =
           (lookupError == null && imports.tail.nonEmpty &&
-              (sameDepth || !imp1Explicit))
+                (sameDepth || !imp1Explicit))
         // If we find a competitor imp2 which imports the same name, possible outcomes are:
         //
         //  - same depth, imp1 wild, imp2 explicit:        imp2 wins, drop imp1
@@ -1293,7 +1300,7 @@ trait Contexts { self: Analyzer =>
     override final def isRootImport = !tree.pos.isDefined
     override final def toString =
       super.toString + " with " +
-      s"ImportContext { $impInfo; outer.owner = ${outer.owner} }"
+        s"ImportContext { $impInfo; outer.owner = ${outer.owner} }"
   }
 
   /** A reporter for use during type checking. It has multiple modes for handling errors.
@@ -1335,8 +1342,8 @@ trait Contexts { self: Analyzer =>
       *  - when true, use global.reporter regardless of whether we're buffering (TODO: can we change this?)
       *  - else, let this context reporter decide
       */
-    final def issueAmbiguousError(
-        err: AbsAmbiguousTypeError)(implicit context: Context): Unit =
+    final def issueAmbiguousError(err: AbsAmbiguousTypeError)(
+        implicit context: Context): Unit =
       if (context.ambiguousErrors)
         reporter.error(
             context.fixPosition(err.errPos),
@@ -1353,8 +1360,7 @@ trait Contexts { self: Analyzer =>
 
     @inline final def propagatingErrorsTo[T](target: ContextReporter)(
         expr: => T): T = {
-      val res =
-        expr // TODO: make sure we're okay skipping the try/finally overhead
+      val res = expr // TODO: make sure we're okay skipping the try/finally overhead
       if ((this ne target) && hasErrors) {
         // `this eq target` in e.g., test/files/neg/divergent-implicit.scala
         // assert(target.errorBuffer ne _errorBuffer)
@@ -1368,8 +1374,10 @@ trait Contexts { self: Analyzer =>
       res
     }
 
-    protected final def info0(
-        pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
+    protected final def info0(pos: Position,
+                              msg: String,
+                              severity: Severity,
+                              force: Boolean): Unit =
       severity match {
         case ERROR => handleError(pos, msg)
         case WARNING => handleWarning(pos, msg)
@@ -1437,7 +1445,8 @@ trait Contexts { self: Analyzer =>
     // [JZ] Contexts, pre- the SI-7345 refactor, avoided allocating the buffers until needed. This
     // is replicated here out of conservatism.
     private def newBuffer[A] =
-      mutable.LinkedHashSet.empty[A] // Important to use LinkedHS for stable results.
+      mutable.LinkedHashSet
+        .empty[A] // Important to use LinkedHS for stable results.
     final protected def errorBuffer = {
       if (_errorBuffer == null) _errorBuffer = newBuffer; _errorBuffer
     }
@@ -1519,7 +1528,7 @@ trait Contexts { self: Analyzer =>
       case _ =>
         throw new FatalError(
             "symbol " + tree.symbol + " has bad type: " +
-            tree.symbol.info) //debug
+              tree.symbol.info) //debug
     }
 
     /** Is name imported explicitly, not via wildcard? */
@@ -1539,8 +1548,9 @@ trait Contexts { self: Analyzer =>
     }
 
     /** If requireExplicit is true, wildcard imports are not considered. */
-    def importedSymbol(
-        name: Name, requireExplicit: Boolean, record: Boolean): Symbol = {
+    def importedSymbol(name: Name,
+                       requireExplicit: Boolean,
+                       record: Boolean): Symbol = {
       var result: Symbol = NoSymbol
       var renamed = false
       var selectors = tree.selectors
@@ -1549,7 +1559,7 @@ trait Contexts { self: Analyzer =>
         if (current.rename == name.toTermName)
           result = qual.tpe
             .nonLocalMember( // new to address #2733: consider only non-local members for imports
-              if (name.isTypeName) current.name.toTypeName else current.name)
+                if (name.isTypeName) current.name.toTypeName else current.name)
         else if (current.name == name.toTermName) renamed = true
         else if (current.name == nme.WILDCARD && !renamed && !requireExplicit)
           result = qual.tpe.nonLocalMember(name)
@@ -1577,8 +1587,8 @@ trait Contexts { self: Analyzer =>
     def allImportedSymbols: Iterable[Symbol] =
       importableMembers(qual.tpe) flatMap (transformImport(tree.selectors, _))
 
-    private def transformImport(
-        selectors: List[ImportSelector], sym: Symbol): List[Symbol] =
+    private def transformImport(selectors: List[ImportSelector],
+                                sym: Symbol): List[Symbol] =
       selectors match {
         case List() => List()
         case List(ImportSelector(nme.WILDCARD, _, _, _)) => List(sym)

@@ -108,8 +108,8 @@ class ScArgumentExprListImpl(node: ASTNode)
     this
   }
 
-  def addExprAfter(
-      expr: ScExpression, anchor: PsiElement): ScArgumentExprList = {
+  def addExprAfter(expr: ScExpression,
+                   anchor: PsiElement): ScArgumentExprList = {
     val nextNode = anchor.getNode.getTreeNext
     val comma = ScalaPsiElementFactory.createComma(getManager)
     val space = ScalaPsiElementFactory.createNewLineNode(getManager, " ")

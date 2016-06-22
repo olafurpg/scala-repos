@@ -20,5 +20,4 @@ class PreparedData(
     val users: EntityMap[User],
     val items: EntityMap[Item],
     val ratings: RDD[Rating]
-)
-    extends Serializable
+) extends Serializable

@@ -49,8 +49,8 @@ class ScalaMoveClassesOrPackagesHandler
     }
   }
 
-  override def canMove(
-      elements: Array[PsiElement], targetContainer: PsiElement): Boolean = {
+  override def canMove(elements: Array[PsiElement],
+                       targetContainer: PsiElement): Boolean = {
     //sort of hack to save destinations here, need to be sure that it is called
     val scalaElements =
       elements.filter(_.getLanguage.isInstanceOf[ScalaLanguage])
@@ -71,15 +71,15 @@ class ScalaMoveClassesOrPackagesHandler
 
     import scala.collection.JavaConversions._
     if (!CommonRefactoringUtil.checkReadOnlyStatusRecursively(
-            project, adjustedElements.toSeq, true)) {
+            project,
+            adjustedElements.toSeq,
+            true)) {
       return
     }
-    val initialTargetPackageName: String =
-      MoveClassesOrPackagesImpl.getInitialTargetPackageName(
-          initialTargetElement, adjustedElements)
-    val initialTargetDirectory: PsiDirectory =
-      MoveClassesOrPackagesImpl.getInitialTargetDirectory(
-          initialTargetElement, adjustedElements)
+    val initialTargetPackageName: String = MoveClassesOrPackagesImpl
+      .getInitialTargetPackageName(initialTargetElement, adjustedElements)
+    val initialTargetDirectory: PsiDirectory = MoveClassesOrPackagesImpl
+      .getInitialTargetDirectory(initialTargetElement, adjustedElements)
     val isTargetDirectoryFixed: Boolean = initialTargetDirectory == null
     val searchTextOccurences: Boolean = adjustedElements.exists(
         TextOccurrencesUtil.isSearchTextOccurencesEnabled)
@@ -126,8 +126,9 @@ class ScalaMoveClassesOrPackagesHandler
       @NotNull directory: PsiDirectory,
       elementsToMove: Array[PsiElement],
       moveCallback: MoveCallback): DialogWrapper = {
-    new MoveClassesOrPackagesToNewDirectoryDialog(
-        directory, elementsToMove, moveCallback) {
+    new MoveClassesOrPackagesToNewDirectoryDialog(directory,
+                                                  elementsToMove,
+                                                  moveCallback) {
       protected override def createCenterPanel(): JComponent = {
         addMoveCompanionChb(super.createCenterPanel(), elementsToMove)
       }
@@ -164,8 +165,7 @@ class ScalaMoveClassesOrPackagesHandler
           ScalaBundle.message("move.with.companion"))
       chbMoveCompanion.setSelected(
           ScalaApplicationSettings.getInstance().MOVE_COMPANION)
-      chbMoveCompanion.addActionListener(
-          new ActionListener {
+      chbMoveCompanion.addActionListener(new ActionListener {
         def actionPerformed(e: ActionEvent) {
           ScalaApplicationSettings.getInstance().MOVE_COMPANION =
             chbMoveCompanion.isSelected

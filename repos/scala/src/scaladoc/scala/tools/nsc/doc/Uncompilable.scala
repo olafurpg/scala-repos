@@ -32,8 +32,9 @@ trait Uncompilable {
     files flatMap { f =>
       val comments = docPairs(f.slurp())
       if (settings.verbose)
-        inform("Found %d doc comments in parse-only file %s: %s".format(
-                comments.size, f, comments.map(_._1).mkString(", ")))
+        inform(
+            "Found %d doc comments in parse-only file %s: %s"
+              .format(comments.size, f, comments.map(_._1).mkString(", ")))
 
       comments
     }
@@ -41,14 +42,14 @@ trait Uncompilable {
   def symbols = pairs map (_._1)
   def templates =
     symbols filter
-    (x =>
-          x.isClass || x.isTrait ||
-          x == AnyRefClass /* which is now a type alias */ ) toSet
+      (x =>
+            x.isClass || x.isTrait ||
+              x == AnyRefClass /* which is now a type alias */ ) toSet
   def comments = {
     if (settings.debug || settings.verbose)
       inform(
-          "Found %d uncompilable files: %s".format(
-              files.size, files mkString ", "))
+          "Found %d uncompilable files: %s".format(files.size,
+                                                   files mkString ", "))
 
     if (pairs.isEmpty)
       warning("no doc comments read from " + settings.docUncompilable.value)
@@ -57,6 +58,6 @@ trait Uncompilable {
   }
   override def toString =
     pairs.size + " uncompilable symbols:\n" +
-    (symbols filterNot (_ == NoSymbol) map
-        (x => "  " + x.owner.fullName + " " + x.defString) mkString "\n")
+      (symbols filterNot (_ == NoSymbol) map
+            (x => "  " + x.owner.fullName + " " + x.defString) mkString "\n")
 }

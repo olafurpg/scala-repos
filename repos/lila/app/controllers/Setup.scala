@@ -87,8 +87,7 @@ object Setup extends LilaController with TheftPrevention {
                                                           TimeControl.Correspondence.apply
                                                         } getOrElse TimeControl.Unlimited,
                                                       mode = config.mode,
-                                                      color =
-                                                        config.color.name,
+                                                      color = config.color.name,
                                                       challenger =
                                                         (ctx.me,
                                                          HTTPRequest sid req) match {
@@ -139,9 +138,9 @@ object Setup extends LilaController with TheftPrevention {
           .bindFromRequest
           .fold(
               err =>
-                negotiate(html =
-                            BadRequest(errorsAsJson(err).toString).fuccess,
-                          api = _ => BadRequest(errorsAsJson(err)).fuccess),
+                negotiate(
+                    html = BadRequest(errorsAsJson(err).toString).fuccess,
+                    api = _ => BadRequest(errorsAsJson(err)).fuccess),
               config =>
                 (ctx.userId ?? Env.relation.api.fetchBlocking) flatMap {
                   blocking =>
@@ -208,8 +207,8 @@ object Setup extends LilaController with TheftPrevention {
     }
   }
 
-  private def process[A](
-      form: Context => Form[A])(op: A => BodyContext[_] => Fu[Pov]) =
+  private def process[A](form: Context => Form[A])(
+      op: A => BodyContext[_] => Fu[Pov]) =
     OpenBody { implicit ctx =>
       PostRateLimit(ctx.req.remoteAddress) {
         implicit val req = ctx.body

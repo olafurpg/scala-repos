@@ -65,8 +65,8 @@ trait PathReads {
   def jsPick[A <: JsValue](path: JsPath)(implicit reads: Reads[A]): Reads[A] =
     at(path)(reads)
 
-  def jsPickBranch[A <: JsValue](
-      path: JsPath)(implicit reads: Reads[A]): Reads[JsObject] =
+  def jsPickBranch[A <: JsValue](path: JsPath)(
+      implicit reads: Reads[A]): Reads[JsObject] =
     Reads[JsObject](
         js =>
           path
@@ -110,8 +110,7 @@ trait ConstraintReads {
 
   /** very simple optional field Reads that maps "null" to None */
   def optionWithNull[T](implicit rds: Reads[T]): Reads[Option[T]] =
-    Reads(
-        js =>
+    Reads(js =>
           js match {
         case JsNull => JsSuccess(None)
         case js => rds.reads(js).map(Some(_))
@@ -164,16 +163,12 @@ trait ConstraintReads {
   /**
     * Defines a regular expression constraint for `String` values, i.e. the string must match the regular expression pattern
     */
-  def pattern(
-      regex: => scala.util.matching.Regex, error: String = "error.pattern")(
-      implicit reads: Reads[String]) =
-    Reads[String](
-        js =>
-          reads
-            .reads(js)
-            .flatMap { o =>
-          regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
-      })
+  def pattern(regex: => scala.util.matching.Regex,
+              error: String = "error.pattern")(implicit reads: Reads[String]) =
+    Reads[String](js =>
+          reads.reads(js).flatMap { o =>
+        regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
+    })
 
   def email(implicit reads: Reads[String]): Reads[String] =
     pattern(
@@ -183,8 +178,8 @@ trait ConstraintReads {
   def verifying[A](cond: A => Boolean)(implicit rds: Reads[A]) =
     filter[A](ValidationError("error.invalid"))(cond)(rds)
 
-  def verifyingIf[A](cond: A => Boolean)(
-      subreads: Reads[_])(implicit rds: Reads[A]) =
+  def verifyingIf[A](cond: A => Boolean)(subreads: Reads[_])(
+      implicit rds: Reads[A]) =
     Reads[A] { js =>
       rds.reads(js).flatMap { t =>
         (scala.util.control.Exception.catching(classOf[MatchError]) opt cond(
@@ -229,8 +224,8 @@ trait PathWrites {
       JsPath.createObj(path -> path(obj).headOption.getOrElse(JsNull))
     }
 
-  def jsPickBranchUpdate(
-      path: JsPath, wrs: OWrites[JsValue]): OWrites[JsValue] =
+  def jsPickBranchUpdate(path: JsPath,
+                         wrs: OWrites[JsValue]): OWrites[JsValue] =
     OWrites[JsValue] { js =>
       JsPath.createObj(
           path -> path(js).headOption

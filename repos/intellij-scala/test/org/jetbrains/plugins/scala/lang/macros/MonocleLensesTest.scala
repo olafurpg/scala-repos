@@ -39,8 +39,9 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
   protected def folderPath: String = TestUtils.getTestDataPath
 
-  protected def addIvyCacheLibrary(
-      libraryName: String, libraryPath: String, jarNames: String*) {
+  protected def addIvyCacheLibrary(libraryName: String,
+                                   libraryPath: String,
+                                   jarNames: String*) {
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -55,15 +56,18 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     val caretPos = text.indexOf("<caret>")
     configureFromFileTextAdapter("dummy.scala", text.replace("<caret>", ""))
     val exp = PsiTreeUtil
-      .findElementOfClassAtOffset(
-          getFileAdapter, caretPos, classOf[ScalaPsiElement], false)
+      .findElementOfClassAtOffset(getFileAdapter,
+                                  caretPos,
+                                  classOf[ScalaPsiElement],
+                                  false)
       .asInstanceOf[ScObject]
     exp.allMethods.find(_.name == methodName) match {
       case Some(x) =>
         x.method.asInstanceOf[ScFunctionDefinition].returnType match {
           case Success(t, _) =>
-            org.junit.Assert.assertEquals(
-                s"${t.toString} != $expectedType", expectedType, t.toString)
+            org.junit.Assert.assertEquals(s"${t.toString} != $expectedType",
+                                          expectedType,
+                                          t.toString)
           case Failure(cause, _) => org.junit.Assert.fail(cause)
         }
       case None => org.junit.Assert.fail("method not found")

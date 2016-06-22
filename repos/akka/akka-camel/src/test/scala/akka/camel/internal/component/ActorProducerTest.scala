@@ -404,7 +404,8 @@ private[camel] trait ActorProducerFixture
             replyTimeout: FiniteDuration = 20 seconds) = {
     prepareMocks(actor, outCapable = outCapable)
     new ActorProducer(
-        configure(isAutoAck = autoAck, _replyTimeout = replyTimeout), camel)
+        configure(isAutoAck = autoAck, _replyTimeout = replyTimeout),
+        camel)
   }
 
   def createAsyncCallback = new TestAsyncCallback
@@ -437,15 +438,16 @@ private[camel] trait ActorProducerFixture
   def configure(endpointUri: String = "test-uri",
                 isAutoAck: Boolean = true,
                 _replyTimeout: FiniteDuration = 20 seconds) = {
-    val endpoint = new ActorEndpoint(
-        endpointUri, actorComponent, actorEndpointPath, camel)
+    val endpoint =
+      new ActorEndpoint(endpointUri, actorComponent, actorEndpointPath, camel)
     endpoint.autoAck = isAutoAck
     endpoint.replyTimeout = _replyTimeout
     endpoint
   }
 
-  def prepareMocks(
-      actor: ActorRef, message: CamelMessage = message, outCapable: Boolean) {
+  def prepareMocks(actor: ActorRef,
+                   message: CamelMessage = message,
+                   outCapable: Boolean) {
     when(actorEndpointPath.findActorIn(any[ActorSystem])) thenReturn Option(
         actor)
     when(exchange.toRequestMessage(any[Map[String, Any]])) thenReturn message

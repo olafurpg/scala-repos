@@ -44,10 +44,11 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
 
   test("SPARK-12404: Datatype Helper Serializability") {
     val ds = sparkContext
-      .parallelize((new Timestamp(0),
-                    new Date(0),
-                    java.math.BigDecimal.valueOf(1),
-                    scala.math.BigDecimal(1)) :: Nil)
+      .parallelize(
+          (new Timestamp(0),
+           new Date(0),
+           java.math.BigDecimal.valueOf(1),
+           scala.math.BigDecimal(1)) :: Nil)
       .toDS()
 
     ds.collect()
@@ -87,8 +88,10 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
 
   test("as case class - reordered fields by name") {
     val ds = Seq((1, "a"), (2, "b"), (3, "c")).toDF("b", "a").as[ClassData]
-    assert(ds.collect() === Array(
-            ClassData("a", 1), ClassData("b", 2), ClassData("c", 3)))
+    assert(
+        ds.collect() === Array(ClassData("a", 1),
+                               ClassData("b", 2),
+                               ClassData("c", 3)))
   }
 
   test("as case class - take") {
@@ -206,8 +209,9 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
     val ds1 = Seq(1, 2, 3).toDS().as("a")
     val ds2 = Seq(1, 2).toDS().as("b")
 
-    checkDataset(
-        ds1.joinWith(ds2, $"a.value" === $"b.value", "inner"), (1, 1), (2, 2))
+    checkDataset(ds1.joinWith(ds2, $"a.value" === $"b.value", "inner"),
+                 (1, 1),
+                 (2, 2))
   }
 
   test("joinWith, expression condition, outer join") {
@@ -398,8 +402,11 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
             key -> (data1.map(_._2).mkString + "#" + data2.map(_._2).mkString))
     }
 
-    checkDataset(
-        cogrouped, 1 -> "a#", 2 -> "#q", 3 -> "abcfoo#w", 5 -> "hello#er")
+    checkDataset(cogrouped,
+                 1 -> "a#",
+                 2 -> "#q",
+                 3 -> "abcfoo#w",
+                 5 -> "hello#er")
   }
 
   test("cogroup with complex data") {
@@ -417,8 +424,11 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
   test("sample with replacement") {
     val n = 100
     val data = sparkContext.parallelize(1 to n, 2).toDS()
-    checkDataset(
-        data.sample(withReplacement = true, 0.05, seed = 13), 5, 10, 52, 73)
+    checkDataset(data.sample(withReplacement = true, 0.05, seed = 13),
+                 5,
+                 10,
+                 52,
+                 73)
   }
 
   test("sample without replacement") {
@@ -469,8 +479,10 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
     implicit val kryoEncoder = Encoders.kryo[KryoData]
     val ds = Seq(KryoData(1), KryoData(2)).toDS()
 
-    assert(ds.groupByKey(p => p).count().collect().toSet == Set(
-            (KryoData(1), 1L), (KryoData(2), 1L)))
+    assert(
+        ds.groupByKey(p => p).count().collect().toSet == Set(
+            (KryoData(1), 1L),
+            (KryoData(2), 1L)))
   }
 
   test("Kryo encoder self join") {
@@ -488,8 +500,10 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
     implicit val kryoEncoder = Encoders.javaSerialization[JavaData]
     val ds = Seq(JavaData(1), JavaData(2)).toDS()
 
-    assert(ds.groupByKey(p => p).count().collect().toSeq == Seq(
-            (JavaData(1), 1L), (JavaData(2), 1L)))
+    assert(
+        ds.groupByKey(p => p).count().collect().toSeq == Seq(
+            (JavaData(1), 1L),
+            (JavaData(2), 1L)))
   }
 
   test("Java encoder self join") {
@@ -535,7 +549,8 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
     val schema = StructType(
         Seq(
             StructField("f",
-                        StructType(Seq(
+                        StructType(
+                            Seq(
                                 StructField("a", StringType, nullable = true),
                                 StructField("b", IntegerType, nullable = false)
                             )),
@@ -609,18 +624,18 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
     }.message
     assert(
         message == "Try to map struct<a:string,b:int> to Tuple3, " +
-        "but failed as the number of fields does not line up.\n" +
-        " - Input schema: struct<a:string,b:int>\n" +
-        " - Target schema: struct<_1:string,_2:int,_3:bigint>")
+          "but failed as the number of fields does not line up.\n" +
+          " - Input schema: struct<a:string,b:int>\n" +
+          " - Target schema: struct<_1:string,_2:int,_3:bigint>")
 
     val message2 = intercept[AnalysisException] {
       ds.as[Tuple1[String]]
     }.message
     assert(
         message2 == "Try to map struct<a:string,b:int> to Tuple1, " +
-        "but failed as the number of fields does not line up.\n" +
-        " - Input schema: struct<a:string,b:int>\n" +
-        " - Target schema: struct<_1:string>")
+          "but failed as the number of fields does not line up.\n" +
+          " - Input schema: struct<a:string,b:int>\n" +
+          " - Target schema: struct<_1:string>")
   }
 
   test("SPARK-13440: Resolving option fields") {

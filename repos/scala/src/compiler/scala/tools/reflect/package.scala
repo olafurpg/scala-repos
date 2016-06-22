@@ -74,8 +74,8 @@ package object reflect {
       }
     }
 
-  private[reflect] def frontEndToReporter(
-      frontEnd: FrontEnd, settings0: Settings): Reporter =
+  private[reflect] def frontEndToReporter(frontEnd: FrontEnd,
+                                          settings0: Settings): Reporter =
     new AbstractReporter {
       val settings = settings0
 

@@ -56,8 +56,10 @@ object Printers {
       }
     }
 
-    protected final def printColumn(
-        ts: List[Tree], start: String, sep: String, end: String): Unit = {
+    protected final def printColumn(ts: List[Tree],
+                                    start: String,
+                                    sep: String,
+                                    end: String): Unit = {
       print(start); indent(); println()
       var rest = ts
       while (rest.nonEmpty) {
@@ -71,8 +73,10 @@ object Printers {
       undent(); println(); print(end)
     }
 
-    protected final def printRow(
-        ts: List[Tree], start: String, sep: String, end: String): Unit = {
+    protected final def printRow(ts: List[Tree],
+                                 start: String,
+                                 sep: String,
+                                 end: String): Unit = {
       print(start)
       var rest = ts
       while (rest.nonEmpty) {
@@ -311,8 +315,7 @@ object Printers {
         case UnaryOp(op, lhs) =>
           import UnaryOp._
           print('(')
-          print(
-              (op: @switch) match {
+          print((op: @switch) match {
             case Boolean_! => "!"
             case IntToLong | DoubleToLong => "(long)"
             case DoubleToInt | LongToInt => "(int)"
@@ -585,8 +588,7 @@ object Printers {
         case JSUnaryOp(op, lhs) =>
           import JSUnaryOp._
           print('(')
-          print(
-              (op: @switch) match {
+          print((op: @switch) match {
             case + => "+"
             case - => "-"
             case ~ => "~"
@@ -988,8 +990,10 @@ object Printers {
       undent(); println()
     }
 
-    protected def printRow(
-        ts: List[String], start: String, sep: String, end: String): Unit = {
+    protected def printRow(ts: List[String],
+                           start: String,
+                           sep: String,
+                           end: String): Unit = {
       print(start)
       var rest = ts
       while (rest.nonEmpty) {

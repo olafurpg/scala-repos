@@ -26,10 +26,10 @@ private[stream] object QueueSource {
 /**
   * INTERNAL API
   */
-final private[stream] class QueueSource[T](
-    maxBuffer: Int, overflowStrategy: OverflowStrategy)
-    extends GraphStageWithMaterializedValue[
-        SourceShape[T], SourceQueueWithComplete[T]] {
+final private[stream] class QueueSource[T](maxBuffer: Int,
+                                           overflowStrategy: OverflowStrategy)
+    extends GraphStageWithMaterializedValue[SourceShape[T],
+                                            SourceQueueWithComplete[T]] {
   import QueueSource._
 
   val out = Outlet[T]("queueSource.out")
@@ -50,7 +50,8 @@ final private[stream] class QueueSource[T](
       }
       override def postStop(): Unit = stopCallback {
         case Offer(elem, promise) ⇒
-          promise.failure(new IllegalStateException(
+          promise.failure(
+              new IllegalStateException(
                   "Stream is terminated. SourceQueue is detached"))
         case _ ⇒ // ignore
       }
@@ -86,7 +87,8 @@ final private[stream] class QueueSource[T](
             case Backpressure ⇒
               pendingOffer match {
                 case Some(_) ⇒
-                  offer.promise.failure(new IllegalStateException(
+                  offer.promise.failure(
+                      new IllegalStateException(
                           "You have to wait for previous offer to be resolved to send another request"))
                 case None ⇒
                   pendingOffer = Some(offer)
@@ -119,7 +121,8 @@ final private[stream] class QueueSource[T](
                 completion.failure(bufferOverflowException)
                 failStage(bufferOverflowException)
               case Backpressure ⇒
-                promise.failure(new IllegalStateException(
+                promise.failure(
+                    new IllegalStateException(
                         "You have to wait for previous offer to be resolved to send another request"))
             }
 

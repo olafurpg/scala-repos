@@ -16,7 +16,7 @@ trait Enclosures { self: Context =>
     enclTrees collectFirst { case x: T => x } getOrElse EmptyTree
   private def strictEnclosure[T <: Tree: ClassTag]: T =
     enclTrees collectFirst { case x: T => x } getOrElse
-    (throw new EnclosureException(classTag[T].runtimeClass, enclTrees))
+      (throw new EnclosureException(classTag[T].runtimeClass, enclTrees))
 
   // vals are eager to simplify debugging
   // after all we wouldn't save that much time by making them lazy

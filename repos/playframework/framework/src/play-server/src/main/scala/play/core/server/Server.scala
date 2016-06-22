@@ -139,8 +139,8 @@ object Server {
     * @param provider The server provider.
     * @return The result of the block of code.
     */
-  def withRouter[T](
-      config: ServerConfig = ServerConfig(port = Some(0), mode = Mode.Test))(
+  def withRouter[T](config: ServerConfig =
+                      ServerConfig(port = Some(0), mode = Mode.Test))(
       routes: PartialFunction[RequestHeader, Handler])(block: Port => T)(
       implicit provider: ServerProvider): T = {
     val application = new BuiltInComponentsFromContext(

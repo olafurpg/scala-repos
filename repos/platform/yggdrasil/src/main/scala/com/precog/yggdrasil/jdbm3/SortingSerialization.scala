@@ -32,8 +32,8 @@ object SortingKeyComparator {
     new SortingKeyComparator(rowFormat, ascending)
 }
 
-class SortingKeyComparator private[SortingKeyComparator](
-    rowFormat: RowFormat, ascending: Boolean)
+class SortingKeyComparator private[SortingKeyComparator] (rowFormat: RowFormat,
+                                                          ascending: Boolean)
     extends Comparator[Array[Byte]]
     with Serializable {
 

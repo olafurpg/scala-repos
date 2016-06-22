@@ -88,8 +88,9 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
       def fromChar(c: Char) = fromDecimalChar(c)
     }
 
-    val test =
-      testFor(pathPrefix(CustomShortNumber) { echoCaptureAndUnmatchedPath })
+    val test = testFor(pathPrefix(CustomShortNumber) {
+      echoCaptureAndUnmatchedPath
+    })
     "accept [/23]" in test("23:")
     "accept [/12345yes]" in test("12345:yes")
     "reject [/]" in test()
@@ -108,8 +109,7 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   }
 
   "pathPrefix(Map(\"red\" -> 1, \"green\" -> 2, \"blue\" -> 3))" should {
-    val test = testFor(
-        pathPrefix(Map("red" -> 1, "green" -> 2, "blue" -> 3)) {
+    val test = testFor(pathPrefix(Map("red" -> 1, "green" -> 2, "blue" -> 3)) {
       echoCaptureAndUnmatchedPath
     })
     "accept [/green]" in test("2:")
@@ -118,8 +118,9 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   }
 
   "pathPrefix(Map.empty)" should {
-    val test =
-      testFor(pathPrefix(Map[String, Int]()) { echoCaptureAndUnmatchedPath })
+    val test = testFor(pathPrefix(Map[String, Int]()) {
+      echoCaptureAndUnmatchedPath
+    })
     "reject [/black]" in test()
   }
 
@@ -139,31 +140,35 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   }
 
   """pathPrefix(separateOnSlashes("a/b"))""" should {
-    val test =
-      testFor(pathPrefix(separateOnSlashes("a/b")) { echoUnmatchedPath })
+    val test = testFor(pathPrefix(separateOnSlashes("a/b")) {
+      echoUnmatchedPath
+    })
     "accept [/a/b]" in test("")
     "accept [/a/b/]" in test("/")
     "reject [/a/c]" in test()
   }
   """pathPrefix(separateOnSlashes("abc"))""" should {
-    val test =
-      testFor(pathPrefix(separateOnSlashes("abc")) { echoUnmatchedPath })
+    val test = testFor(pathPrefix(separateOnSlashes("abc")) {
+      echoUnmatchedPath
+    })
     "accept [/abc]" in test("")
     "accept [/abcdef]" in test("def")
     "reject [/ab]" in test()
   }
 
   """pathPrefixTest("a" / Segment ~ Slash)""" should {
-    val test = testFor(
-        pathPrefixTest("a" / Segment ~ Slash) { echoCaptureAndUnmatchedPath })
+    val test = testFor(pathPrefixTest("a" / Segment ~ Slash) {
+      echoCaptureAndUnmatchedPath
+    })
     "accept [/a/bc/]" in test("bc:/a/bc/")
     "reject [/a/bc]" in test()
     "reject [/a/]" in test()
   }
 
   """pathSuffix("edit" / Segment)""" should {
-    val test =
-      testFor(pathSuffix("edit" / Segment) { echoCaptureAndUnmatchedPath })
+    val test = testFor(pathSuffix("edit" / Segment) {
+      echoCaptureAndUnmatchedPath
+    })
     "accept [/orders/123/edit]" in test("123:/orders/")
     "reject [/orders/123/ed]" in test()
     "reject [/edit]" in test()
@@ -219,8 +224,9 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   }
 
   """pathPrefix("foo") & pathEndOrSingleSlash""" should {
-    val test =
-      testFor((pathPrefix("foo") & pathEndOrSingleSlash) { echoUnmatchedPath })
+    val test = testFor((pathPrefix("foo") & pathEndOrSingleSlash) {
+      echoUnmatchedPath
+    })
     "reject [/foobar]" in test()
     "reject [/foo/bar]" in test()
     "accept [/foo] and clear the unmatchedPath" in test("")
@@ -250,8 +256,9 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
       "accept [/1.2.3./]" in test("List(1, 2, 3):./")
     }
     {
-      val test = testFor(
-          pathPrefix(IntNumber.repeat(2, ".")) { echoCaptureAndUnmatchedPath })
+      val test = testFor(pathPrefix(IntNumber.repeat(2, ".")) {
+        echoCaptureAndUnmatchedPath
+      })
       "reject [/bar]" in test()
       "reject [/1bar]" in test()
       "reject [/1.bar]" in test()
@@ -262,8 +269,7 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   }
 
   """rawPathPrefix(Slash ~ "a" / Segment ~ Slash)""" should {
-    val test = testFor(
-        rawPathPrefix(Slash ~ "a" / Segment ~ Slash) {
+    val test = testFor(rawPathPrefix(Slash ~ "a" / Segment ~ Slash) {
       echoCaptureAndUnmatchedPath
     })
     "accept [/a/bc/]" in test("bc:")
@@ -272,8 +278,7 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   }
 
   """rawPathPrefixTest(Slash ~ "a" / Segment ~ Slash)""" should {
-    val test = testFor(
-        rawPathPrefixTest(Slash ~ "a" / Segment ~ Slash) {
+    val test = testFor(rawPathPrefixTest(Slash ~ "a" / Segment ~ Slash) {
       echoCaptureAndUnmatchedPath
     })
     "accept [/a/bc/]" in test("bc:/a/bc/")
@@ -283,8 +288,9 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
 
   "PathMatchers" should {
     {
-      val test = testFor(
-          path(Rest.tmap { case Tuple1(s) ⇒ Tuple1(s.split('-').toList) }) {
+      val test = testFor(path(Rest.tmap {
+        case Tuple1(s) ⇒ Tuple1(s.split('-').toList)
+      }) {
         echoComplete
       })
       "support the hmap modifier in accept [/yes-no]" in test("List(yes, no)")
@@ -301,8 +307,9 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
       "support the hflatMap modifier in reject [/blub]" in test()
     }
     {
-      val test = testFor(
-          path(Rest.flatMap(s ⇒ Some(s).filter("yes" ==))) { echoComplete })
+      val test = testFor(path(Rest.flatMap(s ⇒ Some(s).filter("yes" ==))) {
+        echoComplete
+      })
       "support the flatMap modifier in accept [/yes]" in test("yes")
       "support the flatMap modifier reject [/blub]" in test()
     }
@@ -316,12 +323,14 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
   case class testFor(route: Route) {
     def apply(expectedResponse: String = null): String ⇒ Unit =
       exampleString ⇒
-        """(accept|reject)\s+\[([^\]]+)\]""".r.findFirstMatchIn(exampleString) match {
+        """(accept|reject)\s+\[([^\]]+)\]""".r
+          .findFirstMatchIn(exampleString) match {
           case Some(uri) ⇒
             uri.group(1) match {
               case "accept" if expectedResponse eq null ⇒
-                failTest("Example '" + exampleString +
-                    "' was missing an expectedResponse")
+                failTest(
+                    "Example '" + exampleString +
+                      "' was missing an expectedResponse")
               case "reject" if expectedResponse ne null ⇒
                 failTest(
                     "Example '" + exampleString + "' had an expectedResponse")

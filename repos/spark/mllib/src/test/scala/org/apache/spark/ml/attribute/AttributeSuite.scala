@@ -70,7 +70,10 @@ class AttributeSuite extends SparkFunSuite {
     val existingMetadata =
       new MetadataBuilder().putString("name", "test").build()
     assert(
-        attr.toStructField(existingMetadata).metadata.getString("name") === "test")
+        attr
+          .toStructField(existingMetadata)
+          .metadata
+          .getString("name") === "test")
 
     val attr2 = attr.withoutName.withoutIndex
       .withMin(0.0)
@@ -152,7 +155,8 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr2.values.get === Array("small", "medium", "large", "x-large"))
     assert(attr2.indexOf("x-large") === 3)
     assert(attr2 === Attribute.fromMetadata(attr2.toMetadataImpl()))
-    assert(attr2 === NominalAttribute.fromMetadata(
+    assert(
+        attr2 === NominalAttribute.fromMetadata(
             attr2.toMetadataImpl(withType = false)))
   }
 

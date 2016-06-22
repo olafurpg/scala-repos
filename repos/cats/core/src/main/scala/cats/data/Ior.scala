@@ -55,10 +55,10 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
   final def toOption: Option[B] = right
   final def toList: List[B] = right.toList
 
-  final def to[F[_], BB >: B](
-      implicit monoidKF: MonoidK[F], applicativeF: Applicative[F]): F[BB] =
-    fold(
-        _ => monoidKF.empty, applicativeF.pure, (_, b) => applicativeF.pure(b))
+  final def to[F[_], BB >: B](implicit monoidKF: MonoidK[F],
+                              applicativeF: Applicative[F]): F[BB] =
+    fold(_ => monoidKF.empty, applicativeF.pure, (_, b) =>
+          applicativeF.pure(b))
 
   final def swap: B Ior A = fold(Ior.right, Ior.left, (a, b) => Ior.both(b, a))
 
@@ -111,7 +111,8 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
 
   // scalastyle:off cyclomatic.complexity
   final def append[AA >: A, BB >: B](that: AA Ior BB)(
-      implicit AA: Semigroup[AA], BB: Semigroup[BB]): AA Ior BB = this match {
+      implicit AA: Semigroup[AA],
+      BB: Semigroup[BB]): AA Ior BB = this match {
     case Ior.Left(a1) =>
       that match {
         case Ior.Left(a2) => Ior.Left(AA.combine(a1, a2))
@@ -134,8 +135,8 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
   }
   // scalastyle:on cyclomatic.complexity
 
-  final def ===[AA >: A, BB >: B](that: AA Ior BB)(
-      implicit AA: Eq[AA], BB: Eq[BB]): Boolean =
+  final def ===[AA >: A, BB >: B](that: AA Ior BB)(implicit AA: Eq[AA],
+                                                   BB: Eq[BB]): Boolean =
     fold(
         a => that.fold(a2 => AA.eqv(a, a2), b2 => false, (a2, b2) => false),
         b => that.fold(a2 => false, b2 => BB.eqv(b, b2), (a2, b2) => false),
@@ -145,8 +146,8 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
                     (a2, b2) => AA.eqv(a, a2) && BB.eqv(b, b2))
     )
 
-  final def show[AA >: A, BB >: B](
-      implicit AA: Show[AA], BB: Show[BB]): String = fold(
+  final def show[AA >: A, BB >: B](implicit AA: Show[AA],
+                                   BB: Show[BB]): String = fold(
       a => s"Ior.Left(${AA.show(a)})",
       b => s"Ior.Right(${BB.show(b)})",
       (a, b) => s"Ior.Both(${AA.show(a)}, ${BB.show(b)})"
@@ -175,8 +176,8 @@ private[data] sealed abstract class IorInstances extends IorInstances0 {
 
   implicit def iorBifunctor: Bifunctor[Ior] =
     new Bifunctor[Ior] {
-      override def bimap[A, B, C, D](fab: A Ior B)(
-          f: A => C, g: B => D): C Ior D = fab.bimap(f, g)
+      override def bimap[A, B, C, D](
+          fab: A Ior B)(f: A => C, g: B => D): C Ior D = fab.bimap(f, g)
     }
 }
 

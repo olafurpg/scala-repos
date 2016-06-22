@@ -38,8 +38,8 @@ class ScModifiersElementType(debugName: String)
         psi.hasExplicitModifiers)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScModifiersStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScModifiersStub = {
     val explicitModifiers = dataStream.readBoolean()
     val num = dataStream.readInt
     val modifiers =

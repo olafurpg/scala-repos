@@ -27,10 +27,10 @@ import scala.language.implicitConversions
   *  @tparam Coll the type of the underlying collection containing the elements.
   *  @tparam This the type of the view itself
   */
-trait IterableViewLike[+A,
-                       +Coll,
-                       +This <: IterableView[A, Coll] with IterableViewLike[
-                           A, Coll, This]]
+trait IterableViewLike[
+    +A,
+    +Coll,
+    +This <: IterableView[A, Coll] with IterableViewLike[A, Coll, This]]
     extends Iterable[A]
     with IterableLike[A, This]
     with TraversableView[A, Coll]
@@ -40,7 +40,7 @@ trait IterableViewLike[+A,
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
       extends Iterable[B]
-      with super [TraversableViewLike].Transformed[B]
+      with super[TraversableViewLike].Transformed[B]
       with Transformed[B]
 
   trait Transformed[+B]
@@ -170,8 +170,9 @@ trait IterableViewLike[+A,
     zip[A1, Int, That](Stream from 0)(bf)
 
   override def zipAll[B, A1 >: A, That](
-      that: GenIterable[B], thisElem: A1, thatElem: B)(
-      implicit bf: CanBuildFrom[This, (A1, B), That]): That =
+      that: GenIterable[B],
+      thisElem: A1,
+      thatElem: B)(implicit bf: CanBuildFrom[This, (A1, B), That]): That =
     newZippedAll(that, thisElem, thatElem).asInstanceOf[That]
 
   override def grouped(size: Int): Iterator[This] =
@@ -179,7 +180,7 @@ trait IterableViewLike[+A,
 
   override def sliding(size: Int, step: Int): Iterator[This] =
     self.iterator.sliding(size, step) map
-    (x => newForced(x).asInstanceOf[This])
+      (x => newForced(x).asInstanceOf[This])
 
   override def sliding(size: Int): Iterator[This] =
     sliding(size, 1) // we could inherit this, but that implies knowledge of the way the super class is implemented.

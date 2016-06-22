@@ -190,8 +190,7 @@ private[http] object RouteImplementation
               scalaResolver(resolver))
         }
       case FileAndResourceRouteWithDefaultResolver(constructor) ⇒
-        RouteImplementation(
-            constructor(new directives.ContentTypeResolver {
+        RouteImplementation(constructor(new directives.ContentTypeResolver {
           def resolve(fileName: String): ContentType =
             ContentTypeResolver.Default(fileName)
         }))
@@ -269,9 +268,9 @@ private[http] object RouteImplementation
 
   def transformExtractionMap(f: ExtractionMap ⇒ ExtractionMap): Directive0 = {
     @tailrec
-    def updateExtractionMap(headers: immutable.Seq[HttpHeader],
-                            prefix: Vector[HttpHeader] =
-                              Vector.empty): immutable.Seq[HttpHeader] =
+    def updateExtractionMap(
+        headers: immutable.Seq[HttpHeader],
+        prefix: Vector[HttpHeader] = Vector.empty): immutable.Seq[HttpHeader] =
       headers match {
         case (m: ExtractionMap) +: rest ⇒ f(m) +: (prefix ++ rest)
         case other +: rest ⇒ updateExtractionMap(rest, prefix :+ other)

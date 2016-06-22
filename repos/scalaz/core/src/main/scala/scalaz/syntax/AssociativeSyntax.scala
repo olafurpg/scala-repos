@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Associative` */
-final class AssociativeOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
+final class AssociativeOps[F[_, _], A, B] private[syntax] (val self: F[A, B])(
     implicit val F: Associative[F])
     extends Ops[F[A, B]] {
   ////

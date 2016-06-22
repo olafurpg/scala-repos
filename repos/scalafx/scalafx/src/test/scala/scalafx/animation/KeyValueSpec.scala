@@ -43,7 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class KeyValueSpec
     extends SimpleSFXDelegateSpec[jfxa.KeyValue, KeyValue[_, _]](
-        classOf[jfxa.KeyValue], classOf[KeyValue[_, _]]) {
+        classOf[jfxa.KeyValue],
+        classOf[KeyValue[_, _]]) {
 
   //////////////////////////////
   // PRIVATE VALUES AND METHODS 
@@ -63,8 +64,9 @@ class KeyValueSpec
       kv.interpolator should equal(jfxa.Interpolator.EASE_BOTH)
   }
 
-  private def evaluateFromJfx[S, J](
-      property: jfxbp.Property[J], endValue: S, kv: KeyValue[S, J]) {
+  private def evaluateFromJfx[S, J](property: jfxbp.Property[J],
+                                    endValue: S,
+                                    kv: KeyValue[S, J]) {
     kv.target should equal(property.delegate)
     kv.endValue should equal(endValue)
   }

@@ -33,7 +33,7 @@ import scala.collection.concurrent.TrieMapIterator
   *  @see  [[http://docs.scala-lang.org/overviews/parallel-collections/concrete-parallel-collections.html#parallel_concurrent_tries Scala's Parallel Collections Library overview]]
   *  section on `ParTrieMap` for more information.
   */
-final class ParTrieMap[K, V] private[collection](
+final class ParTrieMap[K, V] private[collection] (
     private val ctrie: TrieMap[K, V])
     extends ParMap[K, V]
     with GenericParMapTemplate[K, V, ParTrieMap]
@@ -52,7 +52,9 @@ final class ParTrieMap[K, V] private[collection](
 
   def splitter =
     new ParTrieMapSplitter(
-        0, ctrie.readOnlySnapshot().asInstanceOf[TrieMap[K, V]], true)
+        0,
+        ctrie.readOnlySnapshot().asInstanceOf[TrieMap[K, V]],
+        true)
 
   override def clear() = ctrie.clear()
 
@@ -120,16 +122,18 @@ final class ParTrieMap[K, V] private[collection](
   }
 }
 
-private[collection] class ParTrieMapSplitter[K, V](
-    lev: Int, ct: TrieMap[K, V], mustInit: Boolean)
+private[collection] class ParTrieMapSplitter[K, V](lev: Int,
+                                                   ct: TrieMap[K, V],
+                                                   mustInit: Boolean)
     extends TrieMapIterator[K, V](lev, ct, mustInit)
     with IterableSplitter[(K, V)] {
   // only evaluated if `remaining` is invoked (which is not used by most tasks)
   lazy val totalsize = ct.par.size
   var iterated = 0
 
-  protected override def newIterator(
-      _lev: Int, _ct: TrieMap[K, V], _mustInit: Boolean) =
+  protected override def newIterator(_lev: Int,
+                                     _ct: TrieMap[K, V],
+                                     _mustInit: Boolean) =
     new ParTrieMapSplitter[K, V](_lev, _ct, _mustInit)
 
   override def shouldSplitFurther[S](

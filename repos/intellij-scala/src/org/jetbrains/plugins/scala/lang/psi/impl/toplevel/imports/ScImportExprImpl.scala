@@ -22,8 +22,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportExprStub
   * @author AlexanderPodkhalyuzin
   * Date: 20.02.2008
   */
-class ScImportExprImpl private (
-    stub: StubElement[ScImportExpr], nodeType: IElementType, node: ASTNode)
+class ScImportExprImpl private (stub: StubElement[ScImportExpr],
+                                nodeType: IElementType,
+                                node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScImportExpr {
   override def accept(visitor: PsiElementVisitor) {
@@ -147,6 +148,7 @@ class ScImportExprImpl private (
     val stub = getStub
     if (stub != null) stub.asInstanceOf[ScImportExprStub].reference
     else
-      getFirstChild.asOptionOf[ScStableCodeReferenceElement] /*findChild(classOf[ScStableCodeReferenceElement])*/
+      getFirstChild
+        .asOptionOf[ScStableCodeReferenceElement] /*findChild(classOf[ScStableCodeReferenceElement])*/
   }
 }

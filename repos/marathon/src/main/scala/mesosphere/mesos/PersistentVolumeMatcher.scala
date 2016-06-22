@@ -35,6 +35,6 @@ object PersistentVolumeMatcher {
     }.headOption
   }
 
-  case class VolumeMatch(
-      task: Task, persistentVolumeResources: Iterable[Mesos.Resource])
+  case class VolumeMatch(task: Task,
+                         persistentVolumeResources: Iterable[Mesos.Resource])
 }

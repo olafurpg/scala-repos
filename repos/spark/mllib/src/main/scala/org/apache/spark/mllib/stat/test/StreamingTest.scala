@@ -33,8 +33,8 @@ import org.apache.spark.util.StatCounter
   */
 @Since("1.6.0")
 @BeanInfo
-case class BinarySample @Since("1.6.0")(
-    @Since("1.6.0") isExperiment: Boolean, @Since("1.6.0") value: Double) {
+case class BinarySample @Since("1.6.0")(@Since("1.6.0") isExperiment: Boolean,
+                                        @Since("1.6.0") value: Double) {
   override def toString: String = {
     s"($isExperiment, $value)"
   }

@@ -67,8 +67,12 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
 
     if (checkHeader) {
       if (withHeader) {
-        assert(df.schema.fieldNames === Array(
-                "year", "make", "model", "comment", "blank"))
+        assert(
+            df.schema.fieldNames === Array("year",
+                                           "make",
+                                           "model",
+                                           "comment",
+                                           "blank"))
       } else {
         assert(df.schema.fieldNames === Array("C0", "C1", "C2", "C3", "C4"))
       }
@@ -221,7 +225,8 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
         .collect()
     }
 
-    assert(exception.getMessage.contains(
+    assert(
+        exception.getMessage.contains(
             "Malformed line in FAILFAST mode: 2015,Chevy,Volt"))
   }
 
@@ -264,7 +269,10 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
       """.stripMargin.replaceAll("\n", " "))
 
     assert(
-        sqlContext.sql("SELECT count(*) FROM carsTable").collect().head(0) === 0)
+        sqlContext
+          .sql("SELECT count(*) FROM carsTable")
+          .collect()
+          .head(0) === 0)
   }
 
   test("DDL test with schema") {
@@ -276,10 +284,16 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
       """.stripMargin.replaceAll("\n", " "))
 
     val cars = sqlContext.table("carsTable")
-    verifyCars(
-        cars, withHeader = true, checkHeader = false, checkValues = false)
-    assert(cars.schema.fieldNames === Array(
-            "yearMade", "makeName", "modelName", "comments", "blank"))
+    verifyCars(cars,
+               withHeader = true,
+               checkHeader = false,
+               checkValues = false)
+    assert(
+        cars.schema.fieldNames === Array("yearMade",
+                                         "makeName",
+                                         "modelName",
+                                         "comments",
+                                         "blank"))
   }
 
   test("save csv") {
@@ -416,15 +430,15 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
 
   test("SPARK-13543 Write the output as uncompressed via option()") {
     val clonedConf = new Configuration(hadoopConfiguration)
-    hadoopConfiguration.set(
-        "mapreduce.output.fileoutputformat.compress", "true")
+    hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress",
+                            "true")
     hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress.type",
                             CompressionType.BLOCK.toString)
     hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress.codec",
                             classOf[GzipCodec].getName)
     hadoopConfiguration.set("mapreduce.map.output.compress", "true")
-    hadoopConfiguration.set(
-        "mapreduce.map.output.compress.codec", classOf[GzipCodec].getName)
+    hadoopConfiguration.set("mapreduce.map.output.compress.codec",
+                            classOf[GzipCodec].getName)
     withTempDir { dir =>
       try {
         val csvDir = new File(dir, "csv").getCanonicalPath
@@ -465,8 +479,12 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
       .option("inferSchema", "true")
       .load(testFile(simpleSparseFile))
 
-    assert(df.schema.fields.map(field => field.dataType).deep == Array(
-            IntegerType, IntegerType, IntegerType, IntegerType).deep)
+    assert(
+        df.schema.fields.map(field => field.dataType).deep == Array(
+            IntegerType,
+            IntegerType,
+            IntegerType,
+            IntegerType).deep)
   }
 
   test("old csv data source name works") {

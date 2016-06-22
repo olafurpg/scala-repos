@@ -48,8 +48,9 @@ trait ScalacPatternExpanders {
       logResult(
           s"newExtractor($whole, $fixed, $repeated, $typeOfSinglePattern")(
           Extractor(whole, fixed, repeated, typeOfSinglePattern))
-    def newExtractor(
-        whole: Type, fixed: List[Type], repeated: Repeated): Extractor =
+    def newExtractor(whole: Type,
+                     fixed: List[Type],
+                     repeated: Repeated): Extractor =
       newExtractor(whole, fixed, repeated, tupleType(fixed))
 
     // Turn Seq[A] into Repeated(Seq[A], A, A*)
@@ -107,8 +108,9 @@ trait ScalacPatternExpanders {
     }
   }
   object alignPatterns extends ScalacPatternExpander {
-    private def validateAligned(
-        context: Context, tree: Tree, aligned: Aligned): Aligned = {
+    private def validateAligned(context: Context,
+                                tree: Tree,
+                                aligned: Aligned): Aligned = {
       import aligned._
 
       def owner = tree.symbol.owner
@@ -150,11 +152,15 @@ trait ScalacPatternExpanders {
 
       val extractor = sel.symbol.name match {
         case nme.unapply =>
-          unapplyMethodTypes(
-              context, firstParamType(fn.tpe), sel.tpe, isSeq = false)
+          unapplyMethodTypes(context,
+                             firstParamType(fn.tpe),
+                             sel.tpe,
+                             isSeq = false)
         case nme.unapplySeq =>
-          unapplyMethodTypes(
-              context, firstParamType(fn.tpe), sel.tpe, isSeq = true)
+          unapplyMethodTypes(context,
+                             firstParamType(fn.tpe),
+                             sel.tpe,
+                             isSeq = true)
         case _ => applyMethodTypes(fn.tpe)
       }
 
@@ -169,19 +175,18 @@ trait ScalacPatternExpanders {
       val requiresTupling =
         isUnapply && patterns.totalArity == 1 && productArity > 1
 
-      val normalizedExtractor =
-        if (requiresTupling) {
-          val tupled = extractor.asSinglePattern
-          if (effectivePatternArity(args) == 1 &&
-              isTupleType(extractor.typeOfSinglePattern)) {
-            val sym = sel.symbol.owner
-            currentRun.reporting.deprecationWarning(
-                sel.pos,
-                sym,
-                s"${sym} expects $productArity patterns$acceptMessage but crushing into $productArity-tuple to fit single pattern (SI-6675)")
-          }
-          tupled
-        } else extractor
+      val normalizedExtractor = if (requiresTupling) {
+        val tupled = extractor.asSinglePattern
+        if (effectivePatternArity(args) == 1 &&
+            isTupleType(extractor.typeOfSinglePattern)) {
+          val sym = sel.symbol.owner
+          currentRun.reporting.deprecationWarning(
+              sel.pos,
+              sym,
+              s"${sym} expects $productArity patterns$acceptMessage but crushing into $productArity-tuple to fit single pattern (SI-6675)")
+        }
+        tupled
+      } else extractor
       validateAligned(context, fn, Aligned(patterns, normalizedExtractor))
     }
 

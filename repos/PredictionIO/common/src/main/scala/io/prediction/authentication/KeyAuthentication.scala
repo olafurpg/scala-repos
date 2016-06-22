@@ -40,14 +40,18 @@ trait KeyAuthentication {
     Future {
 
       val passedKey = accessKeyParamOpt.getOrElse {
-        Left(AuthenticationFailedRejection(
-                AuthenticationFailedRejection.CredentialsRejected, List()))
+        Left(
+            AuthenticationFailedRejection(
+                AuthenticationFailedRejection.CredentialsRejected,
+                List()))
       }
 
       if (passedKey.equals(ServerKey.get)) Right(ctx.request)
       else
-        Left(AuthenticationFailedRejection(
-                AuthenticationFailedRejection.CredentialsRejected, List()))
+        Left(
+            AuthenticationFailedRejection(
+                AuthenticationFailedRejection.CredentialsRejected,
+                List()))
     }
   }
 }

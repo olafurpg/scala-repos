@@ -146,8 +146,8 @@ class TungstenAggregationIterator(
 
       (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
         {
-          unsafeRowJoiner.join(
-              currentGroupingKey, currentBuffer.asInstanceOf[UnsafeRow])
+          unsafeRowJoiner
+            .join(currentGroupingKey, currentBuffer.asInstanceOf[UnsafeRow])
         }
     } else {
       super.generateResultProjection()
@@ -232,8 +232,8 @@ class TungstenAggregationIterator(
 
   // The iterator created from hashMap. It is used to generate output rows when we
   // are using hash-based aggregation.
-  private[this] var aggregationBufferMapIterator: KVIterator[
-      UnsafeRow, UnsafeRow] = null
+  private[this] var aggregationBufferMapIterator: KVIterator[UnsafeRow,
+                                                             UnsafeRow] = null
 
   // Indicates if aggregationBufferMapIterator still has key-value pairs.
   private[this] var mapIteratorHasNext: Boolean = false
@@ -263,8 +263,8 @@ class TungstenAggregationIterator(
     }
     val newFunctions = initializeAggregateFunctions(newExpressions, 0)
     val newInputAttributes = newFunctions.flatMap(_.inputAggBufferAttributes)
-    sortBasedProcessRow = generateProcessRow(
-        newExpressions, newFunctions, newInputAttributes)
+    sortBasedProcessRow =
+      generateProcessRow(newExpressions, newFunctions, newInputAttributes)
 
     // Step 5: Get the sorted iterator from the externalSorter.
     sortedKVIterator = externalSorter.sortedIterator()
@@ -394,37 +394,36 @@ class TungstenAggregationIterator(
 
   override final def next(): UnsafeRow = {
     if (hasNext) {
-      val res =
-        if (sortBased) {
-          // Process the current group.
-          processCurrentSortedGroup()
-          // Generate output row for the current group.
-          val outputRow = generateOutput(
-              currentGroupingKey, sortBasedAggregationBuffer)
-          // Initialize buffer values for the next group.
-          sortBasedAggregationBuffer.copyFrom(initialAggregationBuffer)
+      val res = if (sortBased) {
+        // Process the current group.
+        processCurrentSortedGroup()
+        // Generate output row for the current group.
+        val outputRow =
+          generateOutput(currentGroupingKey, sortBasedAggregationBuffer)
+        // Initialize buffer values for the next group.
+        sortBasedAggregationBuffer.copyFrom(initialAggregationBuffer)
 
-          outputRow
+        outputRow
+      } else {
+        // We did not fall back to sort-based aggregation.
+        val result = generateOutput(aggregationBufferMapIterator.getKey,
+                                    aggregationBufferMapIterator.getValue)
+
+        // Pre-load next key-value pair form aggregationBufferMapIterator to make hasNext
+        // idempotent.
+        mapIteratorHasNext = aggregationBufferMapIterator.next()
+
+        if (!mapIteratorHasNext) {
+          // If there is no input from aggregationBufferMapIterator, we copy current result.
+          val resultCopy = result.copy()
+          // Then, we free the map.
+          hashMap.free()
+
+          resultCopy
         } else {
-          // We did not fall back to sort-based aggregation.
-          val result = generateOutput(aggregationBufferMapIterator.getKey,
-                                      aggregationBufferMapIterator.getValue)
-
-          // Pre-load next key-value pair form aggregationBufferMapIterator to make hasNext
-          // idempotent.
-          mapIteratorHasNext = aggregationBufferMapIterator.next()
-
-          if (!mapIteratorHasNext) {
-            // If there is no input from aggregationBufferMapIterator, we copy current result.
-            val resultCopy = result.copy()
-            // Then, we free the map.
-            hashMap.free()
-
-            resultCopy
-          } else {
-            result
-          }
+          result
         }
+      }
 
       // If this is the last record, update the task's peak memory usage. Since we destroy
       // the map to create the sorter, their memory usages should not overlap, so it is safe

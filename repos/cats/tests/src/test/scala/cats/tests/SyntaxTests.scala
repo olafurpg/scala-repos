@@ -116,8 +116,11 @@ class SyntaxTests extends AllInstances with AllSyntax {
     val gunit: G[F[A]] = fga.sequence
   }
 
-  def testReducible[
-      F[_]: Reducible, G[_]: Apply: SemigroupK, A: Semigroup, B, Z]: Unit = {
+  def testReducible[F[_]: Reducible,
+                    G[_]: Apply: SemigroupK,
+                    A: Semigroup,
+                    B,
+                    Z]: Unit = {
     val fa = mock[F[A]]
     val f1 = mock[(A, A) => A]
     val a1: A = fa.reduceLeft(f1)

@@ -49,8 +49,8 @@ class ReadOnlyBooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
   var booleanProperty2: jfxbp.BooleanProperty = null
 
   override def beforeEach() {
-    readOnlyBooleanProperty = new ReadOnlyBooleanProperty(
-        bean, "Test Read-only Boolean", true)
+    readOnlyBooleanProperty =
+      new ReadOnlyBooleanProperty(bean, "Test Read-only Boolean", true)
     booleanProperty1 = new BooleanProperty(bean, "Test Boolean 2")
     booleanProperty2 = new BooleanProperty(bean, "Test Boolean 3")
   }

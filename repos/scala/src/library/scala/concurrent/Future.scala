@@ -192,7 +192,8 @@ trait Future[+T] extends Awaitable[T] {
     transform({
       case Failure(t) => Success(t)
       case Success(v) =>
-        Failure(new NoSuchElementException(
+        Failure(
+            new NoSuchElementException(
                 "Future.failed not completed with a throwable."))
     })(internalExecutor)
 
@@ -444,8 +445,8 @@ trait Future[+T] extends Awaitable[T] {
     *  @param f       the function to apply to the results of `this` and `that`
     *  @return        a `Future` with the result of the application of `f` to the results of `this` and `that`
     */
-  def zipWith[U, R](that: Future[U])(
-      f: (T, U) => R)(implicit executor: ExecutionContext): Future[R] =
+  def zipWith[U, R](that: Future[U])(f: (T, U) => R)(
+      implicit executor: ExecutionContext): Future[R] =
     flatMap(r1 => that.map(r2 => f(r1, r2)))(internalExecutor)
 
   /** Creates a new future which holds the result of this future if it was completed successfully, or, if not,
@@ -668,9 +669,9 @@ object Future {
     * @param in        the `TraversableOnce` of Futures which will be sequenced
     * @return          the `Future` of the `TraversableOnce` of results
     */
-  def sequence[A, M[X] <: TraversableOnce[X]](
-      in: M[Future[A]])(implicit cbf: CanBuildFrom[M[Future[A]], A, M[A]],
-                        executor: ExecutionContext): Future[M[A]] = {
+  def sequence[A, M[X] <: TraversableOnce[X]](in: M[Future[A]])(
+      implicit cbf: CanBuildFrom[M[Future[A]], A, M[A]],
+      executor: ExecutionContext): Future[M[A]] = {
     in.foldLeft(successful(cbf(in))) { (fr, fa) =>
         for (r <- fr; a <- fa) yield (r += a)
       }
@@ -770,14 +771,15 @@ object Future {
     * @param op       the fold operation to be applied to the zero and futures
     * @return         the `Future` holding the result of the fold
     */
-  def foldLeft[T, R](
-      futures: scala.collection.immutable.Iterable[Future[T]])(zero: R)(
-      op: (R, T) => R)(implicit executor: ExecutionContext): Future[R] =
+  def foldLeft[T, R](futures: scala.collection.immutable.Iterable[Future[T]])(
+      zero: R)(op: (R, T) => R)(
+      implicit executor: ExecutionContext): Future[R] =
     foldNext(futures.iterator, zero, op)
 
   private[this] def foldNext[T, R](
-      i: Iterator[Future[T]], prevValue: R, op: (R, T) => R)(
-      implicit executor: ExecutionContext): Future[R] =
+      i: Iterator[Future[T]],
+      prevValue: R,
+      op: (R, T) => R)(implicit executor: ExecutionContext): Future[R] =
     if (!i.hasNext) successful(prevValue)
     else
       i.next().flatMap { value =>
@@ -802,8 +804,8 @@ object Future {
     * @return         the `Future` holding the result of the fold
     */
   @deprecated("Use Future.foldLeft instead", "2.12")
-  def fold[T, R](futures: TraversableOnce[Future[T]])(
-      zero: R)(@deprecatedName('foldFun) op: (R, T) => R)(
+  def fold[T, R](futures: TraversableOnce[Future[T]])(zero: R)(
+      @deprecatedName('foldFun) op: (R, T) => R)(
       implicit executor: ExecutionContext): Future[R] = {
     if (futures.isEmpty) successful(zero)
     else sequence(futures).map(_.foldLeft(zero)(op))
@@ -823,8 +825,8 @@ object Future {
     * @return         the `Future` holding the result of the reduce
     */
   @deprecated("Use Future.reduceLeft instead", "2.12")
-  def reduce[T, R >: T](futures: TraversableOnce[Future[T]])(
-      op: (R, T) => R)(implicit executor: ExecutionContext): Future[R] = {
+  def reduce[T, R >: T](futures: TraversableOnce[Future[T]])(op: (R, T) => R)(
+      implicit executor: ExecutionContext): Future[R] = {
     if (futures.isEmpty)
       failed(
           new NoSuchElementException("reduce attempted on empty collection"))
@@ -873,9 +875,9 @@ object Future {
     * @param fn        the function to apply to the `TraversableOnce` of Futures to produce the results
     * @return          the `Future` of the `TraversableOnce` of results
     */
-  def traverse[A, B, M[X] <: TraversableOnce[X]](
-      in: M[A])(fn: A => Future[B])(implicit cbf: CanBuildFrom[M[A], B, M[B]],
-                                    executor: ExecutionContext): Future[M[B]] =
+  def traverse[A, B, M[X] <: TraversableOnce[X]](in: M[A])(fn: A => Future[B])(
+      implicit cbf: CanBuildFrom[M[A], B, M[B]],
+      executor: ExecutionContext): Future[M[B]] =
     in.foldLeft(successful(cbf(in))) { (fr, a) =>
         val fb = fn(a)
         for (r <- fr; b <- fb) yield (r += b)
@@ -908,7 +910,8 @@ object Future {
       r.run()
     override def reportFailure(t: Throwable): Unit =
       throw new IllegalStateException(
-          "problem in scala.concurrent internal callback", t)
+          "problem in scala.concurrent internal callback",
+          t)
   }
 }
 

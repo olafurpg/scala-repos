@@ -68,8 +68,7 @@ case class HandshakeInit(
     serverCap: Capability,
     charset: Short,
     status: Short
-)
-    extends Result
+) extends Result
 
 /**
   * Represents the OK Packet received from the server. It is sent
@@ -95,8 +94,7 @@ case class OK(
     serverStatus: Int,
     warningCount: Int,
     message: String
-)
-    extends Result
+) extends Result
 
 /**
   * Represents the Error Packet received from the server and the data sent along with it.
@@ -185,8 +183,7 @@ case class Field(
     fieldType: Short,
     flags: Short,
     decimals: Byte
-)
-    extends Result {
+) extends Result {
   def id: String = if (name.isEmpty) origName else name
   override val toString = "Field(%s)".format(id)
 }
@@ -216,8 +213,7 @@ case class PrepareOK(
     warningCount: Int,
     columns: Seq[Field] = Nil,
     params: Seq[Field] = Nil
-)
-    extends Result
+) extends Result
 
 /**
   * Used internally to synthesize a response from
@@ -241,8 +237,9 @@ object ResultSet {
   ): Try[ResultSet] =
     Try(decode(isBinaryEncoded)(header, fieldPackets, rowPackets))
 
-  def decode(isBinaryEncoded: Boolean)(
-      header: Packet, fieldPackets: Seq[Packet], rowPackets: Seq[Packet]) = {
+  def decode(isBinaryEncoded: Boolean)(header: Packet,
+                                       fieldPackets: Seq[Packet],
+                                       rowPackets: Seq[Packet]) = {
     val fields = fieldPackets.map(Field.decode(_)).toIndexedSeq
 
     // A name -> index map used to allow quick lookups for rows based on name.

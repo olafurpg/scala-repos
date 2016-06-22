@@ -196,24 +196,26 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           super.transform(tree)
       }
 
-      def mkBootstrapperClass(
-          clazz: ClassDef, modDefOption: Option[ClassDef]): ClassDef = {
+      def mkBootstrapperClass(clazz: ClassDef,
+                              modDefOption: Option[ClassDef]): ClassDef = {
         val bootSym = clazz.symbol.cloneSymbol
-        val getJUnitMetadataDef = mkGetJUnitMetadataDef(
-            clazz.symbol, modDefOption.map(_.symbol))
+        val getJUnitMetadataDef =
+          mkGetJUnitMetadataDef(clazz.symbol, modDefOption.map(_.symbol))
         val newInstanceDef = genNewInstanceDef(clazz.symbol, bootSym)
         val invokeJUnitMethodDef = {
           val annotatedMethods = modDefOption.fold(List.empty[MethodSymbol]) {
             mod =>
               jUnitAnnotatedMethods(mod.symbol.asClass)
           }
-          mkInvokeJUnitMethodOnModuleDef(
-              annotatedMethods, bootSym, modDefOption.map(_.symbol))
+          mkInvokeJUnitMethodOnModuleDef(annotatedMethods,
+                                         bootSym,
+                                         modDefOption.map(_.symbol))
         }
         val invokeJUnitMethodOnInstanceDef = {
           val annotatedMethods = jUnitAnnotatedMethods(clazz.symbol.asClass)
-          mkInvokeJUnitMethodOnInstanceDef(
-              annotatedMethods, bootSym, clazz.symbol)
+          mkInvokeJUnitMethodOnInstanceDef(annotatedMethods,
+                                           bootSym,
+                                           clazz.symbol)
         }
 
         val bootBody = {
@@ -306,7 +308,10 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
         }
 
         val invokeJUnitMethodRhs = mkMethodResolutionAndCall(
-            invokeJUnitMethodSym, methods, paramSyms.head, callLocally)
+            invokeJUnitMethodSym,
+            methods,
+            paramSyms.head,
+            callLocally)
 
         mkMethod(invokeJUnitMethodSym, invokeJUnitMethodRhs, paramSyms)
       }
@@ -353,13 +358,16 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
         }
 
         val invokeJUnitMethodRhs = mkMethodResolutionAndCall(
-            invokeJUnitMethodSym, methods, idParamSym, callLocally)
+            invokeJUnitMethodSym,
+            methods,
+            idParamSym,
+            callLocally)
 
         mkMethod(invokeJUnitMethodSym, invokeJUnitMethodRhs, paramSyms)
       }
 
-      def mkGetJUnitMetadataDef(
-          clSym: Symbol, modSymOption: Option[Symbol]): DefDef = {
+      def mkGetJUnitMetadataDef(clSym: Symbol,
+                                modSymOption: Option[Symbol]): DefDef = {
         val methods = jUnitAnnotatedMethods(clSym)
         val modMethods = modSymOption.map(jUnitAnnotatedMethods)
 
@@ -370,15 +378,15 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           annotations.foreach {
             case ann
                 if ann.atp.typeSymbol == TestClass &&
-                ann.original.isInstanceOf[Block] =>
+                  ann.original.isInstanceOf[Block] =>
               reporter.error(ann.pos,
                              "@Test(timeout = ...) is not " +
-                             "supported in Scala.js JUnit Framework")
+                               "supported in Scala.js JUnit Framework")
 
             case ann if ann.atp.typeSymbol == FixMethodOrderClass =>
               reporter.error(ann.pos,
                              "@FixMethodOrder(...) is not supported " +
-                             "in Scala.js JUnit Framework")
+                               "in Scala.js JUnit Framework")
 
             case _ => // all is well
           }
@@ -444,10 +452,10 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
       /* Generate a method that creates a new instance of the test class, this
        * method will be located in the bootstrapper class.
        */
-      private def genNewInstanceDef(
-          classSym: Symbol, bootSymbol: Symbol): DefDef = {
-        val mkNewInstanceDefRhs = mkNewInstance(
-            TypeTree(classSym.typeConstructor), Nil)
+      private def genNewInstanceDef(classSym: Symbol,
+                                    bootSymbol: Symbol): DefDef = {
+        val mkNewInstanceDefRhs =
+          mkNewInstance(TypeTree(classSym.typeConstructor), Nil)
         val mkNewInstanceDefSym =
           bootSymbol.newMethodSymbol(newTermName("newInstance"))
         mkNewInstanceDefSym.setInfo(MethodType(Nil, definitions.ObjectTpe))
@@ -457,7 +465,8 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
       }
 
       private def mkParamSymbols(
-          method: MethodSymbol, params: List[(String, Type)]): List[Symbol] = {
+          method: MethodSymbol,
+          params: List[(String, Type)]): List[Symbol] = {
         params.map {
           case (pName, tpe) =>
             val sym = method.newValueParameter(newTermName(pName))
@@ -482,8 +491,10 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           (methodSymbol, acc) =>
             val mName = Literal(Constant(methodSymbol.name.toString))
             val paramIdent = gen.mkAttributedIdent(idParamSym)
-            val cond = gen.mkMethodCall(
-                paramIdent, definitions.Object_equals, Nil, List(mName))
+            val cond = gen.mkMethodCall(paramIdent,
+                                        definitions.Object_equals,
+                                        Nil,
+                                        List(mName))
             val call = genCall(methodSymbol)
             If(cond, call, acc)
         }

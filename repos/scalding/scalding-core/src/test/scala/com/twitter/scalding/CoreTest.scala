@@ -133,8 +133,8 @@ class ShuffleJob(args: Args) extends Job(args) {
 }
 
 class ShuffleJobTest extends WordSpec with Matchers {
-  val expectedShuffle: List[Int] = List(
-      10, 5, 9, 12, 0, 1, 4, 8, 11, 6, 2, 3, 7)
+  val expectedShuffle: List[Int] =
+    List(10, 5, 9, 12, 0, 1, 4, 8, 11, 6, 2, 3, 7)
 
   "A ShuffleJob" should {
     val input = (0 to 12).map { Tuple1(_) }
@@ -521,8 +521,9 @@ class LeftJoinTest extends WordSpec with Matchers {
   "A LeftJoinJob" should {
     val input1 = List("a" -> 1, "b" -> 2, "c" -> 3)
     val input2 = List("b" -> -1, "c" -> 5, "d" -> 4)
-    val correctOutput = Map[String, (Int, AnyRef)](
-        "a" -> (1, "NULL"), "b" -> (2, "-1"), "c" -> (3, "5"))
+    val correctOutput = Map[String, (Int, AnyRef)]("a" -> (1, "NULL"),
+                                                   "b" -> (2, "-1"),
+                                                   "c" -> (3, "5"))
     var idx = 0
     JobTest(new LeftJoinJob(_))
       .arg("input1", "fakeInput1")
@@ -570,8 +571,9 @@ class LeftJoinWithLargerTest extends WordSpec with Matchers {
   "A LeftJoinWithLargerJob" should {
     val input1 = List("a" -> 1, "b" -> 2, "c" -> 3)
     val input2 = List("b" -> -1, "c" -> 5, "d" -> 4)
-    val correctOutput = Map[String, (Int, AnyRef)](
-        "a" -> (1, "NULL"), "b" -> (2, "-1"), "c" -> (3, "5"))
+    val correctOutput = Map[String, (Int, AnyRef)]("a" -> (1, "NULL"),
+                                                   "b" -> (2, "-1"),
+                                                   "c" -> (3, "5"))
     var idx = 0
     JobTest(new LeftJoinWithLargerJob(_))
       .arg("input1", "fakeInput1")
@@ -643,10 +645,9 @@ class MergeTest extends WordSpec with Matchers {
       .sink[(Double, Double)](Tsv("out2")) { outBuf =>
         "correctly self merge" in {
           outBuf.toMap shouldBe
-          (big.groupBy(_._1)
-                .mapValues { iter =>
-                  iter.map(_._2).max
-                })
+          (big.groupBy(_._1).mapValues { iter =>
+                iter.map(_._2).max
+              })
         }
       }
       .run
@@ -1067,8 +1068,12 @@ class SmallCrossTest extends WordSpec with Matchers {
       .sink[(Int, Int, Int)](Tsv("fakeOut")) { outBuf =>
         (idx + ": must look exactly right") in {
           outBuf should have size 6
-          outBuf.toSet shouldBe Set(
-              (0, 1, 4), (0, 1, 5), (1, 2, 4), (1, 2, 5), (2, 3, 4), (2, 3, 5))
+          outBuf.toSet shouldBe Set((0, 1, 4),
+                                    (0, 1, 5),
+                                    (1, 2, 4),
+                                    (1, 2, 5),
+                                    (2, 3, 4),
+                                    (2, 3, 5))
         }
         idx += 1
       }
@@ -1657,8 +1662,9 @@ class TypedItsATrapTest extends WordSpec with Matchers {
       }
       .typedSink(TypedThrowsErrorsJob2.trap) { outBuf =>
         "trap must contain the first and the evens" in {
-          outBuf.toList.sorted shouldBe List(
-              ("a", 1, 1), ("b", 2, 2), ("d", 4, 4))
+          outBuf.toList.sorted shouldBe List(("a", 1, 1),
+                                             ("b", 2, 2),
+                                             ("d", 4, 4))
         }
       }
       .run

@@ -40,8 +40,8 @@ class InjectorServerConnector(module: Module,
   }
 
   @tailrec
-  private def classfiles(
-      dir: File, namePrefix: String = ""): Array[(File, String)] =
+  private def classfiles(dir: File,
+                         namePrefix: String = ""): Array[(File, String)] =
     dir.listFiles() match {
       case Array(d) if d.isDirectory =>
         classfiles(d, s"$namePrefix${d.getName}.")

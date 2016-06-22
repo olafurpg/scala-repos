@@ -70,8 +70,8 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
                 val strings = params.map(
                     p =>
                       (if (p.isRepeatedParameter) "scala.Seq[" else "") +
-                      p.typeElement.fold("scala.Any")(_.getText) +
-                      (if (p.isRepeatedParameter) "]" else ""))
+                        p.typeElement.fold("scala.Any")(_.getText) +
+                        (if (p.isRepeatedParameter) "]" else ""))
                 strings.mkString(
                     "scala.Option[" + (if (strings.length > 1) "(" else ""),
                     ", ",
@@ -100,16 +100,18 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
             (if (x.parameterList.clauses.length == 1 &&
                  x.parameterList.clauses.head.isImplicit) "()"
              else "") + x.parameterList.clauses
-              .map(c =>
+              .map(
+                  c =>
                     c.parameters
-                      .map(p =>
+                      .map(
+                          p =>
                             p.name +
-                            " : " + p.typeElement.fold("Any")(_.getText) +
-                            (if (p.isDefaultParam)
-                               " = " +
-                               p.getDefaultExpression.fold("{}")(_.getText)
-                             else if (p.isRepeatedParameter) "*"
-                             else ""))
+                              " : " + p.typeElement.fold("Any")(_.getText) +
+                              (if (p.isDefaultParam)
+                                 " = " +
+                                 p.getDefaultExpression.fold("{}")(_.getText)
+                               else if (p.isRepeatedParameter) "*"
+                               else ""))
                       .mkString(if (c.isImplicit) "(implicit " else "(",
                                 ", ",
                                 ")"))

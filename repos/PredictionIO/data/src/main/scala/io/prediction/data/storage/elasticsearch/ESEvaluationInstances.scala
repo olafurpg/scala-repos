@@ -29,8 +29,9 @@ import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-class ESEvaluationInstances(
-    client: Client, config: StorageClientConfig, index: String)
+class ESEvaluationInstances(client: Client,
+                            config: StorageClientConfig,
+                            index: String)
     extends EvaluationInstances
     with Logging {
   implicit val formats = DefaultFormats + new EvaluationInstanceSerializer
@@ -46,20 +47,20 @@ class ESEvaluationInstances(
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("startTime" -> ("type" -> "date")) ~
-              ("endTime" -> ("type" -> "date")) ~
-              ("evaluationClass" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("engineParamsGeneratorClass" -> ("type" -> "string") ~
-                  ("index" -> "not_analyzed")) ~
-              ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("evaluatorResults" -> ("type" -> "string") ~ ("index" -> "no")) ~
-              ("evaluatorResultsHTML" -> ("type" -> "string") ~
-                  ("index" -> "no")) ~
-              ("evaluatorResultsJSON" -> ("type" -> "string") ~
-                  ("index" -> "no"))))
+            ("properties" ->
+                  ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+                    ("startTime" -> ("type" -> "date")) ~
+                    ("endTime" -> ("type" -> "date")) ~
+                    ("evaluationClass" -> ("type" -> "string") ~
+                          ("index" -> "not_analyzed")) ~
+                    ("engineParamsGeneratorClass" -> ("type" -> "string") ~
+                          ("index" -> "not_analyzed")) ~
+                    ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+                    ("evaluatorResults" -> ("type" -> "string") ~ ("index" -> "no")) ~
+                    ("evaluatorResultsHTML" -> ("type" -> "string") ~
+                          ("index" -> "no")) ~
+                    ("evaluatorResultsJSON" -> ("type" -> "string") ~
+                          ("index" -> "no"))))
     indices
       .preparePutMapping(index)
       .setType(estype)

@@ -33,8 +33,8 @@ object DslUtils {
     * Assignment to specific attribute
     * Implicit conversion to this class is used to create a fancy DSL
     */
-  class AttributeDef[T: Manifest](
-      attribute: Attribute[T], attributes: AttributeMap) {
+  class AttributeDef[T: Manifest](attribute: Attribute[T],
+                                  attributes: AttributeMap) {
     def :=(newValue: => T): Unit =
       attributes.put(attribute, newValue)
   }
@@ -44,8 +44,8 @@ object DslUtils {
     * Implicit conversion to this class is used to create a fancy DSL
     */
   class AttributeSeqDef[T](
-      attribute: Attribute[Seq[T]], attributes: AttributeMap)(
-      implicit m: Manifest[Seq[T]]) {
+      attribute: Attribute[Seq[T]],
+      attributes: AttributeMap)(implicit m: Manifest[Seq[T]]) {
     def +=(newValue: => T): Unit = {
       val newSeq = attributes.get(attribute).getOrElse(Seq.empty) :+ newValue
       attributes.put(attribute, newSeq)

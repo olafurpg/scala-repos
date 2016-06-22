@@ -35,7 +35,9 @@ class FileUploadDirectivesSpec extends RoutingSpec {
         } ~> check {
           file.isDefined === true
           responseAs[String] === FileInfo(
-              "fieldName", "age.xml", ContentTypes.`text/xml(UTF-8)`).toString
+              "fieldName",
+              "age.xml",
+              ContentTypes.`text/xml(UTF-8)`).toString
           read(file.get) === xml
         }
       } finally {

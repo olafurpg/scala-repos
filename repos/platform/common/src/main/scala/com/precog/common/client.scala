@@ -54,16 +54,14 @@ package object client {
   implicit def FutureAsResponse(implicit M: Monad[Future]) =
     new (Future ~> Response) {
       def apply[A](fa: Future[A]): Response[A] =
-        EitherT.eitherT(
-            fa.map(\/.right)
-              .recoverWith {
-            case ClientException(msg) => M.point(\/.left[String, A](msg))
-          })
+        EitherT.eitherT(fa.map(\/.right).recoverWith {
+          case ClientException(msg) => M.point(\/.left[String, A](msg))
+        })
     }
 
   implicit def FutureStreamAsResponseStream(implicit M: Monad[Future]) =
     implicitly[Hoist[StreamT]].hoist(FutureAsResponse)
-  implicit def ResponseStreamAsFutureStream(
-      implicit MF: Monad[Future], MR: Monad[Response]) =
+  implicit def ResponseStreamAsFutureStream(implicit MF: Monad[Future],
+                                            MR: Monad[Response]) =
     implicitly[Hoist[StreamT]].hoist(ResponseAsFuture)
 }

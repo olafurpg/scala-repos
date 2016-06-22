@@ -159,7 +159,8 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     }
 
     assert(
-        Await.result(client.set("\t", Buf.Utf8("bar")).liftToTry) == Return.Unit) // "\t" is a valid key
+        Await
+          .result(client.set("\t", Buf.Utf8("bar")).liftToTry) == Return.Unit) // "\t" is a valid key
     intercept[ClientError] { Await.result(client.set("\r", Buf.Utf8("bar"))) }
     intercept[ClientError] { Await.result(client.set("\n", Buf.Utf8("bar"))) }
     intercept[ClientError] {
@@ -250,7 +251,8 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     val name = "not-pipelined"
     val expectedKey = Seq("client", "memcached", name, "is_pipelining")
     KetamaClientBuilder()
-      .clientBuilder(ClientBuilder()
+      .clientBuilder(
+          ClientBuilder()
             .hosts(Seq(server1.get.address))
             .name(name)
             .codec(new com.twitter.finagle.memcached.protocol.text.Memcached())

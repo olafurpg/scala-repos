@@ -19,8 +19,8 @@ class DataSourceTest {
     try {
       assertEquals(
           1,
-          Await.result(
-              dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
+          Await.result(dc.db.run(sql"select lock_mode()".as[Int].head),
+                       Duration.Inf))
     } finally dc.db.close
   }
 
@@ -30,8 +30,8 @@ class DataSourceTest {
     try {
       assertEquals(
           2,
-          Await.result(
-              dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
+          Await.result(dc.db.run(sql"select lock_mode()".as[Int].head),
+                       Duration.Inf))
     } finally dc.db.close
   }
 
@@ -62,8 +62,8 @@ object MockDriver {
 class MockDriver extends Driver {
   def acceptsURL(url: String): Boolean = true
   def jdbcCompliant(): Boolean = false
-  def getPropertyInfo(
-      url: String, info: Properties): Array[DriverPropertyInfo] = Array()
+  def getPropertyInfo(url: String,
+                      info: Properties): Array[DriverPropertyInfo] = Array()
   def getMinorVersion: Int = 0
   def getParentLogger: Logger =
     throw new SQLException("feature not implemented")

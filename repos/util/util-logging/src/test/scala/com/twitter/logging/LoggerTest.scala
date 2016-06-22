@@ -209,8 +209,7 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
       val executorService = Executors.newFixedThreadPool(numThreads)
       val futureResults = new mutable.ListBuffer[Future[Logger]]
       for (i <- 0.until(numThreads)) {
-        val future = executorService.submit(
-            new Callable[Logger]() {
+        val future = executorService.submit(new Callable[Logger]() {
           def call(): Logger = {
             latch.await(10, TimeUnit.SECONDS)
             return Logger.get("concurrencyTest")
@@ -276,9 +275,10 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
           assert(handler.append == false)
           assert(handler.getLevel == Level.INFO)
           val formatter = handler.formatter
-          assert(formatter.formatPrefix(javalog.Level.WARNING,
-                                        "10:55",
-                                        "hello") == "WARNING 10:55 hello")
+          assert(
+              formatter.formatPrefix(javalog.Level.WARNING,
+                                     "10:55",
+                                     "hello") == "WARNING 10:55 hello")
           assert(log.name == "com.twitter")
           assert(formatter.truncateAt == 1024)
           assert(formatter.useFullPackageNames == true)
@@ -305,7 +305,9 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
             assert(log.getHandlers.length == 1)
             val h = log.getHandlers()(0).asInstanceOf[SyslogHandler]
             assert(
-                h.dest.asInstanceOf[InetSocketAddress].getHostName == "example.com")
+                h.dest
+                  .asInstanceOf[InetSocketAddress]
+                  .getHostName == "example.com")
             assert(h.dest.asInstanceOf[InetSocketAddress].getPort == 212)
             val formatter = h.formatter.asInstanceOf[SyslogFormatter]
             assert(formatter.serverName == Some("elmo"))

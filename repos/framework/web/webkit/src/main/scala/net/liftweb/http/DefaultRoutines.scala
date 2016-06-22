@@ -32,8 +32,8 @@ object DefaultRoutines {
   private val resourceMap: LRUMap[(String, List[String]), Box[ResourceBundle]] =
     new LRUMap(2000)
 
-  private def rawResBundle(
-      loc: Locale, path: List[String]): Box[ResourceBundle] = {
+  private def rawResBundle(loc: Locale,
+                           path: List[String]): Box[ResourceBundle] = {
     val realPath = path match {
       case Nil => List("_resources")
       case x => x
@@ -41,26 +41,27 @@ object DefaultRoutines {
 
     for {
       xml <- Templates(realPath, loc) or Templates(
-                "templates-hidden" :: realPath, loc) or Templates(
+                "templates-hidden" :: realPath,
+                loc) or Templates(
                 realPath.dropRight(1) :::
-                ("resources-hidden" :: realPath.takeRight(1)),
+                  ("resources-hidden" :: realPath.takeRight(1)),
                 loc)
 
       bundle <- BundleBuilder.convert(xml, loc)
     } yield bundle
   }
 
-  private def resBundleFor(
-      loc: Locale, path: List[String]): Box[ResourceBundle] =
+  private def resBundleFor(loc: Locale,
+                           path: List[String]): Box[ResourceBundle] =
     resourceMap.synchronized {
       val key = loc.toString -> path
       resourceMap.get(key) match {
         case Full(x) => x
         case _ => {
-            val res = rawResBundle(loc, path)
-            if (!Props.devMode) resourceMap(key) = res
-            res
-          }
+          val res = rawResBundle(loc, path)
+          if (!Props.devMode) resourceMap(key) = res
+          res
+        }
       }
     }
 

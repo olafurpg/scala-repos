@@ -29,8 +29,9 @@ object DriverActor {
     *
     * `acceptOffers(o: util.Collection[OfferID], ops: util.Collection[Offer.Operation], filters: Filters): Status`
     */
-  case class AcceptOffers(
-      offerIds: Seq[OfferID], ops: Seq[Offer.Operation], filters: Filters)
+  case class AcceptOffers(offerIds: Seq[OfferID],
+                          ops: Seq[Offer.Operation],
+                          filters: Filters)
 
   /**
     * Corresponds to the following method in [[org.apache.mesos.MesosSchedulerDriver]]:
@@ -104,7 +105,8 @@ class DriverActor(schedulerProps: Props) extends Actor {
       .setFrameworkId(FrameworkID.newBuilder().setValue("notanidframework"))
       .setSlaveId(SlaveID.newBuilder().setValue("notanidslave"))
       .setHostname("hostname")
-      .addAllResources(Seq(
+      .addAllResources(
+          Seq(
               resource("cpus", 100),
               resource("mem", 500000),
               resource("disk", 1000000000),
@@ -198,7 +200,8 @@ class DriverActor(schedulerProps: Props) extends Actor {
   }
 
   private[this] def simulateTaskLaunch(
-      offers: Seq[OfferID], tasksToLaunch: Iterable[TaskInfo]): Unit = {
+      offers: Seq[OfferID],
+      tasksToLaunch: Iterable[TaskInfo]): Unit = {
     if (random.nextDouble() > 0.001) {
       log.debug(s"launch tasksToLaunch $offers, $tasksToLaunch")
       tasksToLaunch.map(_.getTaskId).foreach {
@@ -209,13 +212,13 @@ class DriverActor(schedulerProps: Props) extends Actor {
 
       if (random.nextDouble() > 0.001) {
         tasksToLaunch.map(_.getTaskId).foreach {
-          scheduleStatusChange(
-              toState = TaskState.TASK_RUNNING, afterDuration = 5.seconds)
+          scheduleStatusChange(toState = TaskState.TASK_RUNNING,
+                               afterDuration = 5.seconds)
         }
       } else {
         tasksToLaunch.map(_.getTaskId).foreach {
-          scheduleStatusChange(
-              toState = TaskState.TASK_FAILED, afterDuration = 5.seconds)
+          scheduleStatusChange(toState = TaskState.TASK_FAILED,
+                               afterDuration = 5.seconds)
         }
       }
     } else {
@@ -223,8 +226,8 @@ class DriverActor(schedulerProps: Props) extends Actor {
     }
   }
 
-  private[this] def changeTaskStatus(
-      status: TaskStatus, create: Boolean): Unit = {
+  private[this] def changeTaskStatus(status: TaskStatus,
+                                     create: Boolean): Unit = {
     if (create || tasks.contains(status.getTaskId.getValue)) {
       status.getState match {
         case TaskState.TASK_ERROR | TaskState.TASK_FAILED |
@@ -244,10 +247,10 @@ class DriverActor(schedulerProps: Props) extends Actor {
     }
   }
 
-  private[this] def scheduleStatusChange(toState: TaskState,
-                                         afterDuration: FiniteDuration,
-                                         create: Boolean = false)(
-      taskID: TaskID): Unit = {
+  private[this] def scheduleStatusChange(
+      toState: TaskState,
+      afterDuration: FiniteDuration,
+      create: Boolean = false)(taskID: TaskID): Unit = {
 
     val newStatus = TaskStatus
       .newBuilder()

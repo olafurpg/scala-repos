@@ -13,12 +13,12 @@ class ScalaTestTestFrameworkTest
 
     scalaProjectSettings.setScalaTestDefaultSuperClass(
         "org.scalatest.FlatSpec")
-    Assert.assertEquals(
-        "org.scalatest.FlatSpec", scalaTestFramework.getDefaultSuperClass)
+    Assert.assertEquals("org.scalatest.FlatSpec",
+                        scalaTestFramework.getDefaultSuperClass)
 
     scalaProjectSettings.setScalaTestDefaultSuperClass(
         "org.scalatest.WordSPec")
-    Assert.assertEquals(
-        "org.scalatest.WordSPec", scalaTestFramework.getDefaultSuperClass)
+    Assert.assertEquals("org.scalatest.WordSPec",
+                        scalaTestFramework.getDefaultSuperClass)
   }
 }

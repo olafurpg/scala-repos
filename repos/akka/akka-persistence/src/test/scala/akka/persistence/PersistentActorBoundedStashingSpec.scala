@@ -51,8 +51,8 @@ object PersistentActorBoundedStashingSpec {
        |akka.persistence.internal-stash-overflow-strategy = "%s"
        |""".stripMargin
 
-  val throwConfig = String.format(
-      templateConfig, "akka.persistence.ThrowExceptionConfigurator")
+  val throwConfig = String
+    .format(templateConfig, "akka.persistence.ThrowExceptionConfigurator")
   val discardConfig =
     String.format(templateConfig, "akka.persistence.DiscardConfigurator")
   val replyToConfig = String.format(
@@ -72,7 +72,8 @@ class SteppingInMemPersistentActorBoundedStashingSpec(strategyConfig: String)
     with ImplicitSender {
 
   override def atStartup: Unit = {
-    system.eventStream.publish(Mute(EventFilter.warning(
+    system.eventStream.publish(
+        Mute(EventFilter.warning(
                 pattern = ".*received dead letter from.*Cmd.*")))
   }
 

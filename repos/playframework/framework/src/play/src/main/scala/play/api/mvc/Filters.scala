@@ -122,14 +122,14 @@ class WithFilters(filters: EssentialFilter*) extends GlobalSettings {
   * Compose the action and the Filters to create a new Action
   */
 object FilterChain {
-  def apply[A](
-      action: EssentialAction,
-      filters: List[EssentialFilter]): EssentialAction = new EssentialAction {
-    def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
-      val chain = filters.reverse.foldLeft(action) { (a, i) =>
-        i(a)
+  def apply[A](action: EssentialAction,
+               filters: List[EssentialFilter]): EssentialAction =
+    new EssentialAction {
+      def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
+        val chain = filters.reverse.foldLeft(action) { (a, i) =>
+          i(a)
+        }
+        chain(rh)
       }
-      chain(rh)
     }
-  }
 }

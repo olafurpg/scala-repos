@@ -64,8 +64,8 @@ object ContentEncoding {
 
 // - Request decoding --------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
-private class DecodedServletRequest(
-    req: HttpServletRequest, enc: ContentEncoding)
+private class DecodedServletRequest(req: HttpServletRequest,
+                                    enc: ContentEncoding)
     extends HttpServletRequestWrapper(req) {
 
   override lazy val getInputStream: EncodedInputStream = {
@@ -98,8 +98,8 @@ private class EncodedInputStream(encoded: InputStream, raw: ServletInputStream)
 // - Response encoding -------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 /** Encodes any output written to a servlet response. */
-private class EncodedServletResponse(
-    res: HttpServletResponse, enc: ContentEncoding)
+private class EncodedServletResponse(res: HttpServletResponse,
+                                     enc: ContentEncoding)
     extends HttpServletResponseWrapper(res) {
 
   // Object to flush when complete, if any.

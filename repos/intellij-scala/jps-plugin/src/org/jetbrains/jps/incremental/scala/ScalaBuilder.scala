@@ -76,7 +76,8 @@ object ScalaBuilder {
       storageFile.foreach { file =>
         val parentDir = file.getParentFile
         if (!parentDir.exists()) parentDir.mkdirs()
-        using(new DataOutputStream(
+        using(
+            new DataOutputStream(
                 new BufferedOutputStream(new FileOutputStream(file)))) {
           _.writeUTF(incrType.name)
         }
@@ -138,7 +139,8 @@ object ScalaBuilder {
 
   def hasBuildModules(chunk: ModuleChunk): Boolean = {
     import _root_.scala.collection.JavaConversions._
-    chunk.getModules.exists(_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
+    chunk.getModules
+      .exists(_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
   }
 
   def projectSettings(context: CompileContext) =
@@ -208,8 +210,8 @@ object ScalaBuilder {
     if (settings.isCompileServerEnabled &&
         JavaBuilderUtil.CONSTANT_SEARCH_SERVICE.get(context) != null) {
       cleanLocalServerCache()
-      new RemoteServer(
-          InetAddress.getByName(null), settings.getCompileServerPort)
+      new RemoteServer(InetAddress.getByName(null),
+                       settings.getCompileServerPort)
     } else {
       localServer
     }

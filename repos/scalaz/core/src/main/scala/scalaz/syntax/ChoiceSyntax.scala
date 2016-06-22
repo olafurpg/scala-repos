@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Choice` */
-final class ChoiceOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
+final class ChoiceOps[F[_, _], A, B] private[syntax] (val self: F[A, B])(
     implicit val F: Choice[F])
     extends Ops[F[A, B]] {
   ////

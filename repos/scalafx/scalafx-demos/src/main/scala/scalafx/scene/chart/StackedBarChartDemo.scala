@@ -63,8 +63,9 @@ object StackedBarChartDemo extends JFXApp {
     val series = years zip data
     XYChart.Series[String, Number](
         name,
-        ObservableBuffer(
-            series.map { case (x, y) => XYChart.Data[String, Number](x, y) })
+        ObservableBuffer(series.map {
+          case (x, y) => XYChart.Data[String, Number](x, y)
+        })
     )
   }
 }

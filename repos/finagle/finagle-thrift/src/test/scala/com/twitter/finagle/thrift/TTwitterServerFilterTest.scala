@@ -19,7 +19,8 @@ class TTwitterServerFilterTest extends FunSuite {
     // Upgrade the protocol.
     val service = new Service[Array[Byte], Array[Byte]] {
       def apply(req: Array[Byte]) =
-        Future.value(ClientId.current
+        Future.value(
+            ClientId.current
               .map(_.name)
               .getOrElse("NOCLIENT")
               .getBytes(Charsets.Utf8))
@@ -51,8 +52,9 @@ class TTwitterServerFilterTest extends FunSuite {
 
       filter(bytes, service) map { bytes =>
         // Strip the response header.
-        InputBuffer.peelMessage(
-            bytes, new thrift.ResponseHeader, protocolFactory)
+        InputBuffer.peelMessage(bytes,
+                                new thrift.ResponseHeader,
+                                protocolFactory)
       }
     }
     assert(req.isDefined)

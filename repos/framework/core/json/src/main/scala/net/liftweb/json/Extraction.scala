@@ -51,8 +51,8 @@ object Extraction {
   /** Extract a case class from JSON.
     * @see net.liftweb.json.JsonAST.JValue#extract
     */
-  def extractOpt[A](
-      json: JValue)(implicit formats: Formats, mf: Manifest[A]): Option[A] =
+  def extractOpt[A](json: JValue)(implicit formats: Formats,
+                                  mf: Manifest[A]): Option[A] =
     try { Some(extract(json)(formats, mf)) } catch {
       case _: MappingException => None
     }
@@ -187,7 +187,7 @@ object Extraction {
           map
             .filter(t =>
                   t._1 == prefix || t._1.startsWith(prefix + ".") ||
-                  t._1.startsWith(prefix + "["))
+                    t._1.startsWith(prefix + "["))
             .map(
                 t => (t._1.substring(prefix.length), t._2)
             )
@@ -257,7 +257,7 @@ object Extraction {
           constructor
             .bestMatching(argNames)
             .getOrElse(fail("No constructor for type " +
-                    constructor.targetType.clazz + ", " + json))
+                      constructor.targetType.clazz + ", " + json))
         }
       }
 
@@ -266,8 +266,10 @@ object Extraction {
           case o: JObject =>
             formats.fieldSerializer(a.getClass).map { serializer =>
               val constructorArgNames = Reflection
-                .constructorArgs(
-                    a.getClass, constructor, formats.parameterNameReader, None)
+                .constructorArgs(a.getClass,
+                                 constructor,
+                                 formats.parameterNameReader,
+                                 None)
                 .map(_._1)
                 .toSet
               val jsonFields = o.obj.map { f =>
@@ -320,7 +322,7 @@ object Extraction {
           case e @ (_: IllegalArgumentException | _: InstantiationException) =>
             fail(
                 "Parsed JSON values do not match with class constructor\nargs=" +
-                args.mkString(",") + "\narg types=" + args
+                  args.mkString(",") + "\narg types=" + args
                   .map(a =>
                         if (a != null) a.asInstanceOf[AnyRef].getClass.getName
                         else "null")
@@ -328,8 +330,9 @@ object Extraction {
         }
       }
 
-      def mkWithTypeHint(
-          typeHint: String, fields: List[JField], typeInfo: TypeInfo) = {
+      def mkWithTypeHint(typeHint: String,
+                         fields: List[JField],
+                         typeInfo: TypeInfo) = {
         val obj = JObject(
             fields filterNot (_.name == formats.typeHintFieldName))
         val deserializer = formats.typeHints.deserialize
@@ -378,8 +381,9 @@ object Extraction {
         case JArray(arr) => arr.map(build(_, m)).toArray
         case JNothing | JNull => Array[AnyRef]()
         case x =>
-          fail("Expected collection but got " + x + " for root " + root +
-              " and mapping " + m)
+          fail(
+              "Expected collection but got " + x + " for root " + root +
+                " and mapping " + m)
       }
 
       constructor(array)
@@ -434,8 +438,10 @@ object Extraction {
       case x => fail("Expected array but got " + x)
     }
 
-    def mkValue(
-        root: JValue, mapping: Mapping, path: String, optional: Boolean) = {
+    def mkValue(root: JValue,
+                mapping: Mapping,
+                path: String,
+                optional: Boolean) = {
       if (optional && root == JNothing) {
         None
       } else {
@@ -456,8 +462,9 @@ object Extraction {
     build(json, mapping)
   }
 
-  private def convert(
-      json: JValue, targetType: Class[_], formats: Formats): Any = json match {
+  private def convert(json: JValue,
+                      targetType: Class[_],
+                      formats: Formats): Any = json match {
     case JInt(x) if (targetType == classOf[Int]) => x.intValue
     case JInt(x) if (targetType == classOf[JavaInteger]) =>
       new JavaInteger(x.intValue)
@@ -507,7 +514,7 @@ object Extraction {
     case JNothing =>
       fail(
           "Did not find value which can be converted into " +
-          targetType.getName)
+            targetType.getName)
     case _ =>
       val custom = formats.customDeserializer(formats)
       val typeInfo = TypeInfo(targetType, None)

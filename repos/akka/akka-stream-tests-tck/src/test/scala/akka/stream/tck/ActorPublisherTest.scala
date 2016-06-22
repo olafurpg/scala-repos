@@ -45,7 +45,8 @@ object ActorPublisherTest {
 class ActorPublisherTest extends AkkaPublisherVerification[Int] {
 
   override def createPublisher(elements: Long): Publisher[Int] = {
-    val ref = system.actorOf(Props(classOf[TestPublisher], elements)
+    val ref = system.actorOf(
+        Props(classOf[TestPublisher], elements)
           .withDispatcher("akka.test.stream-dispatcher"))
 
     ActorPublisher(ref)

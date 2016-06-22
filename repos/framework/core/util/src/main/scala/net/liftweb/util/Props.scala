@@ -93,7 +93,7 @@ private[util] trait Props extends Logger {
       case bad =>
         throw new Exception(
             "The following required properties are not defined: " +
-            bad.mkString(","))
+              bad.mkString(","))
     }
   }
 
@@ -181,7 +181,9 @@ private[util] trait Props extends Logger {
     */
   lazy val mode: Props.RunModes.Value = {
     runModeInitialised = true
-    Box.legacyNullTest((System.getProperty("run.mode"))).map(_.toLowerCase) match {
+    Box
+      .legacyNullTest((System.getProperty("run.mode")))
+      .map(_.toLowerCase) match {
       case Full("test") => Test
       case Full("production") => Production
       case Full("staging") => Staging
@@ -222,8 +224,9 @@ private[util] trait Props extends Logger {
     def allowModification = !runModeInitialised
 
     def onModificationProhibited() {
-      warn("Setting property " + name +
-          " has no effect. Run mode already initialised to " + mode + ".")
+      warn(
+          "Setting property " + name +
+            " has no effect. Run mode already initialised to " + mode + ".")
     }
   }
 
@@ -234,24 +237,25 @@ private[util] trait Props extends Logger {
     * is referenced. (An attempt to customise this after the run-mode is
     * realised will have no effect and will instead log a warning.)
     */
-  val doesStackTraceContainKnownTestRunner = new RunModeProperty[
-      Array[StackTraceElement] => Boolean](
-      "doesStackTraceContainKnownTestRunner", (st: Array[StackTraceElement]) => {
-    val names = List(
-        "org.apache.maven.surefire.booter.SurefireBooter",
-        "sbt.TestRunner",
-        "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner",
-        "org.scalatest.tools.Runner",
-        "org.scalatest.tools.ScalaTestFramework$ScalaTestRunner",
-        "org.scalatools.testing.Runner",
-        "org.scalatools.testing.Runner2",
-        "org.specs2.runner.TestInterfaceRunner", // sometimes specs2 runs tests on another thread
-        "org.specs2.runner.TestInterfaceConsoleReporter",
-        "org.specs2.specification.FragmentExecution",
-        "org.specs2.specification.core.Execution"
-    )
-    st.exists(e => names.exists(e.getClassName.startsWith))
-  })
+  val doesStackTraceContainKnownTestRunner =
+    new RunModeProperty[Array[StackTraceElement] => Boolean](
+        "doesStackTraceContainKnownTestRunner",
+        (st: Array[StackTraceElement]) => {
+          val names = List(
+              "org.apache.maven.surefire.booter.SurefireBooter",
+              "sbt.TestRunner",
+              "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner",
+              "org.scalatest.tools.Runner",
+              "org.scalatest.tools.ScalaTestFramework$ScalaTestRunner",
+              "org.scalatools.testing.Runner",
+              "org.scalatools.testing.Runner2",
+              "org.specs2.runner.TestInterfaceRunner", // sometimes specs2 runs tests on another thread
+              "org.specs2.runner.TestInterfaceConsoleReporter",
+              "org.specs2.specification.FragmentExecution",
+              "org.specs2.specification.core.Execution"
+          )
+          st.exists(e => names.exists(e.getClassName.startsWith))
+        })
 
   /**
     * When the `run.mode` environment variable isn't set or recognised, this function is invoked to determine the
@@ -262,18 +266,19 @@ private[util] trait Props extends Logger {
     * will have no effect and will instead log a warning.)
     */
   val autoDetectRunModeFn = new RunModeProperty[() => Props.RunModes.Value](
-      "autoDetectRunModeFn", () => {
-    val st = Thread.currentThread.getStackTrace
-    if ((doesStackTraceContainKnownTestRunner.get)(st)) Test
-    else Development
-  })
+      "autoDetectRunModeFn",
+      () => {
+        val st = Thread.currentThread.getStackTrace
+        if ((doesStackTraceContainKnownTestRunner.get)(st)) Test
+        else Development
+      })
 
   /**
     * Is the system running in production mode (apply full optimizations)
     */
   lazy val productionMode: Boolean =
     mode == Props.RunModes.Production || mode == Props.RunModes.Pilot ||
-    mode == Props.RunModes.Staging
+      mode == Props.RunModes.Staging
 
   /**
     * Is the system running in development mode
@@ -401,8 +406,7 @@ private[util] trait Props extends Logger {
     } match {
       // if we've got a propety file, create name/value pairs and turn them into a Map
       case Full(prop) =>
-        Map(
-            prop.entrySet.toArray.flatMap {
+        Map(prop.entrySet.toArray.flatMap {
           case s: JMap.Entry[_, _] =>
             List((s.getKey.toString, s.getValue.toString))
           case _ => Nil
@@ -411,7 +415,7 @@ private[util] trait Props extends Logger {
       case _ =>
         error(
             "Failed to find a properties file (but properties were accessed).  Searched: " +
-            tried.reverse.mkString(", "))
+              tried.reverse.mkString(", "))
         Map()
     }
   }

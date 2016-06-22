@@ -71,7 +71,8 @@ trait Counter2Like[
     innerGetOrElseUpdate(k1, data)(k2) = v
 
   private[linalg] def innerGetOrElseUpdate[M](
-      k: K1, m: scala.collection.mutable.Map[K1, M]): M = {
+      k: K1,
+      m: scala.collection.mutable.Map[K1, M]): M = {
     m.getOrElseUpdate(k, m.default(k))
   }
 
@@ -258,8 +259,8 @@ object Counter2 extends LowPriorityCounter2 with Counter2Ops {
             }
 
             override def iterator =
-              for ((k1, map) <- from.data.iterator; v <- map.get(col)) yield
-                (k1, v)
+              for ((k1, map) <- from.data.iterator; v <- map.get(col))
+                yield (k1, v)
 
             override def get(k1: K1) =
               from.data.get(k1).map(_ (col))
@@ -298,10 +299,13 @@ object Counter2 extends LowPriorityCounter2 with Counter2Ops {
     }
   }
 
-  implicit def handholdCanMapRows[K1, K2, V]: CanCollapseAxis.HandHold[
-      Counter2[K1, K2, V], Axis._0.type, Counter[K1, V]] =
-    new CanCollapseAxis.HandHold[
-        Counter2[K1, K2, V], Axis._0.type, Counter[K1, V]]()
+  implicit def handholdCanMapRows[K1, K2, V]
+    : CanCollapseAxis.HandHold[Counter2[K1, K2, V],
+                               Axis._0.type,
+                               Counter[K1, V]] =
+    new CanCollapseAxis.HandHold[Counter2[K1, K2, V],
+                                 Axis._0.type,
+                                 Counter[K1, V]]()
 
   /**
     * Returns a Counter[K1, V]
@@ -329,10 +333,13 @@ object Counter2 extends LowPriorityCounter2 with Counter2Ops {
         result
       }
     }
-  implicit def handholdCanMapCols[K1, K2, V]: CanCollapseAxis.HandHold[
-      Counter2[K1, K2, V], Axis._1.type, Counter[K2, V]] =
-    new CanCollapseAxis.HandHold[
-        Counter2[K1, K2, V], Axis._1.type, Counter[K2, V]]()
+  implicit def handholdCanMapCols[K1, K2, V]
+    : CanCollapseAxis.HandHold[Counter2[K1, K2, V],
+                               Axis._1.type,
+                               Counter[K2, V]] =
+    new CanCollapseAxis.HandHold[Counter2[K1, K2, V],
+                                 Axis._1.type,
+                                 Counter[K2, V]]()
 
   /**
     * This is just a curried version of scala.collection.Map.
@@ -357,10 +364,16 @@ trait LowPriorityCounter2 {
     * @return
     */
   implicit def canCollapseRows[K1, K2, V, R: ClassTag: Zero: Semiring]
-    : CanCollapseAxis[
-        Counter2[K1, K2, V], Axis._0.type, Counter[K1, V], R, Counter[K2, R]] =
-    new CanCollapseAxis[
-        Counter2[K1, K2, V], Axis._0.type, Counter[K1, V], R, Counter[K2, R]] {
+    : CanCollapseAxis[Counter2[K1, K2, V],
+                      Axis._0.type,
+                      Counter[K1, V],
+                      R,
+                      Counter[K2, R]] =
+    new CanCollapseAxis[Counter2[K1, K2, V],
+                        Axis._0.type,
+                        Counter[K1, V],
+                        R,
+                        Counter[K2, R]] {
       def apply(from: Counter2[K1, K2, V], axis: Axis._0.type)(
           f: (Counter[K1, V]) => R): Counter[K2, R] = {
         val result = Counter[K2, R]()
@@ -378,10 +391,16 @@ trait LowPriorityCounter2 {
     * @return
     */
   implicit def canCollapseCols[K1, K2, V, R: ClassTag: Zero: Semiring]
-    : CanCollapseAxis[
-        Counter2[K1, K2, V], Axis._1.type, Counter[K2, V], R, Counter[K1, R]] =
-    new CanCollapseAxis[
-        Counter2[K1, K2, V], Axis._1.type, Counter[K2, V], R, Counter[K1, R]] {
+    : CanCollapseAxis[Counter2[K1, K2, V],
+                      Axis._1.type,
+                      Counter[K2, V],
+                      R,
+                      Counter[K1, R]] =
+    new CanCollapseAxis[Counter2[K1, K2, V],
+                        Axis._1.type,
+                        Counter[K2, V],
+                        R,
+                        Counter[K1, R]] {
       def apply(from: Counter2[K1, K2, V], axis: Axis._1.type)(
           f: (Counter[K2, V]) => R): Counter[K1, R] = {
         val result = Counter[K1, R]()

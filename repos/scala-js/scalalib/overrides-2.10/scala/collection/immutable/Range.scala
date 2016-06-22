@@ -60,7 +60,7 @@ class Range(val start: Int, val end: Int, val step: Int)
   // correct.
   override final val isEmpty =
     ((start > end && step > 0) || (start < end && step < 0) ||
-        (start == end && !isInclusive))
+          (start == end && !isInclusive))
   final val numRangeElements: Int = {
     if (step == 0) throw new IllegalArgumentException("step cannot be 0.")
     else if (isEmpty) 0
@@ -169,9 +169,7 @@ class Range(val start: Int, val end: Int, val step: Int)
      else if (n >= numRangeElements)
        newEmptyRange(end)
      else
-       copy(locationAfterN(n),
-            end,
-            step))
+       copy(locationAfterN(n), end, step))
 
   /** Creates a new range containing all the elements of this range except the last one.
     *
@@ -212,7 +210,7 @@ class Range(val start: Int, val end: Int, val step: Int)
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: Int) =
     !isEmpty && ((step > 0 && start <= elem && elem <= last) ||
-        (step < 0 && last <= elem && elem <= start))
+          (step < 0 && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.
   private def locationAfterN(n: Int) = start + (step * n)
@@ -277,9 +275,9 @@ class Range(val start: Int, val end: Int, val step: Int)
   override def equals(other: Any) = other match {
     case x: Range =>
       (x canEqual this) && (length == x.length) &&
-      (isEmpty || // all empty sequences are equal
-          (start == x.start &&
-              last == x.last) // same length and same endpoints implies equality
+        (isEmpty || // all empty sequences are equal
+              (start == x.start &&
+                    last == x.last) // same length and same endpoints implies equality
           )
     case _ =>
       super.equals(other)
@@ -299,14 +297,16 @@ class Range(val start: Int, val end: Int, val step: Int)
 object Range {
   private[immutable] val MAX_PRINT = 512 // some arbitrary value
 
-  private def description(
-      start: Int, end: Int, step: Int, isInclusive: Boolean) =
+  private def description(start: Int,
+                          end: Int,
+                          step: Int,
+                          isInclusive: Boolean) =
     start + (if (isInclusive) " to " else " until ") + end + " by " + step
 
   private def fail(start: Int, end: Int, step: Int, isInclusive: Boolean) =
     throw new IllegalArgumentException(
         description(start, end, step, isInclusive) +
-        ": seqs cannot contain more than Int.MaxValue elements.")
+          ": seqs cannot contain more than Int.MaxValue elements.")
 
   /** Counts the number of range elements.
     *  @pre  step != 0
@@ -412,7 +412,7 @@ object Range {
 
     def inclusive(start: Double, end: Double, step: Double) =
       BigDecimal.inclusive(toBD(start), toBD(end), toBD(step)) mapRange
-      (_.doubleValue)
+        (_.doubleValue)
   }
 
   // As there is no appealing default step size for not-really-integral ranges,

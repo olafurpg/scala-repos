@@ -110,8 +110,10 @@ abstract class DelayedOperation(delayMs: Long) extends TimerTask with Logging {
 /**
   * A helper purgatory class for bookkeeping delayed operations with a timeout, and expiring timed out operations.
   */
-class DelayedOperationPurgatory[T <: DelayedOperation](
-    purgatoryName: String, brokerId: Int = 0, purgeInterval: Int = 1000)
+class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String,
+                                                       brokerId: Int = 0,
+                                                       purgeInterval: Int =
+                                                         1000)
     extends Logging
     with KafkaMetricsGroup {
 

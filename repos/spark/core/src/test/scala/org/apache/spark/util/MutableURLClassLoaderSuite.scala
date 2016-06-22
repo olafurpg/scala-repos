@@ -35,8 +35,7 @@ class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
   val urls = List(
       TestUtils.createJarWithClasses(
           classNames = Seq("FakeClass1"),
-          classNamesWithBase =
-            Seq(("FakeClass2", "FakeClass3")), // FakeClass3 is in parent
+          classNamesWithBase = Seq(("FakeClass2", "FakeClass3")), // FakeClass3 is in parent
           toStringValue = "1",
           classpathUrls = urls2)).toArray
 
@@ -44,7 +43,8 @@ class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
       TestUtils.createJarWithFiles(
           Map("resource1" -> "resource1Contents-child",
               "resource2" -> "resource2Contents"))).toArray
-  val fileUrlsParent = List(TestUtils.createJarWithFiles(
+  val fileUrlsParent = List(
+      TestUtils.createJarWithFiles(
           Map("resource1" -> "resource1Contents-parent"))).toArray
 
   test("child first") {

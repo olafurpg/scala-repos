@@ -33,7 +33,7 @@ class DefTypeFilter extends ElementFilter {
         case parent @ (_: ScBlock | _: ScCaseClause | _: ScTemplateBody |
             _: ScClassParameter | _: ScalaFile)
             if !parent.isInstanceOf[ScalaFile] ||
-            parent.asInstanceOf[ScalaFile].isScriptFile() =>
+              parent.asInstanceOf[ScalaFile].isScriptFile() =>
           if ((leaf.getPrevSibling == null ||
                   leaf.getPrevSibling.getPrevSibling == null ||
                   leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&

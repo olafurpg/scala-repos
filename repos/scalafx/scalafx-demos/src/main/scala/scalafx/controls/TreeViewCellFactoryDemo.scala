@@ -56,8 +56,7 @@ object TreeViewCellFactoryDemo extends JFXApp {
         showRoot = false
         root = new TreeItem[Person] {
           expanded = true
-          children = ObservableBuffer(
-              characters.map { p =>
+          children = ObservableBuffer(characters.map { p =>
             new TreeItem(p)
           })
         }

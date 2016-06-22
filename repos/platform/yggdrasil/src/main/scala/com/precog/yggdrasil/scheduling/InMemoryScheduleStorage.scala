@@ -51,7 +51,8 @@ class InMemoryScheduleStorage(implicit executor: ExecutionContext)
 
   def reportRun(report: ScheduledRunReport) = Promise successful {
     history += (report.id ->
-        (history.getOrElse(report.id, Seq.empty[ScheduledRunReport]) :+ report))
+        (history
+              .getOrElse(report.id, Seq.empty[ScheduledRunReport]) :+ report))
     PrecogUnit
   }
 

@@ -21,7 +21,8 @@ object SigarLoader {
     TaskKey[File]("sigar-artifact", "Location of Sigar java agent jar.")
 
   lazy val sigarOptions = TaskKey[String](
-      "sigar-options", "JVM command line options for Sigar java agent.")
+      "sigar-options",
+      "JVM command line options for Sigar java agent.")
 
   lazy val sigarFolder = SettingKey[File](
       "sigar-folder",

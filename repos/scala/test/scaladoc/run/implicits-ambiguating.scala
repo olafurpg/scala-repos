@@ -15,7 +15,8 @@ object Test extends ScaladocModelTest {
 
     def isAmbiguous(mbr: MemberEntity): Boolean =
       mbr.byConversion
-        .map(_.source.implicitsShadowing
+        .map(
+            _.source.implicitsShadowing
               .get(mbr)
               .map(_.isAmbiguous)
               .getOrElse(false))
@@ -92,10 +93,10 @@ object Test extends ScaladocModelTest {
 
     /** conv1-9 should be the same, conv10 should be ambiguous, conv11 should be okay */
     check1to9("B")
-    assert(
-        isAmbiguous(conv1._member("conv10")), "B - AtoX.conv10 is ambiguous")
-    assert(
-        isAmbiguous(conv2._member("conv10")), "B - AtoZ.conv10 is ambiguous")
+    assert(isAmbiguous(conv1._member("conv10")),
+           "B - AtoX.conv10 is ambiguous")
+    assert(isAmbiguous(conv2._member("conv10")),
+           "B - AtoZ.conv10 is ambiguous")
     assert(!isAmbiguous(conv1._member("conv11")),
            "B - AtoX.conv11 is not ambiguous")
     assert(!isAmbiguous(conv2._member("conv11")),
@@ -140,9 +141,9 @@ object Test extends ScaladocModelTest {
            "D - AtoX.conv10 is not ambiguous")
     assert(!isAmbiguous(conv2._member("conv10")),
            "D - AtoZ.conv10 is not ambiguous")
-    assert(
-        isAmbiguous(conv1._member("conv11")), "D - AtoX.conv11 is ambiguous")
-    assert(
-        isAmbiguous(conv2._member("conv11")), "D - AtoZ.conv11 is ambiguous")
+    assert(isAmbiguous(conv1._member("conv11")),
+           "D - AtoX.conv11 is ambiguous")
+    assert(isAmbiguous(conv2._member("conv11")),
+           "D - AtoZ.conv11 is ambiguous")
   }
 }

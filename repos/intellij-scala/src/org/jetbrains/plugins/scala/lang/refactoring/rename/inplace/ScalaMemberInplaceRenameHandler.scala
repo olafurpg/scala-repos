@@ -19,8 +19,9 @@ class ScalaMemberInplaceRenameHandler
     extends MemberInplaceRenameHandler
     with ScalaInplaceRenameHandler {
 
-  override def isAvailable(
-      element: PsiElement, editor: Editor, file: PsiFile): Boolean = {
+  override def isAvailable(element: PsiElement,
+                           editor: Editor,
+                           file: PsiFile): Boolean = {
     val processor = renameProcessor(element)
     editor.getSettings.isVariableInplaceRenameEnabled && processor != null &&
     processor.canProcessElement(element) &&
@@ -44,8 +45,9 @@ class ScalaMemberInplaceRenameHandler
         new ScalaMemberInplaceRenamer(elementToRename, clazz, editor)
       case clazz: PsiClass =>
         val companion = ScalaPsiUtil.getBaseCompanionModule(clazz)
-        new ScalaMemberInplaceRenamer(
-            clazz, companion.getOrElse(clazz), editor)
+        new ScalaMemberInplaceRenamer(clazz,
+                                      companion.getOrElse(clazz),
+                                      editor)
       case subst: PsiNamedElement =>
         new ScalaMemberInplaceRenamer(elementToRename, subst, editor)
       case _ =>

@@ -23,13 +23,14 @@ final case class Envelope private (val message: Any, val sender: ActorRef)
 object Envelope {
   def apply(message: Any, sender: ActorRef, system: ActorSystem): Envelope = {
     if (message == null) throw new InvalidMessageException("Message is null")
-    new Envelope(
-        message, if (sender ne Actor.noSender) sender else system.deadLetters)
+    new Envelope(message,
+                 if (sender ne Actor.noSender) sender else system.deadLetters)
   }
 }
 
-final case class TaskInvocation(
-    eventStream: EventStream, runnable: Runnable, cleanup: () ⇒ Unit)
+final case class TaskInvocation(eventStream: EventStream,
+                                runnable: Runnable,
+                                cleanup: () ⇒ Unit)
     extends Batchable {
   final override def isBatchable: Boolean = runnable match {
     case b: Batchable ⇒ b.isBatchable
@@ -56,15 +57,13 @@ private[akka] trait LoadMetrics { self: Executor ⇒
   * INTERNAL API
   */
 private[akka] object MessageDispatcher {
-  val UNSCHEDULED =
-    0 //WARNING DO NOT CHANGE THE VALUE OF THIS: It relies on the faster init of 0 in AbstractMessageDispatcher
+  val UNSCHEDULED = 0 //WARNING DO NOT CHANGE THE VALUE OF THIS: It relies on the faster init of 0 in AbstractMessageDispatcher
   val SCHEDULED = 1
   val RESCHEDULED = 2
 
   // dispatcher debugging helper using println (see below)
   // since this is a compile-time constant, scalac will elide code behind if (MessageDispatcher.debug) (RK checked with 2.9.1)
-  final val debug =
-    false // Deliberately without type ascription to make it a compile-time constant
+  final val debug = false // Deliberately without type ascription to make it a compile-time constant
   lazy val actors = new Index[MessageDispatcher, ActorRef](16, _ compareTo _)
   def printActors(): Unit =
     if (debug) {
@@ -103,10 +102,8 @@ abstract class MessageDispatcher(
   val mailboxes = prerequisites.mailboxes
   val eventStream = prerequisites.eventStream
 
-  @volatile private[this] var _inhabitantsDoNotCallMeDirectly: Long =
-    _ // DO NOT TOUCH!
-  @volatile private[this] var _shutdownScheduleDoNotCallMeDirectly: Int =
-    _ // DO NOT TOUCH!
+  @volatile private[this] var _inhabitantsDoNotCallMeDirectly: Long = _ // DO NOT TOUCH!
+  @volatile private[this] var _shutdownScheduleDoNotCallMeDirectly: Int = _ // DO NOT TOUCH!
 
   private final def addInhabitants(add: Long): Long = {
     val old = Unsafe.instance.getAndAddLong(this, inhabitantsOffset, add)
@@ -128,14 +125,14 @@ abstract class MessageDispatcher(
   private final def shutdownSchedule: Int =
     Unsafe.instance.getIntVolatile(this, shutdownScheduleOffset)
   private final def updateShutdownSchedule(expect: Int, update: Int): Boolean =
-    Unsafe.instance.compareAndSwapInt(
-        this, shutdownScheduleOffset, expect, update)
+    Unsafe.instance
+      .compareAndSwapInt(this, shutdownScheduleOffset, expect, update)
 
   /**
     *  Creates and returns a mailbox for the given actor.
     */
-  protected[akka] def createMailbox(
-      actor: Cell, mailboxType: MailboxType): Mailbox
+  protected[akka] def createMailbox(actor: Cell,
+                                    mailboxType: MailboxType): Mailbox
 
   /**
     * Identifier of this dispatcher, corresponds to the full key
@@ -281,8 +278,8 @@ abstract class MessageDispatcher(
     *
     * INTERNAL API
     */
-  protected[akka] def systemDispatch(
-      receiver: ActorCell, invocation: SystemMessage)
+  protected[akka] def systemDispatch(receiver: ActorCell,
+                                     invocation: SystemMessage)
 
   /**
     * Will be called when the dispatcher is to queue an invocation for execution
@@ -336,14 +333,16 @@ abstract class MessageDispatcher(
   * An ExecutorServiceConfigurator is a class that given some prerequisites and a configuration can create instances of ExecutorService
   */
 abstract class ExecutorServiceConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+    config: Config,
+    prerequisites: DispatcherPrerequisites)
     extends ExecutorServiceFactoryProvider
 
 /**
   * Base class to be used for hooking in new dispatchers into Dispatchers.
   */
 abstract class MessageDispatcherConfigurator(
-    _config: Config, val prerequisites: DispatcherPrerequisites) {
+    _config: Config,
+    val prerequisites: DispatcherPrerequisites) {
 
   val config: Config = new CachingConfig(_config)
 
@@ -359,10 +358,12 @@ abstract class MessageDispatcherConfigurator(
       executor match {
         case null | "" | "fork-join-executor" ⇒
           new ForkJoinExecutorConfigurator(
-              config.getConfig("fork-join-executor"), prerequisites)
+              config.getConfig("fork-join-executor"),
+              prerequisites)
         case "thread-pool-executor" ⇒
           new ThreadPoolExecutorConfigurator(
-              config.getConfig("thread-pool-executor"), prerequisites)
+              config.getConfig("thread-pool-executor"),
+              prerequisites)
         case fqcn ⇒
           val args = List(classOf[Config] -> config,
                           classOf[DispatcherPrerequisites] -> prerequisites)
@@ -393,12 +394,12 @@ abstract class MessageDispatcherConfigurator(
   }
 }
 
-class ThreadPoolExecutorConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+class ThreadPoolExecutorConfigurator(config: Config,
+                                     prerequisites: DispatcherPrerequisites)
     extends ExecutorServiceConfigurator(config, prerequisites) {
 
-  val threadPoolConfig: ThreadPoolConfig = createThreadPoolConfigBuilder(
-      config, prerequisites).config
+  val threadPoolConfig: ThreadPoolConfig =
+    createThreadPoolConfigBuilder(config, prerequisites).config
 
   protected def createThreadPoolConfigBuilder(
       config: Config,
@@ -411,7 +412,8 @@ class ThreadPoolExecutorConfigurator(
         case size if size > 0 ⇒
           Some(config getString "task-queue-type") map {
             case "array" ⇒
-              ThreadPoolConfig.arrayBlockingQueue(size, false) //TODO config fairness?
+              ThreadPoolConfig
+                .arrayBlockingQueue(size, false) //TODO config fairness?
             case "" | "linked" ⇒ ThreadPoolConfig.linkedBlockingQueue(size)
             case x ⇒
               throw new IllegalArgumentException(
@@ -434,7 +436,8 @@ class ThreadPoolExecutorConfigurator(
   }
 
   def createExecutorServiceFactory(
-      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory =
+      id: String,
+      threadFactory: ThreadFactory): ExecutorServiceFactory =
     threadPoolConfig.createExecutorServiceFactory(id, threadFactory)
 }
 
@@ -448,8 +451,10 @@ object ForkJoinExecutorConfigurator {
       threadFactory: ForkJoinPool.ForkJoinWorkerThreadFactory,
       unhandledExceptionHandler: Thread.UncaughtExceptionHandler,
       asyncMode: Boolean)
-      extends ForkJoinPool(
-          parallelism, threadFactory, unhandledExceptionHandler, asyncMode)
+      extends ForkJoinPool(parallelism,
+                           threadFactory,
+                           unhandledExceptionHandler,
+                           asyncMode)
       with LoadMetrics {
     def this(parallelism: Int,
              threadFactory: ForkJoinPool.ForkJoinWorkerThreadFactory,
@@ -492,8 +497,8 @@ object ForkJoinExecutorConfigurator {
   }
 }
 
-class ForkJoinExecutorConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+class ForkJoinExecutorConfigurator(config: Config,
+                                   prerequisites: DispatcherPrerequisites)
     extends ExecutorServiceConfigurator(config, prerequisites) {
   import ForkJoinExecutorConfigurator._
 
@@ -521,7 +526,8 @@ class ForkJoinExecutorConfigurator(
   }
 
   final def createExecutorServiceFactory(
-      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory = {
+      id: String,
+      threadFactory: ThreadFactory): ExecutorServiceFactory = {
     val tf = threadFactory match {
       case m: MonitorableThreadFactory ⇒
         // add the dispatcher id to the thread names
@@ -535,7 +541,7 @@ class ForkJoinExecutorConfigurator(
       case unsupported ⇒
         throw new IllegalArgumentException(
             "Cannot instantiate ForkJoinExecutorServiceFactory. " +
-            """"task-peeking-mode" in "fork-join-executor" section could only set to "FIFO" or "LIFO".""")
+              """"task-peeking-mode" in "fork-join-executor" section could only set to "FIFO" or "LIFO".""")
     }
 
     new ForkJoinExecutorServiceFactory(
@@ -555,7 +561,8 @@ class DefaultExecutorServiceConfigurator(
   val provider: ExecutorServiceFactoryProvider =
     prerequisites.defaultExecutionContext match {
       case Some(ec) ⇒
-        prerequisites.eventStream.publish(Debug(
+        prerequisites.eventStream.publish(
+            Debug(
                 "DefaultExecutorServiceConfigurator",
                 this.getClass,
                 s"Using passed in ExecutionContext as default executor for this ActorSystem. If you want to use a different executor, please specify one in akka.actor.default-dispatcher.default-executor."))
@@ -577,6 +584,7 @@ class DefaultExecutorServiceConfigurator(
     }
 
   def createExecutorServiceFactory(
-      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory =
+      id: String,
+      threadFactory: ThreadFactory): ExecutorServiceFactory =
     provider.createExecutorServiceFactory(id, threadFactory)
 }

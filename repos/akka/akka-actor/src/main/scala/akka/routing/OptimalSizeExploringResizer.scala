@@ -26,8 +26,8 @@ trait OptimalSizeExploringResizer extends Resizer {
     * @param currentRoutees
     * @param messageCounter
     */
-  def reportMessageCount(
-      currentRoutees: immutable.IndexedSeq[Routee], messageCounter: Long): Unit
+  def reportMessageCount(currentRoutees: immutable.IndexedSeq[Routee],
+                         messageCounter: Long): Unit
 }
 
 case object OptimalSizeExploringResizer {
@@ -40,8 +40,8 @@ case object OptimalSizeExploringResizer {
   /**
     * INTERNAL API
     */
-  private[routing] case class UnderUtilizationStreak(
-      start: LocalDateTime, highestUtilization: Int)
+  private[routing] case class UnderUtilizationStreak(start: LocalDateTime,
+                                                     highestUtilization: Int)
 
   /**
     * INTERNAL API
@@ -159,8 +159,9 @@ case class DefaultOptimalSizeExploringResizer(
   private def checkParamAsPositiveNum(value: Double, paramName: String): Unit =
     checkParamLowerBound(value, 0, paramName)
 
-  private def checkParamLowerBound(
-      value: Double, lowerBound: Double, paramName: String): Unit =
+  private def checkParamLowerBound(value: Double,
+                                   lowerBound: Double,
+                                   paramName: String): Unit =
     if (value < lowerBound)
       throw new IllegalArgumentException(
           s"$paramName must be >= $lowerBound, was: [%s]".format(value))
@@ -169,14 +170,14 @@ case class DefaultOptimalSizeExploringResizer(
   checkParamAsPositiveNum(upperBound, "upperBound")
   if (upperBound < lowerBound)
     throw new IllegalArgumentException(
-        "upperBound must be >= lowerBound, was: [%s] < [%s]".format(
-            upperBound, lowerBound))
+        "upperBound must be >= lowerBound, was: [%s] < [%s]"
+          .format(upperBound, lowerBound))
 
   checkParamLowerBound(numOfAdjacentSizesToConsiderDuringOptimization,
                        2,
                        "numOfAdjacentSizesToConsiderDuringOptimization")
-  checkParamAsProbability(
-      chanceOfScalingDownWhenFull, "chanceOfScalingDownWhenFull")
+  checkParamAsProbability(chanceOfScalingDownWhenFull,
+                          "chanceOfScalingDownWhenFull")
   checkParamAsPositiveNum(numOfAdjacentSizesToConsiderDuringOptimization,
                           "numOfAdjacentSizesToConsiderDuringOptimization")
   checkParamAsPositiveNum(exploreStepSize, "exploreStepSize")
@@ -210,7 +211,7 @@ case class DefaultOptimalSizeExploringResizer(
           a.underlying match {
             case cell: ActorCell ⇒
               cell.mailbox.numberOfMessages +
-              (if (cell.currentMessage != null) 1 else 0)
+                (if (cell.currentMessage != null) 1 else 0)
             case cell ⇒ cell.numberOfMessages
           }
         case x ⇒ 0
@@ -227,8 +228,8 @@ case class DefaultOptimalSizeExploringResizer(
         Some(
             UnderUtilizationStreak(
                 record.underutilizationStreak.fold(now)(_.start),
-                Math.max(record.underutilizationStreak
-                           .fold(0)(_.highestUtilization),
+                Math.max(record.underutilizationStreak.fold(0)(
+                             _.highestUtilization),
                          utilized)))
 
     val newPerformanceLog: PerformanceLog =
@@ -251,11 +252,11 @@ case class DefaultOptimalSizeExploringResizer(
         } else performanceLog
       } else performanceLog
 
-    val newRecord = record.copy(
-        underutilizationStreak = newUnderutilizationStreak,
-        messageCount = messageCounter,
-        totalQueueLength = totalQueueLength,
-        checkTime = System.nanoTime())
+    val newRecord = record.copy(underutilizationStreak =
+                                  newUnderutilizationStreak,
+                                messageCount = messageCounter,
+                                totalQueueLength = totalQueueLength,
+                                checkTime = System.nanoTime())
 
     (newPerformanceLog, newRecord)
   }
@@ -312,8 +313,8 @@ case class DefaultOptimalSizeExploringResizer(
   }
 
   private def explore(currentSize: PoolSize): Int = {
-    val change = Math.max(
-        1, random.nextInt(Math.ceil(currentSize * exploreStepSize).toInt))
+    val change = Math
+      .max(1, random.nextInt(Math.ceil(currentSize * exploreStepSize).toInt))
     if (random.nextDouble() < chanceOfScalingDownWhenFull) -change
     else change
   }

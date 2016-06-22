@@ -111,8 +111,13 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
                              leftPlan: SparkPlan,
                              rightPlan: SparkPlan,
                              side: BuildSide) = {
-      val shuffledHashJoin = joins.ShuffledHashJoin(
-          leftKeys, rightKeys, Inner, side, None, leftPlan, rightPlan)
+      val shuffledHashJoin = joins.ShuffledHashJoin(leftKeys,
+                                                    rightKeys,
+                                                    Inner,
+                                                    side,
+                                                    None,
+                                                    leftPlan,
+                                                    rightPlan)
       val filteredJoin = boundCondition
         .map(Filter(_, shuffledHashJoin))
         .getOrElse(shuffledHashJoin)
@@ -124,8 +129,12 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
                           boundCondition: Option[Expression],
                           leftPlan: SparkPlan,
                           rightPlan: SparkPlan) = {
-      val sortMergeJoin = joins.SortMergeJoin(
-          leftKeys, rightKeys, Inner, boundCondition, leftPlan, rightPlan)
+      val sortMergeJoin = joins.SortMergeJoin(leftKeys,
+                                              rightKeys,
+                                              Inner,
+                                              boundCondition,
+                                              leftPlan,
+                                              rightPlan)
       EnsureRequirements(sqlContext.sessionState.conf).apply(sortMergeJoin)
     }
 
@@ -239,8 +248,11 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
         checkAnswer2(leftRows,
                      rightRows,
                      (left: SparkPlan, right: SparkPlan) =>
-                       BroadcastNestedLoopJoin(
-                           left, right, BuildLeft, Inner, Some(condition())),
+                       BroadcastNestedLoopJoin(left,
+                                               right,
+                                               BuildLeft,
+                                               Inner,
+                                               Some(condition())),
                      expectedAnswer.map(Row.fromTuple),
                      sortAnswers = true)
       }
@@ -251,8 +263,11 @@ class InnerJoinSuite extends SparkPlanTest with SharedSQLContext {
         checkAnswer2(leftRows,
                      rightRows,
                      (left: SparkPlan, right: SparkPlan) =>
-                       BroadcastNestedLoopJoin(
-                           left, right, BuildRight, Inner, Some(condition())),
+                       BroadcastNestedLoopJoin(left,
+                                               right,
+                                               BuildRight,
+                                               Inner,
+                                               Some(condition())),
                      expectedAnswer.map(Row.fromTuple),
                      sortAnswers = true)
       }

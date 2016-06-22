@@ -62,7 +62,8 @@ private[stream] class Throttle[T](cost: Int,
                   previousTime = currentTime + waitTime
                   scheduleOnce(timerName, waitTime.nanos)
                 case Enforcing ⇒
-                  failStage(new RateExceededException(
+                  failStage(
+                      new RateExceededException(
                           "Maximum throttle throughput exceeded"))
               } else {
               lastTokens = currentTokens - elementCost

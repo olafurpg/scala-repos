@@ -54,7 +54,7 @@ private[ml] trait VectorIndexerParams
       this,
       "maxCategories",
       "Threshold for the number of values a categorical feature can take (>= 2)." +
-      " If a feature is found to have > maxCategories values, then it is declared continuous.",
+        " If a feature is found to have > maxCategories values, then it is declared continuous.",
       ParamValidators.gtEq(2))
 
   setDefault(maxCategories -> 20)
@@ -131,8 +131,9 @@ class VectorIndexer(override val uid: String)
         iter.foreach(localCatStats.addVector)
         Iterator(localCatStats)
       }.reduce((stats1, stats2) => stats1.merge(stats2))
-    val model = new VectorIndexerModel(
-        uid, numFeatures, categoryStats.getCategoryMaps).setParent(this)
+    val model =
+      new VectorIndexerModel(uid, numFeatures, categoryStats.getCategoryMaps)
+        .setParent(this)
     copyValues(model)
   }
 
@@ -165,8 +166,8 @@ object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
     * @param numFeatures  This class fails if it encounters a Vector whose length is not numFeatures.
     * @param maxCategories  This class caps the number of unique values collected at maxCategories.
     */
-  private class CategoryStats(
-      private val numFeatures: Int, private val maxCategories: Int)
+  private class CategoryStats(private val numFeatures: Int,
+                              private val maxCategories: Int)
       extends Serializable {
 
     /** featureValueSets[feature index] = set of unique values */
@@ -190,7 +191,7 @@ object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
     def addVector(v: Vector): Unit = {
       require(v.size == numFeatures,
               s"VectorIndexer expected $numFeatures features but" +
-              s" found vector of size ${v.size}.")
+                s" found vector of size ${v.size}.")
       v match {
         case dv: DenseVector => addDenseVector(dv)
         case sv: SparseVector => addSparseVector(sv)
@@ -277,7 +278,7 @@ object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
   *                      If a feature is not in this map, it is treated as continuous.
   */
 @Experimental
-class VectorIndexerModel private[ml](
+class VectorIndexerModel private[ml] (
     override val uid: String,
     val numFeatures: Int,
     val categoryMaps: Map[Int, Map[Double, Int]])
@@ -301,8 +302,7 @@ class VectorIndexerModel private[ml](
     */
   private val partialFeatureAttributes: Array[Attribute] = {
     val attrs = new Array[Attribute](numFeatures)
-    var categoricalFeatureCount =
-      0 // validity check for numFeatures, categoryMaps
+    var categoricalFeatureCount = 0 // validity check for numFeatures, categoryMaps
     var featureIndex = 0
     while (featureIndex < numFeatures) {
       if (categoryMaps.contains(featureIndex)) {
@@ -312,8 +312,9 @@ class VectorIndexerModel private[ml](
           .map(_._1)
           .map(_.toString)
         if (featureValues.length == 2) {
-          attrs(featureIndex) = new BinaryAttribute(
-              index = Some(featureIndex), values = Some(featureValues))
+          attrs(featureIndex) = new BinaryAttribute(index = Some(featureIndex),
+                                                    values =
+                                                      Some(featureValues))
         } else {
           attrs(featureIndex) = new NominalAttribute(
               index = Some(featureIndex),
@@ -330,7 +331,7 @@ class VectorIndexerModel private[ml](
     require(
         categoricalFeatureCount == categoryMaps.size,
         "VectorIndexerModel given categoryMaps" +
-        s" with keys outside expected range [0,...,numFeatures), where numFeatures=$numFeatures")
+          s" with keys outside expected range [0,...,numFeatures), where numFeatures=$numFeatures")
     attrs
   }
 
@@ -344,7 +345,7 @@ class VectorIndexerModel private[ml](
     val f: Vector => Vector = { (v: Vector) =>
       assert(v.size == localNumFeatures,
              "VectorIndexerModel expected vector of length" +
-             s" $numFeatures but found length ${v.size}")
+               s" $numFeatures but found length ${v.size}")
       v match {
         case dv: DenseVector =>
           val tmpv = dv.copy
@@ -403,17 +404,16 @@ class VectorIndexerModel private[ml](
 
     // If the input metadata specifies numFeatures, compare with expected numFeatures.
     val origAttrGroup = AttributeGroup.fromStructField(schema($(inputCol)))
-    val origNumFeatures: Option[Int] =
-      if (origAttrGroup.attributes.nonEmpty) {
-        Some(origAttrGroup.attributes.get.length)
-      } else {
-        origAttrGroup.numAttributes
-      }
+    val origNumFeatures: Option[Int] = if (origAttrGroup.attributes.nonEmpty) {
+      Some(origAttrGroup.attributes.get.length)
+    } else {
+      origAttrGroup.numAttributes
+    }
     require(
         origNumFeatures.forall(_ == numFeatures),
         "VectorIndexerModel expected" +
-        s" $numFeatures features, but input column ${$(inputCol)} had metadata specifying" +
-        s" ${origAttrGroup.numAttributes.get} features.")
+          s" $numFeatures features, but input column ${$(inputCol)} had metadata specifying" +
+          s" ${origAttrGroup.numAttributes.get} features.")
 
     val newField = prepOutputField(schema)
     val outputFields = schema.fields :+ newField
@@ -472,8 +472,8 @@ object VectorIndexerModel extends MLReadable[VectorIndexerModel] {
       instance: VectorIndexerModel)
       extends MLWriter {
 
-    private case class Data(
-        numFeatures: Int, categoryMaps: Map[Int, Map[Double, Int]])
+    private case class Data(numFeatures: Int,
+                            categoryMaps: Map[Int, Map[Double, Int]])
 
     override protected def saveImpl(path: String): Unit = {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
@@ -500,8 +500,8 @@ object VectorIndexerModel extends MLReadable[VectorIndexerModel] {
         .head()
       val numFeatures = data.getAs[Int](0)
       val categoryMaps = data.getAs[Map[Int, Map[Double, Int]]](1)
-      val model = new VectorIndexerModel(
-          metadata.uid, numFeatures, categoryMaps)
+      val model =
+        new VectorIndexerModel(metadata.uid, numFeatures, categoryMaps)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }

@@ -97,12 +97,12 @@ object WatermarkRequestStrategy {
   * Requests up to the `highWatermark` when the `remainingRequested` is
   * below the `lowWatermark`. This a good strategy when the actor performs work itself.
   */
-final case class WatermarkRequestStrategy(
-    highWatermark: Int, lowWatermark: Int)
+final case class WatermarkRequestStrategy(highWatermark: Int,
+                                          lowWatermark: Int)
     extends RequestStrategy {
   require(lowWatermark >= 0, "lowWatermark must be >= 0")
-  require(
-      highWatermark >= lowWatermark, "highWatermark must be >= lowWatermark")
+  require(highWatermark >= lowWatermark,
+          "highWatermark must be >= lowWatermark")
 
   /**
     * Create [[WatermarkRequestStrategy]] with `lowWatermark` as half of
@@ -183,8 +183,8 @@ trait ActorSubscriber extends Actor {
   /**
     * INTERNAL API
     */
-  protected[akka] override def aroundReceive(
-      receive: Receive, msg: Any): Unit = msg match {
+  protected[akka] override def aroundReceive(receive: Receive,
+                                             msg: Any): Unit = msg match {
     case _: OnNext ⇒
       requested -= 1
       if (!_canceled) {
@@ -235,11 +235,11 @@ trait ActorSubscriber extends Actor {
   /**
     * INTERNAL API
     */
-  protected[akka] override def aroundPreRestart(
-      reason: Throwable, message: Option[Any]): Unit = {
+  protected[akka] override def aroundPreRestart(reason: Throwable,
+                                                message: Option[Any]): Unit = {
     // some state must survive restart
-    state.set(
-        self, ActorSubscriberState.State(subscription, requested, _canceled))
+    state.set(self,
+              ActorSubscriberState.State(subscription, requested, _canceled))
     super.aroundPreRestart(reason, message)
   }
 
@@ -277,8 +277,7 @@ trait ActorSubscriber extends Actor {
           context.stop(self)
           s.cancel()
         case _ ⇒
-          _canceled =
-            true // cancel will be signaled once a subscription arrives
+          _canceled = true // cancel will be signaled once a subscription arrives
       }
     }
 
@@ -330,8 +329,9 @@ private[akka] object ActorSubscriberState
       system: ExtendedActorSystem): ActorSubscriberState =
     new ActorSubscriberState
 
-  final case class State(
-      subscription: Option[Subscription], requested: Long, canceled: Boolean)
+  final case class State(subscription: Option[Subscription],
+                         requested: Long,
+                         canceled: Boolean)
 }
 
 /**

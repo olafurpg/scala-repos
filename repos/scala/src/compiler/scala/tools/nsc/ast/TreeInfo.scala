@@ -76,9 +76,9 @@ abstract class TreeInfo extends scala.reflect.internal.TreeInfo {
     // new B(v1) op new B(v2) where op is == or !=. Returns v1, op, v2.
     object BoxAndCompare {
       def unapply(t: Tree): Option[(Tree, Symbol, Tree)] = t match {
-        case BinaryOp(
-            Box(v1, tpe1), op @ (Object_== | Object_!=), Box(v2, tpe2))
-            if isValueClass(tpe1) && tpe1 =:= tpe2 =>
+        case BinaryOp(Box(v1, tpe1),
+                      op @ (Object_== | Object_!=),
+                      Box(v2, tpe2)) if isValueClass(tpe1) && tpe1 =:= tpe2 =>
           Some((v1, op, v2))
         case _ => None
       }

@@ -36,17 +36,17 @@ object LottoExample extends Specification {
 
   val json =
     ("lotto" -> ("id" -> lotto.id) ~
-        ("winning-numbers" -> lotto.`winning-numbers`) ~
-        ("draw-date" -> lotto.`draw-date`.map(_.toString)) ~
-        ("winners" -> lotto.winners.map { w =>
-              (("winner-id" -> w.`winner-id`) ~ ("numbers" -> w.numbers))
-            }))
+          ("winning-numbers" -> lotto.`winning-numbers`) ~
+          ("draw-date" -> lotto.`draw-date`.map(_.toString)) ~
+          ("winners" -> lotto.winners.map { w =>
+                (("winner-id" -> w.`winner-id`) ~ ("numbers" -> w.numbers))
+              }))
 
   "Parse Lotto" in {
 
     (compactRender(json) mustEqual """{"lotto":{"id":5,"winning-numbers":[2,45,34,23,7,5,3],"winners":[{"winner-id":23,"numbers":[2,45,34,23,3,5]},{"winner-id":54,"numbers":[52,3,12,11,18,22]}]}}""") and
-    ((json \ "lotto" \ "winners")(0).extract[Winner] mustEqual Winner(
-            23, List(2, 45, 34, 23, 3, 5))) and
+    ((json \ "lotto" \ "winners")(0)
+          .extract[Winner] mustEqual Winner(23, List(2, 45, 34, 23, 3, 5))) and
     ((json \ "lotto").extract[Lotto] mustEqual lotto) and
     (json.values mustEqual Map(
             "lotto" -> Map(

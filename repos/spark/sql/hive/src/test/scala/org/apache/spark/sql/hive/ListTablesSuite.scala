@@ -37,8 +37,8 @@ class ListTablesSuite
 
   override def beforeAll(): Unit = {
     // The catalog in HiveContext is a case insensitive one.
-    sessionState.catalog.registerTable(
-        TableIdentifier("ListTablesSuiteTable"), df.logicalPlan)
+    sessionState.catalog
+      .registerTable(TableIdentifier("ListTablesSuiteTable"), df.logicalPlan)
     sql("CREATE TABLE HiveListTablesSuiteTable (key int, value string)")
     sql("CREATE DATABASE IF NOT EXISTS ListTablesSuiteDB")
     sql("CREATE TABLE ListTablesSuiteDB.HiveInDBListTablesSuiteTable (key int, value string)")
@@ -60,7 +60,8 @@ class ListTablesSuite
                     Row("listtablessuitetable", true))
         checkAnswer(allTables.filter("tableName = 'hivelisttablessuitetable'"),
                     Row("hivelisttablessuitetable", false))
-        assert(allTables
+        assert(
+            allTables
               .filter("tableName = 'hiveindblisttablessuitetable'")
               .count() === 0)
     }
@@ -71,7 +72,8 @@ class ListTablesSuite
       case allTables =>
         checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
                     Row("listtablessuitetable", true))
-        assert(allTables
+        assert(
+            allTables
               .filter("tableName = 'hivelisttablessuitetable'")
               .count() === 0)
         checkAnswer(

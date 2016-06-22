@@ -45,12 +45,13 @@ class InterpolatedStringEnterHandler extends EnterHandlerDelegateAdapter {
     (a =>
           if (Set(tINTERPOLATED_STRING,
                   tINTERPOLATED_STRING_ESCAPE,
-                  tINTERPOLATED_STRING_END).contains(a.getNode.getElementType)) {
+                  tINTERPOLATED_STRING_END)
+                .contains(a.getNode.getElementType)) {
             a.getParent.getFirstChild.getNode match {
               case b: ASTNode
                   if b.getElementType == tINTERPOLATED_STRING_ID ||
-                  b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE ||
-                  b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE =>
+                    b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE ||
+                    b.getElementType == ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE =>
                 if (a.getNode.getElementType == tINTERPOLATED_STRING_ESCAPE) {
                   if (caretOffset.get - a.getTextOffset == 1) modifyOffset(1)
                 } else {
@@ -66,13 +67,14 @@ class InterpolatedStringEnterHandler extends EnterHandlerDelegateAdapter {
                         a.getTextOffset) {
                       if (StringEscapesTokenTypes.STRING_LITERAL_ESCAPES
                             .contains(lexer.getTokenType)) {
-                        modifyOffset(lexer.getTokenEnd + a.getTextOffset -
-                            caretOffset.get())
+                        modifyOffset(
+                            lexer.getTokenEnd + a.getTextOffset -
+                              caretOffset.get())
                       }
                     }
                   } while (caretOffset.get() > lexer.getTokenEnd +
-                  a.getTextOffset &&
-                  (lexer.advance(), lexer.getTokenType != null)._2)
+                    a.getTextOffset &&
+                    (lexer.advance(), lexer.getTokenType != null)._2)
                 }
 
                 extensions.inWriteAction {

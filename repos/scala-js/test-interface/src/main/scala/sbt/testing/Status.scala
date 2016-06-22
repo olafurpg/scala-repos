@@ -54,8 +54,8 @@ object Status {
   /** Indicates a test was declared as pending. */
   final val Pending = new Status("Pending", 6)
 
-  private[this] val _values: Array[Status] = Array(
-      Success, Error, Failure, Skipped, Ignored, Canceled, Pending)
+  private[this] val _values: Array[Status] =
+    Array(Success, Error, Failure, Skipped, Ignored, Canceled, Pending)
 
   def values(): Array[Status] = _values.clone()
 

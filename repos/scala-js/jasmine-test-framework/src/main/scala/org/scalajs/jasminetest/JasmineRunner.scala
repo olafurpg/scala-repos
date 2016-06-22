@@ -18,8 +18,7 @@ final class JasmineRunner(
     val args: Array[String],
     val remoteArgs: Array[String],
     private[jasminetest] val classLoader: ClassLoader
-)
-    extends Runner {
+) extends Runner {
 
   private[this] var isDone = false
 

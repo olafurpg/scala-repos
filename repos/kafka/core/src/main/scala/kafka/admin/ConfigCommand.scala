@@ -40,7 +40,8 @@ object ConfigCommand {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          opts.parser, "Add/Remove entity (topics/clients) configs")
+          opts.parser,
+          "Add/Remove entity (topics/clients) configs")
 
     opts.checkArgs()
 
@@ -126,7 +127,7 @@ object ConfigCommand {
       println(
           s"WARNING: The configuration ${LogConfig.MessageFormatVersionProp}=${props
         .getProperty(LogConfig.MessageFormatVersionProp)} is specified. " +
-          s"This configuration will be ignored if the version is newer than the inter.broker.protocol.version specified in the broker.")
+            s"This configuration will be ignored if the version is newer than the inter.broker.protocol.version specified in the broker.")
     }
     props
   }
@@ -148,7 +149,7 @@ object ConfigCommand {
       .accepts(
           "zookeeper",
           "REQUIRED: The connection string for the zookeeper connection in the form host:port. " +
-          "Multiple URLS can be given to allow fail-over.")
+            "Multiple URLS can be given to allow fail-over.")
       .withRequiredArg
       .describedAs("urls")
       .ofType(classOf[String])
@@ -170,11 +171,11 @@ object ConfigCommand {
       .accepts(
           "add-config",
           "Key Value pairs configs to add 'k1=v1,k2=v2'. The following is a list of valid configurations: " +
-          "For entity_type '" + ConfigType.Topic + "': " +
-          nl + LogConfig.configNames.map("\t" + _).mkString(nl) + nl +
-          "For entity_type '" + ConfigType.Client + "': " + nl +
-          "\t" + ClientConfigOverride.ProducerOverride + nl + "\t" +
-          ClientConfigOverride.ConsumerOverride)
+            "For entity_type '" + ConfigType.Topic + "': " +
+            nl + LogConfig.configNames.map("\t" + _).mkString(nl) + nl +
+            "For entity_type '" + ConfigType.Client + "': " + nl +
+            "\t" + ClientConfigOverride.ProducerOverride + nl + "\t" +
+            ClientConfigOverride.ConsumerOverride)
       .withRequiredArg
       .ofType(classOf[String])
       .withValuesSeparatedBy(',')
@@ -203,12 +204,14 @@ object ConfigCommand {
             "Command must include exactly one action: --describe, --alter")
 
       // check required args
-      CommandLineUtils.checkRequiredArgs(
-          parser, options, zkConnectOpt, entityType)
-      CommandLineUtils.checkInvalidArgs(
-          parser, options, alterOpt, Set(describeOpt))
-      CommandLineUtils.checkInvalidArgs(
-          parser, options, describeOpt, Set(alterOpt, addConfig, deleteConfig))
+      CommandLineUtils
+        .checkRequiredArgs(parser, options, zkConnectOpt, entityType)
+      CommandLineUtils
+        .checkInvalidArgs(parser, options, alterOpt, Set(describeOpt))
+      CommandLineUtils.checkInvalidArgs(parser,
+                                        options,
+                                        describeOpt,
+                                        Set(alterOpt, addConfig, deleteConfig))
       if (options.has(alterOpt)) {
         if (!options.has(entityName))
           throw new IllegalArgumentException(
@@ -224,8 +227,8 @@ object ConfigCommand {
       if (!entityTypeVal.equals(ConfigType.Topic) &&
           !entityTypeVal.equals(ConfigType.Client)) {
         throw new IllegalArgumentException(
-            "--entity-type must be '%s' or '%s'".format(
-                ConfigType.Topic, ConfigType.Client))
+            "--entity-type must be '%s' or '%s'".format(ConfigType.Topic,
+                                                        ConfigType.Client))
       }
     }
   }

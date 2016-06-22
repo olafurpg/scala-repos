@@ -47,8 +47,9 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
 
     val socket =
       if (settings.server.value == "")
-        compileSocket.getOrCreateSocket(
-            vmArgs mkString " ", !shutdown, settings.port.value)
+        compileSocket.getOrCreateSocket(vmArgs mkString " ",
+                                        !shutdown,
+                                        settings.port.value)
       else compileSocket.getSocket(settings.server.value)
 
     socket match {

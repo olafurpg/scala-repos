@@ -22,11 +22,12 @@ object ServiceFactoryExample {
   val client = Mysql.client
     .withCredentials("<user>", "<password>")
     .withDatabase("test")
-    .configured(DefaultPool.Param(low = 0,
-                                  high = 10,
-                                  idleTime = 5.minutes,
-                                  bufferSize = 0,
-                                  maxWaiters = Int.MaxValue))
+    .configured(
+        DefaultPool.Param(low = 0,
+                          high = 10,
+                          idleTime = 5.minutes,
+                          bufferSize = 0,
+                          maxWaiters = Int.MaxValue))
     .newClient("127.0.0.1:3306")
   //#client
 
@@ -55,11 +56,12 @@ object RichExample {
   val richClient = Mysql.client
     .withCredentials("<user>", "<password>")
     .withDatabase("test")
-    .configured(DefaultPool.Param(low = 0,
-                                  high = 10,
-                                  idleTime = 5.minutes,
-                                  bufferSize = 0,
-                                  maxWaiters = Int.MaxValue))
+    .configured(
+        DefaultPool.Param(low = 0,
+                          high = 10,
+                          idleTime = 5.minutes,
+                          bufferSize = 0,
+                          maxWaiters = Int.MaxValue))
     .newRichClient("127.0.0.1:3306")
   //#richClient
 

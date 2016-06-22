@@ -88,33 +88,33 @@ class ParquetAvroCompatibilitySuite
       val path = dir.getCanonicalPath
 
       withWriter[AvroOptionalPrimitives](
-          path, AvroOptionalPrimitives.getClassSchema) { writer =>
+          path,
+          AvroOptionalPrimitives.getClassSchema) { writer =>
         (0 until 10).foreach { i =>
-          val record =
-            if (i % 3 == 0) {
-              AvroOptionalPrimitives
-                .newBuilder()
-                .setMaybeBoolColumn(null)
-                .setMaybeIntColumn(null)
-                .setMaybeLongColumn(null)
-                .setMaybeFloatColumn(null)
-                .setMaybeDoubleColumn(null)
-                .setMaybeBinaryColumn(null)
-                .setMaybeStringColumn(null)
-                .build()
-            } else {
-              AvroOptionalPrimitives
-                .newBuilder()
-                .setMaybeBoolColumn(i % 2 == 0)
-                .setMaybeIntColumn(i)
-                .setMaybeLongColumn(i.toLong * 10)
-                .setMaybeFloatColumn(i.toFloat + 0.1f)
-                .setMaybeDoubleColumn(i.toDouble + 0.2d)
-                .setMaybeBinaryColumn(ByteBuffer.wrap(
-                        s"val_$i".getBytes(StandardCharsets.UTF_8)))
-                .setMaybeStringColumn(s"val_$i")
-                .build()
-            }
+          val record = if (i % 3 == 0) {
+            AvroOptionalPrimitives
+              .newBuilder()
+              .setMaybeBoolColumn(null)
+              .setMaybeIntColumn(null)
+              .setMaybeLongColumn(null)
+              .setMaybeFloatColumn(null)
+              .setMaybeDoubleColumn(null)
+              .setMaybeBinaryColumn(null)
+              .setMaybeStringColumn(null)
+              .build()
+          } else {
+            AvroOptionalPrimitives
+              .newBuilder()
+              .setMaybeBoolColumn(i % 2 == 0)
+              .setMaybeIntColumn(i)
+              .setMaybeLongColumn(i.toLong * 10)
+              .setMaybeFloatColumn(i.toFloat + 0.1f)
+              .setMaybeDoubleColumn(i.toDouble + 0.2d)
+              .setMaybeBinaryColumn(ByteBuffer.wrap(
+                      s"val_$i".getBytes(StandardCharsets.UTF_8)))
+              .setMaybeStringColumn(s"val_$i")
+              .build()
+          }
 
           writer.write(record)
         }
@@ -226,7 +226,8 @@ class ParquetAvroCompatibilitySuite
       logParquetSchema(path)
 
       checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(Seq
+        Row(
+            Seq
               .tabulate(3)(i => i.toString -> Seq.tabulate(3)(j => i + j))
               .toMap)
       })

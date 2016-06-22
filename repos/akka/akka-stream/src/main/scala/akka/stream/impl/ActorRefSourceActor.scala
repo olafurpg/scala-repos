@@ -20,8 +20,10 @@ private[akka] object ActorRefSourceActor {
     require(overflowStrategy != OverflowStrategies.Backpressure,
             "Backpressure overflowStrategy not supported")
     val maxFixedBufferSize = settings.maxFixedBufferSize
-    Props(new ActorRefSourceActor(
-            bufferSize, overflowStrategy, maxFixedBufferSize))
+    Props(
+        new ActorRefSourceActor(bufferSize,
+                                overflowStrategy,
+                                maxFixedBufferSize))
   }
 }
 
@@ -121,7 +123,7 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
     case elem if isActive ⇒
       log.debug(
           "Dropping element because Status.Success received already, " +
-          "only draining already buffered elements: [{}] (pending: [{}])",
+            "only draining already buffered elements: [{}] (pending: [{}])",
           elem,
           buffer.used)
   }

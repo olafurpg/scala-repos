@@ -222,8 +222,8 @@ private[http] trait Rendering {
 }
 
 private[http] object Rendering {
-  val floatFormat = new DecimalFormat(
-      "0.0##", DecimalFormatSymbols.getInstance(Locale.ROOT))
+  val floatFormat =
+    new DecimalFormat("0.0##", DecimalFormatSymbols.getInstance(Locale.ROOT))
   val `\"` = CharPredicate('\\', '"')
 
   case object `, ` extends SingletonValueRenderable // default separator
@@ -332,8 +332,8 @@ private[http] class ByteStringRendering(sizeHint: Int) extends Rendering {
 /**
   * INTERNAL API
   */
-private[http] class CustomCharsetByteStringRendering(
-    nioCharset: Charset, sizeHint: Int)
+private[http] class CustomCharsetByteStringRendering(nioCharset: Charset,
+                                                     sizeHint: Int)
     extends Rendering {
   private[this] val charBuffer = CharBuffer.allocate(64)
   private[this] val builder = new ByteStringBuilder

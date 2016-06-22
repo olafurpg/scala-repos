@@ -63,7 +63,8 @@ class RateControllerSuite extends TestSuiteBase {
       def updateRateAndVerify(rate: Long): Unit = {
         estimator.updateRate(rate)
         eventually(timeout(5.seconds)) {
-          assert(RateTestReceiver
+          assert(
+              RateTestReceiver
                 .getActive()
                 .get
                 .getDefaultBlockGeneratorRateLimit() === rate)

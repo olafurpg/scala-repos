@@ -86,8 +86,9 @@ object ObjectProperty {
     * @param name The name of this $OP
     * @param initialValue The initial value of the wrapped value
     */
-  def apply[T <: Any](
-      bean: Object, name: String, initialValue: T): ObjectProperty[T] =
+  def apply[T <: Any](bean: Object,
+                      name: String,
+                      initialValue: T): ObjectProperty[T] =
     new ObjectProperty(
         new jfxbp.SimpleObjectProperty[T](bean, name, initialValue))
 
@@ -118,8 +119,8 @@ object ObjectProperty {
     * @param property $OP to be filled.
     * @param value Value to be injected in $OP, to avoid implicit conversion and NPE is `value` is `null`.
     */
-  def fillProperty[J <: AnyRef](
-      property: ObjectProperty[J], value: SFXDelegate[J]) {
+  def fillProperty[J <: AnyRef](property: ObjectProperty[J],
+                                value: SFXDelegate[J]) {
     if (value == null) {
       property.delegate.setValue(null.asInstanceOf[J])
     } else {

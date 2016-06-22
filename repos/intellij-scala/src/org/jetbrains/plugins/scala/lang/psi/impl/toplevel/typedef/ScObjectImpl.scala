@@ -96,7 +96,7 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
 
   override def hasModifierProperty(name: String): Boolean = {
     if (name == "final") return true
-    super [ScTypeDefinitionImpl].hasModifierProperty(name)
+    super[ScTypeDefinitionImpl].hasModifierProperty(name)
   }
 
   override def isObject: Boolean = true
@@ -121,16 +121,22 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
       lastParent: PsiElement,
       place: PsiElement): Boolean = {
     if (DumbService.getInstance(getProject).isDumb) return true
-    if (!super [ScTemplateDefinition].processDeclarationsForTemplateBody(
-            processor, state, lastParent, place)) return false
+    if (!super[ScTemplateDefinition].processDeclarationsForTemplateBody(
+            processor,
+            state,
+            lastParent,
+            place)) return false
     if (isPackageObject && name != "`package`") {
       val newState = state.put(BaseProcessor.FROM_TYPE_KEY, null)
       val qual = qualifiedName
       val facade = JavaPsiFacade.getInstance(getProject)
-      val pack =
-        facade.findPackage(qual) //do not wrap into ScPackage to avoid SOE
-      if (pack != null && !ResolveUtils.packageProcessDeclarations(
-              pack, processor, newState, lastParent, place)) return false
+      val pack = facade.findPackage(qual) //do not wrap into ScPackage to avoid SOE
+      if (pack != null && !ResolveUtils.packageProcessDeclarations(pack,
+                                                                   processor,
+                                                                   newState,
+                                                                   lastParent,
+                                                                   place))
+        return false
     }
     true
   }
@@ -143,8 +149,8 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
       import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl._
       startPackageObjectProcessing()
       try {
-        super [ScTemplateDefinition].processDeclarations(
-            processor, state, lastParent, place)
+        super[ScTemplateDefinition]
+          .processDeclarations(processor, state, lastParent, place)
       } catch {
         case ignore: DoNotProcessPackageObjectException =>
           true //do nothing, just let's move on
@@ -152,8 +158,8 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
         stopPackageObjectProcessing()
       }
     } else {
-      super [ScTemplateDefinition].processDeclarations(
-          processor, state, lastParent, place)
+      super[ScTemplateDefinition]
+        .processDeclarations(processor, state, lastParent, place)
     }
   }
 
@@ -166,8 +172,8 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
             val res = new ArrayBuffer[PsiMethod]
             c.getSyntheticMethodsText.foreach(s => {
               try {
-                val method = ScalaPsiElementFactory.createMethodWithContext(
-                    s, c.getContext, c)
+                val method = ScalaPsiElementFactory
+                  .createMethodWithContext(s, c.getContext, c)
                 method.setSynthetic(this)
                 method.syntheticCaseClass = Some(c)
                 res += method
@@ -251,8 +257,9 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
         case t: ScTypedDefinition if t.isAbstractMember => true
         case _ => false
       }
-      this.processPsiMethodsForNode(
-          node, isStatic = false, isInterface = isInterface)(res += _)
+      this.processPsiMethodsForNode(node,
+                                    isStatic = false,
+                                    isInterface = isInterface)(res += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {
@@ -290,27 +297,32 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
   }
 
   private val hardParameterlessSignatures: mutable.WeakHashMap[
-      Project, TypeDefinitionMembers.ParameterlessNodes.Map] =
-    new mutable.WeakHashMap[
-        Project, TypeDefinitionMembers.ParameterlessNodes.Map]
+      Project,
+      TypeDefinitionMembers.ParameterlessNodes.Map] =
+    new mutable.WeakHashMap[Project,
+                            TypeDefinitionMembers.ParameterlessNodes.Map]
   def getHardParameterlessSignatures: TypeDefinitionMembers.ParameterlessNodes.Map = {
     hardParameterlessSignatures.getOrElseUpdate(
-        getProject, TypeDefinitionMembers.ParameterlessNodes.build(this))
+        getProject,
+        TypeDefinitionMembers.ParameterlessNodes.build(this))
   }
 
   private val hardTypes: mutable.WeakHashMap[
-      Project, TypeDefinitionMembers.TypeNodes.Map] =
+      Project,
+      TypeDefinitionMembers.TypeNodes.Map] =
     new mutable.WeakHashMap[Project, TypeDefinitionMembers.TypeNodes.Map]
   def getHardTypes: TypeDefinitionMembers.TypeNodes.Map = {
-    hardTypes.getOrElseUpdate(
-        getProject, TypeDefinitionMembers.TypeNodes.build(this))
+    hardTypes
+      .getOrElseUpdate(getProject, TypeDefinitionMembers.TypeNodes.build(this))
   }
 
   private val hardSignatures: mutable.WeakHashMap[
-      Project, TypeDefinitionMembers.SignatureNodes.Map] =
+      Project,
+      TypeDefinitionMembers.SignatureNodes.Map] =
     new mutable.WeakHashMap[Project, TypeDefinitionMembers.SignatureNodes.Map]
   def getHardSignatures: TypeDefinitionMembers.SignatureNodes.Map = {
     hardSignatures.getOrElseUpdate(
-        getProject, TypeDefinitionMembers.SignatureNodes.build(this))
+        getProject,
+        TypeDefinitionMembers.SignatureNodes.build(this))
   }
 }

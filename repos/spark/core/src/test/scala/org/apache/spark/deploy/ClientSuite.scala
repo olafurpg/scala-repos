@@ -29,16 +29,16 @@ class ClientSuite extends SparkFunSuite with Matchers {
         true)
 
     // file scheme with authority and path is valid.
-    ClientArguments.isValidJarUrl("file://somehost/path/to/a/jarFile.jar") should be(
-        true)
+    ClientArguments
+      .isValidJarUrl("file://somehost/path/to/a/jarFile.jar") should be(true)
 
     // file scheme without path is not valid.
     // In this case, jarFile.jar is recognized as authority.
     ClientArguments.isValidJarUrl("file://jarFile.jar") should be(false)
 
     // file scheme without authority but with triple slash is valid.
-    ClientArguments.isValidJarUrl("file:///some/path/to/a/jarFile.jar") should be(
-        true)
+    ClientArguments
+      .isValidJarUrl("file:///some/path/to/a/jarFile.jar") should be(true)
     ClientArguments.isValidJarUrl("hdfs://someHost:1234/foo.jar") should be(
         true)
 

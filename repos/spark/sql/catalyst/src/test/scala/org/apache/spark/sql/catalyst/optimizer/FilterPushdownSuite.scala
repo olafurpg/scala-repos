@@ -161,7 +161,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       x.join(y)
         .where(("x.a".attr === 1 && "y.d".attr === "x.b".attr) ||
-            ("x.a".attr === 1 && "y.d".attr === "x.c".attr))
+              ("x.a".attr === 1 && "y.d".attr === "x.c".attr))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -325,7 +325,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       x.join(y, LeftOuter, Some("y.b".attr === 1))
         .where("x.b".attr === 2 && "y.b".attr === 2 &&
-            "x.c".attr === "y.c".attr)
+              "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -346,7 +346,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       x.join(y, RightOuter, Some("y.b".attr === 1))
         .where("x.b".attr === 2 && "y.b".attr === 2 &&
-            "x.c".attr === "y.c".attr)
+              "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -367,7 +367,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       x.join(y, LeftOuter, Some("y.b".attr === 1 && "x.a".attr === 3))
         .where("x.b".attr === 2 && "y.b".attr === 2 &&
-            "x.c".attr === "y.c".attr)
+              "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -388,7 +388,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       x.join(y, RightOuter, Some("y.b".attr === 1 && "x.a".attr === 3))
         .where("x.b".attr === 2 && "y.b".attr === 2 &&
-            "x.c".attr === "y.c".attr)
+              "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -411,8 +411,8 @@ class FilterPushdownSuite extends PlanTest {
     }
     val optimized = Optimize.execute(originalQuery.analyze)
 
-    comparePlans(
-        analysis.EliminateSubqueryAliases(originalQuery.analyze), optimized)
+    comparePlans(analysis.EliminateSubqueryAliases(originalQuery.analyze),
+                 optimized)
   }
 
   test("joins: conjunctive predicates") {
@@ -422,7 +422,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       x.join(y)
         .where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1) &&
-            ("y.a".attr === 1))
+              ("y.a".attr === 1))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -459,7 +459,7 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       z.join(x.join(y))
         .where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1) &&
-            ("z.a".attr >= 3) && ("z.a".attr === "x.b".attr))
+              ("z.a".attr >= 3) && ("z.a".attr === "x.b".attr))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -474,8 +474,8 @@ class FilterPushdownSuite extends PlanTest {
     comparePlans(optimized, analysis.EliminateSubqueryAliases(correctAnswer))
   }
 
-  val testRelationWithArrayType = LocalRelation(
-      'a.int, 'b.int, 'c_arr.array(IntegerType))
+  val testRelationWithArrayType =
+    LocalRelation('a.int, 'b.int, 'c_arr.array(IntegerType))
 
   test("generate: predicate referenced no generated column") {
     val originalQuery = {

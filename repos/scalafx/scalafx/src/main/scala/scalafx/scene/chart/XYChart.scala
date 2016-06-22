@@ -85,8 +85,8 @@ object XYChart {
     def apply[X, Y](data: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) =
       new jfxsc.XYChart.Series[X, Y](data)
 
-    def apply[X, Y](
-        name: String, data: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) =
+    def apply[X, Y](name: String,
+                    data: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) =
       new jfxsc.XYChart.Series[X, Y](name, data)
   }
 

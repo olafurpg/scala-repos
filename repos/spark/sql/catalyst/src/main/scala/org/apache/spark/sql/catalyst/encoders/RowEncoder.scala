@@ -47,8 +47,8 @@ object RowEncoder {
         ClassTag(cls))
   }
 
-  private def extractorsFor(
-      inputObject: Expression, inputType: DataType): Expression =
+  private def extractorsFor(inputObject: Expression,
+                            inputType: DataType): Expression =
     inputType match {
       case NullType | BooleanType | ByteType | ShortType | IntegerType |
           LongType | FloatType | DoubleType | BinaryType |
@@ -61,7 +61,8 @@ object RowEncoder {
         val obj = NewInstance(
             udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt(),
             Nil,
-            dataType = ObjectType(udt.userClass
+            dataType = ObjectType(
+                udt.userClass
                   .getAnnotation(classOf[SQLUserDefinedType])
                   .udt()))
         Invoke(obj, "serialize", udt.sqlType, inputObject :: Nil)
@@ -98,8 +99,9 @@ object RowEncoder {
                         inputObject :: Nil,
                         dataType = t)
           case _ =>
-            MapObjects(
-                extractorsFor(_, et), inputObject, externalDataTypeFor(et))
+            MapObjects(extractorsFor(_, et),
+                       inputObject,
+                       externalDataTypeFor(et))
         }
 
       case t @ MapType(kt, vt, valueNullable) =>
@@ -117,8 +119,8 @@ object RowEncoder {
                    ObjectType(classOf[scala.collection.Iterator[_]])),
             "toSeq",
             ObjectType(classOf[scala.collection.Seq[_]]))
-        val convertedValues = extractorsFor(
-            values, ArrayType(vt, valueNullable))
+        val convertedValues =
+          extractorsFor(values, ArrayType(vt, valueNullable))
 
         NewInstance(classOf[ArrayBasedMapData],
                     convertedKeys :: convertedValues :: Nil,
@@ -127,12 +129,11 @@ object RowEncoder {
       case StructType(fields) =>
         val convertedFields = fields.zipWithIndex.map {
           case (f, i) =>
-            val method =
-              if (f.dataType.isInstanceOf[StructType]) {
-                "getStruct"
-              } else {
-                "get"
-              }
+            val method = if (f.dataType.isInstanceOf[StructType]) {
+              "getStruct"
+            } else {
+              "get"
+            }
             If(Invoke(inputObject, "isNullAt", BooleanType, Literal(i) :: Nil),
                Literal.create(null, f.dataType),
                extractorsFor(Invoke(inputObject,
@@ -188,7 +189,8 @@ object RowEncoder {
         val obj = NewInstance(
             udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt(),
             Nil,
-            dataType = ObjectType(udt.userClass
+            dataType = ObjectType(
+                udt.userClass
                   .getAnnotation(classOf[SQLUserDefinedType])
                   .udt()))
         Invoke(obj, "deserialize", ObjectType(udt.userClass), input :: Nil)

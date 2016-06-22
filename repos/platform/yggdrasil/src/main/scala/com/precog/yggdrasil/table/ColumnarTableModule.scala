@@ -96,11 +96,11 @@ trait ColumnarTableModuleConfig {
 }
 
 object ColumnarTableModule extends Logging {
-  def renderJson[M[+ _]](slices: StreamT[M, Slice],
-                         prefix: String,
-                         delimiter: String,
-                         suffix: String)(
-      implicit M: Monad[M]): StreamT[M, CharBuffer] = {
+  def renderJson[M[+ _]](
+      slices: StreamT[M, Slice],
+      prefix: String,
+      delimiter: String,
+      suffix: String)(implicit M: Monad[M]): StreamT[M, CharBuffer] = {
     import scalaz.\/._
     def wrap(stream: StreamT[M, CharBuffer]) = {
       if (prefix == "" && suffix == "") stream
@@ -273,8 +273,8 @@ object ColumnarTableModule extends Logging {
       * Since we know in advance how many rows we have, we can return
       * an array of lines.
       */
-    def renderSlice(
-        pastIndices: Option[Indices], slice: Slice): (Indices, CharBuffer) = {
+    def renderSlice(pastIndices: Option[Indices],
+                    slice: Slice): (Indices, CharBuffer) = {
 
       val indices = indicesForSlice(slice)
       val height = slice.size
@@ -345,7 +345,8 @@ object ColumnarTableModule extends Logging {
   }
 
   def toCharBuffers[N[+ _]: Monad](
-      output: MimeType, slices: StreamT[N, Slice]): StreamT[N, CharBuffer] = {
+      output: MimeType,
+      slices: StreamT[N, Slice]): StreamT[N, CharBuffer] = {
     import FileContent._
     import MimeTypes._
 
@@ -369,8 +370,8 @@ object ColumnarTableModule extends Logging {
     }
   }
 
-  def byteStream[M[+ _]](
-      blockStream: StreamT[M, Slice], mimeType: Option[MimeType])(
+  def byteStream[M[+ _]](blockStream: StreamT[M, Slice],
+                         mimeType: Option[MimeType])(
       implicit M: Monad[M]): Option[StreamT[M, Array[Byte]]] = {
     import vfs.VFSModule.bufferOutput
     import FileContent._
@@ -536,11 +537,11 @@ trait ColumnarTableModule[M[+ _]]
               back <- {
                 head map {
                   case (s, sx) => {
-                      sliceTransform.f(state, s) map {
-                        case (nextState, s0) =>
-                          StreamT.Yield(s0, stream(nextState, sx))
-                      }
+                    sliceTransform.f(state, s) map {
+                      case (nextState, s0) =>
+                        StreamT.Yield(s0, stream(nextState, sx))
                     }
+                  }
                 } getOrElse {
                   M.point(StreamT.Done)
                 }
@@ -573,8 +574,9 @@ trait ColumnarTableModule[M[+ _]]
           (s.key, s.spec)
         })
 
-      case class IndexedSource(
-          groupId: GroupId, index: TableIndex, keySchema: KeySchema)
+      case class IndexedSource(groupId: GroupId,
+                               index: TableIndex,
+                               keySchema: KeySchema)
 
       (for {
         source <- grouping.sources
@@ -606,20 +608,21 @@ trait ColumnarTableModule[M[+ _]]
             l match {
               case Seq(hd) => hd.map(Seq(_))
               case Seq(hd, tl @ _ *) => {
-                  for {
-                    disjunctHd <- hd
-                    disjunctTl <- allSourceDNF(tl)
-                  } yield disjunctHd +: disjunctTl
-                }
+                for {
+                  disjunctHd <- hd
+                  disjunctTl <- allSourceDNF(tl)
+                } yield disjunctHd +: disjunctTl
+              }
               case empty => empty
             }
           }
 
-          def normalizedKeys(
-              index: TableIndex, keySchema: KeySchema): collection.Set[Key] = {
+          def normalizedKeys(index: TableIndex,
+                             keySchema: KeySchema): collection.Set[Key] = {
             val schemaMap = for (k <- fullSchema) yield keySchema.indexOf(k)
-            for (key <- index.getUniqueKeys) yield
-              for (k <- schemaMap) yield if (k == -1) CUndefined else key(k)
+            for (key <- index.getUniqueKeys)
+              yield
+                for (k <- schemaMap) yield if (k == -1) CUndefined else key(k)
           }
 
           def intersect(keys0: collection.Set[Key],
@@ -663,8 +666,8 @@ trait ColumnarTableModule[M[+ _]]
           }
         }
 
-        def jValueFromGroupKey(
-            key: Seq[RValue], cpaths: Seq[CPathField]): RValue = {
+        def jValueFromGroupKey(key: Seq[RValue],
+                               cpaths: Seq[CPathField]): RValue = {
           val items = (cpaths zip key).map(t => (t._1.name, t._2))
           RObject(items.toMap)
         }
@@ -681,8 +684,8 @@ trait ColumnarTableModule[M[+ _]]
               .filter(_.groupId == gid)
               .map { indexedSource =>
                 val keySchema = indexedSource.keySchema
-                val projectedKeyIndices = for (k <- fullSchema) yield
-                  keySchema.indexOf(k)
+                val projectedKeyIndices = for (k <- fullSchema)
+                  yield keySchema.indexOf(k)
                 (indexedSource.index, projectedKeyIndices, groupKey)
               })
               .toList
@@ -728,8 +731,8 @@ trait ColumnarTableModule[M[+ _]]
       }
     }
 
-    def fromRValues(
-        values: Stream[RValue], maxSliceSize: Option[Int] = None): Table = {
+    def fromRValues(values: Stream[RValue],
+                    maxSliceSize: Option[Int] = None): Table = {
       val sliceSize = maxSliceSize.getOrElse(yggConfig.maxSliceSize)
 
       def makeSlice(data: Stream[RValue]): (Slice, Stream[RValue]) = {
@@ -759,7 +762,9 @@ trait ColumnarTableModule[M[+ _]]
         left0 <- left.sort(leftKeySpec)
         right0 <- right.sort(rightKeySpec)
         cogrouped = left0.cogroup(leftKeySpec, rightKeySpec, right0)(
-            emptySpec, emptySpec, trans.WrapArray(joinSpec))
+            emptySpec,
+            emptySpec,
+            trans.WrapArray(joinSpec))
       } yield {
         JoinOrder.KeyOrder -> cogrouped.transform(
             trans.DerefArrayStatic(Leaf(Source), CPathIndex(0)))
@@ -769,8 +774,7 @@ trait ColumnarTableModule[M[+ _]]
     def cross(left: Table, right: Table, orderHint: Option[CrossOrder] = None)(
         spec: TransSpec2): M[(CrossOrder, Table)] = {
       import CrossOrder._
-      M.point(
-          orderHint match {
+      M.point(orderHint match {
         case Some(CrossRight | CrossRightLeft) =>
           CrossRight -> right.cross(left)(TransSpec2.flip(spec))
         case _ =>
@@ -823,8 +827,8 @@ trait ColumnarTableModule[M[+ _]]
       )
     }
 
-    def compact(
-        spec: TransSpec1, definedness: Definedness = AnyDefined): Table = {
+    def compact(spec: TransSpec1,
+                definedness: Definedness = AnyDefined): Table = {
       val specTransform = SliceTransform.composeSliceTransform(spec)
       val compactTransform = {
         SliceTransform.composeSliceTransform(Leaf(Source)).zip(specTransform) {
@@ -961,8 +965,9 @@ trait ColumnarTableModule[M[+ _]]
               if (splitAt < head.size) {
                 val (prefix, suffix) = head.split(splitAt)
                 val slice = concat(prefix :: acc)
-                M.point(StreamT.Yield(slice,
-                                      StreamT(step(0, Nil, suffix :: tail))))
+                M.point(
+                    StreamT.Yield(slice,
+                                  StreamT(step(0, Nil, suffix :: tail))))
               } else {
                 val slice = concat(head :: acc)
                 M.point(StreamT.Yield(slice, StreamT(step(0, Nil, tail))))
@@ -1089,8 +1094,8 @@ trait ColumnarTableModule[M[+ _]]
                                           rightStart: Option[SlicePosition[B]],
                                           rightEnd: Option[SlicePosition[B]])
           extends NextStep[A, B]
-      case class SkipRight[A, B](
-          left: SlicePosition[A], rightEnd: SlicePosition[B])
+      case class SkipRight[A, B](left: SlicePosition[A],
+                                 rightEnd: SlicePosition[B])
           extends NextStep[A, B]
       case class RestartRight[A, B](left: SlicePosition[A],
                                     rightStart: SlicePosition[B],
@@ -1130,8 +1135,8 @@ trait ColumnarTableModule[M[+ _]]
                     rightPosition: SlicePosition[RK],
                     rightStart0: Option[SlicePosition[RK]],
                     rightEnd0: Option[SlicePosition[RK]])(
-              ibufs: IndexBuffers = new IndexBuffers(
-                  leftPosition.key.size, rightPosition.key.size))
+              ibufs: IndexBuffers = new IndexBuffers(leftPosition.key.size,
+                                                     rightPosition.key.size))
             : M[Option[(Slice, CogroupState)]] = {
 
             val SlicePosition(lSliceId, lpos0, lkstate, lkey, lhead, ltail) =
@@ -1194,20 +1199,32 @@ trait ColumnarTableModule[M[+ _]]
                                 "Inputs are not sorted; value on the left exceeded value on the right at the end of equal span. lpos = %d, rpos = %d"
                                   .format(lpos, rpos))
 
-                          case Some(SlicePosition(
-                              endSliceId, endPos, _, endSlice, _, _))
-                              if endSliceId == rSliceId =>
+                          case Some(
+                              SlicePosition(endSliceId,
+                                            endPos,
+                                            _,
+                                            endSlice,
+                                            _,
+                                            _)) if endSliceId == rSliceId =>
                             buildRemappings(lpos, endPos, None, None, endRight)
 
-                          case Some(rend @ SlicePosition(
-                              endSliceId, _, _, _, _, _)) =>
+                          case Some(
+                              rend @ SlicePosition(endSliceId,
+                                                   _,
+                                                   _,
+                                                   _,
+                                                   _,
+                                                   _)) =>
                             // Step out of buildRemappings so that we can restart with the current rightEnd
                             SkipRight(leftPosition.copy(pos = lpos), rend)
                         }
                       case EQ =>
                         ibufs.advanceBoth(lpos, rpos)
-                        buildRemappings(
-                            lpos, rpos + 1, rightStart, rightEnd, endRight)
+                        buildRemappings(lpos,
+                                        rpos + 1,
+                                        rightStart,
+                                        rightEnd,
+                                        endRight)
                     }
                   } else if (lpos < lhead.size) {
                     if (endRight) {
@@ -1277,38 +1294,38 @@ trait ColumnarTableModule[M[+ _]]
                                   SliceTransform1[RR](rr, strr.f),
                                   SliceTransform2[BR](br, stbr.f)) flatMap {
                     case (completeSlice, lr0, rr0, br0) => {
-                        rtail.uncons flatMap {
-                          case Some((nextRightHead, nextRightTail)) =>
-                            strk.f(rkstate, nextRightHead) map {
-                              case (rkstate0, rkey0) => {
-                                  val nextState =
-                                    Cogroup(lr0,
-                                            rr0,
-                                            br0,
-                                            SlicePosition(lSliceId,
-                                                          0,
-                                                          lkstate,
-                                                          lksuf,
-                                                          lsuf,
-                                                          ltail),
-                                            SlicePosition(rSliceId + 1,
-                                                          0,
-                                                          rkstate0,
-                                                          rkey0,
-                                                          nextRightHead,
-                                                          nextRightTail),
-                                            None,
-                                            None)
+                      rtail.uncons flatMap {
+                        case Some((nextRightHead, nextRightTail)) =>
+                          strk.f(rkstate, nextRightHead) map {
+                            case (rkstate0, rkey0) => {
+                              val nextState =
+                                Cogroup(lr0,
+                                        rr0,
+                                        br0,
+                                        SlicePosition(lSliceId,
+                                                      0,
+                                                      lkstate,
+                                                      lksuf,
+                                                      lsuf,
+                                                      ltail),
+                                        SlicePosition(rSliceId + 1,
+                                                      0,
+                                                      rkstate0,
+                                                      rkey0,
+                                                      nextRightHead,
+                                                      nextRightTail),
+                                        None,
+                                        None)
 
-                                  Some(completeSlice -> nextState)
-                                }
+                              Some(completeSlice -> nextState)
                             }
+                          }
 
-                          case None =>
-                            val nextState = EndLeft(lr0, lsuf, ltail)
-                            M.point(Some(completeSlice -> nextState))
-                        }
+                        case None =>
+                          val nextState = EndLeft(lr0, lsuf, ltail)
+                          M.point(Some(completeSlice -> nextState))
                       }
+                    }
                   }
 
                 case SplitRight(rpos) =>
@@ -1321,38 +1338,38 @@ trait ColumnarTableModule[M[+ _]]
                                   SliceTransform1[RR](rr, strr.f),
                                   SliceTransform2[BR](br, stbr.f)) flatMap {
                     case (completeSlice, lr0, rr0, br0) => {
-                        ltail.uncons flatMap {
-                          case Some((nextLeftHead, nextLeftTail)) =>
-                            stlk.f(lkstate, nextLeftHead) map {
-                              case (lkstate0, lkey0) => {
-                                  val nextState =
-                                    Cogroup(lr0,
-                                            rr0,
-                                            br0,
-                                            SlicePosition(lSliceId + 1,
-                                                          0,
-                                                          lkstate0,
-                                                          lkey0,
-                                                          nextLeftHead,
-                                                          nextLeftTail),
-                                            SlicePosition(rSliceId,
-                                                          0,
-                                                          rkstate,
-                                                          rksuf,
-                                                          rsuf,
-                                                          rtail),
-                                            None,
-                                            None)
+                      ltail.uncons flatMap {
+                        case Some((nextLeftHead, nextLeftTail)) =>
+                          stlk.f(lkstate, nextLeftHead) map {
+                            case (lkstate0, lkey0) => {
+                              val nextState =
+                                Cogroup(lr0,
+                                        rr0,
+                                        br0,
+                                        SlicePosition(lSliceId + 1,
+                                                      0,
+                                                      lkstate0,
+                                                      lkey0,
+                                                      nextLeftHead,
+                                                      nextLeftTail),
+                                        SlicePosition(rSliceId,
+                                                      0,
+                                                      rkstate,
+                                                      rksuf,
+                                                      rsuf,
+                                                      rtail),
+                                        None,
+                                        None)
 
-                                  Some(completeSlice -> nextState)
-                                }
+                              Some(completeSlice -> nextState)
                             }
+                          }
 
-                          case None =>
-                            val nextState = EndRight(rr0, rsuf, rtail)
-                            M.point(Some(completeSlice -> nextState))
-                        }
+                        case None =>
+                          val nextState = EndRight(rr0, rsuf, rtail)
+                          M.point(Some(completeSlice -> nextState))
                       }
+                    }
                   }
 
                 case NextCartesianLeft(left, right, rightStart, rightEnd) =>
@@ -1365,26 +1382,26 @@ trait ColumnarTableModule[M[+ _]]
                           SliceTransform1[RR](rr, strr.f),
                           SliceTransform2[BR](br, stbr.f)) flatMap {
                         case (completeSlice, lr0, rr0, br0) => {
-                            stlk.f(lkstate, nextLeftHead) map {
-                              case (lkstate0, lkey0) => {
-                                  val nextState =
-                                    Cogroup(lr0,
-                                            rr0,
-                                            br0,
-                                            SlicePosition(lSliceId + 1,
-                                                          0,
-                                                          lkstate0,
-                                                          lkey0,
-                                                          nextLeftHead,
-                                                          nextLeftTail),
-                                            right,
-                                            rightStart,
-                                            rightEnd)
+                          stlk.f(lkstate, nextLeftHead) map {
+                            case (lkstate0, lkey0) => {
+                              val nextState =
+                                Cogroup(lr0,
+                                        rr0,
+                                        br0,
+                                        SlicePosition(lSliceId + 1,
+                                                      0,
+                                                      lkstate0,
+                                                      lkey0,
+                                                      nextLeftHead,
+                                                      nextLeftTail),
+                                        right,
+                                        rightStart,
+                                        rightEnd)
 
-                                  Some(completeSlice -> nextState)
-                                }
+                              Some(completeSlice -> nextState)
                             }
                           }
+                        }
                       }
 
                     case None =>
@@ -1399,9 +1416,9 @@ trait ColumnarTableModule[M[+ _]]
                               SliceTransform1[RR](rr, strr.f),
                               SliceTransform2[BR](br, stbr.f)) map {
                             case (completeSlice, lr0, rr0, br0) => {
-                                val nextState = EndRight(rr0, rsuf, end.tail)
-                                Some(completeSlice -> nextState)
-                              }
+                              val nextState = EndRight(rr0, rsuf, end.tail)
+                              Some(completeSlice -> nextState)
+                            }
                           }
 
                         case _ =>
@@ -1427,31 +1444,35 @@ trait ColumnarTableModule[M[+ _]]
                           SliceTransform1[RR](rr, strr.f),
                           SliceTransform2[BR](br, stbr.f)) flatMap {
                         case (completeSlice, lr0, rr0, br0) => {
-                            strk.f(rkstate, nextRightHead) map {
-                              case (rkstate0, rkey0) => {
-                                  val nextState =
-                                    Cogroup(lr0,
-                                            rr0,
-                                            br0,
-                                            left,
-                                            SlicePosition(rSliceId + 1,
-                                                          0,
-                                                          rkstate0,
-                                                          rkey0,
-                                                          nextRightHead,
-                                                          nextRightTail),
-                                            rightStart,
-                                            rightEnd)
+                          strk.f(rkstate, nextRightHead) map {
+                            case (rkstate0, rkey0) => {
+                              val nextState =
+                                Cogroup(lr0,
+                                        rr0,
+                                        br0,
+                                        left,
+                                        SlicePosition(rSliceId + 1,
+                                                      0,
+                                                      rkstate0,
+                                                      rkey0,
+                                                      nextRightHead,
+                                                      nextRightTail),
+                                        rightStart,
+                                        rightEnd)
 
-                                  Some(completeSlice -> nextState)
-                                }
+                              Some(completeSlice -> nextState)
                             }
                           }
+                        }
                       }
 
                     case None =>
-                      continue(buildRemappings(
-                              left.pos, right.pos, rightStart, rightEnd, true))
+                      continue(
+                          buildRemappings(left.pos,
+                                          right.pos,
+                                          rightStart,
+                                          rightEnd,
+                                          true))
                   }
 
                 case SkipRight(left, rightEnd) =>
@@ -1464,16 +1485,16 @@ trait ColumnarTableModule[M[+ _]]
                                   SliceTransform1[RR](rr, strr.f),
                                   SliceTransform2[BR](br, stbr.f)) map {
                     case (completeSlice, lr0, rr0, br0) => {
-                        val nextState = Cogroup(lr0,
-                                                rr0,
-                                                br0,
-                                                left,
-                                                rightStart,
-                                                Some(rightStart),
-                                                Some(rightEnd))
+                      val nextState = Cogroup(lr0,
+                                              rr0,
+                                              br0,
+                                              left,
+                                              rightStart,
+                                              Some(rightStart),
+                                              Some(rightEnd))
 
-                        Some(completeSlice -> nextState)
-                      }
+                      Some(completeSlice -> nextState)
+                    }
                   }
               }
 
@@ -1485,13 +1506,14 @@ trait ColumnarTableModule[M[+ _]]
             case EndLeft(lr, data, tail) =>
               stlr.f(lr, data) flatMap {
                 case (lr0, leftResult) => {
-                    tail.uncons map { unconsed =>
-                      Some(leftResult ->
+                  tail.uncons map { unconsed =>
+                    Some(
+                        leftResult ->
                           (unconsed map {
                             case (nhead, ntail) => EndLeft(lr0, nhead, ntail)
                           } getOrElse CogroupDone))
-                    }
                   }
+                }
               }
 
             case Cogroup(lr, rr, br, left, right, rightReset, rightEnd) =>
@@ -1500,13 +1522,14 @@ trait ColumnarTableModule[M[+ _]]
             case EndRight(rr, data, tail) =>
               strr.f(rr, data) flatMap {
                 case (rr0, rightResult) => {
-                    tail.uncons map { unconsed =>
-                      Some(rightResult ->
+                  tail.uncons map { unconsed =>
+                    Some(
+                        rightResult ->
                           (unconsed map {
                             case (nhead, ntail) => EndRight(rr0, nhead, ntail)
                           } getOrElse CogroupDone))
-                    }
                   }
+                }
               }
 
             case CogroupDone => M.point(None)
@@ -1530,16 +1553,23 @@ trait ColumnarTableModule[M[+ _]]
                 pairR <- strk(rightHead)
                 (rkstate, rkey) = pairR
               } yield {
-                Cogroup(
-                    stlr.initial,
-                    strr.initial,
-                    stbr.initial,
-                    SlicePosition(
-                        SliceId(0), 0, lkstate, lkey, leftHead, leftTail),
-                    SlicePosition(
-                        SliceId(0), 0, rkstate, rkey, rightHead, rightTail),
-                    None,
-                    None)
+                Cogroup(stlr.initial,
+                        strr.initial,
+                        stbr.initial,
+                        SlicePosition(SliceId(0),
+                                      0,
+                                      lkstate,
+                                      lkey,
+                                      leftHead,
+                                      leftTail),
+                        SlicePosition(SliceId(0),
+                                      0,
+                                      rkstate,
+                                      rkey,
+                                      rightHead,
+                                      rightTail),
+                        None,
+                        None)
               }
             }
 
@@ -1598,35 +1628,35 @@ trait ColumnarTableModule[M[+ _]]
 
           val results = (0 until lhead.size by lrowsPerSlice)
             .foldLeft(M.point((a0, List.empty[Slice]))) {
-            case (accM, offset) =>
-              accM flatMap {
-                case (a, acc) =>
-                  val rows =
-                    math.min(sliceSize, (lhead.size - offset) * rhead.size)
+              case (accM, offset) =>
+                accM flatMap {
+                  case (a, acc) =>
+                    val rows =
+                      math.min(sliceSize, (lhead.size - offset) * rhead.size)
 
-                  val lslice = new Slice {
-                    val size = rows
-                    val columns = lhead.columns.lazyMapValues(Remap({ i =>
-                      offset + (i / rhead.size)
-                    })(_).get)
-                  }
+                    val lslice = new Slice {
+                      val size = rows
+                      val columns = lhead.columns.lazyMapValues(Remap({ i =>
+                        offset + (i / rhead.size)
+                      })(_).get)
+                    }
 
-                  val rslice = new Slice {
-                    val size = rows
-                    val columns =
-                      if (rhead.size == 0)
-                        rhead.columns.lazyMapValues(Empty(_).get)
-                      else
-                        rhead.columns.lazyMapValues(
-                            Remap(_ % rhead.size)(_).get)
-                  }
+                    val rslice = new Slice {
+                      val size = rows
+                      val columns =
+                        if (rhead.size == 0)
+                          rhead.columns.lazyMapValues(Empty(_).get)
+                        else
+                          rhead.columns.lazyMapValues(
+                              Remap(_ % rhead.size)(_).get)
+                    }
 
-                  transform.f(a, lslice, rslice) map {
-                    case (b, resultSlice) =>
-                      (b, resultSlice :: acc)
-                  }
-              }
-          }
+                    transform.f(a, lslice, rslice) map {
+                      case (b, resultSlice) =>
+                        (b, resultSlice :: acc)
+                    }
+                }
+            }
 
           results map {
             case (a1, slices) =>
@@ -1649,8 +1679,9 @@ trait ColumnarTableModule[M[+ _]]
 
                   transform.f(state.a, lslice, rhead) map {
                     case (a0, resultSlice) =>
-                      Some((resultSlice,
-                            CrossState(a0, state.position, rtail0)))
+                      Some(
+                          (resultSlice,
+                           CrossState(a0, state.position, rtail0)))
                   }
 
                 case None =>
@@ -1685,10 +1716,10 @@ trait ColumnarTableModule[M[+ _]]
         }
 
         // We canonicalize the tables so that no slices are too small.
-        val left = this.canonicalize(
-            yggConfig.minIdealSliceSize, Some(yggConfig.maxSliceSize))
-        val right = that.canonicalize(
-            yggConfig.minIdealSliceSize, Some(yggConfig.maxSliceSize))
+        val left = this.canonicalize(yggConfig.minIdealSliceSize,
+                                     Some(yggConfig.maxSliceSize))
+        val right = that.canonicalize(yggConfig.minIdealSliceSize,
+                                      Some(yggConfig.maxSliceSize))
 
         left.slices.uncons flatMap {
           case Some((lhead, ltail)) =>
@@ -1742,8 +1773,8 @@ trait ColumnarTableModule[M[+ _]]
         case _ => None
       }
 
-      val sizeCheck = for (resultSize <- newSizeM) yield
-        resultSize < yggConfig.maxSaneCrossSize && resultSize >= 0
+      val sizeCheck = for (resultSize <- newSizeM)
+        yield resultSize < yggConfig.maxSaneCrossSize && resultSize >= 0
 
       if (sizeCheck getOrElse true) {
         Table(StreamT(cross0(composeSliceTransform2(spec)) map { tail =>
@@ -1768,24 +1799,24 @@ trait ColumnarTableModule[M[+ _]]
               back <- {
                 head map {
                   case (s, sx) => {
-                      for {
-                        pairPrev <- id.f(state._1, s)
-                        (prevFilter, cur) = pairPrev
+                    for {
+                      pairPrev <- id.f(state._1, s)
+                      (prevFilter, cur) = pairPrev
 
-                        // TODO use an Applicative
-                        pairNext <- filter.f(state._2, s)
-                        (nextT, curFilter) = pairNext
-                      } yield {
-                        val next = cur.distinct(prevFilter, curFilter)
+                      // TODO use an Applicative
+                      pairNext <- filter.f(state._2, s)
+                      (nextT, curFilter) = pairNext
+                    } yield {
+                      val next = cur.distinct(prevFilter, curFilter)
 
-                        StreamT.Yield(next,
-                                      stream((if (next.size > 0)
-                                                Some(curFilter)
-                                              else prevFilter,
-                                              nextT),
-                                             sx))
-                      }
+                      StreamT.Yield(next,
+                                    stream((if (next.size > 0)
+                                              Some(curFilter)
+                                            else prevFilter,
+                                            nextT),
+                                           sx))
                     }
+                  }
                 } getOrElse {
                   M.point(StreamT.Done)
                 }
@@ -1805,8 +1836,8 @@ trait ColumnarTableModule[M[+ _]]
     }
 
     def takeRange(startIndex: Long, numberToTake: Long): Table = {
-      def loop(
-          stream: StreamT[M, Slice], readSoFar: Long): M[StreamT[M, Slice]] =
+      def loop(stream: StreamT[M, Slice],
+               readSoFar: Long): M[StreamT[M, Slice]] =
         stream.uncons flatMap {
           // Prior to first needed slice, so skip
           case Some((head, tail))
@@ -1819,18 +1850,18 @@ trait ColumnarTableModule[M[+ _]]
           case _ => M.point(StreamT.empty[M, Slice])
         }
 
-      def inner(
-          stream: StreamT[M, Slice],
-          takenSoFar: Long,
-          sliceStartIndex: Int): M[StreamT[M, Slice]] = stream.uncons flatMap {
-        case Some((head, tail)) if takenSoFar < numberToTake => {
-            val needed = head.takeRange(
-                sliceStartIndex, (numberToTake - takenSoFar).toInt)
+      def inner(stream: StreamT[M, Slice],
+                takenSoFar: Long,
+                sliceStartIndex: Int): M[StreamT[M, Slice]] =
+        stream.uncons flatMap {
+          case Some((head, tail)) if takenSoFar < numberToTake => {
+            val needed = head.takeRange(sliceStartIndex,
+                                        (numberToTake - takenSoFar).toInt)
             inner(tail, takenSoFar + (head.size - (sliceStartIndex)), 0)
               .map(needed :: _)
           }
-        case _ => M.point(StreamT.empty[M, Slice])
-      }
+          case _ => M.point(StreamT.empty[M, Slice])
+        }
 
       def calcNewSize(current: Long): Long =
         ((current - startIndex) max 0) min numberToTake
@@ -1890,9 +1921,10 @@ trait ColumnarTableModule[M[+ _]]
               val headComparator = comparatorGen(head)
               val spanEnd = findEnd(headComparator, 0, head.size - 1)
               if (spanEnd < head.size) {
-                M.point(Table(subSlices ++
-                              (head.take(spanEnd) :: StreamT.empty[M, Slice]),
-                              ExactSize(size + spanEnd)))
+                M.point(
+                    Table(subSlices ++
+                            (head.take(spanEnd) :: StreamT.empty[M, Slice]),
+                          ExactSize(size + spanEnd)))
               } else {
                 subTable0(tail,
                           subSlices ++ (head :: StreamT.empty[M, Slice]),
@@ -1907,24 +1939,24 @@ trait ColumnarTableModule[M[+ _]]
         subTable0(slices, StreamT.empty[M, Slice], 0)
       }
 
-      def dropAndSplit(
-          comparatorGen: Slice => (Int => Ordering),
-          slices: StreamT[M, Slice],
-          spanStart: Int): StreamT[M, Slice] = StreamT.wrapEffect {
-        slices.uncons map {
-          case Some((head, tail)) =>
-            val headComparator = comparatorGen(head)
-            val spanEnd = findEnd(headComparator, spanStart, head.size - 1)
-            if (spanEnd < head.size) {
-              stepPartition(head, spanEnd, tail)
-            } else {
-              dropAndSplit(comparatorGen, tail, 0)
-            }
+      def dropAndSplit(comparatorGen: Slice => (Int => Ordering),
+                       slices: StreamT[M, Slice],
+                       spanStart: Int): StreamT[M, Slice] =
+        StreamT.wrapEffect {
+          slices.uncons map {
+            case Some((head, tail)) =>
+              val headComparator = comparatorGen(head)
+              val spanEnd = findEnd(headComparator, spanStart, head.size - 1)
+              if (spanEnd < head.size) {
+                stepPartition(head, spanEnd, tail)
+              } else {
+                dropAndSplit(comparatorGen, tail, 0)
+              }
 
-          case None =>
-            StreamT.empty[M, Slice]
+            case None =>
+              StreamT.empty[M, Slice]
+          }
         }
-      }
 
       def stepPartition(head: Slice,
                         spanStart: Int,
@@ -2061,8 +2093,8 @@ trait ColumnarTableModule[M[+ _]]
       }
 
       // Collects all possible schemas from some slices.
-      def collectSchemas(
-          schemas: Set[JType], slices: StreamT[M, Slice]): M[Set[JType]] = {
+      def collectSchemas(schemas: Set[JType],
+                         slices: StreamT[M, Slice]): M[Set[JType]] = {
         def buildMasks(cols: Array[Column], sliceSize: Int): List[Array[Int]] = {
           import java.util.Arrays.copyOf
           val mask = RawBitSet.create(cols.length)
@@ -2173,8 +2205,8 @@ trait ColumnarTableModule[M[+ _]]
 
     private def toEvents[A](f: (Slice, RowId) => Option[A]): M[Iterable[A]] = {
       for (stream <- self.compact(Leaf(Source)).slices.toStream) yield {
-        for (slice <- stream; i <- 0 until slice.size; a <- f(slice, i)) yield
-          a
+        for (slice <- stream; i <- 0 until slice.size; a <- f(slice, i))
+          yield a
       }
     }
 

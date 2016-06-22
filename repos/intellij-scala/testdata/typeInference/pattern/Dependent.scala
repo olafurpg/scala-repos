@@ -20,7 +20,9 @@ abstract class D {
   import analyzer._
   val a: B[Int] = new B[Int]
   a match {
-    case A(r) => /*start*/ r /*end*/
+    case A(r) =>
+      /*start*/
+      r /*end*/
   }
 }
 //Int

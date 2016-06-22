@@ -40,13 +40,13 @@ object DepthTest extends SFXEnumDelegateCompanion[jfxs.DepthTest, DepthTest] {
   val DISABLE = Disabled
 
   val Enable = new DepthTest(jfxs.DepthTest.ENABLE)
-  @deprecated(
-      "Use Enable; ENABLE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Enable; ENABLE will be removed in a future release",
+              "8.0.60-R10")
   val ENABLE = Enable
 
   val Inherit = new DepthTest(jfxs.DepthTest.INHERIT)
-  @deprecated(
-      "Use Inherit; INHERIT will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Inherit; INHERIT will be removed in a future release",
+              "8.0.60-R10")
   val INHERIT = Inherit
 
   protected override def unsortedValues: Array[DepthTest] =

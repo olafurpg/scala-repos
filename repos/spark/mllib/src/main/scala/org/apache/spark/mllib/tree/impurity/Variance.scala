@@ -49,8 +49,9 @@ object Variance extends Impurity {
     */
   @Since("1.0.0")
   @DeveloperApi
-  override def calculate(
-      count: Double, sum: Double, sumSquares: Double): Double = {
+  override def calculate(count: Double,
+                         sum: Double,
+                         sumSquares: Double): Double = {
     if (count == 0) {
       return 0
     }
@@ -111,7 +112,7 @@ private[spark] class VarianceCalculator(stats: Array[Double])
   require(
       stats.length == 3,
       s"VarianceCalculator requires sufficient statistics array stats to be of length 3," +
-      s" but was given array of length ${stats.length}.")
+        s" but was given array of length ${stats.length}.")
 
   /**
     * Make a deep copy of this [[ImpurityCalculator]].

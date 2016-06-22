@@ -138,11 +138,13 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
         assert(out.getUri == in.uri)
         assert(out.isChunked == false)
         assert(out.contentString == body)
-        assert(out.version == Bijections.netty.versionToFinagle(
+        assert(
+            out.version == Bijections.netty.versionToFinagle(
                 in.protocolVersion))
         out.headerMap.foreach {
           case (k, v) =>
-            assert(in.headers.getAll(k).asScala.toSet == out.headerMap
+            assert(
+                in.headers.getAll(k).asScala.toSet == out.headerMap
                   .getAll(k)
                   .toSet)
         }
@@ -156,11 +158,13 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
         assert(out.statusCode == in.status.code)
         assert(out.isChunked == false)
         assert(out.contentString == body)
-        assert(out.version == Bijections.netty.versionToFinagle(
+        assert(
+            out.version == Bijections.netty.versionToFinagle(
                 in.protocolVersion))
         out.headerMap.foreach {
           case (k, v) =>
-            assert(in.headers.getAll(k).asScala.toSet == out.headerMap
+            assert(
+                in.headers.getAll(k).asScala.toSet == out.headerMap
                   .getAll(k)
                   .toSet)
         }
@@ -172,12 +176,14 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
       case (in: Response, body: String) =>
         val out = Bijections.finagle.responseToNetty(in)
         assert(HttpUtil.isTransferEncodingChunked(out) == false)
-        assert(out.protocolVersion == Bijections.finagle.versionToNetty(
+        assert(
+            out.protocolVersion == Bijections.finagle.versionToNetty(
                 in.version))
         assert(out.content.toString(UTF_8) == body)
         in.headerMap.foreach {
           case (k, v) =>
-            assert(out.headers.getAll(k).asScala.toSet == in.headerMap
+            assert(
+                out.headers.getAll(k).asScala.toSet == in.headerMap
                   .getAll(k)
                   .toSet)
         }
@@ -189,14 +195,16 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
       case (in: Request, body: String) =>
         val out = Bijections.finagle.requestToNetty(in)
         assert(HttpUtil.isTransferEncodingChunked(out) == false)
-        assert(out.protocolVersion == Bijections.finagle.versionToNetty(
+        assert(
+            out.protocolVersion == Bijections.finagle.versionToNetty(
                 in.version))
         assert(out.method == Bijections.finagle.methodToNetty(in.method))
         assert(out.uri == in.getUri)
         assert(out.content.toString(UTF_8) == body)
         in.headerMap.foreach {
           case (k, v) =>
-            assert(out.headers.getAll(k).asScala.toSet == in.headerMap
+            assert(
+                out.headers.getAll(k).asScala.toSet == in.headerMap
                   .getAll(k)
                   .toSet)
         }

@@ -75,8 +75,8 @@ private[akka] object NettySSLSupport {
     if (isClient) initializeClientSSL(settings, log)
     else initializeServerSSL(settings, log)
 
-  def initializeCustomSecureRandom(
-      rngName: Option[String], log: LoggingAdapter): SecureRandom = {
+  def initializeCustomSecureRandom(rngName: Option[String],
+                                   log: LoggingAdapter): SecureRandom = {
     val rng = rngName match {
       case Some(r @ ("AES128CounterSecureRNG" | "AES256CounterSecureRNG")) ⇒
         log.debug("SSL random number generator set to: {}", r)
@@ -84,7 +84,7 @@ private[akka] object NettySSLSupport {
       case Some(r @ ("AES128CounterInetRNG" | "AES256CounterInetRNG")) ⇒
         log.warning(
             "SSL random number generator {} is deprecated, " +
-            "use AES128CounterSecureRNG or AES256CounterSecureRNG instead",
+              "use AES128CounterSecureRNG or AES256CounterSecureRNG instead",
             r)
         SecureRandom.getInstance(r, AkkaProvider)
       case Some(s @ ("SHA1PRNG" | "NativePRNG")) ⇒
@@ -106,8 +106,8 @@ private[akka] object NettySSLSupport {
     rng
   }
 
-  def initializeClientSSL(
-      settings: SSLSettings, log: LoggingAdapter): SslHandler = {
+  def initializeClientSSL(settings: SSLSettings,
+                          log: LoggingAdapter): SslHandler = {
     log.debug("Client SSL is enabled, initialising ...")
 
     def constructClientContext(settings: SSLSettings,
@@ -116,15 +116,16 @@ private[akka] object NettySSLSupport {
                                trustStorePassword: String,
                                protocol: String): Option[SSLContext] =
       try {
-        val rng = initializeCustomSecureRandom(
-            settings.SSLRandomNumberGenerator, log)
+        val rng =
+          initializeCustomSecureRandom(settings.SSLRandomNumberGenerator, log)
         val trustManagers: Array[TrustManager] = {
           val trustManagerFactory = TrustManagerFactory.getInstance(
               TrustManagerFactory.getDefaultAlgorithm)
           trustManagerFactory.init({
             val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
             val fin = new FileInputStream(trustStorePath)
-            try trustStore.load(fin, trustStorePassword.toCharArray) finally Try(
+            try trustStore
+              .load(fin, trustStorePassword.toCharArray) finally Try(
                 fin.close())
             trustStore
           })
@@ -141,7 +142,7 @@ private[akka] object NettySSLSupport {
         case e: IOException ⇒
           throw new RemoteTransportException(
               "Client SSL connection could not be established because: " +
-              e.getMessage,
+                e.getMessage,
               e)
         case e: GeneralSecurityException ⇒
           throw new RemoteTransportException(
@@ -178,8 +179,8 @@ private[akka] object NettySSLSupport {
     }
   }
 
-  def initializeServerSSL(
-      settings: SSLSettings, log: LoggingAdapter): SslHandler = {
+  def initializeServerSSL(settings: SSLSettings,
+                          log: LoggingAdapter): SslHandler = {
     log.debug("Server SSL is enabled, initialising ...")
 
     def constructServerContext(settings: SSLSettings,
@@ -189,8 +190,8 @@ private[akka] object NettySSLSupport {
                                keyPassword: String,
                                protocol: String): Option[SSLContext] =
       try {
-        val rng = initializeCustomSecureRandom(
-            settings.SSLRandomNumberGenerator, log)
+        val rng =
+          initializeCustomSecureRandom(settings.SSLRandomNumberGenerator, log)
         val factory =
           KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
         factory.init({
@@ -225,7 +226,7 @@ private[akka] object NettySSLSupport {
         case e: IOException ⇒
           throw new RemoteTransportException(
               "Server SSL connection could not be established because: " +
-              e.getMessage,
+                e.getMessage,
               e)
         case e: GeneralSecurityException ⇒
           throw new RemoteTransportException(
@@ -241,8 +242,12 @@ private[akka] object NettySSLSupport {
             Some(storePassword),
             Some(keyPassword),
             Some(protocol)) ⇒
-        constructServerContext(
-            settings, log, keyStore, storePassword, keyPassword, protocol)
+        constructServerContext(settings,
+                               log,
+                               keyStore,
+                               storePassword,
+                               keyPassword,
+                               protocol)
       case (keyStore, storePassword, keyPassword, protocol) ⇒
         throw new GeneralSecurityException(
             s"SSL key store settings went missing. [key-store: $keyStore] [key-store-password: $storePassword] [key-password: $keyPassword] [protocol: $protocol]")

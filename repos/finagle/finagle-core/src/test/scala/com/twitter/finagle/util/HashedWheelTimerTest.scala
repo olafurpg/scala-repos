@@ -37,7 +37,8 @@ class HashedWheelTimerTest extends FunSuite with MockitoSugar {
     val taskCaptor = ArgumentCaptor.forClass(classOf[nu.TimerTask])
     val firstTimeout = mock[nu.Timeout]
     when(firstTimeout.isCancelled) thenReturn false
-    when(timer.newTimeout(
+    when(
+        timer.newTimeout(
             taskCaptor.capture(),
             any[Long],
             any[java.util.concurrent.TimeUnit])) thenReturn firstTimeout

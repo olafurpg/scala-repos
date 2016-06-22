@@ -21,12 +21,9 @@ import scala.collection.immutable.NumericRange
   *  @since 2.7
   */
 object BigDecimal {
-  private final val maximumHashScale =
-    4934 // Quit maintaining hash identity with BigInt beyond this scale
-  private final val hashCodeNotComputed =
-    0x5D50690F // Magic value (happens to be "BigDecimal" old MurmurHash3 value)
-  private final val deci2binary =
-    3.3219280948873626 // Ratio of log(10) to log(2)
+  private final val maximumHashScale = 4934 // Quit maintaining hash identity with BigInt beyond this scale
+  private final val hashCodeNotComputed = 0x5D50690F // Magic value (happens to be "BigDecimal" old MurmurHash3 value)
+  private final val deci2binary = 3.3219280948873626 // Ratio of log(10) to log(2)
   private val minCached = -512
   private val maxCached = 512
   val defaultMathContext = MathContext.DECIMAL128
@@ -470,7 +467,7 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     case that: BigDecimal => this equals that
     case that: BigInt =>
       that.bitLength > (precision - scale - 2) * BigDecimal.deci2binary &&
-      this.toBigIntExact.exists(that equals _)
+        this.toBigIntExact.exists(that equals _)
     case that: Double =>
       !that.isInfinity && {
         val d = toDouble

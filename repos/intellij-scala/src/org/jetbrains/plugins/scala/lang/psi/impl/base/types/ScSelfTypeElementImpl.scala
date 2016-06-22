@@ -46,8 +46,9 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
         for {
           templateType <- parent.getType(ctx)
           selfType <- ste.getType(ctx)
-          ct = ScCompoundType(
-              Seq(templateType, selfType), Map.empty, Map.empty)
+          ct = ScCompoundType(Seq(templateType, selfType),
+                              Map.empty,
+                              Map.empty)
         } yield ct
       case None => parent.getType(ctx)
     }
@@ -56,12 +57,14 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
   def typeElement: Option[ScTypeElement] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScSelfTypeElementStub].getTypeElementText match {
+      return stub
+        .asInstanceOf[ScSelfTypeElementStub]
+        .getTypeElementText match {
         case "" => None
         case text =>
           Some(
-              ScalaPsiElementFactory.createTypeElementFromText(
-                  text, this, this))
+              ScalaPsiElementFactory
+                .createTypeElementFromText(text, this, this))
       }
     }
     findChild(classOf[ScTypeElement])

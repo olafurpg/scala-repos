@@ -44,7 +44,10 @@ class TaskTrackerImplTest
   before {
     state = spy(new InMemoryStore)
     val taskTrackerModule = MarathonTestHelper.createTaskTrackerModule(
-        AlwaysElectedLeadershipModule(shutdownHooks), state, config, metrics)
+        AlwaysElectedLeadershipModule(shutdownHooks),
+        state,
+        config,
+        metrics)
     taskTracker = taskTrackerModule.taskTracker
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskUpdater = taskTrackerModule.taskUpdater
@@ -108,8 +111,12 @@ class TaskTrackerImplTest
         TEST_APP_NAME / "a")
     testAppTasks.appTasksMap(TEST_APP_NAME / "b").appId should equal(
         TEST_APP_NAME / "b")
-    testAppTasks.appTasksMap(TEST_APP_NAME / "a").marathonTasks should have size 1
-    testAppTasks.appTasksMap(TEST_APP_NAME / "b").marathonTasks should have size 2
+    testAppTasks
+      .appTasksMap(TEST_APP_NAME / "a")
+      .marathonTasks should have size 1
+    testAppTasks
+      .appTasksMap(TEST_APP_NAME / "b")
+      .marathonTasks should have size 2
     testAppTasks.appTasksMap(TEST_APP_NAME / "a").taskMap.keySet should equal(
         Set(task1.taskId))
     testAppTasks.appTasksMap(TEST_APP_NAME / "b").taskMap.keySet should equal(
@@ -521,9 +528,10 @@ class TaskTrackerImplTest
   }
 
   def containsTask(tasks: Iterable[Task], task: Task) =
-    tasks.exists(t =>
+    tasks.exists(
+        t =>
           t.taskId == task.taskId && t.agentInfo.host == task.agentInfo.host &&
-          t.launched.map(_.networking) == task.launched.map(_.networking))
+            t.launched.map(_.networking) == task.launched.map(_.networking))
   def shouldContainTask(tasks: Iterable[Task], task: Task) =
     assert(containsTask(tasks, task), s"Should contain ${task.taskId}")
   def shouldNotContainTask(tasks: Iterable[Task], task: Task) =

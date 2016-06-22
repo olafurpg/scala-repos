@@ -77,8 +77,7 @@ trait ListInstances extends ListInstances0 {
 
     override def traverseS[S, A, B](l: List[A])(
         f: A => State[S, B]): State[S, List[B]] = {
-      State(
-          (s: S) => {
+      State((s: S) => {
         val buf = new collection.mutable.ListBuffer[B]
         var cur = s
         l.foreach { a =>
@@ -268,7 +267,8 @@ trait ListFunctions {
       p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil => Monad[M].point(Nil, Nil)
     case h :: t =>
-      Monad[M].bind(p(h))(b =>
+      Monad[M].bind(p(h))(
+          b =>
             if (b)
               Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) =>
                     (h :: k._1, k._2))
@@ -320,8 +320,8 @@ trait ListFunctions {
     go(as, Nil)
   }
 
-  private[this] def mapAccum[A, B, C](as: List[A])(
-      c: C, f: (C, A) => (C, B)): (C, List[B]) =
+  private[this] def mapAccum[A, B, C](
+      as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
     as.foldLeft((c, Nil: List[B])) {
       case ((c, bs), a) =>
         val (c0, b) = f(c, a)
@@ -330,16 +330,16 @@ trait ListFunctions {
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
-  final def mapAccumLeft[A, B, C](as: List[A])(
-      c: C, f: (C, A) => (C, B)): (C, List[B]) = {
+  final def mapAccumLeft[A, B, C](
+      as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = {
     val (c0, list) = mapAccum(as)(c, f)
     (c0, list.reverse)
   }
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
-  final def mapAccumRight[A, B, C](as: List[A])(
-      c: C, f: (C, A) => (C, B)): (C, List[B]) =
+  final def mapAccumRight[A, B, C](
+      as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
     mapAccum(as.reverse)(c, f)
 
   /** `[as, as.tail, as.tail.tail, ..., Nil]` */

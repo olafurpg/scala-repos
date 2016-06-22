@@ -52,10 +52,10 @@ trait JavaPlatform extends Platform {
 
   lazy val externalEquals = getDecl(BoxesRunTimeClass, nme.equals_)
   lazy val externalEqualsNumNum = getDecl(BoxesRunTimeClass, nme.equalsNumNum)
-  lazy val externalEqualsNumChar = getDecl(
-      BoxesRunTimeClass, nme.equalsNumChar)
-  lazy val externalEqualsNumObject = getDecl(
-      BoxesRunTimeClass, nme.equalsNumObject)
+  lazy val externalEqualsNumChar =
+    getDecl(BoxesRunTimeClass, nme.equalsNumChar)
+  lazy val externalEqualsNumObject =
+    getDecl(BoxesRunTimeClass, nme.equalsNumObject)
 
   /** We could get away with excluding BoxedBooleanClass for the
     *  purpose of equality testing since it need not compare equal

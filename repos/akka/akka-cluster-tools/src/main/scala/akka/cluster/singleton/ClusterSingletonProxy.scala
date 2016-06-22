@@ -96,14 +96,16 @@ final class ClusterSingletonProxySettings(
   def withBufferSize(bufferSize: Int): ClusterSingletonProxySettings =
     copy(bufferSize = bufferSize)
 
-  private def copy(singletonName: String = singletonName,
-                   role: Option[String] = role,
-                   singletonIdentificationInterval: FiniteDuration =
-                     singletonIdentificationInterval,
-                   bufferSize: Int =
-                     bufferSize): ClusterSingletonProxySettings =
-    new ClusterSingletonProxySettings(
-        singletonName, role, singletonIdentificationInterval, bufferSize)
+  private def copy(
+      singletonName: String = singletonName,
+      role: Option[String] = role,
+      singletonIdentificationInterval: FiniteDuration =
+        singletonIdentificationInterval,
+      bufferSize: Int = bufferSize): ClusterSingletonProxySettings =
+    new ClusterSingletonProxySettings(singletonName,
+                                      role,
+                                      singletonIdentificationInterval,
+                                      bufferSize)
 }
 
 object ClusterSingletonProxy {
@@ -141,8 +143,8 @@ object ClusterSingletonProxy {
   * Note that this is a best effort implementation: messages can always be lost due to the distributed nature of the
   * actors involved.
   */
-final class ClusterSingletonProxy(
-    singletonManagerPath: String, settings: ClusterSingletonProxySettings)
+final class ClusterSingletonProxy(singletonManagerPath: String,
+                                  settings: ClusterSingletonProxySettings)
     extends Actor
     with ActorLogging {
   import settings._
@@ -248,7 +250,7 @@ final class ClusterSingletonProxy(
     case MemberUp(m) ⇒ add(m)
     case mEvent: MemberEvent
         if mEvent.isInstanceOf[MemberExited] ||
-        mEvent.isInstanceOf[MemberRemoved] ⇒
+          mEvent.isInstanceOf[MemberRemoved] ⇒
       remove(mEvent.member)
     case _: MemberEvent ⇒ // do nothing
 

@@ -15,9 +15,9 @@ object Util extends Build {
   val zkGroupVersion = "0.0.90"
   val zkDependency =
     "org.apache.zookeeper" % "zookeeper" % zkVersion excludeAll
-    (ExclusionRule("com.sun.jdmk", "jmxtools"),
-        ExclusionRule("com.sun.jmx", "jmxri"),
-        ExclusionRule("javax.jms", "jms"))
+      (ExclusionRule("com.sun.jdmk", "jmxtools"),
+          ExclusionRule("com.sun.jmx", "jmxri"),
+          ExclusionRule("javax.jms", "jms"))
 
   val parserCombinators = scalaVersion { sv =>
     CrossVersion.partialVersion(sv) match {
@@ -58,9 +58,9 @@ object Util extends Build {
       resolvers += "twitter repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
         (CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, 10)) => false
-            case _ => true
-          }),
+              case Some((2, 10)) => false
+              case _ => true
+            }),
       scalacOptions := scalacOptionsVersion(scalaVersion.value),
       // Note: Use -Xlint rather than -Xlint:unchecked when TestThriftStructure
       // warnings are resolved
@@ -117,11 +117,11 @@ object Util extends Build {
         settings =
           Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings
     ) aggregate
-    (utilFunction, utilRegistry, utilCore, utilCodec, utilCollection,
-        utilCache, utilReflect, utilLint, utilLogging, utilTest, utilThrift,
-        utilHashing, utilJvm, utilZk, utilZkCommon, utilZkTest,
-        utilClassPreloader, utilBenchmark, utilApp, utilEvents, utilStats,
-        utilEval)
+      (utilFunction, utilRegistry, utilCore, utilCodec, utilCollection,
+          utilCache, utilReflect, utilLint, utilLogging, utilTest, utilThrift,
+          utilHashing, utilJvm, utilZk, utilZkCommon, utilZkTest,
+          utilClassPreloader, utilBenchmark, utilApp, utilEvents, utilStats,
+          utilEval)
 
   lazy val utilApp = Project(
       id = "util-app",
@@ -209,15 +209,16 @@ object Util extends Build {
         libraryDependencies <++= parserCombinators,
         resourceGenerators in Compile <+=
           (resourceManaged in Compile, name, version) map { (dir, name, ver) =>
-          val file = dir / "com" / "twitter" / name / "build.properties"
-          val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
-          val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
-            .format(new java.util.Date)
-          val contents =
-            s"name=$name\nversion=$ver\nbuild_revision=$buildRev\nbuild_name=$buildName"
-          IO.write(file, contents)
-          Seq(file)
-        }
+            val file = dir / "com" / "twitter" / name / "build.properties"
+            val buildRev =
+              Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
+            val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
+              .format(new java.util.Date)
+            val contents =
+              s"name=$name\nversion=$ver\nbuild_revision=$buildRev\nbuild_name=$buildName"
+            IO.write(file, contents)
+            Seq(file)
+          }
     )
     .dependsOn(utilFunction)
 

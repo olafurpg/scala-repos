@@ -39,8 +39,8 @@ object FourLetterWords {
       outstream.flush
     } catch {
       case e: SocketTimeoutException => {
-          throw new IOException("Exception while sending 4lw")
-        }
+        throw new IOException("Exception while sending 4lw")
+      }
     } finally {
       sock.close
       if (reader != null) reader.close
@@ -79,9 +79,9 @@ trait ZooKeeperTestHarness extends JUnitSuite with Logging {
         FourLetterWords.sendStat("127.0.0.1", zkPort, 3000)
       } catch {
         case _: Throwable => {
-            info("Server is down")
-            isDown = true
-          }
+          info("Server is down")
+          isDown = true
+        }
       }
     }
     Configuration.setConfiguration(null)

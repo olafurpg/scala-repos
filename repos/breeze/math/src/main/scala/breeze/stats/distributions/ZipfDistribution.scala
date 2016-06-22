@@ -20,6 +20,6 @@ import org.apache.commons.math3.distribution.{ZipfDistribution => ApacheZipfDist
 
 class ZipfDistribution(numberOfElements: Int, exponent: Double)
     extends ApacheDiscreteDistribution {
-  protected final val inner = new ApacheZipfDistribution(
-      numberOfElements, exponent)
+  protected final val inner =
+    new ApacheZipfDistribution(numberOfElements, exponent)
 }

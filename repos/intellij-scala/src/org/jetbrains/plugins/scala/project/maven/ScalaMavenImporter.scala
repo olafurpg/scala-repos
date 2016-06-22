@@ -27,16 +27,22 @@ import scala.collection.JavaConversions._
   */
 class ScalaMavenImporter
     extends MavenImporter("org.scala-tools", "maven-scala-plugin") {
-  override def collectSourceFolders(
-      mavenProject: MavenProject, result: java.util.List[String]) {
-    collectSourceOrTestFolders(
-        mavenProject, "add-source", "sourceDir", "src/main/scala", result)
+  override def collectSourceFolders(mavenProject: MavenProject,
+                                    result: java.util.List[String]) {
+    collectSourceOrTestFolders(mavenProject,
+                               "add-source",
+                               "sourceDir",
+                               "src/main/scala",
+                               result)
   }
 
-  override def collectTestFolders(
-      mavenProject: MavenProject, result: java.util.List[String]) {
-    collectSourceOrTestFolders(
-        mavenProject, "add-source", "testSourceDir", "src/test/scala", result)
+  override def collectTestFolders(mavenProject: MavenProject,
+                                  result: java.util.List[String]) {
+    collectSourceOrTestFolders(mavenProject,
+                               "add-source",
+                               "testSourceDir",
+                               "src/test/scala",
+                               result)
   }
 
   private def collectSourceOrTestFolders(mavenProject: MavenProject,
@@ -86,7 +92,7 @@ class ScalaMavenImporter
         .find(_.scalaVersion == Some(compilerVersion))
         .getOrElse(throw new ExternalSystemException(
                 "Cannot find project Scala library " + compilerVersion.number +
-                " for module " + module.getName))
+                  " for module " + module.getName))
 
       if (!scalaLibrary.isScalaSdk) {
         val languageLevel =
@@ -139,7 +145,8 @@ class ScalaMavenImporter
 private object ScalaMavenImporter {
   implicit class RichMavenProject(val project: MavenProject) extends AnyVal {
     def localPathTo(id: MavenId) =
-      project.getLocalRepository / id.getGroupId.replaceAll("\\.", "/") / id.getArtifactId / id.getVersion / "%s-%s.jar"
+      project.getLocalRepository / id.getGroupId
+        .replaceAll("\\.", "/") / id.getArtifactId / id.getVersion / "%s-%s.jar"
         .format(id.getArtifactId, id.getVersion)
   }
 
@@ -166,7 +173,8 @@ private class ScalaConfiguration(project: MavenProject) {
       .findPlugin("org.scala-tools", "maven-scala-plugin")
       .toOption
       .filter(!_.isDefault)
-      .orElse(project
+      .orElse(
+          project
             .findPlugin("net.alchim31.maven", "scala-maven-plugin")
             .toOption
             .filter(!_.isDefault))

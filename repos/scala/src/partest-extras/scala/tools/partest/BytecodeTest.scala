@@ -120,8 +120,8 @@ abstract class BytecodeTest {
     classNode.methods.asScala.find(_.name == name) getOrElse sys.error(
         s"Didn't find method '$name' in class '${classNode.name}'")
 
-  protected def loadClassNode(
-      name: String, skipDebugInfo: Boolean = true): ClassNode = {
+  protected def loadClassNode(name: String,
+                              skipDebugInfo: Boolean = true): ClassNode = {
     val classBytes: InputStream = classpath
       .findClassFile(name)
       .map(_.input)

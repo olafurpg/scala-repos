@@ -44,7 +44,8 @@ trait FunSuiteFileStructureViewTest extends ScalaTestTestCase {
 
   def testFunSuiteIgnoredAndPending(): Unit = {
     addFunSuiteViewTest()
-    runFileStructureViewTest(
-        className, ignoredStatusId, "ignore(\"pending and ignore\")")
+    runFileStructureViewTest(className,
+                             ignoredStatusId,
+                             "ignore(\"pending and ignore\")")
   }
 }

@@ -120,7 +120,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     // over topics. Compare it against nonEmptyTinyCorpus instead of tinyCorpus
     val nonEmptyTinyCorpus = getNonEmptyDoc(tinyCorpus)
     assert(topicDistributions.length === nonEmptyTinyCorpus.length)
-    assert(nonEmptyTinyCorpus.map(_._1).toSet === topicDistributions
+    assert(
+        nonEmptyTinyCorpus.map(_._1).toSet === topicDistributions
           .map(_._1)
           .toSet)
     //  Ensure we have proper distributions
@@ -267,7 +268,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     // override lambda to simulate an intermediate state
     //    [[ 1.1  1.2  1.3  0.9  0.8  0.7]
     //     [ 0.9  0.8  0.7  1.1  1.2  1.3]]
-    op.setLambda(new BDM[Double](
+    op.setLambda(
+        new BDM[Double](
             k,
             vocabSize,
             Array(1.1, 0.9, 1.2, 0.8, 1.3, 0.7, 0.9, 1.1, 0.8, 1.2, 0.7, 1.3)))
@@ -422,7 +424,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     expectedPredictions.zip(topTopics).foreach {
       case (expected, actual) =>
         assert(expected._1 === actual._1 &&
-            (expected._2 ~== actual._2 relTol 1E-3D))
+              (expected._2 ~== actual._2 relTol 1E-3D))
     }
 
     docs
@@ -519,7 +521,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       > [ 0.42582646  0.43511073]
      */
 
-    assert(ldaModel.docConcentration ~==
+    assert(
+        ldaModel.docConcentration ~==
           Vectors.dense(0.42582646, 0.43511073) absTol 0.05)
   }
 
@@ -579,7 +582,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
 
       val graph = distributedModel.graph
       val sameGraph = sameDistributedModel.graph
-      assert(graph.vertices.sortByKey().collect() === sameGraph.vertices
+      assert(
+          graph.vertices.sortByKey().collect() === sameGraph.vertices
             .sortByKey()
             .collect())
       val edge = graph.edges.map {
@@ -715,7 +719,10 @@ private[clustering] object LDASuite {
                                                 1.94615165,
                                                 1.95204124))
     val ldaModel: LocalLDAModel = new LocalLDAModel(
-        topics, Vectors.dense(Array.fill(k)(alpha)), eta, gammaShape)
+        topics,
+        Vectors.dense(Array.fill(k)(alpha)),
+        eta,
+        gammaShape)
     ldaModel
   }
 }

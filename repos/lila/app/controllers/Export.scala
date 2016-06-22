@@ -24,7 +24,7 @@ object Export extends LilaController {
               initialFen <- GameRepo initialFen game
               pgn = Env.api.pgnDump(game, initialFen)
               analysis ← !get("as").contains("raw") ??
-                        (Env.analyse.analyser get game.id)
+                          (Env.analyse.analyser get game.id)
             } yield
               Env.analyse
                 .annotator(pgn,
@@ -37,8 +37,8 @@ object Export extends LilaController {
         }) map { content =>
           Ok(content).withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                                   CONTENT_DISPOSITION ->
-                                  ("attachment; filename=" +
-                                      (Env.api.pgnDump filename game)))
+                                    ("attachment; filename=" +
+                                          (Env.api.pgnDump filename game)))
         }
       }
     }

@@ -28,16 +28,18 @@ class ScalaChangeUtilSupport extends TreeCopyHandler {
         case ScalaElementTypes.REFERENCE |
             ScalaElementTypes.REFERENCE_EXPRESSION |
             ScalaElementTypes.TYPE_PROJECTION => {
-            val res = original.getPsi.asInstanceOf[ScReferenceElement].bind
-            res match {
-              case Some(resolveResult @ ScalaResolveResult(
-                  elem: PsiNamedElement, subst: ScSubstitutor)) => {
-                  element.putCopyableUserData(
-                      ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY, elem)
-                }
-              case _ =>
+          val res = original.getPsi.asInstanceOf[ScReferenceElement].bind
+          res match {
+            case Some(
+                resolveResult @ ScalaResolveResult(elem: PsiNamedElement,
+                                                   subst: ScSubstitutor)) => {
+              element.putCopyableUserData(
+                  ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY,
+                  elem)
             }
+            case _ =>
           }
+        }
         case _ =>
       }
     }
@@ -57,7 +59,8 @@ class ScalaChangeUtilSupport extends TreeCopyHandler {
             ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY)
         if (named != null) {
           element.putCopyableUserData(
-              ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY, null)
+              ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY,
+              null)
           val res = ref.resolve
           if (!element.getManager.areElementsEquivalent(res, named)) {
             try {

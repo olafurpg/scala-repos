@@ -179,7 +179,8 @@ object JsonTransSpec extends Specification {
       val json = Json.obj("somekey1" -> 11, "somekey2" -> 22)
       val jsonTransform =
         ((__ \ "key1" \ "sk1").json.copyFrom((__ \ "somekey1").json.pick) and
-            (__ \ "key1" \ "sk2").json.copyFrom((__ \ "somekey2").json.pick)).reduce
+              (__ \ "key1" \ "sk2").json
+                .copyFrom((__ \ "somekey2").json.pick)).reduce
 
       json.validate(jsonTransform).get must beEqualTo(
           Json.obj("key1" -> Json.obj("sk1" -> 11, "sk2" -> 22))
@@ -195,7 +196,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-          ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
+        ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
       }
 
       "when the reader is the wrong type" in {
@@ -206,7 +207,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-          ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
+        ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
       }
     }
   }

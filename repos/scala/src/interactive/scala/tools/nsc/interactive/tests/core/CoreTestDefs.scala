@@ -28,7 +28,7 @@ private[tests] trait CoreTestDefs
           compiler ask { () =>
             val filtered = members.filterNot(member =>
                   (member.sym.name string_== "getClass") ||
-                  member.sym.isConstructor)
+                    member.sym.isConstructor)
             reporter println
             (filtered.map(_.forceInfoString).sorted mkString "\n")
           }
@@ -100,8 +100,9 @@ private[tests] trait CoreTestDefs
         if (tree.symbol == compiler.NoSymbol || tree.symbol == null) {
           reporter.println("\nNo symbol is associated with tree: " + tree)
         } else {
-          reporter.println("\naskHyperlinkPos for `" + tree.symbol.name +
-              "` at " + format(pos) + " " + pos.source.file.name)
+          reporter.println(
+              "\naskHyperlinkPos for `" + tree.symbol.name +
+                "` at " + format(pos) + " " + pos.source.file.name)
           val r = new Response[Position]
           // `tree.symbol.sourceFile` was discovered to be null when testing using virtpatmat on the akka presentation test, where a position had shifted to point to `Int`
           // askHyperlinkPos for `Int` at (73,19) pi.scala --> class Int in package scala has null sourceFile!
@@ -120,9 +121,10 @@ private[tests] trait CoreTestDefs
                   val resolvedPos =
                     if (tree.symbol.pos.isDefined) tree.symbol.pos else pos
                   withResponseDelimiter {
-                    reporter.println("[response] found askHyperlinkPos for `" +
-                        tree.symbol.name + "` at " + format(resolvedPos) +
-                        " " + tree.symbol.sourceFile.name)
+                    reporter.println(
+                        "[response] found askHyperlinkPos for `" +
+                          tree.symbol.name + "` at " + format(resolvedPos) +
+                          " " + tree.symbol.sourceFile.name)
                   }
                 case Right(ex) =>
                   ex.printStackTrace()
@@ -130,7 +132,7 @@ private[tests] trait CoreTestDefs
             case None =>
               reporter.println(
                   "[error] could not locate sourcefile `" + treeName + "`." +
-                  "Hint: Does the looked up definition come form a binary?")
+                    "Hint: Does the looked up definition come form a binary?")
           }
         }
       }

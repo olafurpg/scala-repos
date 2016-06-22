@@ -26,8 +26,8 @@ private[akka] object BalancingRoutingLogic {
   */
 @SerialVersionUID(1L)
 private[akka] final class BalancingRoutingLogic extends RoutingLogic {
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else routees.head
 }
@@ -103,8 +103,8 @@ final case class BalancingPool(
   /**
     * INTERNAL API
     */
-  override private[akka] def newRoutee(
-      routeeProps: Props, context: ActorContext): Routee = {
+  override private[akka] def newRoutee(routeeProps: Props,
+                                       context: ActorContext): Routee = {
 
     val rawDeployPath =
       context.self.path.elements.drop(1).mkString("/", "/", "")
@@ -131,8 +131,8 @@ final case class BalancingPool(
 
       dispatchers.registerConfigurator(
           dispatcherId,
-          new BalancingDispatcherConfigurator(
-              dispatcherConfig, dispatchers.prerequisites))
+          new BalancingDispatcherConfigurator(dispatcherConfig,
+                                              dispatchers.prerequisites))
     }
 
     val routeePropsWithDispatcher = routeeProps.withDispatcher(dispatcherId)

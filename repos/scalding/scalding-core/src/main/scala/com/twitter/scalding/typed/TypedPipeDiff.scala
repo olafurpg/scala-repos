@@ -27,10 +27,10 @@ object TypedPipeDiff {
     * Requires that T have an ordering and a hashCode and equals that is stable across JVMs (not reference based).
     * See diffArrayPipes for diffing pipes of arrays, since arrays do not meet these requirements by default.
     */
-  def diff[T: Ordering](left: TypedPipe[T],
-                        right: TypedPipe[T],
-                        reducers: Option[Int] =
-                          None): UnsortedGrouped[T, (Long, Long)] = {
+  def diff[T: Ordering](
+      left: TypedPipe[T],
+      right: TypedPipe[T],
+      reducers: Option[Int] = None): UnsortedGrouped[T, (Long, Long)] = {
     val lefts = left.map { x =>
       (x, (1L, 0L))
     }
@@ -85,8 +85,9 @@ object TypedPipeDiff {
     * or maybe x => x.timestamp, if x's hashCode is not stable, assuming there's shouldn't be too
     * many records with the same timestamp.
     */
-  def diffByGroup[T, K: Ordering](
-      left: TypedPipe[T], right: TypedPipe[T], reducers: Option[Int] = None)(
+  def diffByGroup[T, K: Ordering](left: TypedPipe[T],
+                                  right: TypedPipe[T],
+                                  reducers: Option[Int] = None)(
       groupByFn: T => K): TypedPipe[(T, (Long, Long))] = {
 
     val lefts = left.map { t =>
@@ -110,10 +111,10 @@ object TypedPipeDiff {
     *
     * This method does an exact diff, it does not use the hashCode as a proxy for equality.
     */
-  def diffByHashCode[T](left: TypedPipe[T],
-                        right: TypedPipe[T],
-                        reducers: Option[Int] =
-                          None): TypedPipe[(T, (Long, Long))] =
+  def diffByHashCode[T](
+      left: TypedPipe[T],
+      right: TypedPipe[T],
+      reducers: Option[Int] = None): TypedPipe[(T, (Long, Long))] =
     diffByGroup(left, right, reducers)(_.hashCode)
 
   object Enrichments {
@@ -124,21 +125,21 @@ object TypedPipeDiff {
           implicit ev: Ordering[T]): UnsortedGrouped[T, (Long, Long)] =
         TypedPipeDiff.diff(left, right, reducers)
 
-      def diffByGroup[K: Ordering](
-          right: TypedPipe[T], reducers: Option[Int] = None)(
+      def diffByGroup[K: Ordering](right: TypedPipe[T],
+                                   reducers: Option[Int] = None)(
           groupByFn: T => K): TypedPipe[(T, (Long, Long))] =
         TypedPipeDiff.diffByGroup(left, right, reducers)(groupByFn)
 
-      def diffByHashCode(right: TypedPipe[T],
-                         reducers: Option[Int] =
-                           None): TypedPipe[(T, (Long, Long))] =
+      def diffByHashCode(
+          right: TypedPipe[T],
+          reducers: Option[Int] = None): TypedPipe[(T, (Long, Long))] =
         TypedPipeDiff.diffByHashCode(left, right, reducers)
     }
 
     implicit class DiffArray[T](val left: TypedPipe[Array[T]]) extends AnyVal {
 
-      def diffArrayPipes(
-          right: TypedPipe[Array[T]], reducers: Option[Int] = None)(
+      def diffArrayPipes(right: TypedPipe[Array[T]],
+                         reducers: Option[Int] = None)(
           implicit ev: ClassTag[T]): TypedPipe[(Array[T], (Long, Long))] =
         TypedPipeDiff.diffArrayPipes(left, right, reducers)
     }

@@ -26,8 +26,12 @@ private[akka] object ReplayFilter {
     require(windowSize > 0, "windowSize must be > 0")
     require(maxOldWriters > 0, "maxOldWriters must be > 0")
     require(mode != Disabled, "mode must not be Disabled")
-    Props(new ReplayFilter(
-            persistentActor, mode, windowSize, maxOldWriters, debugEnabled))
+    Props(
+        new ReplayFilter(persistentActor,
+                         mode,
+                         windowSize,
+                         maxOldWriters,
+                         debugEnabled))
   }
 
   // for binary compatibility
@@ -35,8 +39,11 @@ private[akka] object ReplayFilter {
             mode: Mode,
             windowSize: Int,
             maxOldWriters: Int): Props =
-    props(
-        persistentActor, mode, windowSize, maxOldWriters, debugEnabled = false)
+    props(persistentActor,
+          mode,
+          windowSize,
+          maxOldWriters,
+          debugEnabled = false)
 
   sealed trait Mode
   case object Fail extends Mode
@@ -63,8 +70,11 @@ private[akka] class ReplayFilter(persistentActor: ActorRef,
            mode: ReplayFilter.Mode,
            windowSize: Int,
            maxOldWriters: Int) =
-    this(
-        persistentActor, mode, windowSize, maxOldWriters, debugEnabled = false)
+    this(persistentActor,
+         mode,
+         windowSize,
+         maxOldWriters,
+         debugEnabled = false)
 
   val buffer = new LinkedList[ReplayedMessage]()
   val oldWriters = LinkedHashSet.empty[String]
@@ -85,7 +95,7 @@ private[akka] class ReplayFilter(persistentActor: ActorRef,
           if (r.persistent.sequenceNr < seqNo) {
             val errMsg =
               s"Invalid replayed event [${r.persistent.sequenceNr}] in wrong order from " +
-              s"writer [${r.persistent.writerUuid}] with persistenceId [${r.persistent.persistenceId}]"
+                s"writer [${r.persistent.writerUuid}] with persistenceId [${r.persistent.persistenceId}]"
             logIssue(errMsg)
             mode match {
               case RepairByDiscardOld ⇒ // discard
@@ -103,7 +113,7 @@ private[akka] class ReplayFilter(persistentActor: ActorRef,
           // from old writer
           val errMsg =
             s"Invalid replayed event [${r.persistent.sequenceNr}] from old " +
-            s"writer [${r.persistent.writerUuid}] with persistenceId [${r.persistent.persistenceId}]"
+              s"writer [${r.persistent.writerUuid}] with persistenceId [${r.persistent.persistenceId}]"
           logIssue(errMsg)
           mode match {
             case RepairByDiscardOld ⇒ // discard
@@ -128,7 +138,7 @@ private[akka] class ReplayFilter(persistentActor: ActorRef,
             if (msg.persistent.sequenceNr >= seqNo) {
               val errMsg =
                 s"Invalid replayed event [${msg.persistent.sequenceNr}] in buffer from old " +
-                s"writer [${msg.persistent.writerUuid}] with persistenceId [${msg.persistent.persistenceId}]"
+                  s"writer [${msg.persistent.writerUuid}] with persistenceId [${msg.persistent.persistenceId}]"
               logIssue(errMsg)
               mode match {
                 case RepairByDiscardOld ⇒ iter.remove() // discard

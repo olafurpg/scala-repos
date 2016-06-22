@@ -32,15 +32,14 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
           Foldable[Option].foldRight[A, Z](a, b)(f))
   }
 
-  def traverse[G[_], B](f: A => G[B])(
-      implicit F: Traverse[F], G: Applicative[G]): G[OptionT[F, B]] = {
+  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F],
+                                      G: Applicative[G]): G[OptionT[F, B]] = {
     import std.option._
     G.map(F.traverse(run)(o => Traverse[Option].traverse(o)(f)))(OptionT(_))
   }
 
   def ap[B](f: => OptionT[F, A => B])(implicit F: Monad[F]): OptionT[F, B] =
-    OptionT(
-        F.bind(f.run) {
+    OptionT(F.bind(f.run) {
       case None => F.point(None)
       case Some(ff) => F.map(run)(_ map ff)
     })
@@ -49,8 +48,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
     * both `F`s.  It is not compatible with `Monad#bind`.
     */
   def app[B](f: => OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
-    OptionT(
-        F.apply2(f.run, run) {
+    OptionT(F.apply2(f.run, run) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
 
@@ -90,8 +88,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
     mapO(_.forall(f))
 
   def orElse(a: => OptionT[F, A])(implicit F: Monad[F]): OptionT[F, A] =
-    OptionT(
-        F.bind(run) {
+    OptionT(F.bind(run) {
       case None => a.run
       case x @ Some(_) => F.point(x)
     })
@@ -127,8 +124,8 @@ sealed abstract class OptionTInstances3 {
 }
 
 sealed abstract class OptionTInstances2 extends OptionTInstances3 {
-  implicit def optionTBindRec[F[_]](
-      implicit F0: Monad[F], B0: BindRec[F]): BindRec[OptionT[F, ?]] =
+  implicit def optionTBindRec[F[_]](implicit F0: Monad[F],
+                                    B0: BindRec[F]): BindRec[OptionT[F, ?]] =
     new OptionTBindRec[F] {
       implicit def F = F0
       implicit def B = B0

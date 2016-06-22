@@ -53,9 +53,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
   }
 
   test("get ports from multiple ranges, requirePorts") {
-    val app =
-      AppDefinition(portDefinitions = PortDefinitions(80, 81, 82, 83, 100),
-                    requirePorts = true)
+    val app = AppDefinition(portDefinitions =
+                              PortDefinitions(80, 81, 82, 83, 100),
+                            requirePorts = true)
     val portsResource = RangesResource(
         Resource.PORTS,
         Seq(protos.Range(80, 83), protos.Range(100, 100))
@@ -76,8 +76,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
 
   // #2865 Multiple explicit ports are mixed up in task json
   test("get ports with requirePorts preserves the ports order") {
-    val app = AppDefinition(
-        portDefinitions = PortDefinitions(100, 80), requirePorts = true)
+    val app = AppDefinition(portDefinitions = PortDefinitions(100, 80),
+                            requirePorts = true)
     val offer =
       MarathonTestHelper.makeBasicOffer(beginPort = 70, endPort = 200).build
     val matcher = new PortsMatcher(app, offer, ResourceSelector.wildcard)
@@ -106,15 +106,18 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
       .addResources(portsResource)
       .addResources(portsResource2)
       .build
-    val matcher = new PortsMatcher(app,
-                                   offer,
-                                   resourceSelector = ResourceSelector(
-                                       Set("*", "marathon"), reserved = false))
+    val matcher = new PortsMatcher(
+        app,
+        offer,
+        resourceSelector =
+          ResourceSelector(Set("*", "marathon"), reserved = false))
 
     assert(matcher.portsMatch.isDefined)
     assert(5 == matcher.portsMatch.get.hostPorts.size)
-    assert(matcher.portsMatch.get.resources.map(_.getRole).to[Set] == Set(
-            "*", "marathon"))
+    assert(
+        matcher.portsMatch.get.resources.map(_.getRole).to[Set] == Set(
+            "*",
+            "marathon"))
   }
 
   test("get ports from multiple ranges, ignore ranges with unwanted roles") {
@@ -157,8 +160,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
   }
 
   test("fail if required ports are not available") {
-    val app = AppDefinition(
-        portDefinitions = PortDefinitions(80, 81, 82), requirePorts = true)
+    val app = AppDefinition(portDefinitions = PortDefinitions(80, 81, 82),
+                            requirePorts = true)
     val offer = MarathonTestHelper
       .makeBasicOffer(beginPort = 31000, endPort = 32000)
       .build
@@ -171,7 +174,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
+                docker = Some(
+                    new Docker(
                         portMappings = Some(Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 0)
@@ -191,7 +195,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
+                docker = Some(
+                    new Docker(
                         portMappings = Some(Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 0)
@@ -213,7 +218,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
+                docker = Some(
+                    new Docker(
                         portMappings = Some(Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 0)
@@ -252,7 +258,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
+                docker = Some(
+                    new Docker(
                         portMappings = Some(Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 8080)
@@ -273,7 +280,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
+                docker = Some(
+                    new Docker(
                         portMappings = Some(Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 31200)
@@ -296,7 +304,8 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
+                docker = Some(
+                    new Docker(
                         portMappings = Some(Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 31200)
@@ -325,8 +334,10 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
-                        portMappings = Some(Seq(
+                docker = Some(
+                    new Docker(
+                        portMappings = Some(
+                            Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 0),
                                 new Docker.PortMapping(containerPort = 1,
@@ -350,8 +361,10 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(new Docker(
-                        portMappings = Some(Seq(
+                docker = Some(
+                    new Docker(
+                        portMappings = Some(
+                            Seq(
                                 new Docker.PortMapping(containerPort = 1,
                                                        hostPort = 0),
                                 new Docker.PortMapping(containerPort = 1,
@@ -371,10 +384,11 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
       .makeBasicOffer(beginPort = 31000, endPort = 31000)
       .addResources(portsResource)
       .build
-    val matcher = new PortsMatcher(app,
-                                   offer,
-                                   resourceSelector = ResourceSelector(
-                                       Set("*", "marathon"), reserved = false))
+    val matcher = new PortsMatcher(
+        app,
+        offer,
+        resourceSelector =
+          ResourceSelector(Set("*", "marathon"), reserved = false))
 
     assert(matcher.portsMatch.isDefined)
     assert(matcher.portsMatch.get.hostPorts.toSet == Set(31000, 31001))

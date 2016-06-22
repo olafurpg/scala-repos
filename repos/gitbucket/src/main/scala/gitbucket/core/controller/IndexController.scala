@@ -117,11 +117,11 @@ trait IndexControllerBase extends ControllerBase {
   /**
     * JSON API for collaborator completion.
     */
-  get("/_user/proposals")(
-      usersOnly {
+  get("/_user/proposals")(usersOnly {
     contentType = formats("json")
     org.json4s.jackson.Serialization.write(
-        Map("options" -> getAllUsers(false)
+        Map(
+            "options" -> getAllUsers(false)
               .filter(!_.isGroupAccount)
               .map(_.userName)
               .toArray)

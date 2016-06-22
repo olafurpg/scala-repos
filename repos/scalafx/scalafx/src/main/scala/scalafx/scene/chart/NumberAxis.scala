@@ -67,8 +67,9 @@ object NumberAxis {
 
   class DefaultFormatter(
       override val delegate: jfxsc.NumberAxis.DefaultFormatter)
-      extends StringConverterDelegate[
-          java.lang.Number, Number, jfxsc.NumberAxis.DefaultFormatter](
+      extends StringConverterDelegate[java.lang.Number,
+                                      Number,
+                                      jfxsc.NumberAxis.DefaultFormatter](
           delegate)
 }
 

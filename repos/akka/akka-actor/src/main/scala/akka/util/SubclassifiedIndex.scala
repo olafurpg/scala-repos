@@ -196,10 +196,11 @@ private[akka] class SubclassifiedIndex[K, V] private (
     * Find all subkeys of a given key in the index excluding some subkeys.
     */
   protected final def findSubKeysExcept(
-      key: K, except: Vector[Nonroot[K, V]]): Set[K] =
+      key: K,
+      except: Vector[Nonroot[K, V]]): Set[K] =
     root.innerFindSubKeys(key, except)
-  protected def innerFindSubKeys(
-      key: K, except: Vector[Nonroot[K, V]]): Set[K] =
+  protected def innerFindSubKeys(key: K,
+                                 except: Vector[Nonroot[K, V]]): Set[K] =
     (Set.empty[K] /: subkeys) { (s, n) ⇒
       if (sc.isEqual(key, n.key)) s
       else
@@ -222,7 +223,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
     subkeys = sub :+ n
     n.subkeys = if (subsub.nonEmpty) subsub else n.subkeys
     n.subkeys ++=
-      findSubKeysExcept(n.key, n.subkeys).map(k ⇒ new Nonroot(root, k, values))
+    findSubKeysExcept(n.key, n.subkeys).map(k ⇒ new Nonroot(root, k, values))
     n.subkeys.map(n ⇒ (n.key, n.values.toSet))
   }
 

@@ -54,7 +54,7 @@ trait ScReferenceElement
 
   private def patternNeedBackticks(name: String) =
     name != "" && name.charAt(0).isLower &&
-    getParent.isInstanceOf[ScStableReferenceElementPattern]
+      getParent.isInstanceOf[ScStableReferenceElementPattern]
 
   def getElement = this
 
@@ -83,14 +83,15 @@ trait ScReferenceElement
   def handleElementRename(newElementName: String): PsiElement = {
     val needBackticks =
       patternNeedBackticks(newElementName) ||
-      ScalaNamesUtil.isKeyword(newElementName)
+        ScalaNamesUtil.isKeyword(newElementName)
     val newName =
       if (needBackticks) "`" + newElementName + "`" else newElementName
     if (!ScalaNamesUtil.isIdentifier(newName)) return this
     val id = nameId.getNode
     val parent = id.getTreeParent
     parent.replaceChild(
-        id, ScalaPsiElementFactory.createIdentifier(newName, getManager))
+        id,
+        ScalaPsiElementFactory.createIdentifier(newName, getManager))
     this
   }
 
@@ -114,7 +115,8 @@ trait ScReferenceElement
   }
 
   def createReplacingElementWithClassName(
-      useFullQualifiedName: Boolean, clazz: TypeToImport): ScReferenceElement =
+      useFullQualifiedName: Boolean,
+      clazz: TypeToImport): ScReferenceElement =
     ScalaPsiElementFactory.createReferenceFromText(
         if (useFullQualifiedName) clazz.qualifiedName else clazz.name,
         clazz.element.getManager)
@@ -144,7 +146,8 @@ trait ScReferenceElement
                 val nodeMethodContainingClass: PsiClass =
                   n.method.containingClass
                 val classesEquiv: Boolean = ScEquivalenceUtil.smartEquivalence(
-                    methodContainingClass, nodeMethodContainingClass)
+                    methodContainingClass,
+                    nodeMethodContainingClass)
                 if (classesEquiv) break = true
               }
             }
@@ -196,8 +199,8 @@ trait ScReferenceElement
     *
     * Corresponding references are used in FindUsages, but filtered from Rename
     */
-  def isIndirectReferenceTo(
-      resolved: PsiElement, element: PsiElement): Boolean = {
+  def isIndirectReferenceTo(resolved: PsiElement,
+                            element: PsiElement): Boolean = {
     if (resolved == null) return false
     (resolved, element) match {
       case (typeAlias: ScTypeAliasDefinition, cls: PsiClass) =>
@@ -227,8 +230,8 @@ trait ScReferenceElement
   def getKinds(incomplete: Boolean,
                completion: Boolean = false): Set[ResolveTargets.Value]
 
-  def getVariants(
-      implicits: Boolean, filterNotNamedVariants: Boolean): Array[Object] =
+  def getVariants(implicits: Boolean,
+                  filterNotNamedVariants: Boolean): Array[Object] =
     getVariants
 
   def getSameNameVariants: Array[ResolveResult]
@@ -238,7 +241,8 @@ trait ScReferenceElement
   }
 
   protected def safeBindToElement[T <: ScReferenceElement](
-      qualName: String, referenceCreator: (String, Boolean) => T)(
+      qualName: String,
+      referenceCreator: (String, Boolean) => T)(
       simpleImport: => PsiElement): PsiElement = {
     val parts: Array[String] = qualName.split('.')
     val last = parts.last
@@ -350,35 +354,36 @@ trait ScReferenceElement
   def bindToPackage(pckg: PsiPackage, addImport: Boolean = false): PsiElement = {
     val qualifiedName = pckg.getQualifiedName
     extensions.inWriteAction {
-      val refText =
-        if (addImport) {
-          val importHolder = ScalaImportTypeFix.getImportHolder(
-              ref = this, project = getProject)
-          val imported = importHolder.getAllImportUsed.exists {
-            case ImportExprUsed(expr) =>
-              expr.reference.exists { ref =>
-                ref
-                  .multiResolve(false)
-                  .exists(rr =>
-                        rr.getElement match {
-                      case p: ScPackage => p.getQualifiedName == qualifiedName
-                      case p: PsiPackage => p.getQualifiedName == qualifiedName
-                      case _ => false
-                  })
-              }
-            case _ => false
-          }
-          if (!imported)
-            importHolder.addImportForPath(qualifiedName, ref = this)
-          pckg.getName
-        } else qualifiedName
+      val refText = if (addImport) {
+        val importHolder =
+          ScalaImportTypeFix.getImportHolder(ref = this, project = getProject)
+        val imported = importHolder.getAllImportUsed.exists {
+          case ImportExprUsed(expr) =>
+            expr.reference.exists { ref =>
+              ref
+                .multiResolve(false)
+                .exists(rr =>
+                      rr.getElement match {
+                    case p: ScPackage => p.getQualifiedName == qualifiedName
+                    case p: PsiPackage => p.getQualifiedName == qualifiedName
+                    case _ => false
+                })
+            }
+          case _ => false
+        }
+        if (!imported)
+          importHolder.addImportForPath(qualifiedName, ref = this)
+        pckg.getName
+      } else qualifiedName
       this match {
         case stRef: ScStableCodeReferenceElement =>
-          stRef.replace(ScalaPsiElementFactory.createReferenceFromText(
-                  refText, stRef.getManager))
+          stRef.replace(
+              ScalaPsiElementFactory.createReferenceFromText(refText,
+                                                             stRef.getManager))
         case ref: ScReferenceExpression =>
-          ref.replace(ScalaPsiElementFactory.createExpressionFromText(
-                  refText, ref.getManager))
+          ref.replace(
+              ScalaPsiElementFactory.createExpressionFromText(refText,
+                                                              ref.getManager))
         case _ => null
       }
     }

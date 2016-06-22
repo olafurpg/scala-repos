@@ -55,7 +55,7 @@ abstract class RestartNode3Spec
       system.name,
       ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" +
-            secondUniqueAddress.address.port.get)
+              secondUniqueAddress.address.port.get)
         .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
@@ -89,7 +89,8 @@ abstract class RestartNode3Spec
         enterBarrier("second-address-receiver-ready")
         secondUniqueAddress = Cluster(secondSystem).selfUniqueAddress
         List(first, third) foreach { r ⇒
-          system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! secondUniqueAddress
+          system
+            .actorSelection(RootActorPath(r) / "user" / "address-receiver") ! secondUniqueAddress
           expectMsg(5.seconds, "ok")
         }
       }

@@ -89,8 +89,8 @@ class PlannerSuite extends SharedSQLContext {
           .createDataFrame(rowRDD, schema)
           .registerTempTable("testLimit")
 
-        val planned =
-          sql("""
+        val planned = sql(
+            """
             |SELECT l.a, l.b
             |FROM testData2 l JOIN (SELECT * FROM testLimit LIMIT 1) r ON (l.a = r.key)
           """.stripMargin).queryExecution.sparkPlan
@@ -118,9 +118,11 @@ class PlannerSuite extends SharedSQLContext {
 
     val complexTypes =
       ArrayType(DoubleType, true) :: ArrayType(StringType, false) :: MapType(
-          IntegerType, StringType, true) :: MapType(IntegerType,
-                                                    ArrayType(DoubleType),
-                                                    false) :: StructType(
+          IntegerType,
+          StringType,
+          true) :: MapType(IntegerType,
+                           ArrayType(DoubleType),
+                           false) :: StructType(
           Seq(StructField("a", IntegerType, nullable = true),
               StructField("b", ArrayType(DoubleType), nullable = false),
               StructField("c", DoubleType, nullable = false))) :: Nil
@@ -572,8 +574,7 @@ private case class DummySparkPlan(
     override val outputPartitioning: Partitioning = UnknownPartitioning(0),
     override val requiredChildDistribution: Seq[Distribution] = Nil,
     override val requiredChildOrdering: Seq[Seq[SortOrder]] = Nil
-)
-    extends SparkPlan {
+) extends SparkPlan {
   override protected def doExecute(): RDD[InternalRow] =
     throw new NotImplementedError
   override def output: Seq[Attribute] = Seq.empty

@@ -37,18 +37,18 @@ trait CommandHandler {
         cmd.errors.map(_.validation) collect {
           case Failure(e) ⇒ e
         }
-      commandLogger.debug("Command [%s] executed with %d failures.\n%s" format
-          (cmd.getClass.getName, f.size, f.toList))
+      commandLogger.debug(
+          "Command [%s] executed with %d failures.\n%s" format
+            (cmd.getClass.getName, f.size, f.toList))
       NonEmptyList(f.head, f.tail: _*).failure
     }
   }
 
-  private[this] def serverError[R](
-      cmdName: String, ex: Throwable): ModelValidation[R] = {
+  private[this] def serverError[R](cmdName: String,
+                                   ex: Throwable): ModelValidation[R] = {
     commandLogger.error("There was an error while executing " + cmdName, ex)
-    ValidationError(
-        "An error occurred while handling: " + cmdName, UnknownError)
-      .failureNel[R]
+    ValidationError("An error occurred while handling: " + cmdName,
+                    UnknownError).failureNel[R]
   }
 
   type Handler = PartialFunction[ModelCommand[_], ModelValidation[_]]

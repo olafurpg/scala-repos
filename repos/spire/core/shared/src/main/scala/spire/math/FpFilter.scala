@@ -34,8 +34,10 @@ import spire.macros.fpf._
   *
   * [1] Burnikel, Funke, Seel. Exact Geometric Computation Using Cascading. SoCG 1998.
   */
-final class FpFilter[A](
-    val apx: Double, val mes: Double, val ind: Int, exact0: => A) {
+final class FpFilter[A](val apx: Double,
+                        val mes: Double,
+                        val ind: Int,
+                        exact0: => A) {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
   def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
@@ -150,8 +152,10 @@ object FpFilter {
   @inline final def approx[A](exact: A): FpFilterApprox[A] =
     new FpFilterApprox[A](exact)
 
-  @inline final def apply[A](
-      apx: Double, mes: Double, ind: Int, exact: => A): FpFilter[A] =
+  @inline final def apply[A](apx: Double,
+                             mes: Double,
+                             ind: Int,
+                             exact: => A): FpFilter[A] =
     new FpFilter[A](apx, mes, ind, exact)
 
   def apply[A](approx: Double, exact: => A): FpFilter[A] =
@@ -195,27 +199,37 @@ object FpFilter {
     c.Expr[Int](Fuser[c.type, A](c).sign(c.prefix.tree)(ev.tree))
 
   def ltImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+        Fuser[c.type, A](c)
           .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Lt))
 
   def gtImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+        Fuser[c.type, A](c)
           .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Gt))
 
   def ltEqImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+        Fuser[c.type, A](c)
           .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.LtEq))
 
   def gtEqImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+        Fuser[c.type, A](c)
           .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.GtEq))
 
   def eqImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+        Fuser[c.type, A](c)
           .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Eq))
 }

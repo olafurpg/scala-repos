@@ -43,7 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PathElementSpec
     extends SimpleSFXDelegateSpec[jfxss.PathElement, PathElement](
-        classOf[jfxss.PathElement], classOf[PathElement]) {
+        classOf[jfxss.PathElement],
+        classOf[PathElement]) {
 
   override protected def getScalaClassInstance = new ClosePath
 

@@ -101,8 +101,9 @@ trait GameHelper {
     case Mode.Rated => trans.rated.en()
   }
 
-  def playerUsername(
-      player: Player, withRating: Boolean = true, withTitle: Boolean = true) =
+  def playerUsername(player: Player,
+                     withRating: Boolean = true,
+                     withTitle: Boolean = true) =
     Namer.player(player, withRating, withTitle)(lightUser)
 
   def playerText(player: Player, withRating: Boolean = false) =
@@ -234,11 +235,11 @@ trait GameHelper {
                ownerLink: Boolean = false,
                tv: Boolean = false)(implicit ctx: UserContext): String = {
     val owner = ownerLink.fold(ctx.me flatMap game.player, none)
-    val url = tv.fold(
-        routes.Tv.index,
-        owner.fold(routes.Round.watcher(game.id, color.name)) { o =>
-          routes.Round.player(game fullIdOf o.color)
-        })
+    val url = tv.fold(routes.Tv.index,
+                      owner.fold(routes.Round.watcher(game.id, color.name)) {
+                        o =>
+                          routes.Round.player(game fullIdOf o.color)
+                      })
     url.toString
   }
 

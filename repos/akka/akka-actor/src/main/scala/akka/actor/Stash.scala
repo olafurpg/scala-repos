@@ -150,7 +150,7 @@ private[akka] trait StashSupport {
         throw ActorInitializationException(
             self,
             s"DequeBasedMailbox required, got: ${other.getClass.getName}\n" +
-            """An (unbounded) deque-based mailbox can be configured as follows:
+              """An (unbounded) deque-based mailbox can be configured as follows:
           |  my-custom-mailbox {
           |    mailbox-type = "akka.dispatch.UnboundedDequeBasedMailbox"
           |  }

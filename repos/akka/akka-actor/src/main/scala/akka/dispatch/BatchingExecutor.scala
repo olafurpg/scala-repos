@@ -125,7 +125,8 @@ private[akka] trait BatchingExecutor extends Executor {
           newBatch.add(runnable)
           unbatchedExecute(newBatch) // If we aren't in batching mode yet, enqueue batch
         case batch ⇒
-          batch.add(runnable) // If we are already in batching mode, add to batch
+          batch
+            .add(runnable) // If we are already in batching mode, add to batch
       }
     } else
       unbatchedExecute(runnable) // If not batchable, just delegate to underlying

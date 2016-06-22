@@ -37,8 +37,9 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
   }
 
   override lazy val iter =
-    (Iterator continually (codec wrap charReader.read()) takeWhile (_ != -1) map
-        (_.toChar))
+    (Iterator continually (codec wrap charReader
+              .read()) takeWhile (_ != -1) map
+          (_.toChar))
 
   private def decachedReader: BufferedReader = {
     // Don't want to lose a buffered char sitting in iter either. Yes,

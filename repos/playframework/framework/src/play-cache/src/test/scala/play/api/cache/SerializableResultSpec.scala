@@ -51,7 +51,8 @@ class SerializableResultSpec extends PlaySpecification {
       checkSerialization(Results.Ok("hello!"))
       checkSerialization(
           Results.Ok("hello!").withHeaders(CONTENT_TYPE -> "text/banana"))
-      checkSerialization(Results
+      checkSerialization(
+          Results
             .Ok("hello!")
             .withHeaders(CONTENT_TYPE -> "text/banana", "X-Foo" -> "bar"))
     }

@@ -147,8 +147,8 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
 object AbcdStringGen {
   implicit def abcdString =
     for (len <- choose(4, 4);
-         string <- pick(len, List("a", "b", "c", "d"))) yield
-      string.mkString("")
+         string <- pick(len, List("a", "b", "c", "d")))
+      yield string.mkString("")
 
   def pickN(n: Int, elems: List[String]) =
     Arbitrary { for (string <- pick(n, elems)) yield string.mkString("") }
@@ -161,8 +161,8 @@ object WhiteStringGen {
                            frequency((1, Gen.const(" ")),
                                      (1, Gen.const("\t")),
                                      (1, Gen.const("\r")),
-                                     (1, Gen.const("\n"))))) yield
-      string.mkString("")
+                                     (1, Gen.const("\n")))))
+      yield string.mkString("")
 
   implicit def genWhiteString: Arbitrary[String] =
     Arbitrary { genWhite }

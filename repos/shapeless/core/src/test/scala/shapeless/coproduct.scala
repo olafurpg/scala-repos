@@ -182,7 +182,8 @@ class CoproductTests {
 
     val r4 = is.flatMap(coSquare)
     assertTypedEquals[I :+: I :+: S :+: S :+: CNil](
-        Coproduct[I :+: I :+: S :+: S :+: CNil](1), r4)
+        Coproduct[I :+: I :+: S :+: S :+: CNil](1),
+        r4)
 
     object complex extends Poly1 {
       implicit def caseInt = at[Int](i => Coproduct[S :+: CNil](i.toString))
@@ -194,7 +195,8 @@ class CoproductTests {
 
     val r5 = isd.flatMap(complex)
     assertTypedEquals[S :+: C :+: D :+: I :+: S :+: CNil](
-        Coproduct[S :+: C :+: D :+: I :+: S :+: CNil]("1"), r5)
+        Coproduct[S :+: C :+: D :+: I :+: S :+: CNil]("1"),
+        r5)
   }
 
   @Test
@@ -593,27 +595,33 @@ class CoproductTests {
 
       val r2 = in3.rotateLeft(1)
       assertTypedEquals[S :+: D :+: I :+: CNil](
-          Coproduct[S :+: D :+: I :+: CNil](1), r2)
+          Coproduct[S :+: D :+: I :+: CNil](1),
+          r2)
 
       val r3 = in4.rotateLeft(1)
       assertTypedEquals[S :+: D :+: C :+: I :+: CNil](
-          Coproduct[S :+: D :+: C :+: I :+: CNil](1), r3)
+          Coproduct[S :+: D :+: C :+: I :+: CNil](1),
+          r3)
 
       val r4 = in4.rotateLeft(2)
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r4)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r4)
 
       val r5 = in4.rotateLeft(3)
       assertTypedEquals[C :+: I :+: S :+: D :+: CNil](
-          Coproduct[C :+: I :+: S :+: D :+: CNil](1), r5)
+          Coproduct[C :+: I :+: S :+: D :+: CNil](1),
+          r5)
 
       val r6 = in4.rotateLeft(5)
       assertTypedEquals[S :+: D :+: C :+: I :+: CNil](
-          Coproduct[S :+: D :+: C :+: I :+: CNil](1), r6)
+          Coproduct[S :+: D :+: C :+: I :+: CNil](1),
+          r6)
 
       val r7 = in4.rotateLeft(6)
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r7)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r7)
     }
 
     {
@@ -623,27 +631,33 @@ class CoproductTests {
 
       val r2 = in3.rotateLeft[_1]
       assertTypedEquals[S :+: D :+: I :+: CNil](
-          Coproduct[S :+: D :+: I :+: CNil](1), r2)
+          Coproduct[S :+: D :+: I :+: CNil](1),
+          r2)
 
       val r3 = in4.rotateLeft[_1]
       assertTypedEquals[S :+: D :+: C :+: I :+: CNil](
-          Coproduct[S :+: D :+: C :+: I :+: CNil](1), r3)
+          Coproduct[S :+: D :+: C :+: I :+: CNil](1),
+          r3)
 
       val r4 = in4.rotateLeft[_2]
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r4)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r4)
 
       val r5 = in4.rotateLeft[_3]
       assertTypedEquals[C :+: I :+: S :+: D :+: CNil](
-          Coproduct[C :+: I :+: S :+: D :+: CNil](1), r5)
+          Coproduct[C :+: I :+: S :+: D :+: CNil](1),
+          r5)
 
       val r6 = in4.rotateLeft[_5]
       assertTypedEquals[S :+: D :+: C :+: I :+: CNil](
-          Coproduct[S :+: D :+: C :+: I :+: CNil](1), r6)
+          Coproduct[S :+: D :+: C :+: I :+: CNil](1),
+          r6)
 
       val r7 = in4.rotateLeft[_6]
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r7)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r7)
     }
 
     {
@@ -759,27 +773,33 @@ class CoproductTests {
 
       val r2 = in3.rotateRight(1)
       assertTypedEquals[D :+: I :+: S :+: CNil](
-          Coproduct[D :+: I :+: S :+: CNil](1), r2)
+          Coproduct[D :+: I :+: S :+: CNil](1),
+          r2)
 
       val r3 = in4.rotateRight(1)
       assertTypedEquals[C :+: I :+: S :+: D :+: CNil](
-          Coproduct[C :+: I :+: S :+: D :+: CNil](1), r3)
+          Coproduct[C :+: I :+: S :+: D :+: CNil](1),
+          r3)
 
       val r4 = in4.rotateRight(2)
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r4)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r4)
 
       val r5 = in4.rotateRight(3)
       assertTypedEquals[S :+: D :+: C :+: I :+: CNil](
-          Coproduct[S :+: D :+: C :+: I :+: CNil](1), r5)
+          Coproduct[S :+: D :+: C :+: I :+: CNil](1),
+          r5)
 
       val r6 = in4.rotateRight(5)
       assertTypedEquals[C :+: I :+: S :+: D :+: CNil](
-          Coproduct[C :+: I :+: S :+: D :+: CNil](1), r6)
+          Coproduct[C :+: I :+: S :+: D :+: CNil](1),
+          r6)
 
       val r7 = in4.rotateRight(6)
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r7)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r7)
     }
 
     {
@@ -789,27 +809,33 @@ class CoproductTests {
 
       val r2 = in3.rotateRight[_1]
       assertTypedEquals[D :+: I :+: S :+: CNil](
-          Coproduct[D :+: I :+: S :+: CNil](1), r2)
+          Coproduct[D :+: I :+: S :+: CNil](1),
+          r2)
 
       val r3 = in4.rotateRight[_1]
       assertTypedEquals[C :+: I :+: S :+: D :+: CNil](
-          Coproduct[C :+: I :+: S :+: D :+: CNil](1), r3)
+          Coproduct[C :+: I :+: S :+: D :+: CNil](1),
+          r3)
 
       val r4 = in4.rotateRight[_2]
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r4)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r4)
 
       val r5 = in4.rotateRight[_3]
       assertTypedEquals[S :+: D :+: C :+: I :+: CNil](
-          Coproduct[S :+: D :+: C :+: I :+: CNil](1), r5)
+          Coproduct[S :+: D :+: C :+: I :+: CNil](1),
+          r5)
 
       val r6 = in4.rotateRight[_5]
       assertTypedEquals[C :+: I :+: S :+: D :+: CNil](
-          Coproduct[C :+: I :+: S :+: D :+: CNil](1), r6)
+          Coproduct[C :+: I :+: S :+: D :+: CNil](1),
+          r6)
 
       val r7 = in4.rotateRight[_6]
       assertTypedEquals[D :+: C :+: I :+: S :+: CNil](
-          Coproduct[D :+: C :+: I :+: S :+: CNil](1), r7)
+          Coproduct[D :+: C :+: I :+: S :+: CNil](1),
+          r7)
     }
 
     {
@@ -867,7 +893,8 @@ class CoproductTests {
 
     val r3 = Coproduct[Int :+: String :+: CNil]("foo").tail
     assertTypedEquals[Option[String :+: CNil]](
-        Some(Coproduct[String :+: CNil]("foo")), r3)
+        Some(Coproduct[String :+: CNil]("foo")),
+        r3)
   }
 
   @Test
@@ -1123,8 +1150,8 @@ class CoproductTests {
     assertTypedEquals[Option[Int :+: CNil]](None, r2)
 
     val r3 = Coproduct[Int :+: String :+: CNil](1).init
-    assertTypedEquals[Option[Int :+: CNil]](
-        Some(Coproduct[Int :+: CNil](1)), r3)
+    assertTypedEquals[Option[Int :+: CNil]](Some(Coproduct[Int :+: CNil](1)),
+                                            r3)
   }
 
   @Test
@@ -1214,7 +1241,8 @@ class CoproductTests {
 
     val r7 = isdi.partition[I]
     assertTypedEquals[Either[I :+: I :+: CNil, S :+: D :+: CNil]](
-        Left(Inr[I, I :+: CNil](Inl[I, CNil](2))), r7)
+        Left(Inr[I, I :+: CNil](Inl[I, CNil](2))),
+        r7)
   }
 
   @Test
@@ -1243,7 +1271,8 @@ class CoproductTests {
 
     val r7 = isdi.partitionC[I]
     assertTypedEquals[(I :+: I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](
-        Inl(Inr[I, I :+: CNil](Inl[I, CNil](2))), r7)
+        Inl(Inr[I, I :+: CNil](Inl[I, CNil](2))),
+        r7)
   }
 
   @Test
@@ -1272,7 +1301,8 @@ class CoproductTests {
 
     val r7 = isdi.filter[I]
     assertTypedEquals[Option[I :+: I :+: CNil]](
-        Some(Inr[I, I :+: CNil](Inl[I, CNil](2))), r7)
+        Some(Inr[I, I :+: CNil](Inl[I, CNil](2))),
+        r7)
   }
 
   @Test
@@ -1339,8 +1369,8 @@ class CoproductTests {
       assertTypedEquals[Either[I :+: S :+: CNil, D :+: CNil]](Left(is), r8)
 
       val r9 = isdc.split(2)
-      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](
-          Right(dc), r9)
+      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](Right(dc),
+                                                                    r9)
     }
 
     {
@@ -1369,8 +1399,8 @@ class CoproductTests {
       assertTypedEquals[Either[I :+: S :+: CNil, D :+: CNil]](Left(is), r8)
 
       val r9 = isdc.split[_2]
-      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](
-          Right(dc), r9)
+      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](Right(dc),
+                                                                    r9)
     }
   }
 
@@ -1387,34 +1417,41 @@ class CoproductTests {
     {
       val r1 = in1.splitC(0)
       assertTypedEquals[CNil :+: (I :+: CNil) :+: CNil](
-          Coproduct[CNil :+: (I :+: CNil) :+: CNil](in1), r1)
+          Coproduct[CNil :+: (I :+: CNil) :+: CNil](in1),
+          r1)
 
       val r2 = is.splitC(0)
       assertTypedEquals[CNil :+: (I :+: S :+: CNil) :+: CNil](
-          Coproduct[CNil :+: (I :+: S :+: CNil) :+: CNil](is), r2)
+          Coproduct[CNil :+: (I :+: S :+: CNil) :+: CNil](is),
+          r2)
 
       val r3 = in1.splitC(1)
       assertTypedEquals[(I :+: CNil) :+: CNil :+: CNil](
-          Coproduct[(I :+: CNil) :+: CNil :+: CNil](in1), r3)
+          Coproduct[(I :+: CNil) :+: CNil :+: CNil](in1),
+          r3)
 
       val r4 = is.splitC(1)
       assertTypedEquals[(I :+: CNil) :+: (S :+: CNil) :+: CNil](
-          Coproduct[(I :+: CNil) :+: (S :+: CNil) :+: CNil](in1), r4)
+          Coproduct[(I :+: CNil) :+: (S :+: CNil) :+: CNil](in1),
+          r4)
 
       val r5 = isd.splitC(1)
       assertTypedEquals[(I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](
-          Coproduct[(I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](in1), r5)
+          Coproduct[(I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](in1),
+          r5)
 
       // Cannot split at index 2 a coproduct of length 1
       illTyped(""" in1.splitC(2) """)
 
       val r7 = is.splitC(2)
       assertTypedEquals[(I :+: S :+: CNil) :+: CNil :+: CNil](
-          Coproduct[(I :+: S :+: CNil) :+: CNil :+: CNil](is), r7)
+          Coproduct[(I :+: S :+: CNil) :+: CNil :+: CNil](is),
+          r7)
 
       val r8 = isd.splitC(2)
       assertTypedEquals[(I :+: S :+: CNil) :+: (D :+: CNil) :+: CNil](
-          Coproduct[(I :+: S :+: CNil) :+: (D :+: CNil) :+: CNil](is), r8)
+          Coproduct[(I :+: S :+: CNil) :+: (D :+: CNil) :+: CNil](is),
+          r8)
 
       val r9 = isdc.splitC(2)
       assertTypedEquals[(I :+: S :+: CNil) :+: (D :+: C :+: CNil) :+: CNil](
@@ -1425,34 +1462,41 @@ class CoproductTests {
     {
       val r1 = in1.splitC[_0]
       assertTypedEquals[CNil :+: (I :+: CNil) :+: CNil](
-          Coproduct[CNil :+: (I :+: CNil) :+: CNil](in1), r1)
+          Coproduct[CNil :+: (I :+: CNil) :+: CNil](in1),
+          r1)
 
       val r2 = is.splitC[_0]
       assertTypedEquals[CNil :+: (I :+: S :+: CNil) :+: CNil](
-          Coproduct[CNil :+: (I :+: S :+: CNil) :+: CNil](is), r2)
+          Coproduct[CNil :+: (I :+: S :+: CNil) :+: CNil](is),
+          r2)
 
       val r3 = in1.splitC[_1]
       assertTypedEquals[(I :+: CNil) :+: CNil :+: CNil](
-          Coproduct[(I :+: CNil) :+: CNil :+: CNil](in1), r3)
+          Coproduct[(I :+: CNil) :+: CNil :+: CNil](in1),
+          r3)
 
       val r4 = is.splitC[_1]
       assertTypedEquals[(I :+: CNil) :+: (S :+: CNil) :+: CNil](
-          Coproduct[(I :+: CNil) :+: (S :+: CNil) :+: CNil](in1), r4)
+          Coproduct[(I :+: CNil) :+: (S :+: CNil) :+: CNil](in1),
+          r4)
 
       val r5 = isd.splitC[_1]
       assertTypedEquals[(I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](
-          Coproduct[(I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](in1), r5)
+          Coproduct[(I :+: CNil) :+: (S :+: D :+: CNil) :+: CNil](in1),
+          r5)
 
       // Cannot split at index 2 a coproduct of length 1
       illTyped(""" in1.splitC[_2] """)
 
       val r7 = is.splitC[_2]
       assertTypedEquals[(I :+: S :+: CNil) :+: CNil :+: CNil](
-          Coproduct[(I :+: S :+: CNil) :+: CNil :+: CNil](is), r7)
+          Coproduct[(I :+: S :+: CNil) :+: CNil :+: CNil](is),
+          r7)
 
       val r8 = isd.splitC[_2]
       assertTypedEquals[(I :+: S :+: CNil) :+: (D :+: CNil) :+: CNil](
-          Coproduct[(I :+: S :+: CNil) :+: (D :+: CNil) :+: CNil](is), r8)
+          Coproduct[(I :+: S :+: CNil) :+: (D :+: CNil) :+: CNil](is),
+          r8)
 
       val r9 = isdc.splitC[_2]
       assertTypedEquals[(I :+: S :+: CNil) :+: (D :+: C :+: CNil) :+: CNil](

@@ -68,8 +68,8 @@ trait CacheConditionDirectives {
     * it on the *outside* of the `withRangeSupport(...)` directive, i.e. `withRangeSupport(...)`
     * must be on a deeper level in your route structure in order to function correctly.
     */
-  def conditional(
-      eTag: Option[EntityTag], lastModified: Option[DateTime]): Directive0 = {
+  def conditional(eTag: Option[EntityTag],
+                  lastModified: Option[DateTime]): Directive0 = {
     def addResponseHeaders: Directive0 =
       mapResponse(
           _.withDefaultHeaders(eTag.map(ETag(_)).toList ++ lastModified
@@ -91,7 +91,7 @@ trait CacheConditionDirectives {
         def isGetOrHead = method == HEAD || method == GET
         def unmodified(ifModifiedSince: DateTime) =
           lastModified.get <= ifModifiedSince &&
-          ifModifiedSince.clicks < System.currentTimeMillis()
+            ifModifiedSince.clicks < System.currentTimeMillis()
 
         def step1(): Route =
           header[`If-Match`] match {
@@ -129,7 +129,7 @@ trait CacheConditionDirectives {
             header[`If-Range`] match {
               case Some(`If-Range`(Left(tag)))
                   if eTag.isDefined &&
-                  !matches(eTag.get, tag, weakComparison = false) ⇒
+                    !matches(eTag.get, tag, weakComparison = false) ⇒
                 innerRouteWithRangeHeaderFilteredOut
               case Some(`If-Range`(Right(ims)))
                   if lastModified.isDefined && !unmodified(ims) ⇒

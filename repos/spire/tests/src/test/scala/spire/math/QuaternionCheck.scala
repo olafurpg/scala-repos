@@ -115,19 +115,19 @@ class QuaternionCheck
     if (br != gr)
       println(
           s"  r: ${br.repr} != ${gr.repr} (${br.toRational} and ${gr.toRational}) [${(br -
-          gr).signum}] <${br - gr}>")
+            gr).signum}] <${br - gr}>")
     if (bi != gi)
       println(
           s"  i: ${bi.repr} != ${gi.repr} (${bi.toRational} and ${gi.toRational}) [${(bi -
-          gi).signum}] <${bi - gi}>")
+            gi).signum}] <${bi - gi}>")
     if (bj != gj)
       println(
           s"  j: ${bj.repr} != ${gj.repr} (${bj.toRational} and ${gj.toRational}) [${(bj -
-          gj).signum}] <${bj - gj}>")
+            gj).signum}] <${bj - gj}>")
     if (bk != gk)
       println(
           s"  k: ${bk.repr} != ${gk.repr} (${bk.toRational} and ${gk.toRational}) [${(bk -
-          gk).signum}] <${bk - gk}>")
+            gk).signum}] <${bk - gk}>")
   }
 
   def inexactEq(x: H, y: H): Unit =

@@ -91,8 +91,9 @@ class AppStartActorTest
   }
 
   test("With Health Checks") {
-    val app = AppDefinition(
-        id = PathId("app"), instances = 10, healthChecks = Set(HealthCheck()))
+    val app = AppDefinition(id = PathId("app"),
+                            instances = 10,
+                            healthChecks = Set(HealthCheck()))
     val promise = Promise[Unit]()
     val ref = TestActorRef[AppStartActor](
         Props(
@@ -109,10 +110,16 @@ class AppStartActorTest
     )
     watch(ref)
 
-    system.eventStream.publish(HealthStatusChanged(
-            app.id, Task.Id("task_a"), app.version, alive = true))
-    system.eventStream.publish(HealthStatusChanged(
-            app.id, Task.Id("task_b"), app.version, alive = true))
+    system.eventStream.publish(
+        HealthStatusChanged(app.id,
+                            Task.Id("task_a"),
+                            app.version,
+                            alive = true))
+    system.eventStream.publish(
+        HealthStatusChanged(app.id,
+                            Task.Id("task_b"),
+                            app.version,
+                            alive = true))
 
     Await.result(promise.future, 5.seconds)
 
@@ -177,8 +184,9 @@ class AppStartActorTest
   }
 
   test("No tasks to start with health checks") {
-    val app = AppDefinition(
-        id = PathId("app"), instances = 10, healthChecks = Set(HealthCheck()))
+    val app = AppDefinition(id = PathId("app"),
+                            instances = 10,
+                            healthChecks = Set(HealthCheck()))
     val promise = Promise[Unit]()
     val ref = TestActorRef[AppStartActor](
         Props(

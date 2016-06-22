@@ -10,7 +10,8 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
   def testNewComposition = {
     class SuppliersStd(tag: Tag)
         extends Table[(Int, String, String, String, String, String)](
-            tag, "SUPPLIERS") {
+            tag,
+            "SUPPLIERS") {
       def id =
         column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
       def name = column[String]("SUP_NAME")
@@ -86,28 +87,22 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val qc = qa.map(_._2).take(2)
 
     val a1 = seq(
-        mark("qa", qa.result)
-          .map(_.toSet)
-          .map { ra =>
-            ra.size shouldBe 3
-            // No sorting, so result contents can vary
-            ra shouldAllMatch { case (s: Int, (i: String, 42)) => () }
-          },
+        mark("qa", qa.result).map(_.toSet).map { ra =>
+          ra.size shouldBe 3
+          // No sorting, so result contents can vary
+          ra shouldAllMatch { case (s: Int, (i: String, 42)) => () }
+        },
         mark("qa2", qa2.result).map(_.toSet).map(_.size shouldBe 2),
-        mark("qb", qb.result)
-          .map(_.toSet)
-          .map { rb =>
-            rb.size shouldBe 2
-            // No sorting, so result contents can vary
-            rb shouldAllMatch { case (i: String, 42) => () }
-          },
-        mark("qb2", qb2.result)
-          .map(_.toSet)
-          .map { rb2 =>
-            rb2.size shouldBe 2
-            // No sorting, so result contents can vary
-            rb2 shouldAllMatch { case (i: String, 42) => () }
-          },
+        mark("qb", qb.result).map(_.toSet).map { rb =>
+          rb.size shouldBe 2
+          // No sorting, so result contents can vary
+          rb shouldAllMatch { case (i: String, 42) => () }
+        },
+        mark("qb2", qb2.result).map(_.toSet).map { rb2 =>
+          rb2.size shouldBe 2
+          // No sorting, so result contents can vary
+          rb2 shouldAllMatch { case (i: String, 42) => () }
+        },
         mark("qc", qc.result).map(_.toSet).map { rc =>
           rc.size shouldBe 2
           // No sorting, so result contents can vary
@@ -137,18 +132,15 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       } yield (c.name, s.city, c2.name)
 
     def a2 = seq(
-        mark("q0", q0.result)
-          .named("q0: Plain table")
-          .map(_.toSet)
-          .map { r0 =>
-            r0 shouldBe Set(
-                ("Colombian", 101, 799, 1, 0),
-                ("French_Roast", 49, 799, 2, 0),
-                ("Espresso", 150, 999, 3, 0),
-                ("Colombian_Decaf", 101, 849, 4, 0),
-                ("French_Roast_Decaf", 49, 999, 5, 0)
-            )
-          },
+        mark("q0", q0.result).named("q0: Plain table").map(_.toSet).map { r0 =>
+          r0 shouldBe Set(
+              ("Colombian", 101, 799, 1, 0),
+              ("French_Roast", 49, 799, 2, 0),
+              ("Espresso", 150, 999, 3, 0),
+              ("Colombian_Decaf", 101, 849, 4, 0),
+              ("French_Roast_Decaf", 49, 999, 5, 0)
+          )
+        },
         mark("q1", q1.result)
           .named("q1: Plain implicit join")
           .map(_.toSet)
@@ -249,11 +241,12 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
               )
             }
         _ <- q3.result.named("Lifting scalar values").map(_.toSet).map { r3 =>
-              r3 shouldBe Set(("Colombian_Decaf",
-                               "Acme, Inc.",
-                               "Colombian_Decaf",
-                               0,
-                               3396))
+              r3 shouldBe Set(
+                  ("Colombian_Decaf",
+                   "Acme, Inc.",
+                   "Colombian_Decaf",
+                   0,
+                   3396))
             }
         _ <- q3b.result
               .named("Lifting scalar values, with extra tuple")
@@ -359,28 +352,22 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     } yield (c._1.name, c._1.supID, c._2)
 
     def a5 = seq(
-        q7a.result
-          .named("Simple union")
-          .map(_.toSet)
-          .map { r7a =>
-            r7a shouldBe Set(
-                ("Colombian", 101, 0),
-                ("French_Roast", 49, 0),
-                ("Espresso", 150, 0),
-                ("French_Roast_Decaf", 49, 0)
-            )
-          },
-        q7.result
-          .named("Union")
-          .map(_.toSet)
-          .map { r7 =>
-            r7 shouldBe Set(
-                ("Colombian", 101, 1),
-                ("French_Roast", 49, 1),
-                ("Espresso", 150, 2),
-                ("French_Roast_Decaf", 49, 2)
-            )
-          },
+        q7a.result.named("Simple union").map(_.toSet).map { r7a =>
+          r7a shouldBe Set(
+              ("Colombian", 101, 0),
+              ("French_Roast", 49, 0),
+              ("Espresso", 150, 0),
+              ("French_Roast_Decaf", 49, 0)
+          )
+        },
+        q7.result.named("Union").map(_.toSet).map { r7 =>
+          r7 shouldBe Set(
+              ("Colombian", 101, 1),
+              ("French_Roast", 49, 1),
+              ("Espresso", 150, 2),
+              ("French_Roast_Decaf", 49, 2)
+          )
+        },
         q71.result
           .named("Transitive push-down without union")
           .map(_.toSet)
@@ -421,16 +408,13 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 ("French_Roast_Decaf", 49, 2)
             )
           },
-        q8.result
-          .named("Outer join")
-          .map(_.toSet)
-          .map { r8 =>
-            r8 shouldBe Set(
-                ("Colombian", Some("Colombian")),
-                ("French_Roast", Some("French_Roast")),
-                ("Colombian_Decaf", None)
-            )
-          },
+        q8.result.named("Outer join").map(_.toSet).map { r8 =>
+          r8 shouldBe Set(
+              ("Colombian", Some("Colombian")),
+              ("French_Roast", Some("French_Roast")),
+              ("Colombian_Decaf", None)
+          )
+        },
         q8b.result
           .named("Nested outer join")
           .map(_.toSet)
@@ -486,13 +470,13 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
 
     val q6b = (for (o <- orders if o.orderID === (for {
                       o2 <- orders if o.userID === o2.userID
-                    } yield o2.orderID).max) yield
-      o.orderID ~ o.userID).sortBy(_._1)
+                    } yield o2.orderID).max)
+      yield o.orderID ~ o.userID).sortBy(_._1)
 
     val q6c = (for (o <- orders if o.orderID === (for {
                       o2 <- orders if o.userID === o2.userID
-                    } yield o2.orderID).max) yield
-      o).sortBy(_.orderID).map(o => o.orderID ~ o.userID)
+                    } yield o2.orderID).max)
+      yield o).sortBy(_.orderID).map(o => o.orderID ~ o.userID)
 
     seq(
         (users.schema ++ orders.schema).create,
@@ -708,9 +692,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       _ <- mark("q1", q1.result).map(_.toSet shouldBe data.zip(data))
       _ <- mark("q2", q2.result).map(_.toSet shouldBe data.zip(data).zip(data))
       _ <- mark("q3", q3.result).map(_.toSet shouldBe data)
-      _ <- mark("q4", q4.result).map(_.toSet shouldBe data
-                .filter(_._3 == "b")
-                .map { case t @ (id, _, _) => (id, t) })
+      _ <- mark("q4", q4.result)
+            .map(_.toSet shouldBe data.filter(_._3 == "b").map {
+              case t @ (id, _, _) => (id, t)
+            })
       _ <- mark("q5a", q5a.result).map(_ shouldBe Set(2, 3))
       _ <- mark("q5b", q5b.result).map(_ shouldBe Set(2, 3))
       _ <- mark("q5c", q5c.result).map(_ shouldBe Set(2, 3))

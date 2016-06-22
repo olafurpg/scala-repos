@@ -85,7 +85,8 @@ object EventService {
 
   object ServiceConfig {
     def fromConfiguration(config: Configuration) = {
-      (ServiceLocation.fromConfig(config.detach("eventService")) |@| ServiceLocation
+      (ServiceLocation
+            .fromConfig(config.detach("eventService")) |@| ServiceLocation
             .fromConfig(config.detach("bifrost"))) { (serviceLoc, shardLoc) =>
         ServiceConfig(
             serviceLocation = serviceLoc,
@@ -147,8 +148,10 @@ trait EventService
                                                ingestMaxFields,
                                                ingestTmpDir,
                                                AccessMode.Create)
-    val archiveHandler = new ArchiveServiceHandler[ByteChunk](
-        apiKeyFinder, eventStore, Clock.System, deleteTimeout)
+    val archiveHandler = new ArchiveServiceHandler[ByteChunk](apiKeyFinder,
+                                                              eventStore,
+                                                              Clock.System,
+                                                              deleteTimeout)
     val createHandler = new FileStoreHandler(serviceLocation,
                                              permissionsFinder,
                                              jobManager,

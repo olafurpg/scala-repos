@@ -41,7 +41,8 @@ class GenericAvroSerializerSuite
 
   test("schema compression and decompression") {
     val genericSer = new GenericAvroSerializer(conf.getAvroSchema)
-    assert(schema === genericSer.decompress(
+    assert(
+        schema === genericSer.decompress(
             ByteBuffer.wrap(genericSer.compress(schema))))
   }
 
@@ -84,7 +85,8 @@ class GenericAvroSerializerSuite
       genericSer.decompress(ByteBuffer.wrap(compressedSchema))
 
     assert(compressedSchema.eq(genericSer.compress(schema)))
-    assert(decompressedSchema.eq(
+    assert(
+        decompressedSchema.eq(
             genericSer.decompress(ByteBuffer.wrap(compressedSchema))))
   }
 }

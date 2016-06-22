@@ -276,8 +276,8 @@ class JetTest extends FunSuite with Matchers {
     jp.real should be(scala.math.pow(x, scala.math.sin(x)) +- maxError)
     jp.infinitesimal(0) should be(
         scala.math.exp(scala.math.sin(x) * scala.math.log(x)) *
-        (scala.math.cos(x) * scala.math.log(x) +
-            scala.math.sin(x) / x) +- maxError)
+          (scala.math.cos(x) * scala.math.log(x) +
+                scala.math.sin(x) / x) +- maxError)
     // Square root
     val sq = spire.math.sqrt(jx)
     sq.real should be(scala.math.sqrt(x))
@@ -350,7 +350,7 @@ class JetTest extends FunSuite with Matchers {
       3.14 * 2.0 * x - (1.0 + scala.math.tan(x) * scala.math.tan(x))
     def dc(x: Double) =
       1.0 + (-1.0 / scala.math.sqrt(1.0 - x * x)) * scala.math.sin(x) +
-      scala.math.acos(x) * scala.math.cos(x)
+        scala.math.acos(x) * scala.math.cos(x)
     def dabc(x: Double) = da(b(c(x))) * db(c(x)) * dc(x)
 
     val x = 0.293745

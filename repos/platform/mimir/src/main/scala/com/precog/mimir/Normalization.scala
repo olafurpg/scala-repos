@@ -46,8 +46,9 @@ trait NormalizationHelperModule[M[+ _]]
     trait NormalizationHelper {
       import TransSpecModule._
 
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JType.JUniverseT)
+      val tpe = BinaryOperationType(JType.JUniverseT,
+                                    JObjectUnfixedT,
+                                    JType.JUniverseT)
 
       case class Stats(mean: BigDecimal, stdDev: BigDecimal)
       case class RowValueWithStats(rowValue: BigDecimal, stats: Stats)
@@ -94,7 +95,7 @@ trait NormalizationHelperModule[M[+ _]]
             refs collect {
               case ColumnRef(selector, ctype)
                   if selector.hasSuffix(CPathField(reduction.name)) &&
-                  ctype.isNumeric =>
+                    ctype.isNumeric =>
                 selector.take(selector.length - 1) getOrElse CPath.Identity
             }
           }
@@ -189,22 +190,22 @@ trait NormalizationHelperModule[M[+ _]]
               unifiedCols collect {
                 case (ColumnRef(selector, ctype), col: NumColumn)
                     if findSuffices(selector).size == 1 => {
-                    val suffix = findSuffices(selector).head
+                  val suffix = findSuffices(selector).head
 
-                    val mean = singleSummary(suffix).mean
-                    val stdDev = singleSummary(suffix).stdDev
+                  val mean = singleSummary(suffix).mean
+                  val stdDev = singleSummary(suffix).stdDev
 
-                    val newColumn = new Map1Column(col) with NumColumn {
-                      def value(row: Int) =
-                        RowValueWithStats(
-                            col(row).addContext,
-                            Stats(mean.addContext, stdDev.addContext))
+                  val newColumn = new Map1Column(col) with NumColumn {
+                    def value(row: Int) =
+                      RowValueWithStats(
+                          col(row).addContext,
+                          Stats(mean.addContext, stdDev.addContext))
 
-                      def apply(row: Int) = f(value(row))
-                    }
-
-                    (ColumnRef(selector, ctype), newColumn)
+                    def apply(row: Int) = f(value(row))
                   }
+
+                  (ColumnRef(selector, ctype), newColumn)
+                }
               }
 
             val bitsets = resultsAll.values map { _.definedAt(0, range.end) }

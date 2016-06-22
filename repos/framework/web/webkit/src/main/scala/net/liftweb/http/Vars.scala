@@ -77,7 +77,8 @@ abstract class SessionVar[T](dflt: => T)
       }
 
       if (showWarningWhenAccessedOutOfSessionScope_?)
-        logger.warn("Getting a SessionVar " + name + " outside session scope") // added warning per issue 188
+        logger
+          .warn("Getting a SessionVar " + name + " outside session scope") // added warning per issue 188
 
       Empty
   }
@@ -97,7 +98,7 @@ abstract class SessionVar[T](dflt: => T)
           if !magicSessionVar_? && !s.stateful_? && !settingDefault_? =>
         throw new StateInStatelessException(
             "setting a SessionVar in a " + "stateless session: " +
-            getClass.getName)
+              getClass.getName)
 
       case Full(s) => s.set(name, value)
       case _ =>
@@ -107,8 +108,9 @@ abstract class SessionVar[T](dflt: => T)
         }
 
         if (showWarningWhenAccessedOutOfSessionScope_?)
-          logger.warn("Setting a SessionVar " + name + " to " + value +
-              " outside session scope") // added warning per issue 188
+          logger.warn(
+              "Setting a SessionVar " + name + " to " + value +
+                " outside session scope") // added warning per issue 188
     }
 
   /**
@@ -190,26 +192,27 @@ private[http] trait HasLogUnreadVal {
   * about only storing things that can be actually serialized.  Lift
   * provides a subset of these.
   */
-abstract class ContainerVar[T](
-    dflt: => T)(implicit containerSerializer: ContainerSerializer[T])
+abstract class ContainerVar[T](dflt: => T)(
+    implicit containerSerializer: ContainerSerializer[T])
     extends AnyVar[T, ContainerVar[T]](dflt)
     with LazyLoggable {
 
   override protected def findFunc(name: String): Box[T] = S.session match {
     case Full(session) => {
-        localGet(session, name) match {
-          case Full(array: Array[Byte]) =>
-            Full(containerSerializer.deserialize(array))
-          case _ => Empty
-        }
+      localGet(session, name) match {
+        case Full(array: Array[Byte]) =>
+          Full(containerSerializer.deserialize(array))
+        case _ => Empty
       }
+    }
     case _ => {
-        if (showWarningWhenAccessedOutOfSessionScope_?)
-          logger.warn("Getting a SessionVar " + name +
+      if (showWarningWhenAccessedOutOfSessionScope_?)
+        logger.warn(
+            "Getting a SessionVar " + name +
               " outside session scope") // added warning per issue 188
 
-        Empty
-      }
+      Empty
+    }
   }
 
   private def localSet(session: LiftSession, name: String, value: Any): Unit = {
@@ -232,16 +235,17 @@ abstract class ContainerVar[T](
           if !s.allowContainerState_? && !s.stateful_? && !settingDefault_? =>
         throw new StateInStatelessException(
             "setting a SessionVar in a " + "stateless session: " +
-            getClass.getName)
+              getClass.getName)
 
       case Full(session) => {
-          localSet(session, name, containerSerializer.serialize(value))
-        }
+        localSet(session, name, containerSerializer.serialize(value))
+      }
 
       case _ =>
         if (showWarningWhenAccessedOutOfSessionScope_?)
-          logger.warn("Setting a ContainerVar " + name + " to " + value +
-              " outside session scope") // added warning per issue 188
+          logger.warn(
+              "Setting a ContainerVar " + name + " to " + value +
+                " outside session scope") // added warning per issue 188
     }
 
   /**
@@ -357,8 +361,8 @@ trait RequestVarSnapshotGroup
   * This subclass of RequestVars that allow the specification of a RequestVarSnapshotGroup.
   * You can create a snapshot of all the members of this group in RequestVar.snapshot
   */
-abstract class SnapshotRequestVar[T](
-    val group: RequestVarSnapshotGroup, d: => T)
+abstract class SnapshotRequestVar[T](val group: RequestVarSnapshotGroup,
+                                     d: => T)
     extends RequestVar[T](d) {
 
   /**
@@ -664,7 +668,7 @@ private[http] trait CoreRequestVarHandler {
                   if (Props.devMode && LiftRules.logUnreadRequestVars) {
                     vals.value.keys
                       .filter(!_.startsWith(VarConstants.varPrefix +
-                              "net.liftweb"))
+                                "net.liftweb"))
                       .filter(!_.endsWith(VarConstants.initedSuffix))
                       .foreach(key =>
                             vals.value(key) match {

@@ -55,7 +55,9 @@ class FinalFlatMap[Event, Key, Value: Semigroup, S <: InputState[_], D, RC](
     pDecoder: Injection[Event, D],
     pEncoder: Injection[(Int, CMap[Key, Value]), D])
     extends AsyncBase[Event, (Int, CMap[Key, Value]), S, D, RC](
-        maxWaitingFutures, maxWaitingTime, maxEmitPerExec) {
+        maxWaitingFutures,
+        maxWaitingTime,
+        maxEmitPerExec) {
 
   type InS = S
   type OutputElement = (Int, CMap[Key, Value])

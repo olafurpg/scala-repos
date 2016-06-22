@@ -9,7 +9,8 @@ import spire.algebra.partial.{Semigroupoid, Groupoid}
 import spire.util._
 
 final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](
-    implicit cbf: CanBuildFrom[SA, A, SA], A: Semigroup[A])
+    implicit cbf: CanBuildFrom[SA, A, SA],
+    A: Semigroup[A])
     extends Semigroupoid[SA] {
   override def opIsDefined(x: SA, y: SA): Boolean = x.size == y.size
   def partialOp(x: SA, y: SA): Opt[SA] =
@@ -28,7 +29,8 @@ final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](
 }
 
 final class IterableGroupoid[A, SA <: IterableLike[A, SA]](
-    implicit cbf: CanBuildFrom[SA, A, SA], A: Group[A])
+    implicit cbf: CanBuildFrom[SA, A, SA],
+    A: Group[A])
     extends Groupoid[SA] {
   override def opIsDefined(x: SA, y: SA): Boolean = x.size == y.size
   def partialOp(x: SA, y: SA): Opt[SA] =
@@ -50,8 +52,8 @@ final class IterableGroupoid[A, SA <: IterableLike[A, SA]](
 }
 
 trait PartialIterable0 {
-  implicit def IterableSemigroupoid[
-      A: Semigroup, CC[A] <: IterableLike[A, CC[A]]](
+  implicit def IterableSemigroupoid[A: Semigroup,
+                                    CC[A] <: IterableLike[A, CC[A]]](
       implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Semigroupoid[CC[A]] =
     new IterableSemigroupoid[A, CC[A]]
 }

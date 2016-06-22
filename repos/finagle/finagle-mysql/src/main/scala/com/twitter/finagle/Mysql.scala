@@ -22,8 +22,8 @@ trait MysqlRichClient { self: com.twitter.finagle.Client[Request, Result] =>
     * destination described by `dest` with the assigned
     * `label`. The `label` is used to scope client stats.
     */
-  def newRichClient(
-      dest: Name, label: String): mysql.Client with mysql.Transactions =
+  def newRichClient(dest: Name,
+                    label: String): mysql.Client with mysql.Transactions =
     mysql.Client(newClient(dest, label))
 
   /**
@@ -43,7 +43,9 @@ object MySqlClientTracingFilter {
       val param.Label(label) = _label
       // TODO(jeff): should be able to get this directly from ClientTracingFilter
       val annotations = new AnnotatingTracingFilter[Request, Result](
-          label, Annotation.ClientSend(), Annotation.ClientRecv())
+          label,
+          Annotation.ClientSend(),
+          Annotation.ClientRecv())
       annotations andThen TracingFilter andThen next
     }
   }

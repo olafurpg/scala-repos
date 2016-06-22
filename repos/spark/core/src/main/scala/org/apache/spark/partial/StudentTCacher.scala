@@ -26,8 +26,7 @@ import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
   */
 private[spark] class StudentTCacher(confidence: Double) {
 
-  val NORMAL_APPROX_SAMPLE_SIZE =
-    100 // For samples bigger than this, use Gaussian approximation
+  val NORMAL_APPROX_SAMPLE_SIZE = 100 // For samples bigger than this, use Gaussian approximation
 
   val normalApprox = new NormalDistribution()
     .inverseCumulativeProbability(1 - (1 - confidence) / 2)

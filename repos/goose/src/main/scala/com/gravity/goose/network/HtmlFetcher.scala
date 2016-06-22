@@ -103,23 +103,24 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
     try {
       val localContext: HttpContext = new BasicHttpContext
-      localContext.setAttribute(
-          ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
+      localContext
+        .setAttribute(ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
       httpget = new HttpGet(cleanUrl)
-      HttpProtocolParams.setUserAgent(
-          httpClient.getParams, config.getBrowserUserAgent());
+      HttpProtocolParams
+        .setUserAgent(httpClient.getParams, config.getBrowserUserAgent());
 
       val params = httpClient.getParams
-      HttpConnectionParams.setConnectionTimeout(
-          params, config.getConnectionTimeout())
+      HttpConnectionParams
+        .setConnectionTimeout(params, config.getConnectionTimeout())
       HttpConnectionParams.setSoTimeout(params, config.getSocketTimeout())
 
-      trace("Setting UserAgent To: " +
-          HttpProtocolParams.getUserAgent(httpClient.getParams))
+      trace(
+          "Setting UserAgent To: " +
+            HttpProtocolParams.getUserAgent(httpClient.getParams))
       val response: HttpResponse = httpClient.execute(httpget, localContext)
 
-      HttpStatusValidator.validate(
-          cleanUrl, response.getStatusLine.getStatusCode) match {
+      HttpStatusValidator
+        .validate(cleanUrl, response.getStatusLine.getStatusCode) match {
         case Left(ex) => throw ex
         case _ =>
       }
@@ -135,11 +136,11 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
           }
         } catch {
           case e: Exception => {
-              if (logger.isDebugEnabled) {
-                trace("Unable to get charset for: " + cleanUrl)
-                trace("Encoding Type is: " + encodingType)
-              }
+            if (logger.isDebugEnabled) {
+              trace("Unable to get charset for: " + cleanUrl)
+              trace("Encoding Type is: " + encodingType)
             }
+          }
         }
         try {
           htmlResult = HtmlFetcher
@@ -153,35 +154,35 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       }
     } catch {
       case e: NullPointerException => {
-          logger.warn(
-              e.toString + " " + e.getMessage + " Caught for URL: " + cleanUrl)
-        }
+        logger.warn(
+            e.toString + " " + e.getMessage + " Caught for URL: " + cleanUrl)
+      }
       case e: MaxBytesException => {
-          trace("GRVBIGFAIL: " + cleanUrl + " Reached max bytes size")
-          throw e
-        }
+        trace("GRVBIGFAIL: " + cleanUrl + " Reached max bytes size")
+        throw e
+      }
       case e: SocketException => {
-          logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-        }
+        logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
+      }
       case e: SocketTimeoutException => {
-          trace(e.toString)
-        }
+        trace(e.toString)
+      }
       case e: LoggableException => {
-          logger.warn(e.getMessage)
-          return None
-        }
+        logger.warn(e.getMessage)
+        return None
+      }
       case e: Exception => {
-          trace("FAILURE FOR LINK: " + cleanUrl + " " + e.toString)
-          return None
-        }
+        trace("FAILURE FOR LINK: " + cleanUrl + " " + e.toString)
+        return None
+      }
     } finally {
       if (instream != null) {
         try {
           instream.close()
         } catch {
           case e: Exception => {
-              logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-            }
+            logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
+          }
         }
       }
       if (httpget != null) {
@@ -224,11 +225,11 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       }
     } catch {
       case e: UnsupportedEncodingException => {
-          logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-        }
+        logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
+      }
       case e: IOException => {
-          logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-        }
+        logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
+      }
     }
     None
   }
@@ -256,8 +257,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
       private[network] var emptyList: ArrayList[Cookie] = new ArrayList[Cookie]
     }
-    httpParams.setParameter(
-        "http.protocol.cookie-policy", CookiePolicy.BROWSER_COMPATIBILITY)
+    httpParams.setParameter("http.protocol.cookie-policy",
+                            CookiePolicy.BROWSER_COMPATIBILITY)
     httpParams.setParameter(
         "http.User-Agent",
         "Mozilla/5.0 (X11; U; Linux x86_64; de; rv:1.9.2.8) Gecko/20100723 Ubuntu/10.04 (lucid) Firefox/3.6.8")
@@ -281,8 +282,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       .asInstanceOf[AbstractHttpClient]
       .setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
     httpClient.getParams.setParameter("http.conn-manager.timeout", 120000L)
-    httpClient.getParams.setParameter(
-        "http.protocol.wait-for-continue", 10000L)
+    httpClient.getParams
+      .setParameter("http.protocol.wait-for-continue", 10000L)
     httpClient.getParams.setParameter("http.tcp.nodelay", true)
   }
 
@@ -293,8 +294,9 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     * @param maxBytes The max bytes that we want to read from the input stream
     * @return String
     */
-  def convertStreamToString(
-      is: InputStream, maxBytes: Int, encodingType: String): String = {
+  def convertStreamToString(is: InputStream,
+                            maxBytes: Int,
+                            encodingType: String): String = {
     val buf: Array[Char] = new Array[Char](2048)
     var r: Reader = null
     val s = new StringBuilder
@@ -315,14 +317,14 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       return s.toString()
     } catch {
       case e: SocketTimeoutException => {
-          logger.warn(e.toString + " " + e.getMessage)
-        }
+        logger.warn(e.toString + " " + e.getMessage)
+      }
       case e: UnsupportedEncodingException => {
-          logger.warn(e.toString + " Encoding: " + encodingType)
-        }
+        logger.warn(e.toString + " Encoding: " + encodingType)
+      }
       case e: IOException => {
-          logger.warn(e.toString + " " + e.getMessage)
-        }
+        logger.warn(e.toString + " " + e.getMessage)
+      }
     } finally {
       if (r != null) {
         try {

@@ -87,7 +87,9 @@ class ComparingUnrelatedTypesInspection
         //getType() for the reference on the left side returns singleton type, little hack here
         val leftOnTheRight =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              left.getText, right.getParent, right)
+              left.getText,
+              right.getParent,
+              right)
         Seq(leftOnTheRight, right) map (_.getType()) match {
           case Seq(Success(leftType, _), Success(rightType, _))
               if cannotBeCompared(leftType, rightType) =>
@@ -98,9 +100,10 @@ class ComparingUnrelatedTypesInspection
           case _ =>
         }
       }
-    case MethodRepr(
-        _, Some(baseExpr), Some(ResolvesTo(fun: ScFunction)), Seq(arg, _ *))
-        if mayNeedHighlighting(fun) =>
+    case MethodRepr(_,
+                    Some(baseExpr),
+                    Some(ResolvesTo(fun: ScFunction)),
+                    Seq(arg, _ *)) if mayNeedHighlighting(fun) =>
       for {
         ScParameterizedType(_, Seq(elemType)) <- baseExpr
                                                   .getType()
@@ -109,10 +112,11 @@ class ComparingUnrelatedTypesInspection
       } {
         val (elemTypeText, argTypeText) =
           ScTypePresentation.different(elemType, argType)
-        val message = InspectionBundle.message(
-            "comparing.unrelated.types.hint", elemTypeText, argTypeText)
-        holder.registerProblem(
-            arg, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        val message = InspectionBundle
+          .message("comparing.unrelated.types.hint", elemTypeText, argTypeText)
+        holder.registerProblem(arg,
+                               message,
+                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
     case IsInstanceOfCall(call) =>
       val qualType = call.referencedExpr match {

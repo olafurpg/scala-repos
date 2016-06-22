@@ -12,8 +12,8 @@ import java.util.concurrent.{CopyOnWriteArrayList, ConcurrentHashMap}
 import java.net.InetSocketAddress
 import akka.config.Supervision._
 
-class SupervisorException private[akka](
-    message: String, cause: Throwable = null)
+class SupervisorException private[akka] (message: String,
+                                         cause: Throwable = null)
     extends AkkaException(message, cause)
 
 /**
@@ -82,8 +82,8 @@ case class SupervisorFactory(val config: SupervisorConfig) {
   def newInstance: Supervisor = newInstanceFor(config)
 
   def newInstanceFor(config: SupervisorConfig): Supervisor = {
-    val supervisor = new Supervisor(
-        config.restartStrategy, config.maxRestartsHandler)
+    val supervisor =
+      new Supervisor(config.restartStrategy, config.maxRestartsHandler)
     supervisor.configure(config)
     supervisor.start
     supervisor
@@ -164,7 +164,7 @@ sealed class Supervisor(
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-final class SupervisorActor private[akka](
+final class SupervisorActor private[akka] (
     handler: FaultHandlingStrategy,
     maxRestartsHandler: (ActorRef,
                          MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
@@ -186,6 +186,6 @@ final class SupervisorActor private[akka](
     case unknown =>
       throw new SupervisorException(
           "SupervisorActor can not respond to messages.\n\tUnknown message [" +
-          unknown + "]")
+            unknown + "]")
   }
 }

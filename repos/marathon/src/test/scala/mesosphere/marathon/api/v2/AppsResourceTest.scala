@@ -219,7 +219,7 @@ class AppsResourceTest
     val appJson = Json.toJson(app).as[JsObject]
     val appJsonWithOnlyPorts =
       appJson - "uris" - "portDefinitions" - "version" +
-      ("ports" -> Json.parse("""[1000, 1001]"""))
+        ("ports" -> Json.parse("""[1000, 1001]"""))
     val body = Json.stringify(appJsonWithOnlyPorts).getBytes("UTF-8")
 
     When("The application is updated")
@@ -350,16 +350,16 @@ class AppsResourceTest
     Given("An app and group")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val expectedEmbeds: Set[Embed] = Set(Embed.Counts, Embed.Deployments)
-    val appInfo =
-      AppInfo(app,
-              maybeDeployments = Some(Seq(Identifiable("deployment-123"))),
-              maybeCounts = Some(TaskCounts(1, 2, 3, 4)))
+    val appInfo = AppInfo(app,
+                          maybeDeployments =
+                            Some(Seq(Identifiable("deployment-123"))),
+                          maybeCounts = Some(TaskCounts(1, 2, 3, 4)))
     appInfoService.selectAppsBy(any, eq(expectedEmbeds)) returns Future
       .successful(Seq(appInfo))
 
     When("The the index is fetched without any filters")
-    val response = appsResource.index(
-        null, null, null, new java.util.HashSet(), auth.request)
+    val response = appsResource
+      .index(null, null, null, new java.util.HashSet(), auth.request)
 
     Then("The response holds counts and deployments")
     val appJson = Json.parse(response.getEntity.asInstanceOf[String])

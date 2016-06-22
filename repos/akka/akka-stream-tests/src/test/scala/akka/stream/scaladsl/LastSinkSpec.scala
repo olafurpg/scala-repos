@@ -21,7 +21,8 @@ class LastSinkSpec extends AkkaSpec with ScriptedTest {
   "A Flow with Sink.last" must {
 
     "yield the last value" in assertAllStagesStopped {
-      Await.result(Source(1 to 42).map(identity).runWith(Sink.last), 1.second) should be(
+      Await
+        .result(Source(1 to 42).map(identity).runWith(Sink.last), 1.second) should be(
           42)
     }
 
@@ -53,7 +54,8 @@ class LastSinkSpec extends AkkaSpec with ScriptedTest {
     }
 
     "yield None for empty stream" in assertAllStagesStopped {
-      Await.result(Source.empty[Int].runWith(Sink.lastOption), 1.second) should be(
+      Await
+        .result(Source.empty[Int].runWith(Sink.lastOption), 1.second) should be(
           None)
     }
   }

@@ -27,7 +27,7 @@ private[internal] trait TypeToStrings { self: SymbolTable =>
     if (toStringRecursions >= maxToStringRecursions) {
       devWarning(
           "Exceeded recursion depth attempting to print " +
-          util.shortClassOfInstance(tpe))
+            util.shortClassOfInstance(tpe))
       if (settings.debug) (new Throwable).printStackTrace
 
       "..."

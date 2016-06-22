@@ -52,13 +52,12 @@ abstract class ScalaPsiTestCase extends PsiTestCase {
         val srcRoot = new File(TestUtils.getScalaLibrarySrc)
         assert(srcRoot.exists)
 
-        libModel.addRoot(
-            VfsUtil.getUrlForLibraryRoot(libRoot), OrderRootType.CLASSES)
-        libModel.addRoot(
-            VfsUtil.getUrlForLibraryRoot(srcRoot), OrderRootType.SOURCES)
+        libModel.addRoot(VfsUtil.getUrlForLibraryRoot(libRoot),
+                         OrderRootType.CLASSES)
+        libModel.addRoot(VfsUtil.getUrlForLibraryRoot(srcRoot),
+                         OrderRootType.SOURCES)
 
-        ApplicationManager.getApplication.runWriteAction(
-            new Runnable {
+        ApplicationManager.getApplication.runWriteAction(new Runnable {
           def run() {
             libModel.commit()
             rootModel.commit()

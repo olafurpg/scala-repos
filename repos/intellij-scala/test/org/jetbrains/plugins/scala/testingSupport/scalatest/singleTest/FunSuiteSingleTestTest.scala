@@ -7,8 +7,8 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FunSuiteG
   * @since 20.01.2015.
   */
 trait FunSuiteSingleTestTest extends FunSuiteGenerator {
-  val funSuiteTestPath = List(
-      "[root]", "FunSuiteTest", "should run single test")
+  val funSuiteTestPath =
+    List("[root]", "FunSuiteTest", "should run single test")
 
   def testFunSuite() {
     addFunSuite()
@@ -20,7 +20,8 @@ trait FunSuiteSingleTestTest extends FunSuiteGenerator {
         checkConfigAndSettings(_, "FunSuiteTest", "should run single test"),
         root =>
           checkResultTreeHasExactNamedPath(root, funSuiteTestPath: _*) &&
-          checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
+            checkResultTreeDoesNotHaveNodes(root,
+                                            "should not run other tests"),
         debug = true)
   }
 }

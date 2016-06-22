@@ -10,8 +10,7 @@ import akka.http.scaladsl.model._
 trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
 
   implicit def byteStringUnmarshaller: FromEntityUnmarshaller[ByteString] =
-    Unmarshaller.withMaterializer(
-        _ ⇒
+    Unmarshaller.withMaterializer(_ ⇒
           implicit mat ⇒ {
         case HttpEntity.Strict(_, data) ⇒ FastFuture.successful(data)
         case entity ⇒ entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
@@ -52,10 +51,11 @@ trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
       (entity, string) ⇒
         if (entity.isKnownEmpty) FormData.Empty
         else {
-          try FormData(Uri.Query(string,
-                                 Unmarshaller
-                                   .bestUnmarshallingCharsetFor(entity)
-                                   .nioCharset)) catch {
+          try FormData(
+              Uri.Query(string,
+                        Unmarshaller
+                          .bestUnmarshallingCharsetFor(entity)
+                          .nioCharset)) catch {
             case IllegalUriException(info) ⇒
               throw new IllegalArgumentException(
                   info.formatPretty.replace("Query,", "form content,"))

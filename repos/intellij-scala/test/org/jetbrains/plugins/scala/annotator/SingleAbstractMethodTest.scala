@@ -143,7 +143,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((i: Int) => \"aaa\")", typeMismatch()) :: Error(
-          "((i: Int) => \"aaa\")", doesNotConform()) :: Nil =>
+          "((i: Int) => \"aaa\")",
+          doesNotConform()) :: Nil =>
     }
   }
 
@@ -156,7 +157,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((i: Int, j: Int) => \"aaa\")", typeMismatch()) :: Error(
-          "((i: Int, j: Int) => \"aaa\")", doesNotConform()) :: Nil =>
+          "((i: Int, j: Int) => \"aaa\")",
+          doesNotConform()) :: Nil =>
     }
   }
 
@@ -206,7 +208,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("() => 3", typeMismatch()) :: Error(
-          "wantString", cannotResolveReference()) :: Nil =>
+          "wantString",
+          cannotResolveReference()) :: Nil =>
     }
   }
 
@@ -582,8 +585,8 @@ class SingleAbstractMethodTest
     checkCodeHasNoErrors(code)
   }
 
-  def checkCodeHasNoErrors(
-      scalaCode: String, javaCode: Option[String] = None) {
+  def checkCodeHasNoErrors(scalaCode: String,
+                           javaCode: Option[String] = None) {
     assertMatches(messages(scalaCode, javaCode)) {
       case Nil =>
     }
@@ -610,8 +613,8 @@ class SingleAbstractMethodTest
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert.assertTrue(
-        "actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert
+      .assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
   }
 
   def parseText(@Language("Scala") s: String): ScalaFile = {

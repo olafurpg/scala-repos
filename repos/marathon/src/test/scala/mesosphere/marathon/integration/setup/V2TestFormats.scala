@@ -58,7 +58,8 @@ object V2TestFormats {
 
   implicit lazy val eventSubscribersReads: Reads[EventSubscribers] = Reads {
     subscribersJson =>
-      JsSuccess(EventSubscribers(urls = (subscribersJson \ "callbackUrls")
+      JsSuccess(
+          EventSubscribers(urls = (subscribersJson \ "callbackUrls")
                 .asOpt[Set[String]]
                 .getOrElse(Set.empty)))
   }

@@ -103,8 +103,7 @@ object Test extends App {
   locally(treeBuild.mkAttributedRef(sym): RefTree)
   locally(treeBuild.mkAttributedSelect(tree, sym): RefTree)
   locally(treeBuild.mkAttributedThis(sym): This)
-  locally(
-      mkImporter(scala.reflect.runtime.universe): Importer {
+  locally(mkImporter(scala.reflect.runtime.universe): Importer {
     val from: scala.reflect.runtime.universe.type
   })
   locally(treeBuild.mkMethodCall(sym, trees): Tree)

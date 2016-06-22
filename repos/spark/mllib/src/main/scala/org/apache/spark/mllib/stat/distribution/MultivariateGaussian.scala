@@ -35,8 +35,8 @@ import org.apache.spark.mllib.util.MLUtils
   */
 @Since("1.3.0")
 @DeveloperApi
-class MultivariateGaussian @Since("1.3.0")(
-    @Since("1.3.0") val mu: Vector, @Since("1.3.0") val sigma: Matrix)
+class MultivariateGaussian @Since("1.3.0")(@Since("1.3.0") val mu: Vector,
+                                           @Since("1.3.0") val sigma: Matrix)
     extends Serializable {
 
   require(sigma.numCols == sigma.numRows, "Covariance matrix must be square")
@@ -118,8 +118,8 @@ class MultivariateGaussian @Since("1.3.0")(
     * relation to the maximum singular value (same tolerance used by, e.g., Octave).
     */
   private def calculateCovarianceConstants: (DBM[Double], Double) = {
-    val eigSym.EigSym(d, u) =
-      eigSym(sigma.toBreeze.toDenseMatrix) // sigma = u * diag(d) * u.t
+    val eigSym
+      .EigSym(d, u) = eigSym(sigma.toBreeze.toDenseMatrix) // sigma = u * diag(d) * u.t
 
     // For numerical stability, values are considered to be non-zero only if they exceed tol.
     // This prevents any inverted value from exceeding (eps * n * max(d))^-1

@@ -47,8 +47,8 @@ class FileScanRDD(@transient val sqlContext: SQLContext,
                   @transient val filePartitions: Seq[FilePartition])
     extends RDD[InternalRow](sqlContext.sparkContext, Nil) {
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[InternalRow] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[InternalRow] = {
     throw new NotImplementedError("Not Implemented Yet")
   }
 

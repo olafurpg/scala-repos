@@ -11,8 +11,10 @@ object ImmutableLRU {
     * Build an immutable LRU key/value store that cannot grow larger than `maxSize`
     */
   def apply[K, V](maxSize: Int): ImmutableLRU[K, V] = {
-    new ImmutableLRU(
-        maxSize, 0, Map.empty[K, (Long, V)], SortedMap.empty[Long, K])
+    new ImmutableLRU(maxSize,
+                     0,
+                     Map.empty[K, (Long, V)],
+                     SortedMap.empty[Long, K])
   }
 }
 
@@ -24,8 +26,10 @@ object ImmutableLRU {
 // pairs. The index tracks the access time for a particular key. "ord"
 // is used to determine the Least-Recently-Used key in "map" by taking
 // the minimum index.
-class ImmutableLRU[K, V] private (
-    maxSize: Int, idx: Long, map: Map[K, (Long, V)], ord: SortedMap[Long, K]) {
+class ImmutableLRU[K, V] private (maxSize: Int,
+                                  idx: Long,
+                                  map: Map[K, (Long, V)],
+                                  ord: SortedMap[Long, K]) {
 
   // Scala's SortedMap requires a key ordering; ImmutableLRU doesn't
   // care about pulling a minimum value out of the SortedMap, so the
@@ -58,13 +62,12 @@ class ImmutableLRU[K, V] private (
     val baseOrd = map.get(key).map { case (id, _) => ord - id }.getOrElse(ord)
     val ordWithNewKey = baseOrd + (newIdx -> key)
     // Do we need to remove an old key:
-    val (evicts, finalMap, finalOrd) =
-      if (ordWithNewKey.size > maxSize) {
-        val (minIdx, eKey) = ordWithNewKey.min
-        (Some(eKey), newMap - eKey, ordWithNewKey - minIdx)
-      } else {
-        (None, newMap, ordWithNewKey)
-      }
+    val (evicts, finalMap, finalOrd) = if (ordWithNewKey.size > maxSize) {
+      val (minIdx, eKey) = ordWithNewKey.min
+      (Some(eKey), newMap - eKey, ordWithNewKey - minIdx)
+    } else {
+      (None, newMap, ordWithNewKey)
+    }
     (evicts, new ImmutableLRU[K, V](maxSize, newIdx, finalMap, finalOrd))
   }
 

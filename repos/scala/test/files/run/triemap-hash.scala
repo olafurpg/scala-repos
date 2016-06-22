@@ -10,8 +10,8 @@ object Test {
   def hashing() {
     import collection._
 
-    val tm = new concurrent.TrieMap[String, String](
-        Hashing.fromFunction(x => x.length + x(0).toInt), Equiv.universal)
+    val tm = new concurrent.TrieMap[String, String](Hashing.fromFunction(x =>
+              x.length + x(0).toInt), Equiv.universal)
     tm.put("a", "b")
     tm.put("c", "d")
 

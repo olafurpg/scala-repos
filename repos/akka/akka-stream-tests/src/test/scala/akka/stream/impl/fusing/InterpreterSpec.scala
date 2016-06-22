@@ -341,7 +341,8 @@ class InterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
     }
 
     "work with expand-expand" in new OneBoundedSetup[Int](
-        new Expand(Iterator.from), new Expand(Iterator.from)) {
+        new Expand(Iterator.from),
+        new Expand(Iterator.from)) {
 
       lastEvents() should be(Set(RequestOne))
 
@@ -470,9 +471,10 @@ class InterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
     }
 
     "work with pushAndFinish if indirect upstream completes with pushAndFinish" in new OneBoundedSetup[
-        Int](Seq(Map((x: Any) ⇒ x, stoppingDecider),
-                 new PushFinishStage,
-                 Map((x: Any) ⇒ x, stoppingDecider))) {
+        Int](
+        Seq(Map((x: Any) ⇒ x, stoppingDecider),
+            new PushFinishStage,
+            Map((x: Any) ⇒ x, stoppingDecider))) {
 
       lastEvents() should be(Set.empty)
 

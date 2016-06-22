@@ -131,8 +131,10 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
             ResourceSelector(acceptedResourceRoles, reserved = false)
         )
         matchingResourcesForReservation.map { resourceMatch =>
-          reserveAndCreateVolumes(
-              request.frameworkId, app, offer, resourceMatch)
+          reserveAndCreateVolumes(request.frameworkId,
+                                  app,
+                                  offer,
+                                  resourceMatch)
         }
       } else None
 
@@ -187,10 +189,13 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
             agentId = Some(offer.getSlaveId.getValue),
             attributes = offer.getAttributesList.asScala
         ),
-        reservation = Task.Reservation(
-            persistentVolumeIds, Task.Reservation.State.New(timeout = None))
+        reservation =
+          Task.Reservation(persistentVolumeIds,
+                           Task.Reservation.State.New(timeout = None))
     )
-    taskOperationFactory.reserveAndCreateVolumes(
-        frameworkId, task, resourceMatch.resources, localVolumes)
+    taskOperationFactory.reserveAndCreateVolumes(frameworkId,
+                                                 task,
+                                                 resourceMatch.resources,
+                                                 localVolumes)
   }
 }

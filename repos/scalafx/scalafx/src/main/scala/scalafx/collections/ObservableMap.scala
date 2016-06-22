@@ -244,8 +244,9 @@ trait ObservableMap[K, V]
         val changeEvent: Change[K, V] =
           (change.wasAdded, change.wasRemoved) match {
             case (true, true) =>
-              Replace(
-                  change.getKey, change.getValueAdded, change.getValueRemoved)
+              Replace(change.getKey,
+                      change.getValueAdded,
+                      change.getValueRemoved)
             case (true, false) => Add(change.getKey, change.getValueAdded)
             case (false, true) => Remove(change.getKey, change.getValueRemoved)
             case (false, false) =>
@@ -264,8 +265,7 @@ trait ObservableMap[K, V]
     * @param op No-argument function to be activated when some change in this $OM was made.
     */
   def onChange(op: => Unit) {
-    delegate.addListener(
-        new jfxc.MapChangeListener[K, V] {
+    delegate.addListener(new jfxc.MapChangeListener[K, V] {
       def onChanged(change: jfxc.MapChangeListener.Change[_ <: K, _ <: V]) {
         op
       }

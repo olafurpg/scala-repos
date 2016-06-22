@@ -44,10 +44,15 @@ trait APIKeyManagerSpec[M[+ _]] extends Specification {
         rootKey <- mgr.rootAPIKey
         rootGrantId <- mgr.rootGrantId
         perms = Account.newAccountPermissions("012345", Path("/012345/"))
-        grantRequest = v1.NewGrantRequest(
-            Some("testGrant"), None, Set(rootGrantId), perms, None)
-        record <- mgr.newAPIKeyWithGrants(
-                     Some("test"), None, rootKey, Set(grantRequest))
+        grantRequest = v1.NewGrantRequest(Some("testGrant"),
+                                          None,
+                                          Set(rootGrantId),
+                                          perms,
+                                          None)
+        record <- mgr.newAPIKeyWithGrants(Some("test"),
+                                          None,
+                                          rootKey,
+                                          Set(grantRequest))
         grants <- record.toList.flatMap(_.grants).map(mgr.findGrant).sequence
       } yield {
         (grants.flatten.flatMap(_.parentIds), rootGrantId)

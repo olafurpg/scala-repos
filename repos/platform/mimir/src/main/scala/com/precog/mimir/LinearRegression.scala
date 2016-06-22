@@ -59,8 +59,8 @@ trait LinearRegressionLibModule[M[+ _]]
 
     object MultiLinearRegression
         extends Morphism2(Stats2Namespace, "linearRegression") {
-      val tpe = BinaryOperationType(
-          JNumberT, JType.JUniverseT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JNumberT, JType.JUniverseT, JObjectUnfixedT)
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
@@ -138,7 +138,7 @@ trait LinearRegressionLibModule[M[+ _]]
             } else {
               assert(
                   t1.product.getColumnDimension == t2.product.getColumnDimension &&
-                  t1.product.getRowDimension == t2.product.getRowDimension)
+                    t1.product.getRowDimension == t2.product.getRowDimension)
 
               t1.product plus t2.product
             }
@@ -163,8 +163,8 @@ trait LinearRegressionLibModule[M[+ _]]
       }
 
       // inserts the Double value `0` at all `indices` in `values`
-      def insertZeroAt(
-          values: Array[Double], indices0: Array[Int]): Array[Double] = {
+      def insertZeroAt(values: Array[Double],
+                       indices0: Array[Int]): Array[Double] = {
         val vlength = values.length
         val indices =
           indices0 filter { i =>
@@ -193,8 +193,8 @@ trait LinearRegressionLibModule[M[+ _]]
       }
 
       // removes `indices` from `values`
-      def removeAt(
-          values: Array[Double], indices0: Array[Int]): Array[Double] = {
+      def removeAt(values: Array[Double],
+                   indices0: Array[Int]): Array[Double] = {
         val vlength = values.length
         val indices =
           indices0 filter { i =>
@@ -383,8 +383,10 @@ trait LinearRegressionLibModule[M[+ _]]
             val matrixX0 = xs map { case arr => new Matrix(arr) }
             val matrixX =
               matrixX0 map { mx =>
-                removeColumns(
-                    mx, mx.getRowDimension, mx.getColumnDimension, acc.removed)
+                removeColumns(mx,
+                              mx.getRowDimension,
+                              mx.getColumnDimension,
+                              acc.removed)
               }
 
             val matrixProduct =
@@ -450,8 +452,8 @@ trait LinearRegressionLibModule[M[+ _]]
           (0 until colDim) map {
             case i => math.sqrt(varianceCovariance.get(i, i))
           }
-        val stdErrors = insertZeroAt(
-            stdErrors0.toArray, coeffs.removed.toArray)
+        val stdErrors =
+          insertZeroAt(stdErrors0.toArray, coeffs.removed.toArray)
 
         assert(weightedBeta.length == stdErrors.length)
 
@@ -469,8 +471,7 @@ trait LinearRegressionLibModule[M[+ _]]
         val thetaInSchema = theta.transform(spec)
 
         val varCovarArr = varianceCovariance.getArray
-        val varCovarRv = RArray(
-            varCovarArr map { arr =>
+        val varCovarRv = RArray(varCovarArr map { arr =>
           RArray(arr.map(CNum(_)): _*)
         }: _*)
         val varCovarTable0 = Table.fromRValues(Stream(varCovarRv))
@@ -521,8 +522,8 @@ trait LinearRegressionLibModule[M[+ _]]
           val xsSpec = trans.DeepMap1(xsSpec0, cf.util.CoerceToDouble)
 
           // `arraySpec` generates the schema in which the Coefficients will be returned
-          val arraySpec = InnerArrayConcat(
-              trans.WrapArray(xsSpec), trans.WrapArray(ySpec))
+          val arraySpec =
+            InnerArrayConcat(trans.WrapArray(xsSpec), trans.WrapArray(ySpec))
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
           val table = table0.transform(valueSpec).transform(arraySpec)
 
@@ -601,8 +602,8 @@ trait LinearRegressionLibModule[M[+ _]]
     object LinearPrediction
         extends Morphism2(Stats2Namespace, "predictLinear")
         with LinearPredictionBase {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
 
       override val idPolicy = IdentityPolicy.Retain.Merge
 

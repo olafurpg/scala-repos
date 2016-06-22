@@ -12,8 +12,8 @@ import scala.util.control.NoStackTrace
 
 class FlowRecoverWithSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 1, maxSize = 1)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 1, maxSize = 1)
 
   implicit val materializer = ActorMaterializer(settings)
 

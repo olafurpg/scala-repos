@@ -109,7 +109,8 @@ final class PersistencePluginProxy(config: Config)
                    pluginType.qualifier,
                    targetAddress)
           PersistencePluginProxy.setTargetLocation(
-              context.system, AddressFromURIString(targetAddress))
+              context.system,
+              AddressFromURIString(targetAddress))
         } catch {
           case _: URISyntaxException ⇒
             log.warning("Invalid URL provided for target {} address: {}",
@@ -129,7 +130,7 @@ final class PersistencePluginProxy(config: Config)
   private def timeoutException() =
     new TimeoutException(
         s"Target ${pluginType.qualifier} not initialized. " +
-        s"Use `PersistencePluginProxy.setTargetLocation` or set `target-${pluginType.qualifier}-address`")
+          s"Use `PersistencePluginProxy.setTargetLocation` or set `target-${pluginType.qualifier}-address`")
 
   def receive = init
 
@@ -213,8 +214,8 @@ final class PersistencePluginProxy(config: Config)
                             persistentActor) ⇒
           persistentActor ! ReplayMessagesFailure(timeoutException)
         case DeleteMessagesTo(persistenceId, toSequenceNr, persistentActor) ⇒
-          persistentActor ! DeleteMessagesFailure(
-              timeoutException, toSequenceNr)
+          persistentActor ! DeleteMessagesFailure(timeoutException,
+                                                  toSequenceNr)
       }
 
     case req: SnapshotProtocol.Request ⇒

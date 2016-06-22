@@ -43,8 +43,8 @@ private[ui] case class ExecutorSummaryInfo(id: String,
                                            maxMemory: Long,
                                            executorLogs: Map[String, String])
 
-private[ui] class ExecutorsPage(
-    parent: ExecutorsTab, threadDumpEnabled: Boolean)
+private[ui] class ExecutorsPage(parent: ExecutorsTab,
+                                threadDumpEnabled: Boolean)
     extends WebUIPage("") {
   private val listener = parent.listener
   // When GCTimePercent is edited change ToolTips.TASK_TIME to match
@@ -55,12 +55,12 @@ private[ui] class ExecutorsPage(
       // The follow codes should be protected by `listener` to make sure no executors will be
       // removed before we query their status. See SPARK-12784.
       val _activeExecutorInfo = {
-        for (statusId <- 0 until listener.activeStorageStatusList.size) yield
-          ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
+        for (statusId <- 0 until listener.activeStorageStatusList.size)
+          yield ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
       }
       val _deadExecutorInfo = {
-        for (statusId <- 0 until listener.deadStorageStatusList.size) yield
-          ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
+        for (statusId <- 0 until listener.deadStorageStatusList.size)
+          yield ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
       }
       (_activeExecutorInfo, _deadExecutorInfo)
     }
@@ -124,12 +124,11 @@ private[ui] class ExecutorsPage(
     val maximumMemory = info.maxMemory
     val memoryUsed = info.memoryUsed
     val diskUsed = info.diskUsed
-    val executorStatus =
-      if (info.isActive) {
-        "Active"
-      } else {
-        "Dead"
-      }
+    val executorStatus = if (info.isActive) {
+      "Active"
+    } else {
+      "Dead"
+    }
 
     <tr>
       <td>{info.id}</td>
@@ -189,8 +188,8 @@ private[ui] class ExecutorsPage(
     </tr>
   }
 
-  private def execSummaryRow(
-      execInfo: Seq[ExecutorSummary], rowName: String): Seq[Node] = {
+  private def execSummaryRow(execInfo: Seq[ExecutorSummary],
+                             rowName: String): Seq[Node] = {
     val maximumMemory = execInfo.map(_.maxMemory).sum
     val memoryUsed = execInfo.map(_.memoryUsed).sum
     val diskUsed = execInfo.map(_.diskUsed).sum
@@ -273,26 +272,23 @@ private[ui] class ExecutorsPage(
                        totalGCTime: Long): Seq[Node] = {
     // Determine Color Opacity from 0.5-1
     // activeTasks range from 0 to maxTasks
-    val activeTasksAlpha =
-      if (maxTasks > 0) {
-        (activeTasks.toDouble / maxTasks) * 0.5 + 0.5
-      } else {
-        1
-      }
+    val activeTasksAlpha = if (maxTasks > 0) {
+      (activeTasks.toDouble / maxTasks) * 0.5 + 0.5
+    } else {
+      1
+    }
     // failedTasks range max at 10% failure, alpha max = 1
-    val failedTasksAlpha =
-      if (totalTasks > 0) {
-        math.min(10 * failedTasks.toDouble / totalTasks, 1) * 0.5 + 0.5
-      } else {
-        1
-      }
+    val failedTasksAlpha = if (totalTasks > 0) {
+      math.min(10 * failedTasks.toDouble / totalTasks, 1) * 0.5 + 0.5
+    } else {
+      1
+    }
     // totalDuration range from 0 to 50% GC time, alpha max = 1
-    val totalDurationAlpha =
-      if (totalDuration > 0) {
-        math.min(totalGCTime.toDouble / totalDuration + 0.5, 1)
-      } else {
-        1
-      }
+    val totalDurationAlpha = if (totalDuration > 0) {
+      math.min(totalGCTime.toDouble / totalDuration + 0.5, 1)
+    } else {
+      1
+    }
 
     val tableData = <td style={
       if (activeTasks > 0) {
@@ -332,12 +328,11 @@ private[spark] object ExecutorsPage {
   def getExecInfo(listener: ExecutorsListener,
                   statusId: Int,
                   isActive: Boolean): ExecutorSummary = {
-    val status =
-      if (isActive) {
-        listener.activeStorageStatusList(statusId)
-      } else {
-        listener.deadStorageStatusList(statusId)
-      }
+    val status = if (isActive) {
+      listener.activeStorageStatusList(statusId)
+    } else {
+      listener.deadStorageStatusList(statusId)
+    }
     val execId = status.blockManagerId.executorId
     val hostPort = status.blockManagerId.hostPort
     val rddBlocks = status.numBlocks

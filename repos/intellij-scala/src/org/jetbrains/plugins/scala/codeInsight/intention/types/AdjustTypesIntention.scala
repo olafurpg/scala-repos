@@ -22,8 +22,9 @@ class AdjustTypesIntention extends PsiElementBaseIntentionAction {
 
   override def getText = getFamilyName
 
-  override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  override def isAvailable(project: Project,
+                           editor: Editor,
+                           element: PsiElement): Boolean = {
     val file = element.getContainingFile match {
       case sc: ScalaFile => sc
       case _ => return false
@@ -37,8 +38,9 @@ class AdjustTypesIntention extends PsiElementBaseIntentionAction {
     }
   }
 
-  override def invoke(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
+  override def invoke(project: Project,
+                      editor: Editor,
+                      element: PsiElement): Unit = {
     val file = element.getContainingFile match {
       case sf: ScalaFile => sf
       case _ => return
@@ -52,7 +54,7 @@ class AdjustTypesIntention extends PsiElementBaseIntentionAction {
     elem.depthFirst.exists {
       case ref: ScReferenceElement =>
         ref.qualifier.isDefined &&
-        PsiTreeUtil.getParentOfType(ref, classOf[ScImportExpr]) == null
+          PsiTreeUtil.getParentOfType(ref, classOf[ScImportExpr]) == null
       case _ => false
     }
 }

@@ -15,8 +15,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScIdListStub
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-class ScIdListImpl private (
-    stub: StubElement[ScIdList], nodeType: IElementType, node: ASTNode)
+class ScIdListImpl private (stub: StubElement[ScIdList],
+                            nodeType: IElementType,
+                            node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScIdList {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -28,8 +29,8 @@ class ScIdListImpl private (
     val stub = getStub
     if (stub != null) {
       stub
-        .getChildrenByType(
-            ScalaElementTypes.FIELD_ID, JavaArrayFactoryUtil.ScFieldIdFactory)
+        .getChildrenByType(ScalaElementTypes.FIELD_ID,
+                           JavaArrayFactoryUtil.ScFieldIdFactory)
         .toSeq
     } else findChildrenByClass(classOf[ScFieldId]).toSeq
   }

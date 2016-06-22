@@ -41,7 +41,7 @@ import org.scalatra.util.conversion._
   */
 trait Command extends BindingSyntax with ParamsValueReaderProperties {
 
-  type CommandTypeConverterFactory [T] <: TypeConverterFactory[T]
+  type CommandTypeConverterFactory[T] <: TypeConverterFactory[T]
   private[this] var preBindingActions: Seq[BindingAction] = Nil
 
   private[this] var postBindingActions: Seq[BindingAction] = Nil
@@ -157,14 +157,16 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
                 Binding(b.field,
                         tc.asInstanceOf[TypeConverter[String, b.T]],
                         tcf)(manifest[String], b.valueManifest)
-              headersBinding(Right(
+              headersBinding(
+                  Right(
                       headers.get(name).map(_.asInstanceOf[headersBinding.S])))
             case ValueSource.Path | ValueSource.Query =>
               val pv = typeConverterBuilder(
                   tcf.asInstanceOf[CommandTypeConverterFactory[_]])(params)
                 .asInstanceOf[TypeConverter[Seq[String], b.T]]
               val paramsBinding = Binding(b.field, pv, b.typeConverterFactory)(
-                  manifest[Seq[String]], b.valueManifest)
+                  manifest[Seq[String]],
+                  b.valueManifest)
               paramsBinding(
                   params
                     .read(name)

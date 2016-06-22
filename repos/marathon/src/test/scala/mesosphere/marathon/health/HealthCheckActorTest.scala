@@ -42,8 +42,8 @@ class HealthCheckActorTest
     when(appRepository.app(appId, appVersion))
       .thenReturn(Future.successful(Some(app)))
 
-    val task = MarathonTestHelper.stagedTask(
-        "test_task.9876543", appVersion = appVersion)
+    val task = MarathonTestHelper.stagedTask("test_task.9876543",
+                                             appVersion = appVersion)
 
     when(tracker.appTasksSync(appId)).thenReturn(Set(task))
 
@@ -86,8 +86,8 @@ class HealthCheckActorTest
     when(appRepository.app(appId, appVersion))
       .thenReturn(Future.successful(Some(app)))
 
-    val task = MarathonTestHelper.runningTask(
-        "test_task.9876543", appVersion = appVersion)
+    val task = MarathonTestHelper.runningTask("test_task.9876543",
+                                              appVersion = appVersion)
 
     val healthCheck: HealthCheck = HealthCheck(maxConsecutiveFailures = 3)
 
@@ -103,7 +103,8 @@ class HealthCheckActorTest
     )
 
     actor.underlyingActor.checkConsecutiveFailures(
-        task, Health(task.taskId, consecutiveFailures = 3))
+        task,
+        Health(task.taskId, consecutiveFailures = 3))
 
     verify(driver).killTask(task.taskId.mesosTaskId)
 

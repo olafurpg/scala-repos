@@ -19,8 +19,8 @@ object MacroSupportInterpolationImpl {
       Apply(Ident(TermName("quoteIdentifier")), List(t))
     def symbolName(t: Tree) = Apply(Ident(TermName("symbolName")), List(t))
     def toStr(t: Tree) =
-      Apply(Select(
-                Ident(definitions.StringClass.companion), TermName("valueOf")),
+      Apply(Select(Ident(definitions.StringClass.companion),
+                   TermName("valueOf")),
             List(t))
     def append(t: Tree) =
       Apply(Select(sqlBuilder, TermName("+=").encodedName), List(t))
@@ -86,7 +86,7 @@ object MacroSupportInterpolationImpl {
                 case c2 =>
                   ctx.abort(ctx.enclosingPosition,
                             "Invalid escaped character '" + c2 +
-                            "' in literal \"" + str + "\"")
+                              "' in literal \"" + str + "\"")
               }
             }
           case c => sb append c
@@ -116,7 +116,7 @@ object MacroSupportInterpolationImpl {
         case '!' =>
           exprs ++= appendString(s.substring(0, len - 1))
           exprs +=
-            Apply(Ident(TermName("expr")), List(a, Literal(Constant(true))))
+          Apply(Ident(TermName("expr")), List(a, Literal(Constant(true))))
         case _ =>
           exprs ++= appendString(s)
           //println("### tpe: "+ae.actualType)

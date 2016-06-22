@@ -43,8 +43,8 @@ trait BigIntegerInstances {
 
       def zero: BigInteger @@ Multiplication = Multiplication(BigInteger.ONE)
 
-      def order(
-          x: BigInteger @@ Multiplication, y: BigInteger @@ Multiplication) =
+      def order(x: BigInteger @@ Multiplication,
+                y: BigInteger @@ Multiplication) =
         Tag.unwrap(x).compareTo(Tag.unwrap(y)) match {
           case x if x < 0 => Ordering.LT
           case x if x == 0 => Ordering.EQ

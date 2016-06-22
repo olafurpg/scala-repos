@@ -46,7 +46,7 @@ object BuildDef extends Build {
     classpath.collectFirst {
       case entry @ MatchingModule(moduleOrganization, moduleName, revision)
           if moduleOrganization == organization &&
-          moduleName.startsWith(name) =>
+            moduleName.startsWith(name) =>
         (revision, entry.data)
     }
   }
@@ -61,8 +61,8 @@ object BuildDef extends Build {
 
   // Core Projects
   // -------------
-  lazy val core: Seq[ProjectReference] = Seq(
-      common, actor, markdown, json, json_scalaz7, json_ext, util)
+  lazy val core: Seq[ProjectReference] =
+    Seq(common, actor, markdown, json, json_scalaz7, json_ext, util)
 
   lazy val common = coreProject("common").settings(
       description := "Common Libraties and Utilities",
@@ -71,8 +71,8 @@ object BuildDef extends Build {
 
   lazy val actor = coreProject("actor")
     .dependsOn(common)
-    .settings(
-        description := "Simple Actor", parallelExecution in Test := false)
+    .settings(description := "Simple Actor",
+              parallelExecution in Test := false)
 
   lazy val markdown = coreProject("markdown").settings(
       description := "Markdown Parser",
@@ -146,7 +146,7 @@ object BuildDef extends Build {
                                    (src / "webapp").absString)
               },
               (compile in Compile) <<= (compile in Compile) dependsOn
-              (WebKeys.assets),
+                (WebKeys.assets),
               /**
                 * This is to ensure that the tests in net.liftweb.webapptest run last
                 * so that other tests (MenuSpec in particular) run before the SiteMap
@@ -168,8 +168,8 @@ object BuildDef extends Build {
 
   // Persistence Projects
   // --------------------
-  lazy val persistence: Seq[ProjectReference] = Seq(
-      db, proto, mapper, record, squeryl_record, mongodb, mongodb_record)
+  lazy val persistence: Seq[ProjectReference] =
+    Seq(db, proto, mapper, record, squeryl_record, mongodb, mongodb_record)
 
   lazy val db = persistenceProject("db")
     .dependsOn(util, webkit)

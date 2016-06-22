@@ -47,8 +47,12 @@ sealed trait Join[I <: HList, L1 <: HList, L2 <: HList, R] {
   type Out <: HList
 }
 object Join {
-  implicit def join[
-      I <: HList, L1 <: HList, L2 <: HList, R, In0 <: HList, Out0 <: HList](
+  implicit def join[I <: HList,
+                    L1 <: HList,
+                    L2 <: HList,
+                    R,
+                    In0 <: HList,
+                    Out0 <: HList](
       implicit x: Aux[I, L1, L2, R, HNil, In0, Out0])
     : Join[I, L1, L2, R] { type In = In0; type Out = Out0 } = `n/a`
 
@@ -61,8 +65,11 @@ object Join {
                    Out <: HList]
   object Aux extends Aux1 {
     // if R == Unit convert to HNil
-    implicit def forUnit[
-        I <: HList, L1 <: HList, L2 <: HList, Acc <: HList, Out <: HList](
+    implicit def forUnit[I <: HList,
+                         L1 <: HList,
+                         L2 <: HList,
+                         Acc <: HList,
+                         Out <: HList](
         implicit x: Aux[I, L1, L2, HNil, Acc, I, Out])
       : Aux[I, L1, L2, Unit, Acc, I, Out] = `n/a`
 
@@ -78,8 +85,12 @@ object Join {
       : Aux[I, H :: T, L2, R, Acc, I, Out] = `n/a`
 
     // if R <: HList and L1 empty and L2 non-empty move head of L2 to Acc
-    implicit def iter2[
-        I <: HList, H, T <: HList, R <: HList, Acc <: HList, Out <: HList](
+    implicit def iter2[I <: HList,
+                       H,
+                       T <: HList,
+                       R <: HList,
+                       Acc <: HList,
+                       Out <: HList](
         implicit x: Aux[I, HNil, T, R, H :: Acc, I, Out])
       : Aux[I, HNil, H :: T, R, Acc, I, Out] = `n/a`
 
@@ -126,8 +137,12 @@ object Join {
   }
   abstract class Aux1 {
     // convert R to R :: HNil
-    implicit def forAny[
-        I <: HList, L1 <: HList, L2 <: HList, R, Acc <: HList, Out <: HList](
+    implicit def forAny[I <: HList,
+                        L1 <: HList,
+                        L2 <: HList,
+                        R,
+                        Acc <: HList,
+                        Out <: HList](
         implicit x: Aux[I, L1, L2, R :: HNil, Acc, I, Out])
       : Aux[I, L1, L2, R, Acc, I, Out] = `n/a`
   }

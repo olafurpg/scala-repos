@@ -2,15 +2,16 @@ import sbt._
 import sbt.complete._, Parser._, Parsers._
 
 object PartestUtil {
-  private case class TestFiles(
-      srcPath: String, globalBase: File, testBase: File) {
+  private case class TestFiles(srcPath: String,
+                               globalBase: File,
+                               testBase: File) {
     private val testCaseDir = new SimpleFileFilter(
         f =>
           f.isDirectory && f.listFiles.nonEmpty && !(f.getParentFile /
-              (f.name + ".res")).exists)
+                (f.name + ".res")).exists)
     private val testCaseFilter =
       GlobFilter("*.scala") | GlobFilter("*.java") | GlobFilter("*.res") ||
-      testCaseDir
+        testCaseDir
     private def testCaseFinder =
       (testBase / srcPath).*(AllPassFilter).*(testCaseFilter)
     private val basePaths =

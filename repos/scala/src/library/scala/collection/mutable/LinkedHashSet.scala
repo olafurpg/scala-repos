@@ -57,7 +57,8 @@ class LinkedHashSet[A]
   def contains(elem: A): Boolean = findEntry(elem) ne null
 
   @deprecatedOverriding(
-      "+= should not be overridden so it stays consistent with add.", "2.11.0")
+      "+= should not be overridden so it stays consistent with add.",
+      "2.11.0")
   def +=(elem: A): this.type = { add(elem); this }
 
   @deprecatedOverriding(

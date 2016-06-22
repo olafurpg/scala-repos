@@ -84,18 +84,19 @@ private[akka] object EventAdapters {
 
     // A Map of handler from alias to implementation (i.e. class implementing akka.serialization.Serializer)
     // For example this defines a handler named 'country': `"country" -> com.example.comain.CountryTagsAdapter`
-    val handlers = for ((k: String, v: String) ← adapters) yield
-      k -> instantiateAdapter(v, system).get
+    val handlers = for ((k: String, v: String) ← adapters)
+      yield k -> instantiateAdapter(v, system).get
 
     // bindings is a Seq of tuple representing the mapping from Class to handler.
     // It is primarily ordered by the most specific classes first, and secondly in the configured order.
     val bindings: immutable.Seq[ClassHandler] = {
-      val bs = for ((k: FQN, as: BoundAdapters) ← adapterBindings) yield
-        if (as.size == 1)
-          (system.dynamicAccess.getClassFor[Any](k).get, handlers(as.head))
-        else
-          (system.dynamicAccess.getClassFor[Any](k).get,
-           CombinedReadEventAdapter(as.map(handlers)))
+      val bs = for ((k: FQN, as: BoundAdapters) ← adapterBindings)
+        yield
+          if (as.size == 1)
+            (system.dynamicAccess.getClassFor[Any](k).get, handlers(as.head))
+          else
+            (system.dynamicAccess.getClassFor[Any](k).get,
+             CombinedReadEventAdapter(as.map(handlers)))
 
       sort(bs)
     }
@@ -107,8 +108,8 @@ private[akka] object EventAdapters {
     new EventAdapters(backing, bindings, system.log)
   }
 
-  def instantiateAdapter(
-      adapterFQN: String, system: ExtendedActorSystem): Try[EventAdapter] = {
+  def instantiateAdapter(adapterFQN: String,
+                         system: ExtendedActorSystem): Try[EventAdapter] = {
     val clazz = system.dynamicAccess.getClassFor[Any](adapterFQN).get
     if (classOf[EventAdapter] isAssignableFrom clazz)
       instantiate[EventAdapter](adapterFQN, system)
@@ -144,10 +145,11 @@ private[akka] object EventAdapters {
     * Tries to load the specified Serializer by the fully-qualified name; the actual
     * loading is performed by the system’s [[akka.actor.DynamicAccess]].
     */
-  private def instantiate[T: ClassTag](
-      fqn: FQN, system: ExtendedActorSystem): Try[T] =
+  private def instantiate[T: ClassTag](fqn: FQN,
+                                       system: ExtendedActorSystem): Try[T] =
     system.dynamicAccess.createInstanceFor[T](
-        fqn, List(classOf[ExtendedActorSystem] -> system)) recoverWith {
+        fqn,
+        List(classOf[ExtendedActorSystem] -> system)) recoverWith {
       case _: NoSuchMethodException ⇒
         system.dynamicAccess.createInstanceFor[T](fqn, Nil)
     }
@@ -166,8 +168,8 @@ private[akka] object EventAdapters {
       buf
     }.to[immutable.Seq]
 
-  private final def configToMap(
-      config: Config, path: String): Map[String, String] = {
+  private final def configToMap(config: Config,
+                                path: String): Map[String, String] = {
     import scala.collection.JavaConverters._
     if (config.hasPath(path)) {
       config.getConfig(path).root.unwrapped.asScala.toMap map {
@@ -177,7 +179,8 @@ private[akka] object EventAdapters {
   }
 
   private final def configToListMap(
-      config: Config, path: String): Map[String, immutable.Seq[String]] = {
+      config: Config,
+      path: String): Map[String, immutable.Seq[String]] = {
     import scala.collection.JavaConverters._
     if (config.hasPath(path)) {
       config.getConfig(path).root.unwrapped.asScala.toMap map {

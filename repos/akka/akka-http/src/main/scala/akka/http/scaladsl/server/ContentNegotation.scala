@@ -233,7 +233,7 @@ final class LanguageNegotiator(requestHeaders: Seq[HttpHeader]) {
     case _: LanguageRange.`*` ⇒ 1f // most general, needs to come last
     case x ⇒
       -(2 * x.subTags.size +
-          x.qValue) // more subtags -> more specific -> go first
+            x.qValue) // more subtags -> more specific -> go first
   }.toList
 
   /**

@@ -69,7 +69,8 @@ package inf1 {
 }
 
 package inf2 {
-  @scala.annotation.implicitNotFound(msg =
+  @scala.annotation.implicitNotFound(
+      msg =
         "Cannot construct a collection of type ${To} with elements of type ${Elem} based on a collection of type ${From}.") // no warn
   trait CannotBuildFrom[-From, -Elem, +To]
 }

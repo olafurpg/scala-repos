@@ -138,8 +138,7 @@ abstract class MappedString[T <: Mapper[T]](val fieldOwner: T, val maxLen: Int)
   protected def i_was_! = orgData.get
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(
-        get match {
+    Full(get match {
       case null => JsonAST.JNull
       case str => JsonAST.JString(str)
     })
@@ -212,30 +211,30 @@ abstract class MappedString[T <: Mapper[T]](val fieldOwner: T, val maxLen: Int)
           f.wholeSet(if (v eq null) null else v.toString)
       })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedString[T] => f.wholeSet(if (isNull) null else v.toString)
       })
 
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedString[T] => f.wholeSet(if (v eq null) null else v)
       })
 
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedString[T] =>
           f.wholeSet(if (v eq null) null else v.toString)
       })
 
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedString[T] => f.wholeSet(if (isNull) null else v.toString)

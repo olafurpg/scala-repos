@@ -58,7 +58,7 @@ object Partitioner {
   def defaultPartitioner(rdd: RDD[_], others: RDD[_]*): Partitioner = {
     val bySize = (Seq(rdd) ++ others).sortBy(_.partitions.length).reverse
     for (r <- bySize if r.partitioner.isDefined &&
-         r.partitioner.get.numPartitions > 0) {
+           r.partitioner.get.numPartitions > 0) {
       return r.partitioner.get
     }
     if (rdd.context.conf.contains("spark.default.parallelism")) {
@@ -153,7 +153,8 @@ class RangePartitioner[K: Ordering: ClassTag, V](
         if (imbalancedPartitions.nonEmpty) {
           // Re-sample imbalanced partitions with the desired sampling probability.
           val imbalanced = new PartitionPruningRDD(
-              rdd.map(_._1), imbalancedPartitions.contains)
+              rdd.map(_._1),
+              imbalancedPartitions.contains)
           val seed = byteswap32(-rdd.id - 1)
           val reSampled = imbalanced
             .sample(withReplacement = false, fraction, seed)
@@ -272,8 +273,10 @@ private[spark] object RangePartitioner {
     // val classTagK = classTag[K] // to avoid serializing the entire partitioner object
     val sketched = rdd.mapPartitionsWithIndex { (idx, iter) =>
       val seed = byteswap32(idx ^ (shift << 16))
-      val (sample, n) = SamplingUtils.reservoirSampleAndCount(
-          iter, sampleSizePerPartition, seed)
+      val (sample, n) =
+        SamplingUtils.reservoirSampleAndCount(iter,
+                                              sampleSizePerPartition,
+                                              seed)
       Iterator((idx, n, sample))
     }.collect()
     val numItems = sketched.map(_._2).sum
@@ -289,7 +292,8 @@ private[spark] object RangePartitioner {
     * @return selected bounds
     */
   def determineBounds[K: Ordering: ClassTag](
-      candidates: ArrayBuffer[(K, Float)], partitions: Int): Array[K] = {
+      candidates: ArrayBuffer[(K, Float)],
+      partitions: Int): Array[K] = {
     val ordering = implicitly[Ordering[K]]
     val ordered = candidates.sortBy(_._1)
     val numCandidates = ordered.size

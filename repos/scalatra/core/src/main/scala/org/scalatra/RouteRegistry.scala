@@ -26,8 +26,8 @@ class RouteRegistry {
   def apply(method: HttpMethod): Seq[Route] =
     method match {
       case Head =>
-        _methodRoutes.getOrElse(
-            Head, _methodRoutes.getOrElse(Get, Vector.empty))
+        _methodRoutes
+          .getOrElse(Head, _methodRoutes.getOrElse(Get, Vector.empty))
       case m => _methodRoutes.getOrElse(m, Vector.empty)
     }
 
@@ -56,12 +56,12 @@ class RouteRegistry {
     * - GET implies HEAD
     * - filtering one filters the other
     */
-  def matchingMethodsExcept(
-      method: HttpMethod, requestPath: String): Set[HttpMethod] = {
+  def matchingMethodsExcept(method: HttpMethod,
+                            requestPath: String): Set[HttpMethod] = {
     val p: HttpMethod => Boolean = method match {
       case Get | Head => { m =>
-          m == Get || m == Head
-        }
+        m == Get || m == Head
+      }
       case _ => { _ == method }
     }
     matchingMethodsExcept(requestPath)(p)
@@ -117,8 +117,8 @@ class RouteRegistry {
     */
   def appendAfterFilter(route: Route): Unit = _afterFilters :+= route
 
-  @tailrec private def modifyRoutes(
-      method: HttpMethod, f: (Seq[Route] => Seq[Route])): Unit = {
+  @tailrec private def modifyRoutes(method: HttpMethod,
+                                    f: (Seq[Route] => Seq[Route])): Unit = {
     if (_methodRoutes.putIfAbsent(method, f(Vector.empty)).isDefined) {
       val oldRoutes = _methodRoutes(method)
       if (!_methodRoutes.replace(method, oldRoutes, f(oldRoutes)))

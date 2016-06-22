@@ -51,14 +51,14 @@ object MongoCache {
 
   final class Builder(coll: Coll) {
 
-    def apply[K, V: Handler](prefix: String,
-                             f: K => Fu[V],
-                             maxCapacity: Int = 512,
-                             initialCapacity: Int = 64,
-                             timeToLive: FiniteDuration,
-                             timeToLiveMongo: Option[FiniteDuration] = None,
-                             keyToString: K => String = (k: K) =>
-                               k.toString): MongoCache[K, V] =
+    def apply[K, V: Handler](
+        prefix: String,
+        f: K => Fu[V],
+        maxCapacity: Int = 512,
+        initialCapacity: Int = 64,
+        timeToLive: FiniteDuration,
+        timeToLiveMongo: Option[FiniteDuration] = None,
+        keyToString: K => String = (k: K) => k.toString): MongoCache[K, V] =
       new MongoCache[K, V](
           prefix = prefix,
           expiresAt = expiresAt(timeToLiveMongo | timeToLive),
@@ -71,13 +71,13 @@ object MongoCache {
                            f: => Fu[V],
                            timeToLive: FiniteDuration,
                            timeToLiveMongo: Option[FiniteDuration] = None) =
-      new MongoCache[Boolean, V](
-          prefix = prefix,
-          expiresAt = expiresAt(timeToLiveMongo | timeToLive),
-          cache = LruCache(timeToLive = timeToLive),
-          coll = coll,
-          f = _ => f,
-          keyToString = _.toString)
+      new MongoCache[Boolean, V](prefix = prefix,
+                                 expiresAt =
+                                   expiresAt(timeToLiveMongo | timeToLive),
+                                 cache = LruCache(timeToLive = timeToLive),
+                                 coll = coll,
+                                 f = _ => f,
+                                 keyToString = _.toString)
   }
 
   def apply(coll: Coll) = new Builder(coll)

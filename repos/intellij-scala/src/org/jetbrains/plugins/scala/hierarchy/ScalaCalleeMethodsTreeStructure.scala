@@ -16,8 +16,9 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaCalleeMethodsTreeStructure(
-    project: Project, method: PsiMethod, myScopeType: String)
+class ScalaCalleeMethodsTreeStructure(project: Project,
+                                      method: PsiMethod,
+                                      myScopeType: String)
     extends HierarchyTreeStructure(
         project,
         new CallHierarchyNodeDescriptor(project, null, method, true, false)) {
@@ -48,8 +49,8 @@ class ScalaCalleeMethodsTreeStructure(
       .getTargetElement
       .asInstanceOf[PsiMethod]
     val baseClass: PsiClass = baseMethod.containingClass
-    val methodToDescriptorMap: mutable.HashMap[
-        PsiMethod, CallHierarchyNodeDescriptor] =
+    val methodToDescriptorMap: mutable.HashMap[PsiMethod,
+                                               CallHierarchyNodeDescriptor] =
       new mutable.HashMap[PsiMethod, CallHierarchyNodeDescriptor]
     val result: ArrayBuffer[CallHierarchyNodeDescriptor] =
       new ArrayBuffer[CallHierarchyNodeDescriptor]
@@ -58,8 +59,11 @@ class ScalaCalleeMethodsTreeStructure(
       methodToDescriptorMap.get(calledMethod) match {
         case Some(d) => d.incrementUsageCount()
         case _ =>
-          val d = new CallHierarchyNodeDescriptor(
-              myProject, descriptor, calledMethod, false, false)
+          val d = new CallHierarchyNodeDescriptor(myProject,
+                                                  descriptor,
+                                                  calledMethod,
+                                                  false,
+                                                  false)
           methodToDescriptorMap.put(calledMethod, d)
           result += d
       }
@@ -70,7 +74,11 @@ class ScalaCalleeMethodsTreeStructure(
     for (overridingMethod <- overridingMethods
          if isInScope(baseClass, overridingMethod, myScopeType)) {
       val node: CallHierarchyNodeDescriptor = new CallHierarchyNodeDescriptor(
-          myProject, descriptor, overridingMethod, false, false)
+          myProject,
+          descriptor,
+          overridingMethod,
+          false,
+          false)
       if (!result.contains(node)) result += node
     }
     result.toArray
@@ -78,8 +86,8 @@ class ScalaCalleeMethodsTreeStructure(
 }
 
 object ScalaCalleeMethodsTreeStructure {
-  private[hierarchy] def visitor(
-      element: PsiElement, methods: ArrayBuffer[PsiMethod]): Unit = {
+  private[hierarchy] def visitor(element: PsiElement,
+                                 methods: ArrayBuffer[PsiMethod]): Unit = {
     if (element == null) return
     element match {
       case ref: ScReferenceElement =>

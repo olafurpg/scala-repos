@@ -81,8 +81,9 @@ class SparkJLineCompletion(val intp: SparkIMain)
     // XXX we'd like to say "filterNot (_.isDeprecated)" but this causes the
     // compiler to crash for reasons not yet known.
     def members =
-      afterTyper((effectiveTp.nonPrivateMembers.toList ++ anyMembers) filter
-          (_.isPublic))
+      afterTyper(
+          (effectiveTp.nonPrivateMembers.toList ++ anyMembers) filter
+            (_.isPublic))
     def methods = members.toList filter (_.isMethod)
     def packages = members.toList filter (_.isPackage)
     def aliases = members.toList filter (_.isAliasType)
@@ -109,8 +110,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
         lazy val upgrade = {
           intp rebind param
           intp.reporter.printMessage(
-              "\nRebinding stable value %s from %s to %s".format(
-                  param.name, tp, param.tpe))
+              "\nRebinding stable value %s from %s to %s"
+                .format(param.name, tp, param.tpe))
           upgraded = true
           new TypeMemberCompletion(runtimeType)
         }
@@ -125,8 +126,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
         }
         override def alternativesFor(id: String) =
           super.alternativesFor(id) ++
-          (if (upgraded) upgrade.alternativesFor(id)
-           else Nil) distinct
+            (if (upgraded) upgrade.alternativesFor(id)
+             else Nil) distinct
       }
     }
     def apply(tp: Type): TypeMemberCompletion = {
@@ -152,8 +153,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
     def exclude(name: String): Boolean =
       ((name contains "$") || (excludeNames contains name) ||
-          (excludeEndsWith exists (name endsWith _)) ||
-          (excludeStartsWith exists (name startsWith _)))
+            (excludeEndsWith exists (name endsWith _)) ||
+            (excludeStartsWith exists (name startsWith _)))
     def filtered(xs: List[String]) = xs filterNot exclude distinct
 
     def completions(verbosity: Int) =
@@ -162,7 +163,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
     override def follow(s: String): Option[CompletionAware] =
       debugging(tp + " -> '" + s + "' ==> ")(
           Some(TypeMemberCompletion(memberNamed(s).tpe)) filterNot
-          (_ eq NoTypeCompletion))
+            (_ eq NoTypeCompletion))
 
     override def alternativesFor(id: String): List[String] =
       debugging(id + " alternatives ==> ") {
@@ -297,8 +298,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
   // the list of completion aware objects which should be consulted
   // for top level unqualified, it's too noisy to let much in.
-  private lazy val topLevelBase: List[CompletionAware] = List(
-      ids, rootClass, predef, scalalang, javalang, literals)
+  private lazy val topLevelBase: List[CompletionAware] =
+    List(ids, rootClass, predef, scalalang, javalang, literals)
   private def topLevel = topLevelBase ++ imported
   private def topLevelThreshold = 50
 
@@ -368,8 +369,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
     override def complete(buf: String, cursor: Int): Candidates = {
       verbosity = if (isConsecutiveTabs(buf, cursor)) verbosity + 1 else 0
       logDebug(
-          "\ncomplete(%s, %d) last = (%s, %d), verbosity: %s".format(
-              buf, cursor, lastBuf, lastCursor, verbosity))
+          "\ncomplete(%s, %d) last = (%s, %d), verbosity: %s"
+            .format(buf, cursor, lastBuf, lastCursor, verbosity))
 
       // we don't try lower priority completions unless higher ones return no results.
       def tryCompletion(
@@ -403,7 +404,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
       def tryAll =
         (lastResultCompletion orElse tryCompletion(mkDotted, topLevelFor) getOrElse Candidates(
-                cursor, Nil))
+                cursor,
+                Nil))
 
       /**
         *  This is the kickoff point for all manner of theoretically

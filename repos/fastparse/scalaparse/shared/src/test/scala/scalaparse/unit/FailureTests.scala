@@ -681,8 +681,7 @@ object FailureTests extends TestSuite {
           |}
           |
         """.stripMargin,
-        expected =
-          """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
+        expected = """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
         found = ""
     )
     * - checkNeg(
@@ -877,8 +876,7 @@ object FailureTests extends TestSuite {
         s"""
           |object System {
           |  $tq """".stripMargin,
-        expected =
-          """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
+        expected = """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
         found = ""
     )
   }

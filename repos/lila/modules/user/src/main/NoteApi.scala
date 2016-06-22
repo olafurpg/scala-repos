@@ -9,8 +9,8 @@ case class Note(_id: String,
                 troll: Boolean,
                 date: DateTime)
 
-final class NoteApi(
-    coll: lila.db.Types.Coll, timeline: akka.actor.ActorSelection) {
+final class NoteApi(coll: lila.db.Types.Coll,
+                    timeline: akka.actor.ActorSelection) {
 
   import reactivemongo.bson._
   import lila.db.BSON.BSONJodaDateTimeHandler

@@ -13,8 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-abstract class ScalaStructureViewElement(
-    protected val myElement: PsiElement, val inherited: Boolean)
+abstract class ScalaStructureViewElement(protected val myElement: PsiElement,
+                                         val inherited: Boolean)
     extends StructureViewTreeElement {
 
   def getValue: Object = {
@@ -29,7 +29,8 @@ abstract class ScalaStructureViewElement(
         val v = PsiTreeUtil.getParentOfType(myElement, classOf[ScValue])
         if (myElement.textMatches(v.declaredElements.apply(0))) v
         else myElement
-      } else if (PsiTreeUtil.getParentOfType(myElement, classOf[ScVariable]) != null) {
+      } else if (PsiTreeUtil
+                   .getParentOfType(myElement, classOf[ScVariable]) != null) {
         val v = PsiTreeUtil.getParentOfType(myElement, classOf[ScVariable])
         if (myElement.textMatches(v.declaredElements.apply(0))) v
         else myElement

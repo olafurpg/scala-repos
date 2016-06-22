@@ -12,8 +12,8 @@ abstract class Serializer[T](clazz: Class[T])
     extends DocumentProvider[T]
     with DocumentRecovery[T]
     with QueryProvider[T] {
-  private val TypeField = new StringField(
-      "TYPE", clazz.getSimpleName, Store.YES)
+  private val TypeField =
+    new StringField("TYPE", clazz.getSimpleName, Store.YES)
   private val TypeTerm = new TermQuery(
       new Term(TypeField.name, TypeField.stringValue))
 

@@ -19,8 +19,7 @@ class Indexer(
     index: SearchService,
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
-)
-    extends Actor
+) extends Actor
     with ActorLogging {
 
   private def typeResult(hit: FqnSymbol) = TypeSearchResult(
@@ -67,7 +66,7 @@ class Indexer(
   }
 }
 object Indexer {
-  def apply(index: SearchService)(
-      implicit config: EnsimeConfig, vfs: EnsimeVFS): Props =
+  def apply(index: SearchService)(implicit config: EnsimeConfig,
+                                  vfs: EnsimeVFS): Props =
     Props(classOf[Indexer], index, config, vfs)
 }

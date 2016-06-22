@@ -70,7 +70,8 @@ class TestScalaSymbols extends FunSuite {
   }
 
   test("constructorParamWithTypeArgs") {
-    assert(Compat.constructorParamTypes[ParentTag.Foo2] == Seq(
+    assert(
+        Compat.constructorParamTypes[ParentTag.Foo2] == Seq(
             "scala.Tuple2[scala.Int,java.lang.String]"))
   }
 

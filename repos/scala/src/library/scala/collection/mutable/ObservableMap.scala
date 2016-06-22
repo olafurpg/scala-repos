@@ -22,8 +22,8 @@ import script._
   *  @version 2.0, 31/12/2006
   *  @since   1
   */
-@deprecated(
-    "Observables are deprecated because scripting is deprecated.", "2.11.0")
+@deprecated("Observables are deprecated because scripting is deprecated.",
+            "2.11.0")
 trait ObservableMap[A, B]
     extends Map[A, B]
     with Publisher[Message[(A, B)] with Undoable] {
@@ -36,14 +36,12 @@ trait ObservableMap[A, B]
     get(key) match {
       case None =>
         super.+=(kv)
-        publish(
-            new Include((key, value)) with Undoable {
+        publish(new Include((key, value)) with Undoable {
           def undo = -=(key)
         })
       case Some(old) =>
         super.+=(kv)
-        publish(
-            new Update((key, value)) with Undoable {
+        publish(new Update((key, value)) with Undoable {
           def undo = +=((key, old))
         })
     }
@@ -55,8 +53,7 @@ trait ObservableMap[A, B]
       case None =>
       case Some(old) =>
         super.-=(key)
-        publish(
-            new Remove((key, old)) with Undoable {
+        publish(new Remove((key, old)) with Undoable {
           def undo = update(key, old)
         })
     }
@@ -65,8 +62,7 @@ trait ObservableMap[A, B]
 
   abstract override def clear(): Unit = {
     super.clear()
-    publish(
-        new Reset with Undoable {
+    publish(new Reset with Undoable {
       def undo(): Unit = throw new UnsupportedOperationException("cannot undo")
     })
   }

@@ -74,9 +74,12 @@ class ReceivedBlockHandlerSuite
     conf.set("spark.driver.port", rpcEnv.address.port.toString)
 
     blockManagerMaster = new BlockManagerMaster(
-        rpcEnv.setupEndpoint("blockmanager",
-                             new BlockManagerMasterEndpoint(
-                                 rpcEnv, true, conf, new LiveListenerBus)),
+        rpcEnv.setupEndpoint(
+            "blockmanager",
+            new BlockManagerMasterEndpoint(rpcEnv,
+                                           true,
+                                           conf,
+                                           new LiveListenerBus)),
         conf,
         true)
 
@@ -320,10 +323,10 @@ class ReceivedBlockHandlerSuite
       maxMem: Long,
       conf: SparkConf,
       name: String = SparkContext.DRIVER_IDENTIFIER): BlockManager = {
-    val memManager = new StaticMemoryManager(
-        conf, Long.MaxValue, maxMem, numCores = 1)
-    val transfer = new NettyBlockTransferService(
-        conf, securityMgr, numCores = 1)
+    val memManager =
+      new StaticMemoryManager(conf, Long.MaxValue, maxMem, numCores = 1)
+    val transfer =
+      new NettyBlockTransferService(conf, securityMgr, numCores = 1)
     val blockManager = new BlockManager(name,
                                         rpcEnv,
                                         blockManagerMaster,
@@ -360,11 +363,12 @@ class ReceivedBlockHandlerSuite
           val (blockId, blockStoreResult) =
             storeSingleBlock(handler, receivedBlock)
           bId = blockId
-          assert(blockStoreResult.numRecords === expectedNumRecords,
-                 "Message count not matches for a " +
-                 receivedBlock.getClass.getName +
-                 " being inserted using BlockManagerBasedBlockHandler with " +
-                 sLevel)
+          assert(
+              blockStoreResult.numRecords === expectedNumRecords,
+              "Message count not matches for a " +
+                receivedBlock.getClass.getName +
+                " being inserted using BlockManagerBasedBlockHandler with " +
+                sLevel)
         }
       } else {
         // test received block with WAL based handler
@@ -372,11 +376,12 @@ class ReceivedBlockHandlerSuite
           val (blockId, blockStoreResult) =
             storeSingleBlock(handler, receivedBlock)
           bId = blockId
-          assert(blockStoreResult.numRecords === expectedNumRecords,
-                 "Message count not matches for a " +
-                 receivedBlock.getClass.getName +
-                 " being inserted using WriteAheadLogBasedBlockHandler with " +
-                 sLevel)
+          assert(
+              blockStoreResult.numRecords === expectedNumRecords,
+              "Message count not matches for a " +
+                receivedBlock.getClass.getName +
+                " being inserted using WriteAheadLogBasedBlockHandler with " +
+                sLevel)
         }
       }
     } finally {
@@ -427,15 +432,15 @@ class ReceivedBlockHandlerSuite
     // Handle error in iterator (e.g. divide-by-zero error)
     intercept[Exception] {
       val iterator = (10 to (-10, -1)).toIterator.map { _ / 0 }
-      receivedBlockHandler.storeBlock(
-          StreamBlockId(1, 1), IteratorBlock(iterator))
+      receivedBlockHandler.storeBlock(StreamBlockId(1, 1),
+                                      IteratorBlock(iterator))
     }
 
     // Handler error in block manager storing (e.g. too big block)
     intercept[SparkException] {
       val byteBuffer = ByteBuffer.wrap(new Array[Byte](blockManagerSize + 1))
-      receivedBlockHandler.storeBlock(
-          StreamBlockId(1, 1), ByteBufferBlock(byteBuffer))
+      receivedBlockHandler.storeBlock(StreamBlockId(1, 1),
+                                      ByteBufferBlock(byteBuffer))
     }
   }
 
@@ -449,7 +454,8 @@ class ReceivedBlockHandlerSuite
   private def withWriteAheadLogBasedBlockHandler(
       body: WriteAheadLogBasedBlockHandler => Unit) {
     require(
-        WriteAheadLogUtils.getRollingIntervalSecs(conf, isDriver = false) === 1)
+        WriteAheadLogUtils
+          .getRollingIntervalSecs(conf, isDriver = false) === 1)
     val receivedBlockHandler = new WriteAheadLogBasedBlockHandler(
         blockManager,
         1,
@@ -475,7 +481,8 @@ class ReceivedBlockHandlerSuite
       .zip(blockIds)
       .map {
         case (block, id) =>
-          manualClock.advance(500) // log rolling interval set to 1000 ms through SparkConf
+          manualClock
+            .advance(500) // log rolling interval set to 1000 ms through SparkConf
           logDebug("Inserting block " + id)
           receivedBlockHandler.storeBlock(id, block)
       }

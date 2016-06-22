@@ -38,7 +38,8 @@ class HistoryActorTest
     historyActor ! message
 
     verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+        message.appId,
+        TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Store TASK_ERROR") {
@@ -46,7 +47,8 @@ class HistoryActorTest
     historyActor ! message
 
     verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+        message.appId,
+        TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Store TASK_LOST") {
@@ -54,7 +56,8 @@ class HistoryActorTest
     historyActor ! message
 
     verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+        message.appId,
+        TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Ignore TASK_RUNNING") {

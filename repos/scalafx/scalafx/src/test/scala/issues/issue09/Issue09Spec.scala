@@ -49,7 +49,7 @@ class Issue09Spec extends FlatSpec {
     //     cannot be cast to javafx.beans.value.ObservableObjectValue
     val areaSquared =
       when(((a + b) > c) && ((b + c) > a) && ((c + a) > b)) choose
-      (s * (s - a) * (s - b) * (s - c)) otherwise 0.0
+        (s * (s - a) * (s - b) * (s - c)) otherwise 0.0
 
     a() = 3
     b() = 4

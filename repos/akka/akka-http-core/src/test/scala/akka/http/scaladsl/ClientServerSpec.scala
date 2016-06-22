@@ -33,8 +33,8 @@ class ClientServerSpec
     with Matchers
     with BeforeAndAfterAll
     with ScalaFutures {
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.loggers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.stdout-loglevel = ERROR
@@ -107,12 +107,13 @@ class ClientServerSpec
     "properly terminate client when server is not running" in Utils.assertAllStagesStopped {
       for (i ← 1 to 10) withClue(s"iterator $i: ") {
         Source
-          .single(HttpRequest(HttpMethods.POST,
-                              "/test",
-                              List.empty,
-                              HttpEntity(MediaTypes.`text/plain`.withCharset(
-                                             HttpCharsets.`UTF-8`),
-                                         "buh")))
+          .single(
+              HttpRequest(HttpMethods.POST,
+                          "/test",
+                          List.empty,
+                          HttpEntity(MediaTypes.`text/plain`.withCharset(
+                                         HttpCharsets.`UTF-8`),
+                                     "buh")))
           .via(Http(actorSystem).outgoingConnection("localhost", 7777))
           .runWith(Sink.head)
           .failed
@@ -193,8 +194,8 @@ class ClientServerSpec
           Promise().future // never complete the request with a response; we're waiting for the timeout to happen, nothing else
         }
 
-        val binding = Http().bindAndHandleAsync(
-            handle, hostname, port, settings = settings)
+        val binding = Http()
+          .bindAndHandleAsync(handle, hostname, port, settings = settings)
         val b1 = Await.result(binding, 3.seconds)
         (receivedRequest, b1)
       }
@@ -231,7 +232,7 @@ class ClientServerSpec
             }
 
             (System.nanoTime() -
-                serverReceivedRequestAtNanos).millis should be >= serverTimeout
+                  serverReceivedRequestAtNanos).millis should be >= serverTimeout
           } finally Await.result(b1.unbind(), 1.second)
         }
       }
@@ -459,10 +460,11 @@ class ClientServerSpec
           HttpEntity.Chunked(chunkedContentType, Source(chunks))
 
         val clientOutSub = clientOut.expectSubscription()
-        clientOutSub.sendNext(HttpRequest(POST,
-                                          "/chunked",
-                                          List(Accept(MediaRanges.`*/*`)),
-                                          chunkedEntity))
+        clientOutSub.sendNext(
+            HttpRequest(POST,
+                        "/chunked",
+                        List(Accept(MediaRanges.`*/*`)),
+                        chunkedEntity))
 
         val serverInSub = serverIn.expectSubscription()
         serverInSub.request(1)
@@ -552,16 +554,16 @@ class ClientServerSpec
     }
     val connSourceSub = connSource.expectSubscription()
 
-    def openNewClientConnection(
-        settings: ClientConnectionSettings =
+    def openNewClientConnection(settings: ClientConnectionSettings =
           ClientConnectionSettings(system)) = {
       val requestPublisherProbe = TestPublisher.manualProbe[HttpRequest]()
       val responseSubscriberProbe = TestSubscriber.manualProbe[HttpResponse]()
 
       val connectionFuture = Source
         .fromPublisher(requestPublisherProbe)
-        .viaMat(Http().outgoingConnection(
-                hostname, port, settings = settings))(Keep.right)
+        .viaMat(
+            Http().outgoingConnection(hostname, port, settings = settings))(
+            Keep.right)
         .to(Sink.fromSubscriber(responseSubscriberProbe))
         .run()
 

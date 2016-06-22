@@ -67,8 +67,8 @@ class LeaderProxyFilter @Inject()(
 
   private[this] val scheme = if (httpConf.disableHttp()) "https" else "http"
 
-  private[this] def buildUrl(
-      leaderData: String, request: HttpServletRequest): URL = {
+  private[this] def buildUrl(leaderData: String,
+                             request: HttpServletRequest): URL = {
     buildUrl(leaderData, request.getRequestURI, Option(request.getQueryString))
   }
 
@@ -112,7 +112,7 @@ class LeaderProxyFilter @Inject()(
         } else {
           log.error(
               s"inconsistent leadership state, refusing request for ourselves at $myHostPort. " +
-              s"Are we leader?: $weAreLeader, leader: $currentLeaderData")
+                s"Are we leader?: $weAreLeader, leader: $currentLeaderData")
         }
 
         retries -= 1
@@ -133,7 +133,7 @@ class LeaderProxyFilter @Inject()(
           // either not leader or ourselves
           log.info(
               s"Do not proxy to myself. Waiting for consistent leadership state. " +
-              s"Are we leader?: false, leader: $leaderDataOpt")
+                s"Are we leader?: false, leader: $leaderDataOpt")
           if (waitForConsistentLeadership(response)) {
             doFilter(rawRequest, rawResponse, chain)
           } else {
@@ -238,7 +238,7 @@ class JavaUrlConnectionRequestForwarder @Inject()(
         // The host header is used to choose the correct virtual host and should be set to the hostname
         // of the URL for HTTP 1.1. Thus we do not preserve it, even though Marathon does not care.
         if !name.equalsIgnoreCase("host") &&
-        !name.equalsIgnoreCase("connection")
+          !name.equalsIgnoreCase("connection")
         headerValues <- Option(request.getHeaders(name))
         headerValue <- headerValues.asScala
       } {
@@ -324,8 +324,8 @@ class JavaUrlConnectionRequestForwarder @Inject()(
           copyConnectionResponse(leaderConnection, response)
         } catch {
           case connException: ConnectException =>
-            response.sendError(
-                HttpStatus.SC_BAD_GATEWAY, ERROR_STATUS_CONNECTION_REFUSED)
+            response.sendError(HttpStatus.SC_BAD_GATEWAY,
+                               ERROR_STATUS_CONNECTION_REFUSED)
         } finally {
           Try(leaderConnection.getInputStream.close())
           Try(leaderConnection.getErrorStream.close())

@@ -83,8 +83,8 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
   def awaitReference[T](serviceType: Class[T]): ServiceReference[T] =
     awaitReference(serviceType, SleepyTime)
 
-  def awaitReference[T](
-      serviceType: Class[T], wait: FiniteDuration): ServiceReference[T] = {
+  def awaitReference[T](serviceType: Class[T],
+                        wait: FiniteDuration): ServiceReference[T] = {
 
     @tailrec
     def poll(step: Duration, deadline: Deadline): ServiceReference[T] =
@@ -172,8 +172,8 @@ class BundleDescriptorBuilder(name: String) {
     val headers = new HashMap[String, String]()
     val jis = new JarInputStream(new FileInputStream(file))
     try {
-      for (entry ← jis.getManifest.getMainAttributes.entrySet.asScala) headers
-        .put(entry.getKey.toString, entry.getValue.toString)
+      for (entry ← jis.getManifest.getMainAttributes.entrySet.asScala)
+        headers.put(entry.getKey.toString, entry.getValue.toString)
     } finally jis.close()
 
     headers

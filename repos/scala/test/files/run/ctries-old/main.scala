@@ -34,7 +34,7 @@ object Test {
         } finally {
           assert(produced,
                  "Did not produce exception of type: " +
-                 implicitly[ClassManifest[T]])
+                   implicitly[ClassManifest[T]])
         }
       }
     }

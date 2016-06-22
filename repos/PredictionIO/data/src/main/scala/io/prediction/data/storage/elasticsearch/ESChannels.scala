@@ -46,8 +46,8 @@ class ESChannels(client: Client, config: StorageClientConfig, index: String)
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+            ("properties" ->
+                  ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)
@@ -56,12 +56,11 @@ class ESChannels(client: Client, config: StorageClientConfig, index: String)
   }
 
   def insert(channel: Channel): Option[Int] = {
-    val id =
-      if (channel.id == 0) {
-        var roll = seq.genNext(seqName)
-        while (!get(roll).isEmpty) roll = seq.genNext(seqName)
-        roll
-      } else channel.id
+    val id = if (channel.id == 0) {
+      var roll = seq.genNext(seqName)
+      while (!get(roll).isEmpty) roll = seq.genNext(seqName)
+      roll
+    } else channel.id
 
     val realChannel = channel.copy(id = id)
     if (update(realChannel)) Some(id) else None

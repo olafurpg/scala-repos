@@ -127,7 +127,8 @@ trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
   }
 
   def register[AA <: A, BB <: B](op: Method[AA, BB, _ <: R])(
-      implicit manA: Manifest[AA], manB: Manifest[BB]) {
+      implicit manA: Manifest[AA],
+      manB: Manifest[BB]) {
     super.register(manA.runtimeClass.asInstanceOf[Class[_]],
                    manB.runtimeClass.asInstanceOf[Class[_]],
                    op)
@@ -145,7 +146,9 @@ trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
   protected def bindingMissing(a: A, b: B): Unit =
     throw new UnsupportedOperationException("Types not found!")
   protected def multipleOptions(
-      a: A, b: B, m: Map[(Class[_], Class[_]), Method[_ <: A, _ <: B]]) = {
+      a: A,
+      b: B,
+      m: Map[(Class[_], Class[_]), Method[_ <: A, _ <: B]]) = {
     throw new RuntimeException("Multiple bindings for method: " + m)
   }
 
@@ -184,8 +187,8 @@ trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
     }
   }
 
-  def register[AA <: A, BB <: B](op: Method[AA, BB])(
-      implicit manA: Manifest[AA], manB: Manifest[BB]) {
+  def register[AA <: A, BB <: B](
+      op: Method[AA, BB])(implicit manA: Manifest[AA], manB: Manifest[BB]) {
     super.register(manA.runtimeClass.asInstanceOf[Class[AA]],
                    manB.runtimeClass.asInstanceOf[Class[BB]],
                    op)
@@ -257,7 +260,7 @@ trait MMRegistry2[R] {
       // if there is no option (aaa,bbb) s.t. aaa <: aa && bbb <: bb, then add it to the list
       if (!bestCandidates.exists(pair =>
                 aa.isAssignableFrom(pair._1) &&
-                bb.isAssignableFrom(pair._2))) {
+                  bb.isAssignableFrom(pair._2))) {
         bestCandidates = bestCandidates.filterNot(pair =>
               pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb))
         bestCandidates += pair
@@ -335,11 +338,12 @@ trait MMRegistry3[R] {
       // if there is no option (aaa,bbb) s.t. aaa <: aa && bbb <: bb, then add it to the list
       if (!bestCandidates.exists(pair =>
                 aa.isAssignableFrom(pair._1) &&
-                bb.isAssignableFrom(pair._2)) &&
+                  bb.isAssignableFrom(pair._2)) &&
           cc.isAssignableFrom(pair._3)) {
-        bestCandidates = bestCandidates.filterNot(pair =>
+        bestCandidates = bestCandidates.filterNot(
+            pair =>
               pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb) &&
-              pair._3.isAssignableFrom(cc))
+                pair._3.isAssignableFrom(cc))
         bestCandidates += pair
       }
     }
@@ -361,14 +365,15 @@ trait MMRegistry1[M] {
   }
 
   protected def resolve(
-      a: Class[_], checkedA: Set[Class[_]] = Set.empty): Map[Class[_], M] = {
+      a: Class[_],
+      checkedA: Set[Class[_]] = Set.empty): Map[Class[_], M] = {
     ops.get(a) match {
       case Some(m) => Map(a -> m)
       case None =>
         val newCA = checkedA ++ a.getInterfaces
         val sa = a.getSuperclass +: a.getInterfaces.filterNot(checkedA)
-        val allParents =
-          for (aa <- sa; if aa != null; m <- resolve(aa, newCA)) yield {
+        val allParents = for (aa <- sa; if aa != null; m <- resolve(aa, newCA))
+          yield {
             m
           }
         allParents.toMap

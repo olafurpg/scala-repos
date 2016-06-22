@@ -20,8 +20,9 @@ class ScalaPostfixTemplateProvider extends PostfixTemplateProvider {
 
   override def preExpand(file: PsiFile, editor: Editor): Unit = {}
 
-  override def preCheck(
-      copyFile: PsiFile, realEditor: Editor, currentOffset: Int): PsiFile =
+  override def preCheck(copyFile: PsiFile,
+                        realEditor: Editor,
+                        currentOffset: Int): PsiFile =
     copyFile
 
   override def afterExpand(file: PsiFile, editor: Editor): Unit = {}

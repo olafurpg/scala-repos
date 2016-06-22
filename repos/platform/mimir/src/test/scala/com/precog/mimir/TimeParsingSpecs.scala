@@ -116,8 +116,10 @@ trait TimeParsingSpecs[M[+ _]]
 
       result must haveSize(4)
 
-      result must contain(
-          "2010-06-03", "2010-06-04", "2011-08-12", "2010-10-09")
+      result must contain("2010-06-03",
+                          "2010-06-04",
+                          "2011-08-12",
+                          "2010-10-09")
     }
 
     "from heterogeneous set" in {

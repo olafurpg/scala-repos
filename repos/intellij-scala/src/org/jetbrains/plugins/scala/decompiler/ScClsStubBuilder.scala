@@ -32,8 +32,8 @@ object ScClsStubBuilder {
     }
   }
 
-  private def canBeProcessed(
-      file: VirtualFile, bytes: => Array[Byte]): Boolean = {
+  private def canBeProcessed(file: VirtualFile,
+                             bytes: => Array[Byte]): Boolean = {
     if (DecompilerUtil.isScalaFile(file, bytes)) return true
     val fileName: String = file.getNameWithoutExtension
     val parent = file.getParent
@@ -125,8 +125,9 @@ class ScClsStubBuilder extends ClsStubBuilder {
         isInner(name, index + 1, directory))
   }
 
-  private def containsPart(
-      directory: Directory, name: String, endIndex: Int): Boolean = {
+  private def containsPart(directory: Directory,
+                           name: String,
+                           endIndex: Int): Boolean = {
     endIndex > 0 && directory.contains(name.substring(0, endIndex))
   }
 
@@ -137,9 +138,10 @@ class ScClsStubBuilder extends ClsStubBuilder {
   private class ParentDirectory(dir: VirtualFile) extends Directory {
     def contains(name: String): Boolean = {
       if (dir == null) return false
-      !dir.getChildren.forall(child =>
+      !dir.getChildren.forall(
+          child =>
             child.getExtension != "class" ||
-            NameTransformer.decode(child.getNameWithoutExtension) == name)
+              NameTransformer.decode(child.getNameWithoutExtension) == name)
     }
   }
 }

@@ -91,8 +91,9 @@ private[tv] object TvActor {
   case class GetGameId(channel: Tv.Channel)
   case class GetGameIds(channel: Tv.Channel, max: Int)
   case object Select
-  case class Selected(
-      channel: Tv.Channel, game: lila.game.Game, previousId: Option[String])
+  case class Selected(channel: Tv.Channel,
+                      game: lila.game.Game,
+                      previousId: Option[String])
 
   case object GetChampions
 }

@@ -65,8 +65,8 @@ abstract class VertexRDD[VD](sc: SparkContext, deps: Seq[Dependency[_]])
   /**
     * Provides the `RDD[(VertexId, VD)]` equivalent output.
     */
-  override def compute(
-      part: Partition, context: TaskContext): Iterator[(VertexId, VD)] = {
+  override def compute(part: Partition,
+                       context: TaskContext): Iterator[(VertexId, VD)] = {
     firstParent[ShippableVertexPartition[VD]]
       .iterator(part, context)
       .next()
@@ -326,16 +326,19 @@ object VertexRDD {
       case None =>
         vertices.partitionBy(new HashPartitioner(vertices.partitions.length))
     }
-    val routingTables = createRoutingTables(
-        edges, vPartitioned.partitioner.get)
+    val routingTables =
+      createRoutingTables(edges, vPartitioned.partitioner.get)
     val vertexPartitions =
       vPartitioned.zipPartitions(routingTables, preservesPartitioning = true) {
         (vertexIter, routingTableIter) =>
           val routingTable =
             if (routingTableIter.hasNext) routingTableIter.next()
             else RoutingTablePartition.empty
-          Iterator(ShippableVertexPartition(
-                  vertexIter, routingTable, defaultVal, mergeFunc))
+          Iterator(
+              ShippableVertexPartition(vertexIter,
+                                       routingTable,
+                                       defaultVal,
+                                       mergeFunc))
       }
     new VertexRDDImpl(vertexPartitions)
   }
@@ -351,10 +354,11 @@ object VertexRDD {
     * @param numPartitions the desired number of partitions for the resulting `VertexRDD`
     * @param defaultVal the vertex attribute to use when creating missing vertices
     */
-  def fromEdges[VD: ClassTag](
-      edges: EdgeRDD[_], numPartitions: Int, defaultVal: VD): VertexRDD[VD] = {
-    val routingTables = createRoutingTables(
-        edges, new HashPartitioner(numPartitions))
+  def fromEdges[VD: ClassTag](edges: EdgeRDD[_],
+                              numPartitions: Int,
+                              defaultVal: VD): VertexRDD[VD] = {
+    val routingTables =
+      createRoutingTables(edges, new HashPartitioner(numPartitions))
     val vertexPartitions = routingTables.mapPartitions({ routingTableIter =>
       val routingTable =
         if (routingTableIter.hasNext) routingTableIter.next()

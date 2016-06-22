@@ -46,8 +46,8 @@ final class Env(config: Config,
 
   lazy val forms = new DataForm
 
-  lazy val cached = new Cached(
-      createdTtl = CreatedCacheTtl, rankingTtl = RankingCacheTtl)
+  lazy val cached =
+    new Cached(createdTtl = CreatedCacheTtl, rankingTtl = RankingCacheTtl)
 
   lazy val api = new TournamentApi(cached = cached,
                                    scheduleJsonView = scheduleJsonView,
@@ -76,18 +76,19 @@ final class Env(config: Config,
                                              chat = hub.actor.chat,
                                              flood = flood)
 
-  lazy val winners = new Winners(
-      mongoCache = mongoCache, ttl = LeaderboardCacheTtl)
+  lazy val winners =
+    new Winners(mongoCache = mongoCache, ttl = LeaderboardCacheTtl)
 
   lazy val jsonView = new JsonView(lightUser, cached, performance)
 
   lazy val scheduleJsonView = new ScheduleJsonView(lightUser)
 
-  lazy val leaderboardApi = new LeaderboardApi(
-      coll = leaderboardColl, maxPerPage = 20)
+  lazy val leaderboardApi =
+    new LeaderboardApi(coll = leaderboardColl, maxPerPage = 20)
 
   private lazy val leaderboardIndexer = new LeaderboardIndexer(
-      tournamentColl = tournamentColl, leaderboardColl = leaderboardColl)
+      tournamentColl = tournamentColl,
+      leaderboardColl = leaderboardColl)
 
   private val socketHub =
     system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
@@ -100,8 +101,7 @@ final class Env(config: Config,
                    lightUser = lightUser)
     }), name = SocketName)
 
-  private val sequencerMap = system.actorOf(
-      Props(ActorMap { id =>
+  private val sequencerMap = system.actorOf(Props(ActorMap { id =>
     new Sequencer(receiveTimeout = SequencerTimeout.some,
                   executionTimeout = 5.seconds.some,
                   logger = logger)
@@ -110,18 +110,21 @@ final class Env(config: Config,
   system.actorOf(Props(new ApiActor(api = api)), name = ApiActorName)
 
   system.actorOf(
-      Props(new CreatedOrganizer(
+      Props(
+          new CreatedOrganizer(
               api = api,
               isOnline = isOnline
           )))
 
   private val reminder = system.actorOf(
-      Props(new Reminder(
+      Props(
+          new Reminder(
               renderer = hub.actor.renderer
           )))
 
   system.actorOf(
-      Props(new StartedOrganizer(
+      Props(
+          new StartedOrganizer(
               api = api,
               reminder = reminder,
               isOnline = isOnline,
@@ -140,8 +143,8 @@ final class Env(config: Config,
     }
   }
 
-  private lazy val autoPairing = new AutoPairing(
-      roundMap = roundMap, system = system, onStart = onStart)
+  private lazy val autoPairing =
+    new AutoPairing(roundMap = roundMap, system = system, onStart = onStart)
 
   private[tournament] lazy val tournamentColl = db(CollectionTournament)
   private[tournament] lazy val pairingColl = db(CollectionPairing)

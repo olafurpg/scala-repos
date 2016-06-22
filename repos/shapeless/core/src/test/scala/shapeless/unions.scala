@@ -99,8 +99,10 @@ class UnionTests {
     typed[iiss](Coproduct[Union.`'i -> Int, 's -> String`.T]('s ->> "foo"))
 
     type iissbb = FieldType[i, Int] :+: FieldType[s, String] :+: FieldType[
-        b, Boolean] :+: CNil
-    typed[iissbb](Coproduct[Union.`'i -> Int, 's -> String, 'b -> Boolean`.T](
+        b,
+        Boolean] :+: CNil
+    typed[iissbb](
+        Coproduct[Union.`'i -> Int, 's -> String, 'b -> Boolean`.T](
             'b ->> true))
 
     // Curiously, lines like
@@ -252,8 +254,8 @@ class UnionTests {
 
       assertTypedEquals(Coproduct[USF]("first".narrow -> Option(2)), f1)
       assertTypedEquals(Coproduct[USF]("second".narrow -> Option(true)), f2)
-      assertTypedEquals(
-          Coproduct[USF]("third".narrow -> Option.empty[String]), f3)
+      assertTypedEquals(Coproduct[USF]("third".narrow -> Option.empty[String]),
+                        f3)
     }
   }
 
@@ -297,7 +299,8 @@ class UnionTests {
       assertTypedEquals(Map[String, Option[Any]]("first" -> Some(2)), m1)
       assertTypedEquals(Map[String, Option[Any]]("second" -> Some(true)), m2)
       assertTypedEquals(
-          Map[String, Option[Any]]("third" -> Option.empty[String]), m3)
+          Map[String, Option[Any]]("third" -> Option.empty[String]),
+          m3)
     }
 
     {
@@ -308,7 +311,8 @@ class UnionTests {
       assertTypedEquals(Map[String, Option[Any]]("first" -> Some(2)), m1)
       assertTypedEquals(Map[String, Option[Any]]("second" -> Some(true)), m2)
       assertTypedEquals(
-          Map[String, Option[Any]]("third" -> Option.empty[String]), m3)
+          Map[String, Option[Any]]("third" -> Option.empty[String]),
+          m3)
     }
   }
 

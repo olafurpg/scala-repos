@@ -24,14 +24,16 @@ trait HttpFilters {
 
 object HttpFilters {
 
-  def bindingsFromConfiguration(
-      environment: Environment, configuration: Configuration) = {
+  def bindingsFromConfiguration(environment: Environment,
+                                configuration: Configuration) = {
     Reflect.bindingsFromConfiguration[HttpFilters,
                                       play.http.HttpFilters,
                                       JavaHttpFiltersAdapter,
                                       JavaHttpFiltersDelegate,
-                                      NoHttpFilters](
-        environment, PlayConfig(configuration), "play.http.filters", "Filters")
+                                      NoHttpFilters](environment,
+                                                     PlayConfig(configuration),
+                                                     "play.http.filters",
+                                                     "Filters")
   }
 
   def apply(filters: EssentialFilter*): HttpFilters = {

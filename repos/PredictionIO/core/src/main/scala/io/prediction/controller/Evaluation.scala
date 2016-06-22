@@ -29,11 +29,18 @@ import scala.language.implicitConversions
   */
 trait Evaluation extends Deployment {
   protected[this] var _evaluatorSet: Boolean = false
-  protected[this] var _evaluator: BaseEvaluator[
-      _, _, _, _, _ <: BaseEvaluatorResult] = _
+  protected[this] var _evaluator: BaseEvaluator[_,
+                                                _,
+                                                _,
+                                                _,
+                                                _ <: BaseEvaluatorResult] = _
 
   private[prediction] def evaluator: BaseEvaluator[
-      _, _, _, _, _ <: BaseEvaluatorResult] = {
+      _,
+      _,
+      _,
+      _,
+      _ <: BaseEvaluatorResult] = {
     assert(_evaluatorSet, "Evaluator not set")
     _evaluator
   }
@@ -84,11 +91,11 @@ trait Evaluation extends Deployment {
     */
   def engineMetric_=[EI, Q, P, A](
       engineMetric: (BaseEngine[EI, Q, P, A], Metric[EI, Q, P, A, _])) {
-    engineEvaluator =
-      (engineMetric._1,
-       MetricEvaluator(metric = engineMetric._2,
-                       otherMetrics = Seq[Metric[EI, Q, P, A, _]](),
-                       outputPath = "best.json"))
+    engineEvaluator = (engineMetric._1,
+                       MetricEvaluator(metric = engineMetric._2,
+                                       otherMetrics =
+                                         Seq[Metric[EI, Q, P, A, _]](),
+                                       outputPath = "best.json"))
   }
 
   private[prediction] def engineMetrics: (BaseEngine[_, _, _, _],

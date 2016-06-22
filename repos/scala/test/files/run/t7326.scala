@@ -7,8 +7,10 @@ object Test extends App {
     // a key that has many hashCode collisions
     case class Collision(i: Int) { override def hashCode = i / 5 }
 
-    def subsetTest[T](
-        emptyA: Set[T], emptyB: Set[T], mkKey: Int => T, n: Int) {
+    def subsetTest[T](emptyA: Set[T],
+                      emptyB: Set[T],
+                      mkKey: Int => T,
+                      n: Int) {
       val outside = mkKey(n + 1)
       for (i <- 0 to n) {
         val a = emptyA ++ (0 until i).map(mkKey)
@@ -33,12 +35,16 @@ object Test extends App {
     subsetTest(HashSet.empty[Int], ListSet.empty[Int], identity, 100)
 
     // test the HashSet/HashSet case for Collision keys
-    subsetTest(
-        HashSet.empty[Collision], HashSet.empty[Collision], Collision, 100)
+    subsetTest(HashSet.empty[Collision],
+               HashSet.empty[Collision],
+               Collision,
+               100)
 
     // test the HashSet/other set case for Collision keys
-    subsetTest(
-        HashSet.empty[Collision], ListSet.empty[Collision], Collision, 100)
+    subsetTest(HashSet.empty[Collision],
+               ListSet.empty[Collision],
+               Collision,
+               100)
   }
 
   /**

@@ -120,8 +120,7 @@ abstract class MappedDate[T <: Mapper[T]](val fieldOwner: T)
   def asJsExp: JsExp = JE.Num(toLong)
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(
-        get match {
+    Full(get match {
       case null => JsonAST.JNull
       case v => JsonAST.JInt(v.getTime)
     })
@@ -185,30 +184,31 @@ abstract class MappedDate[T <: Mapper[T]](val fieldOwner: T)
       case _ => data.set(null); orgData.set(null)
     }
 
-  def buildSetActualValue(
-      accessor: Method, v: AnyRef, columnName: String): (T, AnyRef) => Unit =
+  def buildSetActualValue(accessor: Method,
+                          v: AnyRef,
+                          columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedDate[_] => f.st(toDate(v)) })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedDate[_] => f.st(if (isNull) Empty else Full(new Date(v)))
       })
 
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedDate[_] => f.st(toDate(v)) })
 
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedDate[_] => f.st(Full(v)) })
 
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, { case f: MappedDate[_] => f.st(Empty) })
 

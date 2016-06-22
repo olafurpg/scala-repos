@@ -13,8 +13,8 @@ final case class IdT[F[_], A](run: F[A]) {
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z =
     F.foldRight[A, Z](run, z)(f)
 
-  def traverse[G[_], B](f: A => G[B])(
-      implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] =
+  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F],
+                                      G: Applicative[G]): G[IdT[F, B]] =
     G.map(F.traverse(run)(f))(IdT(_))
 
   def ap[B](f: => IdT[F, A => B])(implicit F: Apply[F]) =

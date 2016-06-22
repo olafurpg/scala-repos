@@ -195,12 +195,12 @@ object SwaggerSerializers {
   private[swagger] val formats: SwaggerFormats = new SwaggerFormats {}
 
   val defaultFormats: SwaggerFormats =
-    formats ++ Seq(
-        new OperationSerializer, new EndpointSerializer, new ApiSerializer)
+    formats ++ Seq(new OperationSerializer,
+                   new EndpointSerializer,
+                   new ApiSerializer)
 
   class HttpMethodSerializer
-      extends CustomSerializer[HttpMethod](
-          implicit formats =>
+      extends CustomSerializer[HttpMethod](implicit formats =>
             ({
           case JString(method) => HttpMethod(method)
         }, {
@@ -223,7 +223,7 @@ object SwaggerSerializers {
       ("type" -> "array") ~ ("format" -> None)
     case DataType.ContainerDataType("Set", Some(dt), _) =>
       ("type" -> "array") ~ ("items" -> writeDataType(dt, "$ref")) ~
-      ("uniqueItems" -> true)
+        ("uniqueItems" -> true)
     case DataType.ContainerDataType("Set", _, _) =>
       ("type" -> "array") ~ ("uniqueItems" -> true)
     case DataType.ValueDataType(name, _, qualifiedName) =>
@@ -280,7 +280,7 @@ object SwaggerSerializers {
             }
           case value @ JObject(flds)
               if flds.exists(_._1 == "minimum") &&
-              flds.exists(_._1 == "maximum") =>
+                flds.exists(_._1 == "maximum") =>
             AllowableRangeValues(
                 (value \ "minimum").as[Int] to (value \ "maximum").as[Int])
           case _ => AnyValue
@@ -322,9 +322,9 @@ object SwaggerSerializers {
           case json: JObject =>
             val properties = json \ "properties" match {
               case JObject(entries) => {
-                  for ((key, value) <- entries) yield
-                    key -> value.extract[ModelProperty]
-                }
+                for ((key, value) <- entries)
+                  yield key -> value.extract[ModelProperty]
+              }
               case _ => Nil
             }
 
@@ -354,12 +354,11 @@ object SwaggerSerializers {
         }))
 
   class ResponseMessageSerializer
-      extends CustomSerializer[ResponseMessage[_]](
-          implicit formats =>
+      extends CustomSerializer[ResponseMessage[_]](implicit formats =>
             ({
           case value: JObject =>
-            StringResponseMessage(
-                (value \ "code").as[Int], (value \ "message").as[String])
+            StringResponseMessage((value \ "code").as[Int],
+                                  (value \ "message").as[String])
         }, {
           case StringResponseMessage(code, message) =>
             ("code" -> code) ~ ("message" -> message)
@@ -400,9 +399,9 @@ object SwaggerSerializers {
           case x: Parameter =>
             val output =
               ("name" -> x.name) ~ ("description" -> x.description) ~
-              ("defaultValue" -> x.defaultValue) ~ ("required" -> x.required) ~
-              ("paramType" -> x.paramType.toString) ~
-              ("paramAccess" -> x.paramAccess)
+                ("defaultValue" -> x.defaultValue) ~ ("required" -> x.required) ~
+                ("paramType" -> x.paramType.toString) ~
+                ("paramAccess" -> x.paramAccess)
 
             (output merge writeDataType(x.`type`)) merge Extraction.decompose(
                 x.allowableValues)
@@ -431,15 +430,15 @@ object SwaggerSerializers {
           case obj: Operation =>
             val json =
               ("method" -> Extraction.decompose(obj.method)) ~
-              ("summary" -> obj.summary) ~ ("position" -> obj.position) ~
-              ("notes" -> obj.notes.flatMap(_.blankOption).getOrElse("")) ~
-              ("deprecated" -> obj.deprecated) ~ ("nickname" -> obj.nickname) ~
-              ("parameters" -> Extraction.decompose(
-                      obj.parameters.sortBy(_.position))) ~
-              ("responseMessages" ->
-                  (if (obj.responseMessages.nonEmpty)
-                     Some(Extraction.decompose(obj.responseMessages))
-                   else None))
+                ("summary" -> obj.summary) ~ ("position" -> obj.position) ~
+                ("notes" -> obj.notes.flatMap(_.blankOption).getOrElse("")) ~
+                ("deprecated" -> obj.deprecated) ~ ("nickname" -> obj.nickname) ~
+                ("parameters" -> Extraction.decompose(
+                        obj.parameters.sortBy(_.position))) ~
+                ("responseMessages" ->
+                      (if (obj.responseMessages.nonEmpty)
+                         Some(Extraction.decompose(obj.responseMessages))
+                       else None))
 
             val consumes = dontAddOnEmpty("consumes", obj.consumes) _
             val produces = dontAddOnEmpty("produces", obj.produces) _
@@ -464,7 +463,7 @@ object SwaggerSerializers {
         }, {
           case obj: Endpoint =>
             ("path" -> obj.path) ~ ("description" -> obj.description) ~
-            ("operations" -> Extraction.decompose(obj.operations))
+              ("operations" -> Extraction.decompose(obj.operations))
         }))
 
   class ApiSerializer
@@ -491,38 +490,38 @@ object SwaggerSerializers {
         }, {
           case x: Api =>
             ("apiVersion" -> x.apiVersion) ~
-            ("swaggerVersion" -> x.swaggerVersion) ~
-            ("resourcePath" -> x.resourcePath) ~
-            ("produces" ->
-                (x.produces match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("consumes" ->
-                (x.consumes match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("protocols" ->
-                (x.protocols match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("authorizations" ->
-                (x.authorizations match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("apis" ->
-                (x.apis match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("models" ->
-                (x.models match {
-                      case x if x.isEmpty => JNothing
-                      case e => Extraction.decompose(e)
-                    }))
+              ("swaggerVersion" -> x.swaggerVersion) ~
+              ("resourcePath" -> x.resourcePath) ~
+              ("produces" ->
+                    (x.produces match {
+                          case Nil => JNothing
+                          case e => Extraction.decompose(e)
+                        })) ~
+              ("consumes" ->
+                    (x.consumes match {
+                          case Nil => JNothing
+                          case e => Extraction.decompose(e)
+                        })) ~
+              ("protocols" ->
+                    (x.protocols match {
+                          case Nil => JNothing
+                          case e => Extraction.decompose(e)
+                        })) ~
+              ("authorizations" ->
+                    (x.authorizations match {
+                          case Nil => JNothing
+                          case e => Extraction.decompose(e)
+                        })) ~
+              ("apis" ->
+                    (x.apis match {
+                          case Nil => JNothing
+                          case e => Extraction.decompose(e)
+                        })) ~
+              ("models" ->
+                    (x.models match {
+                          case x if x.isEmpty => JNothing
+                          case e => Extraction.decompose(e)
+                        }))
         }))
 
   class GrantTypeSerializer
@@ -547,17 +546,17 @@ object SwaggerSerializers {
         }, {
           case ImplicitGrant(login, tokenName) =>
             ("type" -> "implicit") ~
-            ("loginEndpoint" -> (("url" -> login.url): JValue)) ~
-            ("tokenName" -> tokenName)
+              ("loginEndpoint" -> (("url" -> login.url): JValue)) ~
+              ("tokenName" -> tokenName)
           case AuthorizationCodeGrant(tokenRequest, tokenEndpoint) =>
             ("type" -> "authorization_code") ~
-            ("tokenRequestEndpoint" ->
-                (("url" -> tokenRequest.url) ~
-                    ("clientIdName" -> tokenRequest.clientIdName) ~
-                    ("clientSecretName" -> tokenRequest.clientSecretName))) ~
-            ("tokenEndpoint" ->
-                (("url" -> tokenEndpoint.url) ~
-                    ("tokenName" -> tokenEndpoint.tokenName)))
+              ("tokenRequestEndpoint" ->
+                    (("url" -> tokenRequest.url) ~
+                          ("clientIdName" -> tokenRequest.clientIdName) ~
+                          ("clientSecretName" -> tokenRequest.clientSecretName))) ~
+              ("tokenEndpoint" ->
+                    (("url" -> tokenEndpoint.url) ~
+                          ("tokenName" -> tokenEndpoint.tokenName)))
         }))
 
   class AuthorizationTypeSerializer
@@ -575,11 +574,11 @@ object SwaggerSerializers {
         }, {
           case obj @ OAuth(scopes, grantTypes) =>
             ("type" -> obj.`type`) ~ ("scopes" -> scopes) ~
-            ("grantTypes" -> (for (t <- grantTypes) yield {
-                  (t.`type`, Extraction.decompose(t))
-                }).toMap)
+              ("grantTypes" -> (for (t <- grantTypes) yield {
+                    (t.`type`, Extraction.decompose(t))
+                  }).toMap)
           case obj @ ApiKey(keyname, passAs) =>
             ("type" -> obj.`type`) ~ ("passAs" -> passAs) ~
-            ("keyname" -> keyname)
+              ("keyname" -> keyname)
         }))
 }

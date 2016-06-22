@@ -40,8 +40,9 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
   protected def runChildren(notifier: RunNotifier) =
     children.foreach(ch => runChild(ch, notifier))
 
-  protected final def addFailure(
-      t: Throwable, notifier: RunNotifier, desc: Description): Unit = t match {
+  protected final def addFailure(t: Throwable,
+                                 notifier: RunNotifier,
+                                 desc: Description): Unit = t match {
     case t: MultipleFailureException =>
       t.getFailures.asScala.foreach(t2 => addFailure(t2, notifier, desc))
     case i: InvocationTargetException =>
@@ -51,8 +52,8 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
   }
 
   def getDescription = {
-    val desc = Description.createSuiteDescription(
-        testClass.getName, testClass.getAnnotations: _*)
+    val desc = Description
+      .createSuiteDescription(testClass.getName, testClass.getAnnotations: _*)
     for (ch <- children) desc.addChild(describeChild(ch))
     desc
   }
@@ -77,8 +78,7 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
 
   final def sort(sorter: Sorter) {
     children.foreach(sorter.apply _)
-    children = children.sorted(
-        new Ordering[T] {
+    children = children.sorted(new Ordering[T] {
       def compare(o1: T, o2: T): Int =
         sorter.compare(describeChild(o1), describeChild(o2))
     })

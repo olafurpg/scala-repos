@@ -16,8 +16,8 @@ abstract class IteratorTestCase extends TestCase {
     assertIterates(expectation, createIterator(element))
   }
 
-  protected def assertIterates(
-      expectation: String, iterator: Iterator[PsiElement]) {
+  protected def assertIterates(expectation: String,
+                               iterator: Iterator[PsiElement]) {
     Assert.assertEquals(expectation, iterator.mkString(", "))
   }
 

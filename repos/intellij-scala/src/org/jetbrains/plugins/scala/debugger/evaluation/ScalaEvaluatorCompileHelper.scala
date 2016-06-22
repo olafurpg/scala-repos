@@ -115,8 +115,9 @@ object ScalaEvaluatorCompileHelper {
     project.getComponent(classOf[ScalaEvaluatorCompileHelper])
 }
 
-private class ServerConnector(
-    module: Module, filesToCompile: Seq[File], outputDir: File)
+private class ServerConnector(module: Module,
+                              filesToCompile: Seq[File],
+                              outputDir: File)
     extends RemoteServerConnectorBase(module, filesToCompile, outputDir) {
 
   val errors = ListBuffer[String]()
@@ -139,8 +140,8 @@ private class ServerConnector(
   }
 
   @tailrec
-  private def classfiles(
-      dir: File, namePrefix: String = ""): Array[(File, String)] =
+  private def classfiles(dir: File,
+                         namePrefix: String = ""): Array[(File, String)] =
     dir.listFiles() match {
       case Array(d) if d.isDirectory =>
         classfiles(d, s"$namePrefix${d.getName}.")

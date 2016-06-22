@@ -90,15 +90,15 @@ trait ActionLaws[G, A] extends Laws {
         }
     )
 
-  def additiveMonoidAction(
-      implicit G: AdditiveAction[A, G], G0: AdditiveMonoid[G]) =
+  def additiveMonoidAction(implicit G: AdditiveAction[A, G],
+                           G0: AdditiveMonoid[G]) =
     new AdditiveProperties(
         base = monoidAction(G.additive, G0.additive),
         parent = None
     )
 
-  def multiplicativeMonoidAction(
-      implicit G: MultiplicativeAction[A, G], G0: MultiplicativeMonoid[G]) =
+  def multiplicativeMonoidAction(implicit G: MultiplicativeAction[A, G],
+                                 G0: MultiplicativeMonoid[G]) =
     new MultiplicativeProperties(
         base = monoidAction(G.multiplicative, G0.multiplicative),
         parent = None
@@ -109,8 +109,7 @@ trait ActionLaws[G, A] extends Laws {
       val sl: scalarLaws.type => scalarLaws.RuleSet,
       val parents: Seq[ActionProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet {
+  ) extends RuleSet {
     val bases = Seq("scalar" → sl(scalarLaws))
   }
 
@@ -118,8 +117,7 @@ trait ActionLaws[G, A] extends Laws {
       val base: ActionProperties,
       val parent: Option[AdditiveProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet
+  ) extends RuleSet
       with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)
@@ -129,8 +127,7 @@ trait ActionLaws[G, A] extends Laws {
       val base: ActionProperties,
       val parent: Option[MultiplicativeProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet
+  ) extends RuleSet
       with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)

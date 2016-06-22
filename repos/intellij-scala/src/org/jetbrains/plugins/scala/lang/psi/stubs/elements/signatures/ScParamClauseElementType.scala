@@ -24,15 +24,17 @@ class ScParamClauseElementType
 
   def indexStub(stub: ScParamClauseStub, sink: IndexSink) {}
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScParamClauseStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScParamClauseStub = {
     val implic = dataStream.readBoolean
-    new ScParamClauseStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, implic)
+    new ScParamClauseStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                              this,
+                              implic)
   }
 
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScParameterClause, parentStub: StubElement[ParentPsi]) = {
+      psi: ScParameterClause,
+      parentStub: StubElement[ParentPsi]) = {
     new ScParamClauseStubImpl(parentStub, this, psi.isImplicit)
   }
 

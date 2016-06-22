@@ -414,8 +414,10 @@ abstract class ObservableArray[V: ClassTag, T <: ObservableArray[V, T, D],
   def onChange(op: (T, ObservableArray.Change) => Unit) {
     delegate.addListener {
       new jfxc.ArrayChangeListener[D] {
-        override def onChanged(
-            array: D, sizeChanged: Boolean, start: Int, end: Int) {
+        override def onChanged(array: D,
+                               sizeChanged: Boolean,
+                               start: Int,
+                               end: Int) {
           op(ObservableArray.this.asInstanceOf[T],
              ObservableArray.Change(sizeChanged, start, end))
         }
@@ -434,8 +436,10 @@ abstract class ObservableArray[V: ClassTag, T <: ObservableArray[V, T, D],
   def onChange(op: => Unit) {
     delegate.addListener {
       new jfxc.ArrayChangeListener[D] {
-        override def onChanged(
-            array: D, sizeChanged: Boolean, start: Int, end: Int) {
+        override def onChanged(array: D,
+                               sizeChanged: Boolean,
+                               start: Int,
+                               end: Int) {
           op
         }
       }

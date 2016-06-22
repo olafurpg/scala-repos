@@ -106,19 +106,19 @@ private trait CokleisliArrow[F[_]]
 
   override def dimap[A, B, C, D](fab: Cokleisli[F, A, B])(f: C => A)(
       g: B => D): Cokleisli[F, C, D] =
-    super [CokleisliProfunctor].dimap(fab)(f)(g)
+    super[CokleisliProfunctor].dimap(fab)(f)(g)
 
   override def split[A, B, C, D](
       f: Cokleisli[F, A, B],
       g: Cokleisli[F, C, D]): Cokleisli[F, (A, C), (B, D)] =
-    super [CokleisliSplit].split(f, g)
+    super[CokleisliSplit].split(f, g)
 }
 
 private trait CokleisliSplit[F[_]] extends Split[Cokleisli[F, ?, ?]] {
   implicit def F: CoflatMap[F]
 
-  def compose[A, B, C](
-      f: Cokleisli[F, B, C], g: Cokleisli[F, A, B]): Cokleisli[F, A, C] =
+  def compose[A, B, C](f: Cokleisli[F, B, C],
+                       g: Cokleisli[F, A, B]): Cokleisli[F, A, C] =
     f.compose(g)
 
   def split[A, B, C, D](f: Cokleisli[F, A, B],
@@ -147,8 +147,8 @@ private trait CokleisliSemigroupK[F[_]]
     extends SemigroupK[Lambda[A => Cokleisli[F, A, A]]] {
   implicit def F: CoflatMap[F]
 
-  def combineK[A](
-      a: Cokleisli[F, A, A], b: Cokleisli[F, A, A]): Cokleisli[F, A, A] =
+  def combineK[A](a: Cokleisli[F, A, A],
+                  b: Cokleisli[F, A, A]): Cokleisli[F, A, A] =
     a compose b
 }
 

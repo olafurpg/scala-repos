@@ -29,8 +29,9 @@ object Test extends BytecodeTest {
     (ns zip fs.toList) foreach { case (n, f) => f(n) }
   }
 
-  final case class EnclosingMethod(
-      name: String, descriptor: String, outerClass: String)
+  final case class EnclosingMethod(name: String,
+                                   descriptor: String,
+                                   outerClass: String)
   def enclosingMethod(className: String) = {
     val n = loadClassNode(className)
     EnclosingMethod(n.outerMethod, n.outerMethodDesc, n.outerClass)
@@ -168,8 +169,11 @@ object Test extends BytecodeTest {
   def testA13() = {
     val List(b, c) = innerClassNodes("A13")
     assertMember(b, "A12", "B$", flags = publicStatic)
-    assertMember(
-        c, "A12$B$", "C", name = Some("A12$B$C"), flags = publicStatic)
+    assertMember(c,
+                 "A12$B$",
+                 "C",
+                 name = Some("A12$B$C"),
+                 flags = publicStatic)
   }
 
   def testA14() = {
@@ -255,8 +259,11 @@ object Test extends BytecodeTest {
     assertLocal(j5, "A21$J5$1", "J5$1") // non-static!
 
     val List(i3x, j2x) = innerClassNodes("A21$I3$J2")
-    assertMember(
-        j2x, "A21$I3$", "J2", name = Some("A21$I3$J2"), flags = publicStatic)
+    assertMember(j2x,
+                 "A21$I3$",
+                 "J2",
+                 name = Some("A21$I3$J2"),
+                 flags = publicStatic)
 
     assertNoEnclosingMethod("A21$I3$J2")
     assertEnclosingMethod("A21$J3$1", "A21$", "g", "()V")
@@ -287,21 +294,31 @@ object Test extends BytecodeTest {
     assertMember(defsCls, "A24", "DefinitionsClass")
     assertMember(abs, "A24$DefinitionsClass", "Abs$")
     assertMember(conc, "A24$DefinitionsClass", "Conc$")
-    assertMember(
-        defsApi, "A24Base", "DefinitionsApi", flags = publicAbstractInterface)
+    assertMember(defsApi,
+                 "A24Base",
+                 "DefinitionsApi",
+                 flags = publicAbstractInterface)
   }
 
   def testSI_9105() {
     assertEnclosingMethod("SI_9105$A$3", "SI_9105", null, null)
-    assertEnclosingMethod(
-        "SI_9105$B$5", "SI_9105", "m$1", "()Ljava/lang/Object;")
+    assertEnclosingMethod("SI_9105$B$5",
+                          "SI_9105",
+                          "m$1",
+                          "()Ljava/lang/Object;")
     assertEnclosingMethod("SI_9105$C$1", "SI_9105", null, null)
-    assertEnclosingMethod(
-        "SI_9105$D$1", "SI_9105", "met", "()Lscala/Function1;")
-    assertEnclosingMethod(
-        "SI_9105$E$1", "SI_9105", "m$3", "()Ljava/lang/Object;")
-    assertEnclosingMethod(
-        "SI_9105$F$1", "SI_9105", "met", "()Lscala/Function1;")
+    assertEnclosingMethod("SI_9105$D$1",
+                          "SI_9105",
+                          "met",
+                          "()Lscala/Function1;")
+    assertEnclosingMethod("SI_9105$E$1",
+                          "SI_9105",
+                          "m$3",
+                          "()Ljava/lang/Object;")
+    assertEnclosingMethod("SI_9105$F$1",
+                          "SI_9105",
+                          "met",
+                          "()Lscala/Function1;")
     assertNoEnclosingMethod("SI_9105")
 
     assertLocal(innerClassNodes("SI_9105$A$3").head, "SI_9105$A$3", "A$3")
@@ -313,12 +330,16 @@ object Test extends BytecodeTest {
 
     // by-name
     assertEnclosingMethod("SI_9105$G$1", "SI_9105", null, null)
-    assertEnclosingMethod(
-        "SI_9105$H$1", "SI_9105", "m$2", "()Ljava/lang/Object;")
+    assertEnclosingMethod("SI_9105$H$1",
+                          "SI_9105",
+                          "m$2",
+                          "()Ljava/lang/Object;")
     assertEnclosingMethod("SI_9105$I$1", "SI_9105", null, null)
     assertEnclosingMethod("SI_9105$J$1", "SI_9105", "bnM", "()I")
-    assertEnclosingMethod(
-        "SI_9105$K$2", "SI_9105", "m$4", "()Ljava/lang/Object;")
+    assertEnclosingMethod("SI_9105$K$2",
+                          "SI_9105",
+                          "m$4",
+                          "()Ljava/lang/Object;")
     assertEnclosingMethod("SI_9105$L$1", "SI_9105", "bnM", "()I")
 
     assert(innerClassNodes("SI_9105").length == 13) // the 12 local classes, plus MethodHandles$Lookup
@@ -346,8 +367,10 @@ object Test extends BytecodeTest {
     assertNoEnclosingMethod("SI_9124$A")
     assertEnclosingMethod(classes("f1"), "SI_9124", null, null)
     assertEnclosingMethod(classes("f2"), "SI_9124", "f", "()LSI_9124$A;")
-    assertEnclosingMethod(
-        classes("f3"), "SI_9124", "g", "()Ljava/lang/Object;")
+    assertEnclosingMethod(classes("f3"),
+                          "SI_9124",
+                          "g",
+                          "()Ljava/lang/Object;")
     assertEnclosingMethod(classes("f4"), "SI_9124$O$", null, null)
     assertEnclosingMethod(classes("f5"), "SI_9124", null, null)
     assertEnclosingMethod(classes("f6"), "SI_9124", null, null)
@@ -384,15 +407,18 @@ object Test extends BytecodeTest {
 
     // encl meth n
     List("ImplClassesAreTopLevel$B4$1", "ImplClassesAreTopLevel$$anon$16")
-      .foreach(assertEnclosingMethod(
-            _, "ImplClassesAreTopLevel", "n", "()Ljava/lang/Object;"))
+      .foreach(
+          assertEnclosingMethod(_,
+                                "ImplClassesAreTopLevel",
+                                "n",
+                                "()Ljava/lang/Object;"))
 
-    val an14 = assertAnonymous(
-        _: InnerClassNode, "ImplClassesAreTopLevel$$anon$14")
-    val an15 = assertAnonymous(
-        _: InnerClassNode, "ImplClassesAreTopLevel$$anon$15")
-    val an16 = assertAnonymous(
-        _: InnerClassNode, "ImplClassesAreTopLevel$$anon$16")
+    val an14 =
+      assertAnonymous(_: InnerClassNode, "ImplClassesAreTopLevel$$anon$14")
+    val an15 =
+      assertAnonymous(_: InnerClassNode, "ImplClassesAreTopLevel$$anon$15")
+    val an16 =
+      assertAnonymous(_: InnerClassNode, "ImplClassesAreTopLevel$$anon$16")
     val b1 = assertMember(_: InnerClassNode,
                           "ImplClassesAreTopLevel",
                           "B1",
@@ -436,10 +462,10 @@ object Test extends BytecodeTest {
       .flatMap(innerClassNodes)
       .foreach(icn => assert(!icn.name.endsWith("$sp"), icn))
 
-    val a = assertMember(
-        _: InnerClassNode, "SpecializedClassesAreTopLevel", "A")
-    val t = assertMember(
-        _: InnerClassNode, "SpecializedClassesAreTopLevel", "T$")
+    val a =
+      assertMember(_: InnerClassNode, "SpecializedClassesAreTopLevel", "A")
+    val t =
+      assertMember(_: InnerClassNode, "SpecializedClassesAreTopLevel", "T$")
     val b = assertMember(_: InnerClassNode,
                          "SpecializedClassesAreTopLevel$T$",
                          "B",
@@ -470,8 +496,8 @@ object Test extends BytecodeTest {
                          "NestedInValueClass",
                          "A",
                          flags = publicStatic | Flags.ACC_FINAL)
-    val am = assertMember(
-        _: I, "NestedInValueClass", "A$", flags = publicStatic)
+    val am =
+      assertMember(_: I, "NestedInValueClass", "A$", flags = publicStatic)
     val b = assertMember(_: I,
                          "NestedInValueClass$A$",
                          "B",

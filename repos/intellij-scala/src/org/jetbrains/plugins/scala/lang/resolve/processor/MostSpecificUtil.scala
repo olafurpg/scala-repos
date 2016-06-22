@@ -33,17 +33,19 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       applicable: Set[ScalaResolveResult],
       hasTypeParametersCall: Boolean = false,
       expandInnerResult: Boolean = true): Option[ScalaResolveResult] = {
-    mostSpecificGeneric(
-        applicable.map(r =>
+    mostSpecificGeneric(applicable.map(r =>
               r.innerResolveResult match {
-            case Some(rr) if expandInnerResult =>
-              new InnerScalaResolveResult(
-                  rr.element, rr.implicitConversionClass, r, r.substitutor)
-            case _ =>
-              new InnerScalaResolveResult(
-                  r.element, r.implicitConversionClass, r, r.substitutor)
-        }),
-        noImplicit = false).map(_.repr)
+        case Some(rr) if expandInnerResult =>
+          new InnerScalaResolveResult(rr.element,
+                                      rr.implicitConversionClass,
+                                      r,
+                                      r.substitutor)
+        case _ =>
+          new InnerScalaResolveResult(r.element,
+                                      r.implicitConversionClass,
+                                      r,
+                                      r.substitutor)
+    }), noImplicit = false).map(_.repr)
   }
 
   def mostSpecificForImplicitParameters(
@@ -69,7 +71,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
   }
 
   def nextLayerSpecificForImplicitParameters(
-      filterRest: Option[ScalaResolveResult], rest: Seq[ScalaResolveResult])
+      filterRest: Option[ScalaResolveResult],
+      rest: Seq[ScalaResolveResult])
     : (Option[ScalaResolveResult], Seq[ScalaResolveResult]) = {
     def update(
         r: ScalaResolveResult): InnerScalaResolveResult[ScalaResolveResult] = {
@@ -88,8 +91,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                                       implicitCase = true)
       }
     }
-    val (next, r) = nextLayerSpecificGeneric(
-        filterRest.map(update), rest.map(update))
+    val (next, r) =
+      nextLayerSpecificGeneric(filterRest.map(update), rest.map(update))
     (next.map(_.repr), r.map(_.repr))
   }
 
@@ -143,8 +146,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
             existential: Boolean): Either[Seq[Parameter], ScType] = {
           tp match {
             case ScMethodType(_, params, _) => Left(params)
-            case ScTypePolymorphicType(
-                ScMethodType(_, params, _), typeParams) =>
+            case ScTypePolymorphicType(ScMethodType(_, params, _),
+                                       typeParams) =>
               if (!existential) {
                 val s: ScSubstitutor =
                   typeParams.foldLeft(ScSubstitutor.empty) {
@@ -171,8 +174,9 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                                                 s.subst(tp.upperType())))
                 Left(
                     params.map(p =>
-                          p.copy(paramType = ScExistentialType(
-                                  s.subst(p.paramType), arguments))))
+                          p.copy(paramType =
+                                ScExistentialType(s.subst(p.paramType),
+                                                  arguments))))
               }
             case ScTypePolymorphicType(internal, typeParams) =>
               if (!existential) {
@@ -212,10 +216,10 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
             if ((t1.isInstanceOf[ScTypePolymorphicType] &&
                     t2.isInstanceOf[ScTypePolymorphicType] ||
                     (!(m1.isInstanceOf[ScFunction] || m1.isInstanceOf[ScFun] ||
-                            m1.isInstanceOf[ScPrimaryConstructor]) ||
+                              m1.isInstanceOf[ScPrimaryConstructor]) ||
                         !(m2.isInstanceOf[ScFunction] ||
-                            m2.isInstanceOf[ScFun] ||
-                            m2.isInstanceOf[ScPrimaryConstructor]))) &&
+                              m2.isInstanceOf[ScFun] ||
+                              m2.isInstanceOf[ScPrimaryConstructor]))) &&
                 (lastRepeated(params1) ^ lastRepeated(params2)))
               return lastRepeated(params2) //todo: this is hack!!! see SCL-3846, SCL-4048
             if (lastRepeated(params1) && !lastRepeated(params2))
@@ -223,8 +227,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                 case p: Parameter if p.isRepeated =>
                   val seq = ScalaPsiManager
                     .instance(r1.element.getProject)
-                    .getCachedClass(
-                        r1.element.getResolveScope, "scala.collection.Seq")
+                    .getCachedClass(r1.element.getResolveScope,
+                                    "scala.collection.Seq")
                     .orNull
                   if (seq != null) {
                     val newParamType = p.paramType match {
@@ -233,8 +237,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                             ScParameterizedType(ScDesignatorType(seq), Seq(q)),
                             wilds)
                       case paramType =>
-                        ScParameterizedType(
-                            ScDesignatorType(seq), Seq(paramType))
+                        ScParameterizedType(ScDesignatorType(seq),
+                                            Seq(paramType))
                     }
                     Parameter(p.name,
                               p.deprecatedName,
@@ -255,8 +259,10 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
             val exprs: Seq[Expression] =
               params1.map(p => new Expression(p.paramType, elem)) ++ Seq.fill(
                   i)(default)
-            Compatibility.checkConformance(
-                checkNames = false, params2, exprs, checkImplicits)
+            Compatibility.checkConformance(checkNames = false,
+                                           params2,
+                                           exprs,
+                                           checkImplicits)
           case (Right(type1), Right(type2)) =>
             Conformance.conformsInner(
                 type2,
@@ -280,9 +286,10 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                   var hasRecursiveTypeParameters = false
                   typez.recursiveUpdate {
                     case tpt: ScTypeParameterType =>
-                      typeParams.find(tp =>
+                      typeParams.find(
+                          tp =>
                             (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
-                            (tpt.name, tpt.getId)) match {
+                              (tpt.name, tpt.getId)) match {
                         case None => (true, tpt)
                         case _ =>
                           hasRecursiveTypeParameters = true
@@ -320,7 +327,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       case (_, m2: PsiMethod) => true
       case (e1, e2) =>
         Compatibility.compatibleWithViewApplicability(
-            getType(e2, r2.implicitCase), getType(e1, r1.implicitCase))
+            getType(e2, r2.implicitCase),
+            getType(e1, r1.implicitCase))
     }
   }
 
@@ -436,15 +444,15 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       case f: ScFunction if f.isConstructor =>
         f.containingClass match {
           case td: ScTypeDefinition if td.hasTypeParameters =>
-            ScTypePolymorphicType(
-                f.methodType, td.typeParameters.map(new TypeParameter(_)))
+            ScTypePolymorphicType(f.methodType,
+                                  td.typeParameters.map(new TypeParameter(_)))
           case _ => f.polymorphicType()
         }
       case f: ScFunction => f.polymorphicType()
       case p: ScPrimaryConstructor => p.polymorphicType
       case m: PsiMethod =>
-        ResolveUtils.javaPolymorphicType(
-            m, ScSubstitutor.empty, elem.getResolveScope)
+        ResolveUtils
+          .javaPolymorphicType(m, ScSubstitutor.empty, elem.getResolveScope)
       case refPatt: ScReferencePattern =>
         refPatt.getParent /*id list*/ .getParent match {
           case pd: ScPatternDefinition
@@ -468,8 +476,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
 
     res match {
       case ScMethodType(retType, _, true) if implicitCase => retType
-      case ScTypePolymorphicType(
-          ScMethodType(retType, _, true), typeParameters) if implicitCase =>
+      case ScTypePolymorphicType(ScMethodType(retType, _, true),
+                                 typeParameters) if implicitCase =>
         ScTypePolymorphicType(retType, typeParameters)
       case tp => tp
     }

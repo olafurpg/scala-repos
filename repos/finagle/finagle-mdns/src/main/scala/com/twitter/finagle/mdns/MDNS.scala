@@ -9,8 +9,9 @@ import scala.collection.mutable
 class MDNSAddressException(addr: String)
     extends Exception("Invalid MDNS address \"%s\"".format(addr))
 
-private case class MdnsAddrMetadata(
-    name: String, regType: String, domain: String)
+private case class MdnsAddrMetadata(name: String,
+                                    regType: String,
+                                    domain: String)
 
 private object MdnsAddrMetadata {
   private val key = "mdns_addr_metadata"

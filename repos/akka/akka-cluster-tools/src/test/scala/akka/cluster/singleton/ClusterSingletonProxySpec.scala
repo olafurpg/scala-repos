@@ -21,7 +21,8 @@ class ClusterSingletonProxySpec
   seed.cluster.join(seed.cluster.selfAddress)
 
   val testSystems =
-    (0 until 4).map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
+    (0 until 4)
+      .map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
 
   "The cluster singleton proxy" must {
     "correctly identify the singleton" in {

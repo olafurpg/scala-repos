@@ -39,6 +39,7 @@ private[spark] trait AppClientListener {
                     cores: Int,
                     memory: Int)
 
-  def executorRemoved(
-      fullId: String, message: String, exitStatus: Option[Int]): Unit
+  def executorRemoved(fullId: String,
+                      message: String,
+                      exitStatus: Option[Int]): Unit
 }

@@ -23,8 +23,8 @@ import scala.collection.mutable
 class ScalaByNameWeigher extends CompletionWeigher {
   val MAX_DISTANCE = 4
 
-  override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+  override def weigh(element: LookupElement,
+                     location: CompletionLocation): Comparable[_] = {
     val textForPosition = new mutable.HashMap[PsiElement, String]
     val position = ScalaCompletionUtil.positionFromParameters(
         location.getCompletionParameters)
@@ -57,8 +57,8 @@ class ScalaByNameWeigher extends CompletionWeigher {
 
       def afterNew: Option[String] = {
         val newTemplateDefinition = Option(
-            PsiTreeUtil.getContextOfType(
-                position, classOf[ScNewTemplateDefinition]))
+            PsiTreeUtil.getContextOfType(position,
+                                         classOf[ScNewTemplateDefinition]))
         val result = newTemplateDefinition.map(_.getContext).flatMap {
           case patterDef: ScPatternDefinition =>
             patterDef.bindings.headOption.map(_.name)
@@ -80,8 +80,8 @@ class ScalaByNameWeigher extends CompletionWeigher {
 
     def handleByText(element: PsiNamedElement): Option[Integer] = {
 
-      def computeDistance(
-          element: PsiNamedElement, text: String): Option[Integer] = {
+      def computeDistance(element: PsiNamedElement,
+                          text: String): Option[Integer] = {
 
         def testEq(elementText: String, text: String): Boolean =
           elementText.toUpperCase == text.toUpperCase

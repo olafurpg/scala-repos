@@ -15,7 +15,7 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
   //todo[CYCLIC]
   def lowerBound: TypeResult[ScType] =
     wrapWith(lowerTypeElement, Nothing) flatMap
-    (_.getType(TypingContext.empty))
+      (_.getType(TypingContext.empty))
 
   def upperBound: TypeResult[ScType] =
     wrapWith(upperTypeElement, Any) flatMap (_.getType(TypingContext.empty))

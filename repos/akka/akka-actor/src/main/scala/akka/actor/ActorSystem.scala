@@ -69,8 +69,9 @@ object ActorSystem {
     *
     * @see <a href="http://typesafehub.github.io/config/v1.3.0/" target="_blank">The Typesafe Config Library API Documentation</a>
     */
-  def create(
-      name: String, config: Config, classLoader: ClassLoader): ActorSystem =
+  def create(name: String,
+             config: Config,
+             classLoader: ClassLoader): ActorSystem =
     apply(name, config, classLoader)
 
   /**
@@ -131,8 +132,9 @@ object ActorSystem {
     *
     * @see <a href="http://typesafehub.github.io/config/v1.3.0/" target="_blank">The Typesafe Config Library API Documentation</a>
     */
-  def apply(
-      name: String, config: Config, classLoader: ClassLoader): ActorSystem =
+  def apply(name: String,
+            config: Config,
+            classLoader: ClassLoader): ActorSystem =
     apply(name, Option(config), Option(classLoader), None)
 
   /**
@@ -149,8 +151,8 @@ object ActorSystem {
   def apply(name: String,
             config: Option[Config] = None,
             classLoader: Option[ClassLoader] = None,
-            defaultExecutionContext: Option[ExecutionContext] =
-              None): ActorSystem = {
+            defaultExecutionContext: Option[ExecutionContext] = None)
+    : ActorSystem = {
     val cl = classLoader.getOrElse(findClassLoader())
     val appConfig = config.getOrElse(ConfigFactory.load(cl))
     new ActorSystemImpl(name, appConfig, cl, defaultExecutionContext, None)
@@ -243,9 +245,10 @@ object ActorSystem {
         "akka.actor.deployment.default.virtual-nodes-factor")
 
     if (ConfigVersion != Version)
-      throw new akka.ConfigurationException("Akka JAR version [" + Version +
-          "] does not match the provided config version [" + ConfigVersion +
-          "]")
+      throw new akka.ConfigurationException(
+          "Akka JAR version [" + Version +
+            "] does not match the provided config version [" + ConfigVersion +
+            "]")
 
     /**
       * Returns the String representation of the Config that this Settings is backed by
@@ -567,14 +570,15 @@ private[akka] class ActorSystemImpl(
     extends ExtendedActorSystem {
 
   if (!name.matches("""^[a-zA-Z0-9][a-zA-Z0-9-_]*$"""))
-    throw new IllegalArgumentException("invalid ActorSystem name [" + name +
-        "], must contain only word characters (i.e. [a-zA-Z0-9] plus non-leading '-' or '_')")
+    throw new IllegalArgumentException(
+        "invalid ActorSystem name [" + name +
+          "], must contain only word characters (i.e. [a-zA-Z0-9] plus non-leading '-' or '_')")
 
   import ActorSystem._
 
   @volatile private var logDeadLetterListener: Option[ActorRef] = None
-  final val settings: Settings = new Settings(
-      classLoader, applicationConfig, name)
+  final val settings: Settings =
+    new Settings(classLoader, applicationConfig, name)
 
   protected def uncaughtExceptionHandler: Thread.UncaughtExceptionHandler =
     new Thread.UncaughtExceptionHandler() {
@@ -669,8 +673,8 @@ private[akka] class ActorSystemImpl(
   eventStream.startStdoutLogger(settings)
 
   val logFilter: LoggingFilter = {
-    val arguments = Vector(
-        classOf[Settings] -> settings, classOf[EventStream] -> eventStream)
+    val arguments = Vector(classOf[Settings] -> settings,
+                           classOf[EventStream] -> eventStream)
     dynamicAccess
       .createInstanceFor[LoggingFilter](LoggingFilter, arguments)
       .get
@@ -700,8 +704,8 @@ private[akka] class ActorSystemImpl(
 
   def deadLetters: ActorRef = provider.deadLetters
 
-  val mailboxes: Mailboxes = new Mailboxes(
-      settings, eventStream, dynamicAccess, deadLetters)
+  val mailboxes: Mailboxes =
+    new Mailboxes(settings, eventStream, dynamicAccess, deadLetters)
 
   val dispatchers: Dispatchers = new Dispatchers(
       settings,
@@ -832,7 +836,8 @@ private[akka] class ActorSystemImpl(
         c.await(); findExtension(ext) //Registration in process, await completion and retry
       case t: Throwable ⇒ throw t //Initialization failed, throw same again
       case other ⇒
-        other.asInstanceOf[T] //could be a T or null, in which case we return the null as T
+        other
+          .asInstanceOf[T] //could be a T or null, in which case we return the null as T
     }
 
   @tailrec
@@ -850,14 +855,16 @@ private[akka] class ActorSystemImpl(
                 case null ⇒
                   throw new IllegalStateException(
                       "Extension instance created as 'null' for extension [" +
-                      ext + "]")
+                        ext + "]")
                 case instance ⇒
-                  extensions.replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
+                  extensions
+                    .replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
                   instance //Profit!
               }
             } catch {
               case t: Throwable ⇒
-                extensions.replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
+                extensions
+                  .replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
                 throw t //Escalate to caller
             } finally {
               inProcessOfRegistration.countDown //Always notify listeners of the inProcess signal
@@ -916,11 +923,11 @@ private[akka] class ActorSystemImpl(
                 case real: ActorCell ⇒ " status=" + real.mailbox.currentStatus
                 case _ ⇒ ""
               }) + " " + (cell.childrenRefs match {
-                case ChildrenContainer.TerminatingChildrenContainer(
-                    _, toDie, reason) ⇒
+                case ChildrenContainer
+                      .TerminatingChildrenContainer(_, toDie, reason) ⇒
                   "Terminating(" + reason + ")" + (toDie.toSeq.sorted mkString
-                      ("\n" + indent + "   |    toDie: ",
-                          "\n" + indent + "   |           ", ""))
+                        ("\n" + indent + "   |    toDie: ",
+                            "\n" + indent + "   |           ", ""))
                 case x @ (ChildrenContainer.TerminatedChildrenContainer |
                     ChildrenContainer.EmptyChildrenContainer) ⇒
                   x.toString

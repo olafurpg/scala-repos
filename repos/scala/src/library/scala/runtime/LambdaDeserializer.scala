@@ -84,8 +84,8 @@ object LambdaDeserializer {
                    implMethodSig)
       } catch {
         case e: ReflectiveOperationException =>
-          throw new IllegalArgumentException(
-              "Illegal lambda deserialization", e)
+          throw new IllegalArgumentException("Illegal lambda deserialization",
+                                             e)
       }
 
       val flags: Int =
@@ -111,18 +111,17 @@ object LambdaDeserializer {
 
     val key =
       serialized.getImplMethodName + " : " + serialized.getImplMethodSignature
-    val factory: MethodHandle =
-      if (cache == null) {
-        makeCallSite.getTarget
-      } else
-        cache.get(key) match {
-          case null =>
-            val callSite = makeCallSite
-            val temp = callSite.getTarget
-            cache.put(key, temp)
-            temp
-          case target => target
-        }
+    val factory: MethodHandle = if (cache == null) {
+      makeCallSite.getTarget
+    } else
+      cache.get(key) match {
+        case null =>
+          val callSite = makeCallSite
+          val temp = callSite.getTarget
+          cache.put(key, temp)
+          temp
+        case target => target
+      }
 
     val captures = Array.tabulate(serialized.getCapturedArgCount)(n =>
           serialized.getCapturedArg(n))

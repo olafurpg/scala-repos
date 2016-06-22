@@ -27,8 +27,7 @@ class FlowDocSpec extends AkkaSpec {
     source.map(_ => 0) // has no effect on source, since it's immutable
     source.runWith(Sink.fold(0)(_ + _)) // 55
 
-    val zeroes =
-      source.map(_ => 0) // returns new Source[Int], with `map()` appended
+    val zeroes = source.map(_ => 0) // returns new Source[Int], with `map()` appended
     zeroes.runWith(Sink.fold(0)(_ + _)) // 0
     //#source-immutable
   }
@@ -79,8 +78,9 @@ class FlowDocSpec extends AkkaSpec {
     import scala.concurrent.duration._
     case object Tick
 
-    val timer = Source.tick(
-        initialDelay = 1.second, interval = 1.seconds, tick = () => Tick)
+    val timer =
+      Source.tick(initialDelay = 1.second, interval = 1.seconds, tick = () =>
+            Tick)
 
     val timerCancel: Cancellable = Sink.ignore.runWith(timer)
     timerCancel.cancel()
@@ -152,14 +152,14 @@ class FlowDocSpec extends AkkaSpec {
   "various ways of transforming materialized values" in {
     import scala.concurrent.duration._
 
-    val throttler = Flow.fromGraph(
-        GraphDSL.create(Source.tick(1.second, 1.second, "test")) {
-      implicit builder => tickSource =>
-        import GraphDSL.Implicits._
-        val zip = builder.add(ZipWith[String, Int, Int](Keep.right))
-        tickSource ~> zip.in0
-        FlowShape(zip.in1, zip.out)
-    })
+    val throttler =
+      Flow.fromGraph(GraphDSL.create(Source.tick(1.second, 1.second, "test")) {
+        implicit builder => tickSource =>
+          import GraphDSL.Implicits._
+          val zip = builder.add(ZipWith[String, Int, Int](Keep.right))
+          tickSource ~> zip.in0
+          FlowShape(zip.in1, zip.out)
+      })
 
     //#flow-mat-combine
     // An source that can be signalled explicitly from the outside
@@ -218,8 +218,7 @@ class FlowDocSpec extends AkkaSpec {
 
     // The result of r11 can be also achieved by using the Graph API
     val r12: RunnableGraph[(Promise[Option[Int]], Cancellable, Future[Int])] =
-      RunnableGraph.fromGraph(
-          GraphDSL.create(source, flow, sink)((_, _, _)) {
+      RunnableGraph.fromGraph(GraphDSL.create(source, flow, sink)((_, _, _)) {
         implicit builder => (src, f, dst) =>
           import GraphDSL.Implicits._
           src ~> f ~> dst

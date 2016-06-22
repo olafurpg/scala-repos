@@ -23,8 +23,7 @@ import scala.util.{Failure, Try}
 object JobStats {
   def apply(stats: CascadingStats): JobStats = {
     val m = statsMap(stats)
-    new JobStats(
-        stats match {
+    new JobStats(stats match {
       case cs: CascadeStats => m
       case fs: FlowStats =>
         m + ("flow_step_stats" -> fs.getFlowStepStats.asScala.map(statsMap))

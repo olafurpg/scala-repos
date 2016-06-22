@@ -71,8 +71,10 @@ object Color {
   /**
     * Creates a Color based on the specified values in the HSB color model, and a given opacity.
     */
-  def hsb(
-      hue: Double, saturation: Double, brightness: Double, opacity: Double) =
+  def hsb(hue: Double,
+          saturation: Double,
+          brightness: Double,
+          opacity: Double) =
     new Color(jfxsp.Color.hsb(hue, saturation, brightness, opacity))
 
   /**
@@ -124,8 +126,8 @@ object Color {
       "1.0.0-R9")
   val ANTIQUEWHITE = AntiqueWhite
   val Aqua = new Color(jfxsp.Color.AQUA)
-  @deprecated(
-      "Use Aqua; AQUA will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Aqua; AQUA will be removed in a future release.",
+              "1.0.0-R9")
   val AQUA = Aqua
   val Aquamarine = new Color(jfxsp.Color.AQUAMARINE)
   @deprecated(
@@ -133,20 +135,20 @@ object Color {
       "1.0.0-R9")
   val AQUAMARINE = Aquamarine
   val Azure = new Color(jfxsp.Color.AZURE)
-  @deprecated(
-      "Use Azure; AZURE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Azure; AZURE will be removed in a future release.",
+              "1.0.0-R9")
   val AZURE = Azure
   val Beige = new Color(jfxsp.Color.BEIGE)
-  @deprecated(
-      "Use Beige; BEIGE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Beige; BEIGE will be removed in a future release.",
+              "1.0.0-R9")
   val BEIGE = Beige
   val Bisque = new Color(jfxsp.Color.BISQUE)
-  @deprecated(
-      "Use Bisque; BISQUE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Bisque; BISQUE will be removed in a future release.",
+              "1.0.0-R9")
   val BISQUE = Bisque
   val Black = new Color(jfxsp.Color.BLACK)
-  @deprecated(
-      "Use Black; BLACK will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Black; BLACK will be removed in a future release.",
+              "1.0.0-R9")
   val BLACK = Black
   val BlanchedAlmond = new Color(jfxsp.Color.BLANCHEDALMOND)
   @deprecated(
@@ -154,8 +156,8 @@ object Color {
       "1.0.0-R9")
   val BLANCHEDALMOND = BlanchedAlmond
   val Blue = new Color(jfxsp.Color.BLUE)
-  @deprecated(
-      "Use Blue; BLUE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Blue; BLUE will be removed in a future release.",
+              "1.0.0-R9")
   val BLUE = Blue
   val BlueViolet = new Color(jfxsp.Color.BLUEVIOLET)
   @deprecated(
@@ -163,8 +165,8 @@ object Color {
       "1.0.0-R9")
   val BLUEVIOLET = BlueViolet
   val Brown = new Color(jfxsp.Color.BROWN)
-  @deprecated(
-      "Use Brown; BROWN will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Brown; BROWN will be removed in a future release.",
+              "1.0.0-R9")
   val BROWN = Brown
   val Burlywood = new Color(jfxsp.Color.BURLYWOOD)
   @deprecated("Use Burlywood; BURLYWOOD will be removed in a future release.",
@@ -184,8 +186,8 @@ object Color {
               "1.0.0-R9")
   val CHOCOLATE = Chocolate
   val Coral = new Color(jfxsp.Color.CORAL)
-  @deprecated(
-      "Use Coral; CORAL will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Coral; CORAL will be removed in a future release.",
+              "1.0.0-R9")
   val CORAL = Coral
   val CornflowerBlue = new Color(jfxsp.Color.CORNFLOWERBLUE)
   @deprecated(
@@ -197,12 +199,12 @@ object Color {
               "1.0.0-R9")
   val CORNSILK = Cornsilk
   val Crimson = new Color(jfxsp.Color.CRIMSON)
-  @deprecated(
-      "Use Crimson; CRIMSON will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Crimson; CRIMSON will be removed in a future release.",
+              "1.0.0-R9")
   val CRIMSON = Crimson
   val Cyan = new Color(jfxsp.Color.CYAN)
-  @deprecated(
-      "Use Cyan; CYAN will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Cyan; CYAN will be removed in a future release.",
+              "1.0.0-R9")
   val CYAN = Cyan
   val DarkBlue = new Color(jfxsp.Color.DARKBLUE)
   @deprecated("Use DarkBlue; DARKBLUE will be removed in a future release.",
@@ -254,8 +256,8 @@ object Color {
       "1.0.0-R9")
   val DARKORCHID = DarkOrchid
   val DarkRed = new Color(jfxsp.Color.DARKRED)
-  @deprecated(
-      "Use DarkRed; DARKRED will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use DarkRed; DARKRED will be removed in a future release.",
+              "1.0.0-R9")
   val DARKRED = DarkRed
   val DarkSalmon = new Color(jfxsp.Color.DARKSALMON)
   @deprecated(
@@ -302,12 +304,12 @@ object Color {
       "1.0.0-R9")
   val DEEPSKYBLUE = DeepSkyBlue
   val DimGray = new Color(jfxsp.Color.DIMGRAY)
-  @deprecated(
-      "Use DimGray; DIMGRAY will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use DimGray; DIMGRAY will be removed in a future release.",
+              "1.0.0-R9")
   val DIMGRAY = DimGray
   val DimGrey = new Color(jfxsp.Color.DIMGREY)
-  @deprecated(
-      "Use DimGrey; DIMGREY will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use DimGrey; DIMGREY will be removed in a future release.",
+              "1.0.0-R9")
   val DIMGREY = DimGrey
   val DodgerBlue = new Color(jfxsp.Color.DODGERBLUE)
   @deprecated(
@@ -329,8 +331,8 @@ object Color {
       "1.0.0-R9")
   val FORESTGREEN = ForestGreen
   val Fuchsia = new Color(jfxsp.Color.FUCHSIA)
-  @deprecated(
-      "Use Fuchsia; FUCHSIA will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Fuchsia; FUCHSIA will be removed in a future release.",
+              "1.0.0-R9")
   val FUCHSIA = Fuchsia
   val Gainsboro = new Color(jfxsp.Color.GAINSBORO)
   @deprecated("Use Gainsboro; GAINSBORO will be removed in a future release.",
@@ -342,20 +344,20 @@ object Color {
       "1.0.0-R9")
   val GHOSTWHITE = GhostWhite
   val Gold = new Color(jfxsp.Color.GOLD)
-  @deprecated(
-      "Use Gold; GOLD will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Gold; GOLD will be removed in a future release.",
+              "1.0.0-R9")
   val GOLD = Gold
   val Goldenrod = new Color(jfxsp.Color.GOLDENROD)
   @deprecated("Use Goldenrod; GOLDENROD will be removed in a future release.",
               "1.0.0-R9")
   val GOLDENROD = Goldenrod
   val Gray = new Color(jfxsp.Color.GRAY)
-  @deprecated(
-      "Use Gray; GRAY will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Gray; GRAY will be removed in a future release.",
+              "1.0.0-R9")
   val GRAY = Gray
   val Green = new Color(jfxsp.Color.GREEN)
-  @deprecated(
-      "Use Green; GREEN will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Green; GREEN will be removed in a future release.",
+              "1.0.0-R9")
   val GREEN = Green
   val GreenYellow = new Color(jfxsp.Color.GREENYELLOW)
   @deprecated(
@@ -363,32 +365,32 @@ object Color {
       "1.0.0-R9")
   val GREENYELLOW = GreenYellow
   val Grey = new Color(jfxsp.Color.GREY)
-  @deprecated(
-      "Use Grey; GREY will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Grey; GREY will be removed in a future release.",
+              "1.0.0-R9")
   val GREY = Grey
   val Honeydew = new Color(jfxsp.Color.HONEYDEW)
   @deprecated("Use Honeydew; HONEYDEW will be removed in a future release.",
               "1.0.0-R9")
   val HONEYDEW = Honeydew
   val HotPink = new Color(jfxsp.Color.HOTPINK)
-  @deprecated(
-      "Use HotPink; HOTPINK will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use HotPink; HOTPINK will be removed in a future release.",
+              "1.0.0-R9")
   val HOTPINK = HotPink
   val IndianRed = new Color(jfxsp.Color.INDIANRED)
   @deprecated("Use IndianRed; INDIANRED will be removed in a future release.",
               "1.0.0-R9")
   val INDIANRED = IndianRed
   val Indigo = new Color(jfxsp.Color.INDIGO)
-  @deprecated(
-      "Use Indigo; INDIGO will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Indigo; INDIGO will be removed in a future release.",
+              "1.0.0-R9")
   val INDIGO = Indigo
   val Ivory = new Color(jfxsp.Color.IVORY)
-  @deprecated(
-      "Use Ivory; IVORY will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Ivory; IVORY will be removed in a future release.",
+              "1.0.0-R9")
   val IVORY = Ivory
   val Khaki = new Color(jfxsp.Color.KHAKI)
-  @deprecated(
-      "Use Khaki; KHAKI will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Khaki; KHAKI will be removed in a future release.",
+              "1.0.0-R9")
   val KHAKI = Khaki
   val Lavender = new Color(jfxsp.Color.LAVENDER)
   @deprecated("Use Lavender; LAVENDER will be removed in a future release.",
@@ -479,24 +481,24 @@ object Color {
       "1.0.0-R9")
   val LIGHTYELLOW = LightYellow
   val Lime = new Color(jfxsp.Color.LIME)
-  @deprecated(
-      "Use Lime; LIME will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Lime; LIME will be removed in a future release.",
+              "1.0.0-R9")
   val LIME = Lime
   val LimeGreen = new Color(jfxsp.Color.LIMEGREEN)
   @deprecated("Use LimeGreen; LIMEGREEN will be removed in a future release.",
               "1.0.0-R9")
   val LIMEGREEN = LimeGreen
   val Linen = new Color(jfxsp.Color.LINEN)
-  @deprecated(
-      "Use Linen; LINEN will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Linen; LINEN will be removed in a future release.",
+              "1.0.0-R9")
   val LINEN = Linen
   val Magenta = new Color(jfxsp.Color.MAGENTA)
-  @deprecated(
-      "Use Magenta; MAGENTA will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Magenta; MAGENTA will be removed in a future release.",
+              "1.0.0-R9")
   val MAGENTA = Magenta
   val Maroon = new Color(jfxsp.Color.MAROON)
-  @deprecated(
-      "Use Maroon; MAROON will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Maroon; MAROON will be removed in a future release.",
+              "1.0.0-R9")
   val MAROON = Maroon
   val MediumAquamarine = new Color(jfxsp.Color.MEDIUMAQUAMARINE)
   @deprecated(
@@ -566,32 +568,32 @@ object Color {
       "1.0.0-R9")
   val NAVAJOWHITE = NavajoWhite
   val Navy = new Color(jfxsp.Color.NAVY)
-  @deprecated(
-      "Use Navy; NAVY will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Navy; NAVY will be removed in a future release.",
+              "1.0.0-R9")
   val NAVY = Navy
   val OldLace = new Color(jfxsp.Color.OLDLACE)
-  @deprecated(
-      "Use OldLace; OLDLACE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use OldLace; OLDLACE will be removed in a future release.",
+              "1.0.0-R9")
   val OLDLACE = OldLace
   val Olive = new Color(jfxsp.Color.OLIVE)
-  @deprecated(
-      "Use Olive; OLIVE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Olive; OLIVE will be removed in a future release.",
+              "1.0.0-R9")
   val OLIVE = Olive
   val OliveDrab = new Color(jfxsp.Color.OLIVEDRAB)
   @deprecated("Use OliveDrab; OLIVEDRAB will be removed in a future release.",
               "1.0.0-R9")
   val OLIVEDRAB = OliveDrab
   val Orange = new Color(jfxsp.Color.ORANGE)
-  @deprecated(
-      "Use Orange; ORANGE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Orange; ORANGE will be removed in a future release.",
+              "1.0.0-R9")
   val ORANGE = Orange
   val OrangeRed = new Color(jfxsp.Color.ORANGERED)
   @deprecated("Use OrangeRed; ORANGERED will be removed in a future release.",
               "1.0.0-R9")
   val ORANGERED = OrangeRed
   val Orchid = new Color(jfxsp.Color.ORCHID)
-  @deprecated(
-      "Use Orchid; ORCHID will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Orchid; ORCHID will be removed in a future release.",
+              "1.0.0-R9")
   val ORCHID = Orchid
   val PaleGoldrenrod = new Color(jfxsp.Color.PALEGOLDENROD)
   @deprecated(
@@ -622,16 +624,16 @@ object Color {
               "1.0.0-R9")
   val PEACHPUFF = PeachPuff
   val Peru = new Color(jfxsp.Color.PERU)
-  @deprecated(
-      "Use Peru; PERU will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Peru; PERU will be removed in a future release.",
+              "1.0.0-R9")
   val PERU = Peru
   val Pink = new Color(jfxsp.Color.PINK)
-  @deprecated(
-      "Use Pink; PINK will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Pink; PINK will be removed in a future release.",
+              "1.0.0-R9")
   val PINK = Pink
   val Plum = new Color(jfxsp.Color.PLUM)
-  @deprecated(
-      "Use Plum; PLUM will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Plum; PLUM will be removed in a future release.",
+              "1.0.0-R9")
   val PLUM = Plum
   val PowderBlue = new Color(jfxsp.Color.POWDERBLUE)
   @deprecated(
@@ -639,8 +641,8 @@ object Color {
       "1.0.0-R9")
   val POWDERBLUE = PowderBlue
   val Purple = new Color(jfxsp.Color.PURPLE)
-  @deprecated(
-      "Use Purple; PURPLE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Purple; PURPLE will be removed in a future release.",
+              "1.0.0-R9")
   val PURPLE = Purple
   val Red = new Color(jfxsp.Color.RED)
   @deprecated("Use Red; RED will be removed in a future release.", "1.0.0-R9")
@@ -659,8 +661,8 @@ object Color {
       "1.0.0-R9")
   val SADDLEBROWN = SaddleBrown
   val Salmon = new Color(jfxsp.Color.SALMON)
-  @deprecated(
-      "Use Salmon; SALMON will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Salmon; SALMON will be removed in a future release.",
+              "1.0.0-R9")
   val SALMON = Salmon
   val SandyBrown = new Color(jfxsp.Color.SANDYBROWN)
   @deprecated(
@@ -676,16 +678,16 @@ object Color {
               "1.0.0-R9")
   val SEASHELL = SeaShell
   val Sienna = new Color(jfxsp.Color.SIENNA)
-  @deprecated(
-      "Use Sienna; SIENNA will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Sienna; SIENNA will be removed in a future release.",
+              "1.0.0-R9")
   val SIENNA = Sienna
   val Silver = new Color(jfxsp.Color.SILVER)
-  @deprecated(
-      "Use Silver; SILVER will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Silver; SILVER will be removed in a future release.",
+              "1.0.0-R9")
   val SILVER = Silver
   val SkyBlue = new Color(jfxsp.Color.SKYBLUE)
-  @deprecated(
-      "Use SkyBlue; SKYBLUE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use SkyBlue; SKYBLUE will be removed in a future release.",
+              "1.0.0-R9")
   val SKYBLUE = SkyBlue
   val SlateBlue = new Color(jfxsp.Color.SLATEBLUE)
   @deprecated("Use SlateBlue; SLATEBLUE will be removed in a future release.",
@@ -700,8 +702,8 @@ object Color {
               "1.0.0-R9")
   val SLATEGREY = SlateGrey
   val Snow = new Color(jfxsp.Color.SNOW)
-  @deprecated(
-      "Use Snow; SNOW will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Snow; SNOW will be removed in a future release.",
+              "1.0.0-R9")
   val SNOW = Snow
   val SpringGreen = new Color(jfxsp.Color.SPRINGGREEN)
   @deprecated(
@@ -716,16 +718,16 @@ object Color {
   @deprecated("Use Tan; TAN will be removed in a future release.", "1.0.0-R9")
   val TAN = Tan
   val Teal = new Color(jfxsp.Color.TEAL)
-  @deprecated(
-      "Use Teal; TEAL will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Teal; TEAL will be removed in a future release.",
+              "1.0.0-R9")
   val TEAL = Teal
   val Thistle = new Color(jfxsp.Color.THISTLE)
-  @deprecated(
-      "Use Thistle; THISTLE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Thistle; THISTLE will be removed in a future release.",
+              "1.0.0-R9")
   val THISTLE = Thistle
   val Tomato = new Color(jfxsp.Color.TOMATO)
-  @deprecated(
-      "Use Tomato; TOMATO will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Tomato; TOMATO will be removed in a future release.",
+              "1.0.0-R9")
   val TOMATO = Tomato
   val Transparent = new Color(jfxsp.Color.TRANSPARENT)
   @deprecated(
@@ -737,16 +739,16 @@ object Color {
               "1.0.0-R9")
   val TURQUOISE = Turquoise
   val Violet = new Color(jfxsp.Color.VIOLET)
-  @deprecated(
-      "Use Violet; VIOLET will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Violet; VIOLET will be removed in a future release.",
+              "1.0.0-R9")
   val VIOLET = Violet
   val Wheat = new Color(jfxsp.Color.WHEAT)
-  @deprecated(
-      "Use Wheat; WHEAT will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Wheat; WHEAT will be removed in a future release.",
+              "1.0.0-R9")
   val WHEAT = Wheat
   val White = new Color(jfxsp.Color.WHITE)
-  @deprecated(
-      "Use White; WHITE will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use White; WHITE will be removed in a future release.",
+              "1.0.0-R9")
   val WHITE = White
   val WhiteSmoke = new Color(jfxsp.Color.WHITESMOKE)
   @deprecated(
@@ -754,8 +756,8 @@ object Color {
       "1.0.0-R9")
   val WHITESMOKE = WhiteSmoke
   val Yellow = new Color(jfxsp.Color.YELLOW)
-  @deprecated(
-      "Use Yellow; YELLOW will be removed in a future release.", "1.0.0-R9")
+  @deprecated("Use Yellow; YELLOW will be removed in a future release.",
+              "1.0.0-R9")
   val YELLOW = Yellow
   val YellowGreen = new Color(jfxsp.Color.YELLOWGREEN)
   @deprecated(
@@ -825,8 +827,8 @@ class Color(override val delegate: jfxsp.Color)
                   saturationFactor: Double,
                   brightnessFactor: Double,
                   opacityFactor: Double): Color =
-    delegate.deriveColor(
-        hueShift, saturationFactor, brightnessFactor, opacityFactor)
+    delegate
+      .deriveColor(hueShift, saturationFactor, brightnessFactor, opacityFactor)
 
   /**
     * Creates a new Color that is a less saturated version of this Color.

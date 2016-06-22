@@ -307,8 +307,10 @@ class ColumnPruningSuite extends PlanTest {
     val input2 = LocalRelation('c.int, 'd.string, 'e.double)
     val query = Project('b :: Nil, Union(input1 :: input2 :: Nil)).analyze
     val expected = Project('b :: Nil,
-                           Union(Project('b :: Nil, input1) :: Project(
-                                   'd :: Nil, input2) :: Nil)).analyze
+                           Union(
+                               Project('b :: Nil, input1) :: Project(
+                                   'd :: Nil,
+                                   input2) :: Nil)).analyze
     comparePlans(Optimize.execute(query), expected)
   }
 

@@ -10,8 +10,8 @@ package internal.util
 object HashSet {
   def apply[T >: Null <: AnyRef](initialCapacity: Int): HashSet[T] =
     this("No Label", initialCapacity)
-  def apply[T >: Null <: AnyRef](
-      label: String, initialCapacity: Int): HashSet[T] =
+  def apply[T >: Null <: AnyRef](label: String,
+                                 initialCapacity: Int): HashSet[T] =
     new HashSet[T](label, initialCapacity)
 }
 

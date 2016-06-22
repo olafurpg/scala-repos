@@ -36,8 +36,10 @@ object ShardCoordinator {
   private[akka] def props(typeName: String,
                           settings: ClusterShardingSettings,
                           allocationStrategy: ShardAllocationStrategy): Props =
-    Props(new PersistentShardCoordinator(
-            typeName: String, settings, allocationStrategy))
+    Props(
+        new PersistentShardCoordinator(typeName: String,
+                                       settings,
+                                       allocationStrategy))
       .withDeploy(Deploy.local)
 
   /**
@@ -48,9 +50,11 @@ object ShardCoordinator {
                           settings: ClusterShardingSettings,
                           allocationStrategy: ShardAllocationStrategy,
                           replicator: ActorRef): Props =
-    Props(new DDataShardCoordinator(
-            typeName: String, settings, allocationStrategy, replicator))
-      .withDeploy(Deploy.local)
+    Props(
+        new DDataShardCoordinator(typeName: String,
+                                  settings,
+                                  allocationStrategy,
+                                  replicator)).withDeploy(Deploy.local)
 
   /**
     * Interface of the pluggable shard allocation and rebalancing logic used by the [[ShardCoordinator]].
@@ -126,8 +130,9 @@ object ShardCoordinator {
     def allocateShard(
         requester: ActorRef,
         shardId: String,
-        currentShardAllocations: java.util.Map[
-            ActorRef, immutable.IndexedSeq[String]]): Future[ActorRef]
+        currentShardAllocations: java.util.Map[ActorRef,
+                                               immutable.IndexedSeq[String]])
+      : Future[ActorRef]
 
     /**
       * Invoked periodically to decide which shards to rebalance to another location.
@@ -137,9 +142,10 @@ object ShardCoordinator {
       *                            you should not include these in the returned set
       * @return a `Future` of the shards to be migrated, may be empty to skip rebalance in this round
       */
-    def rebalance(currentShardAllocations: java.util.Map[
-                      ActorRef, immutable.IndexedSeq[String]],
-                  rebalanceInProgress: java.util.Set[String])
+    def rebalance(
+        currentShardAllocations: java.util.Map[ActorRef,
+                                               immutable.IndexedSeq[String]],
+        rebalanceInProgress: java.util.Set[String])
       : Future[java.util.Set[String]]
   }
 
@@ -154,8 +160,8 @@ object ShardCoordinator {
     * must be to begin the rebalancing. The number of ongoing rebalancing processes can be limited.
     */
   @SerialVersionUID(1L)
-  class LeastShardAllocationStrategy(
-      rebalanceThreshold: Int, maxSimultaneousRebalance: Int)
+  class LeastShardAllocationStrategy(rebalanceThreshold: Int,
+                                     maxSimultaneousRebalance: Int)
       extends ShardAllocationStrategy
       with Serializable {
 
@@ -321,7 +327,7 @@ object ShardCoordinator {
       * Persistent state of the event sourced ShardCoordinator.
       */
     @SerialVersionUID(1L)
-    final case class State private[akka](
+    final case class State private[akka] (
         // region for each shard
         shards: Map[ShardId, ActorRef] = Map.empty,
         // shards for each region
@@ -370,8 +376,8 @@ object ShardCoordinator {
                regions = regions.updated(region, regions(region) :+ shard),
                unallocatedShards = newUnallocatedShards)
         case ShardHomeDeallocated(shard) ⇒
-          require(
-              shards.contains(shard), s"Shard [$shard] not allocated: $this")
+          require(shards.contains(shard),
+                  s"Shard [$shard] not allocated: $this")
           val region = shards(shard)
           require(regions.contains(region),
                   s"Region $region for shard [$shard] not registered: $this")
@@ -561,8 +567,8 @@ abstract class ShardCoordinator(
               val activeRegions = state.regions -- gracefulShutdownInProgress
               if (activeRegions.nonEmpty) {
                 val getShardHomeSender = sender()
-                val regionFuture = allocationStrategy.allocateShard(
-                    getShardHomeSender, shard, activeRegions)
+                val regionFuture = allocationStrategy
+                  .allocateShard(getShardHomeSender, shard, activeRegions)
                 regionFuture.value match {
                   case Some(Success(region)) ⇒
                     continueGetShardHome(shard, region, getShardHomeSender)
@@ -700,7 +706,9 @@ abstract class ShardCoordinator(
         if (removalMargin != Duration.Zero && t.addressTerminated &&
             aliveRegions(ref)) {
           context.system.scheduler.scheduleOnce(
-              removalMargin, self, DelayedShardRegionTerminated(ref))
+              removalMargin,
+              self,
+              DelayedShardRegionTerminated(ref))
           regionTerminationInProgress += ref
         } else regionTerminated(ref)
       } else if (state.regionProxies.contains(ref)) {
@@ -784,8 +792,9 @@ abstract class ShardCoordinator(
       state.unallocatedShards.foreach { self ! GetShardHome(_) }
   }
 
-  def continueGetShardHome(
-      shard: ShardId, region: ActorRef, getShardHomeSender: ActorRef): Unit =
+  def continueGetShardHome(shard: ShardId,
+                           region: ActorRef,
+                           getShardHomeSender: ActorRef): Unit =
     if (!rebalanceInProgress.contains(shard)) {
       state.shards.get(shard) match {
         case Some(ref) ⇒ getShardHomeSender ! ShardHome(shard, ref)
@@ -814,8 +823,9 @@ abstract class ShardCoordinator(
         state.shards.get(shard) match {
           case Some(rebalanceFromRegion) ⇒
             rebalanceInProgress += shard
-            log.debug(
-                "Rebalance shard [{}] from [{}]", shard, rebalanceFromRegion)
+            log.debug("Rebalance shard [{}] from [{}]",
+                      shard,
+                      rebalanceFromRegion)
             context.actorOf(
                 rebalanceWorkerProps(
                     shard,
@@ -865,8 +875,8 @@ class PersistentShardCoordinator(
           else {
             log.debug(
                 "ShardRegionTerminated, but region {} was not registered. This inconsistency is due to that " +
-                " some stored ActorRef in Akka v2.3.0 and v2.3.1 did not contain full address information. It will be " +
-                "removed by later watch.",
+                  " some stored ActorRef in Akka v2.3.0 and v2.3.1 did not contain full address information. It will be " +
+                  "removed by later watch.",
                 region)
           }
         case ShardRegionProxyTerminated(proxy) ⇒
@@ -991,7 +1001,8 @@ class DDataShardCoordinator(
 
   // this state will stash all messages until it receives UpdateSuccess
   def waitingForUpdate[E <: DomainEvent](
-      evt: E, afterUpdateCallback: DomainEvent ⇒ Unit): Receive = {
+      evt: E,
+      afterUpdateCallback: DomainEvent ⇒ Unit): Receive = {
     case UpdateSuccess(CoordinatorStateKey, Some(`evt`)) ⇒
       log.debug("The coordinator state was successfully updated with {}", evt)
       context.unbecome()

@@ -29,8 +29,9 @@ import scala.collection.immutable.IndexedSeq
   *
   * Assumes you are giving it a non-empty set of data
   */
-private[spark] class Distribution(
-    val data: Array[Double], val startIdx: Int, val endIdx: Int) {
+private[spark] class Distribution(val data: Array[Double],
+                                  val startIdx: Int,
+                                  val endIdx: Int) {
   require(startIdx < endIdx)
   def this(data: Traversable[Double]) = this(data.toArray, 0, data.size)
   java.util.Arrays.sort(data, startIdx, endIdx)
@@ -43,8 +44,8 @@ private[spark] class Distribution(
     * given from 0 to 1
     * @param probabilities
     */
-  def getQuantiles(probabilities: Traversable[Double] =
-        defaultProbabilities): IndexedSeq[Double] = {
+  def getQuantiles(probabilities: Traversable[Double] = defaultProbabilities)
+    : IndexedSeq[Double] = {
     probabilities.toIndexedSeq.map { p: Double =>
       data(closestIndex(p))
     }
@@ -88,8 +89,8 @@ private[spark] object Distribution {
     }
   }
 
-  def showQuantiles(
-      out: PrintStream = System.out, quantiles: Traversable[Double]) {
+  def showQuantiles(out: PrintStream = System.out,
+                    quantiles: Traversable[Double]) {
     // scalastyle:off println
     out.println("min\t25%\t50%\t75%\tmax")
     quantiles.foreach { q =>

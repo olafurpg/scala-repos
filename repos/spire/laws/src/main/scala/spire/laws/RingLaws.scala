@@ -46,11 +46,12 @@ trait RingLaws[A] extends GroupLaws[A] {
         parent = None,
         "prodn(a, 1) === a" → forAll((a: A) => A.prodn(a, 1) === a),
         "prodn(a, 2) === a * a" → forAll((a: A) => A.prodn(a, 2) === (a * a)),
-        "prodOption" → forAll((a: A) =>
+        "prodOption" → forAll(
+            (a: A) =>
               (A.prodOption(Seq.empty[A]) === Option.empty[A]) &&
-              (A.prodOption(Seq(a)) === Option(a)) &&
-              (A.prodOption(Seq(a, a)) === Option(a * a)) &&
-              (A.prodOption(Seq(a, a, a)) === Option(a * a * a)))
+                (A.prodOption(Seq(a)) === Option(a)) &&
+                (A.prodOption(Seq(a, a)) === Option(a * a)) &&
+                (A.prodOption(Seq(a, a, a)) === Option(a * a * a)))
     )
 
   def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) =
@@ -84,12 +85,14 @@ trait RingLaws[A] extends GroupLaws[A] {
         al = additiveSemigroup,
         ml = multiplicativeSemigroup,
         parents = Seq.empty,
-        "distributive" → forAll((x: A, y: A, z: A) =>
+        "distributive" → forAll(
+            (x: A, y: A, z: A) =>
               (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z +
-                      y * z))),
-        "pow" → forAll((x: A) =>
+                        y * z))),
+        "pow" → forAll(
+            (x: A) =>
               ((x pow 1) === x) && ((x pow 2) === x * x) &&
-              ((x pow 3) === x * x * x))
+                ((x pow 3) === x * x * x))
     )
 
   def rng(implicit A: Rng[A]) = new RingProperties(
@@ -146,8 +149,7 @@ trait RingLaws[A] extends GroupLaws[A] {
       val base: GroupLaws[A] => GroupLaws[A]#GroupProperties,
       val parent: Option[MultiplicativeProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet
+  ) extends RuleSet
       with HasOneParent {
     private val _base = base(RingLaws.this)
 
@@ -156,8 +158,9 @@ trait RingLaws[A] extends GroupLaws[A] {
   }
 
   object RingProperties {
-    def fromParent(
-        name: String, parent: RingProperties, props: (String, Prop)*) =
+    def fromParent(name: String,
+                   parent: RingProperties,
+                   props: (String, Prop)*) =
       new RingProperties(name, parent.al, parent.ml, Seq(parent), props: _*)
   }
 
@@ -167,8 +170,7 @@ trait RingLaws[A] extends GroupLaws[A] {
       val ml: MultiplicativeProperties,
       val parents: Seq[RingProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet {
+  ) extends RuleSet {
     def nonZero: Boolean = false
 
     def _ml =

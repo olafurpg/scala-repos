@@ -46,5 +46,5 @@ object Specs2RunConfiguration extends SuiteValidityChecker {
   override protected[test] def lackSuitableConstructor(
       clazz: PsiClass): Boolean =
     !isScalaObject(clazz) &&
-    AbstractTestRunConfiguration.lackSuitableConstructor(clazz)
+      AbstractTestRunConfiguration.lackSuitableConstructor(clazz)
 }

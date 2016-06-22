@@ -62,14 +62,16 @@ class CodegenContext {
     *
     * Returns the name of class member.
     */
-  def addReferenceObj(
-      name: String, obj: Any, className: String = null): String = {
+  def addReferenceObj(name: String,
+                      obj: Any,
+                      className: String = null): String = {
     val term = freshName(name)
     val idx = references.length
     references += obj
     val clsName = Option(className).getOrElse(obj.getClass.getName)
-    addMutableState(
-        clsName, term, s"this.$term = ($clsName) references[$idx];")
+    addMutableState(clsName,
+                    term,
+                    s"this.$term = ($clsName) references[$idx];")
     term
   }
 
@@ -107,8 +109,9 @@ class CodegenContext {
   val mutableStates: mutable.ArrayBuffer[(String, String, String)] =
     mutable.ArrayBuffer.empty[(String, String, String)]
 
-  def addMutableState(
-      javaType: String, variableName: String, initCode: String): Unit = {
+  def addMutableState(javaType: String,
+                      variableName: String,
+                      initCode: String): Unit = {
     mutableStates += ((javaType, variableName, initCode))
   }
 
@@ -188,12 +191,11 @@ class CodegenContext {
     * Returns a term name that is unique within this instance of a `CodegenContext`.
     */
   def freshName(name: String): String = synchronized {
-    val fullName =
-      if (freshNamePrefix == "") {
-        name
-      } else {
-        s"${freshNamePrefix}_$name"
-      }
+    val fullName = if (freshNamePrefix == "") {
+      name
+    } else {
+      s"${freshNamePrefix}_$name"
+    }
     if (freshNameIds.contains(fullName)) {
       val id = freshNameIds(fullName)
       freshNameIds(fullName) = id + 1
@@ -229,8 +231,10 @@ class CodegenContext {
   /**
     * Returns the code to update a column in Row for a given DataType.
     */
-  def setColumn(
-      row: String, dataType: DataType, ordinal: Int, value: String): String = {
+  def setColumn(row: String,
+                dataType: DataType,
+                ordinal: Int,
+                value: String): String = {
     val jt = javaType(dataType)
     dataType match {
       case _ if isPrimitiveType(jt) =>
@@ -403,10 +407,12 @@ class CodegenContext {
               } else if ($isNullB) {
                 return 1;
               } else {
-                ${javaType(elementType)} $elementA = ${getValue(
-            "a", elementType, "i")};
-                ${javaType(elementType)} $elementB = ${getValue(
-            "b", elementType, "i")};
+                ${javaType(elementType)} $elementA = ${getValue("a",
+                                                                elementType,
+                                                                "i")};
+                ${javaType(elementType)} $elementB = ${getValue("b",
+                                                                elementType,
+                                                                "i")};
                 int comp = ${genComp(elementType, elementA, elementB)};
                 if (comp != 0) {
                   return comp;
@@ -599,9 +605,9 @@ class CodegenContext {
     * elimination will be performed. Subexpression elimination assumes that the code will for each
     * expression will be combined in the `expressions` order.
     */
-  def generateExpressions(expressions: Seq[Expression],
-                          doSubexpressionElimination: Boolean =
-                            false): Seq[ExprCode] = {
+  def generateExpressions(
+      expressions: Seq[Expression],
+      doSubexpressionElimination: Boolean = false): Seq[ExprCode] = {
     if (doSubexpressionElimination) subexpressionElimination(expressions)
     expressions.map(e => e.gen(this))
   }

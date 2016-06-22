@@ -96,8 +96,8 @@ trait CompilationUnits { global: Global =>
         map -= sym
       }
       def get(sym: Symbol): Option[Tree] =
-        debuglogResultIf[Option[Tree]](
-            s"found synthetic for $sym in $self", _.isDefined) {
+        debuglogResultIf[Option[Tree]](s"found synthetic for $sym in $self",
+                                       _.isDefined) {
           map get sym
         }
       def keys: Iterable[Symbol] = map.keys

@@ -28,8 +28,7 @@ object StartupWithOneThreadSpec {
   final case class GossipTo(address: Address)
 
   def testProps =
-    Props(
-        new Actor with ActorLogging {
+    Props(new Actor with ActorLogging {
       val cluster = Cluster(context.system)
       log.debug(
           s"started ${cluster.selfAddress} ${Thread.currentThread().getName}")

@@ -26,8 +26,9 @@ object FormattedStringParser extends StringParser {
     Some(element) collect {
       // "%d".format(1)
       case ScMethodCall(
-          ScReferenceExpression.withQualifier(literal: ScLiteral) && PsiReferenceEx
-            .resolve((f: ScFunction) && ContainingClass(owner: ScTrait)),
+          ScReferenceExpression
+            .withQualifier(literal: ScLiteral) && PsiReferenceEx.resolve(
+          (f: ScFunction) && ContainingClass(owner: ScTrait)),
           args)
           if literal.isString && isFormatMethod(owner.qualifiedName, f.name) =>
         (literal, args)
@@ -46,11 +47,12 @@ object FormattedStringParser extends StringParser {
 
       // 1.formatted("%d")
       case ScMethodCall(
-          ScReferenceExpression.withQualifier(arg: ScExpression) && PsiReferenceEx
-            .resolve((f: ScFunction) && ContainingClass(owner: ScClass)),
+          ScReferenceExpression
+            .withQualifier(arg: ScExpression) && PsiReferenceEx.resolve(
+          (f: ScFunction) && ContainingClass(owner: ScClass)),
           Seq(literal: ScLiteral))
           if literal.isString &&
-          isFormattedMethod(owner.qualifiedName, f.name) =>
+            isFormattedMethod(owner.qualifiedName, f.name) =>
         (literal, Seq(arg))
 
       // 1 formatted "%d"
@@ -59,16 +61,16 @@ object FormattedStringParser extends StringParser {
                        (f: ScFunction) && ContainingClass(owner: ScClass)),
                        literal: ScLiteral)
           if literal.isString &&
-          isFormattedMethod(owner.qualifiedName, f.name) =>
+            isFormattedMethod(owner.qualifiedName, f.name) =>
         (literal, Seq(arg))
 
       // String.format("%d", 1)
       case MethodInvocation(
-          PsiReferenceEx
-            .resolve((f: PsiMethod) && ContainingClass(owner: PsiClass)),
+          PsiReferenceEx.resolve(
+          (f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
-          isStringFormatMethod(owner.qualifiedName, f.getName) =>
+            isStringFormatMethod(owner.qualifiedName, f.getName) =>
         (literal, args)
     }
 
@@ -77,13 +79,13 @@ object FormattedStringParser extends StringParser {
 
   private def isFormattedMethod(holder: String, method: String) =
     (holder == "scala.runtime.StringFormat" ||
-        holder == "scala.runtime.StringAdd") && method == "formatted"
+          holder == "scala.runtime.StringAdd") && method == "formatted"
 
   private def isStringFormatMethod(holder: String, method: String) =
     holder == "java.lang.String" && method == "format"
 
-  def parseFormatCall(
-      literal: ScLiteral, arguments: Seq[ScExpression]): Seq[StringPart] = {
+  def parseFormatCall(literal: ScLiteral,
+                      arguments: Seq[ScExpression]): Seq[StringPart] = {
     val remainingArguments = arguments.toIterator
     val shift = if (literal.isMultiLineString) 3 else 1
     val formatString = literal.getText.drop(shift).dropRight(shift)
@@ -112,11 +114,12 @@ object FormattedStringParser extends StringParser {
         } else {
           if (it.toString().equals("%n"))
             Injection(ScalaPsiElementFactory.createExpressionFromText(
-                          "\"\\n\"", literal.getManager),
+                          "\"\\n\"",
+                          literal.getManager),
                       None)
           else if (it.toString == "%%")
-            Injection(ScalaPsiElementFactory.createExpressionFromText(
-                          "\"%\"", literal.getManager),
+            Injection(ScalaPsiElementFactory
+                        .createExpressionFromText("\"%\"", literal.getManager),
                       None)
           else if (remainingArguments.hasNext)
             Injection(remainingArguments.next(), Some(specifier))

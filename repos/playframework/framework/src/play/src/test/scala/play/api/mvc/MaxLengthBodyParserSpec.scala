@@ -86,7 +86,8 @@ object MaxLengthBodyParserSpec extends Specification with AfterAll {
 
     "be exceeded when using the maxLength body parser" in {
       val (parser, parsed) = bodyParser
-      val result = feed(BodyParsers.parse
+      val result = feed(
+          BodyParsers.parse
             .maxLength(MaxLength10, BodyParser(req => parser))
             .apply(req))
       maxLengthParserEnforced(result)
@@ -99,8 +100,8 @@ object MaxLengthBodyParserSpec extends Specification with AfterAll {
           BodyParsers.parse
             .maxLength(MaxLength10,
                        BodyParser(req =>
-                             BodyParsers.parse.enforceMaxLength(
-                                 req, MaxLength10, parser)))
+                             BodyParsers.parse
+                               .enforceMaxLength(req, MaxLength10, parser)))
             .apply(req))
       maxLengthParserEnforced(result)
       assertDidNotParse(parsed)
@@ -112,8 +113,8 @@ object MaxLengthBodyParserSpec extends Specification with AfterAll {
           BodyParsers.parse
             .maxLength(MaxLength10,
                        BodyParser(req =>
-                             BodyParsers.parse.enforceMaxLength(
-                                 req, MaxLength20, parser)))
+                             BodyParsers.parse
+                               .enforceMaxLength(req, MaxLength20, parser)))
             .apply(req))
       maxLengthParserEnforced(result)
       assertDidNotParse(parsed)
@@ -125,8 +126,8 @@ object MaxLengthBodyParserSpec extends Specification with AfterAll {
           BodyParsers.parse
             .maxLength(MaxLength20,
                        BodyParser(req =>
-                             BodyParsers.parse.enforceMaxLength(
-                                 req, MaxLength10, parser)))
+                             BodyParsers.parse
+                               .enforceMaxLength(req, MaxLength10, parser)))
             .apply(req))
       enforceMaxLengthEnforced(result)
       assertDidNotParse(parsed)
@@ -138,8 +139,8 @@ object MaxLengthBodyParserSpec extends Specification with AfterAll {
           BodyParsers.parse
             .maxLength(MaxLength20,
                        BodyParser(req =>
-                             BodyParsers.parse.enforceMaxLength(
-                                 req, MaxLength20, parser)))
+                             BodyParsers.parse
+                               .enforceMaxLength(req, MaxLength20, parser)))
             .apply(req))
       result must beRight.which { inner =>
         inner must beRight(Body15)

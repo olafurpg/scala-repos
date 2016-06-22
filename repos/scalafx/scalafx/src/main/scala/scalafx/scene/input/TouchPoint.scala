@@ -43,8 +43,8 @@ object TouchPoint {
       * The touch point has been moved
       */
     val Moved = new State(jfxsi.TouchPoint.State.MOVED)
-    @deprecated(
-        "Use Moved; MOVED will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Moved; MOVED will be removed in a future release",
+                "8.0.60-R10")
     val MOVED = Moved
 
     /**

@@ -19,7 +19,7 @@ trait ScPrefixExpr extends ScExpression with ScSugarCallExpr {
       case _ =>
         throw new UnsupportedOperationException(
             "Prefix Expr Operation is not reference expression: " +
-            this.getText)
+              this.getText)
     }
 
   def argsElement: PsiElement = operation

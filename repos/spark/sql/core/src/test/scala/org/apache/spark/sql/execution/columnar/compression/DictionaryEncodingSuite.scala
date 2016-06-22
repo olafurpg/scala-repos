@@ -31,7 +31,8 @@ class DictionaryEncodingSuite extends SparkFunSuite {
   testDictionaryEncoding(new StringColumnStats, STRING)
 
   def testDictionaryEncoding[T <: AtomicType](
-      columnStats: ColumnStats, columnType: NativeColumnType[T]) {
+      columnStats: ColumnStats,
+      columnType: NativeColumnType[T]) {
 
     val typeName = columnType.getClass.getSimpleName.stripSuffix("$")
 
@@ -53,10 +54,11 @@ class DictionaryEncodingSuite extends SparkFunSuite {
       // Tests encoder
       // -------------
 
-      val builder = TestCompressibleColumnBuilder(
-          columnStats, columnType, DictionaryEncoding)
-      val (values, rows) = makeUniqueValuesAndSingleValueRows(
-          columnType, uniqueValueCount)
+      val builder = TestCompressibleColumnBuilder(columnStats,
+                                                  columnType,
+                                                  DictionaryEncoding)
+      val (values, rows) =
+        makeUniqueValuesAndSingleValueRows(columnType, uniqueValueCount)
       val dictValues = stableDistinct(inputSeq)
 
       inputSeq.foreach(i => builder.appendFrom(rows(i), 0))

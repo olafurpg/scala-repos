@@ -72,8 +72,8 @@ private[cats] class FutureSemigroup[A: Semigroup](
     (fx zip fy).map { case (x, y) => x |+| y }
 }
 
-private[cats] class FutureMonoid[A](
-    implicit A: Monoid[A], ec: ExecutionContext)
+private[cats] class FutureMonoid[A](implicit A: Monoid[A],
+                                    ec: ExecutionContext)
     extends FutureSemigroup[A]
     with Monoid[Future[A]] {
   def empty: Future[A] =

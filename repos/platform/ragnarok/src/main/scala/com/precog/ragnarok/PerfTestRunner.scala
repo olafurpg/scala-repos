@@ -57,8 +57,8 @@ trait PerfTestRunner[M[+ _], T] {
       Tree.node((test, a, t), kids)
   }
 
-  private def merge[A: Monoid](
-      run: RunResult[A], f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
+  private def merge[A: Monoid](run: RunResult[A],
+                               f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
     fill(run) match {
       case Tree.Node((test, a, time), children) =>
         Tree.node((test, a |+| f(time)), children map (merge(_, f)))

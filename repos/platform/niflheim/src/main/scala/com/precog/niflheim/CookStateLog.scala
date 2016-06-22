@@ -51,12 +51,14 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
 
   private[this] val txLog = new Logger(txLogConfig)
   txLog.open()
-  txLog.setAutoMark(false) // We only mark when we're ready to write to a new raw log
+  txLog
+    .setAutoMark(false) // We only mark when we're ready to write to a new raw log
 
   def close = {
     if (pendingCookIds0.size > 0) {
-      logger.warn("Closing txLog with pending cooks: " +
-          pendingCookIds0.keys.mkString("[", ", ", "]"))
+      logger.warn(
+          "Closing txLog with pending cooks: " +
+            pendingCookIds0.keys.mkString("[", ", ", "]"))
     }
     txLog.close()
     workLock.release
@@ -126,8 +128,7 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
     // mark if cooks are performed out-of-order.
     pendingCookIds0 -= blockId
 
-    txLog.mark(
-        pendingCookIds0.headOption match {
+    txLog.mark(pendingCookIds0.headOption match {
       case Some((_, txKey)) => txKey
       case None => completeTxKey
     })

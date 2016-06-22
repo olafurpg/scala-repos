@@ -134,7 +134,7 @@ class ScProjectionType private (
     if (hash == -1) {
       hash =
         projected.hashCode() + element.hashCode() * 31 +
-        (if (superReference) 239 else 0)
+          (if (superReference) 239 else 0)
     }
     hash
   }
@@ -173,8 +173,9 @@ class ScProjectionType private (
     }
   }
 
-  @CachedMappedWithRecursionGuard(
-      element, None, ModCount.getBlockModificationCount)
+  @CachedMappedWithRecursionGuard(element,
+                                  None,
+                                  ModCount.getBlockModificationCount)
   private def actualImpl(
       projected: ScType,
       superReference: Boolean): Option[(PsiNamedElement, ScSubstitutor)] = {
@@ -196,8 +197,8 @@ class ScProjectionType private (
       }
     }
 
-    def resolveProcessor(
-        kinds: Set[ResolveTargets.Value], name: String): ResolveProcessor = {
+    def resolveProcessor(kinds: Set[ResolveTargets.Value],
+                         name: String): ResolveProcessor = {
       new ResolveProcessor(kinds, resolvePlace, name) {
         override protected def addResults(
             results: Seq[ScalaResolveResult]): Boolean = {
@@ -250,8 +251,8 @@ class ScProjectionType private (
   }
 
   private def actual: (PsiNamedElement, ScSubstitutor) = {
-    actualImpl(projected, superReference).getOrElse(
-        element, ScSubstitutor.empty)
+    actualImpl(projected, superReference)
+      .getOrElse(element, ScSubstitutor.empty)
   }
 
   def actualElement: PsiNamedElement = actual._1
@@ -295,7 +296,8 @@ class ScProjectionType private (
           case _ => (false, uSubst)
         }
       case param @ ScParameterizedType(
-          proj2 @ ScProjectionType(p1, element1, _), typeArgs) =>
+          proj2 @ ScProjectionType(p1, element1, _),
+          typeArgs) =>
         r.isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, lower, _)) =>
             Equivalence.equivInner(this, lower match {
@@ -332,8 +334,8 @@ class ScProjectionType private (
                 new ScSubstitutor(Map.empty, Map.empty, Some(projected)) followed actualSubst
               t.getType(TypingContext.empty) match {
                 case Success(tp, _) if ScType.isSingletonType(tp) =>
-                  return Equivalence.equivInner(
-                      s.subst(tp), r, uSubst, falseUndef)
+                  return Equivalence
+                    .equivInner(s.subst(tp), r, uSubst, falseUndef)
                 case _ =>
               }
             case _ =>
@@ -345,8 +347,8 @@ class ScProjectionType private (
                 new ScSubstitutor(Map.empty, Map.empty, Some(p1)) followed proj2.actualSubst
               t.getType(TypingContext.empty) match {
                 case Success(tp, _) if ScType.isSingletonType(tp) =>
-                  return Equivalence.equivInner(
-                      s.subst(tp), this, uSubst, falseUndef)
+                  return Equivalence
+                    .equivInner(s.subst(tp), this, uSubst, falseUndef)
                 case _ =>
               }
             case _ =>
@@ -362,8 +364,8 @@ class ScProjectionType private (
               case Success(singl, _) if ScType.isSingletonType(singl) =>
                 val newSubst = actualSubst.followed(
                     new ScSubstitutor(Map.empty, Map.empty, Some(projected)))
-                Equivalence.equivInner(
-                    r, newSubst.subst(singl), uSubst, falseUndef)
+                Equivalence
+                  .equivInner(r, newSubst.subst(singl), uSubst, falseUndef)
               case _ => (false, uSubst)
             }
           case _ => (false, uSubst)
@@ -388,7 +390,7 @@ class ScProjectionType private (
   override def equals(other: Any): Boolean = other match {
     case that: ScProjectionType =>
       (that canEqual this) && projected == that.projected &&
-      element == that.element && superReference == that.superReference
+        element == that.element && superReference == that.superReference
     case _ => false
   }
 
@@ -437,8 +439,8 @@ case class ScThisType(clazz: ScTemplateDefinition) extends ValueType {
           case Success(singl, _) if ScType.isSingletonType(singl) =>
             val newSubst = p.actualSubst.followed(
                 new ScSubstitutor(Map.empty, Map.empty, Some(tp)))
-            Equivalence.equivInner(
-                this, newSubst.subst(singl), uSubst, falseUndef)
+            Equivalence
+              .equivInner(this, newSubst.subst(singl), uSubst, falseUndef)
           case _ => (false, uSubst)
         }
       case _ => (false, uSubst)
@@ -496,7 +498,7 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
             ta.typeParameters.map(tp => {
               val name = tp.name + "$$"
               args +=
-                new ScExistentialArgument(name, Nil, types.Nothing, types.Any)
+              new ScExistentialArgument(name, Nil, types.Nothing, types.Any)
               ScTypeVariable(name)
             }))
         Some(
@@ -582,8 +584,9 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
 }
 
 object ScDesignatorType {
-  def fromClassFqn(
-      fqn: String, project: Project, scope: GlobalSearchScope): ScType = {
+  def fromClassFqn(fqn: String,
+                   project: Project,
+                   scope: GlobalSearchScope): ScType = {
     ScalaPsiManager.instance(project).getCachedClass(scope, fqn) match {
       case Some(c) => ScType.designator(c)
       case _ => types.Nothing

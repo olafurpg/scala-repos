@@ -21,8 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
 /**
   * @author Jason Zaugg
   */
-class ScMacroDefinitionImpl private (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
+class ScMacroDefinitionImpl private (stub: StubElement[ScFunction],
+                                     nodeType: IElementType,
+                                     node: ASTNode)
     extends ScFunctionImpl(stub, nodeType, node)
     with ScMacroDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -36,8 +37,9 @@ class ScMacroDefinitionImpl private (
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
     //process function's parameters for dependent method types, and process type parameters
-    if (!super [ScFunctionImpl].processDeclarations(
-            processor, state, lastParent, place)) return false
+    if (!super[ScFunctionImpl]
+          .processDeclarations(processor, state, lastParent, place))
+      return false
 
     //do not process parameters for default parameters, only for function body
     //processing parameters for default parameters in ScParameters
@@ -47,8 +49,8 @@ class ScMacroDefinitionImpl private (
       body match {
         case Some(x)
             if lastParent != null &&
-            (!needCheckProcessingDeclarationsForBody ||
-                x.startOffsetInParent == lastParent.startOffsetInParent) =>
+              (!needCheckProcessingDeclarationsForBody ||
+                    x.startOffsetInParent == lastParent.startOffsetInParent) =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false

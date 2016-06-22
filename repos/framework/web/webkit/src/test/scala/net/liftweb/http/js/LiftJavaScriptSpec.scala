@@ -148,7 +148,9 @@ object LiftJavaScriptSpec extends Specification {
           .vend()
           .map(_.apply(session))
           .map(LiftJavaScript.initCmd(_).toJsCmd)
-        init must_== Full(formatjs(List(
+        init must_== Full(
+            formatjs(
+                List(
                     "var lift_settings = {};",
                     "window.lift.extend(lift_settings,window.liftJQuery);",
                     """window.lift.extend(lift_settings,{"liftPath": "/lift",
@@ -174,7 +176,9 @@ object LiftJavaScriptSpec extends Specification {
           .vend()
           .map(_.apply(session))
           .map(LiftJavaScript.initCmd(_).toJsCmd)
-        init must_== Full(formatjs(List(
+        init must_== Full(
+            formatjs(
+                List(
                     "var lift_settings = {};",
                     "window.lift.extend(lift_settings,window.liftVanilla);",
                     """window.lift.extend(lift_settings,{"liftPath": "/lift",
@@ -199,7 +203,8 @@ object LiftJavaScriptSpec extends Specification {
         val settings = LiftJavaScript.settings.extend(
             JsObj("liftPath" -> "liftyStuff", "mysetting" -> 99))
         val init = LiftJavaScript.initCmd(settings)
-        init.toJsCmd must_== formatjs(List(
+        init.toJsCmd must_== formatjs(
+            List(
                 "var lift_settings = {};",
                 "window.lift.extend(lift_settings,window.liftJQuery);",
                 """window.lift.extend(lift_settings,{"liftPath": "liftyStuff",

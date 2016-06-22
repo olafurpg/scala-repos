@@ -13,8 +13,7 @@ class DocResolver(
     forceJavaVersion: Option[String] // for testing
 )(
     implicit config: EnsimeConfig
-)
-    extends Actor
+) extends Actor
     with ActorLogging
     with DocUsecaseHandling {
 

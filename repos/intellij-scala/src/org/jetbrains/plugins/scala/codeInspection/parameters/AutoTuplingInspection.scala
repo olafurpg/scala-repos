@@ -36,7 +36,8 @@ class MakeTuplesExplicitFix(invoc: MethodInvocation)
         val newArgsText = s"(${mc.args.getText})"
         val invokedExprText = mc.getInvokedExpr.getText
         val newCall = ScalaPsiElementFactory.createExpressionFromText(
-            s"$invokedExprText$newArgsText", mc.getManager)
+            s"$invokedExprText$newArgsText",
+            mc.getManager)
         mc.replaceExpression(newCall, removeParenthesis = false)
       case _ =>
     }

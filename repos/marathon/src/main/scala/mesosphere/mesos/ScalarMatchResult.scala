@@ -47,7 +47,7 @@ case class NoMatch(resourceName: String,
 
   require(
       scope == ScalarMatchResult.Scope.NoneDisk ||
-      resourceName == Resource.DISK)
+        resourceName == Resource.DISK)
   require(requiredValue > offeredValue)
 
   def matches: Boolean = false
@@ -65,7 +65,7 @@ case class ScalarMatch(resourceName: String,
 
   require(
       scope == ScalarMatchResult.Scope.NoneDisk ||
-      resourceName == Resource.DISK)
+        resourceName == Resource.DISK)
   require(consumedValue >= requiredValue)
 
   def matches: Boolean = true

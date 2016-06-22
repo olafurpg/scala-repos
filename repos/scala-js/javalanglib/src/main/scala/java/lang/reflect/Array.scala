@@ -10,8 +10,8 @@ object Array {
   def newInstance(componentType: Class[_], length: Int): AnyRef =
     componentType.newArrayOfThisClass(js.Array(length))
 
-  def newInstance(
-      componentType: Class[_], dimensions: scala.Array[Int]): AnyRef =
+  def newInstance(componentType: Class[_],
+                  dimensions: scala.Array[Int]): AnyRef =
     componentType.newArrayOfThisClass(dimensions.toJSArray)
 
   def getLength(array: AnyRef): Int = array match {

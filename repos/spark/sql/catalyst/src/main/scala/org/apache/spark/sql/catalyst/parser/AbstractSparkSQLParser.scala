@@ -91,7 +91,7 @@ class SqlLexical extends StdLexical {
 
   delimiters +=
     ("@", "*", "+", "-", "<", "=", "<>", "!=", "<=", ">=", ">", "/", "(", ")",
-      ",", ";", "%", "{", "}", ":", "[", "]", ".", "&", "|", "^", "~", "<=>")
+        ",", ";", "%", "{", "}", ":", "[", "]", ".", "&", "|", "^", "~", "<=>")
 
   protected override def processIdent(name: String) = {
     val token = normalizeKeyword(name)

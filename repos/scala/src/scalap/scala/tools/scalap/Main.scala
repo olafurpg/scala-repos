@@ -31,8 +31,8 @@ class Main {
   val SCALA_LONG_SIG_ANNOTATION = "Lscala/reflect/ScalaLongSignature;"
   val BYTES_VALUE = "bytes"
 
-  val versionMsg = "Scala classfile decoder %s -- %s\n".format(
-      Properties.versionString, Properties.copyrightString)
+  val versionMsg = "Scala classfile decoder %s -- %s\n"
+    .format(Properties.versionString, Properties.copyrightString)
 
   /**Verbose program run?
     */
@@ -118,8 +118,9 @@ class Main {
     path.findClassFile(encName) match {
       case Some(classFile) =>
         if (verbose) {
-          Console.println(Console.BOLD + "FILENAME" + Console.RESET + " = " +
-              classFile.path)
+          Console.println(
+              Console.BOLD + "FILENAME" + Console.RESET + " = " +
+                classFile.path)
         }
         val bytes = classFile.toByteArray
         if (isScalaFile(bytes)) {
@@ -183,7 +184,7 @@ object Main extends Main {
       // construct a custom class path
       val cpArg =
         List(opts.classpath, opts.cp) map arguments.getArgument reduceLeft
-        (_ orElse _)
+          (_ orElse _)
 
       val settings = new Settings()
 
@@ -196,8 +197,9 @@ object Main extends Main {
 
       // print the classpath if output is verbose
       if (verbose)
-        Console.println(Console.BOLD + "CLASSPATH" + Console.RESET + " = " +
-            path.asClassPathString)
+        Console.println(
+            Console.BOLD + "CLASSPATH" + Console.RESET + " = " +
+              path.asClassPathString)
 
       // process all given classes
       arguments.getOthers foreach process(arguments, path)
@@ -230,8 +232,7 @@ object Main extends Main {
                               DefaultJavaContext)
         }
       case _ =>
-        settings.classpath.value =
-          "." // include '.' in the default classpath SI-6669
+        settings.classpath.value = "." // include '.' in the default classpath SI-6669
         PathResolverFactory.create(settings).result
     }
 }

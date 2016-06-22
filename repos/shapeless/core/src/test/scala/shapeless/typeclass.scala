@@ -81,8 +81,9 @@ package TypeClassAux {
 
       def emptyProduct = EmptyProduct
 
-      def coproduct[L, R <: Coproduct](
-          name: String, l: => Image[L], r: => Image[R]) = Sum(l, name, r)
+      def coproduct[L, R <: Coproduct](name: String,
+                                       l: => Image[L],
+                                       r: => Image[R]) = Sum(l, name, r)
 
       def emptyCoproduct = EmptyCoproduct
 
@@ -183,9 +184,10 @@ class TypeClassTests {
           Project(Product(Atom("int"), "a", EmptyProduct)),
           "CaseA",
           Sum(
-              Project(Product(Atom("string"),
-                              "b1",
-                              Product(Atom("string"), "b2", EmptyProduct))),
+              Project(
+                  Product(Atom("string"),
+                          "b1",
+                          Product(Atom("string"), "b2", EmptyProduct))),
               "CaseB",
               EmptyCoproduct
           )

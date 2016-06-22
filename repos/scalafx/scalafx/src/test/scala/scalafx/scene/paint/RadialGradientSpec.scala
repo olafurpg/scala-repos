@@ -43,7 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class RadialGradientSpec
     extends SimpleSFXDelegateSpec[jfxsp.RadialGradient, RadialGradient](
-        classOf[jfxsp.RadialGradient], classOf[RadialGradient]) {
+        classOf[jfxsp.RadialGradient],
+        classOf[RadialGradient]) {
 
   override protected def getJavaClassInstance =
     new jfxsp.RadialGradient(0, 0, 0, 0, 0, true, CycleMethod.NoCycle, Nil)

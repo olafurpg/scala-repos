@@ -14,8 +14,8 @@ import akka.testkit.AkkaSpec
 
 class FlowSlidingSpec extends AkkaSpec with GeneratorDrivenPropertyChecks {
   import system.dispatcher
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -59,7 +59,10 @@ class FlowSlidingSpec extends AkkaSpec with GeneratorDrivenPropertyChecks {
     }
 
     "work with empty sources" in assertAllStagesStopped {
-      Source.empty.sliding(1).runForeach(testActor ! _).map(_ ⇒ "done") pipeTo testActor
+      Source.empty
+        .sliding(1)
+        .runForeach(testActor ! _)
+        .map(_ ⇒ "done") pipeTo testActor
       expectMsg("done")
     }
   }

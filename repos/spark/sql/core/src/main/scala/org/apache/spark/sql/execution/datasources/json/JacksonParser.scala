@@ -73,8 +73,9 @@ object JacksonParser extends Logging {
     }
   }
 
-  private def convertField(
-      factory: JsonFactory, parser: JsonParser, schema: DataType): Any = {
+  private def convertField(factory: JsonFactory,
+                           parser: JsonParser,
+                           schema: DataType): Any = {
     import com.fasterxml.jackson.core.JsonToken._
     (parser.getCurrentToken, schema) match {
       case (null | VALUE_NULL, _) =>
@@ -210,8 +211,8 @@ object JacksonParser extends Logging {
     while (nextUntil(parser, JsonToken.END_OBJECT)) {
       schema.getFieldIndex(parser.getCurrentName) match {
         case Some(index) =>
-          row.update(
-              index, convertField(factory, parser, schema(index).dataType))
+          row.update(index,
+                     convertField(factory, parser, schema(index).dataType))
 
         case None =>
           parser.skipChildren()
@@ -262,7 +263,8 @@ object JacksonParser extends Logging {
         Nil
       } else {
         val row = new GenericMutableRow(schema.length)
-        for (corruptIndex <- schema.getFieldIndex(columnNameOfCorruptRecords)) {
+        for (corruptIndex <- schema
+                              .getFieldIndex(columnNameOfCorruptRecords)) {
           require(schema(corruptIndex).dataType == StringType)
           row.update(corruptIndex, UTF8String.fromString(record))
         }

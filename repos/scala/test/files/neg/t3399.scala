@@ -1,7 +1,7 @@
 object Nats {
   sealed trait Nat {
     // fold right on N, N-1, ..., 1
-    type FoldR [Init <: Type, Type, F <: Fold[Nat, Type]] <: Type
+    type FoldR[Init <: Type, Type, F <: Fold[Nat, Type]] <: Type
   }
   sealed trait _0 extends Nat {
     type FoldR[Init <: Type, Type, F <: Fold[Nat, Type]] = Init
@@ -13,7 +13,7 @@ object Nats {
 
   type Add[A <: Nat, B <: Nat] = A#FoldR[B, Nat, Inc]
   trait Fold[-Elem, Value] {
-    type Apply [N <: Elem, Acc <: Value] <: Value
+    type Apply[N <: Elem, Acc <: Value] <: Value
   }
   type Inc = Fold[Any, Nat] {
     type Apply[N <: Any, Acc <: Nat] = Succ[Acc]

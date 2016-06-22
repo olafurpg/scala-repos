@@ -173,8 +173,12 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
       val nIndex = Array.tabulate[Int](length + 1)((cp: Int) =>
             if (ii < used && cp == index(ii)) { ii += 1; ii - 1 } else ii)
       assert(ii == used)
-      new CSCMatrix[V](
-          data, 1, length, nIndex, activeSize, Array.fill[Int](data.length)(0))
+      new CSCMatrix[V](data,
+                       1,
+                       length,
+                       nIndex,
+                       activeSize,
+                       Array.fill[Int](data.length)(0))
     }
   }
 
@@ -182,8 +186,12 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
     // zero SV
     if (index.length == 0) CSCMatrix.zeros[V](length, 1)
     else {
-      new CSCMatrix[V](
-          data.clone(), length, 1, Array(0, used), activeSize, index)
+      new CSCMatrix[V](data.clone(),
+                       length,
+                       1,
+                       Array(0, used),
+                       activeSize,
+                       index)
     }
   }
 }
@@ -197,8 +205,10 @@ object SparseVector
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](size: Int) =
     new SparseVector(Array.empty, Array.empty[V], 0, size)
   def apply[@spec(Double, Int, Float, Long) V: Zero](values: Array[V]) =
-    new SparseVector(
-        Array.range(0, values.length), values, values.length, values.length)
+    new SparseVector(Array.range(0, values.length),
+                     values,
+                     values.length,
+                     values.length)
 
   def apply[V: ClassTag: Zero](values: V*): SparseVector[V] =
     apply(values.toArray)
@@ -226,7 +236,7 @@ object SparseVector
     if (!vectors.forall(_.size == vectors(0).size))
       throw new IllegalArgumentException(
           "vector lengths must be equal, but got: " +
-          vectors.map(_.length).mkString(", "))
+            vectors.map(_.length).mkString(", "))
     val rows = vectors(0).length
     val cols = vectors.length
     val data = new Array[V](vectors.map(_.data.length).sum)
@@ -238,10 +248,13 @@ object SparseVector
     var off = 0
     while (vec < vectors.length) {
       colPtrs(vec) = off
-      System.arraycopy(
-          vectors(vec).data, 0, data, off, vectors(vec).activeSize)
-      System.arraycopy(
-          vectors(vec).index, 0, rowIndices, off, vectors(vec).activeSize)
+      System
+        .arraycopy(vectors(vec).data, 0, data, off, vectors(vec).activeSize)
+      System.arraycopy(vectors(vec).index,
+                       0,
+                       rowIndices,
+                       off,
+                       vectors(vec).activeSize)
       off += vectors(vec).activeSize
       vec += 1
     }
@@ -266,8 +279,8 @@ object SparseVector
     new CanMapValues[SparseVector[V], V, V2, SparseVector[V2]] {
 
       /**Maps all key-value pairs from the given collection. */
-      override def apply(
-          from: SparseVector[V], fn: (V) => V2): SparseVector[V2] = {
+      override def apply(from: SparseVector[V],
+                         fn: (V) => V2): SparseVector[V2] = {
         SparseVector.tabulate(from.length)(i => fn(from(i)))
       }
     }
@@ -278,8 +291,8 @@ object SparseVector
     new CanMapActiveValues[SparseVector[V], V, V2, SparseVector[V2]] {
 
       /**Maps all active key-value pairs from the given collection. */
-      override def apply(
-          from: SparseVector[V], fn: (V) => V2): SparseVector[V2] = {
+      override def apply(from: SparseVector[V],
+                         fn: (V) => V2): SparseVector[V2] = {
         val out = new Array[V2](from.activeSize)
         var i = 0
         while (i < from.activeSize) {
@@ -392,16 +405,18 @@ object SparseVector
       }
 
       /**Maps all active key-value pairs from the given collection. */
-      def mapActive(
-          from: SparseVector[V], fn: (Int, V) => V2): SparseVector[V2] = {
+      def mapActive(from: SparseVector[V],
+                    fn: (Int, V) => V2): SparseVector[V2] = {
         val out = new Array[V2](from.used)
         var i = 0
         while (i < from.used) {
           out(i) = fn(from.index(i), from.data(i))
           i += 1
         }
-        new SparseVector(
-            from.index.take(from.used), out, from.used, from.length)
+        new SparseVector(from.index.take(from.used),
+                         out,
+                         from.used,
+                         from.length)
       }
     }
   }
@@ -421,8 +436,8 @@ object SparseVector
 //    }
 //  }
 
-  implicit def canTransposeComplex: CanTranspose[
-      SparseVector[Complex], CSCMatrix[Complex]] = {
+  implicit def canTransposeComplex: CanTranspose[SparseVector[Complex],
+                                                 CSCMatrix[Complex]] = {
     new CanTranspose[SparseVector[Complex], CSCMatrix[Complex]] {
       def apply(from: SparseVector[Complex]) = {
         val transposedMtx: CSCMatrix[Complex] =

@@ -109,8 +109,10 @@ private[mongodb] object Meta {
     /*
      * Extended Mongo types.
      */
-    val mongotypes = Set[Class[_]](
-        classOf[DBRef], classOf[ObjectId], classOf[Pattern], classOf[UUID])
+    val mongotypes = Set[Class[_]](classOf[DBRef],
+                                   classOf[ObjectId],
+                                   classOf[Pattern],
+                                   classOf[UUID])
 
     def mongotype_?(clazz: Class[_]) = mongotypes contains clazz
 

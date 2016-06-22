@@ -42,16 +42,19 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
 
     val evaluator: ExpressionEvaluator =
       DebuggerInvocationUtil.commitAndRunReadAction(
-          project, new EvaluatingComputable[ExpressionEvaluator] {
-        def compute: ExpressionEvaluator = {
-          val textWithImports = new TextWithImportsImpl(
-              CodeFragmentKind.CODE_BLOCK, expression.getText)
-          val codeFragment = new ScalaCodeFragmentFactory()
-            .createCodeFragment(textWithImports, expression, project)
-          ScalaEvaluatorBuilder.build(
-              codeFragment, ContextUtil.getSourcePosition(evaluationContext))
-        }
-      })
+          project,
+          new EvaluatingComputable[ExpressionEvaluator] {
+            def compute: ExpressionEvaluator = {
+              val textWithImports =
+                new TextWithImportsImpl(CodeFragmentKind.CODE_BLOCK,
+                                        expression.getText)
+              val codeFragment = new ScalaCodeFragmentFactory()
+                .createCodeFragment(textWithImports, expression, project)
+              ScalaEvaluatorBuilder.build(
+                  codeFragment,
+                  ContextUtil.getSourcePosition(evaluationContext))
+            }
+          })
     val value: Value = evaluator.evaluate(evaluationContext)
     if (value != null) {
       inReadAction {
@@ -60,7 +63,8 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
           .orNull
       }
     } else
-      throw EvaluationException(DebuggerBundle.message(
+      throw EvaluationException(
+          DebuggerBundle.message(
               "evaluation.error.surrounded.expression.null"))
   }
 }
@@ -80,8 +84,8 @@ object ScalaRuntimeTypeEvaluator {
     jdiType match {
       case classType: ClassType =>
         val superclass: ClassType = classType.superclass
-        val stdTypeNames = Seq(
-            "java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
+        val stdTypeNames =
+          Seq("java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
         if (superclass != null && !stdTypeNames.contains(superclass.name)) {
           psiClass = findPsiClass(project, superclass)
           if (psiClass != null) {

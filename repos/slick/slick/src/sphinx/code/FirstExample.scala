@@ -24,7 +24,8 @@ object FirstExample extends App {
   // Definition of the SUPPLIERS table
   class Suppliers(tag: Tag)
       extends Table[(Int, String, String, String, String, String)](
-          tag, "SUPPLIERS") {
+          tag,
+          "SUPPLIERS") {
     def id =
       column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
     def name = column[String]("SUP_NAME")
@@ -95,7 +96,7 @@ object FirstExample extends App {
         .map(_.foreach {
           case (name, supID, price, sales, total) =>
             println("  " + name + "\t" + supID + "\t" + price +
-                "\t" + sales + "\t" + total)
+                  "\t" + sales + "\t" + total)
         })
       // Equivalent SQL code:
       // select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES
@@ -106,10 +107,12 @@ object FirstExample extends App {
       //#projection
       println("Coffees (concatenated by DB):")
       //#projection
-      val q1 = for (c <- coffees) yield
-        LiteralColumn("  ") ++ c.name ++ "\t" ++ c.supID.asColumnOf[String] ++ "\t" ++ c.price
-          .asColumnOf[String] ++ "\t" ++ c.sales.asColumnOf[String] ++ "\t" ++ c.total
-          .asColumnOf[String]
+      val q1 = for (c <- coffees)
+        yield
+          LiteralColumn("  ") ++ c.name ++ "\t" ++ c.supID
+            .asColumnOf[String] ++ "\t" ++ c.price
+            .asColumnOf[String] ++ "\t" ++ c.sales
+            .asColumnOf[String] ++ "\t" ++ c.total.asColumnOf[String]
       // The first string constant needs to be lifted manually to a LiteralColumn
       // so that the proper ++ operator is found
 

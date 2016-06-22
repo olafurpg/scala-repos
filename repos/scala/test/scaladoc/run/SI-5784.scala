@@ -22,7 +22,7 @@ object Test extends ScaladocModelTest {
     assert(
         Base.members.filter(_.inDefinitionTemplates.head == Base).length == 5,
         Base.members.filter(_.inDefinitionTemplates.head == Base).length +
-        " == 5")
+          " == 5")
     assert(Base.members.collect { case d: DocTemplateEntity => d }.length == 4,
            Base.members.collect { case d: DocTemplateEntity => d }.length == 4)
     testDiagram(Base, Base.contentDiagram, 2, 1)
@@ -32,10 +32,10 @@ object Test extends ScaladocModelTest {
     assert(
         BaseT.members.filter(_.inDefinitionTemplates.head == Base).length == 0,
         BaseT.members.filter(_.inDefinitionTemplates.head == Base).length +
-        " == 0")
+          " == 0")
     assert(BaseT.members.map(_.name).sorted == Foo.members.map(_.name).sorted,
            BaseT.members.map(_.name).sorted + " == " +
-           Foo.members.map(_.name).sorted)
+             Foo.members.map(_.name).sorted)
     assert(BaseT.companion.isDefined,
            "test.templates.Base.T should have a pseudo-companion object")
     testDiagram(BaseT, BaseT.inheritanceDiagram, 2, 1)
@@ -43,7 +43,7 @@ object Test extends ScaladocModelTest {
     val Api = main._trait("Api")
     assert(Api.members.filter(_.inDefinitionTemplates.head == Api).length == 2,
            Api.members.filter(_.inDefinitionTemplates.head == Api).length +
-           " == 2") // FooApi and override type T
+             " == 2") // FooApi and override type T
     assert(Api.members.collect { case d: DocTemplateEntity => d }.length == 5,
            Api.members.collect { case d: DocTemplateEntity => d }.length == 5)
     testDiagram(Api, Api.contentDiagram, 3, 2)
@@ -53,11 +53,11 @@ object Test extends ScaladocModelTest {
     assert(
         ApiT.members.filter(_.inDefinitionTemplates.head == Api).length == 0,
         ApiT.members.filter(_.inDefinitionTemplates.head == Api).length +
-        " == 0")
+          " == 0")
     assert(
         ApiT.members.map(_.name).sorted == FooApi.members.map(_.name).sorted,
         ApiT.members.map(_.name).sorted + " == " +
-        FooApi.members.map(_.name).sorted)
+          FooApi.members.map(_.name).sorted)
     assert(ApiT.companion.isDefined,
            "test.templates.Api.T should have a pseudo-companion object")
     testDiagram(ApiT, ApiT.inheritanceDiagram, 2, 1)

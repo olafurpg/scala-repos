@@ -29,10 +29,12 @@ trait MatchCodeGen extends Interface {
 
     // assert(owner ne null); assert(owner ne NoSymbol)
     def freshSym(pos: Position, tp: Type = NoType, prefix: String = "x") =
-      NoSymbol.newTermSymbol(freshName(prefix), pos, newFlags = SYNTHETIC) setInfo tp
+      NoSymbol
+        .newTermSymbol(freshName(prefix), pos, newFlags = SYNTHETIC) setInfo tp
 
     def newSynthCaseLabel(name: String) =
-      NoSymbol.newLabel(freshName(name), NoPosition) setFlag treeInfo.SYNTH_CASE_FLAGS
+      NoSymbol
+        .newLabel(freshName(name), NoPosition) setFlag treeInfo.SYNTH_CASE_FLAGS
 
     // codegen relevant to the structure of the translation (how extractors are combined)
     trait AbsCodegen {
@@ -56,8 +58,10 @@ trait MatchCodeGen extends Interface {
       def one(res: Tree): Tree
 
       def flatMap(prev: Tree, b: Symbol, next: Tree): Tree
-      def flatMapCond(
-          cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree
+      def flatMapCond(cond: Tree,
+                      res: Tree,
+                      nextBinder: Symbol,
+                      next: Tree): Tree
       def flatMapGuard(cond: Tree, next: Tree): Tree
       def ifThenElseZero(c: Tree, thenp: Tree): Tree = {
         val z = zero
@@ -78,7 +82,8 @@ trait MatchCodeGen extends Interface {
       def fun(arg: Symbol, body: Tree): Tree =
         Function(List(ValDef(arg)), body)
       def tupleSel(binder: Symbol)(i: Int): Tree =
-        (REF(binder) DOT nme.productAccessorName(i)) // make tree that accesses the i'th component of the tuple referenced by binder
+        (REF(binder) DOT nme
+              .productAccessorName(i)) // make tree that accesses the i'th component of the tuple referenced by binder
       def index(tgt: Tree)(i: Int): Tree = tgt APPLY (LIT(i))
 
       // Right now this blindly calls drop on the result of the unapplySeq
@@ -105,8 +110,10 @@ trait MatchCodeGen extends Interface {
         if (b.info <:< tp) REF(b)
         else gen.mkCastPreservingAnnotations(REF(b), tp)
       def _isInstanceOf(b: Symbol, tp: Type): Tree =
-        gen.mkIsInstanceOf(
-            REF(b), tp.withoutAnnotations, any = true, wrapInApply = false)
+        gen.mkIsInstanceOf(REF(b),
+                           tp.withoutAnnotations,
+                           any = true,
+                           wrapInApply = false)
 
       def mkZero(tp: Type): Tree = gen.mkConstantZero(tp) match {
         case Constant(null) =>
@@ -143,7 +150,7 @@ trait MatchCodeGen extends Interface {
           cases: List[Casegen => Tree],
           matchFailGen: Option[Tree => Tree]): Tree =
         _match(vpmName.runOrElse) APPLY (scrut) APPLY
-        (fun(scrutSym, cases map (f => f(this)) reduceLeft typedOrElse))
+          (fun(scrutSym, cases map (f => f(this)) reduceLeft typedOrElse))
 
       // __match.one(`res`)
       def one(res: Tree): Tree = (_match(vpmName.one))(res)
@@ -161,8 +168,10 @@ trait MatchCodeGen extends Interface {
       def typedOrElse(thisCase: Tree, elseCase: Tree): Tree =
         (thisCase DOT vpmName.orElse) APPLY (elseCase)
       //  __match.guard(`cond`, `res`).flatMap(`nextBinder` => `next`)
-      def flatMapCond(
-          cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree =
+      def flatMapCond(cond: Tree,
+                      res: Tree,
+                      nextBinder: Symbol,
+                      next: Tree): Tree =
         flatMap(guard(cond, res), nextBinder, next)
       //  __match.guard(`guardTree`, ()).flatMap((_: P[Unit]) => `next`)
       def flatMapGuard(guardTree: Tree, next: Tree): Tree =
@@ -201,8 +210,8 @@ trait MatchCodeGen extends Interface {
               NoPosition,
               newFlags = SYNTHETIC) setInfo restpe.withoutAnnotations
         val matchEnd =
-          newSynthCaseLabel("matchEnd") setInfo MethodType(
-              List(matchRes), restpe)
+          newSynthCaseLabel("matchEnd") setInfo MethodType(List(matchRes),
+                                                           restpe)
 
         def newCaseSym =
           newSynthCaseLabel("case") setInfo MethodType(Nil, restpe)
@@ -222,15 +231,13 @@ trait MatchCodeGen extends Interface {
         // catchAll.isEmpty iff no synthetic default case needed (the (last) user-defined case is a default)
         // if the last user-defined case is a default, it will never jump to the next case; it will go immediately to matchEnd
         val catchAllDef = matchFailGen map { matchFailGen =>
-          val scrutRef =
-            scrutSym.fold(EmptyTree: Tree)(REF) // for alternatives
+          val scrutRef = scrutSym.fold(EmptyTree: Tree)(REF) // for alternatives
 
           LabelDef(_currCase, Nil, matchEnd APPLY (matchFailGen(scrutRef)))
         } toList // at most 1 element
 
         // scrutSym == NoSymbol when generating an alternatives matcher
-        val scrutDef =
-          scrutSym.fold(List[Tree]())(ValDef(_, scrut) :: Nil) // for alternatives
+        val scrutDef = scrutSym.fold(List[Tree]())(ValDef(_, scrut) :: Nil) // for alternatives
 
         // the generated block is taken apart in TailCalls under the following assumptions
         // the assumption is once we encounter a case, the remainder of the block will consist of cases
@@ -248,8 +255,8 @@ trait MatchCodeGen extends Interface {
         def matcher(scrut: Tree, scrutSym: Symbol, restpe: Type)(
             cases: List[Casegen => Tree],
             matchFailGen: Option[Tree => Tree]): Tree =
-          optimizedCodegen.matcher(scrut, scrutSym, restpe)(
-              cases, matchFailGen)
+          optimizedCodegen
+            .matcher(scrut, scrutSym, restpe)(cases, matchFailGen)
 
         // only used to wrap the RHS of a body
         // res: T
@@ -279,8 +286,10 @@ trait MatchCodeGen extends Interface {
         // nextBinder: T
         // next == MatchMonad[U]
         // returns MatchMonad[U]
-        def flatMapCond(
-            cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree = {
+        def flatMapCond(cond: Tree,
+                        res: Tree,
+                        nextBinder: Symbol,
+                        next: Tree): Tree = {
           val rest =
             (// only emit a local val for `nextBinder` if it's actually referenced in `next`
              if (next.exists(_.symbol eq nextBinder))

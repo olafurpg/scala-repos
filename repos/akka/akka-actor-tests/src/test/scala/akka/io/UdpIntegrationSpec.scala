@@ -79,7 +79,8 @@ class UdpIntegrationSpec extends AkkaSpec("""
       val commander = TestProbe()
       val assertOption = AssertBeforeBind()
       commander.send(
-          IO(Udp), Bind(testActor, addresses(3), options = List(assertOption)))
+          IO(Udp),
+          Bind(testActor, addresses(3), options = List(assertOption)))
       commander.expectMsg(Bound(addresses(3)))
       assert(assertOption.beforeCalled === 1)
     }
@@ -88,7 +89,8 @@ class UdpIntegrationSpec extends AkkaSpec("""
       val commander = TestProbe()
       val assertOption = AssertAfterChannelBind()
       commander.send(
-          IO(Udp), Bind(testActor, addresses(4), options = List(assertOption)))
+          IO(Udp),
+          Bind(testActor, addresses(4), options = List(assertOption)))
       commander.expectMsg(Bound(addresses(4)))
       assert(assertOption.afterCalled === 1)
     }
@@ -97,7 +99,8 @@ class UdpIntegrationSpec extends AkkaSpec("""
       val commander = TestProbe()
       val assertOption = AssertOpenDatagramChannel()
       commander.send(
-          IO(Udp), Bind(testActor, addresses(5), options = List(assertOption)))
+          IO(Udp),
+          Bind(testActor, addresses(5), options = List(assertOption)))
       commander.expectMsg(Bound(addresses(5)))
       assert(assertOption.openCalled === 1)
     }

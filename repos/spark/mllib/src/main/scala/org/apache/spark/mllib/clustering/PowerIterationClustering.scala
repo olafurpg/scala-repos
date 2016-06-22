@@ -58,8 +58,8 @@ object PowerIterationClusteringModel
     extends Loader[PowerIterationClusteringModel] {
 
   @Since("1.4.0")
-  override def load(
-      sc: SparkContext, path: String): PowerIterationClusteringModel = {
+  override def load(sc: SparkContext,
+                    path: String): PowerIterationClusteringModel = {
     PowerIterationClusteringModel.SaveLoadV1_0.load(sc, path)
   }
 
@@ -77,8 +77,9 @@ object PowerIterationClusteringModel
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
-      val metadata = compact(render(("class" -> thisClassName) ~
-              ("version" -> thisFormatVersion) ~ ("k" -> model.k)))
+      val metadata = compact(
+          render(("class" -> thisClassName) ~
+                ("version" -> thisFormatVersion) ~ ("k" -> model.k)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -125,7 +126,7 @@ object PowerIterationClusteringModel
   * @see [[http://en.wikipedia.org/wiki/Spectral_clustering Spectral clustering (Wikipedia)]]
   */
 @Since("1.3.0")
-class PowerIterationClustering private[clustering](
+class PowerIterationClustering private[clustering] (
     private var k: Int,
     private var maxIterations: Int,
     private var initMode: String)
@@ -356,8 +357,8 @@ object PowerIterationClustering extends Logging {
     * @param maxIterations maximum number of iterations
     * @return a [[VertexRDD]] representing the pseudo-eigenvector
     */
-  private[clustering] def powerIter(
-      g: Graph[Double, Double], maxIterations: Int): VertexRDD[Double] = {
+  private[clustering] def powerIter(g: Graph[Double, Double],
+                                    maxIterations: Int): VertexRDD[Double] = {
     // the default tolerance used in the PIC paper, with a lower bound 1e-8
     val tol = math.max(1e-5 / g.vertices.count(), 1e-8)
     var prevDelta = Double.MaxValue
@@ -403,8 +404,8 @@ object PowerIterationClustering extends Logging {
     * @param k number of clusters
     * @return a [[VertexRDD]] representing the clustering assignments
     */
-  private[clustering] def kMeans(
-      v: VertexRDD[Double], k: Int): VertexRDD[Int] = {
+  private[clustering] def kMeans(v: VertexRDD[Double],
+                                 k: Int): VertexRDD[Int] = {
     val points = v.mapValues(x => Vectors.dense(x)).cache()
     val model = new KMeans().setK(k).setSeed(0L).run(points.values)
     points.mapValues(p => model.predict(p)).cache()

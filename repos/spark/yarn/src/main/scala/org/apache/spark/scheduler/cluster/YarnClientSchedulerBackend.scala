@@ -27,8 +27,8 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.launcher.SparkAppHandle
 import org.apache.spark.scheduler.TaskSchedulerImpl
 
-private[spark] class YarnClientSchedulerBackend(
-    scheduler: TaskSchedulerImpl, sc: SparkContext)
+private[spark] class YarnClientSchedulerBackend(scheduler: TaskSchedulerImpl,
+                                                sc: SparkContext)
     extends YarnSchedulerBackend(scheduler, sc)
     with Logging {
 
@@ -128,8 +128,9 @@ private[spark] class YarnClientSchedulerBackend(
     if (state == YarnApplicationState.FINISHED ||
         state == YarnApplicationState.FAILED ||
         state == YarnApplicationState.KILLED) {
-      throw new SparkException("Yarn application has already ended! " +
-          "It might have been killed or unable to launch application master.")
+      throw new SparkException(
+          "Yarn application has already ended! " +
+            "It might have been killed or unable to launch application master.")
     }
     if (state == YarnApplicationState.RUNNING) {
       logInfo(s"Application ${appId.get} has started running.")
@@ -183,8 +184,8 @@ private[spark] class YarnClientSchedulerBackend(
     * Stop the scheduler. This assumes `start()` has already been called.
     */
   override def stop() {
-    assert(
-        client != null, "Attempted to stop this scheduler before starting it!")
+    assert(client != null,
+           "Attempted to stop this scheduler before starting it!")
     if (monitorThread != null) {
       monitorThread.stopMonitor()
     }

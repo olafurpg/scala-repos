@@ -352,13 +352,13 @@ object DateTimeUtils {
       return None
     }
 
-    val c =
-      if (timeZone.isEmpty) {
-        Calendar.getInstance()
-      } else {
-        Calendar.getInstance(TimeZone.getTimeZone(
-                f"GMT${timeZone.get.toChar}${segments(7)}%02d:${segments(8)}%02d"))
-      }
+    val c = if (timeZone.isEmpty) {
+      Calendar.getInstance()
+    } else {
+      Calendar.getInstance(
+          TimeZone.getTimeZone(
+              f"GMT${timeZone.get.toChar}${segments(7)}%02d:${segments(8)}%02d"))
+    }
     c.set(Calendar.MILLISECOND, 0)
 
     if (justTime) {
@@ -707,7 +707,7 @@ object DateTimeUtils {
   private def getDateFromYear(absoluteYear: Int): SQLDate = {
     val absoluteDays =
       (absoluteYear * 365 + absoluteYear / 400 - absoluteYear / 100 +
-          absoluteYear / 4)
+            absoluteYear / 4)
     absoluteDays - toYearZero
   }
 
@@ -741,8 +741,9 @@ object DateTimeUtils {
     * Add timestamp and full interval.
     * Returns a timestamp value, expressed in microseconds since 1.1.1970 00:00:00.
     */
-  def timestampAddInterval(
-      start: SQLTimestamp, months: Int, microseconds: Long): SQLTimestamp = {
+  def timestampAddInterval(start: SQLTimestamp,
+                           months: Int,
+                           microseconds: Long): SQLTimestamp = {
     val days = millisToDays(start / 1000L)
     val newDays = dateAddMonths(days, months)
     daysToMillis(newDays) * 1000L + start - daysToMillis(days) * 1000L +
@@ -780,7 +781,7 @@ object DateTimeUtils {
     val timesBetween = (timeInDay1 - timeInDay2).toDouble / MILLIS_PER_DAY
     val diff =
       (months1 - months2).toDouble +
-      (dayInMonth1 - dayInMonth2 + timesBetween) / 31.0
+        (dayInMonth1 - dayInMonth2 + timesBetween) / 31.0
     // rounding to 8 digits
     math.round(diff * 1e8) / 1e8
   }

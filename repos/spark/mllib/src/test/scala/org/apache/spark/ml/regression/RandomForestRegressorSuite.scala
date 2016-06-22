@@ -41,8 +41,8 @@ class RandomForestRegressorSuite
   override def beforeAll() {
     super.beforeAll()
     orderedLabeledPoints50_1000 = sc.parallelize(
-        EnsembleTestHelper.generateOrderedLabeledPoints(
-            numFeatures = 50, 1000))
+        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 50,
+                                                        1000))
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -61,14 +61,16 @@ class RandomForestRegressorSuite
     compareAPIs(orderedLabeledPoints50_1000, newRF, categoricalFeaturesInfo)
   }
 
-  test("Regression with continuous features:" +
-      " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
+  test(
+      "Regression with continuous features:" +
+        " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
     val rf = new RandomForestRegressor()
     regressionTestWithContinuousFeatures(rf)
   }
 
-  test("Regression with continuous features and node Id cache :" +
-      " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
+  test(
+      "Regression with continuous features and node Id cache :" +
+        " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
     val rf = new RandomForestRegressor().setCacheNodeIds(true)
     regressionTestWithContinuousFeatures(rf)
   }

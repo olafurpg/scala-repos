@@ -39,18 +39,17 @@ class DistributedData(system: ExtendedActorSystem) extends Extension {
     */
   def isTerminated: Boolean =
     Cluster(system).isTerminated ||
-    !settings.role.forall(Cluster(system).selfRoles.contains)
+      !settings.role.forall(Cluster(system).selfRoles.contains)
 
   /**
     * `ActorRef` of the [[Replicator]] .
     */
-  val replicator: ActorRef =
-    if (isTerminated) {
-      system.log.warning(
-          "Replicator points to dead letters: Make sure the cluster node is not terminated and has the proper role!")
-      system.deadLetters
-    } else {
-      val name = config.getString("name")
-      system.systemActorOf(Replicator.props(settings), name)
-    }
+  val replicator: ActorRef = if (isTerminated) {
+    system.log.warning(
+        "Replicator points to dead letters: Make sure the cluster node is not terminated and has the proper role!")
+    system.deadLetters
+  } else {
+    val name = config.getString("name")
+    system.systemActorOf(Replicator.props(settings), name)
+  }
 }

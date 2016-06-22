@@ -76,15 +76,19 @@ class ScalaGradleDataServiceTest
   }
 
   def testScalaCompilerClasspathWithoutScala(): Unit = {
-    importProjectData(generateProject(
-            None, Set(new File("/tmp/test/not-a-scala-library.jar")), None))
+    importProjectData(
+        generateProject(None,
+                        Set(new File("/tmp/test/not-a-scala-library.jar")),
+                        None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
   }
 
   def testWithoutScalaLibrary(): Unit = {
-    importProjectData(generateProject(
-            None, Set(new File("/tmp/test/scala-library-2.10.4.jar")), None))
+    importProjectData(
+        generateProject(None,
+                        Set(new File("/tmp/test/scala-library-2.10.4.jar")),
+                        None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
   }
@@ -152,8 +156,11 @@ class ScalaGradleDataServiceTest
     assert(
         compilerConfiguration.debuggingInfoLevel == DebuggingInfoLevel.Source)
     assert(compilerConfiguration.plugins == Seq("test-plugin.jar"))
-    assert(compilerConfiguration.additionalCompilerOptions == Seq(
-            "-encoding", "utf-8", "-target:jvm-1.5"))
+    assert(
+        compilerConfiguration.additionalCompilerOptions == Seq(
+            "-encoding",
+            "utf-8",
+            "-target:jvm-1.5"))
     assert(compilerConfiguration.experimental)
     assert(compilerConfiguration.continuations)
     assert(compilerConfiguration.deprecationWarnings)

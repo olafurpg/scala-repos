@@ -62,15 +62,18 @@ private[http] object HttpServerBluePrint {
           settings.timeouts.requestTimeout) atop requestPreparation(settings) atop controller(
           settings,
           log) atop parsingRendering(settings, log) atop websocketSupport(
-          settings, log) atop tlsSupport
+          settings,
+          log) atop tlsSupport
 
     theStack.withAttributes(HttpAttributes.remoteAddress(remoteAddress))
   }
 
-  val tlsSupport: BidiFlow[
-      ByteString, SslTlsOutbound, SslTlsInbound, SessionBytes, NotUsed] =
-    BidiFlow.fromFlows(
-        Flow[ByteString].map(SendBytes), Flow[SslTlsInbound].collect {
+  val tlsSupport: BidiFlow[ByteString,
+                           SslTlsOutbound,
+                           SslTlsInbound,
+                           SessionBytes,
+                           NotUsed] = BidiFlow
+    .fromFlows(Flow[ByteString].map(SendBytes), Flow[SslTlsInbound].collect {
       case x: SessionBytes ⇒ x
     })
 
@@ -98,8 +101,11 @@ private[http] object HttpServerBluePrint {
                                                 NotUsed] =
     BidiFlow.fromGraph(new ControllerStage(settings, log)).reversed
 
-  def requestPreparation(settings: ServerSettings): BidiFlow[
-      HttpResponse, HttpResponse, RequestOutput, HttpRequest, NotUsed] =
+  def requestPreparation(settings: ServerSettings): BidiFlow[HttpResponse,
+                                                             HttpResponse,
+                                                             RequestOutput,
+                                                             HttpRequest,
+                                                             NotUsed] =
     BidiFlow.fromFlows(Flow[HttpResponse], new PrepareRequests(settings))
 
   def requestTimeoutSupport(timeout: Duration)
@@ -155,14 +161,18 @@ private[http] object HttpServerBluePrint {
               else method
             val effectiveHeaders =
               if (settings.remoteAddressHeader && remoteAddress.isDefined)
-                headers.`Remote-Address`(RemoteAddress(remoteAddress.get)) +: hdrs
+                headers
+                  .`Remote-Address`(RemoteAddress(remoteAddress.get)) +: hdrs
               else hdrs
 
             val entity =
               createEntity(entityCreator) withSizeLimit settings.parserSettings.maxContentLength
             push(out,
-                 HttpRequest(
-                     effectiveMethod, uri, effectiveHeaders, entity, protocol))
+                 HttpRequest(effectiveMethod,
+                             uri,
+                             effectiveHeaders,
+                             entity,
+                             protocol))
           case other ⇒
             throw new IllegalStateException(
                 s"unexpected element of type ${other.getClass}")
@@ -190,9 +200,9 @@ private[http] object HttpServerBluePrint {
             case StreamedEntityCreator(creator) ⇒ streamRequestEntity(creator)
           }
 
-        def streamRequestEntity(creator: (Source[ParserOutput.RequestOutput,
-                                                 NotUsed]) => RequestEntity)
-          : RequestEntity = {
+        def streamRequestEntity(
+            creator: (Source[ParserOutput.RequestOutput,
+                             NotUsed]) => RequestEntity): RequestEntity = {
           // stream incoming chunks into the request entity until we reach the end of it
           // and then toggle back to "idle"
 
@@ -248,23 +258,24 @@ private[http] object HttpServerBluePrint {
     // the initial header parser we initially use for every connection,
     // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
     val rootParser = new HttpRequestParser(
-        parserSettings, rawRequestUriHeader, HttpHeaderParser(parserSettings) {
-      info ⇒
-        if (parserSettings.illegalHeaderWarnings)
-          logParsingError(info withSummaryPrepended "Illegal request header",
-                          log,
-                          parserSettings.errorLoggingVerbosity)
-    })
+        parserSettings,
+        rawRequestUriHeader,
+        HttpHeaderParser(parserSettings) { info ⇒
+          if (parserSettings.illegalHeaderWarnings)
+            logParsingError(info withSummaryPrepended "Illegal request header",
+                            log,
+                            parserSettings.errorLoggingVerbosity)
+        })
 
     def establishAbsoluteUri(requestOutput: RequestOutput): RequestOutput =
       requestOutput match {
         case start: RequestStart ⇒
           try {
-            val effectiveUri = HttpRequest.effectiveUri(
-                start.uri,
-                start.headers,
-                securedConnection = false,
-                defaultHostHeader)
+            val effectiveUri = HttpRequest.effectiveUri(start.uri,
+                                                        start.headers,
+                                                        securedConnection =
+                                                          false,
+                                                        defaultHostHeader)
             start.copy(uri = effectiveUri)
           } catch {
             case e: IllegalUriException ⇒
@@ -290,13 +301,16 @@ private[http] object HttpServerBluePrint {
     import settings._
 
     val responseRendererFactory = new HttpResponseRendererFactory(
-        serverHeader, responseHeaderSizeHint, log)
+        serverHeader,
+        responseHeaderSizeHint,
+        log)
 
     val errorHandler: PartialFunction[Throwable, Throwable] = {
       // idle timeouts should not result in errors in the log. See 19058.
       case timeout: HttpConnectionTimeoutException ⇒
         log.debug(
-            s"Closing HttpConnection due to timeout: ${timeout.getMessage}"); timeout
+            s"Closing HttpConnection due to timeout: ${timeout.getMessage}");
+        timeout
       case t ⇒ log.error(t, "Outgoing response stream error"); t
     }
 
@@ -384,7 +398,8 @@ private[http] object HttpServerBluePrint {
     import materializer.executionContext
 
     set {
-      requestEnd.fast.map(_ ⇒
+      requestEnd.fast.map(
+          _ ⇒
             new TimeoutSetup(Deadline.now,
                              schedule(initialTimeout, this),
                              initialTimeout,
@@ -397,7 +412,7 @@ private[http] object HttpServerBluePrint {
           StatusCodes.ServiceUnavailable,
           entity =
             "The server was not able " +
-            "to produce a timely response to your request.\r\nPlease try again in a short while!")
+              "to produce a timely response to your request.\r\nPlease try again in a short while!")
     //#
 
     def clear(): Unit =
@@ -409,8 +424,8 @@ private[http] object HttpServerBluePrint {
       update(timeout, null: HttpRequest ⇒ HttpResponse)
     override def updateHandler(handler: HttpRequest ⇒ HttpResponse): Unit =
       update(null, handler)
-    override def update(
-        timeout: Duration, handler: HttpRequest ⇒ HttpResponse): Unit = {
+    override def update(timeout: Duration,
+                        handler: HttpRequest ⇒ HttpResponse): Unit = {
       val promise = Promise[TimeoutSetup]()
       for (old ← getAndSet(promise.future).fast) promise.success {
         if ((old.scheduledTask eq null) || old.scheduledTask.cancel()) {
@@ -421,8 +436,10 @@ private[http] object HttpServerBluePrint {
               schedule(old.timeoutBase + x - Deadline.now, newHandler)
             case _ ⇒ null // don't schedule a new timeout
           }
-          new TimeoutSetup(
-              old.timeoutBase, newScheduling, newTimeout, newHandler)
+          new TimeoutSetup(old.timeoutBase,
+                           newScheduling,
+                           newTimeout,
+                           newHandler)
         } else
           old // too late, the previously set timeout cannot be cancelled anymore
       }
@@ -458,8 +475,10 @@ private[http] object HttpServerBluePrint {
 
     override def initialAttributes = Attributes.name("ControllerStage")
 
-    val shape = new BidiShape(
-        requestParsingIn, requestPrepOut, httpResponseIn, responseCtxOut)
+    val shape = new BidiShape(requestParsingIn,
+                              requestPrepOut,
+                              httpResponseIn,
+                              responseCtxOut)
 
     def createLogic(effectiveAttributes: Attributes) =
       new GraphStageLogic(shape) {
@@ -476,12 +495,10 @@ private[http] object HttpServerBluePrint {
                 openRequests = openRequests.enqueue(r)
                 messageEndPending =
                   r.createEntity.isInstanceOf[StreamedEntityCreator[_, _]]
-                val rs =
-                  if (r.expect100Continue) {
-                    oneHundredContinueResponsePending = true
-                    r.copy(
-                        createEntity = with100ContinueTrigger(r.createEntity))
-                  } else r
+                val rs = if (r.expect100Continue) {
+                  oneHundredContinueResponsePending = true
+                  r.copy(createEntity = with100ContinueTrigger(r.createEntity))
+                } else r
                 push(requestPrepOut, rs)
               case MessageEnd ⇒
                 messageEndPending = false
@@ -515,9 +532,9 @@ private[http] object HttpServerBluePrint {
                 |Consider waiting for the request end before dispatching this response!""".stripMargin)
             val close =
               requestStart.closeRequested || requestStart.expect100Continue &&
-              oneHundredContinueResponsePending ||
-              isClosed(requestParsingIn) && openRequests.isEmpty ||
-              isEarlyResponse
+                oneHundredContinueResponsePending ||
+                isClosed(requestParsingIn) && openRequests.isEmpty ||
+                isEarlyResponse
             emit(responseCtxOut,
                  ResponseRenderingContext(response,
                                           requestStart.method,
@@ -534,8 +551,8 @@ private[http] object HttpServerBluePrint {
             ex match {
               case EntityStreamException(errorInfo) ⇒
                 // the application has forwarded a request entity stream error to the response stream
-                finishWithIllegalRequestError(
-                    StatusCodes.BadRequest, errorInfo)
+                finishWithIllegalRequestError(StatusCodes.BadRequest,
+                                              errorInfo)
 
               case EntityStreamSizeException(limit, contentLength) ⇒
                 val summary = contentLength match {
@@ -548,7 +565,8 @@ private[http] object HttpServerBluePrint {
                     summary,
                     "Consider increasing the value of akka.http.server.parsing.max-content-length")
                 finishWithIllegalRequestError(
-                    StatusCodes.RequestEntityTooLarge, info)
+                    StatusCodes.RequestEntityTooLarge,
+                    info)
 
               case NonFatal(e) ⇒
                 log.error(e, "Internal server error, sending 500 response")
@@ -570,8 +588,8 @@ private[http] object HttpServerBluePrint {
           }
         })
 
-        def finishWithIllegalRequestError(
-            status: StatusCode, info: ErrorInfo): Unit = {
+        def finishWithIllegalRequestError(status: StatusCode,
+                                          info: ErrorInfo): Unit = {
           logParsingError(
               info withSummaryPrepended s"Illegal request, responding with status '$status'",
               log,
@@ -662,8 +680,8 @@ private[http] object HttpServerBluePrint {
     : BidiFlow[HttpResponse, HttpResponse, HttpRequest, HttpRequest, NotUsed] =
     One2OneBidiFlow[HttpRequest, HttpResponse](pipeliningLimit).reversed
 
-  private class ProtocolSwitchStage(
-      settings: ServerSettings, log: LoggingAdapter)
+  private class ProtocolSwitchStage(settings: ServerSettings,
+                                    log: LoggingAdapter)
       extends GraphStage[BidiShape[ResponseRenderingOutput,
                                    ByteString,
                                    SessionBytes,
@@ -781,8 +799,7 @@ private[http] object HttpServerBluePrint {
           } else {
             val sourceOut = new SubSourceOutlet[ByteString]("FrameSource")
 
-            val timeoutKey = SubscriptionTimeout(
-                () ⇒ {
+            val timeoutKey = SubscriptionTimeout(() ⇒ {
               sourceOut.timeout(timeout)
               if (sourceOut.isClosed) completeStage()
             })

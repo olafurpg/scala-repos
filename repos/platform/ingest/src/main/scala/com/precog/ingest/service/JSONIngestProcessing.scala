@@ -118,8 +118,8 @@ final class JSONIngestProcessing(
                 parsed.values.indexWhere(_.flattenWithPath.size > maxFields)
               val errors =
                 parsed.errors.map(pe => (pe.line, pe.msg)) ++
-                (overLargeIdx >= 0).option(
-                    overLargeIdx + state.report.ingested -> overLargeMsg)
+                  (overLargeIdx >= 0).option(
+                      overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
                 accumulate(state.update(updatedParser, ingestSize),
@@ -136,8 +136,8 @@ final class JSONIngestProcessing(
                 parsed.values.indexWhere(_.flattenWithPath.size > maxFields)
               val errors =
                 parsed.errors.map(pe => (pe.line, pe.msg)) ++
-                (overLargeIdx >= 0).option(
-                    overLargeIdx + state.report.ingested -> overLargeMsg)
+                  (overLargeIdx >= 0).option(
+                      overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
                 val completedRecords = records ++ parsed.values
@@ -275,9 +275,10 @@ final class JSONIngestProcessing(
                           "Do something useful with%s" format storeFailure.message),
                     _ => {
                       val errors =
-                        parsed.errors.map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
+                        parsed.errors
+                          .map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
                           .option(state.report.ingested +
-                            toIngest.size -> overLargeMsg)
+                                toIngest.size -> overLargeMsg)
 
                       state.update(updatedParser, ingestSize, errors)
                     }
@@ -323,8 +324,9 @@ final class JSONIngestProcessing(
                   StreamingResult(ingested, errors.headOption.map(_._2))
 
                 case IngestAllPossible =>
-                  BatchResult(
-                      ingested + errors.size, ingested, Vector(errors: _*))
+                  BatchResult(ingested + errors.size,
+                              ingested,
+                              Vector(errors: _*))
               }
           }
 

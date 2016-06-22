@@ -21,7 +21,8 @@ final class RecaptchaGoogle(endpoint: String, privateKey: String)
 
   def verify(response: String, req: RequestHeader) = {
     WS.url(endpoint)
-      .post(Map(
+      .post(
+          Map(
               "secret" -> Seq(privateKey),
               "response" -> Seq(response),
               "remoteip" -> Seq(req.remoteAddress)

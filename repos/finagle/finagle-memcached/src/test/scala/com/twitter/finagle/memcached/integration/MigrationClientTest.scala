@@ -61,8 +61,9 @@ class MigrationClientTest
 
     // set-up old pool
     val oldPoolCluster = new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, oldPoolPath))
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.OPEN_ACL_UNSAFE,
+                          oldPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -74,8 +75,9 @@ class MigrationClientTest
 
     // set-up new pool
     val newPoolCluster = new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, newPoolPath))
+        ServerSets.create(zookeeperClient,
+                          ZooKeeperUtils.OPEN_ACL_UNSAFE,
+                          newPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -117,9 +119,10 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -145,23 +148,26 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
       assert(Await.result(migrationClient.get("foo"), TIMEOUT) == None)
       Await.result(migrationClient.set("foo", Buf.Utf8("bar")), TIMEOUT)
 
-      assert(Await.result(migrationClient.get("foo"), TIMEOUT).get == Buf.Utf8(
+      assert(
+          Await.result(migrationClient.get("foo"), TIMEOUT).get == Buf.Utf8(
               "bar"))
 
       assert(Await.result(client1.get("foo"), TIMEOUT).get == Buf.Utf8("bar"))
       eventually {
         assert(
-            Await.result(client2.get("foo")).map { case Buf.Utf8(s) => s } == Some(
-                "bar"))
+            Await
+              .result(client2.get("foo"))
+              .map { case Buf.Utf8(s) => s } == Some("bar"))
       }
     }
   }
@@ -178,9 +184,10 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -197,8 +204,9 @@ class MigrationClientTest
       assert(cl1Res == "bar")
       eventually {
         assert(
-            Await.result(client2.get("foo")).map { case Buf.Utf8(s) => s } == Some(
-                "bar"))
+            Await
+              .result(client2.get("foo"))
+              .map { case Buf.Utf8(s) => s } == Some("bar"))
       }
     }
 
@@ -214,9 +222,10 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -246,9 +255,10 @@ class MigrationClientTest
             "twcache!localhost:" + zookeeperServerPort + "!" + oldPoolPath)
       val client2 = Memcached.client.newRichClient(dest =
             "twcache!localhost:" + zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+      val migrationClient = MigrationClient
+        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -265,8 +275,9 @@ class MigrationClientTest
       assert(res3 == "bar")
       eventually {
         assert(
-            Await.result(client2.get("foo")).map { case Buf.Utf8(s) => s } == Some(
-                "bar"))
+            Await
+              .result(client2.get("foo"))
+              .map { case Buf.Utf8(s) => s } == Some("bar"))
       }
     }
 }

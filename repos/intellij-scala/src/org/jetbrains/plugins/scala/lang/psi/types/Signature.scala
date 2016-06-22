@@ -28,8 +28,8 @@ case class TypeAliasSignature(name: String,
          ta)
   }
 
-  def updateTypes(
-      fun: ScType => ScType, withCopy: Boolean = true): TypeAliasSignature = {
+  def updateTypes(fun: ScType => ScType,
+                  withCopy: Boolean = true): TypeAliasSignature = {
     def updateTypeParam(tp: TypeParameter): TypeParameter = {
       new TypeParameter(tp.name, tp.typeParams.map(updateTypeParam), {
         val res = fun(tp.lowerType())
@@ -78,8 +78,8 @@ case class TypeAliasSignature(name: String,
   override def equals(other: Any): Boolean = other match {
     case that: TypeAliasSignature =>
       (that canEqual this) && name == that.name &&
-      typeParams == that.typeParams && lowerBound == that.lowerBound &&
-      upperBound == that.upperBound && isDefinition == that.isDefinition
+        typeParams == that.typeParams && lowerBound == that.lowerBound &&
+        upperBound == that.upperBound && isDefinition == that.isDefinition
     case _ => false
   }
 
@@ -135,20 +135,25 @@ class Signature(val name: String,
       case (ps1: PhysicalSignature, ps2: PhysicalSignature)
           if ps1.isJava && ps2.isJava =>
         val psiSub1 = ScalaPsiUtil.getPsiSubstitutor(
-            ps1.substitutor, ps1.method.getProject, ps1.method.getResolveScope)
+            ps1.substitutor,
+            ps1.method.getProject,
+            ps1.method.getResolveScope)
         val psiSub2 = ScalaPsiUtil.getPsiSubstitutor(
-            ps2.substitutor, ps2.method.getProject, ps2.method.getResolveScope)
+            ps2.substitutor,
+            ps2.method.getProject,
+            ps2.method.getResolveScope)
         val psiSig1 = ps1.method.getSignature(psiSub1)
         val psiSig2 = ps2.method.getSignature(psiSub2)
-        MethodSignatureUtil.METHOD_PARAMETERS_ERASURE_EQUALITY.equals(
-            psiSig1, psiSig2)
+        MethodSignatureUtil.METHOD_PARAMETERS_ERASURE_EQUALITY
+          .equals(psiSig1, psiSig2)
       case _ => false
     }
   }
 
   def paramTypesEquiv(other: Signature): Boolean = {
-    paramTypesEquivExtended(
-        other, new ScUndefinedSubstitutor, falseUndef = true)._1
+    paramTypesEquivExtended(other,
+                            new ScUndefinedSubstitutor,
+                            falseUndef = true)._1
   }
 
   def paramTypesEquivExtended(
@@ -246,8 +251,8 @@ object Signature {
 
       res =
         res bindT
-        ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
-            ScTypeParameterType.toTypeParameterType(tp1))
+          ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
+              ScTypeParameterType.toTypeParameterType(tp1))
     }
     res
   }
@@ -262,8 +267,7 @@ object PhysicalSignature {
               ScalaPsiUtil.mapToLazyTypesSeq(clause.effectiveParameters))
         .toList
     case _ =>
-      List(
-          ScalaPsiUtil.mapToLazyTypesSeq(method.getParameterList match {
+      List(ScalaPsiUtil.mapToLazyTypesSeq(method.getParameterList match {
         case p: ScParameters => p.params
         case p => p.getParameters.toSeq
       }))
@@ -301,8 +305,8 @@ object PhysicalSignature {
   }
 }
 
-class PhysicalSignature(
-    val method: PsiMethod, override val substitutor: ScSubstitutor)
+class PhysicalSignature(val method: PsiMethod,
+                        override val substitutor: ScSubstitutor)
     extends Signature(method.name,
                       PhysicalSignature.typesEval(method),
                       PhysicalSignature.paramLength(method),

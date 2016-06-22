@@ -25,5 +25,5 @@ class TreeMap[KEY, VALUE](_factory: TreeMapFactory[KEY])
   def this(newOrder: Order[KEY]) = this(new TreeMapFactory[KEY](newOrder));
   def get(key: KEY) = null;
   def iterator: Iterator[Tuple2[KEY, VALUE]] = null;
-  override def size = super [Tree].size
+  override def size = super[Tree].size
 }

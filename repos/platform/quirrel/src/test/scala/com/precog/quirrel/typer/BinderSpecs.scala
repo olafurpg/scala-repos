@@ -81,9 +81,11 @@ object BinderSpecs
       }
 
       {
-        val e @ Let(
-        _, _, _, Add(_, Add(_, tb: Dispatch, tc: Dispatch), td: Dispatch), _) =
-          parseSingle("a(b, c, d) := b + c + d a(1, 2, 3)")
+        val e @ Let(_,
+                    _,
+                    _,
+                    Add(_, Add(_, tb: Dispatch, tc: Dispatch), td: Dispatch),
+                    _) = parseSingle("a(b, c, d) := b + c + d a(1, 2, 3)")
 
         tb.binding mustEqual FormalBinding(e)
         tc.binding mustEqual FormalBinding(e)

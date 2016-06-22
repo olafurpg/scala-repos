@@ -57,6 +57,7 @@ object StatsSampleOneMasterClient {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
     system.actorOf(
-        Props(classOf[StatsSampleClient], "/user/statsServiceProxy"), "client")
+        Props(classOf[StatsSampleClient], "/user/statsServiceProxy"),
+        "client")
   }
 }

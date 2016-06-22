@@ -25,7 +25,8 @@ object EssentialActionSpec extends PlaySpecification {
       // start fake application with its own classloader
       val applicationClassLoader = new ClassLoader() {}
 
-      running(_.in(Environment
+      running(
+          _.in(Environment
                 .simple()
                 .copy(classLoader = applicationClassLoader))) { app =>
         import app.materializer

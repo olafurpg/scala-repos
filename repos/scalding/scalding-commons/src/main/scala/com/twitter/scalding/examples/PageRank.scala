@@ -62,7 +62,7 @@ class PageRank(args: Args) extends Job(args) {
        */
       val nextArgs =
         args + ("input", Some(args("output"))) +
-        ("temp", Some(args("output"))) + ("output",
+          ("temp", Some(args("output"))) + ("output",
             Some(args("temp"))) + ("jobCount", Some((JOB_COUNT + 1).toString))
       //Actually read the error:
       val error = TypedTsv[Double](args("errorOut")).toIterator.next;
@@ -94,9 +94,9 @@ class PageRank(args: Args) extends Job(args) {
     Tsv(args("input")).read
     //Just to name the columns:
       .mapTo((0, 1, 2) -> (nodeCol, neighCol, pageRank)) {
-      input: (Long, String, Double) =>
-        input
-    }
+        input: (Long, String, Double) =>
+          input
+      }
   }
 
   /**
@@ -110,8 +110,8 @@ class PageRank(args: Args) extends Job(args) {
       val nodeRows = pagerank
       //remove any EDGE rows from the previous loop
         .filter('rowtype) { (rowtype: Int) =>
-        rowtype == NODESET
-      }
+          rowtype == NODESET
+        }
       //compute the incremental rank due to the random jump:
       val randomJump = nodeRows.map('rank -> 'rank) { (rank: Double) =>
         ALPHA
@@ -134,7 +134,7 @@ class PageRank(args: Args) extends Job(args) {
         //Here we make a false row that we use to tell dst how much incoming
         //Page rank it needs to add to itself:
         .map(('src, 'd_src, 'dst, 'rank, 'rowtype) ->
-            ('src, 'd_src, 'dst, 'rank, 'rowtype)) {
+              ('src, 'd_src, 'dst, 'rank, 'rowtype)) {
           intup: (Long, Long, Long, Double, Int) =>
             val (src: Long, d_src: Long, dst: Long, rank: Double, row: Int) =
               intup
@@ -157,7 +157,8 @@ class PageRank(args: Args) extends Job(args) {
          * to begin with.  To fix the later case, we have to additionally
          * filter the result to keep only NODESET rows.
          */
-        _.min('rowtype, 'dst, 'd_src).sum[Double]('rank) //Sum the page-rank from both the nodeset and edge rows
+        _.min('rowtype, 'dst, 'd_src)
+          .sum[Double]('rank) //Sum the page-rank from both the nodeset and edge rows
       }
       //Must call ourselves in the tail position:
       doPageRank(steps - 1)(nextPr)

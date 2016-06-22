@@ -32,8 +32,9 @@ import javafx.{collections => jfxc}
   * Companion Object for [[scalafx.collections.ObservableFloatArray]].
   */
 object ObservableFloatArray
-    extends ObservableArrayCompanionBase[
-        Float, ObservableFloatArray, jfxc.ObservableFloatArray] {
+    extends ObservableArrayCompanionBase[Float,
+                                         ObservableFloatArray,
+                                         jfxc.ObservableFloatArray] {
 
   /**
     * @inheritdoc
@@ -54,8 +55,9 @@ object ObservableFloatArray
 class ObservableFloatArray(
     delegate: jfxc.ObservableFloatArray =
       jfxc.FXCollections.observableFloatArray())
-    extends ObservableArray[
-        Float, ObservableFloatArray, jfxc.ObservableFloatArray](delegate) {
+    extends ObservableArray[Float,
+                            ObservableFloatArray,
+                            jfxc.ObservableFloatArray](delegate) {
 
   /**
     * Create $OFA with specified capacity.
@@ -74,16 +76,20 @@ class ObservableFloatArray(
   /**
     * @inheritdoc
     */
-  override def copyTo(
-      srcIdx: Int, dest: Array[Float], destIdx: Int, length: Int) {
+  override def copyTo(srcIdx: Int,
+                      dest: Array[Float],
+                      destIdx: Int,
+                      length: Int) {
     delegate.copyTo(srcIdx, dest, destIdx, length)
   }
 
   /**
     * @inheritdoc
     */
-  override def copyTo(
-      srcIdx: Int, dest: ObservableFloatArray, destIdx: Int, length: Int) {
+  override def copyTo(srcIdx: Int,
+                      dest: ObservableFloatArray,
+                      destIdx: Int,
+                      length: Int) {
     delegate.copyTo(srcIdx, dest.delegate, destIdx, length)
   }
 
@@ -165,8 +171,10 @@ class ObservableFloatArray(
   /**
     * @inheritdoc
     */
-  override def set(
-      destIdx: Int, src: ObservableFloatArray, srcIdx: Int, length: Int) {
+  override def set(destIdx: Int,
+                   src: ObservableFloatArray,
+                   srcIdx: Int,
+                   length: Int) {
     delegate.set(destIdx, src.delegate, srcIdx, length)
   }
 

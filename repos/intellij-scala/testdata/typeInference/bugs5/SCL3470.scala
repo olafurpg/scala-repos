@@ -12,8 +12,7 @@ object SCL3470 {
   val r4: Seq[A] = bar(new B, new B) // okay
 
   val r5: Seq[A] = foo(new B, new B) // fail: Seq[B] doesn't conform to Seq[A]
-  val r6: Seq[A] =
-    foo(new B, new C) // fail: Seq[ScalaObject] doesn't conform to Seq[A]
+  val r6: Seq[A] = foo(new B, new C) // fail: Seq[ScalaObject] doesn't conform to Seq[A]
   /*start*/
   (r1, r2, r3, r4, r5, r6) /*end*/
 }

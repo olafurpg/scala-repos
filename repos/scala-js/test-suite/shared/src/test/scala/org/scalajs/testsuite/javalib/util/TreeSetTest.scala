@@ -207,7 +207,8 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     assertEquals(6, ts.size())
   }
 
-  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit = {
+  @Test
+  def should_check_contained_values_even_in_double_corner_cases(): Unit = {
     val ts = factory.empty[Double]
 
     assertTrue(ts.add(11111.0))
@@ -259,7 +260,8 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     }
   }
 
-  @Test def should_not_put_a_whole_Collection_with_null_elements_into(): Unit = {
+  @Test
+  def should_not_put_a_whole_Collection_with_null_elements_into(): Unit = {
     val l = List[String]("ONE", "TWO", (null: String))
     val ts1 = factory.empty[String]
 
@@ -286,7 +288,8 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     expectThrows(classOf[ClassCastException], ts1.add(new TestObj(111)))
   }
 
-  @Test def should_throw_exceptions_on_access_outside_bound_on_views(): Unit = {
+  @Test
+  def should_throw_exceptions_on_access_outside_bound_on_views(): Unit = {
     assumeTrue("Needs compliant as instanceOf.", hasCompliantAsInstanceOfs)
 
     val l = asJavaCollection(Set(2, 3, 6))

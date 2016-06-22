@@ -11,8 +11,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
   * User: Alexander Podkhalyuzin
   * Date: 31.07.2008
   */
-class ScalaTypeAliasItemPresentation(
-    private val element: ScTypeAlias, isInherited: Boolean)
+class ScalaTypeAliasItemPresentation(private val element: ScTypeAlias,
+                                     isInherited: Boolean)
     extends ScalaItemPresentation(element) {
   def getPresentableText =
     ScalaElementPresentation.getTypeAliasPresentableText(

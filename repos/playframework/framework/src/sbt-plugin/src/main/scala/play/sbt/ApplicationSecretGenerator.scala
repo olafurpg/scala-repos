@@ -47,31 +47,34 @@ object ApplicationSecretGenerator {
       val lines = IO.readLines(appConfFile)
       val config: Config = ConfigFactory.parseString(lines.mkString("\n"))
 
-      val newLines =
-        if (config.hasPath("play.crypto.secret")) {
-          log.info("Replacing old application secret: " +
+      val newLines = if (config.hasPath("play.crypto.secret")) {
+        log.info(
+            "Replacing old application secret: " +
               config.getString("play.crypto.secret"))
-          getUpdatedSecretLines(secret, lines, config)
-        } else {
-          log.warn("Did not find application secret in " +
+        getUpdatedSecretLines(secret, lines, config)
+      } else {
+        log.warn(
+            "Did not find application secret in " +
               appConfFile.getCanonicalPath)
-          log.warn("Adding application secret to start of file")
-          val secretConfig = s"""play.crypto.secret="$secret""""
-          secretConfig :: lines
-        }
+        log.warn("Adding application secret to start of file")
+        val secretConfig = s"""play.crypto.secret="$secret""""
+        secretConfig :: lines
+      }
 
       IO.writeLines(appConfFile, newLines)
 
       appConfFile
     } else {
-      log.error("Could not find configuration file at " +
-          appConfFile.getCanonicalPath)
+      log.error(
+          "Could not find configuration file at " +
+            appConfFile.getCanonicalPath)
       throw new FeedbackProvidedException {}
     }
   }
 
-  def getUpdatedSecretLines(
-      newSecret: String, lines: List[String], config: Config): List[String] = {
+  def getUpdatedSecretLines(newSecret: String,
+                            lines: List[String],
+                            config: Config): List[String] = {
 
     val secretConfigValue: ConfigValue = config.getValue("play.crypto.secret")
     val secretConfigOrigin: ConfigOrigin = secretConfigValue.origin()
@@ -84,7 +87,8 @@ object ApplicationSecretGenerator {
       val newLines: List[String] = lines.updated(
           lineNumber,
           lines(lineNumber).replace(
-              secretConfigValue.unwrapped().asInstanceOf[String], newSecret))
+              secretConfigValue.unwrapped().asInstanceOf[String],
+              newSecret))
 
       // removes existing application.secret key
       if (config.hasPath("application.secret")) {

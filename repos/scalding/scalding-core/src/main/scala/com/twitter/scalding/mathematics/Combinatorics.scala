@@ -42,8 +42,8 @@ object Combinatorics {
     * For (t1,t2) we want t1<t2, otherwise reject.
     * This brings down 90 tuples to the desired 45 tuples = 10C2
     */
-  def combinations[T](input: IndexedSeq[T], k: Int)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+  def combinations[T](input: IndexedSeq[T], k: Int)(implicit flowDef: FlowDef,
+                                                    mode: Mode): Pipe = {
 
     // make k pipes with 1 column each
     // pipe 1 = 1 to n
@@ -52,8 +52,7 @@ object Combinatorics {
     val n = input.size
     val allc = (1 to k).toList.map(x => Symbol("n" + x)) // all column names
 
-    val pipes = allc.zipWithIndex.map(
-        x => {
+    val pipes = allc.zipWithIndex.map(x => {
       val num = x._2 + 1
       val pipe = IterableSource((num to n), x._1).read
       (pipe, num)
@@ -73,8 +72,7 @@ object Combinatorics {
       })
       ._1
 
-    (1 to k).foldLeft(res)(
-        (a, b) => {
+    (1 to k).foldLeft(res)((a, b) => {
       val myname = Symbol("n" + b)
       val newname = Symbol("k" + b)
       a.map(myname -> newname) { inpc: Int =>
@@ -94,8 +92,8 @@ object Combinatorics {
     * Return a pipe with all nPk permutations, with k columns per row
     * For details, see combinations(...) above
     */
-  def permutations[T](input: IndexedSeq[T], k: Int)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+  def permutations[T](input: IndexedSeq[T], k: Int)(implicit flowDef: FlowDef,
+                                                    mode: Mode): Pipe = {
 
     val n = input.size
     val allc = (1 to k).toList.map(x => Symbol("n" + x)) // all column names
@@ -113,8 +111,7 @@ object Combinatorics {
       }
 
     // map numerals to actual data
-    (1 to k).foldLeft(res)(
-        (a, b) => {
+    (1 to k).foldLeft(res)((a, b) => {
       val myname = Symbol("n" + b)
       val newname = Symbol("k" + b)
       a.map(myname -> newname) { inpc: Int =>
@@ -170,7 +167,8 @@ object Combinatorics {
     *
     */
   def weightedSum(weights: IndexedSeq[Double], result: Double, error: Double)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+      implicit flowDef: FlowDef,
+      mode: Mode): Pipe = {
     val numWeights = weights.size
     val allColumns = (1 to numWeights).map(x => Symbol("k" + x))
 
@@ -235,8 +233,9 @@ object Combinatorics {
     * The returned pipe contain only positive non-zero weights.
     */
   def positiveWeightedSum(
-      weights: IndexedSeq[Double], result: Double, error: Double)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+      weights: IndexedSeq[Double],
+      result: Double,
+      error: Double)(implicit flowDef: FlowDef, mode: Mode): Pipe = {
     val allColumns = (1 to weights.size).map(x => Symbol("k" + x))
     weightedSum(weights, result, error).filter(allColumns) { x: TupleEntry =>
       (0 until allColumns.size)

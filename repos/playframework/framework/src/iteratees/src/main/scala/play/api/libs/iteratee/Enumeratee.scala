@@ -129,8 +129,8 @@ object Enumeratee {
     * The Enumeratee will continue consuming input until both inner Iteratees are done.  If one inner Iteratee finishes
     * before the other, the result of that Iteratee is held, and the one continues by itself, until it too is finished.
     */
-  def zip[E, A, B](
-      inner1: Iteratee[E, A], inner2: Iteratee[E, B]): Iteratee[E, (A, B)] =
+  def zip[E, A, B](inner1: Iteratee[E, A],
+                   inner2: Iteratee[E, B]): Iteratee[E, (A, B)] =
     zipWith(inner1, inner2)((_, _))(dec)
 
   /**
@@ -149,22 +149,25 @@ object Enumeratee {
 
     def getNext(it1: Iteratee[E, A], it2: Iteratee[E, B]): Iteratee[E, C] = {
       val eventuallyIter = for ((a1, it1_) <- getInside(it1);
-                                (a2, it2_) <- getInside(it2)) yield
-        checkDone(a1, a2) match {
-          case Left((msg, in)) => Error(msg, in)
-          case Right(None) => Cont(step(it1_, it2_))
-          case Right(Some(Left(Left(a)))) => it2_.map(b => zipper(a, b))(pec)
-          case Right(Some(Left(Right(b)))) => it1_.map(a => zipper(a, b))(pec)
-          case Right(Some(Right(((a, b), e)))) =>
-            executeIteratee(Done(zipper(a, b), e))(pec)
-        }
+                                (a2, it2_) <- getInside(it2))
+        yield
+          checkDone(a1, a2) match {
+            case Left((msg, in)) => Error(msg, in)
+            case Right(None) => Cont(step(it1_, it2_))
+            case Right(Some(Left(Left(a)))) => it2_.map(b => zipper(a, b))(pec)
+            case Right(Some(Left(Right(b)))) =>
+              it1_.map(a => zipper(a, b))(pec)
+            case Right(Some(Right(((a, b), e)))) =>
+              executeIteratee(Done(zipper(a, b), e))(pec)
+          }
 
       Iteratee.flatten(eventuallyIter)
     }
 
     def step(it1: Iteratee[E, A], it2: Iteratee[E, B])(in: Input[E]) = {
-      Iteratee.flatten(for (it1_ <- it1.feed(in);
-                            it2_ <- it2.feed(in)) yield getNext(it1_, it2_))
+      Iteratee.flatten(
+          for (it1_ <- it1.feed(in);
+               it2_ <- it2.feed(in)) yield getNext(it1_, it2_))
     }
 
     def getInside[T](it: Iteratee[E, T])
@@ -177,10 +180,10 @@ object Enumeratee {
       }(dec).map(r => (r, it))(dec)
     }
 
-    def checkDone(
-        x: Option[Either[(String, Input[E]), (A, Input[E])]],
-        y: Option[Either[(String, Input[E]), (B, Input[E])]]): Either[
-        (String, Input[E]), Option[Either[Either[A, B], ((A, B), Input[E])]]] =
+    def checkDone(x: Option[Either[(String, Input[E]), (A, Input[E])]],
+                  y: Option[Either[(String, Input[E]), (B, Input[E])]])
+      : Either[(String, Input[E]),
+               Option[Either[Either[A, B], ((A, B), Input[E])]]] =
       (x, y) match {
         case (Some(Right((a, e1))), Some(Right((b, e2)))) =>
           Right(
@@ -412,8 +415,8 @@ object Enumeratee {
     * Like `map`, but allows the map function to asynchronously return the mapped element.
     */
   def mapM[E] = new MapM[E] {
-    def apply[NE](
-        f: E => Future[NE])(implicit ec: ExecutionContext): Enumeratee[E, NE] =
+    def apply[NE](f: E => Future[NE])(
+        implicit ec: ExecutionContext): Enumeratee[E, NE] =
       mapInputM[E] {
         case Input.Empty => Future.successful(Input.Empty)
         case Input.EOF => Future.successful(Input.EOF)
@@ -580,8 +583,7 @@ object Enumeratee {
     def step[A](k: K[E, A]): K[E, Iteratee[E, A]] = {
 
       case in @ Input.El(e) =>
-        Iteratee.flatten(
-            Future(predicate(e))(pec).map { b =>
+        Iteratee.flatten(Future(predicate(e))(pec).map { b =>
           if (b)
             (new CheckDone[E, E] {
                   def continue[A](k: K[E, A]) = Cont(step(k))
@@ -719,8 +721,7 @@ object Enumeratee {
       def step[A](k: K[E, A]): K[E, Iteratee[E, A]] = {
 
         case in @ Input.El(e) =>
-          Iteratee.flatten(
-              Future(p(e))(pec).map { b =>
+          Iteratee.flatten(Future(p(e))(pec).map { b =>
             if (b)
               (new CheckDone[E, E] {
                     def continue[A](k: K[E, A]) = Cont(step(k))
@@ -757,16 +758,16 @@ object Enumeratee {
                       if (b) Done(inner, in) else stepNoBreak(inner)(in))(dec))
           case _ => stepNoBreak(inner)(in)
         }
-        def stepNoBreak(
-            inner: Iteratee[E, A])(in: Input[E]): Iteratee[E, Iteratee[E, A]] =
+        def stepNoBreak(inner: Iteratee[E, A])(
+            in: Input[E]): Iteratee[E, Iteratee[E, A]] =
           inner.pureFlatFold {
             case Step.Cont(k) => {
-                val next = k(in)
-                next.pureFlatFold {
-                  case Step.Cont(k) => Cont(step(next))
-                  case _ => Done(inner, in)
-                }(dec)
-              }
+              val next = k(in)
+              next.pureFlatFold {
+                case Step.Cont(k) => Cont(step(next))
+                case _ => Done(inner, in)
+              }(dec)
+            }
             case _ => Done(inner, in)
           }(dec)
         Cont(step(inner))
@@ -871,9 +872,9 @@ object Enumeratee {
     * @param f Called when an error occurs with the cause of the error and the input associated with the error.
     * $paramEcSingle
     */
-  def recover[E](
-      f: (Throwable, Input[E]) => Unit = (_: Throwable, _: Input[E]) => ())(
-      implicit ec: ExecutionContext): Enumeratee[E, E] = {
+  def recover[E](f: (Throwable, Input[E]) => Unit = (_: Throwable,
+                                                     _: Input[E]) =>
+                   ())(implicit ec: ExecutionContext): Enumeratee[E, E] = {
     val pec = ec.prepare()
     new Enumeratee[E, E] {
 

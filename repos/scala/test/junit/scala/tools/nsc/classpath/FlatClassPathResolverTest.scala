@@ -21,8 +21,10 @@ class FlatClassPathResolverTest {
 
   val tempDir = new TemporaryFolder()
 
-  private val packagesToTest = List(
-      FlatClassPath.RootPackage, "scala", "scala.reflect", "scala.reflect.io")
+  private val packagesToTest = List(FlatClassPath.RootPackage,
+                                    "scala",
+                                    "scala.reflect",
+                                    "scala.reflect.io")
   private val classFilesToFind = List("scala.tools.util.FlatClassPathResolver",
                                       "scala.reflect.io.AbstractFile",
                                       "scala.collection.immutable.List",
@@ -135,8 +137,8 @@ class FlatClassPathResolverTest {
       val packageNameParts =
         if (inPackage == FlatClassPath.RootPackage) Nil
         else inPackage.split('.').toList
-      val recursiveClassPathInPackage = traverseToPackage(
-          packageNameParts, recursiveClassPath)
+      val recursiveClassPathInPackage =
+        traverseToPackage(packageNameParts, recursiveClassPath)
 
       val flatCpPackages = flatClassPath.packages(inPackage).map(_.name)
       val pkgPrefix = PackageNameUtils.packagePrefix(inPackage)

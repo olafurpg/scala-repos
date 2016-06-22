@@ -67,7 +67,7 @@ class MetadataTask(settings: Settings)
         (json \ "children").children map (_.deserialize[String]) must_== Nil
         val cPathChildren =
           (json \ "structure" \ "children").children map
-          (_.deserialize[String])
+            (_.deserialize[String])
         cPathChildren must haveTheSameElementsAs(List(".a", ".b", ".c"))
         (json \ "strucutre" \ "types").children must_== Nil
       }

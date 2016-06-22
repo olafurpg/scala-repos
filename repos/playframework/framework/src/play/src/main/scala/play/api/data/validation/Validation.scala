@@ -235,8 +235,8 @@ object Invalid {
 }
 
 object ParameterValidator {
-  def apply[T](
-      constraints: Iterable[Constraint[T]], optionalParam: Option[T]*) =
+  def apply[T](constraints: Iterable[Constraint[T]],
+               optionalParam: Option[T]*) =
     optionalParam.flatMap {
       _.map { param =>
         constraints.flatMap {

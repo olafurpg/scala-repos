@@ -16,8 +16,8 @@ object ShouldNotTypecheck {
   def applyImplNoExp(ctx: Context)(code: ctx.Expr[String]) =
     applyImpl(ctx)(code, null)
 
-  def applyImpl(ctx: Context)(
-      code: ctx.Expr[String], expected: ctx.Expr[String]): ctx.Expr[Unit] = {
+  def applyImpl(ctx: Context)(code: ctx.Expr[String],
+                              expected: ctx.Expr[String]): ctx.Expr[Unit] = {
     import ctx.universe._
 
     val Expr(Literal(Constant(codeStr: String))) = code
@@ -34,7 +34,7 @@ object ShouldNotTypecheck {
         if ((expected ne null) && !(expPat.matcher(msg)).matches)
           ctx.abort(ctx.enclosingPosition,
                     "Type-checking failed in an unexpected way.\n" +
-                    expMsg + "\nActual error: " + msg)
+                      expMsg + "\nActual error: " + msg)
         else return reify(())
     }
 

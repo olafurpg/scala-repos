@@ -105,18 +105,19 @@ object TestResultLogger {
 
     val printSummary = TestResultLogger((log, results, _) => {
       val multipleFrameworks = results.summaries.size > 1
-      for (Summary(name, message) <- results.summaries) if (message.isEmpty)
-        log.debug("Summary for " + name + " not available.")
-      else {
-        if (multipleFrameworks) log.info(name)
-        log.info(message)
-      }
+      for (Summary(name, message) <- results.summaries)
+        if (message.isEmpty)
+          log.debug("Summary for " + name + " not available.")
+        else {
+          if (multipleFrameworks) log.info(name)
+          log.info(message)
+        }
     })
 
     val printStandard_? : Output => Boolean = results =>
       // Print the standard one-liner statistic if no framework summary is defined, or when > 1 framework is in used.
       results.summaries.size > 1 ||
-      results.summaries.headOption.forall(_.summaryText.isEmpty)
+        results.summaries.headOption.forall(_.summaryText.isEmpty)
 
     val printStandard = TestResultLogger((log, results, _) => {
       val (skippedCount,
@@ -168,8 +169,9 @@ object TestResultLogger {
           scala.reflect.NameTransformer.decode(name)
       }
 
-      def show(
-          label: String, level: Level.Value, tests: Iterable[String]): Unit =
+      def show(label: String,
+               level: Level.Value,
+               tests: Iterable[String]): Unit =
         if (tests.nonEmpty) {
           log.log(level, label)
           log.log(level, tests.mkString("\t", "\n\t", ""))

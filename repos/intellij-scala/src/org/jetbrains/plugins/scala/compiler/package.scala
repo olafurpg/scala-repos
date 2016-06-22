@@ -25,8 +25,7 @@ package object compiler {
                           "Not valid SDK path: " + sdkName)
 
             vmExecutable.right.flatMap { executable =>
-              val tools =
-                new File(jdkType.getToolsPath(sdk)) // TODO properly handle JDK 6 on Mac OS
+              val tools = new File(jdkType.getToolsPath(sdk)) // TODO properly handle JDK 6 on Mac OS
               val toolsPresent = true //tools.exists()
               Either.cond(toolsPresent,
                           JDK(executable, tools),

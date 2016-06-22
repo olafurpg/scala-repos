@@ -95,8 +95,9 @@ class ScalaIntroduceParameterHandler
         s"$paramsText $arrow {\n$bodyText\n}"
     }
     val expr = ScalaPsiElementFactory
-      .createExpressionWithContextFromText(
-          funText, elems.head.getContext, elems.head)
+      .createExpressionWithContextFromText(funText,
+                                           elems.head.getContext,
+                                           elems.head)
       .asInstanceOf[ScFunctionExpr]
     val toReturn = IntroduceImplicitParameterIntention
       .createExpressionToIntroduce(expr, withoutParameterTypes = true) match {
@@ -152,17 +153,18 @@ class ScalaIntroduceParameterHandler
         (selModel.getSelectionStart, selModel.getSelectionEnd)
       ScalaRefactoringUtil.checkFile(file, project, editor, REFACTORING_NAME)
 
-      val exprWithTypes = ScalaRefactoringUtil.getExpression(
-          project, editor, file, startOffset, endOffset)
+      val exprWithTypes = ScalaRefactoringUtil
+        .getExpression(project, editor, file, startOffset, endOffset)
       val elems = exprWithTypes match {
         case Some((e, _)) => Seq(e)
         case None =>
-          ScalaRefactoringUtil.selectedElements(
-              editor, file.asInstanceOf[ScalaFile], trimComments = false)
+          ScalaRefactoringUtil.selectedElements(editor,
+                                                file.asInstanceOf[ScalaFile],
+                                                trimComments = false)
       }
 
-      val hasWarnings = ScalaRefactoringUtil.showNotPossibleWarnings(
-          elems, project, editor, REFACTORING_NAME)
+      val hasWarnings = ScalaRefactoringUtil
+        .showNotPossibleWarnings(elems, project, editor, REFACTORING_NAME)
       if (hasWarnings) return None
       if (haveReturnStmts(elems)) {
         showErrorHint(
@@ -204,7 +206,8 @@ class ScalaIntroduceParameterHandler
       case null => methodLike
       case scMethod: ScMethodLike =>
         SuperMethodWarningUtil.checkSuperMethod(
-            methodLike, RefactoringBundle.message("to.refactor"))
+            methodLike,
+            RefactoringBundle.message("to.refactor"))
       case _ => methodLike
     }
     val methodToSearchFor = superMethod match {
@@ -215,8 +218,12 @@ class ScalaIntroduceParameterHandler
       return None
 
     val suggestedName = {
-      val validator = new ScalaVariableValidator(
-          this, project, elems.head, false, methodLike, methodLike)
+      val validator = new ScalaVariableValidator(this,
+                                                 project,
+                                                 elems.head,
+                                                 false,
+                                                 methodLike,
+                                                 methodLike)
       val possibleNames = elems match {
         case Seq(expr: ScExpression) =>
           NameSuggester.suggestNames(expr, validator)
@@ -234,10 +241,11 @@ class ScalaIntroduceParameterHandler
         }
 
         val occurrences = ScalaRefactoringUtil.getOccurrenceRanges(
-            ScalaRefactoringUtil.unparExpr(expr), occurrencesScope)
+            ScalaRefactoringUtil.unparExpr(expr),
+            occurrencesScope)
         if (occurrences.length > 1)
-          occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
-              project, occurrences, editor)
+          occurrenceHighlighters = ScalaRefactoringUtil
+            .highlightOccurrences(project, occurrences, editor)
 
         (occurrences, expr.getTextRange)
       case _ =>
@@ -268,8 +276,10 @@ class ScalaIntroduceParameterHandler
     var enclosingMethods = new ArrayBuffer[ScMethodLike]
     var elem: PsiElement = expr
     while (elem != null) {
-      val newFun = PsiTreeUtil.getContextOfType(
-          elem, true, classOf[ScFunctionDefinition], classOf[ScClass])
+      val newFun = PsiTreeUtil.getContextOfType(elem,
+                                                true,
+                                                classOf[ScFunctionDefinition],
+                                                classOf[ScClass])
       newFun match {
         case f @ ScFunctionDefinition.withBody(body)
             if PsiTreeUtil.isContextAncestor(body, expr, false) =>

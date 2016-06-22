@@ -32,6 +32,7 @@ class FlowDispatcherSpec
     "use the default dispatcher" in testDispatcher()
 
     "use custom dispatcher" in testDispatcher(
-        defaultSettings.withDispatcher("my-dispatcher"), "my-dispatcher")
+        defaultSettings.withDispatcher("my-dispatcher"),
+        "my-dispatcher")
   }
 }

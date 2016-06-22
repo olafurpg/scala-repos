@@ -36,8 +36,10 @@ trait AsyncWriteJournal
       config.getDuration("circuit-breaker.call-timeout", MILLISECONDS).millis
     val resetTimeout =
       config.getDuration("circuit-breaker.reset-timeout", MILLISECONDS).millis
-    CircuitBreaker(
-        context.system.scheduler, maxFailures, callTimeout, resetTimeout)
+    CircuitBreaker(context.system.scheduler,
+                   maxFailures,
+                   callTimeout,
+                   resetTimeout)
   }
 
   private val replayFilterMode: ReplayFilter.Mode =
@@ -87,14 +89,16 @@ trait AsyncWriteJournal
           if (results.nonEmpty && results.size != atomicWriteCount)
             throw new IllegalStateException(
                 "asyncWriteMessages returned invalid number of results. " +
-                s"Expected [${prepared.get.size}], but got [${results.size}]")
+                  s"Expected [${prepared.get.size}], but got [${results.size}]")
           results
         }
 
         writeResult.onComplete {
           case Success(results) ⇒
-            resequencer ! Desequenced(
-                WriteMessagesSuccessful, cctr, persistentActor, self)
+            resequencer ! Desequenced(WriteMessagesSuccessful,
+                                      cctr,
+                                      persistentActor,
+                                      self)
 
             val resultsIter =
               if (results.isEmpty)
@@ -134,8 +138,10 @@ trait AsyncWriteJournal
             }
 
           case Failure(e) ⇒
-            resequencer ! Desequenced(
-                WriteMessagesFailed(e), cctr, persistentActor, self)
+            resequencer ! Desequenced(WriteMessagesFailed(e),
+                                      cctr,
+                                      persistentActor,
+                                      self)
             var n = cctr + 1
             messages.foreach {
               case a: AtomicWrite ⇒
@@ -157,8 +163,11 @@ trait AsyncWriteJournal
             }
         }
 
-      case r @ ReplayMessages(
-          fromSequenceNr, toSequenceNr, max, persistenceId, persistentActor) ⇒
+      case r @ ReplayMessages(fromSequenceNr,
+                              toSequenceNr,
+                              max,
+                              persistenceId,
+                              persistentActor) ⇒
         val replyTo =
           if (isReplayFilterEnabled)
             context.actorOf(
@@ -171,8 +180,9 @@ trait AsyncWriteJournal
 
         val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
         breaker
-          .withCircuitBreaker(asyncReadHighestSequenceNr(
-                  persistenceId, readHighestSequenceNrFrom))
+          .withCircuitBreaker(
+              asyncReadHighestSequenceNr(persistenceId,
+                                         readHighestSequenceNrFrom))
           .flatMap { highSeqNr ⇒
             val toSeqNr = math.min(toSequenceNr, highSeqNr)
             if (highSeqNr == 0L || fromSequenceNr > toSeqNr)
@@ -292,8 +302,8 @@ trait AsyncWriteJournal
     * This call is protected with a circuit-breaker.
     * Message deletion doesn't affect the highest sequence number of messages, journal must maintain the highest sequence number and never decrease it.
     */
-  def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit]
+  def asyncDeleteMessagesTo(persistenceId: String,
+                            toSequenceNr: Long): Future[Unit]
 
   /**
     * Plugin API
@@ -312,8 +322,10 @@ trait AsyncWriteJournal
 private[persistence] object AsyncWriteJournal {
   val successUnit: Success[Unit] = Success(())
 
-  final case class Desequenced(
-      msg: Any, snr: Long, target: ActorRef, sender: ActorRef)
+  final case class Desequenced(msg: Any,
+                               snr: Long,
+                               target: ActorRef,
+                               sender: ActorRef)
       extends NoSerializationVerificationNeeded
 
   class Resequencer extends Actor {

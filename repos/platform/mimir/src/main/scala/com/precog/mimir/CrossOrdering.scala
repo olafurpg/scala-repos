@@ -91,10 +91,10 @@ trait CrossOrdering extends DAG {
           dag.MegaReduce(reds, memoized(parent))
 
         case s @ dag.Split(spec, child, id) => {
-            val spec2 = memoizedSpec(spec)
-            val child2 = memoized(child)
-            dag.Split(spec2, child2, id)(s.loc)
-          }
+          val spec2 = memoizedSpec(spec)
+          val child2 = memoized(child)
+          dag.Split(spec2, child2, id)(s.loc)
+        }
 
         case node @ dag.Assert(pred, child) =>
           dag.Assert(memoized(pred), memoized(child))(node.loc)
@@ -116,30 +116,30 @@ trait CrossOrdering extends DAG {
           Diff(memoized(left), memoized(right))(node.loc)
 
         case node @ Join(op, Cross(hint), left, right) => {
-            import CrossOrder._
-            if (right.isSingleton)
-              Join(op,
-                   Cross(Some(CrossLeft)),
-                   memoized(left),
-                   memoized(right))(node.loc)
-            else if (left.isSingleton)
-              Join(op,
-                   Cross(Some(CrossRight)),
-                   memoized(left),
-                   memoized(right))(node.loc)
-            else {
-              val right2 = memoized(right)
+          import CrossOrder._
+          if (right.isSingleton)
+            Join(op,
+                 Cross(Some(CrossLeft)),
+                 memoized(left),
+                 memoized(right))(node.loc)
+          else if (left.isSingleton)
+            Join(op,
+                 Cross(Some(CrossRight)),
+                 memoized(left),
+                 memoized(right))(node.loc)
+          else {
+            val right2 = memoized(right)
 
-              right2 match {
-                case _: Memoize | _: AddSortKey | _: AbsoluteLoad =>
-                  Join(op, Cross(hint), memoized(left), right2)(node.loc)
+            right2 match {
+              case _: Memoize | _: AddSortKey | _: AbsoluteLoad =>
+                Join(op, Cross(hint), memoized(left), right2)(node.loc)
 
-                case _ =>
-                  Join(op, Cross(hint), memoized(left), Memoize(right2, 100))(
-                      node.loc)
-              }
+              case _ =>
+                Join(op, Cross(hint), memoized(left), Memoize(right2, 100))(
+                    node.loc)
             }
           }
+        }
 
         case node @ Join(op, joinSort, left, right) =>
           Join(op, joinSort, memoized(left), memoized(right))(node.loc)

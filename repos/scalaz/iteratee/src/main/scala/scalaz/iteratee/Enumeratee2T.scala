@@ -41,8 +41,8 @@ trait Enumeratee2TFunctions {
           }
         }
 
-        def step(
-            s: StepM[A], rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
+        def step(s: StepM[A],
+                 rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
           s.fold[IterateeT[J, IterateeM, StepM[A]]](
               cont = contf => {
                 for {
@@ -92,17 +92,18 @@ trait Enumeratee2TFunctions {
       }
     }
 
-  def joinI[J, K, F[_]](
-      implicit M: Monad[F],
-      ord: (J, K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
+  def joinI[J, K, F[_]](implicit M: Monad[F],
+                        ord: (J,
+                              K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
     new Enumeratee2T[J, K, (J, K), F] {
       def apply[A] = {
         def cstep(step: StepT[(J, K), F, A])
           : StepT[Either3[J, (J, K), K], F, StepT[(J, K), F, A]] = step.fold(
             cont = contf =>
               scont { in: Input[Either3[J, (J, K), K]] =>
-                val nextInput =
-                  in.flatMap(_.middleOr(emptyInput[(J, K)]) { elInput(_) })
+                val nextInput = in.flatMap(_.middleOr(emptyInput[(J, K)]) {
+                  elInput(_)
+                })
 
                 contf(nextInput) >>== (s => cstep(s).pointI)
             },

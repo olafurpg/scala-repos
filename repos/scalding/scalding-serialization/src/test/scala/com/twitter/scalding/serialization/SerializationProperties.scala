@@ -62,8 +62,8 @@ object SerializationProperties extends Properties("SerializationProperties") {
   class IntWrapperClass(val x: Int)
 
   implicit val myIntWrapperOrdSer: OrderedSerialization[IntWrapperClass] =
-    OrderedSerialization.viaTransform[IntWrapperClass, Int](
-        _.x, new IntWrapperClass(_))
+    OrderedSerialization
+      .viaTransform[IntWrapperClass, Int](_.x, new IntWrapperClass(_))
 
   class IntTryWrapperClass(val x: Int)
 
@@ -101,8 +101,9 @@ object SerializationProperties extends Properties("SerializationProperties") {
       val in2 = baos2.toInputStream
       pairList.forall {
         case Seq(a, b) =>
-          OrderedSerialization.compareBinary[T](in1, in2) == OrderedSerialization
-            .resultFrom(OrderedSerialization.compare(a, b))
+          OrderedSerialization
+            .compareBinary[T](in1, in2) == OrderedSerialization.resultFrom(
+              OrderedSerialization.compare(a, b))
         case _ => sys.error("unreachable")
       }
     }
@@ -163,8 +164,8 @@ object SerializationProperties extends Properties("SerializationProperties") {
   // Test the independent, non-sequenced, laws as well
   include(LawTester("Int Ordered", OrderedSerialization.allLaws[Int]))
   include(
-      LawTester(
-          "(Int, Int) Ordered", OrderedSerialization.allLaws[(Int, Int)]))
+      LawTester("(Int, Int) Ordered",
+                OrderedSerialization.allLaws[(Int, Int)]))
   include(LawTester("String Ordered", OrderedSerialization.allLaws[String]))
   include(
       LawTester("(String, Int) Ordered",

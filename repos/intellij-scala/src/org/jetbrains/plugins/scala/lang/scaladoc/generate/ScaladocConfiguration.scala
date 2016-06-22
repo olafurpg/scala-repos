@@ -22,10 +22,10 @@ class ScaladocConfiguration(
     Module.EMPTY_ARRAY
   }
 
-  def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
-    val state: ScaladocCommandLineState = new ScaladocCommandLineState(
-        env, project)
+  def getState(executor: Executor,
+               env: ExecutionEnvironment): RunProfileState = {
+    val state: ScaladocCommandLineState =
+      new ScaladocCommandLineState(env, project)
     state.setAdditionalScaladocFlags(form.getAdditionalFlags)
     state.setScope(scope)
     state.setVerbose(form.isVerbose)

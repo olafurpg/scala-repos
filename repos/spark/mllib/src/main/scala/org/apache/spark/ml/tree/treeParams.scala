@@ -46,7 +46,7 @@ private[ml] trait DecisionTreeParams
       this,
       "maxDepth",
       "Maximum depth of the tree. (>= 0)" +
-      " E.g., depth 0 means 1 leaf node; depth 1 means 1 internal node + 2 leaf nodes.",
+        " E.g., depth 0 means 1 leaf node; depth 1 means 1 internal node + 2 leaf nodes.",
       ParamValidators.gtEq(0))
 
   /**
@@ -60,8 +60,8 @@ private[ml] trait DecisionTreeParams
       this,
       "maxBins",
       "Max number of bins for" +
-      " discretizing continuous features.  Must be >=2 and >= number of categories for any" +
-      " categorical feature.",
+        " discretizing continuous features.  Must be >=2 and >= number of categories for any" +
+        " categorical feature.",
       ParamValidators.gtEq(2))
 
   /**
@@ -76,9 +76,9 @@ private[ml] trait DecisionTreeParams
       this,
       "minInstancesPerNode",
       "Minimum" +
-      " number of instances each child must have after split.  If a split causes the left or right" +
-      " child to have fewer than minInstancesPerNode, the split will be discarded as invalid." +
-      " Should be >= 1.",
+        " number of instances each child must have after split.  If a split causes the left or right" +
+        " child to have fewer than minInstancesPerNode, the split will be discarded as invalid." +
+        " Should be >= 1.",
       ParamValidators.gtEq(1))
 
   /**
@@ -114,9 +114,9 @@ private[ml] trait DecisionTreeParams
       this,
       "cacheNodeIds",
       "If false, the" +
-      " algorithm will pass trees to executors to match instances with nodes. If true, the" +
-      " algorithm will cache node IDs for each instance. Caching can speed up training of deeper" +
-      " trees.")
+        " algorithm will pass trees to executors to match instances with nodes. If true, the" +
+        " algorithm will cache node IDs for each instance. Caching can speed up training of deeper" +
+        " trees.")
 
   setDefault(maxDepth -> 5,
              maxBins -> 32,
@@ -215,8 +215,8 @@ private[ml] trait TreeClassifierParams extends Params {
       this,
       "impurity",
       "Criterion used for" +
-      " information gain calculation (case-insensitive). Supported options:" +
-      s" ${TreeClassifierParams.supportedImpurities.mkString(", ")}",
+        " information gain calculation (case-insensitive). Supported options:" +
+        s" ${TreeClassifierParams.supportedImpurities.mkString(", ")}",
       (value: String) =>
         TreeClassifierParams.supportedImpurities.contains(value.toLowerCase))
 
@@ -266,8 +266,8 @@ private[ml] trait TreeRegressorParams extends Params {
       this,
       "impurity",
       "Criterion used for" +
-      " information gain calculation (case-insensitive). Supported options:" +
-      s" ${TreeRegressorParams.supportedImpurities.mkString(", ")}",
+        " information gain calculation (case-insensitive). Supported options:" +
+        s" ${TreeRegressorParams.supportedImpurities.mkString(", ")}",
       (value: String) =>
         TreeRegressorParams.supportedImpurities.contains(value.toLowerCase))
 
@@ -332,8 +332,8 @@ private[ml] trait TreeEnsembleParams extends DecisionTreeParams {
       this,
       "subsamplingRate",
       "Fraction of the training data used for learning each decision tree, in range (0, 1].",
-      ParamValidators.inRange(
-          0, 1, lowerInclusive = false, upperInclusive = true))
+      ParamValidators
+        .inRange(0, 1, lowerInclusive = false, upperInclusive = true))
 
   setDefault(subsamplingRate -> 1.0)
 
@@ -408,8 +408,8 @@ private[ml] trait RandomForestParams extends TreeEnsembleParams {
       this,
       "featureSubsetStrategy",
       "The number of features to consider for splits at each tree node." +
-      s" Supported options: ${RandomForestParams.supportedFeatureSubsetStrategies
-        .mkString(", ")}",
+        s" Supported options: ${RandomForestParams.supportedFeatureSubsetStrategies
+          .mkString(", ")}",
       (value: String) =>
         RandomForestParams.supportedFeatureSubsetStrategies.contains(
             value.toLowerCase))
@@ -472,19 +472,22 @@ private[ml] trait GBTParams
   def setStepSize(value: Double): this.type = set(stepSize, value)
 
   override def validateParams(): Unit = {
-    require(
-        ParamValidators.inRange(
-            0, 1, lowerInclusive = false, upperInclusive = true)(getStepSize),
-        "GBT parameter stepSize should be in interval (0, 1], " +
-        s"but it given invalid value $getStepSize.")
+    require(ParamValidators.inRange(0,
+                                    1,
+                                    lowerInclusive = false,
+                                    upperInclusive = true)(getStepSize),
+            "GBT parameter stepSize should be in interval (0, 1], " +
+              s"but it given invalid value $getStepSize.")
   }
 
   /** (private[ml]) Create a BoostingStrategy instance to use with the old API. */
   private[ml] def getOldBoostingStrategy(
       categoricalFeatures: Map[Int, Int],
       oldAlgo: OldAlgo.Algo): OldBoostingStrategy = {
-    val strategy = super.getOldStrategy(
-        categoricalFeatures, numClasses = 2, oldAlgo, OldVariance)
+    val strategy = super.getOldStrategy(categoricalFeatures,
+                                        numClasses = 2,
+                                        oldAlgo,
+                                        OldVariance)
     // NOTE: The old API does not support "seed" so we ignore it.
     new OldBoostingStrategy(strategy, getOldLossType, getMaxIter, getStepSize)
   }

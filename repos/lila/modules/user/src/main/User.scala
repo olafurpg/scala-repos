@@ -85,8 +85,10 @@ object User {
 
   val anonymous = "Anonymous"
 
-  case class LightPerf(
-      user: LightUser, perfKey: String, rating: Int, progress: Int)
+  case class LightPerf(user: LightUser,
+                       perfKey: String,
+                       rating: Int,
+                       progress: Int)
   case class LightCount(user: LightUser, count: Int)
 
   case class Active(user: User)

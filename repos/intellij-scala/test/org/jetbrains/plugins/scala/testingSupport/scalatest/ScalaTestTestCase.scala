@@ -13,13 +13,16 @@ import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodePro
 abstract class ScalaTestTestCase
     extends ScalaTestingTestCase(new ScalaTestConfigurationProducer()) {
 
-  override protected def runFileStructureViewTest(
-      testClassName: String, status: Int, tests: String*): Unit = {
+  override protected def runFileStructureViewTest(testClassName: String,
+                                                  status: Int,
+                                                  tests: String*): Unit = {
     super.runFileStructureViewTest(
-        testClassName, status, (if (status == ignoredStatusId) {
-                              tests.map(_ + TestNodeProvider.ignoredSuffix)
-                            } else if (status == pendingStatusId) {
-                              tests.map(_ + TestNodeProvider.pendingSuffix)
-                            } else tests): _*)
+        testClassName,
+        status,
+        (if (status == ignoredStatusId) {
+           tests.map(_ + TestNodeProvider.ignoredSuffix)
+         } else if (status == pendingStatusId) {
+           tests.map(_ + TestNodeProvider.pendingSuffix)
+         } else tests): _*)
   }
 }

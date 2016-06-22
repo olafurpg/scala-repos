@@ -102,27 +102,27 @@ private[columnar] class BinaryColumnAccessor(buffer: ByteBuffer)
     extends BasicColumnAccessor[Array[Byte]](buffer, BINARY)
     with NullableColumnAccessor
 
-private[columnar] class CompactDecimalColumnAccessor(
-    buffer: ByteBuffer, dataType: DecimalType)
+private[columnar] class CompactDecimalColumnAccessor(buffer: ByteBuffer,
+                                                     dataType: DecimalType)
     extends NativeColumnAccessor(buffer, COMPACT_DECIMAL(dataType))
 
-private[columnar] class DecimalColumnAccessor(
-    buffer: ByteBuffer, dataType: DecimalType)
+private[columnar] class DecimalColumnAccessor(buffer: ByteBuffer,
+                                              dataType: DecimalType)
     extends BasicColumnAccessor[Decimal](buffer, LARGE_DECIMAL(dataType))
     with NullableColumnAccessor
 
-private[columnar] class StructColumnAccessor(
-    buffer: ByteBuffer, dataType: StructType)
+private[columnar] class StructColumnAccessor(buffer: ByteBuffer,
+                                             dataType: StructType)
     extends BasicColumnAccessor[UnsafeRow](buffer, STRUCT(dataType))
     with NullableColumnAccessor
 
-private[columnar] class ArrayColumnAccessor(
-    buffer: ByteBuffer, dataType: ArrayType)
+private[columnar] class ArrayColumnAccessor(buffer: ByteBuffer,
+                                            dataType: ArrayType)
     extends BasicColumnAccessor[UnsafeArrayData](buffer, ARRAY(dataType))
     with NullableColumnAccessor
 
-private[columnar] class MapColumnAccessor(
-    buffer: ByteBuffer, dataType: MapType)
+private[columnar] class MapColumnAccessor(buffer: ByteBuffer,
+                                          dataType: MapType)
     extends BasicColumnAccessor[UnsafeMapData](buffer, MAP(dataType))
     with NullableColumnAccessor
 

@@ -76,8 +76,9 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
     directory: String,
     filter: Path => Boolean = FileInputDStream.defaultFilter,
     newFilesOnly: Boolean = true,
-    conf: Option[Configuration] = None)(
-    implicit km: ClassTag[K], vm: ClassTag[V], fm: ClassTag[F])
+    conf: Option[Configuration] = None)(implicit km: ClassTag[K],
+                                        vm: ClassTag[V],
+                                        fm: ClassTag[F])
     extends InputDStream[(K, V)](_ssc) {
 
   private val serializableConfOpt = conf.map(new SerializableConfiguration(_))
@@ -112,9 +113,8 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
    * This would allow us to filter away not-too-old files which have already been recently
    * selected and processed.
    */
-  private val numBatchesToRemember =
-    FileInputDStream.calculateNumBatchesToRemember(
-        slideDuration, minRememberDurationS)
+  private val numBatchesToRemember = FileInputDStream
+    .calculateNumBatchesToRemember(slideDuration, minRememberDurationS)
   private val durationToRemember = slideDuration * numBatchesToRemember
   remember(durationToRemember)
 
@@ -174,10 +174,12 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
         batchTimeToSelectedFiles.filter(_._1 < (time - rememberDuration))
       batchTimeToSelectedFiles --= oldFiles.keys
       recentlySelectedFiles --= oldFiles.values.flatten
-      logInfo("Cleared " + oldFiles.size + " old files that were older than " +
-          (time - rememberDuration) + ": " + oldFiles.keys.mkString(", "))
-      logDebug("Cleared files are:\n" +
-          oldFiles.map(p => (p._1, p._2.mkString(", "))).mkString("\n"))
+      logInfo(
+          "Cleared " + oldFiles.size + " old files that were older than " +
+            (time - rememberDuration) + ": " + oldFiles.keys.mkString(", "))
+      logDebug(
+          "Cleared files are:\n" +
+            oldFiles.map(p => (p._1, p._2.mkString(", "))).mkString("\n"))
     }
     // Delete file mod times that weren't accessed in the last round of getting new files
     fileToModTime.clearOldValues(lastNewFileFindingTime - 1)
@@ -198,11 +200,11 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
       val modTimeIgnoreThreshold = math.max(
           initialModTimeIgnoreThreshold, // initial threshold based on newFilesOnly setting
           currentTime -
-          durationToRemember.milliseconds // trailing end of the remember window
+            durationToRemember.milliseconds // trailing end of the remember window
       )
       logDebug(
           s"Getting new files for time $currentTime, " +
-          s"ignoring files older than $modTimeIgnoreThreshold")
+            s"ignoring files older than $modTimeIgnoreThreshold")
       val filter = new PathFilter {
         def accept(path: Path): Boolean =
           isNewFile(path, currentTime, modTimeIgnoreThreshold)
@@ -215,8 +217,8 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
       if (timeTaken > slideDuration.milliseconds) {
         logWarning(
             "Time taken to find new files exceeds the batch size. " +
-            "Consider increasing the batch size or reducing the number of " +
-            "files in the monitored directory."
+              "Consider increasing the batch size or reducing the number of " +
+              "files in the monitored directory."
         )
       }
       newFiles
@@ -246,8 +248,9 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
     *   Hence they can get selected as new files again. To prevent this, files whose mod time is more
     *   than current batch time are not considered.
     */
-  private def isNewFile(
-      path: Path, currentTime: Long, modTimeIgnoreThreshold: Long): Boolean = {
+  private def isNewFile(path: Path,
+                        currentTime: Long,
+                        modTimeIgnoreThreshold: Long): Boolean = {
     val pathStr = path.toString
     // Reject file if it does not satisfy filter
     if (!filter(path)) {
@@ -293,9 +296,9 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
       if (rdd.partitions.isEmpty) {
         logError(
             "File " + file +
-            " has no data in it. Spark Streaming can only ingest " +
-            "files that have been \"moved\" to the directory assigned to the file stream. " +
-            "Refer to the streaming programming guide for more details.")
+              " has no data in it. Spark Streaming can only ingest " +
+              "files that have been \"moved\" to the directory assigned to the file stream. " +
+              "Refer to the streaming programming guide for more details.")
       }
       rdd
     }
@@ -304,8 +307,8 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
 
   /** Get file mod time from cache or fetch it from the file system */
   private def getFileModTime(path: Path) = {
-    fileToModTime.getOrElseUpdate(
-        path.toString, fs.getFileStatus(path).getModificationTime())
+    fileToModTime.getOrElseUpdate(path.toString,
+                                  fs.getFileStatus(path).getModificationTime())
   }
 
   private def directoryPath: Path = {
@@ -356,15 +359,15 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
     override def restore() {
       hadoopFiles.toSeq.sortBy(_._1)(Time.ordering).foreach {
         case (t, f) => {
-            // Restore the metadata in both files and generatedRDDs
-            logInfo("Restoring files for time " + t + " - " +
+          // Restore the metadata in both files and generatedRDDs
+          logInfo("Restoring files for time " + t + " - " +
                 f.mkString("[", ", ", "]"))
-            batchTimeToSelectedFiles.synchronized {
-              batchTimeToSelectedFiles += ((t, f))
-            }
-            recentlySelectedFiles ++= f
-            generatedRDDs += ((t, filesToRDD(f)))
+          batchTimeToSelectedFiles.synchronized {
+            batchTimeToSelectedFiles += ((t, f))
           }
+          recentlySelectedFiles ++= f
+          generatedRDDs += ((t, filesToRDD(f)))
+        }
       }
     }
 

@@ -13,7 +13,9 @@ import akka.event.Logging.Warning
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteDeathWatchSpec
-    extends AkkaSpec(ConfigFactory.parseString("""
+    extends AkkaSpec(
+        ConfigFactory.parseString(
+            """
 akka {
     actor {
         provider = "akka.remote.RemoteActorRefProvider"
@@ -39,7 +41,8 @@ akka {
                             .withFallback(system.settings.config))
 
   override def beforeTermination() {
-    system.eventStream.publish(TestEvent.Mute(EventFilter.warning(
+    system.eventStream.publish(
+        TestEvent.Mute(EventFilter.warning(
                 pattern = "received dead letter.*Disassociate")))
   }
 
@@ -58,8 +61,7 @@ akka {
     // simulate de-serialized ActorRef
     val ref = rarp.resolveActorRef(
         s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
-    system.actorOf(
-        Props(new Actor {
+    system.actorOf(Props(new Actor {
       context.watch(ref)
       def receive = {
         case Terminated(r) ⇒ testActor ! r
@@ -99,7 +101,8 @@ akka {
     // Synthesize an ActorRef to a remote system this one has never talked to before.
     // This forces ReliableDeliverySupervisor to start with unknown remote system UID.
     val extinctPath =
-      RootActorPath(Address(
+      RootActorPath(
+          Address(
               "akka.tcp",
               "extinct-system",
               "localhost",

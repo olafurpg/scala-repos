@@ -162,9 +162,10 @@ trait FileAndResourceDirectives {
 
         if (dirs.isEmpty) reject
         else
-          complete(DirectoryListing(pathPrefix + pathString,
-                                    isRoot = pathString == "/",
-                                    dirs.flatMap(_.listFiles)))
+          complete(
+              DirectoryListing(pathPrefix + pathString,
+                               isRoot = pathString == "/",
+                               dirs.flatMap(_.listFiles)))
       }
     }
 
@@ -183,8 +184,9 @@ trait FileAndResourceDirectives {
   def getFromBrowseableDirectories(directories: String*)(
       implicit renderer: DirectoryRenderer,
       resolver: ContentTypeResolver): Route = {
-    directories.map(getFromDirectory).reduceLeft(_ ~ _) ~ listDirectoryContents(
-        directories: _*)
+    directories
+      .map(getFromDirectory)
+      .reduceLeft(_ ~ _) ~ listDirectoryContents(directories: _*)
   }
 
   /**
@@ -192,8 +194,8 @@ trait FileAndResourceDirectives {
     * "resource directory".
     * If the requested resource is itself a directory or cannot be found or read the Route rejects the request.
     */
-  def getFromResourceDirectory(
-      directoryName: String, classLoader: ClassLoader = defaultClassLoader)(
+  def getFromResourceDirectory(directoryName: String,
+                               classLoader: ClassLoader = defaultClassLoader)(
       implicit resolver: ContentTypeResolver): Route = {
     val base =
       if (directoryName.isEmpty) "" else withTrailingSlash(directoryName)
@@ -233,7 +235,7 @@ object FileAndResourceDirectives extends FileAndResourceDirectives {
           if (head.indexOf('/') >= 0 || head == "..") {
             log.warning(
                 "File-system path for base [{}] and Uri.Path [{}] contains suspicious path segment [{}], " +
-                "GET access was disallowed",
+                  "GET access was disallowed",
                 base,
                 path,
                 head)
@@ -250,8 +252,7 @@ object FileAndResourceDirectives extends FileAndResourceDirectives {
         if (file.isDirectory) None
         else Some(ResourceFile(url, file.length(), file.lastModified()))
       case "jar" ⇒
-        val path =
-          new URI(url.getPath).getPath // remove "file:" prefix and normalize whitespace
+        val path = new URI(url.getPath).getPath // remove "file:" prefix and normalize whitespace
         val bangIndex = path.indexOf('!')
         val filePath = path.substring(0, bangIndex)
         val resourcePath = path.substring(bangIndex + 2)
@@ -315,20 +316,19 @@ object ContentTypeResolver {
     new ContentTypeResolver {
       def apply(fileName: String) = {
         val lastDotIx = fileName.lastIndexOf('.')
-        val mediaType =
-          if (lastDotIx >= 0) {
-            fileName.substring(lastDotIx + 1) match {
-              case "gz" ⇒
-                fileName.lastIndexOf('.', lastDotIx - 1) match {
-                  case -1 ⇒ MediaTypes.`application/octet-stream`
-                  case x ⇒
-                    MediaTypes
-                      .forExtension(fileName.substring(x + 1, lastDotIx))
-                      .withComp(MediaType.Gzipped)
-                }
-              case ext ⇒ MediaTypes.forExtension(ext)
-            }
-          } else MediaTypes.`application/octet-stream`
+        val mediaType = if (lastDotIx >= 0) {
+          fileName.substring(lastDotIx + 1) match {
+            case "gz" ⇒
+              fileName.lastIndexOf('.', lastDotIx - 1) match {
+                case -1 ⇒ MediaTypes.`application/octet-stream`
+                case x ⇒
+                  MediaTypes
+                    .forExtension(fileName.substring(x + 1, lastDotIx))
+                    .withComp(MediaType.Gzipped)
+              }
+            case ext ⇒ MediaTypes.forExtension(ext)
+          }
+        } else MediaTypes.`application/octet-stream`
         ContentType(mediaType, () ⇒ charset)
       }
     }
@@ -385,8 +385,9 @@ object DirectoryListing {
         if (!isRoot) {
           val secondToLastSlash =
             path.lastIndexOf('/', path.lastIndexOf('/', path.length - 1) - 1)
-          sb.append("<a href=\"%s/\">../</a>\n" format path.substring(
-                  0, secondToLastSlash))
+          sb.append(
+              "<a href=\"%s/\">../</a>\n" format path
+                .substring(0, secondToLastSlash))
         }
         def lastModified(file: File) =
           DateTime(file.lastModified).toIsoLikeDateTimeString

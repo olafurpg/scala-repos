@@ -191,8 +191,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
     def phase4_collectRuleTraces(reportedErrorIndex: Int,
                                  principalErrorIndex: Int,
                                  reportQuiet: Boolean)(
-        phase3: CollectingRuleTraces = new CollectingRuleTraces(
-            reportedErrorIndex, reportQuiet),
+        phase3: CollectingRuleTraces =
+          new CollectingRuleTraces(reportedErrorIndex, reportQuiet),
         traces: VectorBuilder[RuleTrace] = new VectorBuilder): ParseError = {
 
       def done = {
@@ -213,10 +213,12 @@ abstract class Parser(initialValueStackSize: Int = 16,
         }
         if (trace eq null) done
         else
-          phase4_collectRuleTraces(
-              reportedErrorIndex, principalErrorIndex, reportQuiet)(
-              new CollectingRuleTraces(
-                  reportedErrorIndex, reportQuiet, phase3.traceNr + 1),
+          phase4_collectRuleTraces(reportedErrorIndex,
+                                   principalErrorIndex,
+                                   reportQuiet)(
+              new CollectingRuleTraces(reportedErrorIndex,
+                                       reportQuiet,
+                                       phase3.traceNr + 1),
               traces += trace)
       } else done
     }
@@ -227,15 +229,18 @@ abstract class Parser(initialValueStackSize: Int = 16,
         val principalErrorIndex = phase1_establishPrincipalErrorIndex()
         val p2 = phase2_establishReportedErrorIndex(principalErrorIndex)
         val reportQuiet = phase3_determineReportQuiet(principalErrorIndex)
-        val parseError = phase4_collectRuleTraces(
-            p2.reportedErrorIndex, principalErrorIndex, reportQuiet)()
+        val parseError = phase4_collectRuleTraces(p2.reportedErrorIndex,
+                                                  principalErrorIndex,
+                                                  reportQuiet)()
         scheme.parseError(parseError)
       }
     } catch {
       case e: Parser.Fail ⇒
         val pos = Position(cursor, input)
-        scheme.parseError(ParseError(
-                pos, pos, RuleTrace(Nil, RuleTrace.Fail(e.expected)) :: Nil))
+        scheme.parseError(
+            ParseError(pos,
+                       pos,
+                       RuleTrace(Nil, RuleTrace.Fail(e.expected)) :: Nil))
       case NonFatal(e) ⇒
         scheme.failure(e)
     } finally {
@@ -338,8 +343,7 @@ abstract class Parser(initialValueStackSize: Int = 16,
         }
       case x: CollectingRuleTraces if !x.reportQuiet ⇒
         val saved = x.minErrorIndex
-        x.minErrorIndex =
-          Int.MaxValue // disables triggering of StartTracingException in __registerMismatch
+        x.minErrorIndex = Int.MaxValue // disables triggering of StartTracingException in __registerMismatch
         saved
       case _ ⇒ -1
     }
@@ -417,8 +421,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  @tailrec final def __matchStringWrapped(
-      string: String, ix: Int = 0): Boolean =
+  @tailrec final def __matchStringWrapped(string: String,
+                                          ix: Int = 0): Boolean =
     if (ix < string.length)
       if (_cursorChar == string.charAt(ix)) {
         __advance()
@@ -436,8 +440,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  @tailrec final def __matchIgnoreCaseString(
-      string: String, ix: Int = 0): Boolean =
+  @tailrec final def __matchIgnoreCaseString(string: String,
+                                             ix: Int = 0): Boolean =
     if (ix < string.length)
       if (Character.toLowerCase(_cursorChar) == string.charAt(ix)) {
         __advance()
@@ -448,8 +452,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  @tailrec final def __matchIgnoreCaseStringWrapped(
-      string: String, ix: Int = 0): Boolean =
+  @tailrec final def __matchIgnoreCaseStringWrapped(string: String,
+                                                    ix: Int = 0): Boolean =
     if (ix < string.length)
       if (Character.toLowerCase(_cursorChar) == string.charAt(ix)) {
         __advance()
@@ -545,8 +549,7 @@ abstract class Parser(initialValueStackSize: Int = 16,
   }
 
   protected class __SubParserInput extends ParserInput {
-    val offset =
-      _cursor // the number of chars the input the sub-parser sees is offset from the outer input start
+    val offset = _cursor // the number of chars the input the sub-parser sees is offset from the outer input start
     def getLine(line: Int): String = ??? // TODO
     def sliceCharArray(start: Int, end: Int): Array[Char] =
       input.sliceCharArray(start + offset, end + offset)
@@ -595,7 +598,7 @@ object Parser {
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  class Mark private[Parser](val value: Long) extends AnyVal
+  class Mark private[Parser] (val value: Long) extends AnyVal
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -655,8 +658,7 @@ object Parser {
   private class DetermineReportQuiet(
       private var _minErrorIndex: Int, // the smallest index at which a mismatch triggers a StartTracingException
       var inQuiet: Boolean = false // are we currently in a quiet rule?
-  )
-      extends ErrorAnalysisPhase {
+  ) extends ErrorAnalysisPhase {
     def minErrorIndex = _minErrorIndex
     def applyOffset(offset: Int) = _minErrorIndex -= offset
   }
@@ -666,12 +668,9 @@ object Parser {
   private class CollectingRuleTraces(
       var minErrorIndex: Int, // the smallest index at which a mismatch triggers a StartTracingException
       val reportQuiet: Boolean, // do we need to trace mismatches from quiet rules?
-      val traceNr: Int =
-        0, // the zero-based index number of the RuleTrace we are currently building
-      var errorMismatches: Int =
-        0 // the number of times we have already seen a mismatch at >= minErrorIndex
-  )
-      extends ErrorAnalysisPhase {
+      val traceNr: Int = 0, // the zero-based index number of the RuleTrace we are currently building
+      var errorMismatches: Int = 0 // the number of times we have already seen a mismatch at >= minErrorIndex
+  ) extends ErrorAnalysisPhase {
     def applyOffset(offset: Int) = minErrorIndex -= offset
   }
 }

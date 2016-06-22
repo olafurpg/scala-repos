@@ -42,8 +42,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
       if (testDataProjectPath.exists()) FileUtil.delete(testDataProjectPath)
     }
 
-    UsefulTestCase.edt(
-        new Runnable {
+    UsefulTestCase.edt(new Runnable {
 
       def run() {
         ScalaDebuggerTestBase. super.setUp()
@@ -59,8 +58,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     */
   protected def addOtherLibraries()
 
-  protected def addIvyCacheLibrary(
-      libraryName: String, libraryPath: String, jarNames: String*) {
+  protected def addIvyCacheLibrary(libraryName: String,
+                                   libraryPath: String,
+                                   jarNames: String*) {
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -98,7 +98,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
 
   protected def getRunProfile(module: Module, className: String) = {
     val configuration: ApplicationConfiguration = new ApplicationConfiguration(
-        "app", module.getProject, ApplicationConfigurationType.getInstance)
+        "app",
+        module.getProject,
+        ApplicationConfigurationType.getInstance)
     configuration.setModule(module)
     configuration.setMainClassName(className)
     configuration
@@ -186,7 +188,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
           if (f.isDirectory) computeForDir(f)
           else {
             result +=
-              (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
+            (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
           }
         }
     }

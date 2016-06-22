@@ -49,13 +49,15 @@ private[nio] final class HeapByteBufferDoubleView private (
     GenBuffer(this).generic_put(index, c)
 
   @noinline
-  override def get(
-      dst: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def get(dst: Array[Double],
+                   offset: Int,
+                   length: Int): DoubleBuffer =
     GenBuffer(this).generic_get(dst, offset, length)
 
   @noinline
-  override def put(
-      src: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def put(src: Array[Double],
+                   offset: Int,
+                   length: Int): DoubleBuffer =
     GenBuffer(this).generic_put(src, offset, length)
 
   @noinline

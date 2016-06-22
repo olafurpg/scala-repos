@@ -24,8 +24,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateBodyStub
   * Date: 22.02.2008
   * Time: 9:38:04
   */
-class ScTemplateBodyImpl private (
-    stub: StubElement[ScTemplateBody], nodeType: IElementType, node: ASTNode)
+class ScTemplateBodyImpl private (stub: StubElement[ScTemplateBody],
+                                  nodeType: IElementType,
+                                  node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTemplateBody
     with ScImportsHolder {
@@ -39,15 +40,15 @@ class ScTemplateBodyImpl private (
   def aliases: Array[ScTypeAlias] = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(
-          TokenSets.ALIASES_SET, JavaArrayFactoryUtil.ScTypeAliasFactory)
+      stub.getChildrenByType(TokenSets.ALIASES_SET,
+                             JavaArrayFactoryUtil.ScTypeAliasFactory)
     } else findChildrenByClass(classOf[ScTypeAlias])
   }
 
   def functions: Array[ScFunction] =
     getStubOrPsiChildren(
-        TokenSets.FUNCTIONS, JavaArrayFactoryUtil.ScFunctionFactory)
-      .filterNot(_.isLocal)
+        TokenSets.FUNCTIONS,
+        JavaArrayFactoryUtil.ScFunctionFactory).filterNot(_.isLocal)
 
   def typeDefinitions: Seq[ScTypeDefinition] =
     getStubOrPsiChildren(
@@ -56,8 +57,8 @@ class ScTemplateBodyImpl private (
 
   def members: Array[ScMember] =
     getStubOrPsiChildren(
-        TokenSets.MEMBERS, JavaArrayFactoryUtil.ScMemberFactory)
-      .filterNot(_.isLocal)
+        TokenSets.MEMBERS,
+        JavaArrayFactoryUtil.ScMemberFactory).filterNot(_.isLocal)
 
   def holders: Array[ScDeclaredElementsHolder] =
     getStubOrPsiChildren(
@@ -91,8 +92,10 @@ class ScTemplateBodyImpl private (
                                    place: PsiElement): Boolean = {
     val td = PsiTreeUtil.getContextOfType(this, classOf[ScTemplateDefinition])
     if (td != null) {
-      if (!td.processDeclarationsForTemplateBody(
-              processor, state, td.extendsBlock, place)) return false
+      if (!td.processDeclarationsForTemplateBody(processor,
+                                                 state,
+                                                 td.extendsBlock,
+                                                 place)) return false
     }
     super.processDeclarations(processor, state, lastParent, place)
   }

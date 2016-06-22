@@ -62,7 +62,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   "Diff identity" in {
     val identityProp = (json: JValue) =>
       (json diff JNothing) == Diff(JNothing, JNothing, json) &&
-      (JNothing diff json) == Diff(JNothing, json, JNothing)
+        (JNothing diff json) == Diff(JNothing, json, JNothing)
 
     forAll(identityProp)
   }
@@ -205,7 +205,8 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
             "beta",
             JObject(
                 JField("alpha", JString("bacon")) :: JField(
-                    "charlie", JString("i'm a masseuse")) :: Nil
+                    "charlie",
+                    JString("i'm a masseuse")) :: Nil
             )) :: Nil
     )
 
@@ -213,7 +214,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
         JField("alpha", JString("apple")) :: JField("alpha", JString("bacon")) :: Nil
     )
     subject \\ "charlie" must_==
-      JObject(List(JField("charlie", JString("i'm a masseuse"))))
+    JObject(List(JField("charlie", JString("i'm a masseuse"))))
   }
 
   private def reorderFields(json: JValue) = json map {

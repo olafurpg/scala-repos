@@ -342,8 +342,9 @@ private object UpdatableVar {
     @volatile var active = true
   }
 
-  case class State[T](
-      value: T, version: Long, parties: immutable.SortedSet[Party[T]]) {
+  case class State[T](value: T,
+                      version: Long,
+                      parties: immutable.SortedSet[Party[T]]) {
     def -(p: Party[T]) = copy(parties = parties - p)
     def +(p: Party[T]) = copy(parties = parties + p)
     def :=(newv: T) = copy(value = newv, version = version + 1)

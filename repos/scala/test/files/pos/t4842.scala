@@ -6,8 +6,7 @@ class Foo(x: AnyRef) {
 
 class Blerg(x: AnyRef) {
   def this() = {
-    this(
-        new {
+    this(new {
       class Bar { println(Bar.this); new { println(Bar.this) } }; new Bar
     }) // okay
   }
@@ -16,8 +15,7 @@ class Blerg(x: AnyRef) {
 class Outer {
   class Inner(x: AnyRef) {
     def this() = {
-      this(
-          new {
+      this(new {
         class Bar { println(Bar.this); new { println(Bar.this) } }; new Bar
       }) // okay
     }

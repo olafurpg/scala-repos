@@ -34,8 +34,9 @@ trait SortedMap[A, B]
   override def +[B1 >: B](kv: (A, B1)): SortedMap[A, B1] =
     clone().asInstanceOf[SortedMap[A, B1]] += kv
 
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): SortedMap[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): SortedMap[A, B1] =
     clone().asInstanceOf[SortedMap[A, B1]] += elem1 += elem2 ++= elems
 
   override def ++[B1 >: B](xs: GenTraversableOnce[(A, B1)]): SortedMap[A, B1] =

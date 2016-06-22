@@ -28,12 +28,12 @@ class TestAuthFixture extends Mockito {
     override def authenticate(request: HttpRequest): Future[Option[Identity]] = {
       Future.successful(if (authenticated) Some(identity) else None)
     }
-    override def handleNotAuthenticated(
-        request: HttpRequest, response: HttpResponse): Unit = {
+    override def handleNotAuthenticated(request: HttpRequest,
+                                        response: HttpResponse): Unit = {
       response.status(NotAuthenticatedStatus)
     }
-    override def handleNotAuthorized(
-        principal: Identity, response: HttpResponse): Unit = {
+    override def handleNotAuthorized(principal: Identity,
+                                     response: HttpResponse): Unit = {
       response.status(UnauthorizedStatus)
     }
     override def isAuthorized[Resource](principal: Identity,

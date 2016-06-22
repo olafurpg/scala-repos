@@ -58,18 +58,22 @@ class ActorScheduler(scheduler: ActorRef, timeout: Timeout)
   implicit val requestTimeout = timeout
   val enabled = true
 
-  def addTask(
-      repeat: Option[CronExpression],
-      apiKey: APIKey,
-      authorities: Authorities,
-      context: EvaluationContext,
-      source: Path,
-      sink: Path,
-      timeoutMillis: Option[Long]): EitherT[Future, String, UUID] = EitherT {
-    (scheduler ? AddTask(
-            repeat, apiKey, authorities, context, source, sink, timeoutMillis))
-      .mapTo[String \/ UUID]
-  }
+  def addTask(repeat: Option[CronExpression],
+              apiKey: APIKey,
+              authorities: Authorities,
+              context: EvaluationContext,
+              source: Path,
+              sink: Path,
+              timeoutMillis: Option[Long]): EitherT[Future, String, UUID] =
+    EitherT {
+      (scheduler ? AddTask(repeat,
+                           apiKey,
+                           authorities,
+                           context,
+                           source,
+                           sink,
+                           timeoutMillis)).mapTo[String \/ UUID]
+    }
 
   def deleteTask(id: UUID) = EitherT {
     (scheduler ? DeleteTask(id)).mapTo[String \/ PrecogUnit]

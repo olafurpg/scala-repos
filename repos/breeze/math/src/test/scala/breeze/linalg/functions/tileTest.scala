@@ -10,20 +10,28 @@ import org.scalatest.FunSuite
 class tileTest extends FunSuite {
   test("tile ( DenseMatrix , Int)") {
     val m = new DenseMatrix(2, 2, Array.range(0, 4))
-    assert(tile(m, 2) == new DenseMatrix[Int](
-            4, 2, Array(0, 1, 0, 1, 2, 3, 2, 3)))
+    assert(
+        tile(m, 2) == new DenseMatrix[Int](4,
+                                           2,
+                                           Array(0, 1, 0, 1, 2, 3, 2, 3)))
   }
 
   test("tile ( DenseMatrix , Int, Int)") {
     val m = new DenseMatrix(2, 2, Array.range(0, 4))
-    assert(tile(m, 2, 2) == new DenseMatrix[Int](
-            4, 4, Array(0, 1, 0, 1, 2, 3, 2, 3, 0, 1, 0, 1, 2, 3, 2, 3)))
+    assert(
+        tile(m, 2, 2) == new DenseMatrix[Int](
+            4,
+            4,
+            Array(0, 1, 0, 1, 2, 3, 2, 3, 0, 1, 0, 1, 2, 3, 2, 3)))
   }
 
   test("tile ( DenseMatrix , Int, Int) non-square matrix.") {
     val m = new DenseMatrix(1, 2, Array.range(0, 2))
-    assert(tile(m, 2, 3) == new DenseMatrix[Int](
-            2, 6, Array(0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1)))
+    assert(
+        tile(m, 2, 3) == new DenseMatrix[Int](
+            2,
+            6,
+            Array(0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1)))
   }
 
   test("tile (DenseVector, Int) ") {

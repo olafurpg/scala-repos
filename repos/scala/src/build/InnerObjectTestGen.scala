@@ -130,7 +130,7 @@ object Test {
 
     def shouldBeTopLevel =
       ((depth == 1) || (nested.headOption == Some(PrivateMethod)) ||
-          (nested.isEmpty && privateObj))
+            (nested.isEmpty && privateObj))
 
     val enums =
       if (shouldBeTopLevel) Contexts.topLevel else Contexts.values.toList

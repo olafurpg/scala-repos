@@ -39,7 +39,8 @@ case class Crosstable(user1: Crosstable.User,
                  case Some(u) if user1.id == u => wins * 10
                  case _ => 0
                })),
-         user2 = user2.copy(score =
+         user2 = user2.copy(
+             score =
                user2.score + (userId match {
                  case None => wins * 5
                  case Some(u) if user2.id == u => wins * 10
@@ -82,16 +83,14 @@ object Crosstable {
       case Array(u1Id, u2Id) =>
         Crosstable(user1 = User(u1Id, r intD "s1"),
                    user2 = User(u2Id, r intD "s2"),
-                   results = r
-                     .get[List[String]](results)
-                     .map { r =>
-                       r drop 8 match {
-                         case "" => Result(r take 8, none)
-                         case "+" => Result(r take 8, Some(u1Id))
-                         case "-" => Result(r take 8, Some(u2Id))
-                         case _ => sys error s"Invalid result string $r"
-                       }
-                     },
+                   results = r.get[List[String]](results).map { r =>
+                     r drop 8 match {
+                       case "" => Result(r take 8, none)
+                       case "+" => Result(r take 8, Some(u1Id))
+                       case "-" => Result(r take 8, Some(u2Id))
+                       case _ => sys error s"Invalid result string $r"
+                     }
+                   },
                    nbGames = r int nbGames)
       case x => sys error s"Invalid crosstable id $x"
     }

@@ -92,10 +92,11 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     val sec = items.tail.head
     read = messageSet.read(position = MessageSet.entrySize(sec.message),
                            size = messageSet.sizeInBytes)
-    assertEquals(
-        "Try a read starting from the second message", items.tail, read.toList)
-    read = messageSet.read(
-        MessageSet.entrySize(sec.message), MessageSet.entrySize(sec.message))
+    assertEquals("Try a read starting from the second message",
+                 items.tail,
+                 read.toList)
+    read = messageSet.read(MessageSet.entrySize(sec.message),
+                           MessageSet.entrySize(sec.message))
     assertEquals(
         "Try a read of a single message starting from the second message",
         List(items.tail.head),
@@ -109,8 +110,10 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
   def testSearch() {
     // append a new message with a high offset
     val lastMessage = new Message("test".getBytes)
-    messageSet.append(new ByteBufferMessageSet(
-            NoCompressionCodec, new LongRef(50), lastMessage))
+    messageSet.append(
+        new ByteBufferMessageSet(NoCompressionCodec,
+                                 new LongRef(50),
+                                 lastMessage))
     var position = 0
     assertEquals("Should be able to find the first message by its offset",
                  OffsetPosition(0L, position),
@@ -201,8 +204,8 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     set.close()
 
     val tempReopen = new File(temp.getAbsolutePath())
-    val setReopen = new FileMessageSet(
-        tempReopen, true, 512 * 1024 * 1024, true)
+    val setReopen =
+      new FileMessageSet(tempReopen, true, 512 * 1024 * 1024, true)
     val position = setReopen.channel.position
     val size = setReopen.sizeInBytes()
 
@@ -224,24 +227,27 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
                                      "k2".getBytes,
                                      Message.NoTimestamp,
                                      Message.MagicValue_V0))
-    val messageSetV0 = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec,
-        offsetSeq = offsets,
-        messages = messagesV0: _*)
+    val messageSetV0 = new ByteBufferMessageSet(compressionCodec =
+                                                  NoCompressionCodec,
+                                                offsetSeq = offsets,
+                                                messages = messagesV0: _*)
     val compressedMessageSetV0 = new ByteBufferMessageSet(
         compressionCodec = DefaultCompressionCodec,
         offsetSeq = offsets,
         messages = messagesV0: _*)
 
-    val messagesV1 = Seq(
-        new Message(
-            "hello".getBytes, "k1".getBytes, 1L, Message.MagicValue_V1),
-        new Message(
-            "goodbye".getBytes, "k2".getBytes, 2L, Message.MagicValue_V1))
-    val messageSetV1 = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec,
-        offsetSeq = offsets,
-        messages = messagesV1: _*)
+    val messagesV1 = Seq(new Message("hello".getBytes,
+                                     "k1".getBytes,
+                                     1L,
+                                     Message.MagicValue_V1),
+                         new Message("goodbye".getBytes,
+                                     "k2".getBytes,
+                                     2L,
+                                     Message.MagicValue_V1))
+    val messageSetV1 = new ByteBufferMessageSet(compressionCodec =
+                                                  NoCompressionCodec,
+                                                offsetSeq = offsets,
+                                                messages = messagesV1: _*)
     val compressedMessageSetV1 = new ByteBufferMessageSet(
         compressionCodec = DefaultCompressionCodec,
         offsetSeq = offsets,
@@ -278,15 +284,16 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     convertedMessageSet = fileMessageSet.toMessageFormat(Message.MagicValue_V1)
     verifyConvertedMessageSet(convertedMessageSet, Message.MagicValue_V1)
 
-    def verifyConvertedMessageSet(
-        convertedMessageSet: MessageSet, magicByte: Byte) {
+    def verifyConvertedMessageSet(convertedMessageSet: MessageSet,
+                                  magicByte: Byte) {
       var i = 0
       for (messageAndOffset <- convertedMessageSet) {
         assertEquals("magic byte should be 1",
                      magicByte,
                      messageAndOffset.message.magic)
-        assertEquals(
-            "offset should not change", offsets(i), messageAndOffset.offset)
+        assertEquals("offset should not change",
+                     offsets(i),
+                     messageAndOffset.offset)
         assertEquals("key should not change",
                      messagesV0(i).key,
                      messageAndOffset.message.key)

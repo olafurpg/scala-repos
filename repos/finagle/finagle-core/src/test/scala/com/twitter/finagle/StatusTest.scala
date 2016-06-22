@@ -91,7 +91,7 @@ class StatusTest
     forAll(idx2) {
       case (left, right) =>
         Ordering[Status].compare(ord(left), ord(right)).signum ==
-        (left - right).signum
+          (left - right).signum
     }
   }
 }

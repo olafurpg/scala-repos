@@ -96,8 +96,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   }
 
   test("SPARK-11694 Parquet logical types are not being tested properly") {
-    val parquetSchema =
-      MessageTypeParser.parseMessageType("""message root {
+    val parquetSchema = MessageTypeParser.parseMessageType(
+        """message root {
         |  required int32 a(INT_8);
         |  required int32 b(INT_16);
         |  required int32 c(DATE);
@@ -299,8 +299,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   test("compression codec") {
     def compressionCodecFor(path: String, codecName: String): String = {
       val codecs = for {
-        footer <- readAllFootersWithoutSummaryFiles(
-                     new Path(path), hadoopConfiguration)
+        footer <- readAllFootersWithoutSummaryFiles(new Path(path),
+                                                    hadoopConfiguration)
         block <- footer.getParquetMetadata.getBlocks.asScala
         column <- block.getColumns.asScala
       } yield column.getCodec.name()
@@ -377,7 +377,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         StructType.fromAttributes(ScalaReflection.attributesFor[(Int, String)])
       writeMetadata(schema, path, hadoopConfiguration)
 
-      assert(fs.exists(
+      assert(
+          fs.exists(
               new Path(path, ParquetFileWriter.PARQUET_COMMON_METADATA_FILE)))
       assert(
           fs.exists(new Path(path, ParquetFileWriter.PARQUET_METADATA_FILE)))
@@ -472,7 +473,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         assertResult(df.schema) {
           StructType(
               StructField("a", BooleanType, nullable = true) :: StructField(
-                  "b", IntegerType, nullable = true) :: Nil)
+                  "b",
+                  IntegerType,
+                  nullable = true) :: Nil)
         }
       }
     }
@@ -814,8 +817,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   }
 }
 
-class JobCommitFailureParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+class JobCommitFailureParquetOutputCommitter(outputPath: Path,
+                                             context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
 
   override def commitJob(jobContext: JobContext): Unit = {
@@ -823,8 +826,8 @@ class JobCommitFailureParquetOutputCommitter(
   }
 }
 
-class TaskCommitFailureParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+class TaskCommitFailureParquetOutputCommitter(outputPath: Path,
+                                              context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
 
   override def commitTask(context: TaskAttemptContext): Unit = {

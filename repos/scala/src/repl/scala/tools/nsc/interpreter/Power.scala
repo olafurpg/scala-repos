@@ -41,7 +41,8 @@ Lost after 18/flatten {
 /** A class for methods to be injected into the intp in power mode.
   */
 class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
-    val intp: IMain, replVals: ReplValsImpl) {
+    val intp: IMain,
+    replVals: ReplValsImpl) {
   import intp.{beQuietDuring, parse}
   import intp.global._
   import definitions.{compilerTypeFromTag, compilerSymbolFromTag}
@@ -188,7 +189,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     /** Standard noise reduction filter. */
     def excludeMember(s: Symbol) =
       (isSpecialized(s) || isImplClass(s) || s.isAnonOrRefinementClass ||
-          s.isAnonymousFunction)
+            s.isAnonymousFunction)
     def symbol = compilerSymbolFromTag(tag)
     def tpe = compilerTypeFromTag(tag)
     def members = membersUnabridged filterNot excludeMember
@@ -247,7 +248,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
 
     def freq[U](p: T => U) =
       (value.toSeq groupBy p mapValues (_.size)).toList sortBy (-_._2) map
-      (_.swap)
+        (_.swap)
 
     def >>(implicit ord: Ordering[T]): Unit = pp(_.sorted)
     def >!(): Unit = pp(_.distinct)
@@ -279,8 +280,8 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
 
   trait Implicits1 {
     // fallback
-    implicit def replPrinting[T](x: T)(
-        implicit pretty: Prettifier[T] = Prettifier.default[T]) =
+    implicit def replPrinting[T](x: T)(implicit pretty: Prettifier[T] =
+                                         Prettifier.default[T]) =
       new SinglePrettifierClass[T](x)
   }
   trait Implicits2 extends Implicits1 {

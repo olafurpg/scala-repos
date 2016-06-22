@@ -42,12 +42,13 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
     extends Serializable {
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
-    this(TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.output.BYTES_WRITTEN),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.output.RECORDS_WRITTEN),
-         TaskMetrics.getAccum[String](
-             accumMap, InternalAccumulator.output.WRITE_METHOD))
+    this(
+        TaskMetrics
+          .getAccum[Long](accumMap, InternalAccumulator.output.BYTES_WRITTEN),
+        TaskMetrics.getAccum[Long](accumMap,
+                                   InternalAccumulator.output.RECORDS_WRITTEN),
+        TaskMetrics
+          .getAccum[String](accumMap, InternalAccumulator.output.WRITE_METHOD))
   }
 
   /**
@@ -95,16 +96,16 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
   */
 object OutputMetrics {
 
-  @deprecated(
-      "matching on OutputMetrics will not be supported in the future", "2.0.0")
+  @deprecated("matching on OutputMetrics will not be supported in the future",
+              "2.0.0")
   def apply(writeMethod: DataWriteMethod.Value): OutputMetrics = {
     val om = new OutputMetrics
     om.setWriteMethod(writeMethod)
     om
   }
 
-  @deprecated(
-      "matching on OutputMetrics will not be supported in the future", "2.0.0")
+  @deprecated("matching on OutputMetrics will not be supported in the future",
+              "2.0.0")
   def unapply(output: OutputMetrics): Option[DataWriteMethod.Value] = {
     Some(output.writeMethod)
   }

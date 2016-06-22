@@ -187,8 +187,9 @@ abstract class PredictionModel[
     if ($(predictionCol).nonEmpty) {
       transformImpl(dataset)
     } else {
-      this.logWarning(s"$uid: Predictor.transform() was called as NOOP" +
-          " since no output columns were set.")
+      this.logWarning(
+          s"$uid: Predictor.transform() was called as NOOP" +
+            " since no output columns were set.")
       dataset
     }
   }

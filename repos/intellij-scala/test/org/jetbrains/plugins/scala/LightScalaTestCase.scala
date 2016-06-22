@@ -45,8 +45,8 @@ object LightScalaTestCase {
         JarFileSystem.getInstance.refreshAndFindFileByPath(scalaLib)
       modifiableModel.addRoot(scalaJar, OrderRootType.CLASSES)
       val srcRoot = new File(TestUtils.getScalaLibrarySrc)
-      modifiableModel.addRoot(
-          VfsUtil.getUrlForLibraryRoot(srcRoot), OrderRootType.SOURCES)
+      modifiableModel
+        .addRoot(VfsUtil.getUrlForLibraryRoot(srcRoot), OrderRootType.SOURCES)
       // do not forget to commit a model!
       modifiableModel.commit()
     }

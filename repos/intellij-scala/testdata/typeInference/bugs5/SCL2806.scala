@@ -5,7 +5,8 @@ object SCL2806 {
   var z: A = null
   new C match {
     case x: B =>
-      /*start*/ x /*end*/
+      /*start*/
+      x /*end*/
   }
 }
 //SCL2806.C

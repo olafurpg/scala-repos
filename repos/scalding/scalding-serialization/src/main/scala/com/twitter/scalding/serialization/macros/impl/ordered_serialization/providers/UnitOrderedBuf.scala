@@ -36,8 +36,8 @@ object UnitOrderedBuf {
       override val ctx: c.type = c
       override val tpe = outerType
 
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) =
         q"0"
 
       override def hash(element: ctx.TermName): ctx.Tree =

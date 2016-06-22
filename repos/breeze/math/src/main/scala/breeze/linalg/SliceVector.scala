@@ -23,7 +23,8 @@ import scala.{specialized => spec}
   * @author dlwh
   */
 class SliceVector[@spec(Int) K, @spec(Double, Int, Float, Long) V: ClassTag](
-    val tensor: Tensor[K, V], val slices: IndexedSeq[K])
+    val tensor: Tensor[K, V],
+    val slices: IndexedSeq[K])
     extends Vector[V] {
   def apply(i: Int): V = tensor(slices(i))
 
@@ -50,13 +51,13 @@ object SliceVector {
   implicit def canMapKeyValuePairs[K, V, V2: ClassTag]
     : CanMapKeyValuePairs[SliceVector[K, V], Int, V, V2, DenseVector[V2]] = {
     new CanMapKeyValuePairs[SliceVector[K, V], Int, V, V2, DenseVector[V2]] {
-      override def map(
-          from: SliceVector[K, V], fn: (Int, V) => V2): DenseVector[V2] = {
+      override def map(from: SliceVector[K, V],
+                       fn: (Int, V) => V2): DenseVector[V2] = {
         DenseVector.tabulate(from.length)(i => fn(i, from(i)))
       }
 
-      override def mapActive(
-          from: SliceVector[K, V], fn: (Int, V) => V2): DenseVector[V2] = {
+      override def mapActive(from: SliceVector[K, V],
+                             fn: (Int, V) => V2): DenseVector[V2] = {
         map(from, fn)
       }
     }
@@ -65,8 +66,8 @@ object SliceVector {
   implicit def canMapValues[K, V, V2: ClassTag]
     : CanMapValues[SliceVector[K, V], V, V2, DenseVector[V2]] = {
     new CanMapValues[SliceVector[K, V], V, V2, DenseVector[V2]] {
-      override def apply(
-          from: SliceVector[K, V], fn: (V) => V2): DenseVector[V2] = {
+      override def apply(from: SliceVector[K, V],
+                         fn: (V) => V2): DenseVector[V2] = {
         DenseVector.tabulate(from.length)(i => fn(from(i)))
       }
     }
@@ -100,8 +101,8 @@ object SliceVector {
     new CanTraverseKeyValuePairs[SliceVector[K, V], Int, V] {
 
       /** Traverses all values from the given collection. */
-      override def traverse(
-          from: SliceVector[K, V], fn: KeyValuePairsVisitor[Int, V]): Unit = {
+      override def traverse(from: SliceVector[K, V],
+                            fn: KeyValuePairsVisitor[Int, V]): Unit = {
         from.iterator foreach {
           case (k, v) => fn.visit(k, v)
         }

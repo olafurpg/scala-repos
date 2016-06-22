@@ -42,12 +42,12 @@ object PartitionDirectory {
   */
 private[sql] case class PartitionDirectory(values: InternalRow, path: Path)
 
-private[sql] case class PartitionSpec(
-    partitionColumns: StructType, partitions: Seq[PartitionDirectory])
+private[sql] case class PartitionSpec(partitionColumns: StructType,
+                                      partitions: Seq[PartitionDirectory])
 
 private[sql] object PartitionSpec {
-  val emptySpec = PartitionSpec(
-      StructType(Seq.empty[StructField]), Seq.empty[PartitionDirectory])
+  val emptySpec = PartitionSpec(StructType(Seq.empty[StructField]),
+                                Seq.empty[PartitionDirectory])
 }
 
 private[sql] object PartitioningUtils {
@@ -55,8 +55,8 @@ private[sql] object PartitioningUtils {
   // depend on Hive.
   private[sql] val DEFAULT_PARTITION_NAME = "__HIVE_DEFAULT_PARTITION__"
 
-  private[sql] case class PartitionValues(
-      columnNames: Seq[String], literals: Seq[Literal]) {
+  private[sql] case class PartitionValues(columnNames: Seq[String],
+                                          literals: Seq[Literal]) {
     require(columnNames.size == literals.size)
   }
 
@@ -119,11 +119,11 @@ private[sql] object PartitioningUtils {
       assert(
           discoveredBasePaths.distinct.size == 1,
           "Conflicting directory structures detected. Suspicious paths:\b" +
-          discoveredBasePaths.distinct.mkString("\n\t", "\n\t", "\n\n") +
-          "If provided paths are partition directories, please set " +
-          "\"basePath\" in the options of the data source to specify the " +
-          "root directory of the table. If there are multiple root directories, " +
-          "please load them separately and then union them.")
+            discoveredBasePaths.distinct.mkString("\n\t", "\n\t", "\n\n") +
+            "If provided paths are partition directories, please set " +
+            "\"basePath\" in the options of the data source to specify the " +
+            "root directory of the table. If there are multiple root directories, " +
+            "please load them separately and then union them.")
 
       val resolvedPartitionValues = resolvePartitions(pathsWithPartitionValues)
 
@@ -143,8 +143,8 @@ private[sql] object PartitioningUtils {
       val partitions =
         resolvedPartitionValues.zip(pathsWithPartitionValues).map {
           case (PartitionValues(_, literals), (path, _)) =>
-            PartitionDirectory(
-                InternalRow.fromSeq(literals.map(_.value)), path)
+            PartitionDirectory(InternalRow.fromSeq(literals.map(_.value)),
+                               path)
         }
 
       PartitionSpec(StructType(fields), partitions)
@@ -195,8 +195,9 @@ private[sql] object PartitioningUtils {
       } else {
         // Let's say currentPath is a path of "/table/a=1/", currentPath.getName will give us a=1.
         // Once we get the string, we try to parse it and find the partition column and value.
-        val maybeColumn = parsePartitionColumn(
-            currentPath.getName, defaultPartitionName, typeInference)
+        val maybeColumn = parsePartitionColumn(currentPath.getName,
+                                               defaultPartitionName,
+                                               typeInference)
         maybeColumn.foreach(columns += _)
 
         // Now, we determine if we should stop.
@@ -210,7 +211,7 @@ private[sql] object PartitioningUtils {
         //    the top level dir is "/table".
         finished =
           (maybeColumn.isEmpty && !columns.isEmpty) ||
-          currentPath.getParent == null
+            currentPath.getParent == null
 
         if (!finished) {
           // For the above example, currentPath will be "/table/".
@@ -236,15 +237,16 @@ private[sql] object PartitioningUtils {
       None
     } else {
       val columnName = columnSpec.take(equalSignIndex)
-      assert(
-          columnName.nonEmpty, s"Empty partition column name in '$columnSpec'")
+      assert(columnName.nonEmpty,
+             s"Empty partition column name in '$columnSpec'")
 
       val rawColumnValue = columnSpec.drop(equalSignIndex + 1)
       assert(rawColumnValue.nonEmpty,
              s"Empty partition column value in '$columnSpec'")
 
-      val literal = inferPartitionColumnValue(
-          rawColumnValue, defaultPartitionName, typeInference)
+      val literal = inferPartitionColumnValue(rawColumnValue,
+                                              defaultPartitionName,
+                                              typeInference)
       Some(columnName -> literal)
     }
   }
@@ -292,11 +294,11 @@ private[sql] object PartitioningUtils {
       pathWithPartitionValues.map(_._2.columnNames).distinct
 
     def groupByKey[K, V](seq: Seq[(K, V)]): Map[K, Iterable[V]] =
-      seq.groupBy { case (key, _) => key }
-        .mapValues(_.map { case (_, value) => value })
+      seq.groupBy { case (key, _) => key }.mapValues(_.map {
+        case (_, value) => value
+      })
 
-    val partColNamesToPaths = groupByKey(
-        pathWithPartitionValues.map {
+    val partColNamesToPaths = groupByKey(pathWithPartitionValues.map {
       case (path, partValues) => partValues.columnNames -> path
     })
 
@@ -352,8 +354,8 @@ private[sql] object PartitioningUtils {
     }
   }
 
-  private val upCastingOrder: Seq[DataType] = Seq(
-      NullType, IntegerType, LongType, FloatType, DoubleType, StringType)
+  private val upCastingOrder: Seq[DataType] =
+    Seq(NullType, IntegerType, LongType, FloatType, DoubleType, StringType)
 
   def validatePartitionColumnDataTypes(schema: StructType,
                                        partitionColumns: Seq[String],
@@ -374,8 +376,7 @@ private[sql] object PartitioningUtils {
                              partitionColumns: Seq[String],
                              caseSensitive: Boolean): StructType = {
     val equality = columnNameEquality(caseSensitive)
-    StructType(
-        partitionColumns.map { col =>
+    StructType(partitionColumns.map { col =>
       schema.find(f => equality(f.name, col)).getOrElse {
         throw new RuntimeException(
             s"Partition column $col not found in schema $schema")

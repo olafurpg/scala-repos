@@ -53,7 +53,9 @@ class DefaultDBApi(configuration: Map[String, Config],
       } catch {
         case NonFatal(e) =>
           throw Configuration(configuration(db.name)).reportError(
-              "url", s"Cannot connect to database [${db.name}]", Some(e))
+              "url",
+              s"Cannot connect to database [${db.name}]",
+              Some(e))
       }
     }
   }

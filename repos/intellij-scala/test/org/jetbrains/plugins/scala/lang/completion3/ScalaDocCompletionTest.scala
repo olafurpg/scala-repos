@@ -26,8 +26,9 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
     checkResultByText(resultText)
   }
 
-  protected def genericCompletionComprasion(
-      initialText: String, finalText: String, preferedLookupString: String) {
+  protected def genericCompletionComprasion(initialText: String,
+                                            finalText: String,
+                                            preferedLookupString: String) {
     genericCompletionComparison(
         initialText,
         finalText,
@@ -85,7 +86,9 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       |  */
       """,
         (al: LookupElement) =>
-          al.getObject.asInstanceOf[PsiClass].qualifiedName == "java.util.HashMap"
+          al.getObject
+            .asInstanceOf[PsiClass]
+            .qualifiedName == "java.util.HashMap"
     )
   }
 

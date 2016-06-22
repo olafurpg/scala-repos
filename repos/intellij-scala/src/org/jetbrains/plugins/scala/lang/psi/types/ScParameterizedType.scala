@@ -24,8 +24,8 @@ import scala.collection.immutable.{HashSet, ListMap, Map}
 
 case class JavaArrayType(arg: ScType) extends ValueType {
 
-  def getParameterizedType(
-      project: Project, scope: GlobalSearchScope): Option[ScType] = {
+  def getParameterizedType(project: Project,
+                           scope: GlobalSearchScope): Option[ScType] = {
     val arrayClasses =
       ScalaPsiManager.instance(project).getCachedClasses(scope, "scala.Array")
     var arrayClass: PsiClass = null
@@ -96,8 +96,8 @@ case class JavaArrayType(arg: ScType) extends ValueType {
   override def typeDepth: Int = arg.typeDepth
 }
 
-class ScParameterizedType private (
-    val designator: ScType, val typeArgs: Seq[ScType])
+class ScParameterizedType private (val designator: ScType,
+                                   val typeArgs: Seq[ScType])
     extends ValueType {
   override protected def isAliasTypeInner: Option[AliasType] = {
     this match {
@@ -119,8 +119,10 @@ class ScParameterizedType private (
                   (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         val s = subst.followed(genericSubst)
-        Some(AliasType(
-                ta, ta.lowerBound.map(s.subst), ta.upperBound.map(s.subst)))
+        Some(
+            AliasType(ta,
+                      ta.lowerBound.map(s.subst),
+                      ta.upperBound.map(s.subst)))
       case _ => None
     }
   }
@@ -160,8 +162,9 @@ class ScParameterizedType private (
     }
     designator match {
       case ScTypeParameterType(_, args, _, _, _) =>
-        forParams(
-            args.iterator, ScSubstitutor.empty, (p: ScTypeParameterType) => p)
+        forParams(args.iterator,
+                  ScSubstitutor.empty,
+                  (p: ScTypeParameterType) => p)
       case _ =>
         ScType.extractDesignated(designator, withoutAliases = false) match {
           case Some((owner: ScTypeParametersOwner, s)) =>
@@ -179,8 +182,8 @@ class ScParameterizedType private (
   }
 
   override def removeAbstracts =
-    ScParameterizedType(
-        designator.removeAbstracts, typeArgs.map(_.removeAbstracts))
+    ScParameterizedType(designator.removeAbstracts,
+                        typeArgs.map(_.removeAbstracts))
 
   override def recursiveUpdate(update: ScType => (Boolean, ScType),
                                visited: HashSet[ScType]): ScType = {
@@ -217,14 +220,16 @@ class ScParameterizedType private (
               }
             case _ => Seq.empty
           }
-        ScParameterizedType(designator.recursiveVarianceUpdateModifiable(
-                                newData, update, variance),
-                            typeArgs.zipWithIndex.map {
-                              case (ta, i) =>
-                                val v = if (i < des.length) des(i) else 0
-                                ta.recursiveVarianceUpdateModifiable(
-                                    newData, update, v * variance)
-                            })
+        ScParameterizedType(
+            designator
+              .recursiveVarianceUpdateModifiable(newData, update, variance),
+            typeArgs.zipWithIndex.map {
+              case (ta, i) =>
+                val v = if (i < des.length) des(i) else 0
+                ta.recursiveVarianceUpdateModifiable(newData,
+                                                     update,
+                                                     v * variance)
+            })
     }
   }
 
@@ -246,9 +251,9 @@ class ScParameterizedType private (
         t = Conformance.conformsInner(r, subst.subst(lower), Set.empty, t._2)
         if (!t._1) return (false, uSubst)
         (true, t._2)
-      case (ScParameterizedType(
-            proj @ ScProjectionType(projected, _, _), args),
-            _) if proj.actualElement.isInstanceOf[ScTypeAliasDefinition] =>
+      case (
+          ScParameterizedType(proj @ ScProjectionType(projected, _, _), args),
+          _) if proj.actualElement.isInstanceOf[ScTypeAliasDefinition] =>
         isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, lower, _)) =>
             Equivalence.equivInner(lower match {
@@ -257,8 +262,8 @@ class ScParameterizedType private (
             }, r, uSubst, falseUndef)
           case _ => (false, uSubst)
         }
-      case (ScParameterizedType(
-            ScDesignatorType(a: ScTypeAliasDefinition), args),
+      case (ScParameterizedType(ScDesignatorType(a: ScTypeAliasDefinition),
+                                args),
             _) =>
         isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, lower, _)) =>
@@ -270,16 +275,18 @@ class ScParameterizedType private (
         }
       case (ScParameterizedType(_, _),
             ScParameterizedType(designator1, typeArgs1)) =>
-        var t = Equivalence.equivInner(
-            designator, designator1, undefinedSubst, falseUndef)
+        var t = Equivalence
+          .equivInner(designator, designator1, undefinedSubst, falseUndef)
         if (!t._1) return (false, undefinedSubst)
         undefinedSubst = t._2
         if (typeArgs.length != typeArgs1.length) return (false, undefinedSubst)
         val iterator1 = typeArgs.iterator
         val iterator2 = typeArgs1.iterator
         while (iterator1.hasNext && iterator2.hasNext) {
-          t = Equivalence.equivInner(
-              iterator1.next(), iterator2.next(), undefinedSubst, falseUndef)
+          t = Equivalence.equivInner(iterator1.next(),
+                                     iterator2.next(),
+                                     undefinedSubst,
+                                     falseUndef)
           if (!t._1) return (false, undefinedSubst)
           undefinedSubst = t._2
         }
@@ -307,7 +314,7 @@ class ScParameterizedType private (
       prefix: String): Option[(ScTypeDefinition, Seq[ScType])] = {
     def startsWith(clazz: PsiClass, qualNamePrefix: String) =
       clazz.qualifiedName != null &&
-      clazz.qualifiedName.startsWith(qualNamePrefix)
+        clazz.qualifiedName.startsWith(qualNamePrefix)
 
     ScType.extractClassType(designator) match {
       case Some((clazz: ScTypeDefinition, sub)) if startsWith(clazz, prefix) =>
@@ -347,14 +354,15 @@ class ScParameterizedType private (
   override def equals(other: Any): Boolean = other match {
     case that: ScParameterizedType =>
       (that canEqual this) && designator == that.designator &&
-      typeArgs == that.typeArgs
+        typeArgs == that.typeArgs
     case _ => false
   }
 }
 
 object ScParameterizedType {
-  val substitutorCache: ConcurrentWeakHashMap[
-      ScParameterizedType, ScSubstitutor] = new ConcurrentWeakHashMap()
+  val substitutorCache: ConcurrentWeakHashMap[ScParameterizedType,
+                                              ScSubstitutor] =
+    new ConcurrentWeakHashMap()
 
   def apply(designator: ScType, typeArgs: Seq[ScType]): ValueType = {
     val res = new ScParameterizedType(designator, typeArgs)
@@ -389,7 +397,8 @@ case class ScTypeParameterType(name: String,
     if (hash == -1) {
       hash =
         (((param.hashCode() * 31 + upper.hashCode) * 31 +
-                lower.hashCode()) * 31 + args.hashCode()) * 31 + name.hashCode
+                  lower.hashCode()) * 31 + args
+              .hashCode()) * 31 + name.hashCode
     }
     hash
   }
@@ -426,7 +435,8 @@ case class ScTypeParameterType(name: String,
         })
       case _ =>
         new Suspension[ScType]({ () =>
-          s.subst(ScalaPsiManager
+          s.subst(
+              ScalaPsiManager
                 .instance(ptp.getProject)
                 .psiTypeParameterUpperType(ptp))
         })
@@ -481,10 +491,15 @@ private[types] object CyclicHelper {
   def compute[R](pn1: PsiNamedElement, pn2: PsiNamedElement)(
       fun: () => R): Option[R] = {
     import org.jetbrains.plugins.scala.caches.ScalaRecursionManager._
-    doComputationsForTwoElements(
-        pn1, pn2, (p: Object, searches: Seq[Object]) => {
-      !searches.contains(p)
-    }, pn2, pn1, fun(), CYCLIC_HELPER_KEY)
+    doComputationsForTwoElements(pn1,
+                                 pn2,
+                                 (p: Object, searches: Seq[Object]) => {
+                                   !searches.contains(p)
+                                 },
+                                 pn2,
+                                 pn1,
+                                 fun(),
+                                 CYCLIC_HELPER_KEY)
   }
 }
 

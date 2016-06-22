@@ -63,8 +63,8 @@ object ForumTopic extends LilaController with ForumController {
     CategGrantMod(categSlug) {
       OptionFuRedirect(topicApi.show(categSlug, slug, 1, ctx.troll)) {
         case (categ, topic, pag) =>
-          topicApi.toggleClose(categ, topic, me) inject routes.ForumTopic.show(
-              categSlug, slug, pag.nbPages)
+          topicApi.toggleClose(categ, topic, me) inject routes.ForumTopic
+            .show(categSlug, slug, pag.nbPages)
       }
     }
   }
@@ -73,8 +73,8 @@ object ForumTopic extends LilaController with ForumController {
     implicit ctx => me =>
       OptionFuRedirect(topicApi.show(categSlug, slug, 1, ctx.troll)) {
         case (categ, topic, pag) =>
-          topicApi.toggleHide(categ, topic, me) inject routes.ForumTopic.show(
-              categSlug, slug, pag.nbPages)
+          topicApi.toggleHide(categ, topic, me) inject routes.ForumTopic
+            .show(categSlug, slug, pag.nbPages)
       }
   }
 }

@@ -74,8 +74,8 @@ class HttpServerExampleSpec
   }
 
   // mock values:
-  val handleConnections: Sink[
-      Http.IncomingConnection, Future[Http.ServerBinding]] =
+  val handleConnections: Sink[Http.IncomingConnection,
+                              Future[Http.ServerBinding]] =
     Sink.ignore.mapMaterializedValue(_ => Future.failed(new Exception("")))
 
   "binding-failure-handling" in compileOnlySpec {

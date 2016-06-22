@@ -41,9 +41,9 @@ trait H2Profile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - SqlCapabilities.sequenceMin -
-        SqlCapabilities.sequenceMax - SqlCapabilities.sequenceCycle -
-        JdbcCapabilities.returnInsertOther - RelationalCapabilities.joinFull -
-        JdbcCapabilities.insertOrUpdate - RelationalCapabilities.reverse)
+          SqlCapabilities.sequenceMax - SqlCapabilities.sequenceCycle -
+          JdbcCapabilities.returnInsertOther - RelationalCapabilities.joinFull -
+          JdbcCapabilities.insertOrUpdate - RelationalCapabilities.reverse)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -53,11 +53,12 @@ trait H2Profile extends JdbcProfile {
         override def schema =
           super.schema.filter(_ != "PUBLIC") // remove default schema
       }
-    override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+    override def createColumnBuilder(tableBuilder: TableBuilder,
+                                     meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
         override def length =
-          super.length.filter(_ != Int.MaxValue) // H2 sometimes show this value, but doesn't accept it back in the DBType
+          super.length
+            .filter(_ != Int.MaxValue) // H2 sometimes show this value, but doesn't accept it back in the DBType
         override def default =
           rawDefault
             .map((_, tpe))
@@ -74,32 +75,34 @@ trait H2Profile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
   override val columnTypes = new JdbcTypes
   override protected def computeQueryCompiler =
     super.computeQueryCompiler.replace(Phase.resolveZipJoinsRownumStyle) -
-    Phase.fixRowNumberOrdering
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+      Phase.fixRowNumberOrdering
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createUpsertBuilder(node: Insert): InsertBuilder =
     new UpsertBuilder(node)
   override def createInsertActionExtensionMethods[T](
       compiled: CompiledInsert): InsertActionExtensionMethods[T] =
     new CountingInsertActionComposerImpl[T](compiled)
 
-  override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
-    case java.sql.Types.VARCHAR =>
-      val size =
-        sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length])
-      size.fold("VARCHAR")(l =>
-            if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
-    case _ => super.defaultSqlTypeName(tmd, sym)
-  }
+  override def defaultSqlTypeName(tmd: JdbcType[_],
+                                  sym: Option[FieldSymbol]): String =
+    tmd.sqlType match {
+      case java.sql.Types.VARCHAR =>
+        val size = sym.flatMap(
+            _.findColumnOption[RelationalProfile.ColumnOption.Length])
+        size.fold("VARCHAR")(l =>
+              if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
+      case _ => super.defaultSqlTypeName(tmd, sym)
+    }
 
   class QueryBuilder(tree: Node, state: CompilerState)
       extends super.QueryBuilder(tree, state) {
@@ -117,13 +120,14 @@ trait H2Profile extends JdbcProfile {
       case _ => super.expr(n, skipParens)
     }
 
-    override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
-      case (Some(t), Some(d)) => b"\nlimit $t offset $d"
-      case (Some(t), None) => b"\nlimit $t"
-      case (None, Some(d)) => b"\nlimit -1 offset $d"
-      case _ =>
-    }
+    override protected def buildFetchOffsetClause(fetch: Option[Node],
+                                                  offset: Option[Node]) =
+      (fetch, offset) match {
+        case (Some(t), Some(d)) => b"\nlimit $t offset $d"
+        case (Some(t), None) => b"\nlimit $t"
+        case (None, Some(d)) => b"\nlimit -1 offset $d"
+        case _ =>
+      }
   }
 
   class JdbcTypes extends super.JdbcTypes {

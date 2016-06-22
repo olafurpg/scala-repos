@@ -131,11 +131,12 @@ trait ArrayLibSpecs[M[+ _]]
                            SDecimal(244),
                            SDecimal(13),
                            SDecimal(11),
-                           SArray(Vector(SDecimal(-9),
-                                         SDecimal(-42),
-                                         SDecimal(42),
-                                         SDecimal(87),
-                                         SDecimal(4))))
+                           SArray(
+                               Vector(SDecimal(-9),
+                                      SDecimal(-42),
+                                      SDecimal(42),
+                                      SDecimal(87),
+                                      SDecimal(4))))
     }
 
     "flattened set is related to original set" in {

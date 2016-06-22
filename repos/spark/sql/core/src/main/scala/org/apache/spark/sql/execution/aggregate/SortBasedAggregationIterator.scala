@@ -57,14 +57,13 @@ class SortBasedAggregationIterator(
     val useUnsafeBuffer =
       bufferSchema.map(_.dataType).forall(UnsafeRow.isMutable)
 
-    val buffer =
-      if (useUnsafeBuffer) {
-        val unsafeProjection =
-          UnsafeProjection.create(bufferSchema.map(_.dataType))
-        unsafeProjection.apply(genericMutableBuffer)
-      } else {
-        genericMutableBuffer
-      }
+    val buffer = if (useUnsafeBuffer) {
+      val unsafeProjection =
+        UnsafeProjection.create(bufferSchema.map(_.dataType))
+      unsafeProjection.apply(genericMutableBuffer)
+    } else {
+      genericMutableBuffer
+    }
     initializeBuffer(buffer)
     buffer
   }
@@ -152,8 +151,8 @@ class SortBasedAggregationIterator(
       // Process the current group.
       processCurrentSortedGroup()
       // Generate output row for the current group.
-      val outputRow = generateOutput(
-          currentGroupingKey, sortBasedAggregationBuffer)
+      val outputRow =
+        generateOutput(currentGroupingKey, sortBasedAggregationBuffer)
       // Initialize buffer values for the next group.
       initializeBuffer(sortBasedAggregationBuffer)
       numOutputRows += 1
@@ -166,7 +165,7 @@ class SortBasedAggregationIterator(
 
   def outputForEmptyGroupingKeyWithoutInput(): UnsafeRow = {
     initializeBuffer(sortBasedAggregationBuffer)
-    generateOutput(
-        UnsafeRow.createFromByteArray(0, 0), sortBasedAggregationBuffer)
+    generateOutput(UnsafeRow.createFromByteArray(0, 0),
+                   sortBasedAggregationBuffer)
   }
 }

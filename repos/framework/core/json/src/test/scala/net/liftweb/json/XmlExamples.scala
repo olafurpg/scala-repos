@@ -56,8 +56,7 @@ object XmlExamples extends Specification {
 
     val printer = new scala.xml.PrettyPrinter(100, 2)
     val lotto: JObject = LottoExample.json
-    val xml = toXml(
-        lotto.transformField {
+    val xml = toXml(lotto.transformField {
       case JField("winning-numbers", JArray(nums)) =>
         JField("winning-numbers", flattenArray(nums))
       case JField("numbers", JArray(nums)) =>

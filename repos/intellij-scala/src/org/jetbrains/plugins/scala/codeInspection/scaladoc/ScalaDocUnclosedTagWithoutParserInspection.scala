@@ -23,13 +23,14 @@ class ScalaDocUnclosedTagWithoutParserInspection extends LocalInspectionTool {
 
   override def getDisplayName: String = "Unclosed Tag"
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitWikiSyntax(s: ScDocSyntaxElement) {
         val firstElementType = s.getFirstChild.getNode.getElementType
         if (!ScaladocSyntaxElementType.canClose(
-                firstElementType, s.getLastChild.getNode.getElementType) &&
+                firstElementType,
+                s.getLastChild.getNode.getElementType) &&
             firstElementType != ScalaDocTokenType.DOC_HEADER &&
             firstElementType != ScalaDocTokenType.VALID_DOC_HEADER) {
 
@@ -49,23 +50,22 @@ class ScalaDocUnclosedTagWithoutParserInspection extends LocalInspectionTool {
 
 class ScalaDocEscapeTagQuickFix(s: ScDocSyntaxElement)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("replace.tag.with.esc.seq"), s) {
+        ScalaBundle.message("replace.tag.with.esc.seq"),
+        s) {
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
   def doApplyFix(project: Project) {
     val syntElem = getElement
     if (!syntElem.isValid) return
 
-    val replaceText =
-      if (syntElem.getFirstChild.getText.contains("=")) {
-        StringUtils.repeat(
-            MyScaladocParsing.escapeSequencesForWiki.get("=").get,
-            syntElem.getFirstChild.getText.length())
-      } else {
-        MyScaladocParsing.escapeSequencesForWiki
-          .get(syntElem.getFirstChild.getText)
-          .get
-      }
+    val replaceText = if (syntElem.getFirstChild.getText.contains("=")) {
+      StringUtils.repeat(MyScaladocParsing.escapeSequencesForWiki.get("=").get,
+                         syntElem.getFirstChild.getText.length())
+    } else {
+      MyScaladocParsing.escapeSequencesForWiki
+        .get(syntElem.getFirstChild.getText)
+        .get
+    }
     val doc = FileDocumentManager
       .getInstance()
       .getDocument(syntElem.getContainingFile.getVirtualFile)

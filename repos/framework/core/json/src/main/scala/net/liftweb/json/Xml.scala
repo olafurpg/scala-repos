@@ -152,8 +152,7 @@ object Xml {
       case nodes: NodeSeq =>
         val allLabels = nodes.map(_.label)
         if (array_?(allLabels)) {
-          val arr = XArray(
-              nodes.toList.flatMap { n =>
+          val arr = XArray(nodes.toList.flatMap { n =>
             if (leaf_?(n) && n.attributes.length == 0) XValue(n.text) :: Nil
             else buildNodes(n)
           })

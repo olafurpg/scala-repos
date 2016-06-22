@@ -42,12 +42,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        Props(new TaskKillActor(driver,
-                                PathId("/test"),
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              PathId("/test"),
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     watch(ref)
 
@@ -84,12 +85,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        Props(new TaskKillActor(driver,
-                                PathId("/test"),
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              PathId("/test"),
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     watch(ref)
 
@@ -107,12 +109,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = system.actorOf(
-        Props(new TaskKillActor(driver,
-                                PathId("/test"),
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              PathId("/test"),
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     watch(ref)
 
@@ -136,12 +139,13 @@ class TaskKillActorTest
       .thenReturn(mutable.Iterable.empty[Task])
 
     val ref = TestActorRef[TaskKillActor](
-        Props(new TaskKillActor(driver,
-                                app.id,
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              app.id,
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
     watch(ref)
 
     ref.underlyingActor.periodicalCheck.cancel()
@@ -162,12 +166,13 @@ class TaskKillActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef[TaskKillActor](
-        Props(new TaskKillActor(driver,
-                                appId,
-                                taskTracker,
-                                system.eventStream,
-                                tasks.map(_.taskId),
-                                promise)))
+        Props(
+            new TaskKillActor(driver,
+                              appId,
+                              taskTracker,
+                              system.eventStream,
+                              tasks.map(_.taskId),
+                              promise)))
 
     when(taskTracker.appTasksLaunchedSync(appId))
       .thenReturn(Iterable(taskA, taskB))

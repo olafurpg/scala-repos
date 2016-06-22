@@ -245,7 +245,8 @@ object BidiFlow {
     * stage each, expressed by the two functions.
     */
   def fromFunctions[I1, O1, I2, O2](
-      outbound: I1 ⇒ O1, inbound: I2 ⇒ O2): BidiFlow[I1, O1, I2, O2, NotUsed] =
+      outbound: I1 ⇒ O1,
+      inbound: I2 ⇒ O2): BidiFlow[I1, O1, I2, O2, NotUsed] =
     fromFlows(Flow[I1].map(outbound), Flow[I2].map(inbound))
 
   /**

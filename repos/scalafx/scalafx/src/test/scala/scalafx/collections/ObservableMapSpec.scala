@@ -45,9 +45,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ObservableMapSpec[K, V]
-    extends SimpleSFXDelegateSpec[
-        jfxc.ObservableMap[K, V], ObservableMap[K, V]](
-        classOf[jfxc.ObservableMap[K, V]], classOf[ObservableMap[K, V]]) {
+    extends SimpleSFXDelegateSpec[jfxc.ObservableMap[K, V],
+                                  ObservableMap[K, V]](
+        classOf[jfxc.ObservableMap[K, V]],
+        classOf[ObservableMap[K, V]]) {
 
   /**
     * Verifies if a generated Map is the same instance than a original Map. If it should not be,
@@ -142,8 +143,8 @@ class ObservableMapSpec[K, V]
     map onChange { (sourceMap, change) =>
       change match {
         case Add(key, valueAdded) => {
-            addedEntries += ((key, valueAdded))
-          }
+          addedEntries += ((key, valueAdded))
+        }
         case _ => fail("Unexpected change: " + change)
       }
     }
@@ -151,28 +152,34 @@ class ObservableMapSpec[K, V]
     // Execution
     map(0) = 0.toString
     compareInstances((map += (1 -> 1.toString)), map, true)
-    compareInstances(
-        (map += (2 -> 2.toString) += (3 -> 3.toString)), map, true)
+    compareInstances((map += (2 -> 2.toString) += (3 -> 3.toString)),
+                     map,
+                     true)
     compareInstances((map += ((4, 4.toString))), map, true)
     compareInstances((map += ((5, 5.toString), (6, 6.toString))), map, true)
     compareInstances((map += (7 -> 7.toString, 8 -> 8.toString)), map, true)
     compareInstances((map ++= List((9, 9.toString))), map, true)
-    compareInstances(
-        (map ++= List((10, 10.toString), (11, 11.toString))), map, true)
+    compareInstances((map ++= List((10, 10.toString), (11, 11.toString))),
+                     map,
+                     true)
     (map put (12, 12.toString)) should be(None)
     (map getOrElseUpdate (13, 13.toString)) should equal(13.toString)
     // Next operations must not affect original map, so they must not call onchange function
     compareInstances((map + (100 -> 100.toString)), map, false)
-    compareInstances(
-        (map + (101 -> 101.toString) + (102 -> 102.toString)), map, false)
+    compareInstances((map + (101 -> 101.toString) + (102 -> 102.toString)),
+                     map,
+                     false)
     compareInstances((map + ((103, 103.toString))), map, false)
-    compareInstances(
-        (map + ((104, 104.toString), (105, 105.toString))), map, false)
-    compareInstances(
-        (map + (106 -> 106.toString, 107 -> 107.toString)), map, false)
+    compareInstances((map + ((104, 104.toString), (105, 105.toString))),
+                     map,
+                     false)
+    compareInstances((map + (106 -> 106.toString, 107 -> 107.toString)),
+                     map,
+                     false)
     compareInstances((map ++ List((108, 108.toString))), map, false)
-    compareInstances(
-        (map ++ List((109, 109.toString), (110, 110.toString))), map, false)
+    compareInstances((map ++ List((109, 109.toString), (110, 110.toString))),
+                     map,
+                     false)
     compareInstances((map.updated(111, 111.toString)), map, false)
 
     // Verification
@@ -187,8 +194,8 @@ class ObservableMapSpec[K, V]
     map onChange { (sourceMap, change) =>
       change match {
         case Remove(key, valueRemoved) => {
-            removedEntries += ((key, valueRemoved))
-          }
+          removedEntries += ((key, valueRemoved))
+        }
         case _ => fail("Unexpected change: " + change)
       }
     }
@@ -244,8 +251,8 @@ class ObservableMapSpec[K, V]
     map onChange { (sourceMap, change) =>
       change match {
         case Replace(key, valueAdded, valueRemoved) => {
-            replacedEntries += ((key, valueAdded, valueRemoved))
-          }
+          replacedEntries += ((key, valueAdded, valueRemoved))
+        }
         case _ => fail("Unexpected change: " + change)
       }
     }
@@ -297,9 +304,9 @@ class ObservableMapSpec[K, V]
         case Add(key, value) => addedValues += ((key, value))
         case Remove(key, value) => removedValues += ((key, value))
         case Replace(key, added, removed) => {
-            addedValues += ((key, added))
-            removedValues += ((key, removed))
-          }
+          addedValues += ((key, added))
+          removedValues += ((key, removed))
+        }
       }
     }
 
@@ -313,8 +320,11 @@ class ObservableMapSpec[K, V]
 
     // Verification
     map.toList should equal(List((3, "three"), (5, 5.toString)))
-    addedValues should equal(Buffer(
-            (3, 3.toString), (1, 1.toString), (5, 5.toString), (3, "three")))
+    addedValues should equal(
+        Buffer((3, 3.toString),
+               (1, 1.toString),
+               (5, 5.toString),
+               (3, "three")))
     removedValues should equal(Buffer((1, 1.toString), (3, 3.toString)))
   }
 }

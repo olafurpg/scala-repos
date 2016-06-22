@@ -8,8 +8,9 @@ import java.net.URL
 /**
   * A ClassLoader that only uses resources from its parent
   */
-class DelegatedResourcesClassLoader(
-    name: String, urls: Array[URL], parent: ClassLoader)
+class DelegatedResourcesClassLoader(name: String,
+                                    urls: Array[URL],
+                                    parent: ClassLoader)
     extends NamedURLClassLoader(name, urls, parent) {
   require(parent ne null)
   override def getResources(

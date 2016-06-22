@@ -70,10 +70,10 @@ class ActorSelectionSpec
     asked.correlationId should ===(selection)
 
     implicit val ec = system.dispatcher
-    val resolved = Await.result(
-        selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
-      case _ ⇒ null
-    }, timeout.duration)
+    val resolved = Await
+      .result(selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
+        case _ ⇒ null
+      }, timeout.duration)
     Option(resolved) should ===(result)
 
     result
@@ -322,7 +322,8 @@ class ActorSelectionSpec
     "resolve one actor with explicit timeout" in {
       val s = system.actorSelection(system / "c2")
       // Java and Scala API
-      Await.result(s.resolveOne(1.second.dilated), timeout.duration) should ===(
+      Await
+        .result(s.resolveOne(1.second.dilated), timeout.duration) should ===(
           c2)
     }
 
@@ -347,13 +348,17 @@ class ActorSelectionSpec
       ActorSelection(c21, "../*/hello").## should ===(
           ActorSelection(c21, "../*/hello").##)
       ActorSelection(c2, "../*/hello") should not be ActorSelection(
-          c21, "../*/hello")
+          c21,
+          "../*/hello")
       ActorSelection(c2, "../*/hello").## should not be ActorSelection(
-          c21, "../*/hello").##
+          c21,
+          "../*/hello").##
       ActorSelection(c21, "../*/hell") should not be ActorSelection(
-          c21, "../*/hello")
+          c21,
+          "../*/hello")
       ActorSelection(c21, "../*/hell").## should not be ActorSelection(
-          c21, "../*/hello").##
+          c21,
+          "../*/hello").##
     }
 
     "print nicely" in {
@@ -364,7 +369,9 @@ class ActorSelectionSpec
     "have a stringly serializable path" in {
       system.actorSelection(system / "c2").toSerializationFormat should ===(
           "akka://ActorSelectionSpec/user/c2")
-      system.actorSelection(system / "c2" / "c21").toSerializationFormat should ===(
+      system
+        .actorSelection(system / "c2" / "c21")
+        .toSerializationFormat should ===(
           "akka://ActorSelectionSpec/user/c2/c21")
       ActorSelection(c2, "/").toSerializationFormat should ===(
           "akka://ActorSelectionSpec/user/c2")

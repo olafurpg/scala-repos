@@ -23,15 +23,16 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 10
     val en = 3
 
-    val engineParams = EngineParams(
-        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
-        preparatorParams = PPreparator1.Params(1),
-        algorithmParamsList = Seq(
-            ("PAlgo2", PAlgo2.Params(20)),
-            ("PAlgo2", PAlgo2.Params(21)),
-            ("PAlgo3", PAlgo3.Params(22))
-        ),
-        servingParams = LServing1.Params(3))
+    val engineParams =
+      EngineParams(dataSourceParams =
+                     PDataSource2.Params(id = 0, en = en, qn = qn),
+                   preparatorParams = PPreparator1.Params(1),
+                   algorithmParamsList = Seq(
+                       ("PAlgo2", PAlgo2.Params(20)),
+                       ("PAlgo2", PAlgo2.Params(21)),
+                       ("PAlgo3", PAlgo3.Params(22))
+                   ),
+                   servingParams = LServing1.Params(3))
 
     val algoCount = engineParams.algorithmParamsList.size
     val pd = ProcessedData(1, TrainingData(0))
@@ -45,37 +46,37 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
 
     forAll(evalDataSet.zipWithIndex) {
       case (evalData, ex) => {
-          val (evalInfo, qpaRDD) = evalData
-          evalInfo shouldBe EvalInfo(0)
+        val (evalInfo, qpaRDD) = evalData
+        evalInfo shouldBe EvalInfo(0)
 
-          val qpaSeq: Seq[(Query, Prediction, Actual)] = qpaRDD.collect
+        val qpaSeq: Seq[(Query, Prediction, Actual)] = qpaRDD.collect
 
-          qpaSeq should have size qn
+        qpaSeq should have size qn
 
-          forAll(qpaSeq) {
-            case (q, p, a) =>
-              val Query(qId, qEx, qQx, _) = q
-              val Actual(aId, aEx, aQx) = a
-              qId shouldBe aId
-              qEx shouldBe ex
-              aEx shouldBe ex
-              qQx shouldBe aQx
+        forAll(qpaSeq) {
+          case (q, p, a) =>
+            val Query(qId, qEx, qQx, _) = q
+            val Actual(aId, aEx, aQx) = a
+            qId shouldBe aId
+            qEx shouldBe ex
+            aEx shouldBe ex
+            qQx shouldBe aQx
 
-              inside(p) {
-                case Prediction(pId, pQ, pModels, pPs) => {
-                    pId shouldBe 3
-                    pQ shouldBe q
-                    pModels shouldBe None
-                    pPs should have size algoCount
-                    pPs shouldBe Seq(
-                        Prediction(id = 20, q = q, models = Some(model0)),
-                        Prediction(id = 21, q = q, models = Some(model1)),
-                        Prediction(id = 22, q = q, models = Some(model2))
-                    )
-                  }
+            inside(p) {
+              case Prediction(pId, pQ, pModels, pPs) => {
+                pId shouldBe 3
+                pQ shouldBe q
+                pModels shouldBe None
+                pPs should have size algoCount
+                pPs shouldBe Seq(
+                    Prediction(id = 20, q = q, models = Some(model0)),
+                    Prediction(id = 21, q = q, models = Some(model1)),
+                    Prediction(id = 22, q = q, models = Some(model2))
+                )
               }
-          }
+            }
         }
+      }
     }
   }
 
@@ -88,11 +89,12 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 10
     val en = 3
 
-    val baseEngineParams = EngineParams(
-        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
-        preparatorParams = PPreparator1.Params(1),
-        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-        servingParams = LServing1.Params(3))
+    val baseEngineParams =
+      EngineParams(dataSourceParams =
+                     PDataSource2.Params(id = 0, en = en, qn = qn),
+                   preparatorParams = PPreparator1.Params(1),
+                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+                   servingParams = LServing1.Params(3))
 
     val ep0 = baseEngineParams
     val ep1 =
@@ -116,19 +118,19 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     // same EI
     evalDataSet0.zip(evalDataSet1).foreach {
       case (e0, e1) => {
-          e0._1 should be theSameInstanceAs e1._1
-          e0._2 should be theSameInstanceAs e1._2
-        }
+        e0._1 should be theSameInstanceAs e1._1
+        e0._2 should be theSameInstanceAs e1._2
+      }
     }
 
     // So as set1 and set2, however, the QPA-RDD should be different.
     evalDataSet1.zip(evalDataSet2).foreach {
       case (e1, e2) => {
-          e1._1 should be theSameInstanceAs e2._1
-          val e1Qpa = e1._2
-          val e2Qpa = e2._2
-          e1Qpa should not be theSameInstanceAs(e2Qpa)
-        }
+        e1._1 should be theSameInstanceAs e2._1
+        val e1Qpa = e1._2
+        val e2Qpa = e2._2
+        e1Qpa should not be theSameInstanceAs(e2Qpa)
+      }
     }
   }
 
@@ -143,11 +145,12 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 10
     val en = 3
 
-    val baseEngineParams = EngineParams(
-        dataSourceParams = new PDataSource4.Params(id = 0, en = en, qn = qn),
-        preparatorParams = PPreparator1.Params(1),
-        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-        servingParams = LServing1.Params(3))
+    val baseEngineParams =
+      EngineParams(dataSourceParams =
+                     new PDataSource4.Params(id = 0, en = en, qn = qn),
+                   preparatorParams = PPreparator1.Params(1),
+                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+                   servingParams = LServing1.Params(3))
 
     val ep0 = baseEngineParams
     val ep1 =
@@ -172,16 +175,16 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     // Set0 should have same EI as Set1, since their dsp are the same instance.
     evalDataSet0.zip(evalDataSet1).foreach {
       case (e0, e1) => {
-          e0._1 should be theSameInstanceAs (e1._1)
-        }
+        e0._1 should be theSameInstanceAs (e1._1)
+      }
     }
 
     // Set1 should have different EI as Set2, since Set2's dsp is another
     // instance
     evalDataSet1.zip(evalDataSet2).foreach {
       case (e1, e2) => {
-          e1._1 should not be theSameInstanceAs(e2._1)
-        }
+        e1._1 should not be theSameInstanceAs(e2._1)
+      }
     }
   }
 }

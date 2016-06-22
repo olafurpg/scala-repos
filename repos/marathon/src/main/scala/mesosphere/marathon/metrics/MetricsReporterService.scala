@@ -28,8 +28,8 @@ object MetricsReporterService {
 }
 
 //scalastyle:off magic.number
-class MetricsReporterService @Inject()(
-    config: MetricsReporterConf, registry: MetricRegistry)
+class MetricsReporterService @Inject()(config: MetricsReporterConf,
+                                       registry: MetricRegistry)
     extends AbstractIdleService {
 
   private val log = Logger.getLogger(getClass.getName)

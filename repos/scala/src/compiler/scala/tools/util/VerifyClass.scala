@@ -8,8 +8,8 @@ import scala.language.postfixOps
 object VerifyClass {
 
   // Returns the error if there's a failure
-  private def checkClass(
-      name: String, cl: ClassLoader): (String, Option[String]) = {
+  private def checkClass(name: String,
+                         cl: ClassLoader): (String, Option[String]) = {
     try {
       Class.forName(name, true, cl)
       (name, None)

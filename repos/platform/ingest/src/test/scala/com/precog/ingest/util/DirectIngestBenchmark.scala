@@ -72,8 +72,8 @@ object DirectKafkaConsumer extends App {
         val secs = (now - start) / 1000000000.0
         val throughput = msgs / secs
         println(
-            "Message %d batch %d time %.02fs throughput %.01f msgs/s".format(
-                msgs, batch, secs, throughput))
+            "Message %d batch %d time %.02fs throughput %.01f msgs/s"
+              .format(msgs, batch, secs, throughput))
       }
     }
 
@@ -85,8 +85,8 @@ object DirectKafkaProducer extends App {
   val config = new Properties()
   config.put("broker.list", "0:localhost:9092")
   config.put("enable.zookeeper", "false")
-  config.put(
-      "serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
+  config
+    .put("serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
 
   val producer =
     new Producer[String, IngestMessage](new ProducerConfig(config))
@@ -110,8 +110,8 @@ object DirectKafkaProducer extends App {
       val secs = (now - start) / 1000000000.0
       val throughput = i / secs
       println(
-          "Message %d time %.02fs throughput %.01f msgs/s".format(
-              i, secs, throughput))
+          "Message %d time %.02fs throughput %.01f msgs/s"
+            .format(i, secs, throughput))
     }
 
     val data = new ProducerData[String, IngestMessage](topic, msg)

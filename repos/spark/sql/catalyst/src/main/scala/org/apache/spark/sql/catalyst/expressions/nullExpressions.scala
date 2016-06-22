@@ -46,8 +46,8 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
       TypeCheckResult.TypeCheckFailure(
           "input to function coalesce cannot be empty")
     } else {
-      TypeUtils.checkForSameTypeInputExpr(
-          children.map(_.dataType), "function coalesce")
+      TypeUtils.checkForSameTypeInputExpr(children.map(_.dataType),
+                                          "function coalesce")
     }
   }
 
@@ -117,7 +117,8 @@ case class IsNaN(child: Expression)
         s"""
           ${eval.code}
           boolean ${ev.isNull} = false;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           ${ev.value} = !${eval.isNull} && Double.isNaN(${eval.value});
         """
     }
@@ -160,7 +161,8 @@ case class NaNvl(left: Expression, right: Expression)
         s"""
           ${leftGen.code}
           boolean ${ev.isNull} = false;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (${leftGen.isNull}) {
             ${ev.isNull} = true;
           } else {

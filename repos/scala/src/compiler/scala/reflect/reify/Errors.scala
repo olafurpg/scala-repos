@@ -17,8 +17,8 @@ trait Errors { self: Reifier =>
   // hence we don't crash here, but nicely report a typechecking error and bail out asap
 
   def CannotReifyType(tpe: Type) = {
-    val msg = "implementation restriction: cannot reify type %s (%s)".format(
-        tpe, tpe.kind)
+    val msg = "implementation restriction: cannot reify type %s (%s)"
+      .format(tpe, tpe.kind)
     throw new ReificationException(defaultErrorPosition, msg)
   }
 
@@ -33,8 +33,8 @@ trait Errors { self: Reifier =>
     throw new ReificationException(defaultErrorPosition, msg)
   }
 
-  def CannotConvertManifestToTagWithoutScalaReflect(
-      tpe: Type, manifestInScope: Tree) = {
+  def CannotConvertManifestToTagWithoutScalaReflect(tpe: Type,
+                                                    manifestInScope: Tree) = {
     val msg =
       sm"""to create a type tag here, it is necessary to interoperate with the manifest `$manifestInScope` in scope.
           |however manifest -> typetag conversion requires Scala reflection, which is not present on the classpath.

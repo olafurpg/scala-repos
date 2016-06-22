@@ -21,9 +21,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
   * Date: 27.03.15.
   */
 abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
-    txt: String, description: String, icon: Icon)
+    txt: String,
+    description: String,
+    icon: Icon)
     extends CreateTemplateInPackageAction[T](
-        txt, description, icon, JavaModuleSourceRootTypes.SOURCES) {
+        txt,
+        description,
+        icon,
+        JavaModuleSourceRootTypes.SOURCES) {
   override def checkPackageExists(psiDirectory: PsiDirectory) =
     JavaDirectoryService.getInstance.getPackage(psiDirectory) != null
 
@@ -58,7 +63,7 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
       case e: Exception =>
         throw new RuntimeException(
             "Unable to load template for " +
-            templateManager.internalTemplateToSubject(templateName),
+              templateManager.internalTemplateToSubject(templateName),
             e)
     }
 
@@ -92,8 +97,9 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
 
   protected def getFileType: FileType
 
-  protected def createFile(
-      name: String, text: String, project: Project): PsiFile =
+  protected def createFile(name: String,
+                           text: String,
+                           project: Project): PsiFile =
     PsiFileFactory
       .getInstance(project)
       .createFileFromText(name, getFileType, text)

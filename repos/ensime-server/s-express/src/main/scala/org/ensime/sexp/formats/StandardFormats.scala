@@ -66,8 +66,7 @@ trait StandardFormats extends ThreadLocalSupport {
     }
   }
 
-  implicit val UuidFormat: SexpFormat[UUID] = viaString(
-      new ViaString[UUID] {
+  implicit val UuidFormat: SexpFormat[UUID] = viaString(new ViaString[UUID] {
     def toSexpString(uuid: UUID) = uuid.toString
     def fromSexpString(s: String) = UUID.fromString(s)
   })
@@ -79,14 +78,12 @@ trait StandardFormats extends ThreadLocalSupport {
   //   def fromSexpString(s: String) = new URL(s)
   // })
 
-  implicit val UriFormat: SexpFormat[URI] = viaString(
-      new ViaString[URI] {
+  implicit val UriFormat: SexpFormat[URI] = viaString(new ViaString[URI] {
     def toSexpString(uri: URI) = uri.toASCIIString
     def fromSexpString(s: String) = new URI(s)
   })
 
-  implicit val FileFormat: SexpFormat[File] = viaString(
-      new ViaString[File] {
+  implicit val FileFormat: SexpFormat[File] = viaString(new ViaString[File] {
     def toSexpString(file: File) = file.getPath
     def fromSexpString(s: String) = new File(s)
   })

@@ -41,7 +41,7 @@ class PersistenceQuerySpec
           PersistenceQuery
             .get(system)
             .readJournalFor[DummyReadJournal](DummyReadJournal.Identifier +
-                "-unknown")
+                  "-unknown")
         }.getMessage should include("missing persistence read journal")
       }
     }

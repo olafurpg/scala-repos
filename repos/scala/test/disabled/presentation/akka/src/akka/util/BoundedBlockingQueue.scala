@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.{TimeUnit, BlockingQueue}
 import java.util.{AbstractQueue, Queue, Collection, Iterator}
 
-class BoundedBlockingQueue[E <: AnyRef](
-    val maxCapacity: Int, private val backing: Queue[E])
+class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
+                                        private val backing: Queue[E])
     extends AbstractQueue[E]
     with BlockingQueue[E] {
 

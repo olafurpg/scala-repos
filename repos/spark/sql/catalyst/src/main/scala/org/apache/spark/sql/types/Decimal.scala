@@ -293,8 +293,9 @@ final class Decimal extends Ordered[Decimal] with Serializable {
   def +(that: Decimal): Decimal = {
     if (decimalVal.eq(null) && that.decimalVal.eq(null) &&
         scale == that.scale) {
-      Decimal(
-          longVal + that.longVal, Math.max(precision, that.precision), scale)
+      Decimal(longVal + that.longVal,
+              Math.max(precision, that.precision),
+              scale)
     } else {
       Decimal(toBigDecimal + that.toBigDecimal)
     }
@@ -303,8 +304,9 @@ final class Decimal extends Ordered[Decimal] with Serializable {
   def -(that: Decimal): Decimal = {
     if (decimalVal.eq(null) && that.decimalVal.eq(null) &&
         scale == that.scale) {
-      Decimal(
-          longVal - that.longVal, Math.max(precision, that.precision), scale)
+      Decimal(longVal - that.longVal,
+              Math.max(precision, that.precision),
+              scale)
     } else {
       Decimal(toBigDecimal - that.toBigDecimal)
     }
@@ -374,8 +376,8 @@ object Decimal {
 
   private val BIG_DEC_ZERO = BigDecimal(0)
 
-  private val MATH_CONTEXT = new MathContext(
-      DecimalType.MAX_PRECISION, RoundingMode.HALF_UP)
+  private val MATH_CONTEXT =
+    new MathContext(DecimalType.MAX_PRECISION, RoundingMode.HALF_UP)
 
   private[sql] val ZERO = Decimal(0)
   private[sql] val ONE = Decimal(1)

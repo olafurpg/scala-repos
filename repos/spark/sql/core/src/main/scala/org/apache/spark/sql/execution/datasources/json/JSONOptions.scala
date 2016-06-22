@@ -71,14 +71,14 @@ private[sql] class JSONOptions(
   /** Sets config options on a Jackson [[JsonFactory]]. */
   def setJacksonOptions(factory: JsonFactory): Unit = {
     factory.configure(JsonParser.Feature.ALLOW_COMMENTS, allowComments)
-    factory.configure(
-        JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, allowUnquotedFieldNames)
-    factory.configure(
-        JsonParser.Feature.ALLOW_SINGLE_QUOTES, allowSingleQuotes)
+    factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES,
+                      allowUnquotedFieldNames)
+    factory
+      .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, allowSingleQuotes)
     factory.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS,
                       allowNumericLeadingZeros)
-    factory.configure(
-        JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, allowNonNumericNumbers)
+    factory.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS,
+                      allowNonNumericNumbers)
     factory.configure(
         JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER,
         allowBackslashEscapingAnyCharacter)

@@ -106,9 +106,14 @@ object Menu extends MenuSingleton {
       * The method to add a path element to the URL representing this menu item
       */
     def /(pathElement: LocPath): ParamMenuable[T] with WithSlash =
-      new ParamMenuable[T](
-          name, linkText, parser, encoder, pathElement :: Nil, false, Nil, Nil)
-      with WithSlash
+      new ParamMenuable[T](name,
+                           linkText,
+                           parser,
+                           encoder,
+                           pathElement :: Nil,
+                           false,
+                           Nil,
+                           Nil) with WithSlash
 
     /**
       * The Java way of building menus.  Put the path String here,
@@ -151,13 +156,24 @@ object Menu extends MenuSingleton {
     type BuiltType = ParamMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
-      new ParamMenuable[T](
-          name, linkText, parser, encoder, newPath, newHead, params, submenus)
-    def buildSlashOne(
-        newPath: List[LocPath], newHead: Boolean): BuiltType with WithSlash =
-      new ParamMenuable[T](
-          name, linkText, parser, encoder, newPath, newHead, params, submenus)
-      with WithSlash
+      new ParamMenuable[T](name,
+                           linkText,
+                           parser,
+                           encoder,
+                           newPath,
+                           newHead,
+                           params,
+                           submenus)
+    def buildSlashOne(newPath: List[LocPath],
+                      newHead: Boolean): BuiltType with WithSlash =
+      new ParamMenuable[T](name,
+                           linkText,
+                           parser,
+                           encoder,
+                           newPath,
+                           newHead,
+                           params,
+                           submenus) with WithSlash
 
     /**
       * Append a LocParam to the Menu item
@@ -300,13 +316,24 @@ object Menu extends MenuSingleton {
     type BuiltType = ParamsMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
-      new ParamsMenuable[T](
-          name, linkText, parser, encoder, newPath, newHead, params, submenus)
-    def buildSlashOne(
-        newPath: List[LocPath], newHead: Boolean): BuiltType with WithSlash =
-      new ParamsMenuable[T](
-          name, linkText, parser, encoder, newPath, newHead, params, submenus)
-      with WithSlash
+      new ParamsMenuable[T](name,
+                            linkText,
+                            parser,
+                            encoder,
+                            newPath,
+                            newHead,
+                            params,
+                            submenus)
+    def buildSlashOne(newPath: List[LocPath],
+                      newHead: Boolean): BuiltType with WithSlash =
+      new ParamsMenuable[T](name,
+                            linkText,
+                            parser,
+                            encoder,
+                            newPath,
+                            newHead,
+                            params,
+                            submenus) with WithSlash
 
     /**
       * Append a LocParam to the Menu item
@@ -469,9 +496,9 @@ object Menu extends MenuSingleton {
                           _,
                           _)
           if param.isDefined ||
-          params.contains(Loc.MatchWithoutCurrentValue) => {
-          RewriteResponse(path, true) -> param
-        }
+            params.contains(Loc.MatchWithoutCurrentValue) => {
+        RewriteResponse(path, true) -> param
+      }
     })
 
     def headMatch: Boolean
@@ -495,23 +522,23 @@ object Menu extends MenuSingleton {
         (op, mp) match {
           case (Nil, Nil) => true
           case (o :: Nil, Nil) => {
-              retParams += o
-              headMatch || !gotStar
-            }
+            retParams += o
+            headMatch || !gotStar
+          }
 
           case (op, Nil) => retParams ++= op; headMatch
           case (Nil, _) => false
           case (o :: _, NormalLocPath(str) :: _) if o != str => false
           case (o :: os, * :: ms) => {
-              gotStar = true
-              retParams += o
-              retPath += *.pathItem
-              doExtract(os, ms)
-            }
+            gotStar = true
+            retParams += o
+            retPath += *.pathItem
+            doExtract(os, ms)
+          }
           case (o :: os, _ :: ms) => {
-              retPath += o
-              doExtract(os, ms)
-            }
+            retPath += o
+            doExtract(os, ms)
+          }
         }
 
       if (doExtract(org, locPath)) {
@@ -529,8 +556,8 @@ object Menu extends MenuSingleton {
     def headMatch: Boolean
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType
-    def buildSlashOne(
-        newPath: List[LocPath], newHead: Boolean): BuiltType with WithSlash
+    def buildSlashOne(newPath: List[LocPath],
+                      newHead: Boolean): BuiltType with WithSlash
   }
 
   trait WithSlash { self: BaseMenuable =>
@@ -567,8 +594,8 @@ object Menu extends MenuSingleton {
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
       new Menuable(name, linkText, newPath, newHead, params, submenus)
-    def buildSlashOne(
-        newPath: List[LocPath], newHead: Boolean): BuiltType with WithSlash =
+    def buildSlashOne(newPath: List[LocPath],
+                      newHead: Boolean): BuiltType with WithSlash =
       new Menuable(name, linkText, newPath, newHead, params, submenus)
       with WithSlash
 
@@ -581,8 +608,12 @@ object Menu extends MenuSingleton {
       * Append a LocParam to the Menu item
       */
     def >>(param: Loc.LocParam[Unit]): Menuable =
-      new Menuable(
-          name, linkText, path, headMatch, params ::: List(param), submenus)
+      new Menuable(name,
+                   linkText,
+                   path,
+                   headMatch,
+                   params ::: List(param),
+                   submenus)
 
     /**
       * Define the submenus of this menu item
@@ -689,21 +720,24 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     Menu(loc, f(kids.toList): _*)
 
   private[sitemap] def validate {
-    _parent.foreach(p =>
+    _parent.foreach(
+        p =>
           if (p.isRoot_?)
             throw new SiteMapException(
                 "Menu items with root location (\"/\") cannot have children"))
     kids.foreach(_.validate)
   }
 
-  private[sitemap] def testParentAccess: Either[
-      Boolean, Box[() => LiftResponse]] = _parent match {
-    case Full(p) => p.testAccess
-    case _ => Left(true)
-  }
+  private[sitemap] def testParentAccess: Either[Boolean,
+                                                Box[() => LiftResponse]] =
+    _parent match {
+      case Full(p) => p.testAccess
+      case _ => Left(true)
+    }
 
-  override private[sitemap] def testAccess: Either[
-      Boolean, Box[() => LiftResponse]] = loc.testAccess
+  override private[sitemap] def testAccess: Either[Boolean,
+                                                   Box[() => LiftResponse]] =
+    loc.testAccess
 
   def toMenu = this
 
@@ -729,7 +763,8 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
 
   def makeMenuItem(path: List[Loc[_]]): Box[MenuItem] =
     loc.buildItem(
-        kids.toList.flatMap(_.makeMenuItem(path)) ::: loc.supplementalKidMenuItems,
+        kids.toList
+          .flatMap(_.makeMenuItem(path)) ::: loc.supplementalKidMenuItems,
         _lastInPath(path),
         _inPath(path))
 
@@ -757,8 +792,9 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
   }
 }
 
-final class ParamLocLink[T](
-    path: List[LocPath], headMatch: Boolean, backToList: T => List[String])
+final class ParamLocLink[T](path: List[LocPath],
+                            headMatch: Boolean,
+                            backToList: T => List[String])
     extends Loc.Link[T](path.map(_.pathItem), headMatch) {
 
   @tailrec

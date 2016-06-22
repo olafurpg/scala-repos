@@ -287,13 +287,13 @@ trait TraitContext[This <: android.content.Context] {
     basis.sendOrderedBroadcast(SIntent[T], p)
 
   @inline
-  def sendOrderedBroadcast[T: ClassTag](p1: java.lang.String,
-                                        p2: android.content.BroadcastReceiver,
-                                        p3: android.os.Handler,
-                                        p4: Int,
-                                        p5: java.lang.String,
-                                        p6: android.os.Bundle)(
-      implicit context: Context): Unit =
+  def sendOrderedBroadcast[T: ClassTag](
+      p1: java.lang.String,
+      p2: android.content.BroadcastReceiver,
+      p3: android.os.Handler,
+      p4: Int,
+      p5: java.lang.String,
+      p6: android.os.Bundle)(implicit context: Context): Unit =
     basis.sendOrderedBroadcast(SIntent[T], p1, p2, p3, p4, p5, p6)
 
   @inline
@@ -427,8 +427,8 @@ object SIntent {
     new Intent(context, mt.runtimeClass)
 
   @inline
-  def apply[T](action: String)(
-      implicit context: Context, mt: ClassTag[T]): Intent =
+  def apply[T](action: String)(implicit context: Context,
+                               mt: ClassTag[T]): Intent =
     SIntent[T].setAction(action)
 }
 
@@ -456,8 +456,9 @@ class RichIntent(val intent: Intent) {
   * [[http://blog.scaloid.org/2013/03/introducing-localservice.html]]
   */
 class LocalServiceConnection[S <: LocalService](
-    bindFlag: Int = Context.BIND_AUTO_CREATE)(
-    implicit ctx: Context, reg: Registerable, mf: ClassTag[S])
+    bindFlag: Int = Context.BIND_AUTO_CREATE)(implicit ctx: Context,
+                                              reg: Registerable,
+                                              mf: ClassTag[S])
     extends ServiceConnection {
   var service: Option[S] = None
   var componentName: ComponentName = _

@@ -6,10 +6,10 @@ import scala.annotation.switch
 
 import scala.scalajs.js
 
-final class Matcher private[regex](private var pattern0: Pattern,
-                                   private var input0: CharSequence,
-                                   private var regionStart0: Int,
-                                   private var regionEnd0: Int)
+final class Matcher private[regex] (private var pattern0: Pattern,
+                                    private var input0: CharSequence,
+                                    private var regionStart0: Int,
+                                    private var regionEnd0: Int)
     extends AnyRef
     with MatchResult {
 
@@ -233,8 +233,8 @@ object Matcher {
     result
   }
 
-  private final class SealedResult(
-      inputstr: String, lastMatch: js.RegExp.ExecResult)
+  private final class SealedResult(inputstr: String,
+                                   lastMatch: js.RegExp.ExecResult)
       extends MatchResult {
 
     def groupCount(): Int = ensureLastMatch.length - 1

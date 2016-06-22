@@ -31,15 +31,15 @@ import scala.collection.mutable.ArrayBuffer
   */
 class MethodImplementationsSearch
     extends QueryExecutor[PsiElement, PsiElement] {
-  override def execute(
-      sourceElement: PsiElement, consumer: Processor[PsiElement]): Boolean = {
+  override def execute(sourceElement: PsiElement,
+                       consumer: Processor[PsiElement]): Boolean = {
     sourceElement match {
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
                                 .getOverridingMethods(namedElement)
              //to avoid duplicates with ScalaOverridingMemberSearcher
              if !namedElement.isInstanceOf[PsiMethod] ||
-             !implementation.isInstanceOf[PsiMethod]) {
+               !implementation.isInstanceOf[PsiMethod]) {
           if (!consumer.process(implementation)) {
             return false
           }
@@ -78,8 +78,8 @@ object ScalaOverridingMemberSearcher {
   def getOverridingMethods(method: ScNamedElement): Array[PsiNamedElement] = {
     val result = new ArrayBuffer[PsiNamedElement]
     inReadAction {
-      for (psiMethod <- ScalaOverridingMemberSearcher.search(
-                           method, deep = true)) {
+      for (psiMethod <- ScalaOverridingMemberSearcher.search(method,
+                                                             deep = true)) {
         result += psiMethod
       }
     }
@@ -125,7 +125,7 @@ object ScalaOverridingMemberSearcher {
               if (!deep) return false
             }
             for (td <- inheritor.typeDefinitions if !td.isObject &&
-                 name == td.name) {
+                   name == td.name) {
               buffer += td
               if (!deep) return false
             }
@@ -149,11 +149,12 @@ object ScalaOverridingMemberSearcher {
               else TypeDefinitionMembers.getSignatures(inheritor)
             val signsIterator = signatures.forName(member.name)._1.iterator
             while (signsIterator.hasNext) {
-              val (
-              t: Signature, node: TypeDefinitionMembers.SignatureNodes.Node) =
+              val (t: Signature,
+                   node: TypeDefinitionMembers.SignatureNodes.Node) =
                 signsIterator.next()
               if (PsiTreeUtil.getParentOfType(
-                      t.namedElement, classOf[PsiClass]) == inheritor) {
+                      t.namedElement,
+                      classOf[PsiClass]) == inheritor) {
                 val supersIterator = node.supers.iterator
                 while (supersIterator.hasNext) {
                   val s = supersIterator.next()
@@ -180,8 +181,8 @@ object ScalaOverridingMemberSearcher {
     }
 
     if (withSelfType) {
-      val inheritors = ScalaStubsUtil.getSelfTypeInheritors(
-          parentClass, parentClass.getResolveScope)
+      val inheritors = ScalaStubsUtil
+        .getSelfTypeInheritors(parentClass, parentClass.getResolveScope)
       break = false
       for (clazz <- inheritors if !break) {
         break = !process(clazz)

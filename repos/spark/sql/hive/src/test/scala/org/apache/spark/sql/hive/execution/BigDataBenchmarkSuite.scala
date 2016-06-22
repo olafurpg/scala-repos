@@ -31,28 +31,28 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
 
   val userVisitPath =
     new File(testDataDirectory, "uservisits").getCanonicalPath
-  val testTables = Seq(
-      TestTable(
-          "rankings", s"""
+  val testTables = Seq(TestTable("rankings", s"""
         |CREATE EXTERNAL TABLE rankings (
         |  pageURL STRING,
         |  pageRank INT,
         |  avgDuration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
         |  STORED AS TEXTFILE LOCATION "${new File(
-                         testDataDirectory, "rankings").getCanonicalPath}"
+                                                testDataDirectory,
+                                                "rankings").getCanonicalPath}"
       """.stripMargin.cmd),
-      TestTable("scratch", s"""
+                       TestTable("scratch", s"""
         |CREATE EXTERNAL TABLE scratch (
         |  pageURL STRING,
         |  pageRank INT,
         |  avgDuration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
         |  STORED AS TEXTFILE LOCATION "${new File(
-                              testDataDirectory, "scratch").getCanonicalPath}"
+                                               testDataDirectory,
+                                               "scratch").getCanonicalPath}"
       """.stripMargin.cmd),
-      TestTable("uservisits",
-                s"""
+                       TestTable("uservisits",
+                                 s"""
         |CREATE EXTERNAL TABLE uservisits (
         |  sourceIP STRING,
         |  destURL STRING,
@@ -66,7 +66,7 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
         |  STORED AS TEXTFILE LOCATION "$userVisitPath"
       """.stripMargin.cmd),
-      TestTable("documents", s"""
+                       TestTable("documents", s"""
         |CREATE EXTERNAL TABLE documents (line STRING)
         |STORED AS TEXTFILE
         |LOCATION "${new File(testDataDirectory, "crawl").getCanonicalPath}"
@@ -79,7 +79,8 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
     ignore("No data files found for BigDataBenchmark tests.") {}
   } else {
     createQueryTest(
-        "query1", "SELECT pageURL, pageRank FROM rankings WHERE pageRank > 1")
+        "query1",
+        "SELECT pageURL, pageRank FROM rankings WHERE pageRank > 1")
 
     createQueryTest(
         "query2",

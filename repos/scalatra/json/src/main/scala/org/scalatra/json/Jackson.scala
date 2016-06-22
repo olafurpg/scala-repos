@@ -18,8 +18,8 @@ trait JacksonJsonSupport
                      jsonFormats.wantsBigDecimal)
   }
 
-  protected def readJsonFromStreamWithCharset(
-      stream: InputStream, charset: String): JValue = {
+  protected def readJsonFromStreamWithCharset(stream: InputStream,
+                                              charset: String): JValue = {
     val rdr = new InputStreamReader(stream, charset)
     if (rdr.ready()) mapper.readValue(rdr, classOf[JValue])
     else {

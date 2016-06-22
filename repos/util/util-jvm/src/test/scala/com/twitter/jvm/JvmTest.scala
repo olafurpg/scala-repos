@@ -118,7 +118,8 @@ class JvmTest extends WordSpec with TestLogging {
           tc.advance(2.minutes)
           jvm.pushGc(gc.copy(count = 12))
           r.run()
-          assert(logLines() == Seq(
+          assert(
+              logLines() == Seq(
                   "Missed 1 collections for pcopy due to sampling",
                   "Missed 8 collections for pcopy due to sampling"
               ))

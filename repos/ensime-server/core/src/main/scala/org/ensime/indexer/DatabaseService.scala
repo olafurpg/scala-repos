@@ -62,8 +62,8 @@ class DatabaseService(dir: File) extends SLF4JLogging {
   // file with last modified time
   def knownFiles(): Future[Seq[FileCheck]] = db.run(fileChecks.result)
 
-  def removeFiles(
-      files: List[FileObject])(implicit ec: ExecutionContext): Future[Int] =
+  def removeFiles(files: List[FileObject])(
+      implicit ec: ExecutionContext): Future[Int] =
     db.run {
       val restrict = files.map(_.getName.getURI)
       // Deletion from fqnSymbols relies on fk cascade delete action
@@ -74,8 +74,8 @@ class DatabaseService(dir: File) extends SLF4JLogging {
     fileChecks.filter(_.filename === filename).take(1)
   }
 
-  def outOfDate(f: FileObject)(
-      implicit vfs: EnsimeVFS, ec: ExecutionContext): Future[Boolean] = {
+  def outOfDate(f: FileObject)(implicit vfs: EnsimeVFS,
+                               ec: ExecutionContext): Future[Boolean] = {
     val uri = f.getName.getURI
     val modified = f.getContent.getLastModifiedTime
 
@@ -175,13 +175,14 @@ object DatabaseService {
     def offset = column[Option[Int]]("offset in source")
     def * =
       (id.?, file, path, fqn, descriptor, internal, source, line, offset) <>
-      (FqnSymbol.tupled, FqnSymbol.unapply)
+        (FqnSymbol.tupled, FqnSymbol.unapply)
     def fqnIdx =
       index("idx_fqn", fqn, unique = false) // fqns are unique by type and sig
     def uniq = index("idx_uniq", (fqn, descriptor, internal), unique = true)
     def filename =
-      foreignKey("filename_fk", file, fileChecks)(
-          _.filename, onDelete = ForeignKeyAction.Cascade)
+      foreignKey("filename_fk", file, fileChecks)(_.filename,
+                                                  onDelete =
+                                                    ForeignKeyAction.Cascade)
   }
   private val fqnSymbols = TableQuery[FqnSymbols]
   private val fqnSymbolsCompiled = Compiled { TableQuery[FqnSymbols] }

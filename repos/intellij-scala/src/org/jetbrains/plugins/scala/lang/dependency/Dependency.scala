@@ -15,8 +15,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 /**
   * Pavel Fatin
   */
-case class Dependency(
-    kind: DependencyKind, source: PsiElement, target: PsiElement, path: Path) {
+case class Dependency(kind: DependencyKind,
+                      source: PsiElement,
+                      target: PsiElement,
+                      path: Path) {
   def isExternal = source.getContainingFile != target.getContainingFile
 
   // It's better to re-bind references rather than to add imports
@@ -59,8 +61,11 @@ object Dependency {
                             target: PsiElement,
                             fromType: Option[ScType]): Option[Dependency] = {
     def withEntity(entity: String) =
-      Some(new Dependency(
-              DependencyKind.Reference, reference, target, Path(entity)))
+      Some(
+          new Dependency(DependencyKind.Reference,
+                         reference,
+                         target,
+                         Path(entity)))
 
     def withMember(entity: String, member: String) =
       Some(
@@ -90,7 +95,7 @@ object Dependency {
           case (function: ScFunctionDefinition) && ContainingClass(
               obj: ScObject)
               if function.isSynthetic || function.name == "apply" ||
-              function.name == "unapply" =>
+                function.name == "unapply" =>
             withEntity(obj.qualifiedName)
           case (member: ScMember) && ContainingClass(obj: ScObject) =>
             val memberName = member match {
@@ -111,7 +116,8 @@ object Dependency {
               if method.getModifierList.hasModifierProperty("static") =>
             withMember(e.qualifiedName, method.getName)
           case (member: PsiMember) && ContainingClass(e: PsiClass) =>
-            fromType.flatMap(it => ScType.extractClass(it, Some(e.getProject))) match {
+            fromType
+              .flatMap(it => ScType.extractClass(it, Some(e.getProject))) match {
               case Some(entity: ScObject) =>
                 val memberName = member match {
                   case named: ScNamedElement => named.name

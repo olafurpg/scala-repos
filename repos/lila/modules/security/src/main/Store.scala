@@ -117,8 +117,10 @@ object Store {
     storeColl
       .find(
           BSONDocument("user" -> userId),
-          BSONDocument(
-              "_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true)
+          BSONDocument("_id" -> false,
+                       "ip" -> true,
+                       "ua" -> true,
+                       "fp" -> true)
       )
       .cursor[Info]()
       .collect[List]()
@@ -130,7 +132,8 @@ object Store {
 
   def dedup(userId: String, keepSessionId: String): Funit =
     storeColl
-      .find(BSONDocument(
+      .find(
+          BSONDocument(
               "user" -> userId,
               "up" -> true
           ))

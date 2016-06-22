@@ -180,8 +180,9 @@ object FilesystemIngestFailureLog {
     }
   }
 
-  case class LogRecord(
-      offset: Long, message: EventMessage, lastKnownGood: YggCheckpoint)
+  case class LogRecord(offset: Long,
+                       message: EventMessage,
+                       lastKnownGood: YggCheckpoint)
   object LogRecord {
     implicit val decomposer: Decomposer[LogRecord] =
       new Decomposer[LogRecord] {
@@ -273,8 +274,9 @@ abstract class KafkaShardIngestActor(
       // the minimum value in the ingest cache is complete, so
       // all pending checkpoints from batches earlier than the
       // specified checkpoint can be flushed
-      logger.debug("BatchComplete insert. Head = %s, completed = %s".format(
-              ingestCache.headOption.map(_._1), checkpoint))
+      logger.debug(
+          "BatchComplete insert. Head = %s, completed = %s"
+            .format(ingestCache.headOption.map(_._1), checkpoint))
       if (ingestCache.headOption.exists(_._1 == checkpoint)) {
         // reset failures count here since this state means that we've made forward progress
         totalConsecutiveFailures = 0
@@ -308,17 +310,22 @@ abstract class KafkaShardIngestActor(
       if (totalConsecutiveFailures < maxConsecutiveFailures) {
         logger.info("Retrying failed ingest")
         for (messages <- ingestCache.get(checkpoint)) {
-          val batchHandler = context.actorOf(Props(new BatchHandler(
-                      self, requestor, checkpoint, ingestTimeout)))
+          val batchHandler = context.actorOf(
+              Props(
+                  new BatchHandler(self,
+                                   requestor,
+                                   checkpoint,
+                                   ingestTimeout)))
           requestor.tell(IngestData(messages), batchHandler)
         }
       } else {
         //logger.error("Halting ingest due to excessive consecutive failures at Kafka offsets: " + ingestCache.keys.map(_.offset).mkString("[", ", ", "]"))
         logger.error(
             "Skipping ingest batch due to excessive consecutive failures at Kafka offsets: " +
-            ingestCache.keys.map(_.offset).mkString("[", ", ", "]"))
-        logger.error("Metadata is consistent up to the lower bound:" +
-            ingestCache.head._1)
+              ingestCache.keys.map(_.offset).mkString("[", ", ", "]"))
+        logger.error(
+            "Metadata is consistent up to the lower bound:" +
+              ingestCache.head._1)
         logger.error(
             "Ingest will continue, but query results may be inconsistent until the problem is resolved.")
         for (messages <- ingestCache.get(checkpoint).toSeq;
@@ -337,8 +344,10 @@ abstract class KafkaShardIngestActor(
       try {
         logger.trace(
             "Responding to GetMessages from %s starting from checkpoint %s. Running batches = %d/%d"
-              .format(
-                requestor, lastCheckpoint, runningBatches.get, maxCacheSize))
+              .format(requestor,
+                      lastCheckpoint,
+                      runningBatches.get,
+                      maxCacheSize))
         if (runningBatches.get < maxCacheSize) {
           // Funky handling of current count due to the fact that any errors will occur within a future
           runningBatches.getAndIncrement
@@ -346,7 +355,7 @@ abstract class KafkaShardIngestActor(
             case Success((messages, checkpoint)) =>
               if (messages.size > 0) {
                 logger.debug("Sending " + messages.size +
-                    " events to batch ingest handler.")
+                      " events to batch ingest handler.")
 
                 // update the cache
                 lastCheckpoint = checkpoint
@@ -354,8 +363,12 @@ abstract class KafkaShardIngestActor(
 
                 // create a handler for the batch, then reply to the sender with the message set
                 // using that handler reference as the sender to which the ingest system will reply
-                val batchHandler = context.actorOf(Props(new BatchHandler(
-                            self, requestor, checkpoint, ingestTimeout)))
+                val batchHandler = context.actorOf(
+                    Props(
+                        new BatchHandler(self,
+                                         requestor,
+                                         checkpoint,
+                                         ingestTimeout)))
                 batchHandler.tell(ProjectionUpdatesExpected(messages.size))
                 requestor.tell(IngestData(messages), batchHandler)
               } else {
@@ -367,7 +380,7 @@ abstract class KafkaShardIngestActor(
 
             case Failure(error) =>
               logger.error("Error(s) occurred retrieving data from Kafka: " +
-                  error.message)
+                    error.message)
               runningBatches.getAndDecrement
               requestor ! IngestErrors(List(
                       "Error(s) retrieving data from Kafka: " + error.message))
@@ -415,17 +428,16 @@ abstract class KafkaShardIngestActor(
           (batch, checkpoint)
 
         case (offset, event @ IngestMessage(_, _, _, records, _, _, _)) :: tail =>
-          val newCheckpoint =
-            if (records.isEmpty) {
-              checkpoint.skipTo(offset)
-            } else {
-              records.foldLeft(checkpoint) {
-                // TODO: This nested pattern match indicates that checkpoints are too closely
-                // coupled to the representation of event IDs.
-                case (acc, IngestRecord(EventId(pid, sid), _)) =>
-                  acc.update(offset, pid, sid)
-              }
+          val newCheckpoint = if (records.isEmpty) {
+            checkpoint.skipTo(offset)
+          } else {
+            records.foldLeft(checkpoint) {
+              // TODO: This nested pattern match indicates that checkpoints are too closely
+              // coupled to the representation of event IDs.
+              case (acc, IngestRecord(EventId(pid, sid), _)) =>
+                acc.update(offset, pid, sid)
             }
+          }
 
           buildBatch(tail, batch :+ (offset, event), newCheckpoint)
 
@@ -445,8 +457,8 @@ abstract class KafkaShardIngestActor(
         case (offset, ar @ ArchiveMessage(_, _, _, EventId(pid, sid), _)) :: tail =>
           // TODO: Where is the authorization checking credentials for the archive done?
           logger.debug(
-              "Singleton batch of ArchiveMessage at offset/id %d/%d".format(
-                  offset, ar.eventId.uid))
+              "Singleton batch of ArchiveMessage at offset/id %d/%d"
+                .format(offset, ar.eventId.uid))
           if (failureLog.checkFailed(ar)) {
             // skip the message and continue without deletion.
             // FIXME: This is very dangerous; once we see these errors, we'll have to do a full reingest
@@ -471,8 +483,8 @@ abstract class KafkaShardIngestActor(
       // and recording the offset
 
       val rawMessages = msTime({ t =>
-        logger.debug("Kafka fetch from %s:%d in %d ms".format(
-                topic, lastCheckpoint.offset, t))
+        logger.debug("Kafka fetch from %s:%d in %d ms"
+              .format(topic, lastCheckpoint.offset, t))
       }) {
         consumer.fetch(req)
       }
@@ -490,8 +502,9 @@ abstract class KafkaShardIngestActor(
           }.toList
         }
 
-      val batched: Validation[
-          Error, Future[(Vector[(Long, EventMessage)], YggCheckpoint)]] =
+      val batched: Validation[Error,
+                              Future[(Vector[(Long, EventMessage)],
+                                      YggCheckpoint)]] =
         eventMessages
           .sequence[({ type λ[α] = Validation[Error, α] })#λ,
                     (Long, EventMessage.EventMessageExtraction)] map {
@@ -516,7 +529,8 @@ abstract class KafkaShardIngestActor(
                 case k @ (apiKey, path) =>
                   // infer write authorities without a timestamp here, because we'll only use this for legacy events
                   //val inferStart = System.currentTimeMillis
-                  permissionsFinder.inferWriteAuthorities(apiKey, path, None) map {
+                  permissionsFinder
+                    .inferWriteAuthorities(apiKey, path, None) map {
                     inferred =>
                       //logger.trace("Write authorities inferred on %s in %d ms".format(k, System.currentTimeMillis - inferStart))
                       k -> inferred
@@ -524,9 +538,10 @@ abstract class KafkaShardIngestActor(
               }
 
             authorityCacheFutures.sequence map { cached =>
-              logger.debug("Computed authorities from %d apiKeys in %d ms"
-                    .format(distinctKeys.size,
-                            System.currentTimeMillis - authoritiesStartTime))
+              logger.debug(
+                  "Computed authorities from %d apiKeys in %d ms".format(
+                      distinctKeys.size,
+                      System.currentTimeMillis - authoritiesStartTime))
               val authorityCache =
                 cached.foldLeft(Map.empty[(APIKey, Path), Authorities]) {
                   case (acc, (k, Some(a))) => acc + (k -> a)

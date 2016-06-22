@@ -29,8 +29,9 @@ trait FileLock {
 class FileLockException(message: String) extends Exception(message)
 
 object FileLock {
-  private case class LockHolder(
-      channel: FileChannel, lock: JFileLock, lockFile: Option[File])
+  private case class LockHolder(channel: FileChannel,
+                                lock: JFileLock,
+                                lockFile: Option[File])
       extends FileLock {
     def release = {
       lock.release
@@ -41,14 +42,13 @@ object FileLock {
   }
 
   def apply(target: File, lockPrefix: String = "LOCKFILE"): FileLock = {
-    val (lockFile, removeFile) =
-      if (target.isDirectory) {
-        val lockFile = new File(target, lockPrefix + ".lock")
-        lockFile.createNewFile
-        (lockFile, true)
-      } else {
-        (target, false)
-      }
+    val (lockFile, removeFile) = if (target.isDirectory) {
+      val lockFile = new File(target, lockPrefix + ".lock")
+      lockFile.createNewFile
+      (lockFile, true)
+    } else {
+      (target, false)
+    }
 
     val channel = new RandomAccessFile(lockFile, "rw").getChannel
     val lock = channel.tryLock

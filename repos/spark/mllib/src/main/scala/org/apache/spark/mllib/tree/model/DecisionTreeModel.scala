@@ -42,8 +42,8 @@ import org.apache.spark.util.Utils
   * @param algo algorithm type -- classification or regression
   */
 @Since("1.0.0")
-class DecisionTreeModel @Since("1.0.0")(
-    @Since("1.0.0") val topNode: Node, @Since("1.0.0") val algo: Algo)
+class DecisionTreeModel @Since("1.0.0")(@Since("1.0.0") val topNode: Node,
+                                        @Since("1.0.0") val algo: Algo)
     extends Serializable
     with Saveable {
 
@@ -162,8 +162,10 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
                          categories: Seq[Double]) {
       // TODO: Change to List once SPARK-3365 is fixed
       def toSplit: Split = {
-        new Split(
-            feature, threshold, FeatureType(featureType), categories.toList)
+        new Split(feature,
+                  threshold,
+                  FeatureType(featureType),
+                  categories.toList)
       }
     }
 
@@ -173,8 +175,10 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       }
 
       def apply(r: Row): SplitData = {
-        SplitData(
-            r.getInt(0), r.getDouble(1), r.getInt(2), r.getAs[Seq[Double]](3))
+        SplitData(r.getInt(0),
+                  r.getDouble(1),
+                  r.getInt(2),
+                  r.getAs[Seq[Double]](3))
       }
     }
 
@@ -237,15 +241,15 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
         if (driverMemory <= memThreshold) {
           logWarning(
               s"$thisClassName.save() was called, but it may fail because of too little" +
-              s" driver memory (${driverMemory}m)." +
-              s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
+                s" driver memory (${driverMemory}m)." +
+                s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
         }
       } else {
         if (sc.executorMemory <= memThreshold) {
           logWarning(
               s"$thisClassName.save() was called, but it may fail because of too little" +
-              s" executor memory (${sc.executorMemory}m)." +
-              s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
+                s" executor memory (${sc.executorMemory}m)." +
+                s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
         }
       }
 
@@ -253,8 +257,8 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       val metadata = compact(
           render(
               ("class" -> thisClassName) ~ ("version" -> thisFormatVersion) ~
-              ("algo" -> model.algo.toString) ~
-              ("numNodes" -> model.numNodes)))
+                ("algo" -> model.algo.toString) ~
+                ("numNodes" -> model.numNodes)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -284,7 +288,7 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       val model = new DecisionTreeModel(trees(0), Algo.fromString(algo))
       assert(model.numNodes == numNodes,
              s"Unable to load DecisionTreeModel data from: $datapath." +
-             s" Expected $numNodes nodes but found ${model.numNodes}")
+               s" Expected $numNodes nodes but found ${model.numNodes}")
       model
     }
 
@@ -326,27 +330,26 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
         return nodes(id)
       }
       val data = dataMap(id)
-      val node =
-        if (data.isLeaf) {
-          Node(data.nodeId, data.predict.toPredict, data.impurity, data.isLeaf)
-        } else {
-          val leftNode = constructNode(data.leftNodeId.get, dataMap, nodes)
-          val rightNode = constructNode(data.rightNodeId.get, dataMap, nodes)
-          val stats = new InformationGainStats(data.infoGain.get,
-                                               data.impurity,
-                                               leftNode.impurity,
-                                               rightNode.impurity,
-                                               leftNode.predict,
-                                               rightNode.predict)
-          new Node(data.nodeId,
-                   data.predict.toPredict,
-                   data.impurity,
-                   data.isLeaf,
-                   data.split.map(_.toSplit),
-                   Some(leftNode),
-                   Some(rightNode),
-                   Some(stats))
-        }
+      val node = if (data.isLeaf) {
+        Node(data.nodeId, data.predict.toPredict, data.impurity, data.isLeaf)
+      } else {
+        val leftNode = constructNode(data.leftNodeId.get, dataMap, nodes)
+        val rightNode = constructNode(data.rightNodeId.get, dataMap, nodes)
+        val stats = new InformationGainStats(data.infoGain.get,
+                                             data.impurity,
+                                             leftNode.impurity,
+                                             rightNode.impurity,
+                                             leftNode.predict,
+                                             rightNode.predict)
+        new Node(data.nodeId,
+                 data.predict.toPredict,
+                 data.impurity,
+                 data.isLeaf,
+                 data.split.map(_.toSplit),
+                 Some(leftNode),
+                 Some(rightNode),
+                 Some(stats))
+      }
       nodes += node.id -> node
       node
     }
@@ -371,8 +374,8 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       case _ =>
         throw new Exception(
             s"DecisionTreeModel.load did not recognize model with (className, format version):" +
-            s"($loadedClassName, $version).  Supported:\n" +
-            s"  ($classNameV1_0, 1.0)")
+              s"($loadedClassName, $version).  Supported:\n" +
+              s"  ($classNameV1_0, 1.0)")
     }
   }
 }

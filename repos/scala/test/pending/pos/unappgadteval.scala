@@ -53,8 +53,8 @@ object Test {
     // found   : (Int) => Int
     // required: a    
     case i @ Suc() => { (y: Int) =>
-        y + 1
-      } // a = Int => Int
+      y + 1
+    } // a = Int => Int
 
     // Next one fails like:
     //
@@ -62,8 +62,8 @@ object Test {
     //     case f @ Lam[b,c](x, e) => { (y: b) => eval(e, env.extend(x, y)) }  // a = b=>c
     //                 ^
     case f @ Lam[b, c](x, e) => { (y: b) =>
-        eval(e, env.extend(x, y))
-      } // a = b=>c
+      eval(e, env.extend(x, y))
+    } // a = b=>c
   }
 
   val f1 = () => eval(v1, anEnv)

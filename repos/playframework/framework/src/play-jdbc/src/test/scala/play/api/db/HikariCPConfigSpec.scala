@@ -31,8 +31,8 @@ class HikariCPConfigSpec extends Specification {
 
       hikariConfig.getDataSourceProperties.getProperty("user") must beEqualTo(
           "user")
-      hikariConfig.getDataSourceProperties.getProperty("password") must beEqualTo(
-          "password")
+      hikariConfig.getDataSourceProperties
+        .getProperty("password") must beEqualTo("password")
     }
 
     "set database url" in new Configs {
@@ -182,8 +182,11 @@ class HikariCPConfigSpec extends Specification {
 }
 
 trait Configs extends Scope {
-  val dbConfig = DatabaseConfig(
-      Some("org.h2.Driver"), Some("jdbc:h2:mem:"), None, None, None)
+  val dbConfig = DatabaseConfig(Some("org.h2.Driver"),
+                                Some("jdbc:h2:mem:"),
+                                None,
+                                None,
+                                None)
   val reference =
     PlayConfig(Configuration.reference).get[PlayConfig]("play.db.prototype")
   def from(props: (String, String)*) =

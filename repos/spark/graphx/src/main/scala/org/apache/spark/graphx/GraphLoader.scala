@@ -59,17 +59,16 @@ object GraphLoader extends Logging {
                    canonicalOrientation: Boolean = false,
                    numEdgePartitions: Int = -1,
                    edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
-                   vertexStorageLevel: StorageLevel =
-                     StorageLevel.MEMORY_ONLY): Graph[Int, Int] = {
+                   vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
+    : Graph[Int, Int] = {
     val startTime = System.currentTimeMillis
 
     // Parse the edge data table directly into edge partitions
-    val lines =
-      if (numEdgePartitions > 0) {
-        sc.textFile(path, numEdgePartitions).coalesce(numEdgePartitions)
-      } else {
-        sc.textFile(path)
-      }
+    val lines = if (numEdgePartitions > 0) {
+      sc.textFile(path, numEdgePartitions).coalesce(numEdgePartitions)
+    } else {
+      sc.textFile(path)
+    }
     val edges = lines.mapPartitionsWithIndex { (pid, iter) =>
       val builder = new EdgePartitionBuilder[Int, Int]
       iter.foreach { line =>
@@ -92,7 +91,8 @@ object GraphLoader extends Logging {
       .setName("GraphLoader.edgeListFile - edges (%s)".format(path))
     edges.count()
 
-    logInfo("It took %d ms to load the edges".format(
+    logInfo(
+        "It took %d ms to load the edges".format(
             System.currentTimeMillis - startTime))
 
     GraphImpl.fromEdgePartitions(edges,

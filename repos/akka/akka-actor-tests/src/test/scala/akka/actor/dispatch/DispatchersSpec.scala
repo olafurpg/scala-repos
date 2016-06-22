@@ -122,7 +122,8 @@ class DispatchersSpec
 
   lazy val allDispatchers: Map[String, MessageDispatcher] = {
     validTypes
-      .map(t ⇒
+      .map(
+          t ⇒
             (t,
              from(ConfigFactory
                    .parseMap(Map(tipe -> t, id -> t).asJava)
@@ -164,7 +165,8 @@ class DispatchersSpec
 
     "throw ConfigurationException if type does not exist" in {
       intercept[ConfigurationException] {
-        from(ConfigFactory
+        from(
+            ConfigFactory
               .parseMap(Map(tipe -> "typedoesntexist",
                             id -> "invalid-dispatcher").asJava)
               .withFallback(defaultDispatcherConfig))
@@ -184,7 +186,8 @@ class DispatchersSpec
     }
 
     "include system name and dispatcher id in thread names for fork-join-executor" in {
-      assertMyDispatcherIsUsed(system.actorOf(
+      assertMyDispatcherIsUsed(
+          system.actorOf(
               Props[ThreadNameEcho].withDispatcher("myapp.mydispatcher")))
     }
 

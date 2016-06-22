@@ -50,8 +50,8 @@ class ThriftClientFinagleServerTest
   val serverAddr = server.boundAddress.asInstanceOf[InetSocketAddress]
 
   val (client, transport) = {
-    val socket = new TSocket(
-        serverAddr.getHostName, serverAddr.getPort, 1000 /*ms*/ )
+    val socket =
+      new TSocket(serverAddr.getHostName, serverAddr.getPort, 1000 /*ms*/ )
     val transport = new TFramedTransport(socket)
     val protocol = new TBinaryProtocol(transport)
     (new B.Client(protocol), transport)

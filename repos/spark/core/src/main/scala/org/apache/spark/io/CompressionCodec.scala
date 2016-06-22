@@ -79,9 +79,10 @@ private[spark] object CompressionCodec {
       case e: ClassNotFoundException => None
       case e: IllegalArgumentException => None
     }
-    codec.getOrElse(throw new IllegalArgumentException(
+    codec.getOrElse(
+        throw new IllegalArgumentException(
             s"Codec [$codecName] is not available. " +
-            s"Consider setting $configKey=$FALLBACK_COMPRESSION_CODEC"))
+              s"Consider setting $configKey=$FALLBACK_COMPRESSION_CODEC"))
   }
 
   /**

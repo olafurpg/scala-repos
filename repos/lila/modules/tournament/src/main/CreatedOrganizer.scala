@@ -5,8 +5,8 @@ import scala.concurrent.duration._
 
 import actorApi._
 
-private[tournament] final class CreatedOrganizer(
-    api: TournamentApi, isOnline: String => Boolean)
+private[tournament] final class CreatedOrganizer(api: TournamentApi,
+                                                 isOnline: String => Boolean)
     extends Actor {
 
   override def preStart {

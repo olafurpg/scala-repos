@@ -13,11 +13,12 @@ import scala.collection.mutable
   * @author Roman.Shein
   * @since 20.03.2015.
   */
-class BuildFileChangeBrowser(val project: Project,
-                             val changes: java.util.List[Change],
-                             val canExcludeChanges: Boolean,
-                             val fileChangesMap: mutable.Map[
-                                 VirtualFile, (BuildFileModifiedStatus, Long)])
+class BuildFileChangeBrowser(
+    val project: Project,
+    val changes: java.util.List[Change],
+    val canExcludeChanges: Boolean,
+    val fileChangesMap: mutable.Map[VirtualFile,
+                                    (BuildFileModifiedStatus, Long)])
     extends ChangesBrowser(project,
                            null,
                            changes,
@@ -64,13 +65,15 @@ class BuildFileChangeBrowser(val project: Project,
     setChangesToDisplay(updatedChanges)
   }
 
-  override protected def showDiffForChanges(
-      changesArray: Array[Change], indexInSelection: Int) {
+  override protected def showDiffForChanges(changesArray: Array[Change],
+                                            indexInSelection: Int) {
     val context: ShowDiffUIContext = new ShowDiffUIContext(false)
-    val changesArraySwapped: Array[Change] = for (change <- changesArray) yield
-      BuildFileChange.swap(change.asInstanceOf[BuildFileChange])
+    val changesArraySwapped: Array[Change] = for (change <- changesArray)
+      yield BuildFileChange.swap(change.asInstanceOf[BuildFileChange])
 
-    ShowDiffAction.showDiffForChange(
-        changesArraySwapped, indexInSelection, myProject, context)
+    ShowDiffAction.showDiffForChange(changesArraySwapped,
+                                     indexInSelection,
+                                     myProject,
+                                     context)
   }
 }

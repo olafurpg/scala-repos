@@ -17,8 +17,9 @@ object CollectionsOnListTest extends CollectionsTestBase {
   // Test: sort[T<:Comparable[T]](List[T])
   def sort_on_comparables(factory: ListFactory): Unit = {
     if (factory.sortableUsingCollections) {
-      test_sort_on_comparables[CustomComparable](
-          factory, new CustomComparable(_), false)
+      test_sort_on_comparables[CustomComparable](factory,
+                                                 new CustomComparable(_),
+                                                 false)
       test_sort_on_comparables[jl.Integer](factory, jl.Integer.valueOf)
       test_sort_on_comparables[jl.Long](factory, _.toLong)
       test_sort_on_comparables[jl.Double](factory, _.toDouble)
@@ -28,22 +29,24 @@ object CollectionsOnListTest extends CollectionsTestBase {
   // Test: sort[T](List[T], Comparator[T])
   def sort_with_comparator(factory: ListFactory): Unit = {
     if (factory.sortableUsingCollections) {
-      test_sort_with_comparator[CustomComparable](
-          factory, new CustomComparable(_), (x, y) => x.compareTo(y), false)
-      test_sort_with_comparator[jl.Integer](
-          factory, _.toInt, (x, y) => x.compareTo(y))
-      test_sort_with_comparator[jl.Long](
-          factory, _.toLong, (x, y) => x.compareTo(y))
-      test_sort_with_comparator[jl.Double](
-          factory, _.toDouble, (x, y) => x.compareTo(y))
+      test_sort_with_comparator[CustomComparable](factory,
+                                                  new CustomComparable(_),
+                                                  (x, y) => x.compareTo(y),
+                                                  false)
+      test_sort_with_comparator[jl.Integer](factory, _.toInt, (x, y) =>
+            x.compareTo(y))
+      test_sort_with_comparator[jl.Long](factory, _.toLong, (x, y) =>
+            x.compareTo(y))
+      test_sort_with_comparator[jl.Double](factory, _.toDouble, (x, y) =>
+            x.compareTo(y))
     }
   }
 
   private def test_sort_on_comparables[
-      T <: AnyRef with Comparable[T]: ClassTag](factory: ListFactory,
-                                                toElem: Int => T,
-                                                absoluteOrder: Boolean =
-                                                  true): Unit = {
+      T <: AnyRef with Comparable[T]: ClassTag](
+      factory: ListFactory,
+      toElem: Int => T,
+      absoluteOrder: Boolean = true): Unit = {
 
     val list = factory.empty[T]
 
@@ -411,8 +414,8 @@ trait CollectionsOnListTest extends CollectionsOnCollectionsTest {
       assertEquals(0, ju.Collections.indexOfSubList(source, target))
 
       source.remove(0)
-      assertEquals(
-          range.size - 1, ju.Collections.indexOfSubList(source, target))
+      assertEquals(range.size - 1,
+                   ju.Collections.indexOfSubList(source, target))
 
       target.add(0, toElem(-5))
       assertEquals(-1, ju.Collections.indexOfSubList(source, target))
@@ -432,23 +435,23 @@ trait CollectionsOnListTest extends CollectionsOnCollectionsTest {
       assertEquals(0, ju.Collections.lastIndexOfSubList(source, target))
 
       source.addAll(range.map(toElem))
-      assertEquals(
-          range.size, ju.Collections.lastIndexOfSubList(source, target))
+      assertEquals(range.size,
+                   ju.Collections.lastIndexOfSubList(source, target))
 
       target.addAll(range.map(toElem))
       assertEquals(0, ju.Collections.lastIndexOfSubList(source, target))
 
       source.addAll(range.map(toElem))
-      assertEquals(
-          range.size, ju.Collections.lastIndexOfSubList(source, target))
+      assertEquals(range.size,
+                   ju.Collections.lastIndexOfSubList(source, target))
 
       source.addAll(range.map(toElem))
-      assertEquals(
-          2 * range.size, ju.Collections.lastIndexOfSubList(source, target))
+      assertEquals(2 * range.size,
+                   ju.Collections.lastIndexOfSubList(source, target))
 
       source.remove(source.size - 1)
-      assertEquals(
-          range.size, ju.Collections.lastIndexOfSubList(source, target))
+      assertEquals(range.size,
+                   ju.Collections.lastIndexOfSubList(source, target))
 
       target.add(0, toElem(-5))
       assertEquals(-1, ju.Collections.lastIndexOfSubList(source, target))

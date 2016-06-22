@@ -83,8 +83,9 @@ case class AckOnEntry(get: Boolean)
 /**
   * Maximum number of elements to execute in a given second per task
   */
-case class MaxExecutePerSecond(
-    lowerBound: Long, upperBound: Long, rampUptimeMS: Long) {
-  require(
-      rampUptimeMS >= 0L, "Ramp up time must greater than or equal to zero")
+case class MaxExecutePerSecond(lowerBound: Long,
+                               upperBound: Long,
+                               rampUptimeMS: Long) {
+  require(rampUptimeMS >= 0L,
+          "Ramp up time must greater than or equal to zero")
 }

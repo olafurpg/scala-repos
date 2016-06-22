@@ -234,7 +234,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     *  @param nnIds The set of ids of values (adjusted so that the lowest value does
     *    not fall below zero), organized as a `BitSet`.
     */
-  class ValueSet private[ValueSet](private[this] var nnIds: immutable.BitSet)
+  class ValueSet private[ValueSet] (private[this] var nnIds: immutable.BitSet)
       extends AbstractSet[Value]
       with immutable.SortedSet[Value]
       with SortedSetLike[Value, ValueSet]
@@ -243,8 +243,8 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     implicit def ordering: Ordering[Value] = ValueOrdering
     def rangeImpl(from: Option[Value], until: Option[Value]): ValueSet =
       new ValueSet(
-          nnIds.rangeImpl(
-              from.map(_.id - bottomId), until.map(_.id - bottomId)))
+          nnIds.rangeImpl(from.map(_.id - bottomId),
+                          until.map(_.id - bottomId)))
 
     override def empty = ValueSet.empty
     def contains(v: Value) = nnIds contains (v.id - bottomId)

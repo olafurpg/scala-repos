@@ -47,8 +47,10 @@ class ColorAdjust(
   /**
     * Creates a new instance of ColorAdjust with the specified hue, saturation, brightness, and contrast.
     */
-  def this(
-      hue: Double, saturation: Double, brightness: Double, contrast: Double) =
+  def this(hue: Double,
+           saturation: Double,
+           brightness: Double,
+           contrast: Double) =
     this(new jfxse.ColorAdjust(hue, saturation, brightness, contrast))
 
   /**

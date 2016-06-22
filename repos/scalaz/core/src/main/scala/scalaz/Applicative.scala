@@ -28,8 +28,8 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   override def map[A, B](fa: F[A])(f: A => B): F[B] =
     ap(fa)(point(f))
 
-  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(
-      f: (A, B) => C): F[C] =
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A,
+                                                             B) => C): F[C] =
     ap2(fa, fb)(point(f))
 
   // impls of sequence, traverse, etc

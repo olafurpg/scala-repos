@@ -80,8 +80,8 @@ trait ProvidesTransformedQuasiMonteCarlo {
     }
   }
 
-  case class GammaQuasiRandomVariableSpecAlphaLeq1(
-      alpha: Double, theta: Double)
+  case class GammaQuasiRandomVariableSpecAlphaLeq1(alpha: Double,
+                                                   theta: Double)
       extends RejectionSampledGammaQuasiRandomVariable {
     /*
      * Uses Algorithm 1 from http://home.iitk.ac.in/~kundu/paper120.pdf.
@@ -110,8 +110,8 @@ trait ProvidesTransformedQuasiMonteCarlo {
     def copy = GammaQuasiRandomVariableSpecAlphaLeq1(alpha, theta)
   }
 
-  case class GammaQuasiRandomVariableSpecAlphaGeq1(
-      alpha: Double, theta: Double)
+  case class GammaQuasiRandomVariableSpecAlphaGeq1(alpha: Double,
+                                                   theta: Double)
       extends RejectionSampledGammaQuasiRandomVariable {
     /*
      * Uses Algorithm 8 from http://arxiv.org/pdf/1403.5599.pdf
@@ -172,16 +172,16 @@ trait ProvidesTransformedQuasiMonteCarlo {
         while ((i < dimension) && accepted) {
           variables(i) match {
             case (v: TransformingQuasiRandomVariableSpec) => {
-                currentValue(i) = v.transform(next, inputPosition)
-              }
+              currentValue(i) = v.transform(next, inputPosition)
+            }
             case (v: RejectionQuasiRandomVariableSpec) => {
-                if (v.accept(next, inputPosition)) {
-                  currentValue(i) = v.compute(next, inputPosition)
-                } else {
-                  rejectedCount(i) = rejectedCount(i) + 1
-                  accepted = false
-                }
+              if (v.accept(next, inputPosition)) {
+                currentValue(i) = v.compute(next, inputPosition)
+              } else {
+                rejectedCount(i) = rejectedCount(i) + 1
+                accepted = false
               }
+            }
           }
           inputPosition = inputPosition + variables(i).numInputs
           i = i + 1
